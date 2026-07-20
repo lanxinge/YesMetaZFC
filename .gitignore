@@ -1,0 +1,12 @@
+/.lake
+/tmp
+/.tmp
+/.codex_tmp
+/.agents
+/.claude
+/.codex
+/knowledge
+/tools
+/*.pdf
+/**/*.pdf
+**/__pycache__/

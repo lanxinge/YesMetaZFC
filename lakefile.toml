@@ -1,0 +1,11 @@
+name = "YesMetaZFC"
+version = "0.1.0"
+defaultTargets = ["YesMetaZFC"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+
+[[lean_lib]]
+name = "YesMetaZFC"
