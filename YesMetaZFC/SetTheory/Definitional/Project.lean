@@ -398,9 +398,7 @@ theorem satisfies_bind
     (formula : Formula 1 sourceDepth) :
     satisfies env (formula.bind substitution) ↔
       satisfies (Definitional.Env.substitute env substitution) formula := by
-  simpa [satisfies] using
-    (Definitional.Semantics.satisfies_bind
-      Semantics.interpretation env substitution formula)
+  simp [satisfies]
 
 theorem satisfies_forallClosure_iff
     {ℳ : Structure.{v}} {depth : Nat}
@@ -462,7 +460,7 @@ theorem satisfies_extensionalEq_iff_eq
   constructor
   · exact hExt.eq_of_same_members _ _
   · intro hEq value
-    simpa [hEq]
+    simp [hEq]
 
 @[deep_rfl 2000] theorem satisfies_subset_iff
     {ℳ : Structure.{v}} {depth : Nat}

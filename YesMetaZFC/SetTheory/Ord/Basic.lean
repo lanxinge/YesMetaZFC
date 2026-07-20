@@ -389,7 +389,7 @@ theorem emptyOrd :
     Definitional.Project.Formula.satisfies_forall_iff,
     Definitional.Project.Formula.satisfies_imp_iff]
   intro empty hEmpty
-  simp only [Definitional.Project.Formula.satisfies_forall_iff,
+  simp only [
     Definitional.Project.Formula.satisfies_neg_iff,
     Definitional.Project.Formula.satisfies_mem_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken] at hEmpty

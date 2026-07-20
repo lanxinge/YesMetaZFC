@@ -116,7 +116,7 @@ theorem evalEnv_boundParameters_zero {ℳ : SetTheory.Structure.{v}}
   rw [SetTheory.Env.mk.injEq]
   constructor
   · funext entry
-    simp [evalEnv, eval, boundParameters, SetTheory.Env.push, Term.eval]
+    simp [evalEnv, eval, boundParameters, Term.eval]
   · rfl
 
 /-- 一个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/

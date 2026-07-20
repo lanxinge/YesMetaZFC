@@ -345,7 +345,6 @@ theorem satisfies_union_iff {ℳ : Structure.{u}}
     Definitional.Project.Formula.satisfies_exists_iff,
     Definitional.Project.Formula.satisfies_existsMem_iff,
     Definitional.Project.Formula.satisfies_iff_iff,
-    Definitional.Project.Formula.satisfies_conj_iff,
     Definitional.Project.Formula.satisfies_mem_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 

@@ -496,7 +496,7 @@ theorem satisfies_searchFormula
           rw [Definitional.Project.Formula.satisfies_atom_extensionalEq_iff]
           simp only [searchFormula,
             Logic.FirstOrder.Formula.satisfies, searchStructureOfSet,
-            List.map_cons, List.map_nil, subsetPredicate_ne_extensionalEq,
+            List.map_cons, List.map_nil,
             ↓reduceIte]
           rw [← eval_searchTerm hEnv (arguments 0),
             ← eval_searchTerm hEnv (arguments 1)]
