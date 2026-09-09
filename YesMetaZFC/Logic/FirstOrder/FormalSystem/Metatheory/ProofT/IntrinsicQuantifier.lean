@@ -177,6 +177,34 @@ theorem bounded_forall_numeral_intro
   simpa only [Formula.openBoundTop_eq_instantiateTop_weakenFree] using
     hTransport
 
+/-- 只替换量词的集合界，主体的当前 binder 保持不变。 -/
+theorem bounded_forall_of_bound_eq
+    {T : SetTheory} {free : SetContext} {Γ : Context signature free}
+    {left right : SetOpenTerm free}
+    {body : SetFormula [SetSort.set] free}
+    (hBound : Γ ⊢ₘ[T] left ≐ₘ right)
+    (hBody : Γ ⊢ₘ[T]
+      Formula.LevyBound.boundedForall set_levy_bound right body) :
+    Γ ⊢ₘ[T] Formula.LevyBound.boundedForall set_levy_bound left body := by
+  let template : SetFormula [SetSort.set] free :=
+    Formula.LevyBound.boundedForall set_levy_bound
+      (.bvar .here) (body.weakenBoundUnderTop SetSort.set)
+  have hAt : Γ ⊢ₘ[T] template.instantiateTop right := by
+    change Γ ⊢ₘ[T]
+      (Formula.LevyBound.boundedForall set_levy_bound
+        ((.bvar .here) : SetTerm [SetSort.set] free)
+        (body.weakenBoundUnderTop SetSort.set)).instantiateTop right
+    rw [Formula.LevyBound.boundedForall_instantiateTop_bvar]
+    exact hBody
+  have hResult := FirstOrder.Derives.eq_subst (body := template)
+    (FirstOrder.Derives.eq_symm hBound) hAt
+  change Γ ⊢ₘ[T]
+    (Formula.LevyBound.boundedForall set_levy_bound
+      ((.bvar .here) : SetTerm [SetSort.set] free)
+      (body.weakenBoundUnderTop SetSort.set)).instantiateTop left at hResult
+  rw [Formula.LevyBound.boundedForall_instantiateTop_bvar] at hResult
+  exact hResult
+
 theorem bounded_forall_elim
     {T : SetTheory}
     {free : SetContext}
@@ -270,73 +298,7 @@ theorem bounded_exists_body_openBoundTop
   congr 2
   congr 1
   congr 2
-  calc
-    (Term.weakenBound SetSort.set bound).substituteMapped
-        (VariableSubstitution.openLastBound
-          (SetSort.set :: prefixContext) SetSort.set)
-        (VariableSubstitution.of_renaming
-          (σ := signature) (bound := SetSort.set :: prefixContext)
-          (sourceFree := free) (targetFree := SetSort.set :: free)
-          (VariableRenaming.weaken SetSort.set)) =
-      (Term.weakenBound SetSort.set bound).substituteMapped
-        (VariableSubstitution.liftBound SetSort.set
-          (VariableSubstitution.openLastBound prefixContext SetSort.set))
-          (VariableSubstitution.weakenBound
-            (σ := signature) (source := free)
-            (targetBound := prefixContext) (targetFree := SetSort.set :: free)
-            SetSort.set
-            (VariableSubstitution.of_renaming
-              (σ := signature) (bound := prefixContext)
-              (sourceFree := free) (targetFree := SetSort.set :: free)
-              (VariableRenaming.weaken SetSort.set))) := by
-              have hOpen :
-                  (VariableSubstitution.openLastBound
-                    (SetSort.set :: prefixContext) SetSort.set :
-                    VariableSubstitution signature
-                      ((SetSort.set :: prefixContext) ++ [SetSort.set])
-                      (SetSort.set :: prefixContext) (SetSort.set :: free)) =
-                (VariableSubstitution.liftBound SetSort.set
-                  (VariableSubstitution.openLastBound
-                    prefixContext SetSort.set) :
-                    VariableSubstitution signature
-                      (SetSort.set :: (prefixContext ++ [SetSort.set]))
-                      (SetSort.set :: prefixContext) (SetSort.set :: free)) :=
-                VariableSubstitution.openLastBound_cons
-                  (σ := signature) (free := free)
-                  SetSort.set prefixContext SetSort.set
-              have hFree :
-                  (VariableSubstitution.of_renaming
-                    (σ := signature) (bound := SetSort.set :: prefixContext)
-                    (VariableRenaming.weaken SetSort.set) :
-                    VariableSubstitution signature free
-                      (SetSort.set :: prefixContext) (SetSort.set :: free)) =
-                (VariableSubstitution.weakenBound
-                  (σ := signature) (source := free)
-                  (targetBound := prefixContext) (targetFree := SetSort.set :: free)
-                  SetSort.set
-                  (VariableSubstitution.of_renaming
-                    (σ := signature) (bound := prefixContext)
-                    (sourceFree := free) (targetFree := SetSort.set :: free)
-                    (VariableRenaming.weaken SetSort.set)) :
-                    VariableSubstitution signature free
-                      (SetSort.set :: prefixContext) (SetSort.set :: free)) :=
-                (VariableSubstitution.weakenBound_of_renaming
-                  (bound := prefixContext)
-                  SetSort.set (VariableRenaming.weaken SetSort.set)).symm
-              rw [hOpen, hFree]
-    _ = (Term.openBoundLast prefixContext SetSort.set bound).weakenBound
-        SetSort.set := by
-      simpa [Term.openBoundLast] using
-        (Term.substituteMapped_weakenBound
-          (σ := signature) (sourceBound := prefixContext ++ [SetSort.set])
-          (sourceFree := free) (targetBound := prefixContext)
-          (targetFree := SetSort.set :: free)
-          SetSort.set
-          (VariableSubstitution.openLastBound prefixContext SetSort.set)
-          (VariableSubstitution.of_renaming
-            (σ := signature) (bound := prefixContext)
-            (sourceFree := free) (targetFree := SetSort.set :: free)
-            (VariableRenaming.weaken SetSort.set)) bound)
+  exact Term.openBoundLast_weakenBound SetSort.set prefixContext SetSort.set bound
 
 /-- 有界存在消去：成员 guard 与公式体统一打开到规范 fresh 槽位。 -/
 theorem bounded_exists_elim

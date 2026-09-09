@@ -54,47 +54,12 @@ mutual
       (term.embedClosed sourceBound sourceFree).substituteMapped
           boundSubstitution freeSubstitution =
         term.embedClosed targetBound targetFree := by
-    exact Term.rec
-      (motive_1 := fun sort term =>
-        ∀ (sourceBound sourceFree targetBound targetFree : SortContext σ)
-          (boundSubstitution :
-            VariableSubstitution σ sourceBound targetBound targetFree)
-          (freeSubstitution :
-            VariableSubstitution σ sourceFree targetBound targetFree),
-          (term.embedClosed sourceBound sourceFree).substituteMapped
-              boundSubstitution freeSubstitution =
-            term.embedClosed targetBound targetFree)
-      (motive_2 := fun sorts arguments =>
-        ∀ (sourceBound sourceFree targetBound targetFree : SortContext σ)
-          (boundSubstitution :
-            VariableSubstitution σ sourceBound targetBound targetFree)
-          (freeSubstitution :
-            VariableSubstitution σ sourceFree targetBound targetFree),
-          (arguments.embedClosed sourceBound sourceFree).substituteMapped
-              boundSubstitution freeSubstitution =
-            arguments.embedClosed targetBound targetFree)
-      (fun entry => nomatch entry)
-      (fun entry => nomatch entry)
-      (fun function arguments ih => by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        simp only [Term.embedClosed, Term.substituteMapped]
-        rw [ih sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution])
-      (by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        rfl)
-      (fun head tail ihHead ihTail => by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        simp only [Arguments.embedClosed, Arguments.substituteMapped]
-        rw [ihHead sourceBound sourceFree targetBound targetFree
-            boundSubstitution freeSubstitution,
-          ihTail sourceBound sourceFree targetBound targetFree
-            boundSubstitution freeSubstitution])
-      term sourceBound sourceFree targetBound targetFree
-        boundSubstitution freeSubstitution
+    match term with
+    | .bvar entry => nomatch entry
+    | .fvar entry => nomatch entry
+    | .app function arguments =>
+        simp only [Term.embedClosed, Term.substituteMapped,
+          Arguments.embedClosed_substituteMapped]
 
   /-- 闭参数列的直接嵌入与任意类型化替换交换。 -/
   @[simp] theorem Arguments.embedClosed_substituteMapped
@@ -109,47 +74,11 @@ mutual
       (arguments.embedClosed sourceBound sourceFree).substituteMapped
           boundSubstitution freeSubstitution =
         arguments.embedClosed targetBound targetFree := by
-    exact Arguments.rec
-      (motive_1 := fun sort term =>
-        ∀ (sourceBound sourceFree targetBound targetFree : SortContext σ)
-          (boundSubstitution :
-            VariableSubstitution σ sourceBound targetBound targetFree)
-          (freeSubstitution :
-            VariableSubstitution σ sourceFree targetBound targetFree),
-          (term.embedClosed sourceBound sourceFree).substituteMapped
-              boundSubstitution freeSubstitution =
-            term.embedClosed targetBound targetFree)
-      (motive_2 := fun sorts arguments =>
-        ∀ (sourceBound sourceFree targetBound targetFree : SortContext σ)
-          (boundSubstitution :
-            VariableSubstitution σ sourceBound targetBound targetFree)
-          (freeSubstitution :
-            VariableSubstitution σ sourceFree targetBound targetFree),
-          (arguments.embedClosed sourceBound sourceFree).substituteMapped
-              boundSubstitution freeSubstitution =
-            arguments.embedClosed targetBound targetFree)
-      (fun entry => nomatch entry)
-      (fun entry => nomatch entry)
-      (fun function arguments ih => by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        simp only [Term.embedClosed, Term.substituteMapped]
-        rw [ih sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution])
-      (by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        rfl)
-      (fun head tail ihHead ihTail => by
-        intro sourceBound sourceFree targetBound targetFree
-          boundSubstitution freeSubstitution
-        simp only [Arguments.embedClosed, Arguments.substituteMapped]
-        rw [ihHead sourceBound sourceFree targetBound targetFree
-            boundSubstitution freeSubstitution,
-          ihTail sourceBound sourceFree targetBound targetFree
-            boundSubstitution freeSubstitution])
-      arguments sourceBound sourceFree targetBound targetFree
-        boundSubstitution freeSubstitution
+    match arguments with
+    | .nil => rfl
+    | .cons head tail =>
+        simp only [Arguments.embedClosed, Arguments.substituteMapped,
+          Term.embedClosed_substituteMapped, Arguments.embedClosed_substituteMapped]
 
 end
 

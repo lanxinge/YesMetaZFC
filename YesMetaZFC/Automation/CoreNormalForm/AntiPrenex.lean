@@ -356,22 +356,7 @@ theorem rewriteOnce?_before_eq {current : Nnf} {step : Step} (hStep : rewriteOnc
   unfold rewriteOnce? at hStep
   induction current generalizing step with
   | trueE | falseE | lit => simp [rewriteOnceAt, rewriteRoot?] at hStep
-  | conj left right ihLeft ihRight =>
-      rw [rewriteOnceAt] at hStep
-      simp only [rewriteRoot?] at hStep
-      cases hLeft : rewriteOnceAt [PathStep.left] left with
-      | some child =>
-          simp [hLeft] at hStep
-          subst step
-          rfl
-      | none =>
-          simp [hLeft] at hStep
-          cases hRight : rewriteOnceAt [PathStep.right] right with
-          | some child =>
-              simp [hRight] at hStep
-              subst step
-              rfl
-          | none => simp [hRight] at hStep
+  | conj left right ihLeft ihRight
   | disj left right ihLeft ihRight =>
       rw [rewriteOnceAt] at hStep
       simp only [rewriteRoot?] at hStep

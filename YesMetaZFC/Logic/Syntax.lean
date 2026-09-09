@@ -250,6 +250,18 @@ inductive Arguments (σ : Signature.{u, v, w})
 
 end
 
+/-- 只沿参数列归纳；各头项的性质可直接复用既有项定理。 -/
+@[elab_as_elim] theorem Arguments.listRec {σ : Signature.{u, v, w}}
+    {bound free : SortContext σ}
+    {motive : {sorts : List σ.SortSymbol} → Arguments σ bound free sorts → Prop}
+    (nil : motive .nil)
+    (cons : ∀ {sort sorts} (head : Term σ bound free sort)
+      (tail : Arguments σ bound free sorts),
+      motive tail → motive (.cons head tail)) :
+    ∀ {sorts} (arguments : Arguments σ bound free sorts), motive arguments
+  | _, .nil => nil
+  | _, .cons head tail => cons head tail (Arguments.listRec nil cons tail)
+
 /-- 内在排序且内在作用域正确的一阶公式。 -/
 inductive Formula (σ : Signature.{u, v, w}) :
     SortContext σ → SortContext σ → Type (max u v w) where

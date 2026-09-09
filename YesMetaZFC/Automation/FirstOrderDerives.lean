@@ -265,28 +265,62 @@ private partial def saturate_conj_facts (state : ReplayState) (fuel : Nat) : Met
     saturate_conj_facts next (fuel - 1)
   else
     return next
-private partial def discharge_context_prefix? (_config : TypedView.Config) (theory : Expr) (targetContext resourceContext formula proof : Expr)
-    (fuel : Nat := 64) :
+/-- 目标上下文增加有限前缀时，逐层复用核的弱化规则。 -/
+private partial def weaken_context_prefix? (config : TypedView.Config)
+    (theory targetContext resourceContext formula proof : Expr) (fuel : Nat := 64) :
+    MetaM (Option RawFact) := do
+  if ← same_expression resourceContext targetContext then
+    return some { formula, proof }
+  if fuel == 0 then return none
+  let targetContext ← whnf (← instantiateMVars targetContext)
+  unless targetContext.isAppOfArity ``List.cons 3 do return none
+  let arguments := targetContext.getAppArgs
+  let antecedent := arguments[1]!
+  let tail := arguments[2]!
+  let some fact ← weaken_context_prefix? config theory tail resourceContext formula proof (fuel - 1)
+    | return none
+  let proof ← mkAppOptM ``Logic.FirstOrder.Derives.context_weaken_cons
+    #[some config.signature, some theory, some config.free, some tail,
+      some antecedent, some formula, some fact.proof]
+  return some { formula, proof }
+
+/-- 资源带有额外假设时，先消去最外层，再递归处理其余前缀。 -/
+private partial def discharge_context_prefix? (config : TypedView.Config) (theory : Expr)
+    (targetContext resourceContext formula proof : Expr) (fuel : Nat := 64) :
     MetaM (Option RawFact) := do
   let resourceContext ← whnf (← instantiateMVars resourceContext)
   if ← same_expression resourceContext targetContext then
     return some { formula, proof }
-  if fuel == 0 then
-    return none
-  unless resourceContext.isAppOfArity ``List.cons 3 do
-    return none
+  if fuel == 0 then return none
+  unless resourceContext.isAppOfArity ``List.cons 3 do return none
   let arguments := resourceContext.getAppArgs
   let antecedent := arguments[1]!
   let tail := arguments[2]!
-  let some fact ←
-      discharge_context_prefix?
-        _config theory targetContext tail formula proof (fuel - 1)
-    | return none
-  let nextFormula ←
-    mkAppM ``Logic.FirstOrder.Formula.imp #[antecedent, fact.formula]
-  let nextProof ←
-    mkAppM ``Logic.FirstOrder.Derives.imp_intro #[fact.proof]
-  return some { formula := nextFormula, proof := nextProof }
+  let nextFormula ← mkAppM ``Logic.FirstOrder.Formula.imp #[antecedent, formula]
+  let nextProof ← mkAppM ``Logic.FirstOrder.Derives.imp_intro #[proof]
+  discharge_context_prefix? config theory targetContext tail nextFormula nextProof (fuel - 1)
+
+/-- 当前上下文本身也是局部证明资源；不要求上层重复声明 assumption。 -/
+private partial def context_facts (config : TypedView.Config) (theory context : Expr)
+    (fuel : Nat := 64) : MetaM (Array RawFact) := do
+  if fuel == 0 then return #[]
+  let context ← whnf (← instantiateMVars context)
+  unless context.isAppOfArity ``List.cons 3 do return #[]
+  let arguments := context.getAppArgs
+  let head := arguments[1]!
+  let tail := arguments[2]!
+  let membership ← mkAppOptM ``List.Mem.head #[none, some head, some tail]
+  let proof ← mkAppOptM ``Logic.FirstOrder.Derives.assumption
+    #[some config.signature, some theory, some config.free, some context,
+      some head, some membership]
+  let mut facts : Array RawFact := #[{ formula := head, proof }]
+  for fact in ← context_facts config theory tail (fuel - 1) do
+    let proof ← mkAppOptM ``Logic.FirstOrder.Derives.context_weaken_cons
+      #[some config.signature, some theory, some config.free, some tail,
+        some head, some fact.formula, some fact.proof]
+    facts := facts.push { fact with proof }
+  return facts
+
 private def resource_fact? (config : TypedView.Config) (theory context : Expr) (resource : FVarId) :
     MetaM (Option RawFact) := do
   let proposition ← instantiateMVars (← resource.getType)
@@ -294,11 +328,13 @@ private def resource_fact? (config : TypedView.Config) (theory context : Expr) (
     | return none
   unless ← same_expression view.theory theory do
     return none
-  discharge_context_prefix?
-    config theory context view.context view.formula (mkFVar resource)
+  if let some fact ← weaken_context_prefix?
+      config theory context view.context view.formula (mkFVar resource) then
+    return some fact
+  discharge_context_prefix? config theory context view.context view.formula (mkFVar resource)
 private def collect_facts (config : TypedView.Config) (theory context : Expr) (resources : Array FVarId) :
     MetaM (Array RawFact) := do
-  let mut facts := #[]
+  let mut facts ← context_facts config theory context
   for resource in resources do
     if let some fact ←
         resource_fact? config theory context resource then
@@ -454,7 +490,9 @@ mutual
         "derive equality sameTerms=true"
       if let some proof ← attempt_proof do
           let reflexive ←
-            mkAppM ``Logic.FirstOrder.Derives.eq_refl #[term]
+            mkAppOptM ``Logic.FirstOrder.Derives.eq_refl
+              #[some state.config.signature, some state.theory, some state.config.free,
+                some state.context, none, some term]
           return some (← cast_derives hFormula reflexive) then
         trace[YesMetaZFC.proveAuto.firstOrderDerives]
           "derive equality proof accepted"
@@ -618,7 +656,13 @@ mutual
       MetaM (Option Expr) := do
     if fuel == 0 then
       return none
-    for fact in state.facts do
+    -- 合取投影和析取分支先于蕴含前件搜索，防止重复探索尚未拆开的分支。
+    let decomposable (fact : Fact) := match fact.node.shell with
+      | .conj .. | .disj .. => true
+      | _ => false
+    let orderedFacts := state.facts.filter decomposable ++
+      state.facts.filter (fun fact => !decomposable fact)
+    for fact in orderedFacts do
       match fact.node.shell with
       | .conj left right =>
           if let some proof ← attempt_proof do
@@ -723,8 +767,9 @@ mutual
         derive_false? state (fuel - 1) allowClassical active then
       if let some proof ← attempt_proof do
           return some <|
-            ← mkAppM ``Logic.FirstOrder.Derives.falsum_elim
-              #[contradiction] then
+            ← mkAppOptM ``Logic.FirstOrder.Derives.falsum_elim
+              #[some state.config.signature, some state.theory, some state.config.free,
+                some state.context, some formula.raw, some contradiction] then
         return some proof
     unless allowClassical do
       return none
@@ -860,6 +905,16 @@ mutual
           pure ()
     return none
 end
+/-- 先寻找短重放，再逐步增加深度；总上限仍由原有 maxFuel 控制。 -/
+private def derive_progressively? (state : ReplayState) (formula : FormulaNode)
+    (maxFuel : Nat) : MetaM (Option Expr) := do
+  let mut fuel := min 4 maxFuel
+  repeat
+    if let some proof ← derive_formula? state formula fuel false then return some proof
+    if let some proof ← derive_formula? state formula fuel then return some proof
+    if fuel == maxFuel then return none
+    fuel := min maxFuel (fuel * 2)
+
 /--
 尝试闭合一个 `Derives T Γ φ` 命题模式目标。
 返回 `false` 表示目标不是 `Derives`，或当前有界命题重放未找到证明；调用方可以继续
@@ -905,7 +960,7 @@ unsafe def try_close (goal : MVarId) (resources : Array FVarId) (mode : SearchMo
     "start phase=local; target={view.formula}; \
     resources={resources.size}; facts={resourceFacts.size}; \
     variables={objectVariables.size}; fuel={fuel}; maxFacts={maxFacts}"
-  let mut proof? ← derive_formula? resourceState targetNode fuel
+  let mut proof? ← derive_progressively? resourceState targetNode fuel
   if proof?.isNone && mode == .withTheory then
     let mut rawFacts := resourceRawFacts
     for fact in ←
@@ -927,7 +982,7 @@ unsafe def try_close (goal : MVarId) (resources : Array FVarId) (mode : SearchMo
       objectVariables
       facts
     }
-    let directProof? ← derive_formula? state targetNode fuel
+    let directProof? ← derive_progressively? state targetNode fuel
     proof? ←
       match directProof? with
       | some proof =>
@@ -941,7 +996,7 @@ unsafe def try_close (goal : MVarId) (resources : Array FVarId) (mode : SearchMo
           else
             trace[YesMetaZFC.proveAuto.firstOrderDerives]
               "retry after forall saturation; facts={saturatedState.facts.size}"
-            derive_formula? saturatedState targetNode fuel
+            derive_progressively? saturatedState targetNode fuel
   let some proof := proof?
     | trace[YesMetaZFC.proveAuto.firstOrderDerives]
         "no proof found for {view.formula}"
@@ -965,7 +1020,7 @@ unsafe def try_close (goal : MVarId) (resources : Array FVarId) (mode : SearchMo
 private def local_proof_resources : MetaM (Array FVarId) := do
   let mut resources := #[]
   for declaration in (← getLCtx) do
-    if declaration.isLet || declaration.isImplementationDetail ||
+    if declaration.isImplementationDetail ||
         declaration.isAuxDecl || declaration.binderInfo.isInstImplicit then
       continue
     let proposition ← instantiateMVars declaration.type

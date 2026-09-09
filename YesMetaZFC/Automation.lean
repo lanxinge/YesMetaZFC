@@ -88,8 +88,8 @@ sort 保持、source 解释保持以及 FOOL/lambda 与外延合同保持。
 checked HO-AVATAR DAG 后端出口。
 `Automation.AvatarSplit` 放置搜索层与 DAG checker 共用的 component partition 核心。
 `Automation.Avatar` 放置常驻 CDCL 与 guarded first-order saturation 的双核协调器。
-`Automation.AvatarSoundness` 保留旧 fixed-bound-stack AVATAR 数学层，供尚未迁移的
-FO/HO 消费者继续使用；新的 typed DAG replay 不再从该层复制桥接证明。
+AVATAR 数学层统一由 `DAGCertificate.IntrinsicReplay.Avatar` 与
+`AvatarSemantics` 提供；旧的空兼容入口已移除。
 `Automation.DAGCertificate.AvatarRegistry` 复算 selector registry 的有限结构合同；
 `Automation.DAGCertificate.IntrinsicReplay.AvatarSemantics` 在统一 free registry 下提供
 component/split 语义，并由 `HostRules` 直接消费 AVATAR 后端出口。

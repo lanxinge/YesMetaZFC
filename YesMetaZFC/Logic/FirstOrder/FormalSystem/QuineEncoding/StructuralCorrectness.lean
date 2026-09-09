@@ -1,3 +1,5 @@
+import YesMetaZFC.Logic.FirstOrder.Derivation.QuantifierBlock
+import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Algebra
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.FormalSystem
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.DefinitionContracts
 
@@ -321,202 +323,24 @@ theorem three_free_substitution_beta
           (VariableSubstitution.cons second
             (VariableSubstitution.cons third
               VariableSubstitution.empty))) body := by
-  change
-    Formula.substitute (Substitution.instantiateFreeTop first)
-      (Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop second)))
-        (Formula.substitute
-          (Substitution.free_map
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.liftFree SetSort.set
-                (VariableSubstitution.instantiateFreeTop third))))
-          body)) =
-    Formula.substitute
-      (Substitution.free_map
-        (VariableSubstitution.cons first
-          (VariableSubstitution.cons second
-            (VariableSubstitution.cons third
-              VariableSubstitution.empty)))) body
-  rw [Formula.substitute_comp, Formula.substitute_comp]
-  simp only [Substitution.comp, Substitution.instantiateFreeTop,
-    Substitution.free_map]
+  change ((body.substituteFree _).substituteFree _).substituteFree _ = _
+  rw [Formula.substituteFree_comp, Formula.substituteFree_comp]
   congr 1
-  change Substitution.map _ _ = Substitution.map _ _
-  congr
   funext resultSort entry
   cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, VariableSubstitution.liftFree,
-        VariableSubstitution.instantiateFreeTop,
-        VariableSubstitution.boundId,
-        Term.substituteMapped, Term.weakenFree, Term.rename,
-        Renaming.weakenFree, Renaming.free]
-  | there previous =>
-      cases resultSort
-      cases previous with
+  | here => rfl
+  | there entry =>
+    cases entry with
+    | here =>
+      exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
+    | there entry =>
+      cases entry with
       | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there next =>
-          cases next with
-          | here =>
-              simp [ VariableSubstitution.cons, VariableSubstitution.liftFree,
-                VariableSubstitution.instantiateFreeTop,
-                VariableSubstitution.boundId, Term.substituteMapped,
-                Term.weakenFree, Term.rename, Renaming.weakenFree,
-                Renaming.free]
-              let ρ : VariableSubstitution signature
-                  [SetSort.set, SetSort.set] [] [] :=
-                fun {sort} entry =>
-                  Term.substituteMapped
-                    VariableSubstitution.boundId
-                    (VariableSubstitution.instantiateFreeTop first)
-                    (VariableSubstitution.liftFree SetSort.set
-                      (VariableSubstitution.instantiateFreeTop second) entry)
-              have hρ :
-                  (ρ : ∀ {sort : signature.SortSymbol},
-                    Variable [SetSort.set, SetSort.set] sort →
-                      Term signature [] [] sort) =
-                    (VariableSubstitution.cons (sort := SetSort.set) first
-                      (VariableSubstitution.cons (sort := SetSort.set) second
-                        (VariableSubstitution.empty :
-                          VariableSubstitution signature [] [] [])) :
-                      VariableSubstitution signature
-                        [SetSort.set, SetSort.set] [] []) := by
-                funext resultSort entry
-                cases entry with
-                | here =>
-                    rfl
-                | there previous =>
-                    cases previous with
-                    | here =>
-                        simpa [ρ, VariableSubstitution.cons,
-                          VariableSubstitution.empty,
-                          VariableSubstitution.liftFree,
-                          VariableSubstitution.instantiateFreeTop,
-                          Term.substituteMapped, Term.weakenFree,
-                          Term.rename, Renaming.weakenFree, Renaming.free,
-                          Term.renameMapped] using
-                          (Term.substituteMapped_weakenFree_instantiateFreeTop
-                            (σ := signature) SetSort.set first second)
-                    | there impossible =>
-                        cases impossible
-              change
-                Term.substituteMapped
-                    VariableSubstitution.boundId
-                    ρ
-                    (Term.renameMapped
-                      (VariableRenaming.comp
-                        (outer := (@VariableRenaming.id signature.SortSymbol []))
-                        (inner := (@VariableRenaming.id signature.SortSymbol [])))
-                      (VariableRenaming.comp
-                        (outer := VariableRenaming.weaken SetSort.set)
-                        (inner := VariableRenaming.weaken SetSort.set))
-                      third) = third
-              rw [hρ]
-              change
-                Term.substituteMapped
-                    VariableSubstitution.boundId
-                    (VariableSubstitution.cons first
-                      (VariableSubstitution.cons second
-                        (VariableSubstitution.empty :
-                          VariableSubstitution signature [] [] [])))
-                    (Term.renameMapped
-                      (VariableRenaming.comp
-                        (outer := (@VariableRenaming.id signature.SortSymbol []))
-                        (inner := (@VariableRenaming.id signature.SortSymbol [])))
-                      (VariableRenaming.comp
-                        (outer := VariableRenaming.weaken SetSort.set)
-                        (inner := VariableRenaming.weaken SetSort.set))
-                      third) = third
-              have hBound :
-                  (VariableRenaming.comp
-                    (outer := (@VariableRenaming.id signature.SortSymbol []))
-                    (inner := (@VariableRenaming.id signature.SortSymbol [])) :
-                      VariableRenaming (S := signature.SortSymbol) [] []) =
-                    (@VariableRenaming.id signature.SortSymbol []) := by
-                funext resultSort entry
-                cases entry
-              rw [hBound]
-              rw [Term.renameMapped_two_weakenFree]
-              have hClosed :
-                  ∀ {resultSort : signature.SortSymbol}
-                    (term : Term signature [] [] resultSort),
-                    Term.substituteMapped
-                        VariableSubstitution.boundId
-                        (VariableSubstitution.cons first
-                          (VariableSubstitution.cons second
-                            (VariableSubstitution.empty :
-                              VariableSubstitution signature [] [] [])))
-                        ((term.weakenFree SetSort.set).weakenFree SetSort.set) =
-                      term := by
-                intro resultSort term
-                exact Term.rec
-                  (motive_1 := fun _ term =>
-                    Term.substituteMapped
-                        VariableSubstitution.boundId
-                        (VariableSubstitution.cons first
-                          (VariableSubstitution.cons second
-                            (VariableSubstitution.empty :
-                              VariableSubstitution signature [] [] [])))
-                        ((term.weakenFree SetSort.set).weakenFree SetSort.set) =
-                      term)
-                  (motive_2 := fun _ arguments =>
-                    Arguments.substituteMapped
-                        VariableSubstitution.boundId
-                        (VariableSubstitution.cons first
-                          (VariableSubstitution.cons second
-                            (VariableSubstitution.empty :
-                              VariableSubstitution signature [] [] [])))
-                        ((arguments.weakenFree SetSort.set).weakenFree SetSort.set) =
-                      arguments)
-                  (fun entry => by
-                    cases entry)
-                  (fun entry => by
-                    cases entry)
-                  (fun function arguments ih => by
-                    change
-                      Term.app function
-                          (Arguments.substituteMapped
-                            VariableSubstitution.boundId
-                            (VariableSubstitution.cons first
-                              (VariableSubstitution.cons second
-                                (VariableSubstitution.empty :
-                                  VariableSubstitution signature [] [] [])))
-                            ((arguments.weakenFree SetSort.set).weakenFree
-                              SetSort.set)) =
-                        Term.app function arguments
-                    rw [ih])
-                  rfl
-                  (fun head tail ihHead ihTail => by
-                    change
-                      Arguments.cons
-                          (Term.substituteMapped
-                            VariableSubstitution.boundId
-                            (VariableSubstitution.cons first
-                              (VariableSubstitution.cons second
-                                (VariableSubstitution.empty :
-                                  VariableSubstitution signature [] [] [])))
-                            ((head.weakenFree SetSort.set).weakenFree
-                              SetSort.set))
-                          (Arguments.substituteMapped
-                            VariableSubstitution.boundId
-                            (VariableSubstitution.cons first
-                              (VariableSubstitution.cons second
-                                (VariableSubstitution.empty :
-                                  VariableSubstitution signature [] [] [])))
-                            ((tail.weakenFree SetSort.set).weakenFree
-                              SetSort.set)) =
-                        Arguments.cons head tail
-                    rw [ihHead, ihTail])
-                  term
-              exact hClosed third
-          | there impossible =>
-              cases impossible
+        simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
+          VariableSubstitution.instantiateFreeTop,
+          Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+          VariableSubstitution.cons]
+      | there entry => exact nomatch entry
 
 theorem gq_closed_three_weaken_substitute
     (τ : VariableSubstitution signature
@@ -527,42 +351,7 @@ theorem gq_closed_three_weaken_substitute
         (((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
           SetSort.set) =
       term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        term)
-    (motive_2 := fun _ arguments =>
-      Arguments.substituteMapped VariableSubstitution.boundId τ
-          (((arguments.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        arguments)
-    (fun entry => by
-      cases entry)
-    (fun entry => by
-      cases entry)
-    (fun function arguments ih => by
-      change
-        Term.app function
-            (Arguments.substituteMapped VariableSubstitution.boundId τ
-              (((arguments.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-                SetSort.set)) =
-          Term.app function arguments
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change
-        Arguments.cons
-            (Term.substituteMapped VariableSubstitution.boundId τ
-              (((head.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-                SetSort.set))
-            (Arguments.substituteMapped VariableSubstitution.boundId τ
-              (((tail.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-                SetSort.set)) =
-          Arguments.cons head tail
-      rw [ihHead, ihTail])
-    term
+  simp only [Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree]
 
 private theorem term_list_code_cons_condition_intro
     (depth length code previousLength head tail : SetOpenTerm [])
@@ -584,74 +373,13 @@ private theorem term_list_code_cons_condition_intro
     ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
       term_list_code_cons_condition depth length code := by
   unfold term_list_code_cons_condition
-  apply FirstOrder.Derives.exists_intro tail
-  rw [Formula.instantiateTop_abstractFreeTop,
-    Formula.instantiateFreeTop_existsFreeTop]
-  apply FirstOrder.Derives.exists_intro head
-  rw [Formula.substituteFree_existsFreeTop]
-  rw [Formula.instantiateTop_abstractFreeTop,
-    Formula.instantiateFreeTop_existsFreeTop]
-  apply FirstOrder.Derives.exists_intro previousLength
-  rw [Formula.instantiateTop_abstractFreeTop]
-  rw [three_free_substitution_beta]
-  simp only [ Formula.substituteFree]
-  let τ : VariableSubstitution signature
-      [SetSort.set, SetSort.set, SetSort.set] [] [] :=
-    VariableSubstitution.cons previousLength
-      (VariableSubstitution.cons head
-        (VariableSubstitution.cons tail VariableSubstitution.empty))
-  have hLengthClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three length) =
-        length :=
-    by
-      change
-        Term.substituteMapped VariableSubstitution.boundId τ
-            (((length.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set) =
-          length
-      exact gq_closed_three_weaken_substitute τ length
-  have hDepthClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three depth) =
-        depth :=
-    by
-      change
-        Term.substituteMapped VariableSubstitution.boundId τ
-            (((depth.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set) =
-          depth
-      exact gq_closed_three_weaken_substitute τ depth
-  have hCodeClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three code) =
-        code :=
-    by
-      change
-        Term.substituteMapped VariableSubstitution.boundId τ
-            (((code.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set) =
-          code
-      exact gq_closed_three_weaken_substitute τ code
-  simpa [Formula.instantiateFreeTop, Formula.substituteFree,
-    Substitution.free_map, Substitution.instantiateFreeTop,
-    Formula.substitute, Formula.substitute_comp,
-    Formula.substituteMapped, Substitution.comp,
-    Term.substituteFree, Term.substitute, Term.substituteMapped,
-    Arguments.substituteMapped, VariableSubstitution.liftFree,
-    VariableSubstitution.instantiateFreeTop,
-    VariableSubstitution.weakenBound,
-    VariableSubstitution.boundId, VariableSubstitution.freeId,
-    Term.substituteMapped_weakenFree_instantiateFreeTop,
-    Arguments.substituteMapped_weakenFree_instantiateFreeTop,
-    Term.substituteMapped_weakenFree_boundId,
-    Arguments.substituteMapped_weakenFree_boundId,
-    Term.weakenFree, Term.rename, Renaming.weakenFree, Renaming.free,
-    Term.renameMapped, VariableRenaming.weaken,
-    VariableRenaming.comp, VariableRenaming.id,
-    VariableSubstitution.cons,
-    VariableSubstitution.empty, τ, hLengthClosed, hDepthClosed,
-    hCodeClosed] using
+  apply FirstOrder.Derives.existsFreePrefix_intro
+    (.cons previousLength (.cons head (.cons tail .nil)))
+  simpa [Arguments.substitutionWith, Formula.substituteFree, Formula.substitute,
+    Substitution.free_map, Formula.substituteMapped, Term.substituteMapped,
+    Arguments.substituteMapped, VariableSubstitution.cons, VariableSubstitution.freeId,
+    Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+    structural_raw_node_code_term, godel_pairing_term, term_weaken_free_three] using
     FirstOrder.Derives.conj_intro
       (FirstOrder.Derives.conj_intro hPreviousLength hLength)
       (FirstOrder.Derives.conj_intro
@@ -674,106 +402,17 @@ private theorem term_code_application_condition_intro
     ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
       term_code_application_condition depth code := by
   unfold term_code_application_condition
-  apply FirstOrder.Derives.exists_intro arity
-  rw [Formula.instantiateTop_abstractFreeTop,
-    Formula.instantiateFreeTop_existsFreeTop]
-  apply FirstOrder.Derives.exists_intro symbol
-  rw [Formula.substituteFree_existsFreeTop]
-  rw [Formula.instantiateTop_abstractFreeTop,
-    Formula.instantiateFreeTop_existsFreeTop]
-  apply FirstOrder.Derives.exists_intro arguments
-  rw [Formula.instantiateTop_abstractFreeTop]
-  rw [three_free_substitution_beta]
-  simp only [ Formula.substituteFree]
-  let τ : VariableSubstitution signature
-      [SetSort.set, SetSort.set, SetSort.set] [] [] :=
-    VariableSubstitution.cons arguments
-      (VariableSubstitution.cons symbol
-        (VariableSubstitution.cons arity VariableSubstitution.empty))
-  have hDepthClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three depth) =
-        depth := by
-    change
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((depth.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        depth
-    exact gq_closed_three_weaken_substitute τ depth
-  have hCodeClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three code) =
-        code := by
-    change
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((code.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        code
-    exact gq_closed_three_weaken_substitute τ code
-  have hArityClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three arity) =
-        arity := by
-    change
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((arity.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        arity
-    exact gq_closed_three_weaken_substitute τ arity
-  have hSymbolClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three symbol) =
-        symbol := by
-    change
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((symbol.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        symbol
-    exact gq_closed_three_weaken_substitute τ symbol
-  have hArgumentsClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three arguments) =
-        arguments := by
-    change
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (((arguments.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set) =
-        arguments
-    exact gq_closed_three_weaken_substitute τ arguments
-  have hAppCodeClosed :
-      Term.substituteMapped VariableSubstitution.boundId τ
-          (term_weaken_free_three
-            (app_codeₘ(arity, symbol, arguments) : SetOpenTerm [])) =
-        app_codeₘ(arity, symbol, arguments) :=
-    gq_closed_three_weaken_substitute τ
-      (app_codeₘ(arity, symbol, arguments) : SetOpenTerm [])
-  let body : SetOpenFormula
-      [SetSort.set, SetSort.set, SetSort.set] :=
-    ((.fvar (.there (.there .here)) ∈ₘ ωₘ) ∧ₘ
-      (.fvar (.there .here) ∈ₘ ωₘ)) ∧ₘ
-        (term_list_code_atₘ(
-            term_weaken_free_three depth,
-            .fvar (.there (.there .here)), .fvar .here) ∧ₘ
-          (term_weaken_free_three code ≐ₘ
-            app_codeₘ(.fvar (.there (.there .here)),
-              .fvar (.there .here), .fvar .here)))
-  change ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-    Formula.substitute (Substitution.free_map τ) body
-  have hBody :
-      Formula.substitute (Substitution.free_map τ) body =
-        ((arity ∈ₘ ωₘ) ∧ₘ (symbol ∈ₘ ωₘ)) ∧ₘ
-          (term_list_code_atₘ(depth, arity, arguments) ∧ₘ
-            (code ≐ₘ app_codeₘ(arity, symbol, arguments))) := by
-    simp [body, Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
-      Arguments.substituteMapped,
-      structural_list_code_term, application_code_term,
-      structural_node_code_term, structural_raw_node_code_term,
-      godel_pairing_term, τ, hDepthClosed, hCodeClosed]
-  rw [hBody]
-  exact FirstOrder.Derives.conj_intro
-    (FirstOrder.Derives.conj_intro hArity hSymbol)
-    (FirstOrder.Derives.conj_intro hArguments hCode)
+  apply FirstOrder.Derives.existsFreePrefix_intro
+    (.cons arguments (.cons symbol (.cons arity .nil)))
+  simpa [Arguments.substitutionWith, Formula.substituteFree, Formula.substitute,
+    Substitution.free_map, Formula.substituteMapped, Term.substituteMapped,
+    Arguments.substituteMapped, VariableSubstitution.cons, VariableSubstitution.freeId,
+    Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+    structural_node_code_term, structural_list_code_term, structural_raw_node_code_term,
+    godel_pairing_term, application_code_term, term_weaken_free_three] using
+    FirstOrder.Derives.conj_intro
+      (FirstOrder.Derives.conj_intro hArity hSymbol)
+      (FirstOrder.Derives.conj_intro hArguments hCode)
 
 private theorem term_list_code_at_of_nil_branch
     (depth length code : SetOpenTerm [])
@@ -925,198 +564,7 @@ theorem quote_bound_variable_term_code_at
 
 /-! ## 项与参数列的递归正确性 -/
 
-/-- 任意内在项的直接 quotation 满足项码递归谓词。 -/
-theorem quote_term_code_at
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term σ bound free sort) :
-    ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-      term_code_atₘ(
-        numₘ(bound.length),
-        (quote_term term : SetOpenTerm [])) := by
-  refine Term.rec
-    (motive_1 := fun _ term =>
-      ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-        term_code_atₘ(
-          numₘ(bound.length),
-          (quote_term term : SetOpenTerm [])))
-    (motive_2 := fun sorts arguments =>
-      ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-        term_list_code_atₘ(
-          numₘ(bound.length),
-          numₘ(sorts.length),
-          (quote_arguments arguments : SetOpenTerm [])))
-    (fun {sort} entry => quote_bound_variable_term_code_at entry)
-    (fun {sort} entry => quote_free_variable_term_code_at entry)
-    (fun function arguments ih => by
-      cases hDomain : σ.funcDomain function with
-      | nil =>
-          simpa [quote_term, hDomain] using
-            (quote_constant_term_code_at
-              (bound := bound) (free := free) (function := function) hDomain)
-      | cons head tail =>
-          have hArguments :
-              ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-                term_list_code_atₘ(
-                  numₘ(bound.length),
-                  numₘ(σ.funcArity function),
-                  (quote_arguments arguments : SetOpenTerm [])) := by
-            simpa [Signature.funcArity, hDomain] using ih
-          have hArgumentsCode := term_list_code_at_code_mem_of_derives
-            (numₘ(bound.length))
-            (numₘ(σ.funcArity function))
-            (quote_arguments arguments : SetOpenTerm [])
-            hArguments
-          have hCode :
-              ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-                app_codeₘ(
-                  numₘ(σ.funcArity function),
-                  numₘ(QuotationNumbering.function_number function),
-                  (quote_arguments arguments : SetOpenTerm [])) ∈ₘ ωₘ := by
-            simpa [structural_node_code_term, structural_list_code_term] using!
-              (structural_node_code_mem_formal_language_encoding_theory
-                (Γ := ([] : Context signature [])) StructuralCodeTag.application
-                [numₘ(σ.funcArity function),
-                  numₘ(QuotationNumbering.function_number function),
-                  (quote_arguments arguments : SetOpenTerm [])] (by
-                    intro field hField
-                    simp only [List.mem_cons, List.not_mem_nil] at hField
-                    rcases hField with hField | hField
-                    · simpa [hField] using
-                        (finite_numeral_mem_formal_language_encoding_theory
-                          (Γ := ([] : Context signature []))
-                          (σ.funcArity function))
-                    · rcases hField with hField | hField
-                      · simpa [hField] using
-                          (finite_numeral_mem_formal_language_encoding_theory
-                            (Γ := ([] : Context signature []))
-                            (QuotationNumbering.function_number function))
-                      · rcases hField with hField | hField
-                        · simpa [hField] using hArgumentsCode
-                        · contradiction))
-          have hInstance := term_code_at_of_application_branch
-            (numₘ(bound.length))
-            (app_codeₘ(
-              numₘ(σ.funcArity function),
-              numₘ(QuotationNumbering.function_number function),
-              (quote_arguments arguments : SetOpenTerm [])) :
-              SetOpenTerm [])
-            (finite_numeral_mem_formal_language_encoding_theory
-              (Γ := ([] : Context signature [])) bound.length)
-            hCode
-            (term_code_application_condition_intro
-              (numₘ(bound.length))
-              (app_codeₘ(
-                numₘ(σ.funcArity function),
-                numₘ(QuotationNumbering.function_number function),
-                (quote_arguments arguments : SetOpenTerm [])) :
-                SetOpenTerm [])
-              (numₘ(σ.funcArity function))
-              (numₘ(QuotationNumbering.function_number function))
-              (quote_arguments arguments : SetOpenTerm [])
-              (finite_numeral_mem_formal_language_encoding_theory
-                (Γ := ([] : Context signature [])) (σ.funcArity function))
-              (finite_numeral_mem_formal_language_encoding_theory
-                (Γ := ([] : Context signature []))
-                (QuotationNumbering.function_number function))
-              hArguments
-              (Metatheory.Derives.equality_refl
-                (app_codeₘ(
-                  numₘ(σ.funcArity function),
-                  numₘ(QuotationNumbering.function_number function),
-                  (quote_arguments arguments : SetOpenTerm [])) :
-                  SetOpenTerm [])))
-          simpa [quote_term, hDomain] using hInstance)
-    (by
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) bound.length
-      have hLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) 0
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_nilₘ : SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listNil ∅ₘ
-          (finite_numeral_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature [])) 0)
-      simpa [quote_arguments] using
-        (term_list_code_at_of_nil_branch
-          (numₘ(bound.length)) (numₘ(0)) (code_nilₘ : SetOpenTerm [])
-          hDepth hLength hCode
-          (Metatheory.Derives.equality_refl (numₘ(0) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))))
-    (fun {sort} {sorts} head tail ihHead ihTail => by
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) bound.length
-      have hPreviousLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) sorts.length
-      have hLengthMem := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) (sort :: sorts).length
-      have hLength :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            numₘ((sort :: sorts).length) ≐ₘ Sₘ(numₘ(sorts.length)) := by
-        simpa [finite_numeral_term] using
-          (Metatheory.Derives.equality_refl
-            (Sₘ(numₘ(sorts.length)) : SetOpenTerm []))
-      have hHeadCode := term_code_at_code_mem_of_derives
-        (numₘ(bound.length))
-        (quote_term head : SetOpenTerm []) ihHead
-      have hTailCode := term_list_code_at_code_mem_of_derives
-        (numₘ(bound.length))
-        (numₘ(sorts.length))
-        (quote_arguments tail : SetOpenTerm []) ihTail
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :
-              SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listCons
-          (godel_pairₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])))
-          (godel_pair_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature []))
-            (quote_term head : SetOpenTerm [])
-            (quote_arguments tail : SetOpenTerm [])
-            hHeadCode hTailCode)
-      have hCodeEq :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :
-              SetOpenTerm []) ≐ₘ
-            code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :=
-        Metatheory.Derives.equality_refl
-          (T := formal_language_encoding_theory)
-          (Γ := ([] : Context signature []))
-          (code_consₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-      simpa [quote_arguments] using
-        (term_list_code_at_of_cons_branch
-          (numₘ(bound.length))
-          (numₘ((sort :: sorts).length))
-          (code_consₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-          hDepth hLengthMem hCode
-          (term_list_code_cons_condition_intro
-            (numₘ(bound.length))
-            (numₘ((sort :: sorts).length))
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-            (numₘ(sorts.length))
-            (quote_term head : SetOpenTerm [])
-            (quote_arguments tail : SetOpenTerm [])
-            hPreviousLength hLength ihHead ihTail hCodeEq)))
-    term
-
-/-! ## 外部深度提升 -/
+mutual
 
 /-- 类型化项在不小于其 bound 上下文长度的任意外部深度下都满足项码递归谓词。 -/
 theorem quote_term_code_at_of_depth
@@ -1128,24 +576,8 @@ theorem quote_term_code_at_of_depth
       term_code_atₘ(
         numₘ(depth),
         (quote_term term : SetOpenTerm [])) := by
-  exact (Term.rec
-    (motive_1 := fun (currentSort : σ.SortSymbol)
-        (currentTerm : Term σ bound free currentSort) =>
-      ∀ depth, bound.length ≤ depth →
-        ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-          term_code_atₘ(
-            numₘ(depth),
-            (quote_term currentTerm : SetOpenTerm [])))
-    (motive_2 := fun (currentSorts : List σ.SortSymbol)
-        (arguments : Arguments σ bound free currentSorts) =>
-      ∀ depth, bound.length ≤ depth →
-        ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-          term_list_code_atₘ(
-            numₘ(depth),
-            numₘ(currentSorts.length),
-            (quote_arguments arguments : SetOpenTerm [])))
-    (fun {sort} entry => by
-      intro depth hBound
+  match term with
+  | .bvar entry =>
       have hIndex : entry.index < depth :=
         Nat.lt_of_lt_of_le entry.index_lt_length hBound
       have hDepth := finite_numeral_mem_formal_language_encoding_theory
@@ -1165,9 +597,8 @@ theorem quote_term_code_at_of_depth
         (bound_var_codeₘ(numₘ(entry.index)) : SetOpenTerm [])
         hDepth hCode
         (bound_variable_code_condition_derives depth entry.index hIndex)
-      simpa [quote_term] using hInstance)
-    (fun {sort} entry => by
-      intro depth hBound
+      simpa [quote_term] using hInstance
+  | .fvar entry =>
       have hDepth := finite_numeral_mem_formal_language_encoding_theory
         (Γ := ([] : Context signature [])) depth
       have hCode := structural_node_code_mem_formal_language_encoding_theory
@@ -1185,9 +616,9 @@ theorem quote_term_code_at_of_depth
         (free_var_codeₘ(numₘ(entry.index)) : SetOpenTerm [])
         hDepth hCode
         (free_variable_code_condition_derives entry.index)
-      simpa [quote_term] using hInstance)
-    (fun function arguments ih => by
-      intro depth hBound
+      simpa [quote_term] using hInstance
+  | .app function arguments =>
+      have ih := quote_arguments_term_list_code_at_of_depth arguments
       cases hDomain : σ.funcDomain function with
       | nil =>
           have hCode := structural_node_code_mem_formal_language_encoding_theory
@@ -1283,91 +714,19 @@ theorem quote_term_code_at_of_depth
                   numₘ(QuotationNumbering.function_number function),
                   (quote_arguments arguments : SetOpenTerm [])) :
                   SetOpenTerm [])))
-          simpa [quote_term, hDomain] using hInstance)
-    (by
-      intro depth hBound
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) depth
-      have hLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) 0
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_nilₘ : SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listNil ∅ₘ
-          (finite_numeral_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature [])) 0)
-      simpa [quote_arguments] using
-        (term_list_code_at_of_nil_branch
-          (numₘ(depth)) (numₘ(0)) (code_nilₘ : SetOpenTerm [])
-          hDepth hLength hCode
-          (Metatheory.Derives.equality_refl (numₘ(0) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))))
-    (fun {sort} {sorts} head tail ihHead ihTail => by
-      intro depth hBound
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) depth
-      have hPreviousLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) sorts.length
-      have hLengthMem := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) (sort :: sorts).length
-      have hLength :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            numₘ((sort :: sorts).length) ≐ₘ Sₘ(numₘ(sorts.length)) := by
-        simpa [finite_numeral_term] using
-          (Metatheory.Derives.equality_refl
-            (Sₘ(numₘ(sorts.length)) : SetOpenTerm []))
-      have hHead := ihHead depth hBound
-      have hTail := ihTail depth hBound
-      have hHeadCode := term_code_at_code_mem_of_derives
-        (numₘ(depth))
-        (quote_term head : SetOpenTerm []) hHead
-      have hTailCode := term_list_code_at_code_mem_of_derives
-        (numₘ(depth))
-        (numₘ(sorts.length))
-        (quote_arguments tail : SetOpenTerm []) hTail
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :
-              SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listCons
-          (godel_pairₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])))
-          (godel_pair_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature []))
-            (quote_term head : SetOpenTerm [])
-            (quote_arguments tail : SetOpenTerm [])
-            hHeadCode hTailCode)
-      simpa [quote_arguments] using
-        (term_list_code_at_of_cons_branch
-          (numₘ(depth))
-          (numₘ((sort :: sorts).length))
-          (code_consₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-          hDepth hLengthMem hCode
-          (term_list_code_cons_condition_intro
-            (numₘ(depth))
-            (numₘ((sort :: sorts).length))
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-            (numₘ(sorts.length))
-            (quote_term head : SetOpenTerm [])
-            (quote_arguments tail : SetOpenTerm [])
-            hPreviousLength hLength hHead hTail
-            (Metatheory.Derives.equality_refl
-              (code_consₘ(
-                (quote_term head : SetOpenTerm []),
-                (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm []))))
-     )
-     term) depth hBound
+          simpa [quote_term, hDomain] using hInstance
 
-/-- 任意内在参数列的直接 quotation 满足参数列码递归谓词。 -/
+/-- 当前深度的识别直接复用任意合法深度定理。 -/
+theorem quote_term_code_at
+    {σ : Signature} [QuotationNumbering σ]
+    {bound free : SortContext σ} {sort : σ.SortSymbol}
+    (term : Term σ bound free sort) :
+    ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
+      term_code_atₘ(
+        numₘ(bound.length),
+        (quote_term term : SetOpenTerm [])) := by
+  exact quote_term_code_at_of_depth term bound.length (Nat.le_refl _)
+
 theorem quote_arguments_term_list_code_at_of_depth
     {σ : Signature} [QuotationNumbering σ]
     {bound free : SortContext σ} {sorts : List σ.SortSymbol}
@@ -1378,33 +737,8 @@ theorem quote_arguments_term_list_code_at_of_depth
         numₘ(depth),
         numₘ(sorts.length),
         (quote_arguments arguments : SetOpenTerm [])) := by
-  exact (Arguments.rec (σ := σ) (bound := bound) (free := free)
-    (motive_1 := fun (currentSort : σ.SortSymbol)
-        (currentTerm : Term σ bound free currentSort) =>
-      ∀ depth, bound.length ≤ depth →
-        ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-          term_code_atₘ(
-            numₘ(depth),
-            (quote_term currentTerm : SetOpenTerm [])))
-    (motive_2 := fun (currentSorts : List σ.SortSymbol)
-        (currentArguments : Arguments σ bound free currentSorts) =>
-      ∀ depth, bound.length ≤ depth →
-        ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-          term_list_code_atₘ(
-            numₘ(depth),
-            numₘ(currentSorts.length),
-            (quote_arguments currentArguments : SetOpenTerm [])))
-    (fun {sort} entry => by
-      intro depth hBound
-      exact quote_term_code_at_of_depth (.bvar entry) depth hBound)
-    (fun {sort} entry => by
-      intro depth hBound
-      exact quote_term_code_at_of_depth (.fvar entry) depth hBound)
-    (fun function arguments _ => by
-      intro depth hBound
-      exact quote_term_code_at_of_depth (.app function arguments) depth hBound)
-    (by
-      intro depth hBound
+  match arguments with
+  | .nil =>
       have hDepth := finite_numeral_mem_formal_language_encoding_theory
         (Γ := ([] : Context signature [])) depth
       have hLength := finite_numeral_mem_formal_language_encoding_theory
@@ -1421,9 +755,10 @@ theorem quote_arguments_term_list_code_at_of_depth
           (numₘ(depth)) (numₘ(0)) (code_nilₘ : SetOpenTerm [])
           hDepth hLength hCode
           (Metatheory.Derives.equality_refl (numₘ(0) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))))
-    (fun {sort} {sorts} head tail ihHead ihTail => by
-      intro depth hBound
+          (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm [])))
+  | @Arguments.cons _ _ _ sort sorts head tail =>
+      have ihTail := quote_arguments_term_list_code_at_of_depth tail
+      have ihHead := quote_term_code_at_of_depth head
       have hDepth := finite_numeral_mem_formal_language_encoding_theory
         (Γ := ([] : Context signature [])) depth
       have hPreviousLength := finite_numeral_mem_formal_language_encoding_theory
@@ -1482,8 +817,9 @@ theorem quote_arguments_term_list_code_at_of_depth
           (quote_term head : SetOpenTerm []),
           (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
         hDepth hLengthMem hCode hBranch
-      simpa [quote_arguments] using hResult)
-    arguments) depth hBound
+      simpa [quote_arguments] using hResult
+
+end
 
 theorem quote_arguments_term_list_code_at
     {σ : Signature} [QuotationNumbering σ]
@@ -1494,112 +830,7 @@ theorem quote_arguments_term_list_code_at
         numₘ(bound.length),
         numₘ(sorts.length),
         (quote_arguments arguments : SetOpenTerm [])) := by
-  refine Arguments.rec (σ := σ) (bound := bound) (free := free)
-    (motive_1 := fun sort term =>
-      ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-        term_code_atₘ(
-          numₘ(bound.length),
-          (quote_term term : SetOpenTerm [])))
-    (motive_2 := fun sorts arguments =>
-      ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-        term_list_code_atₘ(
-          numₘ(bound.length),
-          numₘ(sorts.length),
-          (quote_arguments arguments : SetOpenTerm [])))
-    (fun {sort} entry => quote_term_code_at (.bvar entry))
-    (fun {sort} entry => quote_term_code_at (.fvar entry))
-    (fun function arguments _ =>
-      quote_term_code_at
-        (σ := σ) (bound := bound) (free := free)
-        (.app function arguments))
-    (by
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) bound.length
-      have hLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) 0
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_nilₘ : SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listNil ∅ₘ
-          (finite_numeral_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature [])) 0)
-      simpa [quote_arguments] using
-        (term_list_code_at_of_nil_branch
-          (numₘ(bound.length)) (numₘ(0)) (code_nilₘ : SetOpenTerm [])
-          hDepth hLength hCode
-          (Metatheory.Derives.equality_refl (numₘ(0) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))))
-    (fun {sort} {sorts} head tail ihHead ihTail => by
-      have hDepth := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) bound.length
-      have hPreviousLength := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) sorts.length
-      have hLengthMem := finite_numeral_mem_formal_language_encoding_theory
-        (Γ := ([] : Context signature [])) (sort :: sorts).length
-      have hLength :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            numₘ((sort :: sorts).length) ≐ₘ Sₘ(numₘ(sorts.length)) := by
-        simpa [finite_numeral_term] using
-          (Metatheory.Derives.equality_refl
-            (Sₘ(numₘ(sorts.length)) : SetOpenTerm []))
-      have hHeadCode := term_code_at_code_mem_of_derives
-        (numₘ(bound.length))
-        (quote_term head : SetOpenTerm []) ihHead
-      have hTailCode := term_list_code_at_code_mem_of_derives
-        (numₘ(bound.length))
-        (numₘ(sorts.length))
-        (quote_arguments tail : SetOpenTerm []) ihTail
-      have hCode :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :
-              SetOpenTerm []) ∈ₘ ωₘ := by
-        exact structural_raw_node_mem_formal_language_encoding_theory
-          (Γ := ([] : Context signature [])) StructuralCodeTag.listCons
-          (godel_pairₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])))
-          (godel_pair_mem_formal_language_encoding_theory
-            (Γ := ([] : Context signature []))
-            (quote_term head : SetOpenTerm [])
-            (quote_arguments tail : SetOpenTerm [])
-            hHeadCode hTailCode)
-      have hCodeEq :
-          ([] : Context signature []) ⊢ₘ[formal_language_encoding_theory]
-            (code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :
-              SetOpenTerm []) ≐ₘ
-            code_consₘ(
-              (quote_term head : SetOpenTerm []),
-              (quote_arguments tail : SetOpenTerm [])) :=
-        Metatheory.Derives.equality_refl
-          (T := formal_language_encoding_theory)
-          (Γ := ([] : Context signature []))
-          (code_consₘ(
-            (quote_term head : SetOpenTerm []),
-            (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-      have hBranch := term_list_code_cons_condition_intro
-        (numₘ(bound.length))
-        (numₘ((sort :: sorts).length))
-        (code_consₘ(
-          (quote_term head : SetOpenTerm []),
-          (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-        (numₘ(sorts.length))
-        (quote_term head : SetOpenTerm [])
-        (quote_arguments tail : SetOpenTerm [])
-        hPreviousLength hLength ihHead ihTail hCodeEq
-      have hResult := term_list_code_at_of_cons_branch
-        (numₘ(bound.length))
-        (numₘ((sort :: sorts).length))
-        (code_consₘ(
-          (quote_term head : SetOpenTerm []),
-          (quote_arguments tail : SetOpenTerm [])) : SetOpenTerm [])
-        hDepth hLengthMem hCode hBranch
-      simpa [quote_arguments] using hResult)
-    arguments
+  exact quote_arguments_term_list_code_at_of_depth arguments bound.length (Nat.le_refl _)
 
 end QuineEncoding
 end FormalSystem

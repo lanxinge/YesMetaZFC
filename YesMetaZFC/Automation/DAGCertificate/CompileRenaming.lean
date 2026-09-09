@@ -670,81 +670,9 @@ theorem formula?_renameFreeVars
               bound body compiledBody hBody
               (by simpa [Formula.freeSupport] using hSupport)]
           rfl
-  | bound, .conj left right, source, hSource, hSupport => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.renameFreeVars_conj, formula?,
-                formula?_renameFreeVars registry support offset hCompile
-                  bound left compiledLeft hLeft
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry]),
-                formula?_renameFreeVars registry support offset hCompile
-                  bound right compiledRight hRight
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry])]
-              rfl
-  | bound, .disj left right, source, hSource, hSupport => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.renameFreeVars_disj, formula?,
-                formula?_renameFreeVars registry support offset hCompile
-                  bound left compiledLeft hLeft
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry]),
-                formula?_renameFreeVars registry support offset hCompile
-                  bound right compiledRight hRight
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry])]
-              rfl
-  | bound, .imp left right, source, hSource, hSupport => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.renameFreeVars_imp, formula?,
-                formula?_renameFreeVars registry support offset hCompile
-                  bound left compiledLeft hLeft
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry]),
-                formula?_renameFreeVars registry support offset hCompile
-                  bound right compiledRight hRight
-                  (by
-                    intro entry hEntry
-                    apply hSupport entry
-                    simp [Formula.freeSupport, hEntry])]
-              rfl
+  | bound, .conj left right, source, hSource, hSupport
+  | bound, .disj left right, source, hSource, hSupport
+  | bound, .imp left right, source, hSource, hSupport
   | bound, .iff left right, source, hSource, hSupport => by
       cases hLeft : formula? registry bound left with
       | none =>
@@ -756,7 +684,12 @@ theorem formula?_renameFreeVars
           | some compiledRight =>
               simp [formula?, hLeft, hRight] at hSource
               subst source
-              rw [Formula.renameFreeVars_iff, formula?,
+              first
+              | rw [Formula.renameFreeVars_conj]
+              | rw [Formula.renameFreeVars_disj]
+              | rw [Formula.renameFreeVars_imp]
+              | rw [Formula.renameFreeVars_iff]
+              rw [formula?,
                 formula?_renameFreeVars registry support offset hCompile
                   bound left compiledLeft hLeft
                   (by
@@ -770,21 +703,7 @@ theorem formula?_renameFreeVars
                     apply hSupport entry
                     simp [Formula.freeSupport, hEntry])]
               rfl
-  | bound, .forallE sort body, source, hSource, hSupport => by
-      cases hBody : formula? registry (sort :: bound) body with
-      | none =>
-          simp [formula?, hBody] at hSource
-      | some compiledBody =>
-          simp [formula?, hBody] at hSource
-          subst source
-          rw [Formula.renameFreeVars_forallE, formula?,
-            formula?_renameFreeVars registry support offset hCompile
-              (sort :: bound) body compiledBody hBody
-              (by simpa [Formula.freeSupport] using hSupport)]
-          simp [Logic.FirstOrder.Formula.renameFree,
-            Logic.FirstOrder.Formula.rename,
-            Logic.FirstOrder.Renaming.free,
-            Logic.FirstOrder.Formula.renameMapped]
+  | bound, .forallE sort body, source, hSource, hSupport
   | bound, .existsE sort body, source, hSource, hSupport => by
       cases hBody : formula? registry (sort :: bound) body with
       | none =>
@@ -792,7 +711,10 @@ theorem formula?_renameFreeVars
       | some compiledBody =>
           simp [formula?, hBody] at hSource
           subst source
-          rw [Formula.renameFreeVars_existsE, formula?,
+          first
+          | rw [Formula.renameFreeVars_forallE]
+          | rw [Formula.renameFreeVars_existsE]
+          rw [formula?,
             formula?_renameFreeVars registry support offset hCompile
               (sort :: bound) body compiledBody hBody
               (by simpa [Formula.freeSupport] using hSupport)]

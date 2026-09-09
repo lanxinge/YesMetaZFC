@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.StructuralSequenceCondition
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ArithmeticEvaluation
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceSpaceSemantics
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.IntrinsicQuantifier
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceConstruction
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.PairingInversionDirect
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.NaturalArithmeticBound
 
@@ -218,36 +218,6 @@ theorem omega_nonempty_of_numeral_member
         (ωₘ : SetOpenTerm free))
   exact FirstOrder.Derives.imp_elim hImp hNumber
 
-private theorem membership_body_instantiateTop
-    {free : SetContext}
-    (left right : SetOpenTerm free)
-    (index : Nat) :
-    Formula.instantiateTop (numₘ(index))
-        (((left.weakenBound SetSort.set ·ₘ
-            (.bvar .here : SetTerm [SetSort.set] free)) ∈ₘ
-          right.weakenBound SetSort.set)) =
-      (left ·ₘ numₘ(index)) ∈ₘ right := by
-  rw [Formula.instantiateTop_rel]
-  simp only [Arguments.instantiateTop_cons,
-    Arguments.instantiateTop_nil, Term.instantiateTop_app,
-    Term.instantiateTop_weakenBound]
-  rw [Term.instantiateTop_bvar_here]
-
-private theorem successor_membership_body_instantiateTop
-    {free : SetContext}
-    (left right : SetOpenTerm free)
-    (index : Nat) :
-    Formula.instantiateTop (numₘ(index))
-        (((left.weakenBound SetSort.set ·ₘ
-            (.bvar .here : SetTerm [SetSort.set] free)) ∈ₘ
-          Sₘ(right.weakenBound SetSort.set))) =
-      (left ·ₘ numₘ(index)) ∈ₘ Sₘ(right) := by
-  rw [Formula.instantiateTop_rel]
-  simp only [Arguments.instantiateTop_cons,
-    Arguments.instantiateTop_nil, Term.instantiateTop_app,
-    Term.instantiateTop_weakenBound]
-  repeat rw [Term.instantiateTop_bvar_here]
-
 private theorem structural_sequence_code_row_condition_instantiateTop
     {free : SetContext}
     (sequence trace code : SetOpenTerm free)
@@ -319,6 +289,27 @@ def object_sequence_code_trace {free : SetContext}
     (elements : List (SetOpenTerm free)) : List (SetOpenTerm free) :=
   object_sequence_code_trace_from (numₘ(0)) elements
 
+/-- 对象项编码的原递归就是列表折叠，不展开对象项的语法。 -/
+theorem object_sequence_code_from_eq_foldl
+    {free : SetContext} (seed : SetOpenTerm free)
+    (elements : List (SetOpenTerm free)) :
+    object_sequence_code_from seed elements =
+      elements.foldl object_sequence_code_step seed := by
+  induction elements generalizing seed with
+  | nil => rfl
+  | cons head tail ih => exact ih _
+
+/-- 自然数与对象项轨迹共用列表扫描的结构定理。 -/
+theorem object_sequence_code_trace_from_eq_scanl
+    {free : SetContext} (seed : SetOpenTerm free)
+    (elements : List (SetOpenTerm free)) :
+    object_sequence_code_trace_from seed elements =
+      elements.scanl object_sequence_code_step seed := by
+  induction elements generalizing seed with
+  | nil => rfl
+  | cons head tail ih =>
+      simp only [object_sequence_code_trace_from, List.scanl_cons, ih]
+
 @[simp] theorem object_sequence_code_from_nil
     {free : SetContext} (seed : SetOpenTerm free) :
     object_sequence_code_from seed [] = seed :=
@@ -346,22 +337,15 @@ def object_sequence_code_trace {free : SetContext}
     object_sequence_code_from seed (elements ++ [element]) =
       object_sequence_code_step
         (object_sequence_code_from seed elements) element := by
-  induction elements generalizing seed with
-  | nil => rfl
-  | cons head tail ih =>
-      simpa [List.cons_append] using
-        ih (seed := object_sequence_code_step seed head)
+  simp only [object_sequence_code_from_eq_foldl, List.foldl_append,
+    List.foldl_cons, List.foldl_nil]
 
 @[simp] theorem object_sequence_code_trace_from_length
     {free : SetContext} (seed : SetOpenTerm free)
     (elements : List (SetOpenTerm free)) :
     (object_sequence_code_trace_from seed elements).length =
       elements.length + 1 := by
-  induction elements generalizing seed with
-  | nil => rfl
-  | cons head tail ih =>
-      simp [object_sequence_code_trace_from,
-        ih (seed := object_sequence_code_step seed head), Nat.add_assoc]
+  rw [object_sequence_code_trace_from_eq_scanl, List.length_scanl]
 
 @[simp] theorem object_sequence_code_trace_length
     {free : SetContext} (elements : List (SetOpenTerm free)) :
@@ -375,26 +359,8 @@ theorem object_sequence_code_trace_from_getElem?
     (hIndex : index ≤ elements.length) :
     (object_sequence_code_trace_from seed elements)[index]? =
       some (object_sequence_code_from seed (elements.take index)) := by
-  induction elements generalizing seed index with
-  | nil =>
-      have hZero : index = 0 := by
-        simp only [List.length_nil] at hIndex
-        omega
-      subst index
-      simp [object_sequence_code_trace_from]
-  | cons head tail ih =>
-      cases index with
-      | zero =>
-          simp [object_sequence_code_trace_from]
-      | succ index =>
-          have hTail : index ≤ tail.length := by
-            simp only [List.length_cons] at hIndex
-            omega
-          simpa [object_sequence_code_trace_from,
-            object_sequence_code_from, Nat.succ_eq_add_one,
-            List.take_succ_cons] using
-            ih (seed := object_sequence_code_step seed head)
-              index hTail
+  simp only [object_sequence_code_trace_from_eq_scanl, List.getElem?_scanl,
+    hIndex, if_true, object_sequence_code_from_eq_foldl]
 
 theorem object_sequence_code_trace_from_last
     {free : SetContext} (seed : SetOpenTerm free)
@@ -419,22 +385,12 @@ theorem object_sequence_code_trace_from_step
     (object_sequence_code_trace_from seed elements)[index + 1]? =
       some (object_sequence_code_step
         (object_sequence_code_from seed (elements.take index)) element) := by
-  induction elements generalizing seed index element with
-  | nil =>
-      simp at hElement
-  | cons head tail ih =>
-      cases index with
-      | zero =>
-          simp only [List.getElem?_cons_zero, Option.some.injEq] at hElement
-          subst element
-          cases tail <;> rfl
-      | succ index =>
-          simp only [List.getElem?_cons_succ] at hElement
-          simpa [object_sequence_code_trace_from,
-            object_sequence_code_from, Nat.succ_eq_add_one,
-            Nat.add_assoc, List.take_succ_cons] using
-            ih (seed := object_sequence_code_step seed head)
-              (index := index) (element := element) hElement
+  obtain ⟨hIndex, _⟩ := List.getElem_of_getElem? hElement
+  rw [object_sequence_code_trace_from_eq_scanl, List.getElem?_succ_scanl,
+    ← object_sequence_code_trace_from_eq_scanl,
+    object_sequence_code_trace_from_getElem? seed elements index
+      (Nat.le_of_lt hIndex), hElement]
+  rfl
 
 /-! ## 对象层递归不变量 -/
 
@@ -447,22 +403,12 @@ theorem object_sequence_code_from_mem_omega
     (hElements : ∀ element, element ∈ elements →
       Γ ⊢ₘ[T] element ∈ₘ ωₘ) :
     Γ ⊢ₘ[T] object_sequence_code_from seed elements ∈ₘ ωₘ := by
-  induction elements generalizing seed with
-  | nil =>
-      exact hSeed
-  | cons head tail ih =>
-      have hHead : Γ ⊢ₘ[T] head ∈ₘ ωₘ :=
-        hElements head (by simp)
-      have hPair : Γ ⊢ₘ[T]
-          godel_pairₘ(seed, head) ∈ₘ ωₘ :=
-        S.pairing_mem_omega seed head hSeed hHead
-      have hStep : Γ ⊢ₘ[T]
-          object_sequence_code_step seed head ∈ₘ ωₘ := by
-        simpa [object_sequence_code_step] using
-          S.successor_mem_omega (godel_pairₘ(seed, head)) hPair
-      apply ih (seed := object_sequence_code_step seed head) hStep
-      intro element hElement
-      exact hElements element (by simp [hElement])
+  rw [object_sequence_code_from_eq_foldl]
+  apply List.foldlRecOn (motive := fun value => Γ ⊢ₘ[T] value ∈ₘ ωₘ)
+    elements object_sequence_code_step hSeed
+  intro value hValue element hElement
+  exact S.successor_mem_omega _ (S.pairing_mem_omega _ _ hValue
+    (hElements element hElement))
 
 theorem object_sequence_code_trace_from_mem_omega
     {T : SetTheory} (S : StructuralSequenceCodeSupport T)
@@ -475,29 +421,43 @@ theorem object_sequence_code_trace_from_mem_omega
     {value : SetOpenTerm free}
     (hValue : value ∈ object_sequence_code_trace_from seed elements) :
     Γ ⊢ₘ[T] value ∈ₘ ωₘ := by
-  induction elements generalizing seed with
-  | nil =>
-      simp [object_sequence_code_trace_from] at hValue
-      subst value
-      exact hSeed
-  | cons head tail ih =>
-      rcases List.mem_cons.mp hValue with hHead | hTail
-      · subst value
-        exact hSeed
-      · have hHeadOmega : Γ ⊢ₘ[T] head ∈ₘ ωₘ :=
-          hElements head (by simp)
-        have hPair : Γ ⊢ₘ[T]
-            godel_pairₘ(seed, head) ∈ₘ ωₘ :=
-          S.pairing_mem_omega seed head hSeed hHeadOmega
-        have hStep : Γ ⊢ₘ[T]
-            object_sequence_code_step seed head ∈ₘ ωₘ := by
-          simpa [object_sequence_code_step] using
-            S.successor_mem_omega (godel_pairₘ(seed, head)) hPair
-        apply ih (seed := object_sequence_code_step seed head)
-          hStep
-        · intro element hElement
-          exact hElements element (by simp [hElement])
-        · exact hTail
+  rcases List.mem_iff_getElem?.mp hValue with ⟨index, hGet⟩
+  have hIndex : index ≤ elements.length := by
+    obtain ⟨hLt, _⟩ := List.getElem_of_getElem? hGet
+    simpa only [object_sequence_code_trace_from_length, Nat.lt_add_one_iff] using hLt
+  have hValueEq := Option.some.inj
+    (hGet.symm.trans (object_sequence_code_trace_from_getElem? seed elements index hIndex))
+  rw [hValueEq]
+  exact object_sequence_code_from_mem_omega S seed (elements.take index) hSeed
+    (fun element hElement => hElements element (List.mem_of_mem_take hElement))
+
+/-- 拼接只延续已有折叠状态。 -/
+theorem object_sequence_code_from_append
+    {free : SetContext} (seed : SetOpenTerm free)
+    (left right : List (SetOpenTerm free)) :
+    object_sequence_code_from seed (left ++ right) =
+      object_sequence_code_from (object_sequence_code_from seed left) right := by
+  simp only [object_sequence_code_from_eq_foldl, List.foldl_append]
+
+/-- 同时保持自然数域与初值下界；后续前缀证明只消费这个折叠不变量。 -/
+theorem object_sequence_code_seed_mem_successor
+    {T : SetTheory} (S : StructuralSequenceCodeSupport T)
+    {free : SetContext} {Γ : Context signature free}
+    (seed : SetOpenTerm free) (elements : List (SetOpenTerm free))
+    (hSeed : Γ ⊢ₘ[T] seed ∈ₘ ωₘ)
+    (hElements : ∀ element, element ∈ elements → Γ ⊢ₘ[T] element ∈ₘ ωₘ) :
+    Γ ⊢ₘ[T] seed ∈ₘ Sₘ(object_sequence_code_from seed elements) := by
+  have hInvariant := List.foldlRecOn
+    (motive := fun value => (Γ ⊢ₘ[T] value ∈ₘ ωₘ) ∧ (Γ ⊢ₘ[T] seed ∈ₘ Sₘ(value)))
+    elements object_sequence_code_step ⟨hSeed, S.member_successor_self seed⟩
+    (by
+      intro value hValue element hElement
+      have hMember := hElements element hElement
+      have hNext := S.successor_mem_omega _ (S.pairing_mem_omega _ _ hValue.1 hMember)
+      exact ⟨hNext, S.member_successor_of_member _ _
+        (S.natural_mem_trans _ _ _ hValue.1 hNext hValue.2
+          (FirstOrder.Derives.conj_elim_left (S.pairing_coordinates_lt _ _ hValue.1 hMember)))⟩)
+  simpa only [object_sequence_code_from_eq_foldl] using hInvariant.2
 
 theorem object_sequence_code_point_mem_successor_from
     {T : SetTheory} (S : StructuralSequenceCodeSupport T)
@@ -511,37 +471,10 @@ theorem object_sequence_code_point_mem_successor_from
     (hPoint : Γ ⊢ₘ[T] point ∈ₘ seed) :
     Γ ⊢ₘ[T]
       point ∈ₘ Sₘ(object_sequence_code_from seed elements) := by
-  induction elements generalizing seed point with
-  | nil =>
-      simpa using S.member_successor_of_member seed point hPoint
-  | cons head tail ih =>
-      have hHead : Γ ⊢ₘ[T] head ∈ₘ ωₘ :=
-        hElements head (by simp)
-      have hPair : Γ ⊢ₘ[T]
-          godel_pairₘ(seed, head) ∈ₘ ωₘ :=
-        S.pairing_mem_omega seed head hSeed hHead
-      have hStepOmega : Γ ⊢ₘ[T]
-          object_sequence_code_step seed head ∈ₘ ωₘ := by
-        simpa [object_sequence_code_step] using
-          S.successor_mem_omega (godel_pairₘ(seed, head)) hPair
-      have hCoordinates := S.pairing_coordinates_lt
-        seed head hSeed hHead
-      have hSeedStep : Γ ⊢ₘ[T]
-          seed ∈ₘ object_sequence_code_step seed head := by
-        simpa [object_sequence_code_step] using
-          FirstOrder.Derives.conj_elim_left hCoordinates
-      have hPointStep : Γ ⊢ₘ[T]
-          point ∈ₘ object_sequence_code_step seed head :=
-        S.natural_mem_trans point seed
-          (object_sequence_code_step seed head)
-          hSeed hStepOmega
-          (S.member_successor_of_member seed point hPoint)
-          hSeedStep
-      apply ih (seed := object_sequence_code_step seed head)
-        (point := point) hStepOmega
-      · intro element hElement
-        exact hElements element (by simp [hElement])
-      · exact hPointStep
+  exact S.natural_mem_successor_trans point seed _ hSeed
+    (object_sequence_code_from_mem_omega S seed elements hSeed hElements)
+    (S.member_successor_of_member seed point hPoint)
+    (object_sequence_code_seed_mem_successor S seed elements hSeed hElements)
 
 theorem object_sequence_code_element_mem_successor
     {T : SetTheory} (S : StructuralSequenceCodeSupport T)
@@ -612,51 +545,15 @@ theorem object_sequence_code_prefix_mem_successor
     Γ ⊢ₘ[T]
       object_sequence_code_from seed (elements.take index) ∈ₘ
         Sₘ(object_sequence_code_from seed elements) := by
-  rcases Nat.lt_or_eq_of_le hIndex with hLt | rfl
-  · induction elements generalizing seed index with
-    | nil => simp at hLt
-    | cons head tail ih =>
-        cases index with
-        | zero =>
-            have hHead : Γ ⊢ₘ[T] head ∈ₘ ωₘ :=
-              hElements head (by simp)
-            have hPair := S.pairing_mem_omega seed head hSeed hHead
-            have hStepOmega : Γ ⊢ₘ[T]
-                object_sequence_code_step seed head ∈ₘ ωₘ := by
-              simpa [object_sequence_code_step] using
-                S.successor_mem_omega
-                  (godel_pairₘ(seed, head)) hPair
-            have hCoordinates := S.pairing_coordinates_lt
-              seed head hSeed hHead
-            have hSeedStep : Γ ⊢ₘ[T]
-                seed ∈ₘ object_sequence_code_step seed head := by
-              simpa [object_sequence_code_step] using
-                FirstOrder.Derives.conj_elim_left hCoordinates
-            simpa [object_sequence_code_from] using
-            object_sequence_code_point_mem_successor_from S
-                (object_sequence_code_step seed head) tail seed
-                hStepOmega (by
-                  intro value hValue
-                  exact hElements value (by simp [hValue])) hSeedStep
-        | succ index =>
-            have hTailIndex : index < tail.length := by
-              simpa [List.length_cons] using hLt
-            have hHead : Γ ⊢ₘ[T] head ∈ₘ ωₘ :=
-              hElements head (by simp)
-            have hPair := S.pairing_mem_omega seed head hSeed hHead
-            have hStepOmega : Γ ⊢ₘ[T]
-                object_sequence_code_step seed head ∈ₘ ωₘ := by
-              simpa [object_sequence_code_step] using
-                S.successor_mem_omega
-                  (godel_pairₘ(seed, head)) hPair
-            simpa [object_sequence_code_from,
-              Nat.succ_eq_add_one, List.take_succ_cons] using
-              ih (seed := object_sequence_code_step seed head)
-                (index := index) (Nat.le_of_lt hTailIndex) hStepOmega (by
-                  intro value hValue
-                  exact hElements value (by simp [hValue])) hTailIndex
-  · simpa [List.take_length] using S.member_successor_self
-      (object_sequence_code_from seed elements)
+  have hPrefix := object_sequence_code_from_mem_omega S seed (elements.take index)
+    hSeed (fun element hElement => hElements element (List.mem_of_mem_take hElement))
+  have hBound := object_sequence_code_seed_mem_successor S
+    (object_sequence_code_from seed (elements.take index))
+    (elements.drop (elements.take index).length)
+    hPrefix (fun element hElement => hElements element (List.mem_of_mem_drop hElement))
+  rw [List.length_take, Nat.min_eq_left hIndex,
+    ← object_sequence_code_from_append, List.take_append_drop] at hBound
+  exact hBound
 
 theorem object_sequence_code_terminal_mem_omega
     {T : SetTheory} (S : StructuralSequenceCodeSupport T)
@@ -740,12 +637,7 @@ theorem standard_object_sequence_value
     (index : Nat) (hIndex : index < elements.length) :
     Γ ⊢ₘ[T]
       (standard_sequence elements ·ₘ numₘ(index)) ≐ₘ (elements[index]'hIndex) := by
-  have hGet : elements[index]? = some (elements[index]'hIndex) :=
-    List.getElem?_eq_getElem hIndex
-  have hApply := standard_sequence_from_getElem?_apply_eq
-    (Γ := Γ) S 0 hGet
-  exact Metatheory.Derives.equality_symm <| by
-    simpa [standard_sequence] using hApply
+  exact standard_sequence_getElem?_value S (List.getElem?_eq_getElem hIndex)
 
 theorem standard_object_sequence_trace_value
     {T : SetTheory} (S : FiniteSequenceEvaluationSupport T)
@@ -756,15 +648,8 @@ theorem standard_object_sequence_trace_value
       (standard_sequence (object_sequence_code_trace elements) ·ₘ
         numₘ(index)) ≐ₘ
         object_sequence_code_from (numₘ(0)) (elements.take index) := by
-  have hGetRaw :
-      (object_sequence_code_trace elements)[index]? =
-        some (object_sequence_code_from (numₘ(0)) (elements.take index)) :=
-    object_sequence_code_trace_from_getElem?
-      (numₘ(0)) elements index hIndex
-  have hApply := standard_sequence_from_getElem?_apply_eq
-    (Γ := Γ) S 0 hGetRaw
-  exact Metatheory.Derives.equality_symm <| by
-    simpa [standard_sequence] using hApply
+  exact standard_sequence_getElem?_value S
+    (object_sequence_code_trace_from_getElem? (numₘ(0)) elements index hIndex)
 
 theorem standard_object_sequence_trace_step
     {T : SetTheory} (S : FiniteSequenceEvaluationSupport T)
@@ -777,26 +662,10 @@ theorem standard_object_sequence_trace_step
         object_sequence_code_step
           (object_sequence_code_from (numₘ(0)) (elements.take index))
           (elements[index]'hIndex) := by
-  have hElementGet : elements[index]? = some (elements[index]'hIndex) :=
-    List.getElem?_eq_getElem hIndex
-  have hTraceGet :
-      (object_sequence_code_trace elements)[index + 1]? =
-        some (object_sequence_code_step
-          (object_sequence_code_from (numₘ(0)) (elements.take index))
-          (elements[index]'hIndex)) :=
-    object_sequence_code_trace_from_step
-      (numₘ(0)) elements index (elements[index]'hIndex) hElementGet
-  have hApply := standard_sequence_from_getElem?_apply_eq
-    (Γ := Γ) S 0 hTraceGet
-  have hNext : Γ ⊢ₘ[T]
-      (standard_sequence (object_sequence_code_trace elements) ·ₘ
-        numₘ(index + 1)) ≐ₘ
-        object_sequence_code_step
-          (object_sequence_code_from (numₘ(0)) (elements.take index))
-          (elements[index]'hIndex) := by
-    exact Metatheory.Derives.equality_symm <| by
-      simpa [standard_sequence] using hApply
-  simpa [finite_numeral_term, successor_term] using hNext
+  simpa only [object_sequence_code_trace, finite_numeral_term, successor_term] using
+    (standard_sequence_getElem?_value (Γ := Γ) S
+      (object_sequence_code_trace_from_step (numₘ(0)) elements index _
+        (List.getElem?_eq_getElem hIndex)))
 
 /-- 标准对象项列表直接满足结构码有限序列条件。 -/
 theorem object_sequence_code_condition_intro_standard
@@ -863,103 +732,34 @@ theorem object_sequence_code_condition_intro_standard
         (S.finite_numeral_mem_omega 0)) hTraceMember
     simpa [trace] using hSpace
   have hTraceDomain : Γ ⊢ₘ[T]
-      domₘ(trace) ≐ₘ Sₘ(domₘ(sequence)) := by
-    have hRaw : Γ ⊢ₘ[T]
-        domₘ(trace) ≐ₘ
-          numₘ((object_sequence_code_trace elements).length) := by
-      simpa [trace] using
-        (standard_sequence_domain_eq
-          (Γ := Γ) S.toFiniteSequenceSpaceSupport.toFiniteSequenceGraphSupport
-          (elements := object_sequence_code_trace elements))
-    have hTraceNumeral : Γ ⊢ₘ[T]
-        domₘ(trace) ≐ₘ Sₘ(numₘ(elements.length)) := by
-      simpa [object_sequence_code_trace_length,
-        finite_numeral_term, successor_term] using hRaw
-    have hSequenceSuccessor := successor_term_congr_of_equality
-      (domₘ(sequence)) (numₘ(elements.length)) hSequenceDomain
-    exact Metatheory.Derives.equality_trans hTraceNumeral
-      (Metatheory.Derives.equality_symm hSequenceSuccessor)
+      domₘ(trace) ≐ₘ Sₘ(domₘ(sequence)) :=
+    standard_sequence_trace_domain
+      S.toFiniteSequenceSpaceSupport.toFiniteSequenceGraphSupport
+      elements (object_sequence_code_trace elements)
+      (object_sequence_code_trace_length elements)
   have hTraceBound : Γ ⊢ₘ[T]
       sequence_trace_code_bound trace code := by
-    let body : SetFormula [SetSort.set] free :=
-      ((trace.weakenBound SetSort.set ·ₘ
-          (.bvar .here : SetTerm [SetSort.set] free)) ∈ₘ
-        Sₘ(code.weakenBound SetSort.set))
-    have hNumeralBound : Γ ⊢ₘ[T]
-        Formula.LevyBound.boundedForall set_levy_bound
-          (numₘ((object_sequence_code_trace elements).length)) body :=
-      bounded_forall_numeral_intro
-        (ArithmeticSupport.finite_core
-          S.toFiniteSequenceSpaceSupport.toArithmeticSupport)
-        (object_sequence_code_trace elements).length body (by
-          intro index hIndex
-          have hIndexLe : index ≤ elements.length := by
-            simp only [object_sequence_code_trace_length] at hIndex
-            omega
-          have hPrefix := object_sequence_code_prefix_mem_successor S
-            (numₘ(0)) elements index hIndexLe
-            (S.finite_numeral_mem_omega 0) hElementOmega
-          have hPoint := object_sequence_code_point_mem_terminal S
-            (numₘ(0)) elements
-            (object_sequence_code_from (numₘ(0)) (elements.take index))
-            (S.finite_numeral_mem_omega 0) hElementOmega hPrefix
-          have hValue := standard_object_sequence_trace_value
-            (Γ := Γ)
-            S.toFiniteSequenceSpaceSupport.toFiniteSequenceEvaluationSupport
-            elements index hIndexLe
-          have hMember : Γ ⊢ₘ[T]
-              (trace ·ₘ numₘ(index)) ∈ₘ Sₘ(code) :=
-            FirstOrder.Derives.iff_elim_right
-              (membership_left_iff_of_equality
-                (trace ·ₘ numₘ(index))
-                (object_sequence_code_from
-                  (numₘ(0)) (elements.take index))
-                (Sₘ(code)) hValue)
-              (by simpa [code] using! hPoint)
-          change Γ ⊢ₘ[T]
-            Formula.instantiateTop (numₘ(index)) body
-          rw [successor_membership_body_instantiateTop]
-          exact hMember)
-    let boundTemplate : SetFormula [SetSort.set] free :=
-      Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (body.weakenBoundUnderTop SetSort.set)
-    have hNumeralAt : Γ ⊢ₘ[T]
-        boundTemplate.instantiateTop
-          (numₘ((object_sequence_code_trace elements).length)) := by
-      change Γ ⊢ₘ[T]
-        (Formula.LevyBound.boundedForall set_levy_bound
-          ((.bvar .here) : SetTerm [SetSort.set] free)
-          (body.weakenBoundUnderTop SetSort.set)).instantiateTop
-            (numₘ((object_sequence_code_trace elements).length))
-      rw [Formula.LevyBound.boundedForall_instantiateTop_bvar]
-      exact hNumeralBound
-    have hDomainRaw := FirstOrder.Derives.eq_subst
-      (body := boundTemplate)
-      (Metatheory.Derives.equality_symm <| by
-        simpa [trace] using
-          (standard_sequence_domain_eq
-            (Γ := Γ)
-            S.toFiniteSequenceSpaceSupport.toFiniteSequenceGraphSupport
-            (elements := object_sequence_code_trace elements))) hNumeralAt
-    change Γ ⊢ₘ[T]
-      (Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (body.weakenBoundUnderTop SetSort.set)).instantiateTop
-          (domₘ(trace)) at hDomainRaw
-    rw [Formula.LevyBound.boundedForall_instantiateTop_bvar] at hDomainRaw
-    simpa [sequence_trace_code_bound, body] using hDomainRaw
+    apply standard_sequence_values_mem
+      (ArithmeticSupport.finite_core S.toFiniteSequenceSpaceSupport.toArithmeticSupport)
+      S.toFiniteSequenceSpaceSupport.toFiniteSequenceEvaluationSupport
+      (object_sequence_code_trace elements) (Sₘ(code))
+    intro value hValue
+    rcases List.mem_iff_getElem?.mp hValue with ⟨index, hGet⟩
+    have hIndex : index ≤ elements.length := by
+      obtain ⟨hLt, _⟩ := List.getElem_of_getElem? hGet
+      simpa only [object_sequence_code_trace_length, Nat.lt_add_one_iff] using hLt
+    have hValueEq := Option.some.inj (hGet.symm.trans
+      (object_sequence_code_trace_from_getElem? (numₘ(0)) elements index hIndex))
+    rw [hValueEq]
+    exact object_sequence_code_point_mem_terminal S (numₘ(0)) elements _
+      (S.finite_numeral_mem_omega 0) hElementOmega
+      (object_sequence_code_prefix_mem_successor S (numₘ(0)) elements index hIndex
+        (S.finite_numeral_mem_omega 0) hElementOmega)
   have hZero : Γ ⊢ₘ[T]
       trace ·ₘ numₘ(0) ≐ₘ numₘ(0) := by
-    have hGet : (object_sequence_code_trace elements)[0]? =
-        some (numₘ(0) : SetOpenTerm free) := by
-      cases elements <;> rfl
-    have hApply := standard_sequence_from_getElem?_apply_eq
-      (Γ := Γ)
+    apply standard_sequence_getElem?_value
       S.toFiniteSequenceSpaceSupport.toFiniteSequenceEvaluationSupport
-      0 hGet
-    exact Metatheory.Derives.equality_symm <| by
-      simpa [trace, standard_sequence] using hApply
+    cases elements <;> rfl
   let rowBody : SetFormula [SetSort.set] free :=
     object_sequence_code_row_condition
       (sequence.weakenBound SetSort.set)
@@ -1030,30 +830,8 @@ theorem object_sequence_code_condition_intro_standard
         simpa [rowBody, sequence, trace, code] using! hRow)
   have hRows : Γ ⊢ₘ[T]
       Formula.LevyBound.boundedForall set_levy_bound
-        (domₘ(sequence)) rowBody := by
-    let boundTemplate : SetFormula [SetSort.set] free :=
-      Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (rowBody.weakenBoundUnderTop SetSort.set)
-    have hNumeralAt : Γ ⊢ₘ[T]
-        boundTemplate.instantiateTop (numₘ(elements.length)) := by
-      change Γ ⊢ₘ[T]
-        (Formula.LevyBound.boundedForall set_levy_bound
-          ((.bvar .here) : SetTerm [SetSort.set] free)
-          (rowBody.weakenBoundUnderTop SetSort.set)).instantiateTop
-            (numₘ(elements.length))
-      rw [Formula.LevyBound.boundedForall_instantiateTop_bvar]
-      exact hRowsNumeral
-    have hDomainRaw := FirstOrder.Derives.eq_subst
-      (body := boundTemplate)
-      (Metatheory.Derives.equality_symm hSequenceDomain) hNumeralAt
-    change Γ ⊢ₘ[T]
-      (Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (rowBody.weakenBoundUnderTop SetSort.set)).instantiateTop
-          (domₘ(sequence)) at hDomainRaw
-    rw [Formula.LevyBound.boundedForall_instantiateTop_bvar] at hDomainRaw
-    exact hDomainRaw
+        (domₘ(sequence)) rowBody :=
+    bounded_forall_of_bound_eq hSequenceDomain hRowsNumeral
   have hPointwise : Γ ⊢ₘ[T]
       object_sequence_code_pointwise_condition sequence trace code := by
     change Γ ⊢ₘ[T]

@@ -122,13 +122,14 @@ private partial def expose_head (expression : Expr) (fuel : Nat := 64) :
   let expression ← instantiateMVars expression
   if fuel == 0 then
     return expression
+  -- 先约化 recursor 的实际参数，再展开包装，避免把类型化替换打散成 Eq.rec。
+  let reduced ← withTransparency .default <| whnf expression
+  unless Expr.equal reduced expression do
+    return ← expose_head reduced (fuel - 1)
   if let some unfolded ← delta_head? expression then
     unless Expr.equal unfolded expression do
       return ← expose_head unfolded (fuel - 1)
-  let reduced ← withTransparency .reducible <| whnf expression
-  if Expr.equal reduced expression then
-    return expression
-  expose_head reduced (fuel - 1)
+  return expression
 
 private def defeq_alignment? (left right : Expr) : MetaM (Option Expr) := do
   if Expr.equal left right then
@@ -136,7 +137,7 @@ private def defeq_alignment? (left right : Expr) : MetaM (Option Expr) := do
   let savedState ← saveState
   let aligned ←
     try
-      withTransparency .reducible <| isDefEq left right
+      withTransparency .default <| isDefEq left right
     catch _ =>
       pure false
   savedState.restore
@@ -152,23 +153,21 @@ mutual
       return { raw := source, key := .opaque source }
     let expression ← expose_head source fuel
     if expression.isAppOfArity ``Logic.FirstOrder.Term.bvar 5 then
-      return { raw := expression, key := .bvar expression.getAppArgs[4]! }
+      return { raw := source, key := .bvar expression.getAppArgs[4]! }
     if expression.isAppOfArity ``Logic.FirstOrder.Term.fvar 5 then
       let arguments := expression.getAppArgs
       return {
-        raw := expression
+        raw := source
         key := .fvar arguments[3]! arguments[4]!
       }
     if expression.isAppOfArity ``Logic.FirstOrder.Term.app 5 then
       let arguments := expression.getAppArgs
       let compiledArguments ← compile_arguments arguments[4]! (fuel - 1)
-      let raw ← mkAppM ``Logic.FirstOrder.Term.app
-        #[arguments[3]!, compiledArguments.1]
       return {
-        raw
+        raw := source
         key := .app arguments[3]! compiledArguments.2
       }
-    return { raw := expression, key := .opaque expression }
+    return { raw := source, key := .opaque expression }
 
   private partial def compile_arguments
       (expression : Expr) (fuel : Nat := 128) : MetaM (Expr × ArgumentsKey) := do
@@ -182,8 +181,7 @@ mutual
       let arguments := expression.getAppArgs
       let head ← compile_term arguments[5]! (fuel - 1)
       let tail ← compile_arguments arguments[6]! (fuel - 1)
-      let raw ← mkAppM ``Logic.FirstOrder.Arguments.cons #[head.raw, tail.1]
-      return (raw, .cons head.key tail.2)
+      return (source, .cons head.key tail.2)
     return (expression, .opaque expression)
 end
 
@@ -200,18 +198,16 @@ private partial def compile_formula_node
   if expression.isAppOfArity ``Logic.FirstOrder.Formula.rel 5 then
     let arguments := expression.getAppArgs
     let compiledArguments ← compile_arguments arguments[4]! (fuel - 1)
-    let raw ← mkAppM ``Logic.FirstOrder.Formula.rel
-      #[arguments[3]!, compiledArguments.1]
-    return { raw, key := .rel arguments[3]! compiledArguments.2 }
+    -- 原子保留已有类型参数与项；反射键只观察结构，不强制展开 numeral 的递归实现。
+    return { raw := expression, key := .rel arguments[3]! compiledArguments.2 }
   if expression.isAppOfArity ``Logic.FirstOrder.Formula.equal 6 then
     let arguments := expression.getAppArgs
     let left ← compile_term arguments[4]! (fuel - 1)
     let right ← compile_term arguments[5]! (fuel - 1)
-    let raw ← mkAppM ``Logic.FirstOrder.Formula.equal #[left.raw, right.raw]
-    return { raw, key := .equal left.key right.key }
+    return { raw := expression, key := .equal left.key right.key }
   if expression.isAppOfArity ``Logic.FirstOrder.Formula.neg 4 then
     let body ← compile_formula_node expression.getAppArgs[3]! (fuel - 1)
-    let raw ← mkAppM ``Logic.FirstOrder.Formula.neg #[body.raw]
+    let raw := mkAppN expression.getAppFn (expression.getAppArgs.set! 3 body.raw)
     return { raw, key := .neg body.key }
   for constructor in
       [``Logic.FirstOrder.Formula.conj,
@@ -222,7 +218,7 @@ private partial def compile_formula_node
       let arguments := expression.getAppArgs
       let left ← compile_formula_node arguments[3]! (fuel - 1)
       let right ← compile_formula_node arguments[4]! (fuel - 1)
-      let raw ← mkAppM constructor #[left.raw, right.raw]
+      let raw := mkAppN expression.getAppFn ((arguments.set! 3 left.raw).set! 4 right.raw)
       let key :=
         if constructor == ``Logic.FirstOrder.Formula.conj then
           FormulaKey.conj left.key right.key
@@ -239,7 +235,7 @@ private partial def compile_formula_node
     if expression.isAppOfArity constructor 5 then
       let arguments := expression.getAppArgs
       let body ← compile_formula_node arguments[4]! (fuel - 1)
-      let raw ← mkAppM constructor #[arguments[3]!, body.raw]
+      let raw := mkAppN expression.getAppFn (arguments.set! 4 body.raw)
       let key :=
         if constructor == ``Logic.FirstOrder.Formula.forallE then
           FormulaKey.forallE arguments[3]! body.key

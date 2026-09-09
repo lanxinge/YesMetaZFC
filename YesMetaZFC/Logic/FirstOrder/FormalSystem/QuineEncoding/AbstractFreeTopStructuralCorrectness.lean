@@ -20,87 +20,6 @@ open scoped FormalSystem.Symbols
 
 set_option autoImplicit false
 
-private theorem finite_numeral_mem_expression
-    {free : SetContext} {Γ : Context signature free}
-    (number : Nat) :
-    Γ ⊢ₘ[expression_encoding_theory]
-      (numₘ(number) : SetOpenTerm free) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (finite_numeral_mem_formal_language_encoding_theory
-      (Γ := Γ) number)
-
-private theorem finite_numeral_mem_of_lt_expression
-    {free : SetContext} {Γ : Context signature free}
-    {left right : Nat} (h : left < right) :
-    Γ ⊢ₘ[expression_encoding_theory]
-      (numₘ(left) : SetOpenTerm free) ∈ₘ numₘ(right) :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (finite_numeral_mem_of_lt_formal_language_encoding_theory
-      (Γ := Γ) h)
-
-private theorem quote_term_code_at_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term σ bound free sort) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      term_code_atₘ(
-        numₘ(bound.length),
-        (quote_term term : SetOpenTerm [])) :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (quote_term_code_at term)
-
-private theorem quote_term_code_mem_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term σ bound free sort) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      (quote_term term : SetOpenTerm []) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (term_code_at_code_mem_of_derives
-      (numₘ(bound.length)) (quote_term term : SetOpenTerm [])
-      (quote_term_code_at term))
-
-private theorem quote_arguments_code_at_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sorts : List σ.SortSymbol}
-    (arguments : Arguments σ bound free sorts) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      term_list_code_atₘ(
-        numₘ(bound.length), numₘ(sorts.length),
-        (quote_arguments arguments : SetOpenTerm [])) :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (quote_arguments_term_list_code_at arguments)
-
-private theorem quote_arguments_code_mem_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sorts : List σ.SortSymbol}
-    (arguments : Arguments σ bound free sorts) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      (quote_arguments arguments : SetOpenTerm []) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (term_list_code_at_code_mem_of_derives
-      (numₘ(bound.length)) (numₘ(sorts.length))
-      (quote_arguments arguments : SetOpenTerm [])
-      (quote_arguments_term_list_code_at arguments))
-
 
 private theorem term_abstract_free_top_scope
     (depth source target : SetOpenTerm [])
@@ -113,26 +32,7 @@ private theorem term_abstract_free_top_scope
         (syntax_code_kind_term .term)
         (syntax_transform_operation_term .abstractFreeTop)
         depth (numₘ(0)) (numₘ(0)) source target := by
-  dsimp [syntax_transform_scope_condition]
-  apply FirstOrder.Derives.disj_intro_left
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .term : SetOpenTerm [])
-  · apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    exact FirstOrder.Derives.conj_intro
-      (Metatheory.Derives.equality_refl
-        (syntax_transform_operation_term .abstractFreeTop :
-          SetOpenTerm []))
-      (FirstOrder.Derives.conj_intro
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.conj_intro hSourceAt hTargetAt)
-          (Metatheory.Derives.equality_refl
-            (numₘ(0) : SetOpenTerm [])))
-        (Metatheory.Derives.equality_refl
-          (numₘ(0) : SetOpenTerm [])))
+  derive_prop
 
 private theorem term_list_abstract_free_top_scope
     (depth length source target : SetOpenTerm [])
@@ -147,39 +47,19 @@ private theorem term_list_abstract_free_top_scope
         (syntax_code_kind_term .termList)
         (syntax_transform_operation_term .abstractFreeTop)
         depth (numₘ(0)) (numₘ(0)) source target := by
+
   dsimp [syntax_transform_scope_condition]
   apply FirstOrder.Derives.disj_intro_right
   apply FirstOrder.Derives.disj_intro_left
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .termList : SetOpenTerm [])
-  · apply FirstOrder.Derives.exists_intro length
-    simpa [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
-      Formula.substitute, Formula.substituteMapped,
-      Term.substituteFree, Term.substitute, Term.substituteMapped,
-      Arguments.substituteMapped,
-      VariableSubstitution.instantiateFreeTop,
-      VariableSubstitution.liftFree,
-      VariableSubstitution.weakenBound,
-      VariableSubstitution.boundId, VariableSubstitution.freeId,
-      Term.substituteMapped_weakenFree_instantiateFreeTop,
-      Arguments.substituteMapped_weakenFree_instantiateFreeTop] using
-      FirstOrder.Derives.conj_intro hLength
-        (FirstOrder.Derives.disj_intro_right
-          (FirstOrder.Derives.disj_intro_right
-            (FirstOrder.Derives.disj_intro_right
-              (FirstOrder.Derives.disj_intro_right
-                (FirstOrder.Derives.conj_intro
-                  (Metatheory.Derives.equality_refl
-                    (syntax_transform_operation_term .abstractFreeTop :
-                      SetOpenTerm []))
-                  (FirstOrder.Derives.conj_intro
-                    (FirstOrder.Derives.conj_intro
-                      (FirstOrder.Derives.conj_intro hSourceAt hTargetAt)
-                      (Metatheory.Derives.equality_refl
-                        (numₘ(0) : SetOpenTerm [])))
-                    (Metatheory.Derives.equality_refl
-                      (numₘ(0) : SetOpenTerm []))))))))
+  apply FirstOrder.Derives.conj_intro (FirstOrder.Derives.eq_refl _)
+  apply FirstOrder.Derives.exists_intro length
+  rw [Formula.instantiateTop_abstractFreeTop]
+  simp only [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
+    Formula.substitute, Formula.substituteMapped, Term.substituteMapped,
+    Arguments.substituteMapped, VariableSubstitution.instantiateFreeTop,
+    Term.substituteMapped_weakenFree_instantiateFreeTop]
+  derive_prop
+
 
 private theorem term_abstract_free_top_bound_shape
     (depth index : SetOpenTerm [])
@@ -199,29 +79,13 @@ private theorem term_abstract_free_top_bound_shape
   · apply FirstOrder.Derives.disj_intro_right
     apply FirstOrder.Derives.disj_intro_left
     apply FirstOrder.Derives.exists_intro index
-    simpa [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
-      Formula.substitute, Formula.substituteMapped,
-      Term.substituteFree, Term.substitute, Term.substituteMapped,
-      Arguments.substituteMapped,
-      VariableSubstitution.instantiateFreeTop,
-      VariableSubstitution.liftFree,
-      VariableSubstitution.weakenBound,
-      VariableSubstitution.boundId, VariableSubstitution.freeId,
-      structural_list_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term] using!
-      FirstOrder.Derives.conj_intro
-        (Metatheory.Derives.equality_refl
-          (bound_var_codeₘ(index) : SetOpenTerm []))
-        (FirstOrder.Derives.disj_intro_left
-          (FirstOrder.Derives.conj_intro
-            (FirstOrder.Derives.disj_intro_right
-              (FirstOrder.Derives.disj_intro_right
-                (Metatheory.Derives.equality_refl
-                  (syntax_transform_operation_term .abstractFreeTop :
-                    SetOpenTerm []))))
-            (FirstOrder.Derives.conj_intro hIndex
-              (Metatheory.Derives.equality_refl
-                (bound_var_codeₘ(index) : SetOpenTerm [])))))
+    rw [Formula.instantiateTop_abstractFreeTop]
+    simp only [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
+      Formula.substitute, Formula.substituteMapped, Term.substituteMapped,
+      Arguments.substituteMapped, VariableSubstitution.instantiateFreeTop,
+      Term.substituteMapped_weakenFree_instantiateFreeTop]
+    derive_prop
+
 
 private theorem term_abstract_free_top_here_shape
     (depth : SetOpenTerm []) :
@@ -338,198 +202,6 @@ private theorem term_abstract_free_top_there_shape
                 (Metatheory.Derives.equality_refl
                   (free_var_codeₘ(numₘ(previous)) : SetOpenTerm [])))
 
-private theorem term_abstract_free_top_constant_shape
-    (depth : SetOpenTerm []) (symbol : Nat) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transform_shape_condition
-        (syntax_code_kind_term .term)
-        (syntax_transform_operation_term .abstractFreeTop)
-        depth (numₘ(0)) (numₘ(0))
-        (const_codeₘ(numₘ(symbol))) (const_codeₘ(numₘ(symbol))) := by
-  dsimp [syntax_transform_shape_condition]
-  apply FirstOrder.Derives.disj_intro_left
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .term : SetOpenTerm [])
-  · apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_left
-    apply FirstOrder.Derives.exists_intro (numₘ(symbol) : SetOpenTerm [])
-    simpa [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
-      Formula.substitute, Formula.substituteMapped,
-      Term.substituteFree, Term.substitute, Term.substituteMapped,
-      Arguments.substituteMapped,
-      VariableSubstitution.instantiateFreeTop,
-      VariableSubstitution.liftFree,
-      VariableSubstitution.weakenBound,
-      VariableSubstitution.boundId, VariableSubstitution.freeId,
-      Term.substituteMapped_weakenFree_instantiateFreeTop,
-      Arguments.substituteMapped_weakenFree_instantiateFreeTop] using
-      FirstOrder.Derives.conj_intro
-        (finite_numeral_mem_expression (Γ := []) symbol)
-        (FirstOrder.Derives.conj_intro
-          (Metatheory.Derives.equality_refl
-            (const_codeₘ(numₘ(symbol)) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl
-            (const_codeₘ(numₘ(symbol)) : SetOpenTerm [])))
-
-private theorem term_abstract_free_top_application_shape
-    (depth arity symbol sourceArguments targetArguments : SetOpenTerm [])
-    (hArity : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      arity ∈ₘ ωₘ)
-    (hSymbol : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      symbol ∈ₘ ωₘ)
-    (hTransform : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transformₘ(
-        syntax_code_kind_term .termList,
-        syntax_transform_operation_term .abstractFreeTop,
-        depth, numₘ(0), numₘ(0), sourceArguments, targetArguments)) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transform_shape_condition
-        (syntax_code_kind_term .term)
-        (syntax_transform_operation_term .abstractFreeTop)
-        depth (numₘ(0)) (numₘ(0))
-        (app_codeₘ(arity, symbol, sourceArguments))
-        (app_codeₘ(arity, symbol, targetArguments)) := by
-  dsimp [syntax_transform_shape_condition]
-  apply FirstOrder.Derives.disj_intro_left
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .term : SetOpenTerm [])
-  · apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.exists_intro arity
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro symbol
-    rw [Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro sourceArguments
-    rw [Formula.substituteFree_existsFreeTop,
-      Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetArguments
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [four_free_substitution_beta]
-    simp only [ Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetArguments
-        (VariableSubstitution.cons sourceArguments
-          (VariableSubstitution.cons symbol
-            (VariableSubstitution.cons arity VariableSubstitution.empty)))
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_four_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      application_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_four, τ, hClosed] using
-      FirstOrder.Derives.conj_intro
-        (FirstOrder.Derives.conj_intro hArity hSymbol)
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.conj_intro
-            (Metatheory.Derives.equality_refl
-              (app_codeₘ(arity, symbol, sourceArguments) : SetOpenTerm []))
-            (Metatheory.Derives.equality_refl
-              (app_codeₘ(arity, symbol, targetArguments) : SetOpenTerm [])))
-          hTransform)
-
-private theorem term_list_abstract_free_top_nil_shape
-    (depth : SetOpenTerm []) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transform_shape_condition
-        (syntax_code_kind_term .termList)
-        (syntax_transform_operation_term .abstractFreeTop)
-        depth (numₘ(0)) (numₘ(0)) code_nilₘ code_nilₘ := by
-  dsimp [syntax_transform_shape_condition]
-  apply FirstOrder.Derives.disj_intro_right
-  apply FirstOrder.Derives.disj_intro_left
-  exact FirstOrder.Derives.conj_intro
-    (Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .termList : SetOpenTerm []))
-    (FirstOrder.Derives.disj_intro_left
-      (FirstOrder.Derives.conj_intro
-        (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))
-        (Metatheory.Derives.equality_refl (code_nilₘ : SetOpenTerm []))))
-
-private theorem term_list_abstract_free_top_cons_shape
-    (depth sourceHead sourceTail targetHead targetTail : SetOpenTerm [])
-    (hHead : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transformₘ(
-        syntax_code_kind_term .term,
-        syntax_transform_operation_term .abstractFreeTop,
-        depth, numₘ(0), numₘ(0), sourceHead, targetHead))
-    (hTail : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transformₘ(
-        syntax_code_kind_term .termList,
-        syntax_transform_operation_term .abstractFreeTop,
-        depth, numₘ(0), numₘ(0), sourceTail, targetTail)) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transform_shape_condition
-        (syntax_code_kind_term .termList)
-        (syntax_transform_operation_term .abstractFreeTop)
-        depth (numₘ(0)) (numₘ(0))
-        (code_consₘ(sourceHead, sourceTail))
-        (code_consₘ(targetHead, targetTail)) := by
-  dsimp [syntax_transform_shape_condition]
-  apply FirstOrder.Derives.disj_intro_right
-  apply FirstOrder.Derives.disj_intro_left
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .termList : SetOpenTerm [])
-  · apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.exists_intro sourceHead
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro sourceTail
-    rw [Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetHead
-    rw [Formula.substituteFree_existsFreeTop,
-      Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetTail
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [four_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetTail
-        (VariableSubstitution.cons targetHead
-          (VariableSubstitution.cons sourceTail
-            (VariableSubstitution.cons sourceHead VariableSubstitution.empty)))
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_four_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      structural_node_code_term, structural_raw_node_code_term,
-      godel_pairing_term, term_weaken_free_four, τ, hClosed] using
-      FirstOrder.Derives.conj_intro
-        (FirstOrder.Derives.conj_intro
-          (Metatheory.Derives.equality_refl
-            (code_consₘ(sourceHead, sourceTail) : SetOpenTerm []))
-          (Metatheory.Derives.equality_refl
-            (code_consₘ(targetHead, targetTail) : SetOpenTerm [])))
-        (FirstOrder.Derives.conj_intro hHead hTail)
-
 private theorem quote_term_abstract_free_top_last_of_shape
     {σ : Signature} [QuotationNumbering σ]
     {bound free : SortContext σ}
@@ -628,33 +300,10 @@ private theorem quote_bound_variable_abstract_free_top_last
         (quote_term
           ((.bvar entry : Term σ bound (introduced :: free) resultSort)
             |>.abstractFreeTopLast bound introduced) : SetOpenTerm [])) := by
-  have hSourceAt := quote_term_code_at_expression
-    (.bvar entry : Term σ bound (introduced :: free) resultSort)
-  have hTargetAt : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      term_code_atₘ(
-        Sₘ(numₘ(bound.length)),
-        (quote_term
-          ((.bvar entry : Term σ bound (introduced :: free) resultSort)
-            |>.abstractFreeTopLast bound introduced) : SetOpenTerm [])) := by
-    simpa [List.length_append, finite_numeral_term] using
-      quote_term_code_at_expression
-        ((.bvar entry : Term σ bound (introduced :: free) resultSort)
-          |>.abstractFreeTopLast bound introduced)
-  have hSourceMem := quote_term_code_mem_expression
-    (.bvar entry : Term σ bound (introduced :: free) resultSort)
-  have hTargetMem := quote_term_code_mem_expression
-    ((.bvar entry : Term σ bound (introduced :: free) resultSort)
-      |>.abstractFreeTopLast bound introduced)
+  apply quote_term_abstract_free_top_last_of_shape
   have hIndex := finite_numeral_mem_of_lt_expression
     (Γ := ([] : Context signature [])) entry.index_lt_length
-  apply syntax_transform_intro .term .abstractFreeTop
-    bound.length 0 (numₘ(0))
-  · exact hSourceMem
-  · exact hTargetMem
-  · exact finite_numeral_mem_expression (Γ := []) 0
-  · exact term_abstract_free_top_scope
-      (numₘ(bound.length)) _ _ hSourceAt hTargetAt
-  · simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
+  simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
       Term.substitute, Term.substituteMapped, Arguments.substituteMapped,
       quote_term, Variable.index_appendRight] using
       term_abstract_free_top_bound_shape
@@ -675,42 +324,21 @@ private theorem quote_free_variable_abstract_free_top_last
         (quote_term
           ((.fvar entry : Term σ bound (introduced :: free) resultSort)
             |>.abstractFreeTopLast bound introduced) : SetOpenTerm [])) := by
-  have hSourceAt := quote_term_code_at_expression
-    (.fvar entry : Term σ bound (introduced :: free) resultSort)
-  have hTargetAt : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      term_code_atₘ(
-        Sₘ(numₘ(bound.length)),
-        (quote_term
-          ((.fvar entry : Term σ bound (introduced :: free) resultSort)
-            |>.abstractFreeTopLast bound introduced) : SetOpenTerm [])) := by
-    simpa [List.length_append, finite_numeral_term] using
-      quote_term_code_at_expression
-        ((.fvar entry : Term σ bound (introduced :: free) resultSort)
-          |>.abstractFreeTopLast bound introduced)
-  have hSourceMem := quote_term_code_mem_expression
-    (.fvar entry : Term σ bound (introduced :: free) resultSort)
-  have hTargetMem := quote_term_code_mem_expression
-    ((.fvar entry : Term σ bound (introduced :: free) resultSort)
-      |>.abstractFreeTopLast bound introduced)
-  apply syntax_transform_intro .term .abstractFreeTop
-    bound.length 0 (numₘ(0))
-  · exact hSourceMem
-  · exact hTargetMem
-  · exact finite_numeral_mem_expression (Γ := []) 0
-  · exact term_abstract_free_top_scope
-      (numₘ(bound.length)) _ _ hSourceAt hTargetAt
-  · cases entry with
-    | here =>
-        simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
-          Term.substitute, Term.substituteMapped, Arguments.substituteMapped,
-          quote_term, Variable.index, Variable.index_last] using
-          term_abstract_free_top_here_shape (numₘ(bound.length))
-    | there previous =>
-        simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
-          Term.substitute, Term.substituteMapped, Arguments.substituteMapped,
-          quote_term, Variable.index, finite_numeral_term] using
-          term_abstract_free_top_there_shape
-            (numₘ(bound.length)) previous.index
+  apply quote_term_abstract_free_top_last_of_shape
+  cases entry with
+  | here =>
+      simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
+        Term.substitute, Term.substituteMapped, Arguments.substituteMapped,
+        quote_term, Variable.index, Variable.index_last] using
+        term_abstract_free_top_here_shape (numₘ(bound.length))
+  | there previous =>
+      simpa [Term.abstractFreeTopLast, Substitution.abstractFreeTopLast,
+        Term.substitute, Term.substituteMapped, Arguments.substituteMapped,
+        quote_term, Variable.index, finite_numeral_term] using
+        term_abstract_free_top_there_shape
+          (numₘ(bound.length)) previous.index
+
+mutual
 
 /-- 项 quotation 与尾槽自由变量抽象交换。 -/
 theorem quote_term_abstract_free_top_last
@@ -726,46 +354,32 @@ theorem quote_term_abstract_free_top_last
         (quote_term term : SetOpenTerm []),
         (quote_term (term.abstractFreeTopLast bound introduced) :
           SetOpenTerm [])) := by
-  refine Term.rec
-    (motive_1 := fun _ term =>
-      ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-        syntax_transformₘ(
-          syntax_code_kind_term .term,
-          syntax_transform_operation_term .abstractFreeTop,
-          numₘ(bound.length), numₘ(0), numₘ(0),
-          (quote_term term : SetOpenTerm []),
-          (quote_term (term.abstractFreeTopLast bound introduced) :
-            SetOpenTerm [])))
-    (motive_2 := fun _ arguments =>
-      ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-        syntax_transformₘ(
-          syntax_code_kind_term .termList,
-          syntax_transform_operation_term .abstractFreeTop,
-          numₘ(bound.length), numₘ(0), numₘ(0),
-          (quote_arguments arguments : SetOpenTerm []),
-          (quote_arguments
-            (arguments.abstractFreeTopLast bound introduced) :
-            SetOpenTerm [])))
-    (fun entry => quote_bound_variable_abstract_free_top_last entry)
-    (fun entry => quote_free_variable_abstract_free_top_last entry)
-    (fun function arguments ih => by
+  match term with
+  | .bvar entry =>
+      exact quote_bound_variable_abstract_free_top_last entry
+  | .fvar entry =>
+      exact quote_free_variable_abstract_free_top_last entry
+  | .app function arguments =>
+      have ih := quote_arguments_abstract_free_top_last arguments
       cases hDomain : σ.funcDomain function with
       | nil =>
           apply quote_term_abstract_free_top_last_of_shape
           simpa [quote_term, hDomain, Term.abstractFreeTopLast,
             Substitution.abstractFreeTopLast, Term.substitute,
             Term.substituteMapped, Arguments.substituteMapped] using
-            term_abstract_free_top_constant_shape
-              (numₘ(bound.length))
-              (QuotationNumbering.function_number function)
+            syntax_transform_constant_shape (syntax_transform_operation_term .abstractFreeTop)
+              (numₘ(bound.length)) (numₘ(0)) (numₘ(0))
+              (numₘ(QuotationNumbering.function_number function))
+              (finite_numeral_mem_expression (Γ := [])
+                (QuotationNumbering.function_number function))
       | cons head tail =>
           apply quote_term_abstract_free_top_last_of_shape
           simpa [quote_term, hDomain, Term.abstractFreeTopLast,
             Arguments.abstractFreeTopLast, Substitution.abstractFreeTopLast,
             Term.substitute, Arguments.substitute, Term.substituteMapped,
             Arguments.substituteMapped] using
-            term_abstract_free_top_application_shape
-              (numₘ(bound.length))
+            syntax_transform_application_shape (syntax_transform_operation_term .abstractFreeTop)
+              (numₘ(bound.length)) (numₘ(0)) (numₘ(0))
               (numₘ(σ.funcArity function))
               (numₘ(QuotationNumbering.function_number function))
               (quote_arguments arguments : SetOpenTerm [])
@@ -777,29 +391,7 @@ theorem quote_term_abstract_free_top_last
               (finite_numeral_mem_expression
                 (Γ := ([] : Context signature []))
                 (QuotationNumbering.function_number function))
-              ih)
-    (by
-      apply quote_arguments_abstract_free_top_last_of_shape
-      simpa [quote_arguments, Arguments.abstractFreeTopLast,
-        Substitution.abstractFreeTopLast, Arguments.substitute,
-        Arguments.substituteMapped] using
-        term_list_abstract_free_top_nil_shape (numₘ(bound.length)))
-    (fun head tail ihHead ihTail => by
-      apply quote_arguments_abstract_free_top_last_of_shape
-      simpa [quote_arguments, Term.abstractFreeTopLast,
-        Arguments.abstractFreeTopLast, Substitution.abstractFreeTopLast,
-        Term.substitute, Arguments.substitute, Term.substituteMapped,
-        Arguments.substituteMapped] using
-        term_list_abstract_free_top_cons_shape
-          (numₘ(bound.length))
-          (quote_term head : SetOpenTerm [])
-          (quote_arguments tail : SetOpenTerm [])
-          (quote_term (head.abstractFreeTopLast bound introduced) :
-            SetOpenTerm [])
-          (quote_arguments
-            (tail.abstractFreeTopLast bound introduced) : SetOpenTerm [])
-          ihHead ihTail)
-    term
+              ih
 
 /-- 参数列 quotation 与尾槽自由变量抽象交换。 -/
 theorem quote_arguments_abstract_free_top_last
@@ -816,58 +408,34 @@ theorem quote_arguments_abstract_free_top_last
         (quote_arguments
           (arguments.abstractFreeTopLast bound introduced) :
           SetOpenTerm [])) := by
-  refine Arguments.rec (σ := σ) (bound := bound)
-    (free := introduced :: free)
-    (motive_1 := fun _ term =>
-      ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-        syntax_transformₘ(
-          syntax_code_kind_term .term,
-          syntax_transform_operation_term .abstractFreeTop,
-          numₘ(bound.length), numₘ(0), numₘ(0),
-          (quote_term term : SetOpenTerm []),
-          (quote_term (term.abstractFreeTopLast bound introduced) :
-            SetOpenTerm [])))
-    (motive_2 := fun _ arguments =>
-      ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-        syntax_transformₘ(
-          syntax_code_kind_term .termList,
-          syntax_transform_operation_term .abstractFreeTop,
-          numₘ(bound.length), numₘ(0), numₘ(0),
-          (quote_arguments arguments : SetOpenTerm []),
-          (quote_arguments
-            (arguments.abstractFreeTopLast bound introduced) :
-            SetOpenTerm [])))
-    (fun {sort} entry =>
-      quote_term_abstract_free_top_last
-        (.bvar entry : Term σ bound (introduced :: free) sort))
-    (fun {sort} entry =>
-      quote_term_abstract_free_top_last
-        (.fvar entry : Term σ bound (introduced :: free) sort))
-    (fun function arguments _ =>
-      quote_term_abstract_free_top_last
-        (.app function arguments))
-    (by
+  match arguments with
+  | .nil =>
       apply quote_arguments_abstract_free_top_last_of_shape
       simpa [quote_arguments, Arguments.abstractFreeTopLast,
         Substitution.abstractFreeTopLast, Arguments.substitute,
         Arguments.substituteMapped] using
-        term_list_abstract_free_top_nil_shape (numₘ(bound.length)))
-    (fun head tail ihHead ihTail => by
+        syntax_transform_nil_shape (T := expression_encoding_theory) (Γ := [])
+          (syntax_transform_operation_term .abstractFreeTop)
+          (numₘ(bound.length)) (numₘ(0)) (numₘ(0))
+  | @Arguments.cons _ _ _ sort sorts head tail =>
+      have ihTail := quote_arguments_abstract_free_top_last tail
+      have ihHead := quote_term_abstract_free_top_last head
       apply quote_arguments_abstract_free_top_last_of_shape
       simpa [quote_arguments, Term.abstractFreeTopLast,
         Arguments.abstractFreeTopLast, Substitution.abstractFreeTopLast,
         Term.substitute, Arguments.substitute, Term.substituteMapped,
         Arguments.substituteMapped] using
-        term_list_abstract_free_top_cons_shape
-          (numₘ(bound.length))
+        syntax_transform_cons_shape (syntax_transform_operation_term .abstractFreeTop)
+          (numₘ(bound.length)) (numₘ(0)) (numₘ(0))
           (quote_term head : SetOpenTerm [])
           (quote_arguments tail : SetOpenTerm [])
           (quote_term (head.abstractFreeTopLast bound introduced) :
             SetOpenTerm [])
           (quote_arguments
             (tail.abstractFreeTopLast bound introduced) : SetOpenTerm [])
-          ihHead ihTail)
-    arguments
+          ihHead ihTail
+
+end
 
 end QuineEncoding
 end FormalSystem

@@ -437,15 +437,19 @@ def nat_sequence_code_trace_from (seed : Nat) :
 def nat_sequence_code_trace (sequence : List Nat) :
     List Nat :=
   nat_sequence_code_trace_from 0 sequence
+/-- 原递归轨迹与通用列表扫描相同，后续结构性质复用扫描代数。 -/
+theorem nat_sequence_code_trace_from_eq_scanl (seed : Nat) (sequence : List Nat) :
+    nat_sequence_code_trace_from seed sequence =
+      sequence.scanl nat_sequence_code_step seed := by
+  induction sequence generalizing seed with
+  | nil => rfl
+  | cons head tail ih =>
+      simp only [nat_sequence_code_trace_from, List.scanl_cons, ih]
 /-- 规范轨迹的长度恰为源序列长度加一。 -/
 @[simp]
 theorem nat_sequence_code_trace_from_length (seed : Nat) (sequence : List Nat) : (nat_sequence_code_trace_from seed sequence).length =
       sequence.length + 1 := by
-  induction sequence generalizing seed with
-  | nil =>
-      rfl
-  | cons item rest ih =>
-      simp [nat_sequence_code_trace_from, ih]
+  rw [nat_sequence_code_trace_from_eq_scanl, List.length_scanl]
 /-- 初值为零时的规范轨迹长度。 -/
 @[simp]
 theorem nat_sequence_code_trace_length (sequence : List Nat) : (nat_sequence_code_trace sequence).length =
@@ -457,28 +461,8 @@ theorem nat_sequence_code_trace_length (sequence : List Nat) : (nat_sequence_cod
 theorem nat_sequence_code_trace_from_getElem? (seed : Nat) (sequence : List Nat) (index : Nat) (hIndex : index ≤ sequence.length) :
     (nat_sequence_code_trace_from seed sequence)[index]? =
       some (nat_sequence_code_from seed (sequence.take index)) := by
-  induction sequence generalizing seed index with
-  | nil =>
-      have hZero : index = 0 := by
-        simp only [List.length_nil] at hIndex
-        omega
-      subst index
-      simp [nat_sequence_code_trace_from,
-        nat_sequence_code_from]
-  | cons item rest ih =>
-      cases index with
-      | zero =>
-          simp [nat_sequence_code_trace_from,
-            nat_sequence_code_from]
-      | succ index =>
-          have hTail : index ≤ rest.length := by
-            simp only [List.length_cons] at hIndex
-            omega
-          simpa [nat_sequence_code_trace_from,
-            nat_sequence_code_from] using
-            ih (seed :=
-                nat_sequence_code_step seed item)
-              index hTail
+  simp only [nat_sequence_code_trace_from_eq_scanl, List.getElem?_scanl,
+    hIndex, if_true, nat_sequence_code_from]
 /-- 规范轨迹的最后一项就是整个源序列的折叠值。 -/
 theorem nat_sequence_code_trace_from_last (seed : Nat) (sequence : List Nat) : (nat_sequence_code_trace_from seed sequence)[sequence.length]? =
       some (nat_sequence_code_from seed sequence) := by
@@ -498,27 +482,12 @@ theorem nat_sequence_code_trace_from_step (seed : Nat) (sequence : List Nat) (in
     (nat_sequence_code_trace_from seed sequence)[index + 1]? =
       some (nat_sequence_code_step (nat_sequence_code_from seed (sequence.take index))
           item) := by
-  induction sequence generalizing seed index with
-  | nil =>
-      simp at hItem
-  | cons head tail ih =>
-      cases index with
-      | zero =>
-          simp only [List.getElem?_cons_zero,
-            Option.some.injEq] at hItem
-          subst item
-          simpa [nat_sequence_code_trace_from,
-            nat_sequence_code_from] using
-            nat_sequence_code_trace_from_getElem? (nat_sequence_code_step seed head)
-              tail 0 (by omega)
-      | succ index =>
-          simp only [List.getElem?_cons_succ] at hItem
-          simpa [nat_sequence_code_trace_from,
-            nat_sequence_code_from, Nat.succ_eq_add_one,
-            Nat.add_assoc] using
-            ih (seed :=
-                nat_sequence_code_step seed head)
-              index hItem
+  obtain ⟨hIndex, _⟩ := List.getElem_of_getElem? hItem
+  rw [nat_sequence_code_trace_from_eq_scanl, List.getElem?_succ_scanl,
+    ← nat_sequence_code_trace_from_eq_scanl,
+    nat_sequence_code_trace_from_getElem? seed sequence index
+      (Nat.le_of_lt hIndex), hItem]
+  rfl
 /-- 初值为零时的规范轨迹递归步。 -/
 theorem nat_sequence_code_trace_step (sequence : List Nat) (index item : Nat) (hItem : sequence[index]? = some item) :
     (nat_sequence_code_trace sequence)[index + 1]? =

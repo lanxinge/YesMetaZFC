@@ -9,131 +9,25 @@ universe x
 namespace Semantics
 mutual
   theorem Term.eval_lowerAbove_of_not_occurs {M : Model} (env : Env M) (depth : Nat) (inserted : M.Carrier) (term : Term) (hOccurs : Term.occursBVarAt depth term = false) : Term.eval env (Term.lowerAbove depth term) = Term.eval (env.insertAt depth inserted) term := by
-    cases term with
-    | bvar sort index =>
-        simp only [Term.occursBVarAt] at hOccurs
-        by_cases hLt : index < depth
-        · simp [Term.lowerAbove, Term.eval, Env.insertAt, hLt]
-        · by_cases hEq : index = depth
-          · subst index
-            simp at hOccurs
-          · simp [Term.lowerAbove, Term.eval, Env.insertAt, hLt, hEq]
-    | fvar sort id => simp [Term.lowerAbove, Term.eval, Env.insertAt]
-    | app symbol args =>
-        simp only [Term.occursBVarAt] at hOccurs
-        simp only [Term.lowerAbove, Term.eval]
-        congr 1
-        exact Term.evalList_lowerAbove_of_not_occurs env depth inserted args hOccurs
-    | apply fn arg =>
-        simp only [Term.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp [Term.lowerAbove, Term.eval, Term.eval_lowerAbove_of_not_occurs env depth inserted fn hOccurs.1, Term.eval_lowerAbove_of_not_occurs env depth inserted arg hOccurs.2]
-    | bool value => simp [Term.lowerAbove, Term.eval]
-    | notE body =>
-        simp only [Term.occursBVarAt] at hOccurs
-        simp [Term.lowerAbove, Term.eval, Term.eval_lowerAbove_of_not_occurs env depth inserted body hOccurs]
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        simp only [Term.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp [Term.lowerAbove, Term.eval, Term.eval_lowerAbove_of_not_occurs env depth inserted left hOccurs.1, Term.eval_lowerAbove_of_not_occurs env depth inserted right hOccurs.2]
-    | quote formula =>
-        simp only [Term.occursBVarAt] at hOccurs
-        simp only [Term.lowerAbove, Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_lowerAbove_of_not_occurs env depth inserted formula hOccurs
-    | lam domain codomain body =>
-        simp only [Term.occursBVarAt] at hOccurs
-        simp only [Term.lowerAbove, Term.eval]
-        congr 1
-        funext value
-        rw [Term.eval_lowerAbove_of_not_occurs (env.push value) (depth + 1) inserted body hOccurs]
-        apply Term.eval_eq_of_env_eq
-        · exact Env.insertAt_push_bound depth env inserted value
-        · intro sort id
-          rfl
-    | ite sort condition thenTerm elseTerm =>
-        simp only [Term.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        rcases hOccurs with ⟨⟨hCondition, hThen⟩, hElse⟩
-        simp only [Term.lowerAbove, Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_lowerAbove_of_not_occurs env depth inserted condition
-            hCondition
-        · exact Term.eval_lowerAbove_of_not_occurs env depth inserted thenTerm hThen
-        · exact Term.eval_lowerAbove_of_not_occurs env depth inserted elseTerm hElse
+
+    cases term <;> simp only [Term.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
+    case bvar sort index =>
+      by_cases hLt : index < depth
+      · simp [Term.lowerAbove, Term.eval, Env.insertAt, hLt]
+      · by_cases hEq : index = depth
+        · subst index; simp at hOccurs
+        · simp [Term.lowerAbove, Term.eval, Env.insertAt, hLt, hEq]
+    all_goals simp only [Term.lowerAbove, Term.eval]
+    all_goals first | rfl | simp_all only [Term.eval_lowerAbove_of_not_occurs (inserted := inserted),
+      Term.evalList_lowerAbove_of_not_occurs (inserted := inserted), ← Formula.Satisfies.eq_def,
+      Formula.satisfies_lowerAbove_of_not_occurs (inserted := inserted), Env.insertAt_push]
   theorem Formula.satisfies_lowerAbove_of_not_occurs {M : Model} (env : Env M) (depth : Nat) (inserted : M.Carrier) (formula : Formula) (hOccurs : Formula.occursBVarAt depth formula = false) : Formula.Satisfies env (Formula.lowerAbove depth formula) ↔ Formula.Satisfies (env.insertAt depth inserted) formula := by
-    cases formula with
-    | trueE
-    | falseE => simp [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-    | atom predicate args =>
-        simp only [Formula.occursBVarAt] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_lowerAbove_of_not_occurs env depth inserted args hOccurs]
-    | equal sort left right =>
-        simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_lowerAbove_of_not_occurs env depth inserted left hOccurs.1, Term.eval_lowerAbove_of_not_occurs env depth inserted right hOccurs.2]
-    | boolTerm term =>
-        simp only [Formula.occursBVarAt] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_lowerAbove_of_not_occurs env depth inserted term hOccurs]
-    | neg body =>
-        simp only [Formula.occursBVarAt] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          not_congr (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted body hOccurs)
-    | imp left right =>
-        simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          imp_congr (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted left hOccurs.1)
-            (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted right hOccurs.2)
-    | conj left right =>
-        simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          and_congr (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted left hOccurs.1)
-            (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted right hOccurs.2)
-    | disj left right =>
-        simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          or_congr (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted left hOccurs.1)
-            (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted right hOccurs.2)
-    | iffE left right =>
-        simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          iff_congr (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted left hOccurs.1)
-            (Formula.satisfies_lowerAbove_of_not_occurs env depth inserted right hOccurs.2)
-    | forallE sort body =>
-        simp only [Formula.occursBVarAt] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        constructor <;> intro h value hSort
-        · apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value)
-              (Env.insertAt_push_bound depth env inserted value) (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_lowerAbove_of_not_occurs (env.push value) (depth + 1) inserted body hOccurs).mp (h value hSort)
-        · apply (Formula.satisfies_lowerAbove_of_not_occurs (env.push value) (depth + 1) inserted body hOccurs).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value)
-              (Env.insertAt_push_bound depth env inserted value) (by intro target id; rfl) body).mpr
-          exact h value hSort
-    | existsE sort body =>
-        simp only [Formula.occursBVarAt] at hOccurs
-        simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value)
-              (Env.insertAt_push_bound depth env inserted value) (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_lowerAbove_of_not_occurs (env.push value) (depth + 1) inserted body hOccurs).mp hBody
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_lowerAbove_of_not_occurs (env.push value) (depth + 1) inserted body hOccurs).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value)
-              (Env.insertAt_push_bound depth env inserted value) (by intro target id; rfl) body).mpr
-          exact hBody
+
+    cases formula <;> simp only [Formula.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
+    all_goals simp only [Formula.lowerAbove, Formula.Satisfies, Formula.eval]
+    all_goals first | rfl | simp_all only [← Formula.Satisfies.eq_def,
+      Term.eval_lowerAbove_of_not_occurs (inserted := inserted), Term.evalList_lowerAbove_of_not_occurs (inserted := inserted),
+      Formula.satisfies_lowerAbove_of_not_occurs (inserted := inserted), Env.insertAt_push]
   theorem Term.evalList_lowerAbove_of_not_occurs {M : Model} (env : Env M) (depth : Nat) (inserted : M.Carrier) (terms : List Term) (hOccurs : Term.occursBVarListAt depth terms = false) : (Term.lowerListAbove depth terms).map (Term.eval env) = terms.map (Term.eval (env.insertAt depth inserted)) := by
     cases terms with
     | nil => rfl
@@ -169,47 +63,11 @@ theorem Nnf.satisfies_iff_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound 
   rw [← Nnf.satisfies_toFormula env₁ nnf, ← Nnf.satisfies_toFormula env₂ nnf]
   exact Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree nnf.toFormula
 theorem Nnf.satisfies_lowerAbove_of_not_occurs {M : Model} (env : Env M) (depth : Nat) (inserted : M.Carrier) (nnf : Nnf) (hOccurs : nnf.occursBVarAt depth = false) : Nnf.Satisfies env (nnf.lowerAbove depth) ↔ Nnf.Satisfies (env.insertAt depth inserted) nnf := by
-  induction nnf generalizing env depth with
-  | trueE => simp [Nnf.lowerAbove, Nnf.Satisfies]
-  | falseE => simp [Nnf.lowerAbove, Nnf.Satisfies]
-  | lit literal =>
-      simp only [Nnf.occursBVarAt] at hOccurs
-      simp only [Nnf.lowerAbove, Nnf.Satisfies]
-      exact Literal.satisfies_lowerAbove_of_not_occurs env depth inserted literal hOccurs
-  | conj left right ihLeft ihRight =>
-      simp only [Nnf.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-      simp only [Nnf.lowerAbove, Nnf.Satisfies]
-      exact and_congr (ihLeft env depth hOccurs.1) (ihRight env depth hOccurs.2)
-  | disj left right ihLeft ihRight =>
-      simp only [Nnf.occursBVarAt, Bool.or_eq_false_iff] at hOccurs
-      simp only [Nnf.lowerAbove, Nnf.Satisfies]
-      exact or_congr (ihLeft env depth hOccurs.1) (ihRight env depth hOccurs.2)
-  | forallE sort body ih =>
-      simp only [Nnf.occursBVarAt] at hOccurs
-      simp only [Nnf.lowerAbove, Nnf.Satisfies]
-      constructor <;> intro h value hSort
-      · apply (Nnf.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value) (Env.insertAt_push_bound depth env inserted value)
-            (by intro target id; rfl) body).mp
-        exact (ih (env.push value) (depth + 1) hOccurs).mp (h value hSort)
-      · apply (ih (env.push value) (depth + 1) hOccurs).mpr
-        apply (Nnf.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value) (Env.insertAt_push_bound depth env inserted value)
-            (by intro target id; rfl) body).mpr
-        exact h value hSort
-  | existsE sort body ih =>
-      simp only [Nnf.occursBVarAt] at hOccurs
-      simp only [Nnf.lowerAbove, Nnf.Satisfies]
-      constructor
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        apply (Nnf.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value) (Env.insertAt_push_bound depth env inserted value)
-            (by intro target id; rfl) body).mp
-        exact (ih (env.push value) (depth + 1) hOccurs).mp hBody
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        apply (ih (env.push value) (depth + 1) hOccurs).mpr
-        apply (Nnf.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) inserted) ((env.insertAt depth inserted).push value) (Env.insertAt_push_bound depth env inserted value)
-            (by intro target id; rfl) body).mpr
-        exact hBody
+
+  induction nnf generalizing env depth <;>
+    simp_all only [Nnf.occursBVarAt, Bool.or_eq_false_iff, Nnf.lowerAbove,
+      Nnf.Satisfies, Literal.satisfies_lowerAbove_of_not_occurs (inserted := inserted), Env.insertAt_push]
+
 theorem Env.insertAt_zero {M : Model} (env : Env M) (inserted : M.Carrier) : env.insertAt 0 inserted = env.push inserted := by
   cases env with
   | mk boundVal freeVal =>
@@ -277,181 +135,46 @@ theorem rewriteRoot?_satisfies {before : Nnf} {rewrite : Rewrite} (hRewrite : re
   classical
   intro M env
   cases before with
-  | trueE | falseE | lit => simp [rewriteRoot?] at hRewrite
-  | conj | disj => simp [rewriteRoot?] at hRewrite
-  | forallE sort body =>
+  | trueE | falseE | lit | conj | disj => simp [rewriteRoot?] at hRewrite
+  | forallE sort body | existsE sort body =>
       by_cases hBody : Dependency.independentCurrentBinder body = true
       · simp [rewriteRoot?, hBody] at hRewrite
         subst rewrite
-        apply Nnf.satisfies_forall_drop_of_independent
-        simpa [Dependency.independentCurrentBinder] using hBody
+        first
+        | exact Nnf.satisfies_forall_drop_of_independent env sort body
+            (by simpa [Dependency.independentCurrentBinder] using hBody)
+        | exact Nnf.satisfies_exists_drop_of_independent env sort body
+            (by simpa [Dependency.independentCurrentBinder] using hBody)
       · cases body with
         | trueE | falseE | lit | forallE | existsE => simp [rewriteRoot?, hBody] at hRewrite
-        | conj left right =>
+        | conj left right | disj left right =>
+            have hNonempty := M.sortNonempty sort
             by_cases hLeft : Dependency.independentCurrentBinder left = true
             · simp [rewriteRoot?, hBody, hLeft] at hRewrite
               subst rewrite
-              have hIndependent : left.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hLeft
-              change Nnf.Satisfies env (Nnf.forallE sort (Nnf.conj left right)) ↔
-                (Nnf.Satisfies env left.dropCurrentBinder ∧ Nnf.Satisfies env (Nnf.forallE sort right))
-              rw [← Nnf.satisfies_forall_drop_of_independent env sort left hIndependent]
+              have hIndependent : left.usesCurrentBinder = false := by
+                simpa [Dependency.independentCurrentBinder] using hLeft
+              have hValue (value : M.Carrier) :=
+                (Nnf.satisfies_dropCurrentBinder_of_independent env value left hIndependent).symm
               simp only [Nnf.Satisfies]
-              constructor
-              · intro h
-                exact ⟨fun value hSort => (h value hSort).1, fun value hSort => (h value hSort).2⟩
-              · rintro ⟨hLeftAll, hRightAll⟩ value hSort
-                exact ⟨hLeftAll value hSort, hRightAll value hSort⟩
+              simp only [hValue]
+              by_cases hConstant : Nnf.Satisfies env left.dropCurrentBinder <;>
+                simp [hConstant, hNonempty]
             · by_cases hRight : Dependency.independentCurrentBinder right = true
               · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
                 subst rewrite
-                have hIndependent : right.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hRight
-                change Nnf.Satisfies env (Nnf.forallE sort (Nnf.conj left right)) ↔
-                  (Nnf.Satisfies env (Nnf.forallE sort left) ∧ Nnf.Satisfies env right.dropCurrentBinder)
-                rw [← Nnf.satisfies_forall_drop_of_independent env sort right hIndependent]
+                have hIndependent : right.usesCurrentBinder = false := by
+                  simpa [Dependency.independentCurrentBinder] using hRight
+                have hValue (value : M.Carrier) :=
+                  (Nnf.satisfies_dropCurrentBinder_of_independent env value right hIndependent).symm
                 simp only [Nnf.Satisfies]
-                constructor
-                · intro h
-                  exact ⟨fun value hSort => (h value hSort).1, fun value hSort => (h value hSort).2⟩
-                · rintro ⟨hLeftAll, hRightAll⟩ value hSort
-                  exact ⟨hLeftAll value hSort, hRightAll value hSort⟩
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-                subst rewrite
-                simp only [Nnf.Satisfies]
-                constructor
-                · intro h
-                  exact ⟨fun value hSort => (h value hSort).1, fun value hSort => (h value hSort).2⟩
-                · rintro ⟨hLeftAll, hRightAll⟩ value hSort
-                  exact ⟨hLeftAll value hSort, hRightAll value hSort⟩
-        | disj left right =>
-            by_cases hLeft : Dependency.independentCurrentBinder left = true
-            · simp [rewriteRoot?, hBody, hLeft] at hRewrite
-              subst rewrite
-              have hIndependent : left.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hLeft
-              change Nnf.Satisfies env (Nnf.forallE sort (Nnf.disj left right)) ↔
-                (Nnf.Satisfies env left.dropCurrentBinder ∨ Nnf.Satisfies env (Nnf.forallE sort right))
-              simp only [Nnf.Satisfies]
-              by_cases hConstant : Nnf.Satisfies env left.dropCurrentBinder
-              · constructor
-                · intro _
-                  exact Or.inl hConstant
-                · intro _ value _
-                  exact Or.inl ((Nnf.satisfies_dropCurrentBinder_of_independent env value left hIndependent).mp hConstant)
-              · constructor
-                · intro h
-                  right
-                  intro value hSort
-                  rcases h value hSort with hValue | hRight
-                  · exact False.elim (hConstant ((Nnf.satisfies_dropCurrentBinder_of_independent env value left hIndependent).mpr hValue))
-                  · exact hRight
-                · rintro (hImpossible | hRightAll)
-                  · exact False.elim (hConstant hImpossible)
-                  · intro value hSort
-                    exact Or.inr (hRightAll value hSort)
-            · by_cases hRight : Dependency.independentCurrentBinder right = true
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-                subst rewrite
-                have hIndependent : right.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hRight
-                change Nnf.Satisfies env (Nnf.forallE sort (Nnf.disj left right)) ↔
-                  (Nnf.Satisfies env (Nnf.forallE sort left) ∨ Nnf.Satisfies env right.dropCurrentBinder)
-                simp only [Nnf.Satisfies]
-                by_cases hConstant : Nnf.Satisfies env right.dropCurrentBinder
-                · constructor
-                  · intro _
-                    exact Or.inr hConstant
-                  · intro _ value _
-                    exact Or.inr ((Nnf.satisfies_dropCurrentBinder_of_independent env value right hIndependent).mp hConstant)
-                · constructor
-                  · intro h
-                    left
-                    intro value hSort
-                    rcases h value hSort with hLeftValue | hValue
-                    · exact hLeftValue
-                    · exact False.elim (hConstant ((Nnf.satisfies_dropCurrentBinder_of_independent env value right hIndependent).mpr hValue))
-                  · rintro (hLeftAll | hImpossible)
-                    · intro value hSort
-                      exact Or.inl (hLeftAll value hSort)
-                    · exact False.elim (hConstant hImpossible)
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-  | existsE sort body =>
-      by_cases hBody : Dependency.independentCurrentBinder body = true
-      · simp [rewriteRoot?, hBody] at hRewrite
-        subst rewrite
-        apply Nnf.satisfies_exists_drop_of_independent
-        simpa [Dependency.independentCurrentBinder] using hBody
-      · cases body with
-        | trueE | falseE | lit | forallE | existsE => simp [rewriteRoot?, hBody] at hRewrite
-        | disj left right =>
-            by_cases hLeft : Dependency.independentCurrentBinder left = true
-            · simp [rewriteRoot?, hBody, hLeft] at hRewrite
-              subst rewrite
-              have hIndependent : left.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hLeft
-              change Nnf.Satisfies env (Nnf.existsE sort (Nnf.disj left right)) ↔
-                (Nnf.Satisfies env left.dropCurrentBinder ∨ Nnf.Satisfies env (Nnf.existsE sort right))
-              rw [← Nnf.satisfies_exists_drop_of_independent env sort left hIndependent]
-              simp only [Nnf.Satisfies]
-              constructor
-              · rintro ⟨value, hSort, hLeftValue | hRightValue⟩
-                · exact Or.inl ⟨value, hSort, hLeftValue⟩
-                · exact Or.inr ⟨value, hSort, hRightValue⟩
-              · rintro (⟨value, hSort, hLeftValue⟩ | ⟨value, hSort, hRightValue⟩)
-                · exact ⟨value, hSort, Or.inl hLeftValue⟩
-                · exact ⟨value, hSort, Or.inr hRightValue⟩
-            · by_cases hRight : Dependency.independentCurrentBinder right = true
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-                subst rewrite
-                have hIndependent : right.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hRight
-                change Nnf.Satisfies env (Nnf.existsE sort (Nnf.disj left right)) ↔
-                  (Nnf.Satisfies env (Nnf.existsE sort left) ∨ Nnf.Satisfies env right.dropCurrentBinder)
-                rw [← Nnf.satisfies_exists_drop_of_independent env sort right hIndependent]
-                simp only [Nnf.Satisfies]
-                constructor
-                · rintro ⟨value, hSort, hLeftValue | hRightValue⟩
-                  · exact Or.inl ⟨value, hSort, hLeftValue⟩
-                  · exact Or.inr ⟨value, hSort, hRightValue⟩
-                · rintro (⟨value, hSort, hLeftValue⟩ | ⟨value, hSort, hRightValue⟩)
-                  · exact ⟨value, hSort, Or.inl hLeftValue⟩
-                  · exact ⟨value, hSort, Or.inr hRightValue⟩
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-                subst rewrite
-                simp only [Nnf.Satisfies]
-                constructor
-                · rintro ⟨value, hSort, hLeftValue | hRightValue⟩
-                  · exact Or.inl ⟨value, hSort, hLeftValue⟩
-                  · exact Or.inr ⟨value, hSort, hRightValue⟩
-                · rintro (⟨value, hSort, hLeftValue⟩ | ⟨value, hSort, hRightValue⟩)
-                  · exact ⟨value, hSort, Or.inl hLeftValue⟩
-                  · exact ⟨value, hSort, Or.inr hRightValue⟩
-        | conj left right =>
-            by_cases hLeft : Dependency.independentCurrentBinder left = true
-            · simp [rewriteRoot?, hBody, hLeft] at hRewrite
-              subst rewrite
-              have hIndependent : left.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hLeft
-              change Nnf.Satisfies env (Nnf.existsE sort (Nnf.conj left right)) ↔
-                (Nnf.Satisfies env left.dropCurrentBinder ∧ Nnf.Satisfies env (Nnf.existsE sort right))
-              rw [← Nnf.satisfies_exists_drop_of_independent env sort left hIndependent]
-              simp only [Nnf.Satisfies]
-              constructor
-              · rintro ⟨value, hSort, hLeftValue, hRightValue⟩
-                exact ⟨⟨value, hSort, hLeftValue⟩, value, hSort, hRightValue⟩
-              · rintro ⟨⟨leftValue, hLeftSort, hLeftValue⟩, rightValue, hRightSort, hRightValue⟩
-                exact ⟨rightValue, hRightSort, (Nnf.satisfies_dropCurrentBinder_of_independent env rightValue left hIndependent).mp
-                    ((Nnf.satisfies_dropCurrentBinder_of_independent env leftValue left hIndependent).mpr hLeftValue),
-                  hRightValue⟩
-            · by_cases hRight : Dependency.independentCurrentBinder right = true
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
-                subst rewrite
-                have hIndependent : right.usesCurrentBinder = false := by simpa [Dependency.independentCurrentBinder] using hRight
-                change Nnf.Satisfies env (Nnf.existsE sort (Nnf.conj left right)) ↔
-                  (Nnf.Satisfies env (Nnf.existsE sort left) ∧ Nnf.Satisfies env right.dropCurrentBinder)
-                rw [← Nnf.satisfies_exists_drop_of_independent env sort right hIndependent]
-                simp only [Nnf.Satisfies]
-                constructor
-                · rintro ⟨value, hSort, hLeftValue, hRightValue⟩
-                  exact ⟨⟨value, hSort, hLeftValue⟩, value, hSort, hRightValue⟩
-                · rintro ⟨⟨leftValue, hLeftSort, hLeftValue⟩, rightValue, hRightSort, hRightValue⟩
-                  exact ⟨leftValue, hLeftSort, hLeftValue, (Nnf.satisfies_dropCurrentBinder_of_independent env leftValue right hIndependent).mp
-                      ((Nnf.satisfies_dropCurrentBinder_of_independent env rightValue right hIndependent).mpr hRightValue)⟩
-              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite
+                simp only [hValue]
+                by_cases hConstant : Nnf.Satisfies env right.dropCurrentBinder <;>
+                  simp [hConstant, hNonempty]
+              · simp [rewriteRoot?, hBody, hLeft, hRight] at hRewrite <;>
+                  subst rewrite <;>
+                  simp [Nnf.Satisfies, forall_and, exists_or, and_or_left]
+
 theorem rewriteOnceAt_satisfies {path : Path} {current : Nnf} {step : Step} (hStep : rewriteOnceAt path current = some step) : Nnf.Equivalent.{x} current step.after := by
   induction current generalizing path step with
   | trueE | falseE | lit => simp [rewriteOnceAt, rewriteRoot?] at hStep

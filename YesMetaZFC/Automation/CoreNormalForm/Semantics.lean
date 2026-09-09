@@ -36,6 +36,16 @@ structure Env (M : Model) where
   boundVal : Nat → M.Carrier
   freeVal : CoreSort → VarId → M.Carrier
 namespace Env
+/-- 环境逐点相等即为记录相等，所有解释函数共用这一外延性。 -/
+theorem ext {M : Model} (env₁ env₂ : Env M)
+    (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
+    (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) : env₁ = env₂ := by
+  cases env₁
+  cases env₂
+  congr
+  · exact funext hBound
+  · exact funext (fun sort => funext (hFree sort))
+
 def push {M : Model} (env : Env M) (value : M.Carrier) : Env M where
   boundVal := fun index =>
     match index with
@@ -103,6 +113,19 @@ theorem insertAt_push_bound {M : Model} (depth : Nat) (env : Env M) (inserted va
           cases previous with
           | zero => omega
           | succ index => simp [insertAt, Nat.succ_lt_succ_iff, hLt, hEq]
+/-- 移位、删除与插入和 binder 扩张交换；上层不再逐点重建环境。 -/
+@[simp] theorem skip_push {M : Model} (amount cutoff : Nat) (env : Env M) (value : M.Carrier) :
+    (env.push value).skip amount (cutoff + 1) = (env.skip amount cutoff).push value :=
+  ext _ _ (skip_push_bound amount cutoff env value) (fun _ _ => rfl)
+
+@[simp] theorem drop_push {M : Model} (amount : Nat) (env : Env M) (value : M.Carrier) :
+    (env.push value).drop (amount + 1) = env.drop amount :=
+  ext _ _ (drop_push_bound amount env value) (fun _ _ => rfl)
+
+@[simp] theorem insertAt_push {M : Model} (depth : Nat) (env : Env M) (inserted value : M.Carrier) :
+    (env.push value).insertAt (depth + 1) inserted = (env.insertAt depth inserted).push value :=
+  ext _ _ (insertAt_push_bound depth env inserted value) (fun _ _ => rfl)
+
 end Env
 mutual
   def Term.eval {M : Model} (env : Env M) : Term → M.Carrier
@@ -141,219 +164,38 @@ def Satisfiable (formula : Formula) : Prop :=
 def Unsatisfiable (formula : Formula) : Prop :=
   ¬ Satisfiable.{x} formula
 end Formula
-mutual
-  theorem Term.eval_eq_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (term : Term) : Term.eval env₁ term = Term.eval env₂ term := by
-    cases term with
-    | bvar _ index => simpa only [Term.eval] using hBound index
-    | fvar sort id => simpa only [Term.eval] using hFree sort id
-    | app symbol args =>
-        simp only [Term.eval]
-        congr 1
-        exact Term.evalList_eq_of_env_eq env₁ env₂ hBound hFree args
-    | apply fn arg =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree fn, Term.eval_eq_of_env_eq env₁ env₂ hBound hFree arg]
-    | bool _ => simp only [Term.eval]
-    | notE body =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree body]
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree left, Term.eval_eq_of_env_eq env₁ env₂ hBound hFree right]
-    | quote formula =>
-        simp only [Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree formula
-    | lam domain codomain body =>
-        simp only [Term.eval]
-        congr 1
-        funext value
-        apply Term.eval_eq_of_env_eq
-        · intro index
-          cases index <;> simp [Env.push, hBound]
-        · intro sort id
-          simp [Env.push, hFree]
-    | ite _ condition thenTerm elseTerm =>
-        simp only [Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree condition
-        · exact Term.eval_eq_of_env_eq env₁ env₂ hBound hFree thenTerm
-        · exact Term.eval_eq_of_env_eq env₁ env₂ hBound hFree elseTerm
-  theorem Formula.satisfies_iff_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (formula : Formula) : Formula.Satisfies env₁ formula ↔ Formula.Satisfies env₂ formula := by
-    cases formula with
-    | trueE
-    | falseE => simp only [Formula.Satisfies, Formula.eval]
-    | atom _ args =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_eq_of_env_eq env₁ env₂ hBound hFree args]
-    | equal _ left right =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree left, Term.eval_eq_of_env_eq env₁ env₂ hBound hFree right]
-    | boolTerm term =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree term]
-    | neg body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          not_congr (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree body)
-    | imp left right =>
-        simp only [Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          imp_congr (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree left) (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree right)
-    | conj left right =>
-        simp only [Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          and_congr (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree left) (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree right)
-    | disj left right =>
-        simp only [Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          or_congr (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree left) (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree right)
-    | iffE left right =>
-        simp only [Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          iff_congr (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree left) (Formula.satisfies_iff_of_env_eq env₁ env₂ hBound hFree right)
-    | forallE sort body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor <;> intro h value hSort
-        · apply (Formula.satisfies_iff_of_env_eq (env₁.push value) (env₂.push value) (by
-                intro index
-                cases index <;> simp [Env.push, hBound]) (by
-                intro target id
-                simp [Env.push, hFree]) body).mp
-          exact h value hSort
-        · apply (Formula.satisfies_iff_of_env_eq (env₁.push value) (env₂.push value) (by
-                intro index
-                cases index <;> simp [Env.push, hBound]) (by
-                intro target id
-                simp [Env.push, hFree]) body).mpr
-          exact h value hSort
-    | existsE sort body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          exact (Formula.satisfies_iff_of_env_eq (env₁.push value) (env₂.push value) (by
-              intro index
-              cases index <;> simp [Env.push, hBound]) (by
-              intro target id
-              simp [Env.push, hFree]) body).mp hBody
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          exact (Formula.satisfies_iff_of_env_eq (env₁.push value) (env₂.push value) (by
-              intro index
-              cases index <;> simp [Env.push, hBound]) (by
-              intro target id
-              simp [Env.push, hFree]) body).mpr hBody
-  theorem Term.evalList_eq_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (terms : List Term) : terms.map (Term.eval env₁) = terms.map (Term.eval env₂) := by
-    cases terms with
-    | nil => rfl
-    | cons head tail =>
-        simp only [List.map_cons]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree head, Term.evalList_eq_of_env_eq env₁ env₂ hBound hFree tail]
-end
+theorem Term.eval_eq_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal
+    index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (term : Term) : Term.eval env₁ term =
+    Term.eval env₂ term := by
+
+  cases Env.ext env₁ env₂ hBound hFree
+  rfl
+theorem Formula.satisfies_iff_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index =
+    env₂.boundVal index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (formula : Formula) :
+    Formula.Satisfies env₁ formula ↔ Formula.Satisfies env₂ formula := by
+
+  cases Env.ext env₁ env₂ hBound hFree
+  rfl
+theorem Term.evalList_eq_of_env_eq {M : Model} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index =
+    env₂.boundVal index) (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (terms : List Term) :
+    terms.map (Term.eval env₁) = terms.map (Term.eval env₂) := by
+
+  cases Env.ext env₁ env₂ hBound hFree
+  rfl
+
 mutual
   theorem Term.eval_shiftAbove {M : Model} (env : Env M) (amount cutoff : Nat) (term : Term) : Term.eval env (Term.shiftAbove amount cutoff term) = Term.eval (env.skip amount cutoff) term := by
-    cases term with
-    | bvar sort index =>
-        by_cases hIndex : index < cutoff
-        · simp [Term.shiftAbove, Term.eval, Env.skip, hIndex]
-        · simp [Term.shiftAbove, Term.eval, Env.skip, hIndex]
-    | fvar sort id => simp [Term.shiftAbove, Term.eval, Env.skip]
-    | app symbol args =>
-        simp only [Term.shiftAbove, Term.eval]
-        congr 1
-        exact Term.evalList_shiftAbove env amount cutoff args
-    | apply fn arg => simp [Term.shiftAbove, Term.eval, Term.eval_shiftAbove]
-    | bool value => simp [Term.shiftAbove, Term.eval]
-    | notE body => simp [Term.shiftAbove, Term.eval, Term.eval_shiftAbove]
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right => simp [Term.shiftAbove, Term.eval, Term.eval_shiftAbove]
-    | quote formula =>
-        simp only [Term.shiftAbove, Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_shiftAbove env amount cutoff formula
-    | lam domain codomain body =>
-        simp only [Term.shiftAbove, Term.eval]
-        congr 1
-        funext value
-        rw [Term.eval_shiftAbove]
-        apply Term.eval_eq_of_env_eq
-        · exact Env.skip_push_bound amount cutoff env value
-        · intro sort id
-          rfl
-    | ite sort condition thenTerm elseTerm =>
-        simp only [Term.shiftAbove, Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_shiftAbove env amount cutoff condition
-        · exact Term.eval_shiftAbove env amount cutoff thenTerm
-        · exact Term.eval_shiftAbove env amount cutoff elseTerm
+
+    cases term <;> simp only [Term.shiftAbove, Term.eval]
+    case bvar sort index =>
+      by_cases hIndex : index < cutoff <;> simp [Term.eval, Env.skip, hIndex]
+    all_goals first | rfl | simp only [Term.eval_shiftAbove, Term.evalList_shiftAbove,
+      ← Formula.Satisfies.eq_def, Formula.satisfies_shiftAbove, Env.skip_push]
   theorem Formula.satisfies_shiftAbove {M : Model} (env : Env M) (amount cutoff : Nat) (formula : Formula) : Formula.Satisfies env (Formula.shiftAbove amount cutoff formula) ↔ Formula.Satisfies (env.skip amount cutoff) formula := by
-    cases formula with
-    | trueE
-    | falseE => simp [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-    | atom predicate args =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_shiftAbove env amount cutoff args]
-    | equal sort left right =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_shiftAbove env amount cutoff left, Term.eval_shiftAbove env amount cutoff right]
-    | boolTerm term =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_shiftAbove env amount cutoff term]
-    | neg body =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          not_congr (Formula.satisfies_shiftAbove env amount cutoff body)
-    | imp left right =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          imp_congr (Formula.satisfies_shiftAbove env amount cutoff left) (Formula.satisfies_shiftAbove env amount cutoff right)
-    | conj left right =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          and_congr (Formula.satisfies_shiftAbove env amount cutoff left) (Formula.satisfies_shiftAbove env amount cutoff right)
-    | disj left right =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          or_congr (Formula.satisfies_shiftAbove env amount cutoff left) (Formula.satisfies_shiftAbove env amount cutoff right)
-    | iffE left right =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          iff_congr (Formula.satisfies_shiftAbove env amount cutoff left) (Formula.satisfies_shiftAbove env amount cutoff right)
-    | forallE sort body =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        constructor <;> intro h value hSort
-        · apply (Formula.satisfies_iff_of_env_eq ((env.push value).skip amount (cutoff + 1)) ((env.skip amount cutoff).push value) (Env.skip_push_bound amount cutoff env value)
-              (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_shiftAbove (env.push value) amount (cutoff + 1) body).mp (h value hSort)
-        · apply (Formula.satisfies_shiftAbove (env.push value) amount (cutoff + 1) body).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).skip amount (cutoff + 1)) ((env.skip amount cutoff).push value) (Env.skip_push_bound amount cutoff env value)
-              (by intro target id; rfl) body).mpr
-          exact h value hSort
-    | existsE sort body =>
-        simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).skip amount (cutoff + 1)) ((env.skip amount cutoff).push value) (Env.skip_push_bound amount cutoff env value)
-              (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_shiftAbove (env.push value) amount (cutoff + 1) body).mp
-            hBody
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_shiftAbove (env.push value) amount (cutoff + 1) body).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).skip amount (cutoff + 1)) ((env.skip amount cutoff).push value) (Env.skip_push_bound amount cutoff env value)
-              (by intro target id; rfl) body).mpr
-          exact hBody
+
+    cases formula <;> simp only [Formula.shiftAbove, Formula.Satisfies, Formula.eval]
+    all_goals simp only [← Formula.Satisfies.eq_def, Term.eval_shiftAbove, Term.evalList_shiftAbove,
+      Formula.satisfies_shiftAbove, Env.skip_push]
   theorem Term.evalList_shiftAbove {M : Model} (env : Env M) (amount cutoff : Nat) (terms : List Term) : (Term.shiftListAbove amount cutoff terms).map (Term.eval env) = terms.map (Term.eval (env.skip amount cutoff)) := by
     cases terms with
     | nil => rfl
@@ -363,129 +205,22 @@ mutual
 end
 mutual
   theorem Term.eval_instantiateAt {M : Model} (env : Env M) (depth : Nat) (replacement term : Term) : Term.eval env (Term.instantiateAt depth replacement term) = Term.eval (env.insertAt depth (Term.eval (env.drop depth) replacement)) term := by
-    cases term with
-    | bvar sort index =>
-        by_cases hLt : index < depth
-        · simp [Term.instantiateAt, Term.eval, Env.insertAt, hLt]
-        · by_cases hEq : index = depth
-          · subst index
-            calc
-              Term.eval env (Term.instantiateAt depth replacement (Term.bvar sort depth)) =
-                  Term.eval env (Term.shiftAbove depth 0 replacement) := by simp [Term.instantiateAt, Term.shift]
-              _ = Term.eval (env.skip depth 0) replacement :=
-                Term.eval_shiftAbove env depth 0 replacement
-              _ = Term.eval (env.drop depth) replacement := by
-                apply Term.eval_eq_of_env_eq
-                · exact Env.skip_zero_bound depth env
-                · intro target id
-                  rfl
-              _ = Term.eval (env.insertAt depth (Term.eval (env.drop depth) replacement)) (Term.bvar sort depth) := by simp [Term.eval, Env.insertAt]
-          · have hGt : depth < index := Nat.lt_of_le_of_ne (Nat.le_of_not_gt hLt) (Ne.symm hEq)
-            simp [Term.instantiateAt, Term.eval, Env.insertAt, hLt, hEq]
-    | fvar sort id => simp [Term.instantiateAt, Term.eval, Env.insertAt]
-    | app symbol args =>
-        simp only [Term.instantiateAt, Term.eval]
-        congr 1
-        exact Term.evalList_instantiateAt env depth replacement args
-    | apply fn arg => simp [Term.instantiateAt, Term.eval, Term.eval_instantiateAt]
-    | bool value => simp [Term.instantiateAt, Term.eval]
-    | notE body => simp [Term.instantiateAt, Term.eval, Term.eval_instantiateAt]
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right => simp [Term.instantiateAt, Term.eval, Term.eval_instantiateAt]
-    | quote formula =>
-        simp only [Term.instantiateAt, Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_instantiateAt env depth replacement formula
-    | lam domain codomain body =>
-        simp only [Term.instantiateAt, Term.eval]
-        congr 1
-        funext value
-        rw [Term.eval_instantiateAt]
-        apply Term.eval_eq_of_env_eq
-        · intro index
-          rw [Term.eval_eq_of_env_eq ((env.push value).drop (depth + 1)) (env.drop depth) (Env.drop_push_bound depth env value) (by intro target id; rfl) replacement]
-          exact Env.insertAt_push_bound depth env _ value index
-        · intro target id
-          rfl
-    | ite sort condition thenTerm elseTerm =>
-        simp only [Term.instantiateAt, Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_instantiateAt env depth replacement condition
-        · exact Term.eval_instantiateAt env depth replacement thenTerm
-        · exact Term.eval_instantiateAt env depth replacement elseTerm
+
+    cases term <;> simp only [Term.instantiateAt, Term.eval]
+    case bvar sort index =>
+      by_cases hLt : index < depth
+      · simp [Term.eval, Env.insertAt, hLt]
+      · by_cases hEq : index = depth
+        · subst index
+          simp [Term.shift, Env.insertAt, Term.eval_shiftAbove, Env.skip, Env.drop]
+        · simp [Term.eval, Env.insertAt, hLt, hEq]
+    all_goals first | rfl | simp only [Term.eval_instantiateAt, Term.evalList_instantiateAt,
+      ← Formula.Satisfies.eq_def, Formula.satisfies_instantiateAt, Env.drop_push, Env.insertAt_push]
   theorem Formula.satisfies_instantiateAt {M : Model} (env : Env M) (depth : Nat) (replacement : Term) (formula : Formula) : Formula.Satisfies env (Formula.instantiateAt depth replacement formula) ↔ Formula.Satisfies (env.insertAt depth (Term.eval (env.drop depth) replacement)) formula := by
-    cases formula with
-    | trueE
-    | falseE => simp [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-    | atom predicate args =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_instantiateAt env depth replacement args]
-    | equal sort left right =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_instantiateAt env depth replacement left, Term.eval_instantiateAt env depth replacement right]
-    | boolTerm term =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        rw [Term.eval_instantiateAt env depth replacement term]
-    | neg body =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          not_congr (Formula.satisfies_instantiateAt env depth replacement body)
-    | imp left right =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          imp_congr (Formula.satisfies_instantiateAt env depth replacement left) (Formula.satisfies_instantiateAt env depth replacement right)
-    | conj left right =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          and_congr (Formula.satisfies_instantiateAt env depth replacement left) (Formula.satisfies_instantiateAt env depth replacement right)
-    | disj left right =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          or_congr (Formula.satisfies_instantiateAt env depth replacement left) (Formula.satisfies_instantiateAt env depth replacement right)
-    | iffE left right =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        simpa only [Formula.Satisfies] using
-          iff_congr (Formula.satisfies_instantiateAt env depth replacement left) (Formula.satisfies_instantiateAt env depth replacement right)
-    | forallE sort body =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        constructor <;> intro h value hSort
-        · apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) (Term.eval ((env.push value).drop (depth + 1)) replacement))
-              ((env.insertAt depth (Term.eval (env.drop depth) replacement)).push value) (by
-                intro index
-                rw [Term.eval_eq_of_env_eq ((env.push value).drop (depth + 1)) (env.drop depth) (Env.drop_push_bound depth env value) (by intro target id; rfl) replacement]
-                exact Env.insertAt_push_bound depth env _ value index) (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_instantiateAt (env.push value) (depth + 1) replacement body).mp (h value hSort)
-        · apply (Formula.satisfies_instantiateAt (env.push value) (depth + 1) replacement body).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) (Term.eval ((env.push value).drop (depth + 1)) replacement))
-              ((env.insertAt depth (Term.eval (env.drop depth) replacement)).push value) (by
-                intro index
-                rw [Term.eval_eq_of_env_eq ((env.push value).drop (depth + 1)) (env.drop depth) (Env.drop_push_bound depth env value) (by intro target id; rfl) replacement]
-                exact Env.insertAt_push_bound depth env _ value index) (by intro target id; rfl) body).mpr
-          exact h value hSort
-    | existsE sort body =>
-        simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) (Term.eval ((env.push value).drop (depth + 1)) replacement))
-              ((env.insertAt depth (Term.eval (env.drop depth) replacement)).push value) (by
-                intro index
-                rw [Term.eval_eq_of_env_eq ((env.push value).drop (depth + 1)) (env.drop depth) (Env.drop_push_bound depth env value) (by intro target id; rfl) replacement]
-                exact Env.insertAt_push_bound depth env _ value index) (by intro target id; rfl) body).mp
-          exact (Formula.satisfies_instantiateAt (env.push value) (depth + 1) replacement body).mp hBody
-        · rintro ⟨value, hSort, hBody⟩
-          refine ⟨value, hSort, ?_⟩
-          apply (Formula.satisfies_instantiateAt (env.push value) (depth + 1) replacement body).mpr
-          apply (Formula.satisfies_iff_of_env_eq ((env.push value).insertAt (depth + 1) (Term.eval ((env.push value).drop (depth + 1)) replacement))
-              ((env.insertAt depth (Term.eval (env.drop depth) replacement)).push value) (by
-                intro index
-                rw [Term.eval_eq_of_env_eq ((env.push value).drop (depth + 1)) (env.drop depth) (Env.drop_push_bound depth env value) (by intro target id; rfl) replacement]
-                exact Env.insertAt_push_bound depth env _ value index) (by intro target id; rfl) body).mpr
-          exact hBody
+
+    cases formula <;> simp only [Formula.instantiateAt, Formula.Satisfies, Formula.eval]
+    all_goals simp only [← Formula.Satisfies.eq_def, Term.eval_instantiateAt, Term.evalList_instantiateAt,
+      Formula.satisfies_instantiateAt, Env.drop_push, Env.insertAt_push]
   theorem Term.evalList_instantiateAt {M : Model} (env : Env M) (depth : Nat) (replacement : Term) (terms : List Term) : (Term.instantiateListAt depth replacement terms).map (Term.eval env) = terms.map (Term.eval (env.insertAt depth (Term.eval (env.drop depth) replacement))) := by
     cases terms with
     | nil => rfl
@@ -520,32 +255,16 @@ def Satisfiable (nnf : Nnf) : Prop :=
 def Unsatisfiable (nnf : Nnf) : Prop :=
   ¬ Satisfiable.{x} nnf
 theorem satisfies_toFormula {M : Model} (env : Env M) (nnf : Nnf) : Formula.Satisfies env nnf.toFormula ↔ Satisfies env nnf := by
-  induction nnf generalizing env with
-  | trueE => simp [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-  | falseE => simp [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-  | lit literal =>
-      cases literal with
-      | mk positive atom =>
-          cases positive <;> cases atom <;>
-            simp [Nnf.toFormula, Literal.toFormula, Atom.toFormula, Literal.Satisfies, Atom.Satisfies, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-  | conj left right ihLeft ihRight =>
-      simp only [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-      simpa only [Formula.Satisfies] using and_congr (ihLeft env) (ihRight env)
-  | disj left right ihLeft ihRight =>
-      simp only [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-      simpa only [Formula.Satisfies] using or_congr (ihLeft env) (ihRight env)
-  | forallE sort body ih =>
-      simp only [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-      constructor <;> intro h value hSort
-      · exact (ih (env.push value)).mp (h value hSort)
-      · exact (ih (env.push value)).mpr (h value hSort)
-  | existsE sort body ih =>
-      simp only [Nnf.toFormula, Formula.Satisfies, Formula.eval, Nnf.Satisfies]
-      constructor
-      · rintro ⟨value, hSort, hBody⟩
-        exact ⟨value, hSort, (ih (env.push value)).mp hBody⟩
-      · rintro ⟨value, hSort, hBody⟩
-        exact ⟨value, hSort, (ih (env.push value)).mpr hBody⟩
+
+  induction nnf generalizing env <;>
+    simp_all only [Nnf.toFormula, Formula.Satisfies.eq_def, Formula.eval, Nnf.Satisfies]
+  case lit literal =>
+    cases literal with
+    | mk positive atom =>
+        cases positive <;> cases atom <;>
+          simp [Literal.toFormula, Atom.toFormula, Literal.Satisfies,
+            Atom.Satisfies, Formula.eval]
+
 def Equivalent (left right : Nnf) : Prop :=
   ∀ {M : Model.{x}} (env : Env M), Satisfies env left ↔ Satisfies env right
 end Nnf

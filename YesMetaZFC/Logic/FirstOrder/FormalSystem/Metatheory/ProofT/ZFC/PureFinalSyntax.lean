@@ -19,7 +19,7 @@ variable {ℳ : Structure.{0,0,0,x} ℒ}
 
 theorem structural_syntax (hℳ : Theory.Models ℳ theory) :
     structural_syntax_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ structural_syntax_definition_axiom (by decide +kernel)).mp
   refine ⟨⟨?_, ?_⟩, ?_⟩
   · apply close_of_values
     intro args
@@ -43,7 +43,7 @@ theorem structural_syntax (hℳ : Theory.Models ℳ theory) :
 
 theorem related_term (hℳ : Theory.Models ℳ theory) :
     related_term_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_term_code_at_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons c tail1 =>
@@ -54,7 +54,7 @@ theorem related_term (hℳ : Theory.Models ℳ theory) :
 
 theorem related_term_list (hℳ : Theory.Models ℳ theory) :
     related_term_list_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_term_list_code_at_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons d tail1 =>
@@ -66,7 +66,7 @@ theorem related_term_list (hℳ : Theory.Models ℳ theory) :
 
 theorem related_formula (hℳ : Theory.Models ℳ theory) :
     related_formula_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_formula_code_at_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons c tail1 =>
@@ -77,7 +77,7 @@ theorem related_formula (hℳ : Theory.Models ℳ theory) :
 
 theorem related_term_set (hℳ : Theory.Models ℳ theory) :
     related_term_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_term_set_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons b tail1 =>
@@ -87,7 +87,7 @@ theorem related_term_set (hℳ : Theory.Models ℳ theory) :
 
 theorem related_formula_set (hℳ : Theory.Models ℳ theory) :
     related_formula_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_formula_set_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons b tail1 =>
@@ -139,7 +139,7 @@ theorem syntax_transform (hℳ : Theory.Models ℳ theory) :
     syntax_transform_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply close_of_values
   intro args
-  apply (fromTransform hℳ _ rfl args).mp
+  apply (fromTransform hℳ _ (by decide +kernel) args).mp
   cases args with | cons g tail1 =>
   cases tail1 with | cons f tail2 =>
   cases tail2 with | cons e tail3 =>
@@ -183,7 +183,7 @@ theorem free_variable_occurs (hℳ : Theory.Models ℳ theory) :
     free_variable_occurs_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply close_of_values
   intro args
-  apply (fromTransform hℳ _ rfl args).mp
+  apply (fromTransform hℳ _ (by decide +kernel) args).mp
   cases args with | cons c tail1 =>
   cases tail1 with | cons b tail2 =>
   cases tail2 with | cons a tail3 =>
@@ -193,7 +193,7 @@ theorem free_variable_occurs (hℳ : Theory.Models ℳ theory) :
 
 theorem structure_axiom (hℳ : Theory.Models ℳ theory) :
     structure_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ structure_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons c tail1 =>
@@ -204,7 +204,7 @@ theorem structure_axiom (hℳ : Theory.Models ℳ theory) :
 
 theorem modus_ponens (hℳ : Theory.Models ℳ theory) :
     modus_ponens_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ modus_ponens_definition_axiom (by decide +kernel)).mp
   apply close_of_values
   intro args
   cases args with | cons c tail1 =>
@@ -246,7 +246,7 @@ theorem related_syntax (hℳ : Theory.Models ℳ theory) :
 
 theorem nonlogical_symbols (hℳ : Theory.Models ℳ theory) :
     related_nonlogical_symbol_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply (fromRelatedSentence hℳ _ rfl).mp
+  apply (fromRelatedSentence hℳ related_nonlogical_symbol_set_definition_axiom (by decide +kernel)).mp
   have h := PureRelatedStage.nonlogical_definition hℳ
   have hEnv : (templateEnv .nil : Env (PureRelatedStage.expansion hℳ).model [] []) = Env.empty := by
     apply Env.ext <;> intro sort entry <;> cases entry

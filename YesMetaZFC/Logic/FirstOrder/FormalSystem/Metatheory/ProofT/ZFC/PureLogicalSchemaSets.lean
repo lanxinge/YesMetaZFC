@@ -73,12 +73,48 @@ theorem constructor_natural (hℳ : Theory.Models ℳ theory) (kind : Kind)
     (args : Values (E hℳ).model.Carrier (parameters kind))
     (hArgs : ∀ entry : Variable (parameters kind) s, membership ℳ ((templateEnv args).freeVal entry) (omega hℳ)) :
     membership ℳ ((constructor kind).eval (templateEnv args)) (omega hℳ) := by
-  cases kind <;> repeat' first
-    | apply binary hℳ _ .implication
-    | apply binary hℳ _ .equality
-    | apply unary hℳ _ .negation
-    | apply unary hℳ _ .universal
-    | exact hArgs _
+  -- 按实际语法树组合封闭性；不让回溯搜索猜测构造子和变量槽。
+  cases kind with
+  | implicationDistribution =>
+    exact binary hℳ _ .implication _ _
+      (binary hℳ _ .implication _ _ (hArgs .here)
+        (binary hℳ _ .implication _ _ (hArgs (.there .here)) (hArgs (.there (.there .here)))))
+      (binary hℳ _ .implication _ _
+        (binary hℳ _ .implication _ _ (hArgs .here) (hArgs (.there .here)))
+        (binary hℳ _ .implication _ _ (hArgs .here) (hArgs (.there (.there .here)))))
+  | selfImplication =>
+    exact binary hℳ _ .implication _ _ (hArgs .here)
+      (binary hℳ _ .implication _ _ (hArgs .here) (hArgs .here))
+  | weakening =>
+    exact binary hℳ _ .implication _ _ (hArgs .here)
+      (binary hℳ _ .implication _ _ (hArgs (.there .here)) (hArgs .here))
+  | contradiction =>
+    exact binary hℳ _ .implication _ _ (hArgs .here)
+      (binary hℳ _ .implication _ _
+        (unary hℳ _ .negation _ (hArgs .here)) (hArgs (.there .here)))
+  | classical =>
+    exact binary hℳ _ .implication _ _
+      (binary hℳ _ .implication _ _ (unary hℳ _ .negation _ (hArgs .here)) (hArgs .here))
+      (hArgs .here)
+  | explosion =>
+    exact binary hℳ _ .implication _ _ (unary hℳ _ .negation _ (hArgs .here))
+      (binary hℳ _ .implication _ _ (hArgs .here) (hArgs (.there .here)))
+  | caseAnalysis =>
+    exact binary hℳ _ .implication _ _
+      (binary hℳ _ .implication _ _ (hArgs .here) (hArgs (.there .here)))
+      (binary hℳ _ .implication _ _
+        (binary hℳ _ .implication _ _
+          (unary hℳ _ .negation _ (hArgs .here)) (hArgs (.there .here)))
+        (hArgs (.there .here)))
+  | quantifierDistribution =>
+    exact binary hℳ _ .implication _ _
+      (unary hℳ _ .universal _
+        (binary hℳ _ .implication _ _ (hArgs .here) (hArgs (.there .here))))
+      (binary hℳ _ .implication _ _
+        (unary hℳ _ .universal _ (hArgs .here))
+        (unary hℳ _ .universal _ (hArgs (.there .here))))
+  | equalityReflexivity =>
+    exact binary hℳ _ .equality _ _ (hArgs .here) (hArgs .here)
 
 /-- 原模式成员条件本身给出 ω 界，没有在新定义中补加限制。 -/
 theorem condition_bounded (hℳ : Theory.Models ℳ theory) (kind : Kind) (code : Carrier ℳ)
@@ -224,6 +260,7 @@ theorem graph_correct (hℳ : Theory.Models ℳ theory) (kind : Kind) (output : 
   exact iff_congr Iff.rfl (openFormula_correct (E hℳ) (PureSyntaxStage.realizes hℳ) (condition kind) (.cons code .nil))
 
 theorem dependencies_covered (kind : Kind) :
-    formulaCovered PureSyntaxStage.functionCovered PureSyntaxStage.relationCovered (condition kind) = true := by cases kind <;> rfl
+    formulaCovered PureSyntaxStage.functionCovered PureSyntaxStage.relationCovered (condition kind) = true := by
+  cases kind <;> decide +kernel
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureLogicalSchemaSets

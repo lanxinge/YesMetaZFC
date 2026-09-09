@@ -26,6 +26,20 @@ theorem accept_shape (shape : Shape) (hShape : shape ∈ shapes) (values : Fin s
   (checked_iff _).mpr ⟨shape, hShape, values,
     (fun i => shape.head.variable_le values (head_variables shape hShape i)), rfl, hQueries⟩
 
+/-- 命题公理的参数列统一满足完整公式语法查询。 -/
+private def formulaValues {free : SetContext} {count : Nat}
+    (formulas : Fin count → SetOpenFormula free) : Fin (count + 1) → Nat :=
+  Fin.cases free.length (fun i => treeValue (SyntaxEncode.formula (formulas i)))
+
+private theorem formula_queries_accept {free : SetContext} {count : Nat}
+    (formulas : Fin count → SetOpenFormula free) :
+    ∀ query, query ∈ (List.finRange count).map
+        (fun i => grammar false (.literal 0) (.var 0) (.var i.succ)) →
+      queryChecked query.1 (query.2.eval (formulaValues formulas)) = true := by
+  intro query hQuery
+  rcases List.mem_map.mp hQuery with ⟨i, _, rfl⟩
+  exact formula_accept (formulas i)
+
 attribute [local simp] LogicalAxiomEncode.encode SyntaxEncode.formula Formula.forallFreeTop
   Formula.existsFreeTop SyntaxCodeRenaming.vacuous_body head node imp neg conj disj iffE allE exE eqE leaf
 
@@ -35,237 +49,84 @@ theorem checked_encode {free : SetContext} {formula : SetOpenFormula free}
     checked (nodeValue 0 [free.length, treeValue (LogicalAxiomEncode.encode certificate), treeValue (SyntaxEncode.formula formula)]) = true := by
   cases certificate with
   | implication_distribution a1 a2 a3 =>
-    have h := accept_shape rule0 (by simp [shapes])
-      (fun i : Fin 4 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2), treeValue (SyntaxEncode.formula a3)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule0, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2), grammar false (.literal 0) (.var 0) (.var 3)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2
-        · exact formula_accept a3)
+    have h := accept_shape rule0 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 3 => [a1, a2, a3][i]))
     exact h
   | self_implication a1 =>
-    have h := accept_shape rule1 (by simp [shapes])
-      (fun i : Fin 2 => [free.length, treeValue (SyntaxEncode.formula a1)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule1, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        obtain rfl := hQuery
-        exact formula_accept a1)
+    have h := accept_shape rule1 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 1 => [a1][i]))
     exact h
   | weakening a1 a2 =>
-    have h := accept_shape rule2 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule2, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule2 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | contradiction a1 a2 =>
-    have h := accept_shape rule3 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule3, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule3 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | classical a1 =>
-    have h := accept_shape rule4 (by simp [shapes])
-      (fun i : Fin 2 => [free.length, treeValue (SyntaxEncode.formula a1)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule4, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        obtain rfl := hQuery
-        exact formula_accept a1)
+    have h := accept_shape rule4 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 1 => [a1][i]))
     exact h
   | explosion a1 a2 =>
-    have h := accept_shape rule5 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule5, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule5 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | case_analysis a1 a2 =>
-    have h := accept_shape rule6 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule6, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule6 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | truth_intro  =>
-    have h := accept_shape rule7 (by simp [shapes])
-      (fun i : Fin 1 => [free.length][i])
-      (by
-        intro query hQuery
-        dsimp only [rule7, prop] at query hQuery ⊢
-        cases hQuery)
+    have h := accept_shape rule7 (by simp [shapes]) _
+      (formula_queries_accept (free := free) (fun i : Fin 0 => Fin.elim0 i))
     exact h
   | falsum_elimination a1 =>
-    have h := accept_shape rule8 (by simp [shapes])
-      (fun i : Fin 2 => [free.length, treeValue (SyntaxEncode.formula a1)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule8, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        obtain rfl := hQuery
-        exact formula_accept a1)
+    have h := accept_shape rule8 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 1 => [a1][i]))
     exact h
   | negation_intro a1 =>
-    have h := accept_shape rule9 (by simp [shapes])
-      (fun i : Fin 2 => [free.length, treeValue (SyntaxEncode.formula a1)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule9, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        obtain rfl := hQuery
-        exact formula_accept a1)
+    have h := accept_shape rule9 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 1 => [a1][i]))
     exact h
   | negation_elimination a1 =>
-    have h := accept_shape rule10 (by simp [shapes])
-      (fun i : Fin 2 => [free.length, treeValue (SyntaxEncode.formula a1)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule10, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        obtain rfl := hQuery
-        exact formula_accept a1)
+    have h := accept_shape rule10 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 1 => [a1][i]))
     exact h
   | conjunction_intro a1 a2 =>
-    have h := accept_shape rule11 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule11, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule11 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | conjunction_elim_left a1 a2 =>
-    have h := accept_shape rule12 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule12, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule12 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | conjunction_elim_right a1 a2 =>
-    have h := accept_shape rule13 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule13, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule13 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | disjunction_intro_left a1 a2 =>
-    have h := accept_shape rule14 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule14, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule14 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | disjunction_intro_right a1 a2 =>
-    have h := accept_shape rule15 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule15, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule15 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | disjunction_elimination a1 a2 a3 =>
-    have h := accept_shape rule16 (by simp [shapes])
-      (fun i : Fin 4 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2), treeValue (SyntaxEncode.formula a3)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule16, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2), grammar false (.literal 0) (.var 0) (.var 3)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2
-        · exact formula_accept a3)
+    have h := accept_shape rule16 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 3 => [a1, a2, a3][i]))
     exact h
   | biconditional_intro a1 a2 =>
-    have h := accept_shape rule17 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule17, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule17 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | biconditional_elim_left a1 a2 =>
-    have h := accept_shape rule18 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule18, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule18 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | biconditional_elim_right a1 a2 =>
-    have h := accept_shape rule19 (by simp [shapes])
-      (fun i : Fin 3 => [free.length, treeValue (SyntaxEncode.formula a1), treeValue (SyntaxEncode.formula a2)][i])
-      (by
-        intro query hQuery
-        dsimp only [rule19, prop] at query hQuery ⊢
-        change query ∈ [grammar false (.literal 0) (.var 0) (.var 1), grammar false (.literal 0) (.var 0) (.var 2)] at hQuery
-        simp only [List.mem_cons, List.not_mem_nil, or_false] at hQuery
-        rcases hQuery with rfl | rfl
-        · exact formula_accept a1
-        · exact formula_accept a2)
+    have h := accept_shape rule19 (by simp [shapes]) _
+      (formula_queries_accept (fun i : Fin 2 => [a1, a2][i]))
     exact h
   | forall_specialization sort body point =>
     cases ‹SetSort›

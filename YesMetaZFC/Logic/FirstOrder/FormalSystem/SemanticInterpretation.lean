@@ -41,11 +41,6 @@ private def weaken_set_five {bound free : SetContext}
     (SetSort.set :: SetSort.set :: SetSort.set :: SetSort.set :: free)
     SetSort.set SetSort.set (weaken_set_four term)
 
-private def exists_set_one {bound free : SetContext}
-    (body : SetFormula bound (SetSort.set :: free)) :
-    SetFormula bound free :=
-  body.existsFreeTop SetSort.set
-
 private def exists_set_two {bound free : SetContext}
     (body : SetFormula bound ([SetSort.set, SetSort.set] ++ free)) :
     SetFormula bound free :=
@@ -72,12 +67,6 @@ private def exists_set_five {bound free : SetContext}
   body.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
     |>.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
     |>.existsFreeTop SetSort.set
-
-private def forall_set_three {bound free : SetContext}
-    (body : SetFormula bound ([SetSort.set, SetSort.set, SetSort.set] ++ free)) :
-    SetFormula bound free :=
-  body.forallFreeTop SetSort.set |>.forallFreeTop SetSort.set
-    |>.forallFreeTop SetSort.set
 
 /-! ## 结构解释键 -/
 

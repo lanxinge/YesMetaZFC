@@ -1,3 +1,4 @@
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceConstruction
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.Core
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceDomainSemantics
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceSpaceSemantics
@@ -134,29 +135,6 @@ theorem intrinsic_proof_row_quote_formula_element_mem
       element ∈ₘ syntax_formula_code_set_term := by
   rcases List.mem_map.mp hElement with ⟨formula, _, rfl⟩
   exact intrinsic_proof_row_quote_formula_mem formula
-
-/-- 有限定义域等式下，外部有效索引属于对象定义域。 -/
-theorem row_index_mem_of_domain
-    {T : SetTheory}
-    (A : ArithmeticSupport T)
-    {free : SetContext}
-    {Γ : Context signature free}
-    (sequence : SetOpenTerm free)
-    (length index : Nat)
-    (hDomain : Γ ⊢ₘ[T] domₘ(sequence) ≐ₘ numₘ(length))
-    (hIndex : index < length) :
-    Γ ⊢ₘ[T] numₘ(index) ∈ₘ domₘ(sequence) := by
-  have hNumeralMember :
-      Γ ⊢ₘ[T] numₘ(index) ∈ₘ numₘ(length) :=
-    FirstOrder.Derives.context_weaken
-      (Γ := ([] : Context signature free))
-      (Δ := Γ)
-      (by simp)
-      (numeral_mem_of_lt A.contains_successor hIndex)
-  exact FirstOrder.Derives.iff_elim_right
-    (membership_right_iff_of_equality
-      (numₘ(index)) (domₘ(sequence)) (numₘ(length)) hDomain)
-    hNumeralMember
 
 /-- 规范有限图在有效行位置的函数值等式。 -/
 theorem row_value_of_standard_sequence

@@ -256,144 +256,23 @@ theorem project_formula_rename
     project_formula (formula.rename indexMap) (by simpa using hClosed) =
     (project_formula formula hClosed).renameMapped
         (project_bound_renaming indexMap) VariableRenaming.id := by
-  induction formula generalizing targetDepth with
-  | falsum =>
-      simp [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-  | truth =>
-      simp [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-  | mem left right =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, project_mem, Formula.renameMapped]
-      have hLeft := project_term_bind_bound indexMap left hClosed.1
-      have hRight := project_term_bind_bound indexMap right hClosed.2
-      simp [Arguments.renameMapped, hLeft, hRight]
-  | atom symbol hStage arguments =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      cases symbol with
-      | extensionalEq =>
-          simp only [
-            _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-            _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-            project_formula,
-            _root_.YesMetaZFC.SetTheory.Definitional.TermVector.get_bind,
-            Formula.renameMapped]
-          have hLeft := project_term_bind_bound indexMap (arguments 0) (hClosed 0)
-          have hRight := project_term_bind_bound indexMap (arguments 1) (hClosed 1)
-          simp [hLeft, hRight]
-      | subset =>
-          simp only [
-            _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-            _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-            project_formula,
-            _root_.YesMetaZFC.SetTheory.Definitional.TermVector.get_bind,
-            Formula.renameMapped]
-          have hLeft := project_term_bind_bound indexMap (arguments 0) (hClosed 0)
-          have hRight := project_term_bind_bound indexMap (arguments 1) (hClosed 1)
-          simp [Arguments.renameMapped, hLeft, hRight]
-  | neg body ih =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-      have hBody :
-          project_formula
-              (_root_.YesMetaZFC.SetTheory.Definitional.Formula.bind
-                (.bound ∘ indexMap) body)
-                ((_root_.YesMetaZFC.SetTheory.Definitional.Formula.freeClosed_rename
-                  indexMap body).mpr hClosed) =
-            (project_formula body hClosed).renameMapped
-              (project_bound_renaming indexMap) VariableRenaming.id := by
-        change project_formula
-            (_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename
-              indexMap body) _ = _
-        exact ih indexMap hClosed
-      simp [hBody]
-  | conj left right ihLeft ihRight
-  | disj left right ihLeft ihRight
-  | imp left right ihLeft ihRight
-  | iff left right ihLeft ihRight =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-      have hLeft :
-          project_formula
-              (_root_.YesMetaZFC.SetTheory.Definitional.Formula.bind
-                (.bound ∘ indexMap) left)
-                ((_root_.YesMetaZFC.SetTheory.Definitional.Formula.freeClosed_rename
-                  indexMap left).mpr hClosed.1) =
-            (project_formula left hClosed.1).renameMapped
-              (project_bound_renaming indexMap) VariableRenaming.id := by
-        change project_formula
-            (_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename
-              indexMap left) _ = _
-        exact ihLeft indexMap hClosed.1
-      have hRight :
-          project_formula
-              (_root_.YesMetaZFC.SetTheory.Definitional.Formula.bind
-                (.bound ∘ indexMap) right)
-                ((_root_.YesMetaZFC.SetTheory.Definitional.Formula.freeClosed_rename
-                  indexMap right).mpr hClosed.2) =
-            (project_formula right hClosed.2).renameMapped
-              (project_bound_renaming indexMap) VariableRenaming.id := by
-        change project_formula
-            (_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename
-              indexMap right) _ = _
-        exact ihRight indexMap hClosed.2
-      simp [hLeft, hRight]
-  | forallE body ih =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-      have hBody := ih (project_lift_index_map indexMap) hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename] at hBody
-      have hLift := project_lift_substitution_eq indexMap
-      simp only [hLift]
-      simpa [project_bound_renaming_lift indexMap] using
-        congrArg
-          (fun body : SetFormula
-              (SetSort.set :: project_bound_context targetDepth) [] =>
-            @_root_.YesMetaZFC.Logic.FirstOrder.Formula.forallE
-              _root_.YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.signature
-              (project_bound_context targetDepth) [] SetSort.set body) hBody
-  | existsE body ih =>
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-        project_formula, Formula.renameMapped]
-      have hBody := ih (project_lift_index_map indexMap) hClosed
-      simp only [
-        _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename] at hBody
-      have hLift := project_lift_substitution_eq indexMap
-      simp only [hLift]
-      simpa [project_bound_renaming_lift indexMap] using
-        congrArg
-          (fun body : SetFormula
-              (SetSort.set :: project_bound_context targetDepth) [] =>
-            @_root_.YesMetaZFC.Logic.FirstOrder.Formula.existsE
-              _root_.YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.signature
-              (project_bound_context targetDepth) [] SetSort.set body) hBody
+  induction formula generalizing targetDepth <;>
+    simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
+  all_goals simp only [
+    _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+    _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
+    project_formula, project_mem, Formula.renameMapped]
+  case atom symbol hStage arguments hClosed =>
+    cases symbol <;>
+      have hLeft := project_term_bind_bound indexMap (arguments 0) (hClosed 0) <;>
+      have hRight := project_term_bind_bound indexMap (arguments 1) (hClosed 1) <;>
+      simp [project_formula,
+        _root_.YesMetaZFC.SetTheory.Definitional.TermVector.get_bind,
+        Formula.renameMapped, Arguments.renameMapped, hLeft, hRight]
+  all_goals simp_all [
+    _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+    Arguments.renameMapped, project_term_bind_bound,
+    project_lift_substitution_eq, project_bound_renaming_lift]
 
 /-- Project 句子的 FormalSystem 闭句像。 -/
 def project_sentence (sentence : Project.Sentence) : SetSentence :=

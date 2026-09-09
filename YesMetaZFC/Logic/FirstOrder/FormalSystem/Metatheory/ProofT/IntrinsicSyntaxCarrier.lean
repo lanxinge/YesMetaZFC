@@ -1,6 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.IntrinsicSyntaxSemantics
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.StructuralCorrectness
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.EmptySet
+import YesMetaZFC.Logic.FirstOrder.Derivation.QuantifierBlock
 
 /-!
 # 内在结构语法承载层
@@ -68,104 +69,6 @@ theorem formal_language_encoding_theory_subset_intrinsic_syntax_carrier_theory
     intrinsic_syntax_carrier_theory sentence := by
   exact expression_encoding_theory_subset_intrinsic_syntax_carrier_theory
     (formal_language_encoding_theory_subset_expression_encoding_theory hSentence)
-
-private theorem two_free_substitution_beta
-    {free : SetContext}
-    {body : SetOpenFormula ([SetSort.set, SetSort.set] ++ free)}
-    (first second : SetOpenTerm free) :
-    Formula.instantiateFreeTop first
-      (Formula.substituteFree
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.instantiateFreeTop second)) body) =
-      Formula.substituteFree
-        (VariableSubstitution.cons first
-          (VariableSubstitution.cons second VariableSubstitution.freeId)) body := by
-  change
-    Formula.substitute
-      (Substitution.instantiateFreeTop first)
-      (Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop second))) body) =
-      Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second VariableSubstitution.freeId))) body
-  rw [Formula.substitute_comp]
-  simp only [Substitution.comp, Substitution.instantiateFreeTop,
-    Substitution.free_map]
-  congr 1
-  change Substitution.map _ _ = Substitution.map _ _
-  congr
-  funext resultSort entry
-  cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, VariableSubstitution.liftFree,
-        VariableSubstitution.instantiateFreeTop,
-        Term.substituteMapped]
-  | there previous =>
-      cases resultSort
-      cases previous with
-      | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there previous =>
-          simp [ VariableSubstitution.cons,
-            VariableSubstitution.freeId, VariableSubstitution.liftFree,
-            VariableSubstitution.instantiateFreeTop, Term.substituteMapped,
-            Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped, VariableRenaming.weaken]
-
-private theorem substitute_two_weaken_free_id
-    {free : SetContext}
-    (first second : SetOpenTerm free)
-    (term : SetOpenTerm free) :
-    Term.substituteMapped VariableSubstitution.boundId
-      (VariableSubstitution.cons first
-        (VariableSubstitution.cons second VariableSubstitution.freeId))
-      ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.substituteMapped VariableSubstitution.boundId
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second VariableSubstitution.freeId))
-          ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term)
-    (motive_2 := fun _ arguments =>
-      Arguments.substituteMapped VariableSubstitution.boundId
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second VariableSubstitution.freeId))
-          ((arguments.weakenFree SetSort.set).weakenFree SetSort.set) = arguments)
-    (fun entry => by
-      cases entry)
-    (fun entry => by
-      simp [Term.substituteMapped, Term.weakenFree, Term.rename,
-        Renaming.weakenFree, Renaming.free, Term.renameMapped,
-        VariableSubstitution.cons, VariableSubstitution.freeId,
-        VariableRenaming.weaken])
-    (fun function arguments ih => by
-      change Term.app function
-          (Arguments.substituteMapped VariableSubstitution.boundId
-            (VariableSubstitution.cons first
-              (VariableSubstitution.cons second VariableSubstitution.freeId))
-            ((arguments.weakenFree SetSort.set).weakenFree SetSort.set)) =
-        Term.app function arguments
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          (Term.substituteMapped VariableSubstitution.boundId
-            (VariableSubstitution.cons first
-              (VariableSubstitution.cons second VariableSubstitution.freeId))
-            ((head.weakenFree SetSort.set).weakenFree SetSort.set))
-          (Arguments.substituteMapped VariableSubstitution.boundId
-            (VariableSubstitution.cons first
-              (VariableSubstitution.cons second VariableSubstitution.freeId))
-            ((tail.weakenFree SetSort.set).weakenFree SetSort.set)) =
-        Arguments.cons head tail
-      rw [ihHead, ihTail])
-    term
 
 theorem related_nonlogical_symbol_set_subset_derives
     {free : SetContext} {Γ : Context signature free} :
@@ -254,104 +157,16 @@ theorem intrinsic_syntax_carrier_formula_mem
       related_formula_binary_condition symbols depth formulaCode
         .equality := by
     unfold related_formula_binary_condition
-    apply FirstOrder.Derives.exists_intro termCode
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro termCode
-    rw [Formula.instantiateTop_abstractFreeTop]
-    let symbolsTwo : SetOpenTerm ([SetSort.set, SetSort.set] ++ free) :=
-      @Term.weakenFree signature [] (SetSort.set :: free)
-        SetSort.set SetSort.set
-        (@Term.weakenFree signature [] free SetSort.set SetSort.set symbols)
-    let depthTwo : SetOpenTerm ([SetSort.set, SetSort.set] ++ free) :=
-      @Term.weakenFree signature [] (SetSort.set :: free)
-        SetSort.set SetSort.set
-        (@Term.weakenFree signature [] free SetSort.set SetSort.set depth)
-    let codeTwo : SetOpenTerm ([SetSort.set, SetSort.set] ++ free) :=
-      @Term.weakenFree signature [] (SetSort.set :: free)
-        SetSort.set SetSort.set
-        (@Term.weakenFree signature [] free SetSort.set SetSort.set formulaCode)
-    let body : SetOpenFormula ([SetSort.set, SetSort.set] ++ free) :=
-      ((related_term_code_atₘ(
-          symbolsTwo, depthTwo,
-          .fvar (.there .here)) ∧ₘ
-        related_term_code_atₘ(
-          symbolsTwo, depthTwo,
-          .fvar .here)) ∧ₘ
-        (codeTwo ≐ₘ
-          structural_node_code_term .equality
-            [.fvar (.there .here), .fvar .here]))
-    change Γ ⊢ₘ[intrinsic_syntax_carrier_theory]
-      Formula.instantiateFreeTop termCode
-        (Formula.substituteFree
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop termCode)) body)
-    rw [two_free_substitution_beta (body := body) termCode termCode]
-    simp only [ Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        ([SetSort.set, SetSort.set] ++ free) [] free :=
-      VariableSubstitution.cons termCode
-        (VariableSubstitution.cons termCode VariableSubstitution.freeId)
-    have hDepthClosed :
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((depth.weakenFree SetSort.set).weakenFree SetSort.set) = depth :=
-      substitute_two_weaken_free_id termCode termCode depth
-    have hSymbolsClosed :
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((symbols.weakenFree SetSort.set).weakenFree SetSort.set) = symbols :=
-      substitute_two_weaken_free_id termCode termCode symbols
-    have hCodeClosed :
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((formulaCode.weakenFree SetSort.set).weakenFree SetSort.set) =
-          formulaCode :=
-      substitute_two_weaken_free_id termCode termCode formulaCode
-    have hTargetClosed :
-        Term.substituteMapped VariableSubstitution.boundId τ
-            (structural_node_code_term .equality
-              [.fvar (.there .here), .fvar .here]) =
-          structural_node_code_term .equality [termCode, termCode] := by
-      simp [structural_node_code_term, structural_list_code_term,
-        structural_raw_node_code_term, godel_pairing_term,
-        Term.substituteMapped, Arguments.substituteMapped, τ,
-        VariableSubstitution.cons]
-    change Γ ⊢ₘ[intrinsic_syntax_carrier_theory]
-      Formula.substitute (Substitution.free_map τ) body
-    have hBody :
-        Formula.substitute (Substitution.free_map τ) body =
-          ((related_term_code_atₘ(symbols, depth, termCode) ∧ₘ
-              related_term_code_atₘ(symbols, depth, termCode)) ∧ₘ
-            (formulaCode ≐ₘ
-              structural_node_code_term .equality [termCode, termCode])) := by
-      change
-        ((related_term_code_atₘ(
-            Term.substituteMapped VariableSubstitution.boundId τ
-              ((symbols.weakenFree SetSort.set).weakenFree SetSort.set),
-            Term.substituteMapped VariableSubstitution.boundId τ
-              ((depth.weakenFree SetSort.set).weakenFree SetSort.set),
-            Term.substituteMapped VariableSubstitution.boundId τ
-              (.fvar (.there .here))) ∧ₘ
-          related_term_code_atₘ(
-            Term.substituteMapped VariableSubstitution.boundId τ
-              ((symbols.weakenFree SetSort.set).weakenFree SetSort.set),
-            Term.substituteMapped VariableSubstitution.boundId τ
-              ((depth.weakenFree SetSort.set).weakenFree SetSort.set),
-            Term.substituteMapped VariableSubstitution.boundId τ
-              (.fvar .here))) ∧ₘ
-          (Term.substituteMapped VariableSubstitution.boundId τ
-              ((formulaCode.weakenFree SetSort.set).weakenFree SetSort.set) ≐ₘ
-            Term.substituteMapped VariableSubstitution.boundId τ
-              (structural_node_code_term .equality
-                [.fvar (.there .here), .fvar .here]))) =
-          ((related_term_code_atₘ(symbols, depth, termCode) ∧ₘ
-              related_term_code_atₘ(symbols, depth, termCode)) ∧ₘ
-            (formulaCode ≐ₘ
-              structural_node_code_term .equality [termCode, termCode]))
-      rw [hSymbolsClosed, hDepthClosed, hCodeClosed, hTargetClosed]
-      rfl
-    rw [hBody]
-    exact FirstOrder.Derives.conj_intro
-      (FirstOrder.Derives.conj_intro hTermAt hTermAt)
-      (Metatheory.Derives.equality_refl formulaCode)
+    apply FirstOrder.Derives.existsFreePrefix_intro (.cons termCode (.cons termCode .nil))
+    simpa [Arguments.substitutionWith, Formula.substituteFree, Formula.substitute,
+      Substitution.free_map, Formula.substituteMapped, Term.substituteMapped,
+      Arguments.substituteMapped, VariableSubstitution.cons,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_id,
+      structural_node_code_term, structural_list_code_term, structural_raw_node_code_term,
+      godel_pairing_term, term_weaken_free_two, equality_formula_code_term, symbols, depth, formulaCode] using
+      FirstOrder.Derives.conj_intro
+        (FirstOrder.Derives.conj_intro hTermAt hTermAt)
+        (Metatheory.Derives.equality_refl formulaCode)
   have hSubset := related_nonlogical_symbol_set_subset_derives (Γ := Γ)
   have hSetEq :
       (syntax_formula_code_set_term : SetOpenTerm free) =

@@ -397,140 +397,39 @@ theorem satisfies_rename {σ : Signature.{u, v, w}}
     (formula : Formula σ sourceBound sourceFree) :
     satisfies env (formula.rename ρ) ↔
       satisfies (env.pullbackRenaming ρ) formula := by
-  induction formula generalizing targetBound targetFree with
-  | falsum =>
-      cases ρ <;> rfl
-  | truth =>
-      cases ρ <;> rfl
-  | rel relation arguments =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change M.relInterp relation ((arguments.rename ρ).eval env) ↔
-            M.relInterp relation
-              (arguments.eval (env.pullbackRenaming ρ))
-          rw [Arguments.eval_rename]
-  | equal left right =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (left.rename ρ).eval env = (right.rename ρ).eval env ↔
-              left.eval (env.pullbackRenaming ρ) =
-                right.eval (env.pullbackRenaming ρ)
-          rw [Term.eval_rename, Term.eval_rename]
-  | neg body ih =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change (¬ satisfies env (body.rename ρ)) ↔
-            ¬ satisfies (env.pullbackRenaming ρ) body
-          exact not_congr (ih env ρ)
-  | conj left right ihLeft ihRight =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (satisfies env (left.rename ρ) ∧
-              satisfies env (right.rename ρ)) ↔
-            (satisfies (env.pullbackRenaming ρ) left ∧
-              satisfies (env.pullbackRenaming ρ) right)
-          exact and_congr (ihLeft env ρ) (ihRight env ρ)
-  | disj left right ihLeft ihRight =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (satisfies env (left.rename ρ) ∨
-              satisfies env (right.rename ρ)) ↔
-            (satisfies (env.pullbackRenaming ρ) left ∨
-              satisfies (env.pullbackRenaming ρ) right)
-          exact or_congr (ihLeft env ρ) (ihRight env ρ)
-  | imp left right ihLeft ihRight =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (satisfies env (left.rename ρ) →
-              satisfies env (right.rename ρ)) ↔
-            (satisfies (env.pullbackRenaming ρ) left →
-              satisfies (env.pullbackRenaming ρ) right)
-          exact imp_congr (ihLeft env ρ) (ihRight env ρ)
-  | iff left right ihLeft ihRight =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (satisfies env (left.rename ρ) ↔
-              satisfies env (right.rename ρ)) ↔
-            (satisfies (env.pullbackRenaming ρ) left ↔
-              satisfies (env.pullbackRenaming ρ) right)
-          exact iff_congr (ihLeft env ρ) (ihRight env ρ)
-  | forallE sort body ih =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (∀ value, satisfies (env.pushBound value)
-              (body.rename (ρ.liftBound sort))) ↔
-            ∀ value,
-              satisfies
-                ((env.pullbackRenaming ρ).pushBound value) body
-          constructor
-          · intro hFormula value
-            have hBody :=
-              (ih (env.pushBound value) (ρ.liftBound sort)).mp
-                (hFormula value)
-            simpa [Env.pullbackRenaming_liftBound] using hBody
-          · intro hFormula value
-            have hBody : satisfies
-                ((env.pushBound value).pullbackRenaming
-                  (ρ.liftBound sort)) body := by
-              simpa [Env.pullbackRenaming_liftBound] using hFormula value
-            exact
-              (ih (env.pushBound value) (ρ.liftBound sort)).mpr hBody
-  | existsE sort body ih =>
-      cases ρ with
-      | id =>
-          rfl
-      | map boundRenaming freeRenaming =>
-          let ρ := Renaming.map boundRenaming freeRenaming
-          change
-            (∃ value, satisfies (env.pushBound value)
-              (body.rename (ρ.liftBound sort))) ↔
-            ∃ value,
-              satisfies
-                ((env.pullbackRenaming ρ).pushBound value) body
-          constructor
-          · rintro ⟨value, hBody⟩
-            refine ⟨value, ?_⟩
-            have hPulled :=
-              (ih (env.pushBound value) (ρ.liftBound sort)).mp hBody
-            simpa [Env.pullbackRenaming_liftBound] using hPulled
-          · rintro ⟨value, hBody⟩
-            refine ⟨value, ?_⟩
-            have hPulled : satisfies
-                ((env.pushBound value).pullbackRenaming
-                  (ρ.liftBound sort)) body := by
-              simpa [Env.pullbackRenaming_liftBound] using hBody
-            exact
-              (ih (env.pushBound value) (ρ.liftBound sort)).mpr hPulled
+  cases ρ with
+  | id => rfl
+  | map boundMap freeMap =>
+      cases formula with
+      | falsum | truth => rfl
+      | rel relation arguments =>
+          exact (congrArg (M.relInterp relation)
+            (Arguments.eval_rename env (.map boundMap freeMap) arguments)).to_iff
+      | equal left right =>
+          exact (congr (congrArg Eq
+            (Term.eval_rename env (.map boundMap freeMap) left))
+            (Term.eval_rename env (.map boundMap freeMap) right)).to_iff
+      | neg body => exact not_congr (satisfies_rename env (.map boundMap freeMap) body)
+      | conj left right =>
+          exact and_congr (satisfies_rename env (.map boundMap freeMap) left) (satisfies_rename env (.map boundMap freeMap) right)
+      | disj left right =>
+          exact or_congr (satisfies_rename env (.map boundMap freeMap) left) (satisfies_rename env (.map boundMap freeMap) right)
+      | imp left right =>
+          exact imp_congr (satisfies_rename env (.map boundMap freeMap) left) (satisfies_rename env (.map boundMap freeMap) right)
+      | iff left right =>
+          exact iff_congr (satisfies_rename env (.map boundMap freeMap) left) (satisfies_rename env (.map boundMap freeMap) right)
+      | forallE sort body =>
+          apply forall_congr'
+          intro value
+          exact (satisfies_rename (env.pushBound value)
+            ((Renaming.map boundMap freeMap).liftBound sort) body).trans
+              (by rw [Env.pullbackRenaming_liftBound])
+      | existsE sort body =>
+          apply exists_congr
+          intro value
+          exact (satisfies_rename (env.pushBound value)
+            ((Renaming.map boundMap freeMap).liftBound sort) body).trans
+              (by rw [Env.pullbackRenaming_liftBound])
 
 /-- 闭句嵌入任意 free 上下文后保持其闭语义。 -/
 theorem satisfies_fromSentence {σ : Signature.{u, v, w}}
@@ -552,148 +451,39 @@ theorem satisfies_substitute {σ : Signature.{u, v, w}}
     (formula : Formula σ sourceBound sourceFree) :
     satisfies env (formula.substitute substitution) ↔
       satisfies (env.pullback substitution) formula := by
-  induction formula generalizing targetBound targetFree with
-  | falsum =>
-      cases substitution <;> rfl
-  | truth =>
-      cases substitution <;> rfl
-  | rel relation arguments =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change M.relInterp relation
-              ((arguments.substitute τ).eval env) ↔
-            M.relInterp relation
-              (arguments.eval (env.pullback τ))
-          rw [Arguments.eval_substitute]
-  | equal left right =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (left.substitute τ).eval env =
-                (right.substitute τ).eval env ↔
-              left.eval (env.pullback τ) =
-                right.eval (env.pullback τ)
-          rw [Term.eval_substitute, Term.eval_substitute]
-  | neg body ih =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change (¬ satisfies env (body.substitute τ)) ↔
-            ¬ satisfies (env.pullback τ) body
-          exact not_congr (ih env τ)
-  | conj left right ihLeft ihRight =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (satisfies env (left.substitute τ) ∧
-              satisfies env (right.substitute τ)) ↔
-            (satisfies (env.pullback τ) left ∧
-              satisfies (env.pullback τ) right)
-          exact and_congr (ihLeft env τ) (ihRight env τ)
-  | disj left right ihLeft ihRight =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (satisfies env (left.substitute τ) ∨
-              satisfies env (right.substitute τ)) ↔
-            (satisfies (env.pullback τ) left ∨
-              satisfies (env.pullback τ) right)
-          exact or_congr (ihLeft env τ) (ihRight env τ)
-  | imp left right ihLeft ihRight =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (satisfies env (left.substitute τ) →
-              satisfies env (right.substitute τ)) ↔
-            (satisfies (env.pullback τ) left →
-              satisfies (env.pullback τ) right)
-          exact imp_congr (ihLeft env τ) (ihRight env τ)
-  | iff left right ihLeft ihRight =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (satisfies env (left.substitute τ) ↔
-              satisfies env (right.substitute τ)) ↔
-            (satisfies (env.pullback τ) left ↔
-              satisfies (env.pullback τ) right)
-          exact iff_congr (ihLeft env τ) (ihRight env τ)
-  | forallE sort body ih =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (∀ value, satisfies (env.pushBound value)
-              (body.substitute (τ.liftBound sort))) ↔
-            ∀ value,
-              satisfies ((env.pullback τ).pushBound value) body
-          constructor
-          · intro hFormula value
-            have hBody :=
-              (ih (env.pushBound value)
-                (τ.liftBound sort)).mp (hFormula value)
-            simpa [Env.pullback_liftBound] using hBody
-          · intro hFormula value
-            have hBody : satisfies
-                ((env.pullback
-                  τ).pushBound value)
-                body :=
-              hFormula value
-            have hPulled : satisfies
-                ((env.pushBound value).pullback
-                  (τ.liftBound sort)) body := by
-              simpa [Env.pullback_liftBound] using hBody
-            exact
-              (ih (env.pushBound value)
-                (τ.liftBound sort)).mpr hPulled
-  | existsE sort body ih =>
-      cases substitution with
-      | id =>
-          rfl
-      | map boundSubstitution freeSubstitution =>
-          let τ := Substitution.map boundSubstitution freeSubstitution
-          change
-            (∃ value, satisfies (env.pushBound value)
-              (body.substitute (τ.liftBound sort))) ↔
-            ∃ value,
-              satisfies ((env.pullback τ).pushBound value) body
-          constructor
-          · rintro ⟨value, hBody⟩
-            refine ⟨value, ?_⟩
-            have hPulled :=
-              (ih (env.pushBound value)
-                (τ.liftBound sort)).mp hBody
-            simpa [Env.pullback_liftBound] using hPulled
-          · rintro ⟨value, hBody⟩
-            refine ⟨value, ?_⟩
-            have hPulled : satisfies
-                ((env.pushBound value).pullback
-                  (τ.liftBound sort)) body := by
-              simpa [Env.pullback_liftBound] using hBody
-            exact
-              (ih (env.pushBound value)
-                (τ.liftBound sort)).mpr hPulled
+  cases substitution with
+  | id => rfl
+  | map boundMap freeMap =>
+      cases formula with
+      | falsum | truth => rfl
+      | rel relation arguments =>
+          exact (congrArg (M.relInterp relation)
+            (Arguments.eval_substitute env (.map boundMap freeMap) arguments)).to_iff
+      | equal left right =>
+          exact (congr (congrArg Eq
+            (Term.eval_substitute env (.map boundMap freeMap) left))
+            (Term.eval_substitute env (.map boundMap freeMap) right)).to_iff
+      | neg body => exact not_congr (satisfies_substitute env (.map boundMap freeMap) body)
+      | conj left right =>
+          exact and_congr (satisfies_substitute env (.map boundMap freeMap) left) (satisfies_substitute env (.map boundMap freeMap) right)
+      | disj left right =>
+          exact or_congr (satisfies_substitute env (.map boundMap freeMap) left) (satisfies_substitute env (.map boundMap freeMap) right)
+      | imp left right =>
+          exact imp_congr (satisfies_substitute env (.map boundMap freeMap) left) (satisfies_substitute env (.map boundMap freeMap) right)
+      | iff left right =>
+          exact iff_congr (satisfies_substitute env (.map boundMap freeMap) left) (satisfies_substitute env (.map boundMap freeMap) right)
+      | forallE sort body =>
+          apply forall_congr'
+          intro value
+          exact (satisfies_substitute (env.pushBound value)
+            ((Substitution.map boundMap freeMap).liftBound sort) body).trans
+              (by rw [Env.pullback_liftBound])
+      | existsE sort body =>
+          apply exists_congr
+          intro value
+          exact (satisfies_substitute (env.pushBound value)
+            ((Substitution.map boundMap freeMap).liftBound sort) body).trans
+              (by rw [Env.pullback_liftBound])
 
 /-- free 替换语义是统一替换语义的直接特例。 -/
 theorem satisfies_substituteFree {σ : Signature.{u, v, w}}

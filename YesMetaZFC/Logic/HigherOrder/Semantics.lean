@@ -80,6 +80,17 @@ structure Env {σ : Signature.{u, v, w}} (M : Structure.{u, v, w, x} σ) where
   boundVal : Nat → M.Domain
   freeVal : SimpleType σ.BaseSort → FreeVarId → M.Domain
 namespace Env
+/-- 环境逐点相等即为记录相等，所有解释函数共用这一外延性。 -/
+theorem ext {σ : Signature.{u, v, w}}
+    {M : Structure.{u, v, w, x} σ} (env₁ env₂ : Env M)
+    (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
+    (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) : env₁ = env₂ := by
+  cases env₁
+  cases env₂
+  congr
+  · exact funext hBound
+  · exact funext (fun sort => funext (hFree sort))
+
 /-- 在统一的 bound 栈顶部压入一个值。 -/
 def push {σ : Signature.{u, v, w}} {M : Structure.{u, v, w, x} σ} (env : Env M) (value : M.Domain) : Env M where
   boundVal
@@ -214,48 +225,23 @@ def Satisfies {σ : Signature.{u, v, w}} {M : Structure.{u, v, w, x} σ} (env : 
   | .existsE sort body =>
       ∃ value, M.sortInterp sort value ∧ Satisfies (env.push value) body
 end Formula
-mutual
-  /-- 项解释只依赖环境的逐点取值。 -/
-  theorem Term.eval_eq_of_env_eq {σ : Signature.{u, v, w}}
-      {M : Structure.{u, v, w, x} σ} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
-      (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (term : Term σ) : Term.eval env₁ term = Term.eval env₂ term := by
-    cases term with
-    | var value =>
-        cases value with
-        | bvar _ index =>
-            simpa only [Term.eval] using hBound index
-        | fvar sort id =>
-            simpa only [Term.eval] using hFree sort id
-    | app symbol arguments =>
-        simp only [Term.eval]
-        congr 1
-        exact Term.evalList_eq_of_env_eq env₁ env₂ hBound hFree arguments
-    | apply function argument =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree function,
-          Term.eval_eq_of_env_eq env₁ env₂ hBound hFree argument]
-    | lam domain codomain body =>
-        simp only [Term.eval]
-        congr 1
-        funext value
-        apply Term.eval_eq_of_env_eq
-        · intro index
-          cases index <;> simp [Env.push, hBound]
-        · intro sort id
-          simp [Env.push, hFree]
-  /-- 项列表解释只依赖环境的逐点取值。 -/
-  theorem Term.evalList_eq_of_env_eq {σ : Signature.{u, v, w}}
-      {M : Structure.{u, v, w, x} σ} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
-      (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (terms : List (Term σ)) :
-      terms.map (Term.eval env₁) = terms.map (Term.eval env₂) := by
-    cases terms with
-    | nil =>
-        rfl
-    | cons head tail =>
-        simp only [List.map_cons]
-        rw [Term.eval_eq_of_env_eq env₁ env₂ hBound hFree head,
-          Term.evalList_eq_of_env_eq env₁ env₂ hBound hFree tail]
-end
+/-- 项解释只依赖环境的逐点取值。 -/
+theorem Term.eval_eq_of_env_eq {σ : Signature.{u, v, w}}
+    {M : Structure.{u, v, w, x} σ} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
+    (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (term : Term σ) : Term.eval env₁ term = Term.eval env₂ term := by
+
+  cases Env.ext env₁ env₂ hBound hFree
+  rfl
+
+/-- 项列表解释只依赖环境的逐点取值。 -/
+theorem Term.evalList_eq_of_env_eq {σ : Signature.{u, v, w}}
+    {M : Structure.{u, v, w, x} σ} (env₁ env₂ : Env M) (hBound : ∀ index, env₁.boundVal index = env₂.boundVal index)
+    (hFree : ∀ sort id, env₁.freeVal sort id = env₂.freeVal sort id) (terms : List (Term σ)) :
+    terms.map (Term.eval env₁) = terms.map (Term.eval env₂) := by
+
+  cases Env.ext env₁ env₂ hBound hFree
+  rfl
+
 mutual
   /--
   类型正确项的解释只依赖当前上下文实际可见的 bound 值和全部 free 值。
@@ -337,60 +323,20 @@ theorem Formula.satisfies_iff_of_wellFormed_env
   | neg hBody ih =>
       simp only [Formula.Satisfies]
       exact not_congr (ih hBound hFree)
-  | conj hLeft hRight ihLeft ihRight =>
-      simp only [Formula.Satisfies]
-      exact and_congr (ihLeft hBound hFree) (ihRight hBound hFree)
-  | disj hLeft hRight ihLeft ihRight =>
-      simp only [Formula.Satisfies]
-      exact or_congr (ihLeft hBound hFree) (ihRight hBound hFree)
-  | imp hLeft hRight ihLeft ihRight =>
-      simp only [Formula.Satisfies]
-      exact imp_congr (ihLeft hBound hFree) (ihRight hBound hFree)
+  | conj hLeft hRight ihLeft ihRight
+  | disj hLeft hRight ihLeft ihRight
+  | imp hLeft hRight ihLeft ihRight
   | iff hLeft hRight ihLeft ihRight =>
-      simp only [Formula.Satisfies]
-      exact iff_congr (ihLeft hBound hFree) (ihRight hBound hFree)
-  | forallE hBody ih =>
-      simp only [Formula.Satisfies]
-      constructor
-      · intro h value hValue
-        apply (ih (env₁ := env₁.push value) (env₂ := env₂.push value) (by
-            intro index target hLookup
-            cases index with
-            | zero => rfl
-            | succ previous => exact hBound previous target hLookup) (by
-            intro target id
-            exact hFree target id)).mp
-        exact h value hValue
-      · intro h value hValue
-        apply (ih (env₁ := env₁.push value) (env₂ := env₂.push value) (by
-            intro index target hLookup
-            cases index with
-            | zero => rfl
-            | succ previous => exact hBound previous target hLookup) (by
-            intro target id
-            exact hFree target id)).mpr
-        exact h value hValue
-  | existsE hBody ih =>
-      simp only [Formula.Satisfies]
-      constructor
-      · rintro ⟨value, hValue, hBodySat⟩
-        refine ⟨value, hValue, ?_⟩
-        exact (ih (env₁ := env₁.push value) (env₂ := env₂.push value) (by
-            intro index target hLookup
-            cases index with
-            | zero => rfl
-            | succ previous => exact hBound previous target hLookup) (by
-            intro target id
-            exact hFree target id)).mp hBodySat
-      · rintro ⟨value, hValue, hBodySat⟩
-        refine ⟨value, hValue, ?_⟩
-        exact (ih (env₁ := env₁.push value) (env₂ := env₂.push value) (by
-            intro index target hLookup
-            cases index with
-            | zero => rfl
-            | succ previous => exact hBound previous target hLookup) (by
-            intro target id
-            exact hFree target id)).mpr hBodySat
+      simp only [Formula.Satisfies, ihLeft hBound hFree, ihRight hBound hFree]
+  | forallE hBody ih | existsE hBody ih =>
+      have hBodyEq (value : M.Domain) :=
+        ih (env₁ := env₁.push value) (env₂ := env₂.push value)
+          (by intro index target hLookup; cases index with
+              | zero => rfl
+              | succ previous => exact hBound previous target hLookup)
+          hFree
+      simp only [Formula.Satisfies, hBodyEq]
+
 namespace TermSubstitution
 /--
 `targetEnv` 是从 `sourceEnv` 按 substitution 更新自由变量得到的环境。

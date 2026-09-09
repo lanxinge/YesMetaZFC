@@ -17,6 +17,8 @@ bash scripts/check-all.sh
 和 `prove_auto_sweep` 可执行工具；任何 warning 都会使检查失败。
 需要从头验证时，先运行 `lake clean`。
 
+工程清理范围、性能测量及后续热点见 [ENGINEERING.md](ENGINEERING.md)。
+
 扫描器只静态导入公共 tactic 入口，完整证明库在执行扫描时从 `.olean` 加载；
 不要改回静态导入根 `YesMetaZFC`，否则大型元数学编码的原生初始化可能使工具在
 处理 `--help` 之前就发生栈溢出。实际扫描使用
@@ -28,8 +30,9 @@ bash scripts/check-all.sh
 需要按定义相等转换的简化证明显式使用 `simpa ... using!`，自由闭合性则显式消费
 有序对约定的 `code_freeClosed` 合同。
 
-`Automation.AvatarSoundness` 与 `Automation.AvatarRegistrySoundness` 已统一为当前
-内在回放实现的导入入口。旧 raw 字句 / bound-stack 接口已不受公共一阶语法支持；
+AVATAR 可靠性直接使用当前内在回放模块。已删除无声明、无调用方的
+`Automation.AvatarSoundness` 与 `Automation.AvatarRegistrySoundness` 兼容入口。
+旧 raw 字句 / bound-stack 接口已不受公共一阶语法支持；
 调用方应使用 `DAGCertificate.IntrinsicReplay` 的节点与根节点可靠性定理，以及
 `HostRules.Semantics.avatar_semanticallyEntailsAt`。相关 checker 与语义合同仍由公共
 DAG 模块维护。
@@ -62,8 +65,8 @@ DAG 模块维护。
 `Delta1ProofPresentation intrinsic_zfc_theory intrinsic_zfc_theory`，不再有待填的局部表示参数。
 `ReducedRosser.presentation` 将该图接入有限 Rosser 比较；`ReducedRosser.sentence`
 是当前 quotation 下的实际对角句，`fixed_point` 给出对象理论中的固定点等价，
-`independent` 给出仅依赖一致性的双向不可证结论。该实例属于支撑理论；裸 ZFC
-上的实例仍需消去支撑语言与支撑公理。
+`independent` 给出仅依赖一致性的双向不可证结论。该实例属于支撑理论；支撑消去与模型对应也已完成，
+裸 ZFC 上的最终实例见 `PureRosser.independent`。
 
 对角化的关键是 `Automation.ObjectLeastWitness.unique`：在对象公式中选择最小合法
 输出，再用标准正确输出处的码域切分与有限负实例，排除全部错误对象见证。

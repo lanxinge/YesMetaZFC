@@ -8,7 +8,10 @@
 持续更新同一个 `YesMetaZFC-source.zip`，解压后根目录包含 `lakefile.toml`、
 `lean-toolchain`、`YesMetaZFC.lean` 和 `YesMetaZFC/`。
 
-- 源码文件身份：`libfile_e921d03ce9e081919cde0a1656667ebd`。
+- 当前基点为自由清理第二轮：806 个 Lean 文件、224,509 行，本轮独立净减 5,006 行。
+  Lean 源码与下述 Google Drive 包逐字节相同；Git 发布入口为 `lanxinge/YesMetaZFC` 的
+  `main` 分支。本次发布仅额外更新工程文档中的发布状态。
+- 早期来源文件身份：`libfile_e921d03ce9e081919cde0a1656667ebd`；本轮未回写该旧包。
 - [Google Drive 源码](https://drive.google.com/file/d/1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID/view)。
 - Drive 源码目录：`1KFNGtD8yE-rp1Jk4UfH6BTbnpp9cQSEx`。
 
@@ -49,5 +52,5 @@
 - 默认完整库：`lake --wfail build`。
 - 全部独立源模块及扫描工具：`bash scripts/check-all.sh`。
 - 支撑统一验证入口：`PureSupportModels.support_models`、`PureZFCModels.models`。
-- 当前 Rosser 已接入 `ReducedNaturalProofPresentation.presentation`，纯配置入口仍为 `PureRosser`。内部 ω、幂集界与轨迹归约入口为 `PureSourceInfinity`、`PureSourceBounds`、`PureNaturalRosserAgreement`。`ReducedRosser.delta0Sentence` 是支撑语言 Δ₀ 等价代表；`PureRosserDelta0` 已证明当前无参数纯闭句非 Δ₀，并构造纯 ∈ 的 Δ₀ 参数矩阵及裸 ZFC 推导等价。`PureSourceMappings`、`PureSourceArithmetic`、`PureSourceCoding` 已完成合法映射求值、内部加乘幂、配数和根编码对应，行归约接口已移除根值前提。默认构建已通过 790 个任务；`Agreement` 仍待局部行对应及后续装配，参数定义未声称为 Δ₀。
+- 当前 Rosser 已接入 `ReducedNaturalProofPresentation.presentation`，纯配置入口仍为 `PureRosser`。内部 ω、幂集界与轨迹归约入口为 `PureSourceInfinity`、`PureSourceBounds`、`PureNaturalRosserAgreement`。`ReducedRosser.delta0Sentence` 是支撑语言 Δ₀ 等价代表；`PureRosserDelta0` 已证明当前无参数纯闭句非 Δ₀，并构造纯 ∈ 的 Δ₀ 参数矩阵及裸 ZFC 推导等价。`PureSourceMappings`、`PureSourceArithmetic`、`PureSourceCoding` 已完成合法映射求值、内部加乘幂、配数和根编码对应，行归约接口已移除根值前提。最新全源严格构建已通过 808 个任务，扫描工具 320 个任务；`PureSourceLocalTests` 已完成局部行对应，`PureRosser.agreement` 与 `PureRosser.independent` 已闭合。参数定义未声称为 Δ₀。
 - 证明范围和剩余数学义务见 `UNIFIED_VERIFICATION.md`。

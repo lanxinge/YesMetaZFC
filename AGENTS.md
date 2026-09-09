@@ -1,5 +1,29 @@
 # YesMetaZFC Agent Notes
 
+## 当前恢复入口（2026-09-09）
+
+- 可构建工作区：`/workspace/scratch/fb4803f63959/YesMetaZFC`；先执行
+  `source /workspace/scratch/fb4803f63959/activate-yesmetazfc.sh`。
+- 自由清理第二轮从 229,515 行独立计数，净减 **5,006 行**；当前 806 个 Lean
+  源文件、224,509 行、211,291 个非空行。另有 837 行 Python/Shell，全部代码
+  225,346 行，严格低于 20 万还需至少净减 25,347 行。前一轮净减 5,082 行另记。
+- 最终全源严格检查 808 个任务、扫描工具 320 个任务通过，零错误、零警告。
+  13,662 个既有公开声明全部保留，类型无实质变化；6,955 项数据定义中，6,953 项
+  原始编译表达式相同，公理降低函数已额外证明任意输入返回的完整证书相等，
+  自动化入口 try_close 按计划改进。60 项辅助声明增加对既有核心公理的部分引用，
+  全仓公理并集及裸 ZFC Rosser 终点依赖集合保持；完整审计见 ENGINEERING.md。
+- 本轮规范源码对应同一个 Google Drive `YesMetaZFC-source.zip`，文件 ID 为
+  `1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID`；当前恢复使用该文件的最新版本或本工作树，
+  不以早期来源包覆盖。本轮按用户授权在超过 5,000 行里程碑后更新该包。
+- 此前 `/workspace/scratch/6e6aaba5102a` 的运行时已不可用，本次从 Drive 三个分片
+  重新恢复并核对完整 SHA-256。当前实际工具链位于
+  `/workspace/scratch/fb4803f63959/toolchains/lean-4.33.1-linux`，Lean 4.33.1。
+  容器 readlink 兼容层只修复运行时定位，不进入源码包；普通 Linux 无需该层。
+- 本次发布以 `b36e2434459fa71bd6d5ff91f0882058a9746399` 为父基点，将此前暂缓
+  提交的累计工程精简汇总为一个发布节点，目标为 `origin/main`。用户已明确授权发布。
+  后续以当前 Git 提交及其工作树为基点；下文历史记录中的“未提交”描述归档时状态。
+  Lean 源码与本轮 Drive 包逐字节相同，本次发布额外更新三份工程文档的状态说明。
+
 本仓库的 Lean 内核采用“文献对照但不照搬有限护栏”的路线。
 
 ## 元数学内核
@@ -96,6 +120,46 @@
 
 ## 形式化习惯
 
+- 参数列骨架归纳复用 `Arguments.listRec`；需要同时证明项与参数列时优先相互结构递归，
+  不在两个定理里各写一套完整 `Term.rec` / `Arguments.rec`。
+- Hilbert 编译像使用 `Formula.hilbertize_induction` 的五种原始构造，派生联结词在底层
+  统一展开；四种 quotation 变换已经迁移。码域与深度事实消费
+  `FormulaStructuralCorrectness` 的 `quote_*_expression` 接口。
+- 搜索语法编码的单射性通过精确编码等式复用 `SyntaxNatCoding`；不改变已有编码定义。
+  大型检查器的通用接受实例先固定参数列，再与目标匹配，避免未定参数触发计算展开。
+- Skolem 扩展复用 `UniformFrameExtension.refl` / `trans` 和 `UniformSoundExtension.refl`，
+  复合必须显式保留新鲜变量与函数界的单调性以及环境和类型合同。
+
+
+- 同一行列表生成公式列和证书列时，复用 `IntrinsicCheckedSequence.intro_of_mapped_rows`。
+  它提供两个取值坐标等式，实例仅提交行条件；不要重做长度、`List.map` 成员和索引装配。
+  逻辑行的实际 quotation 码域与目标上下文提升复用 `IntrinsicLogicalTranscriptSupport`
+  的 `intrinsic_zfc_quote_*`，完整证书复用 `intrinsic_zfc_logical_certificate_mem_omega`。
+  单行特化是特化 transcript 的单元素实例；空泛全称仍需正文的深度提升识别。
+- 存在见证块复用 `Derivation.QuantifierBlock`：`Arguments.substitutionWith` 携带任意排序的
+  见证列，`Formula.existsFreePrefix` 关闭自由槽前缀，`Derives.existsFreePrefix_intro`
+  一次性引入见证并保持外部自由参数。列表头对应最内层见证；不要按元数复制 binder
+  展开或增加新的二、三、四槽专用证明。Quine 的 22 处构造已消费这一接口。
+- Quine 的常量、应用、空参数列和 cons 构造复用
+  `TransformStructuralCorrectness.syntax_transform_*_shape`（声明位于 `QuineEncoding` 命名空间）。
+  四种变换直接给出操作码、深度、变量位置和替换项，不再维护操作专属的 shape 证明。
+  公共定理适用于任意目标理论及自由上下文为空的假设列表；常量符号可为任意闭项，
+  只需给出其内部 ω 成员证明。它们仅装配 shape，scope 与总码域仍由原接口保证。
+- 规范化的类型分解与环境接口复用 `CoreNormalForm.RewriteTyping`。
+  FOOL 与高阶项的类型保持复用 `eval_mem_of_inferSortWith_fragment`；
+  具体根规则提供 `RootRewriteSemantics`，外层上下文可靠性复用三个 `*_of_root`
+  入口。保留 FOOL 片段 guard 和高阶 λ 的受类型限制同余，不重新维护两套语法归纳。
+- 类型化槽位替换复用 `Derivation.Substitution.Algebra` 的 `postcompose`、`map_cons`
+  与弱化尾映射定理；具体模板不再按参数个数重复语法归纳。实际 quotation 的公式归纳
+  复用 `Automation.QuotationInduction.FormulaClosure`，伴随码域事实可并入其谓词。
+  当前深度识别应由 `*_of_depth` 实例化，不维护第二套项或参数列递归。
+- 工程维护与已测热点见 `ENGINEERING.md`。不要仅凭默认导入图不可达删除模块；
+  `ProveAutoBranchProbe` 由扫描器动态导入，独立源模块由 `scripts/check-all.sh` 验证。
+- 大模型上的等式替换优先固定替换参数与目标类型。`PureSyntaxFixedPoint.tag_injective`
+  使用 `congrArg (membership ℳ input)` 避免猜测替换目标；不要恢复代价高昂的隐式替换
+  和九分支回溯。固定公式的布尔覆盖检查可用 `decide +kernel`，不因此增加原生可信依赖。
+- 无引用私有声明、退役回放实现及空兼容入口已清理；不要恢复常开的 `simp.rewrite` 追踪。
+
 - 机械 Hilbert 证明优先改进或复用 tactic，不要手写长证明序列。
 - 通用自动化层放在 `YesMetaZFC.Automation` 及其子模块；具体集合论或元数学目录只保留领域接口，不承载通用证明器实现。
 - 后续 CDCL、前束规划、超消元叠加演算等证明器基础设施不要下沉到具体章节目录。
@@ -131,11 +195,11 @@
   也不通过 `Classical.choose` 固定全局模型相关的 `ω`。
 - 接口迁移按完整模块或完整层进行，同时更新命名参数调用；不保留旧变量名兼容层。
 
-## Library 稳定基点与公共区卫生
+## 稳定基点与公共区卫生
 
-- Library 中的规范源码基点固定为 `/Projects/YesMetaZFC/YesMetaZFC-source.zip`。后续工作从该文件的当前版本开始，并在稳定后替换同一文件；不要创建按日期、轮次或版本号命名的平行源码包。
-- Library 的版本历史就是源码基点的历史记录。更新时必须保持同一 Library 文件身份；如果无法确认原文件、遇到版本冲突或没有替换权限，应停止并询问用户，不要用“另存一份”绕过。
-- 源码修改和形式化研究在 scratch 工作区进行。只有达到稳定基点后才回写 Library：至少要求 `lake build` 成功，相关额外目标或未接入默认构建图的改动模块也已单独验证，并且没有新引入未说明的 `sorry`、`admit` 或自定义公理。
+- 按当前用户授权，规范源码持续更新 Google Drive 中同一个 `YesMetaZFC-source.zip`（ID 见当前恢复入口）。后续从其当前版本或已验证工作树继续；不要创建按日期、轮次或版本号命名的平行源码包。早期 `/Projects/YesMetaZFC/YesMetaZFC-source.zip` 是历史来源，未同步当前精简，不得用其覆盖最新工作。
+- 更新源码包保持同一 Drive 文件身份；报告更新也保持各自文件身份和版本历史。若无法确认原文件、遇到版本冲突或没有替换权限，先保留当前工作并说明阻碍，不要用“另存一份”绕过。
+- 源码修改和形式化研究在 scratch 工作区进行。只有达到稳定基点后才回写规范源码包：至少要求 `lake build` 成功，相关额外目标或未接入默认构建图的改动模块也已单独验证，并且没有新引入未说明的 `sorry`、`admit` 或自定义公理。
 - 回写前更新必要的源码、测试和状态说明；研究草稿只有在已经转化为可复核的定义、定理、证明或明确要求保留的单一研究文档后才进入稳定基点。
 - 源码包只包含可复现项目所需的源码、配置和文档。不要打包 `.lake/`、编译产物、Lean/elan 缓存、临时日志、探针文件、环境兼容 shim、备份文件或旧源码压缩包。
 - 公共区原则上只保留一个当前稳定源码包；用户明确要求的发布物或报告也应采用单一持续更新文件。中间检查点、失败日志和一次性分析留在 scratch，不在公共区堆积。

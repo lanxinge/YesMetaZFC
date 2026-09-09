@@ -33,10 +33,14 @@ theorem state_unique (hℳ : Theory.Models ℳ theory) {other : Carrier ℳ}
 theorem tag_injective (hℳ : Theory.Models ℳ theory) {first second : Kind} (hEqual : tag hℳ first = tag hℳ second) : first = second := by
   have hZeroSucc (input : Carrier ℳ) : zero hℳ ≠ succ hℳ input := by
     intro h
-    exact zero_spec hℳ input (h.symm ▸ (succ_spec hℳ input input).mpr (Or.inr rfl))
+    exact zero_spec hℳ input
+      ((congrArg (membership ℳ input) h.symm).mp ((succ_spec hℳ input input).mpr (Or.inr rfl)))
   have hOneTwo : succ hℳ (zero hℳ) ≠ succ hℳ (succ hℳ (zero hℳ)) := by
     intro h
-    have hSelf := h.symm ▸ (succ_spec hℳ (succ hℳ (zero hℳ)) (succ hℳ (zero hℳ))).mpr (Or.inr rfl)
+    -- 只改写隶属关系的右参数，固定替换目标，避免展开整个模型来猜测 motive。
+    have hSelf : membership ℳ (succ hℳ (zero hℳ)) (succ hℳ (zero hℳ)) :=
+      (congrArg (membership ℳ (succ hℳ (zero hℳ))) h.symm).mp
+        ((succ_spec hℳ (succ hℳ (zero hℳ)) (succ hℳ (zero hℳ))).mpr (Or.inr rfl))
     have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ (succ_mem hℳ (zero_mem hℳ))
     exact hOrdinal.wellOrder.linear.irrefl _ hSelf hSelf
   have hTerm : tag hℳ .term = zero hℳ := zero_eq hℳ
@@ -46,16 +50,24 @@ theorem tag_injective (hℳ : Theory.Models ℳ theory) {first second : Kind} (h
   have hFormula : tag hℳ .formula = succ hℳ (succ hℳ (zero hℳ)) := by
     change (E hℳ).function .successor (.cons ((E hℳ).function .successor (.cons ((E hℳ).function .emptySet .nil) .nil)) .nil) = _
     simp only [succ_eq hℳ,zero_eq hℳ]
-  cases first <;> cases second <;> simp only [hTerm,hList,hFormula] at hEqual <;>
-    first | rfl | exact False.elim (hZeroSucc _ hEqual) | exact False.elim (hZeroSucc _ hEqual.symm) |
-      exact False.elim (hOneTwo hEqual) | exact False.elim (hOneTwo hEqual.symm)
+  -- 三个标签的九种比较已确定；避免逐分支试探不适用的不等式。
+  cases first <;> cases second <;> simp only [hTerm, hList, hFormula] at hEqual
+  · rfl
+  · exact False.elim (hZeroSucc (zero hℳ) hEqual)
+  · exact False.elim (hZeroSucc (succ hℳ (zero hℳ)) hEqual)
+  · exact False.elim (hZeroSucc (zero hℳ) hEqual.symm)
+  · rfl
+  · exact False.elim (hOneTwo hEqual)
+  · exact False.elim (hZeroSucc (succ hℳ (zero hℳ)) hEqual.symm)
+  · exact False.elim (hOneTwo hEqual.symm)
+  · rfl
 
 theorem tuple_injective (hℳ : Theory.Models ℳ theory) {first second : Kind} {d l c d' l' c' : Carrier ℳ}
     (hEqual : tuple hℳ first d l c = tuple hℳ second d' l' c') : first = second ∧ d = d' ∧ l = l' ∧ c = c' := by
   have hOuter := pair_injective hℳ hEqual
   have hDepth := pair_injective hℳ hOuter.2
   have hTail := pair_injective hℳ hDepth.2
-  exact ⟨tag_injective hℳ hOuter.1,hDepth.1,hTail⟩
+  exact ⟨tag_injective hℳ (first := first) (second := second) hOuter.1, hDepth.1, hTail⟩
 
 theorem equation (hℳ : Theory.Models ℳ theory) (kind : Kind) (depth length code : Carrier ℳ) :
     membership ℳ (tuple hℳ kind depth length code) (state hℳ) ↔ Condition hℳ (state hℳ) kind depth length code := by
@@ -63,7 +75,9 @@ theorem equation (hℳ : Theory.Models ℳ theory) (kind : Kind) (depth length c
   apply (body_correct hℳ _ _).trans
   constructor
   · rintro ⟨other,d,l,c,hEqual,hCondition⟩
-    obtain ⟨rfl,rfl,rfl,rfl⟩ := tuple_injective hℳ hEqual
+    obtain ⟨rfl,rfl,rfl,rfl⟩ := tuple_injective hℳ
+      (first := kind) (second := other) (d := depth) (l := length) (c := code)
+      (d' := d) (l' := l) (c' := c) hEqual
     exact hCondition
   · intro hCondition
     exact ⟨kind,depth,length,code,rfl,hCondition⟩

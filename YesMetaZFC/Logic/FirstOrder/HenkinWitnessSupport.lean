@@ -73,27 +73,14 @@ theorem Term.mem_witnessSupport_iff
     (term : Term (HSignature σ) bound free sort) :
     (witnessSort, witnessIndex) ∈ Term.witnessSupport term ↔
       Term.usesWitness witnessSort witnessIndex term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      (witnessSort, witnessIndex) ∈ Term.witnessSupport term ↔
-        Term.usesWitness witnessSort witnessIndex term)
-    (motive_2 := fun _ arguments =>
-      (witnessSort, witnessIndex) ∈ Arguments.witnessSupport arguments ↔
-        Arguments.usesWitness witnessSort witnessIndex arguments)
-    (fun _ => by simp [Term.witnessSupport, Term.usesWitness])
-    (fun _ => by simp [Term.witnessSupport, Term.usesWitness])
-    (fun function _ ih => by
-      cases function with
-      | base function =>
-          simpa [Term.witnessSupport, Term.usesWitness] using ih
-      | witness sort index =>
-          simp [Term.witnessSupport, Term.usesWitness, ih,
-            Prod.mk.injEq, eq_comm, and_comm])
-    (by simp [Arguments.witnessSupport, Arguments.usesWitness])
-    (fun _ _ ihHead ihTail => by
-      simp [Arguments.witnessSupport, Arguments.usesWitness,
-        ihHead, ihTail])
-    term
+  match term with
+  | .bvar _ | .fvar _ => simp [Term.witnessSupport, Term.usesWitness]
+  | .app (HenkinFunc.base function) arguments =>
+      simpa [Term.witnessSupport, Term.usesWitness] using
+        Arguments.mem_witnessSupport_iff witnessSort witnessIndex arguments
+  | .app (HenkinFunc.witness sort index) arguments =>
+      simp [Term.witnessSupport, Term.usesWitness, Arguments.mem_witnessSupport_iff,
+        Prod.mk.injEq, eq_comm, and_comm]
 
 /-- 参数列支持成员关系与见证出现谓词完全一致。 -/
 theorem Arguments.mem_witnessSupport_iff
@@ -103,27 +90,11 @@ theorem Arguments.mem_witnessSupport_iff
     (arguments : Arguments (HSignature σ) bound free sorts) :
     (witnessSort, witnessIndex) ∈ Arguments.witnessSupport arguments ↔
       Arguments.usesWitness witnessSort witnessIndex arguments := by
-  exact Arguments.rec (σ := HSignature σ) (bound := bound) (free := free)
-    (motive_1 := fun _ term =>
-      (witnessSort, witnessIndex) ∈ Term.witnessSupport term ↔
-        Term.usesWitness witnessSort witnessIndex term)
-    (motive_2 := fun _ arguments =>
-      (witnessSort, witnessIndex) ∈ Arguments.witnessSupport arguments ↔
-        Arguments.usesWitness witnessSort witnessIndex arguments)
-    (fun _ => by simp [Term.witnessSupport, Term.usesWitness])
-    (fun _ => by simp [Term.witnessSupport, Term.usesWitness])
-    (fun function _ ih => by
-      cases function with
-      | base function =>
-          simpa [Term.witnessSupport, Term.usesWitness] using ih
-      | witness sort index =>
-          simp [Term.witnessSupport, Term.usesWitness, ih,
-            Prod.mk.injEq, eq_comm, and_comm])
-    (by simp [Arguments.witnessSupport, Arguments.usesWitness])
-    (fun _ _ ihHead ihTail => by
+  match arguments with
+  | .nil => simp [Arguments.witnessSupport, Arguments.usesWitness]
+  | .cons head tail =>
       simp [Arguments.witnessSupport, Arguments.usesWitness,
-        ihHead, ihTail])
-    arguments
+        Term.mem_witnessSupport_iff, Arguments.mem_witnessSupport_iff]
 
 end
 
@@ -135,29 +106,9 @@ theorem Formula.mem_witnessSupport_iff
     (formula : Formula (HSignature σ) bound free) :
     (witnessSort, witnessIndex) ∈ Formula.witnessSupport formula ↔
       Formula.usesWitness witnessSort witnessIndex formula := by
-  induction formula with
-  | falsum => simp [Formula.witnessSupport, Formula.usesWitness]
-  | truth => simp [Formula.witnessSupport, Formula.usesWitness]
-  | rel relation arguments =>
-      exact Arguments.mem_witnessSupport_iff
-        witnessSort witnessIndex arguments
-  | equal left right =>
-      simp [Formula.witnessSupport, Formula.usesWitness,
-        Term.mem_witnessSupport_iff]
-  | neg body ih =>
-      simpa [Formula.witnessSupport, Formula.usesWitness] using ih
-  | conj left right ihLeft ihRight =>
-      simp [Formula.witnessSupport, Formula.usesWitness, ihLeft, ihRight]
-  | disj left right ihLeft ihRight =>
-      simp [Formula.witnessSupport, Formula.usesWitness, ihLeft, ihRight]
-  | imp left right ihLeft ihRight =>
-      simp [Formula.witnessSupport, Formula.usesWitness, ihLeft, ihRight]
-  | iff left right ihLeft ihRight =>
-      simp [Formula.witnessSupport, Formula.usesWitness, ihLeft, ihRight]
-  | forallE sort body ih =>
-      simpa [Formula.witnessSupport, Formula.usesWitness] using ih
-  | existsE sort body ih =>
-      simpa [Formula.witnessSupport, Formula.usesWitness] using ih
+  induction formula <;>
+    simp_all [Formula.witnessSupport, Formula.usesWitness,
+      Term.mem_witnessSupport_iff, Arguments.mem_witnessSupport_iff]
 
 /-- 从有限支持中删除指定见证的全部出现。 -/
 def withoutWitness [DecidableEq σ.SortSymbol]
@@ -234,62 +185,22 @@ theorem Term.witnessSupport_eliminatePersistentWitness
           witnessSort witnessIndex term) =
       withoutWitness (witnessSort, witnessIndex)
         (Term.witnessSupport term) := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.witnessSupport
-          (Term.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex term) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Term.witnessSupport term))
-    (motive_2 := fun _ arguments =>
-      Arguments.witnessSupport
-          (Arguments.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex arguments) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Arguments.witnessSupport arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      cases function with
-      | base function =>
-          simpa [Term.eliminatePersistentWitness,
-            Arguments.eliminatePersistentWitness,
-            Term.eliminateWitness, Term.witnessSupport] using ih
-      | witness sort index =>
-          cases arguments with
-          | nil =>
-              by_cases h : sort = witnessSort ∧ index = witnessIndex
-              · rcases h with ⟨rfl, rfl⟩
-                simp [Term.eliminatePersistentWitness,
-                  Term.eliminateWitness,
-                  Term.witnessSupport,
-                  Arguments.witnessSupport, withoutWitness,
-                  persistentImage, FreshVariable.persistent]
-              · simp [Term.eliminatePersistentWitness,
-                  Term.eliminateWitness, Arguments.eliminateWitness,
-                  Term.witnessSupport,
-                  Arguments.witnessSupport, withoutWitness, h,
-                  Prod.mk.injEq])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change
-        Term.witnessSupport
-              (Term.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex head) ++
-            Arguments.witnessSupport
-              (Arguments.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex tail) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Term.witnessSupport head ++ Arguments.witnessSupport tail)
-      rw [show withoutWitness (witnessSort, witnessIndex)
-          (Term.witnessSupport head ++ Arguments.witnessSupport tail) =
-            withoutWitness (witnessSort, witnessIndex)
-                (Term.witnessSupport head) ++
-              withoutWitness (witnessSort, witnessIndex)
-                (Arguments.witnessSupport tail) by
-        simp [withoutWitness, List.filter_append]]
-      rw [ihHead, ihTail])
-    term
+
+  match term with
+  | .bvar _ | .fvar _ => rfl
+  | .app (HenkinFunc.base function) arguments =>
+      simpa [Term.eliminatePersistentWitness, Arguments.eliminatePersistentWitness,
+        Term.eliminateWitness, Term.witnessSupport] using
+        Arguments.witnessSupport_eliminatePersistentWitness witnessSort witnessIndex arguments
+  | .app (HenkinFunc.witness sort index) .nil =>
+      by_cases h : sort = witnessSort ∧ index = witnessIndex
+      · rcases h with ⟨rfl, rfl⟩
+        simp [Term.eliminatePersistentWitness, Term.eliminateWitness,
+          Term.witnessSupport, Arguments.witnessSupport, withoutWitness,
+          persistentImage, FreshVariable.persistent]
+      · simp [Term.eliminatePersistentWitness, Term.eliminateWitness,
+          Arguments.eliminateWitness, Term.witnessSupport,
+          Arguments.witnessSupport, withoutWitness, h, Prod.mk.injEq]
 
 /-- 持久消去在参数支持上精确删除指定见证。 -/
 theorem Arguments.witnessSupport_eliminatePersistentWitness
@@ -303,62 +214,15 @@ theorem Arguments.witnessSupport_eliminatePersistentWitness
           witnessSort witnessIndex arguments) =
       withoutWitness (witnessSort, witnessIndex)
         (Arguments.witnessSupport arguments) := by
-  exact Arguments.rec (σ := HSignature σ) (bound := bound) (free := free)
-    (motive_1 := fun _ term =>
-      Term.witnessSupport
-          (Term.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex term) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Term.witnessSupport term))
-    (motive_2 := fun _ arguments =>
-      Arguments.witnessSupport
-          (Arguments.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex arguments) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Arguments.witnessSupport arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      cases function with
-      | base function =>
-          simpa [Term.eliminatePersistentWitness,
-            Arguments.eliminatePersistentWitness,
-            Term.eliminateWitness, Term.witnessSupport] using ih
-      | witness sort index =>
-          cases arguments with
-          | nil =>
-              by_cases h : sort = witnessSort ∧ index = witnessIndex
-              · rcases h with ⟨rfl, rfl⟩
-                simp [Term.eliminatePersistentWitness,
-                  Term.eliminateWitness,
-                  Term.witnessSupport,
-                  Arguments.witnessSupport, withoutWitness,
-                  persistentImage, FreshVariable.persistent]
-              · simp [Term.eliminatePersistentWitness,
-                  Term.eliminateWitness, Arguments.eliminateWitness,
-                  Term.witnessSupport,
-                  Arguments.witnessSupport, withoutWitness, h,
-                  Prod.mk.injEq])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change
-        Term.witnessSupport
-              (Term.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex head) ++
-            Arguments.witnessSupport
-              (Arguments.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex tail) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Term.witnessSupport head ++ Arguments.witnessSupport tail)
-      rw [show withoutWitness (witnessSort, witnessIndex)
-          (Term.witnessSupport head ++ Arguments.witnessSupport tail) =
-            withoutWitness (witnessSort, witnessIndex)
-                (Term.witnessSupport head) ++
-              withoutWitness (witnessSort, witnessIndex)
-                (Arguments.witnessSupport tail) by
-        simp [withoutWitness, List.filter_append]]
-      rw [ihHead, ihTail])
-    arguments
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      change Term.witnessSupport (Term.eliminatePersistentWitness
+          witnessSort witnessIndex head) ++
+        Arguments.witnessSupport (Arguments.eliminatePersistentWitness
+          witnessSort witnessIndex tail) = _
+      rw [Term.witnessSupport_eliminatePersistentWitness, Arguments.witnessSupport_eliminatePersistentWitness]
+      exact (withoutWitness_append _ _ _).symm
 
 end
 
@@ -373,87 +237,18 @@ theorem Formula.witnessSupport_eliminatePersistentWitness
           witnessSort witnessIndex formula) =
       withoutWitness (witnessSort, witnessIndex)
         (Formula.witnessSupport formula) := by
-  induction formula with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      change Arguments.witnessSupport
-          (Arguments.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex arguments) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Arguments.witnessSupport arguments)
-      exact Arguments.witnessSupport_eliminatePersistentWitness
-        witnessSort witnessIndex arguments
-  | equal left right =>
-      change
-        Term.witnessSupport
-              (Term.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex left) ++
-            Term.witnessSupport
-              (Term.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex right) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Term.witnessSupport left ++ Term.witnessSupport right)
-      rw [withoutWitness_append,
-        Term.witnessSupport_eliminatePersistentWitness,
-        Term.witnessSupport_eliminatePersistentWitness]
-  | neg body ih =>
-      change Formula.witnessSupport
-          (Formula.eliminatePersistentWitness (σ := σ)
-            witnessSort witnessIndex body) =
-        withoutWitness (witnessSort, witnessIndex)
-          (Formula.witnessSupport body)
-      exact ih
-  | conj left right ihLeft ihRight =>
-      change
-        Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex left) ++
-            Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex right) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Formula.witnessSupport left ++ Formula.witnessSupport right)
-      rw [withoutWitness_append, ihLeft, ihRight]
-  | disj left right ihLeft ihRight =>
-      change
-        Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex left) ++
-            Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex right) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Formula.witnessSupport left ++ Formula.witnessSupport right)
-      rw [withoutWitness_append, ihLeft, ihRight]
-  | imp left right ihLeft ihRight =>
-      change
-        Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex left) ++
-            Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex right) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Formula.witnessSupport left ++ Formula.witnessSupport right)
-      rw [withoutWitness_append, ihLeft, ihRight]
-  | iff left right ihLeft ihRight =>
-      change
-        Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex left) ++
-            Formula.witnessSupport
-              (Formula.eliminatePersistentWitness (σ := σ)
-                witnessSort witnessIndex right) =
-          withoutWitness (witnessSort, witnessIndex)
-            (Formula.witnessSupport left ++ Formula.witnessSupport right)
-      rw [withoutWitness_append, ihLeft, ihRight]
-  | forallE sort body ih =>
-      rw [Formula.eliminatePersistentWitness_forallE]
-      exact ih
-  | existsE sort body ih =>
-      rw [Formula.eliminatePersistentWitness_existsE]
-      exact ih
+  induction formula <;>
+    simp_all only [Formula.eliminatePersistentWitness_falsum,
+      Formula.eliminatePersistentWitness_truth, Formula.eliminatePersistentWitness_equal,
+      Formula.eliminatePersistentWitness_neg, Formula.eliminatePersistentWitness_conj,
+      Formula.eliminatePersistentWitness_disj, Formula.eliminatePersistentWitness_imp,
+      Formula.eliminatePersistentWitness_iff, Formula.eliminatePersistentWitness_forallE,
+      Formula.eliminatePersistentWitness_existsE, Formula.witnessSupport,
+      Term.witnessSupport_eliminatePersistentWitness, withoutWitness_append]
+  case falsum => rfl
+  case truth => rfl
+  case rel relation arguments =>
+    exact Arguments.witnessSupport_eliminatePersistentWitness witnessSort witnessIndex arguments
 
 mutual
 
@@ -468,25 +263,12 @@ theorem Term.witnessSupport_renameMapped
     Term.witnessSupport
         (term.renameMapped boundRenaming freeRenaming) =
       Term.witnessSupport term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.witnessSupport
-          (term.renameMapped boundRenaming freeRenaming) =
-        Term.witnessSupport term)
-    (motive_2 := fun _ arguments =>
-      Arguments.witnessSupport
-          (arguments.renameMapped boundRenaming freeRenaming) =
-        Arguments.witnessSupport arguments)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
-      cases function <;>
-        simpa [Term.renameMapped, Term.witnessSupport] using ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
-      simp [Arguments.renameMapped, Arguments.witnessSupport,
-        ihHead, ihTail])
-    term
+  match term with
+  | .bvar _ | .fvar _ => rfl
+  | .app (HenkinFunc.base function) arguments
+  | .app (HenkinFunc.witness sort index) arguments =>
+      simpa [Term.renameMapped, Term.witnessSupport] using
+        Arguments.witnessSupport_renameMapped boundRenaming freeRenaming arguments
 
 /-- 变量重命名不改变参数列中的见证常量支持。 -/
 theorem Arguments.witnessSupport_renameMapped
@@ -499,26 +281,11 @@ theorem Arguments.witnessSupport_renameMapped
     Arguments.witnessSupport
         (arguments.renameMapped boundRenaming freeRenaming) =
       Arguments.witnessSupport arguments := by
-  exact Arguments.rec (σ := HSignature σ)
-    (bound := sourceBound) (free := sourceFree)
-    (motive_1 := fun _ term =>
-      Term.witnessSupport
-          (term.renameMapped boundRenaming freeRenaming) =
-        Term.witnessSupport term)
-    (motive_2 := fun _ arguments =>
-      Arguments.witnessSupport
-          (arguments.renameMapped boundRenaming freeRenaming) =
-        Arguments.witnessSupport arguments)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
-      cases function <;>
-        simpa [Term.renameMapped, Term.witnessSupport] using ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
       simp [Arguments.renameMapped, Arguments.witnessSupport,
-        ihHead, ihTail])
-    arguments
+        Term.witnessSupport_renameMapped, Arguments.witnessSupport_renameMapped]
 
 end
 
@@ -532,36 +299,9 @@ theorem Formula.witnessSupport_renameMapped
     Formula.witnessSupport
         (formula.renameMapped boundRenaming freeRenaming) =
       Formula.witnessSupport formula := by
-  induction formula generalizing targetBound with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      exact Arguments.witnessSupport_renameMapped
-        boundRenaming freeRenaming arguments
-  | equal left right =>
-      simp [Formula.renameMapped, Formula.witnessSupport,
-        Term.witnessSupport_renameMapped]
-  | neg body ih =>
-      simpa [Formula.renameMapped, Formula.witnessSupport] using
-        ih boundRenaming freeRenaming
-  | conj left right ihLeft ihRight =>
-      simp [Formula.renameMapped, Formula.witnessSupport,
-        ihLeft, ihRight]
-  | disj left right ihLeft ihRight =>
-      simp [Formula.renameMapped, Formula.witnessSupport,
-        ihLeft, ihRight]
-  | imp left right ihLeft ihRight =>
-      simp [Formula.renameMapped, Formula.witnessSupport,
-        ihLeft, ihRight]
-  | iff left right ihLeft ihRight =>
-      simp [Formula.renameMapped, Formula.witnessSupport,
-        ihLeft, ihRight]
-  | forallE sort body ih =>
-      simpa [Formula.renameMapped, Formula.witnessSupport] using
-        ih (VariableRenaming.lift boundRenaming) freeRenaming
-  | existsE sort body ih =>
-      simpa [Formula.renameMapped, Formula.witnessSupport] using
-        ih (VariableRenaming.lift boundRenaming) freeRenaming
+  induction formula generalizing targetBound <;>
+    simp_all [Formula.renameMapped, Formula.witnessSupport,
+      Term.witnessSupport_renameMapped, Arguments.witnessSupport_renameMapped]
 
 /-- 闭句嵌入任意 free 上下文时不改变见证支持。 -/
 theorem Formula.witnessSupport_fromSentence

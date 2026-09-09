@@ -332,6 +332,8 @@ noncomputable def canonical_env (result : Result background) :
   Env.empty
 
 omit [DecidableEq σ.SortSymbol] in
+mutual
+
 /--
 闭项求值等于自身商类；参数分支同时记录所选代表与原参数逐项候选等价。
 -/
@@ -339,41 +341,16 @@ theorem eval_eq_classOf (result : Result background)
     {sort : σ.SortSymbol} (term : OpenTerm (HSignature σ) [] sort) :
     Term.eval (canonical_env (σ := σ) result) term =
       classOf (σ := σ) result term := by
-  refine Term.rec
-    (motive_1 := fun _ term =>
-      Term.eval (canonical_env (σ := σ) result) term =
-        classOf (σ := σ) result term)
-    (motive_2 := fun _ arguments =>
-      EquivalentArguments result
-        (selectArguments (σ := σ) result
-          (Arguments.eval (canonical_env (σ := σ) result) arguments))
-        arguments)
-    ?_ ?_ ?_ ?_ ?_ term
-  · intro _ entry
-    cases entry
-  · intro _ entry
-    cases entry
-  · intro function arguments hArguments
-    change
-      funcInterp (σ := σ) result function
+
+  match term with
+  | .bvar entry | .fvar entry => nomatch entry
+  | .app function arguments =>
+      change funcInterp (σ := σ) result function
           (Arguments.eval (canonical_env (σ := σ) result) arguments) =
         classOf (σ := σ) result (.app function arguments)
-    apply Quotient.sound
-    exact app_mem_congr result function hArguments
-  · exact .nil
-  · intro _ _ head tail hHead hTail
-    have hRepresentative := representative_equivalent (σ := σ) result head
-    change EquivalentArguments result
-      (.cons
-        (representative (σ := σ) result
-          (Term.eval (canonical_env (σ := σ) result) head))
-        (selectArguments (σ := σ) result
-          (Arguments.eval (canonical_env (σ := σ) result) tail)))
-      (.cons head tail)
-    rw [hHead]
-    exact .cons hRepresentative hTail
+      exact Quotient.sound (app_mem_congr result function
+        (eval_arguments_equivalent result arguments))
 
-omit [DecidableEq σ.SortSymbol] in
 /-- 闭项实参求值后，固定代表与原实参逐项候选等价。 -/
 theorem eval_arguments_equivalent (result : Result background)
     {sorts : List σ.SortSymbol}
@@ -382,37 +359,20 @@ theorem eval_arguments_equivalent (result : Result background)
       (selectArguments (σ := σ) result
         (Arguments.eval (canonical_env (σ := σ) result) arguments))
       arguments := by
-  exact Arguments.rec
-    (motive_1 := fun _ term =>
-      Term.eval (canonical_env (σ := σ) result) term =
-        classOf (σ := σ) result term)
-    (motive_2 := fun _ nested =>
-      EquivalentArguments result
-        (selectArguments (σ := σ) result
-          (Arguments.eval (canonical_env (σ := σ) result) nested)) nested)
-    (fun entry => nomatch entry)
-    (fun entry => nomatch entry)
-    (fun function nested hNested => by
-      change
-        funcInterp (σ := σ) result function
-            (Arguments.eval (canonical_env (σ := σ) result) nested) =
-          classOf (σ := σ) result (.app function nested)
-      apply Quotient.sound
-      exact app_mem_congr result function hNested)
-    (.nil)
-    (fun head tail hHead hTail => by
-      have hRepresentative :=
-        representative_equivalent (σ := σ) result head
+
+  match arguments with
+  | .nil => exact .nil
+  | .cons head tail =>
       change EquivalentArguments result
-        (.cons
-          (representative (σ := σ) result
-            (Term.eval (canonical_env (σ := σ) result) head))
+        (.cons (representative (σ := σ) result
+          (Term.eval (canonical_env (σ := σ) result) head))
           (selectArguments (σ := σ) result
-            (Arguments.eval (canonical_env (σ := σ) result) tail)))
-        (.cons head tail)
-      rw [hHead]
-      exact .cons hRepresentative hTail)
-    arguments
+            (Arguments.eval (canonical_env (σ := σ) result) tail))) (.cons head tail)
+      rw [eval_eq_classOf]
+      exact .cons (representative_equivalent (σ := σ) result head)
+        (eval_arguments_equivalent result tail)
+
+end
 
 end CanonicalModel
 end Henkin

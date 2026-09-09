@@ -441,44 +441,20 @@ theorem Term.eliminateWitness_eq_substituteMapped_of_not_uses
     Term.eliminateWitness witnessSort witnessIndex boundSubstitution
       freeSubstitution image term =
       term.substituteMapped boundSubstitution freeSubstitution := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ¬ Term.usesWitness witnessSort witnessIndex term →
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image term =
-          term.substituteMapped boundSubstitution freeSubstitution)
-    (motive_2 := fun _ arguments =>
-      ¬ Arguments.usesWitness witnessSort witnessIndex arguments →
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image arguments =
-          arguments.substituteMapped boundSubstitution freeSubstitution)
-    (fun _ _ => rfl)
-    (fun _ _ => rfl)
-    (fun function arguments ih hNoWitness => by
-      cases function with
-      | base baseFunction =>
-          simp [Term.eliminateWitness, Term.substituteMapped,
-            Term.usesWitness] at hNoWitness ⊢
-          exact ih (by
-            simpa [Arguments.usesWitness] using hNoWitness)
-      | witness termSort termIndex =>
-          by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
-          · exact False.elim (hNoWitness (by
-              simp [Term.usesWitness, hMatch]))
-          · simp [Term.eliminateWitness, Term.substituteMapped,
-              Term.usesWitness, hMatch] at hNoWitness ⊢
-            exact ih (by
-              simpa [Arguments.usesWitness] using hNoWitness))
-    (by simp [Arguments.eliminateWitness, Arguments.substituteMapped,
-      Arguments.usesWitness])
-    (fun head tail ihHead ihTail hNoWitness => by
-      simp [Arguments.eliminateWitness, Arguments.substituteMapped,
-        Arguments.usesWitness] at hNoWitness ⊢
-      rcases hNoWitness with ⟨hHead, hTail⟩
-      constructor
-      · exact ihHead hHead
-      · exact ihTail hTail)
-    term hNoWitness
+  match term with
+  | .bvar _ => rfl
+  | .fvar _ => rfl
+  | .app (HenkinFunc.base function) arguments =>
+      simp only [Term.eliminateWitness, Term.substituteMapped]
+      rw [Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
+        witnessSort witnessIndex _ _ _ arguments hNoWitness]
+  | .app (HenkinFunc.witness termSort termIndex) arguments =>
+      have hParts : ¬ (termSort = witnessSort ∧ termIndex = witnessIndex) ∧
+          ¬ Arguments.usesWitness witnessSort witnessIndex arguments := by
+        simpa only [Term.usesWitness, not_or] using hNoWitness
+      simp only [Term.eliminateWitness, Term.substituteMapped, dif_neg hParts.1]
+      rw [Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
+        witnessSort witnessIndex _ _ _ arguments hParts.2]
 
 theorem Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
     {bound sourceFree targetBound targetFree : SortContext (HSignature σ)}
@@ -494,44 +470,15 @@ theorem Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
     Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
       freeSubstitution image arguments =
       arguments.substituteMapped boundSubstitution freeSubstitution := by
-  exact Arguments.rec (σ := HSignature σ) (bound := bound) (free := sourceFree)
-    (motive_1 := fun _ term =>
-      ¬ Term.usesWitness witnessSort witnessIndex term →
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image term =
-          term.substituteMapped boundSubstitution freeSubstitution)
-    (motive_2 := fun sorts arguments =>
-      ¬ Arguments.usesWitness witnessSort witnessIndex arguments →
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image arguments =
-          arguments.substituteMapped boundSubstitution freeSubstitution)
-    (fun _ _ => rfl)
-    (fun _ _ => rfl)
-    (fun function arguments ih hNoWitness => by
-      cases function with
-      | base baseFunction =>
-          simp [Term.eliminateWitness, Term.substituteMapped,
-            Term.usesWitness] at hNoWitness ⊢
-          exact ih (by
-            simpa [Arguments.usesWitness] using hNoWitness)
-      | witness termSort termIndex =>
-          by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
-          · exact False.elim (hNoWitness (by
-              simp [Term.usesWitness, hMatch]))
-          · simp [Term.eliminateWitness, Term.substituteMapped,
-              Term.usesWitness, hMatch] at hNoWitness ⊢
-            exact ih (by
-              simpa [Arguments.usesWitness] using hNoWitness))
-    (by simp [Arguments.eliminateWitness, Arguments.substituteMapped,
-      Arguments.usesWitness])
-    (fun head tail ihHead ihTail hNoWitness => by
-      simp [Arguments.eliminateWitness, Arguments.substituteMapped,
-        Arguments.usesWitness] at hNoWitness ⊢
-      rcases hNoWitness with ⟨hHead, hTail⟩
-      constructor
-      · exact ihHead hHead
-      · exact ihTail hTail)
-    arguments hNoWitness
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      simp only [Arguments.usesWitness, not_or] at hNoWitness
+      simp only [Arguments.eliminateWitness, Arguments.substituteMapped]
+      rw [Term.eliminateWitness_eq_substituteMapped_of_not_uses
+        witnessSort witnessIndex _ _ _ head hNoWitness.1,
+        Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
+        witnessSort witnessIndex _ _ _ tail hNoWitness.2]
 
 end
 
@@ -548,47 +495,10 @@ theorem Formula.eliminateWitness_eq_substituteMapped_of_not_uses
     Formula.eliminateWitness witnessSort witnessIndex boundSubstitution
       freeSubstitution image formula =
       formula.substituteMapped boundSubstitution freeSubstitution := by
-  induction formula generalizing targetBound targetFree image with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      simp [Formula.eliminateWitness, Formula.usesWitness] at hNoWitness ⊢
-      exact congrArg (Formula.rel relation)
-        (Arguments.eliminateWitness_eq_substituteMapped_of_not_uses
-          witnessSort witnessIndex boundSubstitution freeSubstitution image
-          arguments hNoWitness)
-  | equal left right =>
-      simp [Formula.eliminateWitness, Formula.usesWitness] at hNoWitness ⊢
-      congr
-      · exact Term.eliminateWitness_eq_substituteMapped_of_not_uses
-          witnessSort witnessIndex boundSubstitution freeSubstitution image
-          left hNoWitness.1
-      · exact Term.eliminateWitness_eq_substituteMapped_of_not_uses
-          witnessSort witnessIndex boundSubstitution freeSubstitution image
-          right hNoWitness.2
-  | neg body ih =>
-      simp [Formula.eliminateWitness, Formula.usesWitness] at hNoWitness ⊢
-      exact congrArg Formula.neg
-        (ih boundSubstitution freeSubstitution image hNoWitness)
-  | conj left right ihLeft ihRight
-  | disj left right ihLeft ihRight
-  | imp left right ihLeft ihRight
-  | iff left right ihLeft ihRight =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped,
-        Formula.usesWitness] at hNoWitness ⊢
-      simp [ihLeft boundSubstitution freeSubstitution image hNoWitness.1,
-        ihRight boundSubstitution freeSubstitution image hNoWitness.2]
-  | forallE sort body ih
-  | existsE sort body ih =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped,
-        Formula.usesWitness] at hNoWitness ⊢
-      have h := ih
-        (targetBound := sort :: targetBound)
-        (targetFree := targetFree)
-        (VariableSubstitution.liftBound sort boundSubstitution)
-        (VariableSubstitution.weakenBound sort freeSubstitution)
-        (Term.weakenBound sort image) hNoWitness
-      simpa [Formula.eliminateWitness, Formula.substituteMapped] using h
+  induction formula generalizing targetBound targetFree image <;>
+    simp_all [Formula.eliminateWitness, Formula.substituteMapped, Formula.usesWitness,
+      Term.eliminateWitness_eq_substituteMapped_of_not_uses,
+      Arguments.eliminateWitness_eq_substituteMapped_of_not_uses]
 
 @[simp] theorem Formula.eliminateWitness_falsum
     {bound sourceFree targetBound targetFree : SortContext (HSignature σ)}
@@ -716,108 +626,21 @@ theorem Term.eliminateWitness_instantiateTop
         (Term.weakenBound (σ := HSignature σ) sort image) body).instantiateTop
         (Term.eliminateWitness witnessSort witnessIndex
           boundSubstitution freeSubstitution image replacement) := by
-  exact Term.rec
-    (motive_1 := fun resultSort body =>
-      ∀ {targetBound targetFree : SortContext (HSignature σ)},
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          bound targetBound targetFree) →
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree targetBound targetFree) →
-        (image : Term (HSignature σ) targetBound targetFree witnessSort) →
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image (body.instantiateTop replacement) =
-          (Term.eliminateWitness witnessSort witnessIndex
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              boundSubstitution)
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              freeSubstitution)
-            (Term.weakenBound (σ := HSignature σ) sort image) body).instantiateTop
-            (Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image replacement))
-    (motive_2 := fun sorts arguments =>
-      ∀ {targetBound targetFree : SortContext (HSignature σ)},
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          bound targetBound targetFree) →
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree targetBound targetFree) →
-        (image : Term (HSignature σ) targetBound targetFree witnessSort) →
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image (arguments.instantiateTop replacement) =
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              boundSubstitution)
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              freeSubstitution)
-            (Term.weakenBound (σ := HSignature σ) sort image) arguments).instantiateTop
-            (Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image replacement))
-    (fun entry targetBound targetFree boundSubstitution freeSubstitution image => by
+  match body with
+  | .bvar entry =>
       cases entry with
-      | here =>
-          simp [Term.eliminateWitness, VariableSubstitution.liftBound,
-            Term.instantiateTop_bvar_here]
-      | there previous =>
-          simp [Term.eliminateWitness, VariableSubstitution.liftBound])
-    (fun entry targetBound targetFree boundSubstitution freeSubstitution image => by
-      simp [Term.eliminateWitness, VariableSubstitution.weakenBound])
-    (fun function arguments ih targetBound targetFree boundSubstitution
-        freeSubstitution image => by
-      cases function with
-      | base baseFunction =>
-          simp [Term.eliminateWitness, ih]
-      | witness termSort termIndex =>
-          by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
-          · rcases hMatch with ⟨rfl, rfl⟩
-            have hWeaken :=
-              (Term.instantiateTop_weakenBound
-                (σ := HSignature σ)
-                (Term.eliminateWitness termSort termIndex
-                  boundSubstitution freeSubstitution image replacement)
-                image).symm
-            calc
-              _ = image := by
-                simp only [Term.instantiateTop_app, Term.eliminateWitness,
-                  eq_self, true_and, dif_pos]
-              _ = (Term.weakenBound (σ := HSignature σ) sort image).instantiateTop
-                    (Term.eliminateWitness termSort termIndex
-                      boundSubstitution freeSubstitution image replacement) :=
-                hWeaken
-              _ = _ := by
-                simp only [ Term.eliminateWitness,
-                  eq_self, true_and, dif_pos]
-          · calc
-              _ = Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex)
-                    (Arguments.eliminateWitness witnessSort witnessIndex
-                      boundSubstitution freeSubstitution image
-                      (arguments.instantiateTop replacement)) := by
-                simp only [Term.instantiateTop_app, Term.eliminateWitness,
-                  dif_neg hMatch]
-              _ = Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex)
-                    ((Arguments.eliminateWitness witnessSort witnessIndex
-                      (VariableSubstitution.liftBound (σ := HSignature σ) sort
-                        boundSubstitution)
-                      (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-                        freeSubstitution)
-                      (Term.weakenBound (σ := HSignature σ) sort image)
-                      arguments).instantiateTop
-                        (Term.eliminateWitness witnessSort witnessIndex
-                          boundSubstitution freeSubstitution image replacement)) := by
-                exact congrArg
-                  (Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex))
-                  (ih boundSubstitution freeSubstitution image)
-              _ = _ := by
-                simp only [Term.eliminateWitness, dif_neg hMatch,
-                  Term.instantiateTop_app])
-    (by
-      intro targetBound targetFree boundSubstitution freeSubstitution image
-      simp [Arguments.eliminateWitness])
-    (fun head tail ihHead ihTail targetBound targetFree boundSubstitution
-        freeSubstitution image => by
-      simp [Arguments.eliminateWitness, ihHead, ihTail])
-    body boundSubstitution freeSubstitution image
+      | here => simp [Term.eliminateWitness, VariableSubstitution.liftBound]
+      | there previous => simp [Term.eliminateWitness, VariableSubstitution.liftBound]
+  | .fvar entry => simp [Term.eliminateWitness, VariableSubstitution.weakenBound]
+  | .app (HenkinFunc.base function) arguments =>
+      simp only [Term.eliminateWitness, Term.instantiateTop_app,
+        Arguments.eliminateWitness_instantiateTop]
+  | .app (HenkinFunc.witness termSort termIndex) arguments =>
+      by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
+      · rcases hMatch with ⟨rfl, rfl⟩
+        simp [Term.eliminateWitness, Term.instantiateTop_app]
+      · simp only [Term.eliminateWitness, Term.instantiateTop_app, dif_neg hMatch,
+          Arguments.eliminateWitness_instantiateTop]
 
 theorem Arguments.eliminateWitness_instantiateTop
     {bound sourceFree targetBound targetFree : SortContext (HSignature σ)}
@@ -838,109 +661,11 @@ theorem Arguments.eliminateWitness_instantiateTop
         (Term.weakenBound (σ := HSignature σ) sort image) arguments).instantiateTop
         (Term.eliminateWitness witnessSort witnessIndex
           boundSubstitution freeSubstitution image replacement) := by
-  exact Arguments.rec (σ := HSignature σ) (bound := sort :: bound)
-    (free := sourceFree)
-    (motive_1 := fun _ term =>
-      ∀ {targetBound targetFree : SortContext (HSignature σ)},
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          bound targetBound targetFree) →
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree targetBound targetFree) →
-        (image : Term (HSignature σ) targetBound targetFree witnessSort) →
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image (term.instantiateTop replacement) =
-          (Term.eliminateWitness witnessSort witnessIndex
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              boundSubstitution)
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              freeSubstitution)
-            (Term.weakenBound (σ := HSignature σ) sort image) term).instantiateTop
-            (Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image replacement))
-    (motive_2 := fun sorts arguments =>
-      ∀ {targetBound targetFree : SortContext (HSignature σ)},
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          bound targetBound targetFree) →
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree targetBound targetFree) →
-        (image : Term (HSignature σ) targetBound targetFree witnessSort) →
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image (arguments.instantiateTop replacement) =
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              boundSubstitution)
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              freeSubstitution)
-            (Term.weakenBound (σ := HSignature σ) sort image) arguments).instantiateTop
-            (Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image replacement))
-    (fun entry targetBound targetFree boundSubstitution freeSubstitution image => by
-      cases entry with
-      | here =>
-          simp [Term.eliminateWitness, VariableSubstitution.liftBound,
-            Term.instantiateTop_bvar_here]
-      | there previous =>
-          simp [Term.eliminateWitness, VariableSubstitution.liftBound])
-    (fun entry targetBound targetFree boundSubstitution freeSubstitution image => by
-      simp [Term.eliminateWitness, VariableSubstitution.weakenBound])
-    (fun function arguments ih targetBound targetFree boundSubstitution
-        freeSubstitution image => by
-      cases function with
-      | base baseFunction =>
-          simp [Term.eliminateWitness, ih]
-      | witness termSort termIndex =>
-          by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
-          · rcases hMatch with ⟨rfl, rfl⟩
-            have hWeaken :=
-              (Term.instantiateTop_weakenBound
-                (σ := HSignature σ)
-                (Term.eliminateWitness termSort termIndex
-                  boundSubstitution freeSubstitution image replacement)
-                image).symm
-            calc
-              _ = image := by
-                simp only [Term.instantiateTop_app, Term.eliminateWitness,
-                  eq_self, true_and, dif_pos]
-              _ = (Term.weakenBound (σ := HSignature σ) sort image).instantiateTop
-                    (Term.eliminateWitness termSort termIndex
-                      boundSubstitution freeSubstitution image replacement) :=
-                hWeaken
-              _ = _ := by
-                simp only [ Term.eliminateWitness,
-                  eq_self, true_and, dif_pos]
-          · calc
-              _ = Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex)
-                    (Arguments.eliminateWitness witnessSort witnessIndex
-                      boundSubstitution freeSubstitution image
-                      (arguments.instantiateTop replacement)) := by
-                simp only [Term.instantiateTop_app, Term.eliminateWitness,
-                  dif_neg hMatch]
-              _ = Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex)
-                    ((Arguments.eliminateWitness witnessSort witnessIndex
-                      (VariableSubstitution.liftBound (σ := HSignature σ) sort
-                        boundSubstitution)
-                      (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-                        freeSubstitution)
-                      (Term.weakenBound (σ := HSignature σ) sort image)
-                      arguments).instantiateTop
-                        (Term.eliminateWitness witnessSort witnessIndex
-                          boundSubstitution freeSubstitution image replacement)) := by
-                exact congrArg
-                  (Term.app (σ := HSignature σ)
-                    (HenkinFunc.witness termSort termIndex))
-                  (ih boundSubstitution freeSubstitution image)
-              _ = _ := by
-                simp only [Term.eliminateWitness, dif_neg hMatch,
-                  Term.instantiateTop_app])
-    (by
-      intro targetBound targetFree boundSubstitution freeSubstitution image
-      simp [Arguments.eliminateWitness])
-    (fun head tail ihHead ihTail targetBound targetFree boundSubstitution
-        freeSubstitution image => by
-      simp [Arguments.eliminateWitness, ihHead, ihTail])
-    arguments boundSubstitution freeSubstitution image
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      simp only [Arguments.eliminateWitness, Arguments.instantiateTop_cons,
+        Term.eliminateWitness_instantiateTop, Arguments.eliminateWitness_instantiateTop]
 
 /-- 见证消去后继续执行普通替换，可融合为一次见证消去遍历。 -/
 theorem Term.eliminateWitness_substituteMapped
@@ -966,107 +691,18 @@ theorem Term.eliminateWitness_substituteMapped
         (fun entry => (freeSubstitution entry).substituteMapped
           outerBound outerFree)
         (image.substituteMapped outerBound outerFree) term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (image : Term (HSignature σ) middleBound middleFree witnessSort)
-        (outerBound : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (outerFree : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree),
-        (Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image term).substituteMapped outerBound outerFree =
-          Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) term)
-    (motive_2 := fun _ arguments =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (image : Term (HSignature σ) middleBound middleFree witnessSort)
-        (outerBound : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (outerFree : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree),
-        (Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image arguments).substituteMapped
-            outerBound outerFree =
-          Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) arguments)
-    (fun entry middleBound middleFree targetBound targetFree boundSubstitution
-        freeSubstitution image outerBound outerFree => rfl)
-    (fun entry middleBound middleFree targetBound targetFree boundSubstitution
-        freeSubstitution image outerBound outerFree => rfl)
-    (fun function arguments ih middleBound middleFree targetBound targetFree
-        boundSubstitution freeSubstitution image outerBound outerFree => by
-      cases function with
-      | base baseFunction =>
-          change Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction)
-              ((Arguments.eliminateWitness witnessSort witnessIndex
-                boundSubstitution freeSubstitution image arguments).substituteMapped
-                  outerBound outerFree) =
-            Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction)
-              (Arguments.eliminateWitness witnessSort witnessIndex
-                (fun entry => (boundSubstitution entry).substituteMapped
-                  outerBound outerFree)
-                (fun entry => (freeSubstitution entry).substituteMapped
-                  outerBound outerFree)
-                (image.substituteMapped outerBound outerFree) arguments)
-          exact congrArg
-            (Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction))
-            (ih boundSubstitution freeSubstitution image outerBound outerFree)
-      | witness termSort termIndex =>
-          by_cases hMatch :
-              termSort = witnessSort ∧ termIndex = witnessIndex
-          · rcases hMatch with ⟨rfl, rfl⟩
-            simp only [ Term.eliminateWitness,
-              eq_self, true_and, dif_pos]
-          · simpa only [Term.eliminateWitness, dif_neg hMatch,
-                Term.substituteMapped] using congrArg
-              (Term.app (σ := HSignature σ)
-                (HenkinFunc.witness termSort termIndex))
-              (ih boundSubstitution freeSubstitution image outerBound outerFree))
-    (fun {middleBound middleFree targetBound targetFree} boundSubstitution
-        freeSubstitution image outerBound outerFree => rfl)
-    (fun {sort} {sorts} head tail ihHead ihTail
-        {middleBound middleFree targetBound targetFree} boundSubstitution
-        freeSubstitution image outerBound outerFree => by
-      change Arguments.cons
-          ((Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image head).substituteMapped outerBound outerFree)
-          ((Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image tail).substituteMapped outerBound outerFree) =
-        Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) head)
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) tail)
-      rw [ihHead boundSubstitution freeSubstitution image outerBound outerFree,
-        ihTail boundSubstitution freeSubstitution image outerBound outerFree])
-    term boundSubstitution freeSubstitution image outerBound outerFree
+  match term with
+  | .bvar _ => rfl
+  | .fvar _ => rfl
+  | .app (HenkinFunc.base function) arguments =>
+      simp only [Term.eliminateWitness, Term.substituteMapped,
+        Arguments.eliminateWitness_substituteMapped]
+  | .app (HenkinFunc.witness termSort termIndex) arguments =>
+      by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
+      · rcases hMatch with ⟨rfl, rfl⟩
+        simp [Term.eliminateWitness]
+      · simp only [Term.eliminateWitness, Term.substituteMapped, dif_neg hMatch,
+          Arguments.eliminateWitness_substituteMapped]
 
 /-- 参数列上的见证消去同样与后续普通替换融合。 -/
 theorem Arguments.eliminateWitness_substituteMapped
@@ -1092,87 +728,11 @@ theorem Arguments.eliminateWitness_substituteMapped
         (fun entry => (freeSubstitution entry).substituteMapped
           outerBound outerFree)
         (image.substituteMapped outerBound outerFree) arguments := by
-  exact Arguments.rec
-    (motive_1 := fun _ term =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (image : Term (HSignature σ) middleBound middleFree witnessSort)
-        (outerBound : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (outerFree : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree),
-        (Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image term).substituteMapped outerBound outerFree =
-          Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) term)
-    (motive_2 := fun _ arguments =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (image : Term (HSignature σ) middleBound middleFree witnessSort)
-        (outerBound : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (outerFree : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree),
-        (Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image arguments).substituteMapped
-            outerBound outerFree =
-          Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) arguments)
-    (fun entry middleBound middleFree targetBound targetFree boundSubstitution
-        freeSubstitution image outerBound outerFree =>
-      Term.eliminateWitness_substituteMapped witnessSort witnessIndex
-        boundSubstitution freeSubstitution image outerBound outerFree (.bvar entry))
-    (fun entry middleBound middleFree targetBound targetFree boundSubstitution
-        freeSubstitution image outerBound outerFree =>
-      Term.eliminateWitness_substituteMapped witnessSort witnessIndex
-        boundSubstitution freeSubstitution image outerBound outerFree (.fvar entry))
-    (fun function nested ih middleBound middleFree targetBound targetFree
-        boundSubstitution freeSubstitution image outerBound outerFree =>
-      Term.eliminateWitness_substituteMapped witnessSort witnessIndex
-        boundSubstitution freeSubstitution image outerBound outerFree
-        (.app function nested))
-    (fun {middleBound middleFree targetBound targetFree} boundSubstitution
-        freeSubstitution image outerBound outerFree => rfl)
-    (fun {sort} {sorts} head tail ihHead ihTail
-        {middleBound middleFree targetBound targetFree} boundSubstitution
-        freeSubstitution image outerBound outerFree => by
-      change Arguments.cons
-          ((Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image head).substituteMapped outerBound outerFree)
-          ((Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image tail).substituteMapped outerBound outerFree) =
-        Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) head)
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => (boundSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (fun entry => (freeSubstitution entry).substituteMapped
-              outerBound outerFree)
-            (image.substituteMapped outerBound outerFree) tail)
-      rw [ihHead boundSubstitution freeSubstitution image outerBound outerFree,
-        ihTail boundSubstitution freeSubstitution image outerBound outerFree])
-    arguments boundSubstitution freeSubstitution image outerBound outerFree
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      simp only [Arguments.eliminateWitness, Arguments.substituteMapped,
+        Term.eliminateWitness_substituteMapped, Arguments.eliminateWitness_substituteMapped]
 
 /-- 先执行普通替换再消去见证，可融合为一次见证消去遍历。 -/
 theorem Term.eliminateWitness_substituteMapped_source
@@ -1199,110 +759,18 @@ theorem Term.eliminateWitness_substituteMapped_source
         (fun entry => Term.eliminateWitness witnessSort witnessIndex
           boundSubstitution freeSubstitution image (innerFree entry))
         image term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (innerBound : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (innerFree : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree)
-        (image : Term (HSignature σ) targetBound targetFree witnessSort),
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image
-          (term.substituteMapped innerBound innerFree) =
-          Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image term)
-    (motive_2 := fun _ arguments =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (innerBound : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (innerFree : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree)
-        (image : Term (HSignature σ) targetBound targetFree witnessSort),
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image
-          (arguments.substituteMapped innerBound innerFree) =
-          Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image arguments)
-    (fun entry middleBound middleFree targetBound targetFree innerBound innerFree
-        boundSubstitution freeSubstitution image => rfl)
-    (fun entry middleBound middleFree targetBound targetFree innerBound innerFree
-        boundSubstitution freeSubstitution image => rfl)
-    (fun function arguments ih middleBound middleFree targetBound targetFree
-        innerBound innerFree boundSubstitution freeSubstitution image => by
-      cases function with
-      | base baseFunction =>
-          change Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction)
-              (Arguments.eliminateWitness witnessSort witnessIndex
-                boundSubstitution freeSubstitution image
-                (arguments.substituteMapped innerBound innerFree)) =
-            Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction)
-              (Arguments.eliminateWitness witnessSort witnessIndex
-                (fun entry => Term.eliminateWitness witnessSort witnessIndex
-                  boundSubstitution freeSubstitution image (innerBound entry))
-                (fun entry => Term.eliminateWitness witnessSort witnessIndex
-                  boundSubstitution freeSubstitution image (innerFree entry))
-                image arguments)
-          exact congrArg
-            (Term.app (σ := HSignature σ) (HenkinFunc.base baseFunction))
-            (ih innerBound innerFree boundSubstitution freeSubstitution image)
-      | witness termSort termIndex =>
-          by_cases hMatch :
-              termSort = witnessSort ∧ termIndex = witnessIndex
-          · rcases hMatch with ⟨rfl, rfl⟩
-            simp only [Term.substituteMapped, Term.eliminateWitness,
-              eq_self, true_and, dif_pos]
-          · simpa only [Term.substituteMapped, Term.eliminateWitness,
-                dif_neg hMatch] using congrArg
-              (Term.app (σ := HSignature σ)
-                (HenkinFunc.witness termSort termIndex))
-              (ih innerBound innerFree boundSubstitution freeSubstitution image))
-    (fun {middleBound middleFree targetBound targetFree} innerBound innerFree
-        boundSubstitution freeSubstitution image => rfl)
-    (fun {sort} {sorts} head tail ihHead ihTail
-        {middleBound middleFree targetBound targetFree} innerBound innerFree
-        boundSubstitution freeSubstitution image => by
-      change Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image
-            (head.substituteMapped innerBound innerFree))
-          (Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image
-            (tail.substituteMapped innerBound innerFree)) =
-        Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image head)
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image tail)
-      rw [ihHead innerBound innerFree boundSubstitution freeSubstitution image,
-        ihTail innerBound innerFree boundSubstitution freeSubstitution image])
-    term innerBound innerFree boundSubstitution freeSubstitution image
+  match term with
+  | .bvar _ => rfl
+  | .fvar _ => rfl
+  | .app (HenkinFunc.base function) arguments =>
+      simp only [Term.eliminateWitness, Term.substituteMapped,
+        Arguments.eliminateWitness_substituteMapped_source]
+  | .app (HenkinFunc.witness termSort termIndex) arguments =>
+      by_cases hMatch : termSort = witnessSort ∧ termIndex = witnessIndex
+      · rcases hMatch with ⟨rfl, rfl⟩
+        simp [Term.eliminateWitness, Term.substituteMapped]
+      · simp only [Term.eliminateWitness, Term.substituteMapped, dif_neg hMatch,
+          Arguments.eliminateWitness_substituteMapped_source]
 
 /-- 参数列上先替换后消去的源端融合律。 -/
 theorem Arguments.eliminateWitness_substituteMapped_source
@@ -1329,90 +797,11 @@ theorem Arguments.eliminateWitness_substituteMapped_source
         (fun entry => Term.eliminateWitness witnessSort witnessIndex
           boundSubstitution freeSubstitution image (innerFree entry))
         image arguments := by
-  exact Arguments.rec
-    (motive_1 := fun _ term =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (innerBound : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (innerFree : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree)
-        (image : Term (HSignature σ) targetBound targetFree witnessSort),
-        Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image
-          (term.substituteMapped innerBound innerFree) =
-          Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image term)
-    (motive_2 := fun _ nested =>
-      ∀ {middleBound middleFree targetBound targetFree :
-          SortContext (HSignature σ)}
-        (innerBound : VariableSubstitution (HSignature σ)
-          sourceBound middleBound middleFree)
-        (innerFree : VariableSubstitution (HSignature σ)
-          sourceFree middleBound middleFree)
-        (boundSubstitution : VariableSubstitution (HSignature σ)
-          middleBound targetBound targetFree)
-        (freeSubstitution : VariableSubstitution (HSignature σ)
-          middleFree targetBound targetFree)
-        (image : Term (HSignature σ) targetBound targetFree witnessSort),
-        Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-          freeSubstitution image
-          (nested.substituteMapped innerBound innerFree) =
-          Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image nested)
-    (fun entry middleBound middleFree targetBound targetFree innerBound innerFree
-        boundSubstitution freeSubstitution image =>
-      Term.eliminateWitness_substituteMapped_source witnessSort witnessIndex
-        innerBound innerFree boundSubstitution freeSubstitution image (.bvar entry))
-    (fun entry middleBound middleFree targetBound targetFree innerBound innerFree
-        boundSubstitution freeSubstitution image =>
-      Term.eliminateWitness_substituteMapped_source witnessSort witnessIndex
-        innerBound innerFree boundSubstitution freeSubstitution image (.fvar entry))
-    (fun function nested ih middleBound middleFree targetBound targetFree
-        innerBound innerFree boundSubstitution freeSubstitution image =>
-      Term.eliminateWitness_substituteMapped_source witnessSort witnessIndex
-        innerBound innerFree boundSubstitution freeSubstitution image
-        (.app function nested))
-    (fun {middleBound middleFree targetBound targetFree} innerBound innerFree
-        boundSubstitution freeSubstitution image => rfl)
-    (fun {sort} {sorts} head tail ihHead ihTail
-        {middleBound middleFree targetBound targetFree} innerBound innerFree
-        boundSubstitution freeSubstitution image => by
-      change Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image
-            (head.substituteMapped innerBound innerFree))
-          (Arguments.eliminateWitness witnessSort witnessIndex boundSubstitution
-            freeSubstitution image
-            (tail.substituteMapped innerBound innerFree)) =
-        Arguments.cons
-          (Term.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image head)
-          (Arguments.eliminateWitness witnessSort witnessIndex
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerBound entry))
-            (fun entry => Term.eliminateWitness witnessSort witnessIndex
-              boundSubstitution freeSubstitution image (innerFree entry))
-            image tail)
-      rw [ihHead innerBound innerFree boundSubstitution freeSubstitution image,
-        ihTail innerBound innerFree boundSubstitution freeSubstitution image])
-    arguments innerBound innerFree boundSubstitution freeSubstitution image
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      simp only [Arguments.eliminateWitness, Arguments.substituteMapped,
+        Term.eliminateWitness_substituteMapped_source, Arguments.eliminateWitness_substituteMapped_source]
 
 /-- 公式上先替换后消去的源端融合律。 -/
 theorem Formula.eliminateWitness_substituteMapped_source
@@ -1504,29 +893,11 @@ theorem Formula.eliminateWitness_substituteMapped
         (fun entry => (freeSubstitution entry).substituteMapped
           outerBound outerFree)
         (image.substituteMapped outerBound outerFree) formula := by
-  induction formula generalizing middleBound middleFree targetBound targetFree with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped,
-        Arguments.eliminateWitness_substituteMapped]
-  | equal left right =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped,
-        Term.eliminateWitness_substituteMapped]
-  | neg body ih =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped, ih]
-  | conj left right ihLeft ihRight
-  | disj left right ihLeft ihRight
-  | imp left right ihLeft ihRight
-  | iff left right ihLeft ihRight =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped,
-        ihLeft, ihRight]
-  | forallE sort body ih
-  | existsE sort body ih =>
-      simp [Formula.eliminateWitness, Formula.substituteMapped, ih,
-        VariableSubstitution.liftBound_substituteMapped,
-        VariableSubstitution.weakenBound_substituteMapped,
-        Term.substituteMapped_weakenBound]
+  induction formula generalizing middleBound middleFree targetBound targetFree <;>
+    simp_all [Formula.eliminateWitness, Formula.substituteMapped,
+      Arguments.eliminateWitness_substituteMapped, Term.eliminateWitness_substituteMapped,
+      VariableSubstitution.liftBound_substituteMapped,
+      VariableSubstitution.weakenBound_substituteMapped, Term.substituteMapped_weakenBound]
 
 /-- 见证消去与最外层 bound 实例化交换。 -/
 theorem Formula.eliminateWitness_instantiateTop

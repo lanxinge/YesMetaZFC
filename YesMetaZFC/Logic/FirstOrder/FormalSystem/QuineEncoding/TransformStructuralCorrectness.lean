@@ -19,18 +19,6 @@ open scoped FormalSystem.Symbols
 
 set_option autoImplicit false
 
-private theorem finite_numeral_mem_expression
-    {free : SetContext} {Γ : Context signature free}
-    (number : Nat) :
-    Γ ⊢ₘ[expression_encoding_theory]
-      (numₘ(number) : SetOpenTerm free) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (finite_numeral_mem_formal_language_encoding_theory
-      (Γ := Γ) number)
-
 /-- 由码域、scope 与构造形状组合统一语法变换关系。 -/
 theorem syntax_transform_intro
     (kind : SyntaxCodeKind) (operation : SyntaxTransformOperation)
@@ -83,101 +71,6 @@ theorem syntax_transform_intro
   exact FirstOrder.Derives.conj_intro
     (FirstOrder.Derives.conj_intro hGlobal hScope) hShape
 
-private theorem two_free_substitution_map_beta
-    (first second : SetOpenTerm []) :
-    ((fun {_sort} entry =>
-      Term.substituteMapped VariableSubstitution.boundId
-        (VariableSubstitution.instantiateFreeTop first)
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.instantiateFreeTop second) entry)) :
-      VariableSubstitution signature [SetSort.set, SetSort.set] [] []) =
-      (VariableSubstitution.cons first
-        (VariableSubstitution.cons second
-          (VariableSubstitution.empty :
-            VariableSubstitution signature [] [] [])) :
-        VariableSubstitution signature
-          [SetSort.set, SetSort.set] [] []) := by
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there impossible => cases impossible
-
-private theorem three_free_substitution_map_beta
-    (first second third : SetOpenTerm []) :
-    ((fun {_sort} entry =>
-      Term.substituteMapped VariableSubstitution.boundId
-        (fun {_sort} entry =>
-          Term.substituteMapped VariableSubstitution.boundId
-            (VariableSubstitution.instantiateFreeTop first)
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.instantiateFreeTop second) entry))
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop third)) entry)) :
-      VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set] [] []) =
-      (VariableSubstitution.cons first
-        (VariableSubstitution.cons second
-          (VariableSubstitution.cons third
-            (VariableSubstitution.empty :
-              VariableSubstitution signature [] [] []))) :
-        VariableSubstitution signature
-          [SetSort.set, SetSort.set, SetSort.set] [] []) := by
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there firstRest =>
-      cases firstRest with
-      | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there secondRest =>
-          cases secondRest with
-          | here =>
-              simp [VariableSubstitution.liftFree,
-                VariableSubstitution.instantiateFreeTop,
-                Term.weakenFree, Term.rename, Renaming.weakenFree,
-                Renaming.free]
-              let ρ : VariableSubstitution signature
-                  [SetSort.set, SetSort.set] [] [] :=
-                fun {sort} entry =>
-                  Term.substituteMapped VariableSubstitution.boundId
-                    (VariableSubstitution.instantiateFreeTop first)
-                    (VariableSubstitution.liftFree SetSort.set
-                      (VariableSubstitution.instantiateFreeTop second) entry)
-              change
-                Term.substituteMapped VariableSubstitution.boundId ρ
-                    (Term.renameMapped
-                      (VariableRenaming.comp
-                        (outer := (@VariableRenaming.id signature.SortSymbol []))
-                        (inner := (@VariableRenaming.id signature.SortSymbol [])))
-                      (VariableRenaming.comp
-                        (outer := VariableRenaming.weaken SetSort.set)
-                        (inner := VariableRenaming.weaken SetSort.set))
-                      third) = third
-              rw [two_free_substitution_map_beta first second]
-              have hBound :
-                  (VariableRenaming.comp
-                    (outer := (@VariableRenaming.id signature.SortSymbol []))
-                    (inner := (@VariableRenaming.id signature.SortSymbol [])) :
-                      VariableRenaming (S := signature.SortSymbol) [] []) =
-                    (@VariableRenaming.id signature.SortSymbol []) := by
-                funext resultSort entry
-                cases entry
-              rw [hBound, Term.renameMapped_two_weakenFree]
-              exact gq_closed_two_weaken_substitute _ third
-          | there impossible => cases impossible
-
-/-- 连续实例化四个自由槽等于一次四槽替换。 -/
 theorem four_free_substitution_beta
     {body : SetOpenFormula
       [SetSort.set, SetSort.set, SetSort.set, SetSort.set]}
@@ -202,146 +95,32 @@ theorem four_free_substitution_beta
             (VariableSubstitution.cons third
               (VariableSubstitution.cons fourth
                 VariableSubstitution.empty)))) body := by
-  change
-    Formula.substitute (Substitution.instantiateFreeTop first)
-      (Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop second)))
-        (Formula.substitute
-          (Substitution.free_map
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.liftFree SetSort.set
-                (VariableSubstitution.instantiateFreeTop third))))
-          (Formula.substitute
-            (Substitution.free_map
-              (VariableSubstitution.liftFree SetSort.set
-                (VariableSubstitution.liftFree SetSort.set
-                  (VariableSubstitution.liftFree SetSort.set
-                    (VariableSubstitution.instantiateFreeTop fourth)))))
-            body))) = _
-  rw [Formula.substitute_comp, Formula.substitute_comp,
-    Formula.substitute_comp]
-  simp only [Substitution.comp, Substitution.instantiateFreeTop,
-    Substitution.free_map]
+  change (((body.substituteFree _).substituteFree _).substituteFree _).substituteFree _ = _
+  rw [Formula.substituteFree_comp, Formula.substituteFree_comp, Formula.substituteFree_comp]
   congr 1
-  change Substitution.map _ _ = Substitution.map _ _
-  congr
   funext resultSort entry
-  cases resultSort
   cases entry with
-  | here =>
-      simp [VariableSubstitution.cons,
-        VariableSubstitution.liftFree,
-        VariableSubstitution.instantiateFreeTop,
-        VariableSubstitution.boundId,
-        Term.substituteMapped,
-        Term.weakenFree, Term.rename, Renaming.weakenFree,
-        Renaming.free]
-  | there firstRest =>
-      cases firstRest with
+  | here => rfl
+  | there entry =>
+    cases entry with
+    | here => exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
+    | there entry =>
+      cases entry with
       | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there secondRest =>
-          cases secondRest with
-          | here =>
-              simp [ VariableSubstitution.cons,
-                VariableSubstitution.liftFree,
-                VariableSubstitution.instantiateFreeTop,
-                VariableSubstitution.boundId, Term.substituteMapped,
-                Term.weakenFree, Term.rename, Renaming.weakenFree,
-                Renaming.free, Term.renameMapped,
-                VariableRenaming.weaken]
-              let ρ : VariableSubstitution signature
-                  [SetSort.set, SetSort.set] [] [] :=
-                fun {sort} entry =>
-                  Term.substituteMapped VariableSubstitution.boundId
-                    (VariableSubstitution.instantiateFreeTop first)
-                    (VariableSubstitution.liftFree SetSort.set
-                      (VariableSubstitution.instantiateFreeTop second) entry)
-              change
-                Term.substituteMapped VariableSubstitution.boundId ρ
-                    (Term.renameMapped
-                      (VariableRenaming.comp
-                        (outer := (@VariableRenaming.id signature.SortSymbol []))
-                        (inner := (@VariableRenaming.id signature.SortSymbol [])))
-                      (VariableRenaming.comp
-                        (outer := VariableRenaming.weaken SetSort.set)
-                        (inner := VariableRenaming.weaken SetSort.set))
-                      third) = third
-              rw [two_free_substitution_map_beta first second]
-              have hBound :
-                  (VariableRenaming.comp
-                    (outer := (@VariableRenaming.id signature.SortSymbol []))
-                    (inner := (@VariableRenaming.id signature.SortSymbol [])) :
-                      VariableRenaming (S := signature.SortSymbol) [] []) =
-                    (@VariableRenaming.id signature.SortSymbol []) := by
-                funext resultSort entry
-                cases entry
-              rw [hBound, Term.renameMapped_two_weakenFree]
-              exact gq_closed_two_weaken_substitute _ third
-          | there thirdRest =>
-              cases thirdRest with
-              | here =>
-                  simp [VariableSubstitution.cons,
-                    VariableSubstitution.liftFree,
-                    VariableSubstitution.instantiateFreeTop,
-                    VariableSubstitution.boundId,
-                    Term.substituteMapped,
-                    Term.weakenFree, Term.rename, Renaming.weakenFree,
-                    Renaming.free]
-                  let ρ : VariableSubstitution signature
-                      [SetSort.set, SetSort.set, SetSort.set] [] [] :=
-                    fun {sort} entry =>
-                      Term.substituteMapped VariableSubstitution.boundId
-                        (fun {sort} entry =>
-                          Term.substituteMapped
-                            VariableSubstitution.boundId
-                            (VariableSubstitution.instantiateFreeTop first)
-                            (VariableSubstitution.liftFree SetSort.set
-                              (VariableSubstitution.instantiateFreeTop second)
-                              entry))
-                        (VariableSubstitution.liftFree SetSort.set
-                          (VariableSubstitution.liftFree SetSort.set
-                            (VariableSubstitution.instantiateFreeTop third))
-                          entry)
-                  change
-                    Term.substituteMapped VariableSubstitution.boundId ρ
-                        (Term.renameMapped
-                          (VariableRenaming.comp
-                            (outer :=
-                              (@VariableRenaming.id signature.SortSymbol []))
-                            (inner := VariableRenaming.comp
-                              (outer :=
-                                (@VariableRenaming.id signature.SortSymbol []))
-                              (inner :=
-                                (@VariableRenaming.id signature.SortSymbol []))))
-                          (VariableRenaming.comp
-                            (outer := VariableRenaming.weaken SetSort.set)
-                            (inner := VariableRenaming.comp
-                              (outer := VariableRenaming.weaken SetSort.set)
-                              (inner := VariableRenaming.weaken SetSort.set)))
-                          fourth) = fourth
-                  rw [three_free_substitution_map_beta first second third]
-                  have hBound :
-                      (VariableRenaming.comp
-                        (outer :=
-                          (@VariableRenaming.id signature.SortSymbol []))
-                        (inner := VariableRenaming.comp
-                          (outer :=
-                            (@VariableRenaming.id signature.SortSymbol []))
-                          (inner :=
-                            (@VariableRenaming.id signature.SortSymbol []))) :
-                        VariableRenaming (S := signature.SortSymbol) [] []) =
-                      (@VariableRenaming.id signature.SortSymbol []) := by
-                    funext resultSort entry
-                    cases entry
-                  rw [hBound, Term.renameMapped_three_weakenFree]
-                  exact gq_closed_three_weaken_substitute _ fourth
-              | there impossible => cases impossible
+        simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
+          VariableSubstitution.instantiateFreeTop,
+          Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+          VariableSubstitution.cons]
+        rfl
+      | there entry =>
+        cases entry with
+        | here =>
+          simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
+            VariableSubstitution.instantiateFreeTop,
+            Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+            VariableSubstitution.cons]
+        | there entry => exact nomatch entry
+
 
 /-- 任意四槽替换消去闭项的四层自由上下文提升。 -/
 theorem gq_closed_four_weaken_substitute
@@ -353,44 +132,135 @@ theorem gq_closed_four_weaken_substitute
         ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
           SetSort.set).weakenFree SetSort.set) =
       term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.substituteMapped VariableSubstitution.boundId τ
-          ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set).weakenFree SetSort.set) =
-        term)
-    (motive_2 := fun _ arguments =>
-      Arguments.substituteMapped VariableSubstitution.boundId τ
-          ((((arguments.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-            SetSort.set).weakenFree SetSort.set) =
-        arguments)
-    (fun entry => by cases entry)
-    (fun entry => by cases entry)
-    (fun function arguments ih => by
-      change
-        Term.app function
-            (Arguments.substituteMapped VariableSubstitution.boundId τ
-              ((((arguments.weakenFree SetSort.set).weakenFree
-                SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set)) =
-          Term.app function arguments
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change
-        Arguments.cons
-            (Term.substituteMapped VariableSubstitution.boundId τ
-              ((((head.weakenFree SetSort.set).weakenFree
-                SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set))
-            (Arguments.substituteMapped VariableSubstitution.boundId τ
-              ((((tail.weakenFree SetSort.set).weakenFree
-                SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set)) =
-          Arguments.cons head tail
-      rw [ihHead, ihTail])
-    term
+  simp only [Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree]
+
+/-! ## 操作无关的项与参数列构造
+
+这些定理只证明 shape；操作码合法性、作用域与总码域由 `syntax_transform_intro`
+消费原有合同。子构造的推导可以来自任意目标理论与闭自由上下文上的任意假设。
+-/
+
+/-- 常量节点不读取变换参数；只要求符号码的成员证据。 -/
+theorem syntax_transform_constant_shape
+    {T : SetTheory} {Γ : Context signature []}
+    (operation depth variableIndex replacement : SetOpenTerm [])
+    (symbol : SetOpenTerm []) (hSymbol : Γ ⊢ₘ[T] symbol ∈ₘ ωₘ) :
+    Γ ⊢ₘ[T] syntax_transform_shape_condition
+      (syntax_code_kind_term .term) operation depth variableIndex replacement
+      (const_codeₘ(symbol)) (const_codeₘ(symbol)) := by
+  dsimp [syntax_transform_shape_condition]
+  apply FirstOrder.Derives.disj_intro_left
+  apply FirstOrder.Derives.conj_intro
+  · exact Metatheory.Derives.equality_refl
+      (syntax_code_kind_term .term : SetOpenTerm [])
+  · apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.disj_intro_left
+    apply FirstOrder.Derives.exists_intro symbol
+    simpa [Formula.instantiateFreeTop, Substitution.instantiateFreeTop,
+      Formula.substitute, Formula.substituteMapped,
+      Term.substituteFree, Term.substitute, Term.substituteMapped,
+      Arguments.substituteMapped,
+      VariableSubstitution.instantiateFreeTop,
+      VariableSubstitution.liftFree,
+      VariableSubstitution.weakenBound,
+      VariableSubstitution.boundId, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_instantiateFreeTop,
+      Arguments.substituteMapped_weakenFree_instantiateFreeTop] using
+      FirstOrder.Derives.conj_intro hSymbol
+        (FirstOrder.Derives.conj_intro
+          (Metatheory.Derives.equality_refl
+            (const_codeₘ(symbol) : SetOpenTerm []))
+          (Metatheory.Derives.equality_refl
+            (const_codeₘ(symbol) : SetOpenTerm [])))
+
+/-- 应用节点仅装配参数列的变换；元数、符号和操作均由调用方给定。 -/
+theorem syntax_transform_application_shape
+    {T : SetTheory} {Γ : Context signature []}
+    (operation depth variableIndex replacement : SetOpenTerm [])
+    (arity symbol sourceArguments targetArguments : SetOpenTerm [])
+    (hArity : Γ ⊢ₘ[T] arity ∈ₘ ωₘ)
+    (hSymbol : Γ ⊢ₘ[T] symbol ∈ₘ ωₘ)
+    (hTransform : Γ ⊢ₘ[T] syntax_transformₘ(
+      syntax_code_kind_term .termList, operation, depth, variableIndex,
+      replacement, sourceArguments, targetArguments)) :
+    Γ ⊢ₘ[T] syntax_transform_shape_condition
+      (syntax_code_kind_term .term) operation depth variableIndex replacement
+      (app_codeₘ(arity, symbol, sourceArguments))
+      (app_codeₘ(arity, symbol, targetArguments)) := by
+  dsimp [syntax_transform_shape_condition]
+  apply FirstOrder.Derives.disj_intro_left
+  apply FirstOrder.Derives.conj_intro
+  · exact Metatheory.Derives.equality_refl
+      (syntax_code_kind_term .term : SetOpenTerm [])
+  · apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetArguments (.cons sourceArguments (.cons symbol (.cons arity .nil))))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId, Formula.substituteFree,
+      Formula.substitute, Formula.substituteMapped, Substitution.free_map,
+      VariableSubstitution.cons, Term.substituteMapped, Arguments.substituteMapped,
+      structural_list_code_term, application_code_term, structural_node_code_term,
+      structural_raw_node_code_term, godel_pairing_term, term_weaken_free_four,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree] using
+      FirstOrder.Derives.conj_intro
+        (FirstOrder.Derives.conj_intro hArity hSymbol)
+        (FirstOrder.Derives.conj_intro
+          (FirstOrder.Derives.conj_intro
+            (Metatheory.Derives.equality_refl
+              (app_codeₘ(arity, symbol, sourceArguments) : SetOpenTerm []))
+            (Metatheory.Derives.equality_refl
+              (app_codeₘ(arity, symbol, targetArguments) : SetOpenTerm [])))
+          hTransform)
+
+/-- 空参数列的构造形状与具体变换操作无关。 -/
+theorem syntax_transform_nil_shape
+    {T : SetTheory} {Γ : Context signature []}
+    (operation depth variableIndex replacement : SetOpenTerm []) :
+    Γ ⊢ₘ[T] syntax_transform_shape_condition
+      (syntax_code_kind_term .termList) operation depth variableIndex replacement
+      code_nilₘ code_nilₘ := by
+  derive_prop
+
+/-- 参数列 cons 共用一次见证装配，头项与尾列只提供各自的变换。 -/
+theorem syntax_transform_cons_shape
+    {T : SetTheory} {Γ : Context signature []}
+    (operation depth variableIndex replacement : SetOpenTerm [])
+    (sourceHead sourceTail targetHead targetTail : SetOpenTerm [])
+    (hHead : Γ ⊢ₘ[T] syntax_transformₘ(
+      syntax_code_kind_term .term, operation, depth, variableIndex,
+      replacement, sourceHead, targetHead))
+    (hTail : Γ ⊢ₘ[T] syntax_transformₘ(
+      syntax_code_kind_term .termList, operation, depth, variableIndex,
+      replacement, sourceTail, targetTail)) :
+    Γ ⊢ₘ[T] syntax_transform_shape_condition
+      (syntax_code_kind_term .termList) operation depth variableIndex replacement
+      (code_consₘ(sourceHead, sourceTail)) (code_consₘ(targetHead, targetTail)) := by
+  dsimp [syntax_transform_shape_condition]
+  apply FirstOrder.Derives.disj_intro_right
+  apply FirstOrder.Derives.disj_intro_left
+  apply FirstOrder.Derives.conj_intro
+  · exact Metatheory.Derives.equality_refl
+      (syntax_code_kind_term .termList : SetOpenTerm [])
+  · apply FirstOrder.Derives.disj_intro_right
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetTail (.cons targetHead (.cons sourceTail (.cons sourceHead .nil))))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId, Formula.substituteFree,
+      Formula.substitute, Formula.substituteMapped, Substitution.free_map,
+      VariableSubstitution.cons, Term.substituteMapped, Arguments.substituteMapped,
+      structural_raw_node_code_term, godel_pairing_term, term_weaken_free_four,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree] using
+      FirstOrder.Derives.conj_intro
+        (FirstOrder.Derives.conj_intro
+          (Metatheory.Derives.equality_refl
+            (code_consₘ(sourceHead, sourceTail) : SetOpenTerm []))
+          (Metatheory.Derives.equality_refl
+            (code_consₘ(targetHead, targetTail) : SetOpenTerm [])))
+        (FirstOrder.Derives.conj_intro hHead hTail)
 
 end QuineEncoding
 end FormalSystem
 end FirstOrder
 end Logic
 end YesMetaZFC
-

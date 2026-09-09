@@ -244,133 +244,28 @@ theorem formula_encode_injective
     {bound free : SortContext σ} :
     Function.Injective (@formula_encode σ coding bound free) := by
   intro left
-  induction left with
-  | falsum =>
-      intro right hCode
-      cases right
-      case falsum => rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | truth =>
-      intro right hCode
-      cases right
-      case truth => rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | rel relation arguments =>
-      intro right hCode
-      cases right
-      case rel relation' arguments' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hRelation, hArguments⟩
-        cases coding.relation.injective hRelation
-        cases arguments_encode_eq coding hArguments
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | equal left right =>
-      intro target hCode
-      cases target
-      case equal left' right' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hLeft, hRight⟩
-        exact equality_formula_eq_of_codes coding hLeft hRight
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | neg body ih =>
-      intro right hCode
-      cases right
-      case neg body' =>
-        have hBody := (NatPairing.pair_eq_pair_iff.mp hCode).2
-        cases ih hBody
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | conj left right ihLeft ihRight =>
-      intro target hCode
-      cases target
-      case conj left' right' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hLeft, hRight⟩
-        cases ihLeft hLeft
-        cases ihRight hRight
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | disj left right ihLeft ihRight =>
-      intro target hCode
-      cases target
-      case disj left' right' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hLeft, hRight⟩
-        cases ihLeft hLeft
-        cases ihRight hRight
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | imp left right ihLeft ihRight =>
-      intro target hCode
-      cases target
-      case imp left' right' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hLeft, hRight⟩
-        cases ihLeft hLeft
-        cases ihRight hRight
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | iff left right ihLeft ihRight =>
-      intro target hCode
-      cases target
-      case iff left' right' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hLeft, hRight⟩
-        cases ihLeft hLeft
-        cases ihRight hRight
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | forallE sort body ih =>
-      intro right hCode
-      cases right
-      case forallE sort' body' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hSort, hBody⟩
-        cases coding.sort.injective hSort
-        cases ih hBody
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
-  | existsE sort body ih =>
-      intro right hCode
-      cases right
-      case existsE sort' body' =>
-        rcases NatPairing.pair_eq_pair_iff.mp hCode with ⟨_, hPayload⟩
-        rcases NatPairing.pair_eq_pair_iff.mp hPayload with
-          ⟨hSort, hBody⟩
-        cases coding.sort.injective hSort
-        cases ih hBody
-        rfl
-      all_goals
-        have hTag := (NatPairing.pair_eq_pair_iff.mp hCode).1
-        omega
+  induction left <;> intro target hCode <;> cases target <;>
+    simp [formula_encode, NatPairing.pair_eq_pair_iff] at hCode
+  all_goals first | rfl | skip
+  case rel.rel =>
+    cases coding.relation.injective hCode.1
+    cases arguments_encode_eq coding hCode.2
+    rfl
+  case equal.equal => exact equality_formula_eq_of_codes coding hCode.1 hCode.2
+  case neg.neg =>
+    rename_i body ih target
+    exact congrArg Formula.neg (ih hCode)
+  case conj.conj | disj.disj | imp.imp | iff.iff =>
+    rename_i left right ihLeft ihRight left' right'
+    cases ihLeft hCode.1
+    cases ihRight hCode.2
+    rfl
+  case forallE.forallE | existsE.existsE =>
+    rename_i sort body ih sort' body'
+    cases coding.sort.injective hCode.1
+    cases ih hCode.2
+    rfl
+
 
 def formula_coding :
     NatCoding (Sentence σ) where

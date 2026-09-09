@@ -149,6 +149,16 @@ theorem disj_assoc_m {σ : Signature.{u, v, w}}
     Γ ⊢ₘ[T] (φ ∨ₘ (ψ ∨ₘ θ)) ↔ₘ ((φ ∨ₘ ψ) ∨ₘ θ) := by
   derive_prop
 
+/-- guard 等价且 guard 下正文等价时，携带共同前件的两个合取等价。 -/
+theorem guarded_conj_congr_m {σ : Signature.{u, v, w}}
+    {T : Theory σ} {free : SortContext σ} {Γ : Context σ free}
+    {common left right source target : OpenFormula σ free}
+    (hGuard : Γ ⊢ₘ[T] left ↔ₘ right)
+    (hBody : Γ ⊢ₘ[T] left ⟶ₘ (source ↔ₘ target)) :
+    Γ ⊢ₘ[T] (common ∧ₘ (left ∧ₘ source)) ↔ₘ
+      (common ∧ₘ (right ∧ₘ target)) := by
+  derive_prop
+
 end Derives
 end Metatheory
 end FirstOrder

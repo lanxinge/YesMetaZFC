@@ -227,6 +227,15 @@ def quote_hilbert {σ : Signature.{u, v, w}} [QuotationNumbering σ]
   | .existsE _ body =>
       neg_codeₘ(all_codeₘ(neg_codeₘ(quote_hilbert body)))
 
+/-- 已按 Hilbert 联结词编码的 quotation 对再次编译保持不变。 -/
+@[simp] theorem quote_hilbert_hilbertize {σ : Signature} [QuotationNumbering σ]
+    {bound free : SortContext σ} (formula : Formula σ bound free) :
+    quote_hilbert (Formula.hilbertize QuotationNumbering.objectSort formula) =
+      quote_hilbert formula := by
+  induction formula <;>
+    simp_all [Formula.hilbertize, Formula.hilbert_truth, Formula.hilbert_falsum,
+      Formula.hilbert_conj, Formula.hilbert_iff, quote_hilbert, quote_term, Variable.index]
+
 /-- 公共公式先 Hilbert 化，再直接生成结构码。 -/
 def quote {σ : Signature.{u, v, w}}
     [numbering : QuotationNumbering σ]

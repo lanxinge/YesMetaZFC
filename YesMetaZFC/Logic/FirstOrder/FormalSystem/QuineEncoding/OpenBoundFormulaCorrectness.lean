@@ -20,74 +20,6 @@ open scoped FormalSystem.Symbols
 
 set_option autoImplicit false
 
-private theorem finite_numeral_mem_expression
-    {free : SetContext} {Γ : Context signature free}
-    (number : Nat) :
-    Γ ⊢ₘ[expression_encoding_theory]
-      (numₘ(number) : SetOpenTerm free) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (finite_numeral_mem_formal_language_encoding_theory
-      (Γ := Γ) number)
-
-private theorem quote_term_code_at_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term σ bound free sort) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      term_code_atₘ(
-        numₘ(bound.length),
-        (quote_term term : SetOpenTerm [])) :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (quote_term_code_at term)
-
-private theorem quote_term_code_mem_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term σ bound free sort) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      (quote_term term : SetOpenTerm []) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (term_code_at_code_mem_of_derives
-      (numₘ(bound.length)) (quote_term term : SetOpenTerm [])
-      (quote_term_code_at term))
-
-private theorem quote_hilbert_code_at_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ}
-    (formula : Formula σ bound free) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      formula_code_atₘ(
-        numₘ(bound.length),
-        (quote_hilbert formula : SetOpenTerm [])) :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (quote_hilbert_formula_code_at formula)
-
-private theorem quote_hilbert_code_mem_expression
-    {σ : Signature} [QuotationNumbering σ]
-    {bound free : SortContext σ}
-    (formula : Formula σ bound free) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      (quote_hilbert formula : SetOpenTerm []) ∈ₘ ωₘ :=
-  FirstOrder.Derives.theory_weaken
-    (T := formal_language_encoding_theory)
-    (U := expression_encoding_theory)
-    formal_language_encoding_theory_subset_expression_encoding_theory
-    (formula_code_at_code_mem_of_derives
-      (numₘ(bound.length)) (quote_hilbert formula : SetOpenTerm [])
-      (quote_hilbert_formula_code_at formula))
-
 private theorem formula_open_bound_scope
     (depth replacement source target : SetOpenTerm [])
     (hReplacement : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
@@ -101,21 +33,7 @@ private theorem formula_open_bound_scope
         (syntax_code_kind_term .formula)
         (syntax_transform_operation_term .openBound)
         depth (numₘ(0)) replacement source target := by
-  dsimp [syntax_transform_scope_condition]
-  apply FirstOrder.Derives.disj_intro_right
-  apply FirstOrder.Derives.disj_intro_right
-  apply FirstOrder.Derives.conj_intro
-  · exact Metatheory.Derives.equality_refl
-      (syntax_code_kind_term .formula : SetOpenTerm [])
-  · apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_right
-    apply FirstOrder.Derives.disj_intro_left
-    exact FirstOrder.Derives.conj_intro
-      (Metatheory.Derives.equality_refl
-        (syntax_transform_operation_term .openBound : SetOpenTerm []))
-      (FirstOrder.Derives.conj_intro
-        (FirstOrder.Derives.conj_intro hSourceAt hTargetAt)
-        hReplacement)
+  derive_prop
 
 private theorem quote_hilbert_open_bound_last_of_shape
     {σ : Signature} [QuotationNumbering σ]
@@ -471,38 +389,6 @@ private theorem quote_hilbert_equality_open_bound_last
       (quote_term_open_bound_last replacement left)
       (quote_term_open_bound_last replacement right)
 
-private theorem quote_hilbert_truth_open_bound_last
-    {σ : Signature} [QuotationNumbering σ]
-    {free prefixContext : SortContext σ} {introduced : σ.SortSymbol}
-    (replacement : Term σ [] free introduced) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      syntax_transformₘ(
-        syntax_code_kind_term .formula,
-        syntax_transform_operation_term .openBound,
-        numₘ(prefixContext.length), numₘ(0),
-        (quote_term replacement : SetOpenTerm []),
-        (quote_hilbert
-          (.truth : Formula σ (prefixContext ++ [introduced]) free) :
-          SetOpenTerm []),
-        (quote_hilbert
-          (Formula.instantiateLastBound prefixContext replacement
-            (.truth : Formula σ (prefixContext ++ [introduced]) free)) :
-          SetOpenTerm [])) := by
-  let boundVariable : Term σ
-      (QuotationNumbering.objectSort :: (prefixContext ++ [introduced])) free
-      QuotationNumbering.objectSort := .bvar .here
-  have hEquality := quote_hilbert_equality_open_bound_last
-    (prefixContext := QuotationNumbering.objectSort :: prefixContext)
-    replacement boundVariable boundVariable
-  have hUniversal := quote_hilbert_all_open_bound_last
-    (prefixContext := prefixContext) replacement
-    (.equal boundVariable boundVariable) hEquality
-  simpa [boundVariable, quote_hilbert, Formula.instantiateLastBound,
-    Substitution.instantiateLastBound, Formula.substitute,
-    Formula.substituteMapped, Term.instantiateLastBound,
-    Term.substitute, Term.substituteMapped,
-    Arguments.substituteMapped] using! hUniversal
-
 /-- Hilbert 公式 quotation 与 bound 尾槽闭项实例化交换。 -/
 theorem quote_hilbert_open_bound_last
     {σ : Signature} [QuotationNumbering σ]
@@ -519,8 +405,8 @@ theorem quote_hilbert_open_bound_last
         (quote_hilbert
           (Formula.instantiateLastBound prefixContext replacement formula) :
           SetOpenTerm [])) := by
-  refine Formula.rec
-    (motive := fun currentBound currentFree currentFormula =>
+  have h := Formula.hilbertize_induction QuotationNumbering.objectSort
+    (motive := fun {currentBound currentFree} currentFormula =>
       ∀ (tailBound : SortContext σ) (introduced : σ.SortSymbol)
           (replacement : Term σ [] currentFree introduced)
           (hBound : currentBound = tailBound ++ [introduced]),
@@ -534,19 +420,6 @@ theorem quote_hilbert_open_bound_last
             (quote_hilbert
               (Formula.instantiateLastBound tailBound replacement
                 (hBound ▸ currentFormula)) : SetOpenTerm [])))
-    (fun {currentBound currentFree} => by
-      intro tailBound introduced replacement hBound
-      cases hBound
-      have hTruth := quote_hilbert_truth_open_bound_last
-        (prefixContext := tailBound) replacement
-      have hNeg := quote_hilbert_neg_open_bound_last replacement
-        (.truth : Formula σ (tailBound ++ [introduced]) currentFree) hTruth
-      simpa [quote_hilbert, Formula.instantiateLastBound,
-        Formula.substitute, Formula.substituteMapped] using! hNeg)
-    (fun {currentBound currentFree} => by
-      intro tailBound introduced replacement hBound
-      cases hBound
-      exact quote_hilbert_truth_open_bound_last replacement)
     (fun {currentBound currentFree} relation arguments => by
       intro tailBound introduced replacement hBound
       cases hBound
@@ -564,68 +437,16 @@ theorem quote_hilbert_open_bound_last
     (fun {currentBound currentFree} left right ihLeft ihRight => by
       intro tailBound introduced replacement hBound
       cases hBound
-      have hRightNeg := quote_hilbert_neg_open_bound_last replacement
-        right (ihRight tailBound introduced replacement rfl)
-      have hImp := quote_hilbert_imp_open_bound_last replacement
-        left (.neg right) (ihLeft tailBound introduced replacement rfl) hRightNeg
-      have hNeg := quote_hilbert_neg_open_bound_last replacement
-        (.imp left (.neg right)) hImp
-      simpa [quote_hilbert, Formula.instantiateLastBound,
-        Formula.substitute, Formula.substituteMapped] using! hNeg)
-    (fun {currentBound currentFree} left right ihLeft ihRight => by
-      intro tailBound introduced replacement hBound
-      cases hBound
-      have hLeftNeg := quote_hilbert_neg_open_bound_last replacement
-        left (ihLeft tailBound introduced replacement rfl)
-      have hImp := quote_hilbert_imp_open_bound_last replacement
-        (.neg left) right hLeftNeg
-        (ihRight tailBound introduced replacement rfl)
-      simpa [quote_hilbert, Formula.instantiateLastBound,
-        Formula.substitute, Formula.substituteMapped] using! hImp)
-    (fun {currentBound currentFree} left right ihLeft ihRight => by
-      intro tailBound introduced replacement hBound
-      cases hBound
       exact quote_hilbert_imp_open_bound_last replacement left right
         (ihLeft tailBound introduced replacement rfl)
         (ihRight tailBound introduced replacement rfl))
-    (fun {currentBound currentFree} left right ihLeft ihRight => by
-      intro tailBound introduced replacement hBound
-      cases hBound
-      have hLeftRight := quote_hilbert_imp_open_bound_last replacement
-        left right (ihLeft tailBound introduced replacement rfl)
-        (ihRight tailBound introduced replacement rfl)
-      have hRightLeft := quote_hilbert_imp_open_bound_last replacement
-        right left (ihRight tailBound introduced replacement rfl)
-        (ihLeft tailBound introduced replacement rfl)
-      have hRightLeftNeg := quote_hilbert_neg_open_bound_last replacement
-        (.imp right left) hRightLeft
-      have hOuterImp := quote_hilbert_imp_open_bound_last replacement
-        (.imp left right) (.neg (.imp right left))
-        hLeftRight hRightLeftNeg
-      have hNeg := quote_hilbert_neg_open_bound_last replacement
-        (.imp (.imp left right) (.neg (.imp right left))) hOuterImp
-      simpa [quote_hilbert, Formula.instantiateLastBound,
-        Formula.substitute, Formula.substituteMapped] using! hNeg)
     (fun {currentBound currentFree} quantified body ih => by
       intro tailBound introduced replacement hBound
       cases hBound
       exact quote_hilbert_all_open_bound_last replacement body
         (ih (quantified :: tailBound) introduced replacement rfl))
-    (fun {currentBound currentFree} quantified body ih => by
-      intro tailBound introduced replacement hBound
-      cases hBound
-      have hBodyNeg := quote_hilbert_neg_open_bound_last
-        (prefixContext := quantified :: tailBound) replacement
-        body (ih (quantified :: tailBound) introduced replacement rfl)
-      have hUniversal := quote_hilbert_all_open_bound_last replacement
-        (.neg body) hBodyNeg
-      have hNeg := quote_hilbert_neg_open_bound_last replacement
-        (.forallE quantified (.neg body)) hUniversal
-      simpa [quote_hilbert, Formula.instantiateLastBound,
-        Formula.substitute, Formula.substituteMapped,
-        Formula.instantiateLastBound_existsE,
-        Formula.instantiateLastBound_forallE] using! hNeg)
     formula prefixContext introduced replacement rfl
+  simpa only [Formula.instantiateLastBound, ← Formula.hilbertize_substitute, quote_hilbert_hilbertize] using h
 
 /-- 公共公式 quotation 实现规范的 bound 顶槽打开。 -/
 theorem quote_formula_open_bound

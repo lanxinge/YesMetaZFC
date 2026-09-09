@@ -91,105 +91,25 @@ theorem proof_sequence_step_code_elim
           (trace.weakenFree SetSort.set ·ₘ numₘ(index)) ∈ₘ
             numₘ(bound + 1) := by
         simpa using lift_to_row hTraceBound
-      apply C.member_elim
-        (bound + 1)
-        (trace.weakenFree SetSort.set ·ₘ numₘ(index))
-        (conclusion.weakenFree SetSort.set)
-        hTraceBoundXi
-      intro accumulator hAccumulator
-      let Ε : Context signature (SetSort.set :: free) :=
-        ((trace.weakenFree SetSort.set ·ₘ numₘ(index)) ≐ₘ
-          numₘ(accumulator)) :: Ξ
-      have hRowCodeBoundAt : Ε ⊢ₘ[T]
-          proof_sequence_row_code_term ∈ₘ numₘ(bound) :=
-        FirstOrder.Derives.context_weaken_cons hRowCodeBound
-      apply C.member_elim bound proof_sequence_row_code_term
-        (conclusion.weakenFree SetSort.set) hRowCodeBoundAt
-      intro item hItem
-      let Ζ : Context signature (SetSort.set :: free) :=
-        (proof_sequence_row_code_term ≐ₘ numₘ(item)) :: Ε
-      have hTraceEquality : Ζ ⊢ₘ[T]
-          (trace.weakenFree SetSort.set ·ₘ numₘ(index)) ≐ₘ
-            numₘ(accumulator) :=
-        FirstOrder.Derives.assumption (by simp [Ζ, Ε])
-      have hRowCodeEquality : Ζ ⊢ₘ[T]
-          proof_sequence_row_code_term ≐ₘ numₘ(item) :=
-        FirstOrder.Derives.assumption (by simp [Ζ])
-      have hOuterXi : Ξ ⊢ₘ[T]
+      have hOuter : Ξ ⊢ₘ[T]
           (trace.weakenFree SetSort.set ·ₘ Sₘ(numₘ(index))) ≐ₘ
-            Sₘ(godel_pairₘ(
-              trace.weakenFree SetSort.set ·ₘ numₘ(index),
+            Sₘ(godel_pairₘ(trace.weakenFree SetSort.set ·ₘ numₘ(index),
               proof_sequence_row_code_term)) := by
         simpa [proof_sequence_code_step_condition] using!
           FirstOrder.Derives.conj_elim_right P.row_condition
-      have hInnerXi : Ξ ⊢ₘ[T]
-          nat_sequence_code_condition
-            (sequence.weakenFree SetSort.set ·ₘ numₘ(index))
-            proof_sequence_row_code_term := by
-        simpa [proof_sequence_code_step_condition] using!
-          FirstOrder.Derives.conj_elim_left P.row_condition
-      have hInner : Ζ ⊢ₘ[T]
-          nat_sequence_code_condition
-            (sequence.weakenFree SetSort.set ·ₘ numₘ(index))
-            proof_sequence_row_code_term :=
-        FirstOrder.Derives.context_weaken_cons
-          (FirstOrder.Derives.context_weaken_cons hInnerXi)
-      have hOuter : Ζ ⊢ₘ[T]
-          (trace.weakenFree SetSort.set ·ₘ Sₘ(numₘ(index))) ≐ₘ
-            Sₘ(godel_pairₘ(
-              trace.weakenFree SetSort.set ·ₘ numₘ(index),
-              proof_sequence_row_code_term)) :=
-        FirstOrder.Derives.context_weaken_cons
-          (FirstOrder.Derives.context_weaken_cons hOuterXi)
-      have hPairEquality : Ζ ⊢ₘ[T]
-          godel_pairₘ(
-              trace.weakenFree SetSort.set ·ₘ numₘ(index),
-              proof_sequence_row_code_term) ≐ₘ
-            godel_pairₘ(numₘ(accumulator), numₘ(item)) :=
-        pair_congr_of_equalities
-          (trace.weakenFree SetSort.set ·ₘ numₘ(index))
-          (numₘ(accumulator))
-          proof_sequence_row_code_term (numₘ(item))
-          hTraceEquality hRowCodeEquality
-      have hSuccessorEquality : Ζ ⊢ₘ[T]
-          Sₘ(godel_pairₘ(
-              trace.weakenFree SetSort.set ·ₘ numₘ(index),
-              proof_sequence_row_code_term)) ≐ₘ
-            Sₘ(godel_pairₘ(numₘ(accumulator), numₘ(item))) :=
-        successor_term_congr_of_equality
-          (godel_pairₘ(
-            trace.weakenFree SetSort.set ·ₘ numₘ(index),
-            proof_sequence_row_code_term))
-          (godel_pairₘ(numₘ(accumulator), numₘ(item)))
-          hPairEquality
-      have hStepGround : Ζ ⊢ₘ[T]
-          (trace.weakenFree SetSort.set ·ₘ numₘ(index + 1)) ≐ₘ
-            Sₘ(godel_pairₘ(numₘ(accumulator), numₘ(item))) := by
-        have hRaw := Metatheory.Derives.equality_trans
-          hOuter hSuccessorEquality
-        simpa [finite_numeral_term, successor_term] using hRaw
-      have hFinalXi : Ξ ⊢ₘ[T]
-          numₘ(targetCode) ≐ₘ
-            (trace.weakenFree SetSort.set ·ₘ numₘ(index + 1)) := by
+      have hFinalXi : Ξ ⊢ₘ[T] numₘ(targetCode) ≐ₘ
+          (trace.weakenFree SetSort.set ·ₘ numₘ(index + 1)) := by
         simpa using lift_to_row hFinal
-      have hFinalAt : Ζ ⊢ₘ[T]
-          numₘ(targetCode) ≐ₘ
-            (trace.weakenFree SetSort.set ·ₘ numₘ(index + 1)) :=
+      apply nat_sequence_step_value_elim C
+        (trace.weakenFree SetSort.set ·ₘ numₘ(index)) proof_sequence_row_code_term
+        targetCode bound _ hTraceBoundXi hRowCodeBound
+        (FirstOrder.Derives.eq_trans hFinalXi hOuter)
+      intro accumulator hAccumulator item hItem hMatch
+      apply hBranch accumulator hAccumulator item hItem hMatch
+      simpa [proof_sequence_code_step_condition] using!
         FirstOrder.Derives.context_weaken_cons
-          (FirstOrder.Derives.context_weaken_cons hFinalXi)
-      have hGround :=
-        nat_sequence_code_step_numeral_at C accumulator item (Γ := Ζ)
-      have hTargetGround : Ζ ⊢ₘ[T]
-          numₘ(targetCode) ≐ₘ
-            numₘ(nat_sequence_code_step accumulator item) :=
-        Metatheory.Derives.equality_trans hFinalAt
-          (Metatheory.Derives.equality_trans hStepGround hGround)
-      by_cases hMatch :
-          targetCode = nat_sequence_code_step accumulator item
-      · simpa [Ζ, Ε, Ξ] using
-          hBranch accumulator hAccumulator item hItem hMatch hInner
-      · exact FirstOrder.Derives.falsum_elim
-          (falsum_of_numeral_equality C hMatch hTargetGround))
+          (FirstOrder.Derives.context_weaken_cons
+            (FirstOrder.Derives.conj_elim_left P.row_condition)))
 
 /-! ## 有限前缀反演 -/
 
@@ -388,147 +308,14 @@ theorem proof_sequence_code_replay_of_data
       numₘ(proof_sequence_code_value rows) ≐ₘ
         (trace ·ₘ numₘ(length))) :
     Γ ⊢ₘ[T] sequence ≐ₘ proof_sequence_graph_term rows := by
-  have hUnique := proof_sequence_code_prefix_unique C
-    S sequence trace code rows length bound hZero hStep
-    hTraceBound hCodeEquality hFinal
-  let standard : SetOpenTerm free := proof_sequence_graph_term rows
-  have hStandardFunction : Γ ⊢ₘ[T] is_function_formula standard := by
-    simpa [standard, proof_sequence_graph_term] using
-      (standard_sequence_from_is_function
-        (Γ := Γ) S.toFiniteSequenceGraphSupport 0
-          (rows.map fun row => nat_sequence_graph_term row))
-  have hDomainRows : Γ ⊢ₘ[T]
-      domₘ(sequence) ≐ₘ numₘ(rows.length) :=
-    Metatheory.Derives.equality_trans hDomain hUnique.1
-  have hStandardDomain : Γ ⊢ₘ[T]
-      domₘ(standard) ≐ₘ numₘ(rows.length) := by
-    simpa [standard] using
-      (proof_sequence_graph_domain_eq
-        (Γ := Γ) S.toFiniteSequenceGraphSupport rows)
-  have hDomainAgreement : Γ ⊢ₘ[T]
-      domₘ(sequence) ≐ₘ domₘ(standard) :=
-    Metatheory.Derives.equality_trans hDomainRows
-      (Metatheory.Derives.equality_symm hStandardDomain)
-  have hPointwise : Γ ⊢ₘ[T]
-      Formula.forallFreeTop SetSort.set
-        (((.fvar .here : SetOpenTerm (SetSort.set :: free)) ∈ₘ
-            domₘ(sequence.weakenFree SetSort.set)) ⟶ₘ
-          ((sequence.weakenFree SetSort.set ·ₘ
-              (.fvar .here : SetOpenTerm (SetSort.set :: free))) ≐ₘ
-            (standard.weakenFree SetSort.set ·ₘ
-              (.fvar .here : SetOpenTerm (SetSort.set :: free))))) := by
-    apply FirstOrder.Derives.forall_intro
-    let Δ : Context signature (SetSort.set :: free) :=
-      FreshVariable.extendContext SetSort.set Γ
-    let input : SetOpenTerm (SetSort.set :: free) :=
-      FreshVariable.newest (σ := signature) (free := free) SetSort.set
-    change Δ ⊢ₘ[T]
-      (input ∈ₘ domₘ(sequence.weakenFree SetSort.set)) ⟶ₘ
-        ((sequence.weakenFree SetSort.set ·ₘ input) ≐ₘ
-          (standard.weakenFree SetSort.set ·ₘ input))
-    apply FirstOrder.Derives.imp_intro
-    let Ε : Context signature (SetSort.set :: free) :=
-      (input ∈ₘ domₘ(sequence.weakenFree SetSort.set)) :: Δ
-    have hInput : Ε ⊢ₘ[T]
-        input ∈ₘ domₘ(sequence.weakenFree SetSort.set) :=
-      FirstOrder.Derives.assumption (by simp [Ε])
-    have hDomainAt : Δ ⊢ₘ[T]
-        domₘ(sequence.weakenFree SetSort.set) ≐ₘ
-          numₘ(rows.length) := by
-      simpa [Δ] using fresh_context_weaken hDomainRows
-    have hInputNumeral : Ε ⊢ₘ[T]
-        input ∈ₘ numₘ(rows.length) :=
-      FirstOrder.Derives.iff_elim_left
-        (FirstOrder.Derives.context_weaken_cons
-          (membership_right_iff_of_equality
-            input (domₘ(sequence.weakenFree SetSort.set))
-            (numₘ(rows.length)) hDomainAt))
-        hInput
-    apply C.member_elim rows.length input
-      ((sequence.weakenFree SetSort.set ·ₘ input) ≐ₘ
-        (standard.weakenFree SetSort.set ·ₘ input)) hInputNumeral
-    intro index hIndex
-    have hNumeralMap : ∀ tokens : List Nat,
-        List.map (fun token =>
-          (numₘ(token) : SetOpenTerm free).weakenFree SetSort.set) tokens =
-          List.map (fun token =>
-            (numₘ(token) : SetOpenTerm (SetSort.set :: free))) tokens := by
-      intro tokens
-      induction tokens with
-      | nil => rfl
-      | cons token rest ih =>
-          simp []
-    have hRowWeaken : ∀ row : List Nat,
-        (nat_sequence_graph_term
-            (bound := []) (free := free) row).weakenFree SetSort.set =
-          nat_sequence_graph_term
-            (bound := []) (free := SetSort.set :: free) row := by
-      intro row
-      unfold nat_sequence_graph_term
-      rw [standard_sequence_from_weakenFree]
-      congr 1
-      simp [List.map_map, Function.comp_def]
-    let Ζ : Context signature (SetSort.set :: free) :=
-      (input ≐ₘ numₘ(index)) :: Ε
-    have hInputEquality : Ζ ⊢ₘ[T]
-        input ≐ₘ numₘ(index) :=
-      FirstOrder.Derives.assumption (by simp [Ζ])
-    have hPrefix : Ζ ⊢ₘ[T]
-        sequence.weakenFree SetSort.set ·ₘ numₘ(index) ≐ₘ
-          nat_sequence_graph_term (rows[index]'hIndex) := by
-      have hRenamed := FirstOrder.Derives.free_renaming
-        (T := T) (VariableRenaming.weaken SetSort.set)
-          (hUnique.2 index hIndex)
-      have hTail :
-          List.map (Formula.renameFree (VariableRenaming.weaken SetSort.set)) Γ =
-            FreshVariable.extendContext SetSort.set Γ := rfl
-      rw [hTail] at hRenamed
-      change FreshVariable.extendContext SetSort.set Γ ⊢ₘ[T]
-        (sequence ·ₘ numₘ(index)).weakenFree SetSort.set ≐ₘ
-          (nat_sequence_graph_term
-            (bound := []) (free := free) (rows[index]'hIndex)).weakenFree
-              SetSort.set at hRenamed
-      have hAt : Δ ⊢ₘ[T]
-          sequence.weakenFree SetSort.set ·ₘ numₘ(index) ≐ₘ
-            nat_sequence_graph_term (rows[index]'hIndex) := by
-        simpa [Δ, hRowWeaken] using hRenamed
-      exact FirstOrder.Derives.context_weaken_cons
-        (FirstOrder.Derives.context_weaken_cons hAt)
-    have hSequenceAt : Ζ ⊢ₘ[T]
-        sequence.weakenFree SetSort.set ·ₘ input ≐ₘ
-          nat_sequence_graph_term (rows[index]'hIndex) := by
-      have hApplication :=
-        function_application_term_congr_argument_of_equality
-          (sequence.weakenFree SetSort.set) input (numₘ(index))
-          hInputEquality
-      exact Metatheory.Derives.equality_trans hApplication hPrefix
-    have hCanonicalAtNumeral : Ζ ⊢ₘ[T]
-        nat_sequence_graph_term (rows[index]'hIndex) ≐ₘ
-          (standard.weakenFree SetSort.set ·ₘ numₘ(index)) := by
-      have hValue := proof_row_value_of_graph
-        (Γ := Ζ) S.toFiniteSequenceEvaluationSupport rows index hIndex
-      simpa [standard, proof_sequence_graph_term,
-        standard_sequence_from_weakenFree,
-        finite_numeral_term_weakenFree, Function.comp_def, hRowWeaken] using hValue
-    have hCanonicalApplication : Ζ ⊢ₘ[T]
-        (standard.weakenFree SetSort.set ·ₘ numₘ(index)) ≐ₘ
-          (standard.weakenFree SetSort.set ·ₘ input) := by
-      exact function_application_term_congr_argument_of_equality
-        (standard.weakenFree SetSort.set) (numₘ(index)) input
-        (Metatheory.Derives.equality_symm hInputEquality)
-    exact Metatheory.Derives.equality_trans hSequenceAt
-      (Metatheory.Derives.equality_trans hCanonicalAtNumeral
-        hCanonicalApplication)
-  have hAgreement : Γ ⊢ₘ[T]
-      function_extensional_agreement sequence standard := by
-    simpa [function_extensional_agreement] using
-      FirstOrder.Derives.conj_intro hDomainAgreement hPointwise
-  simpa [standard] using
-    function_equality_of_extensional_agreement
-      S.toFiniteSequenceEvaluationSupport sequence standard
-      hFunction hStandardFunction hAgreement
-
-/-! ## 完整二维条件的规范唯一性 -/
+  have hUnique := proof_sequence_code_prefix_unique C S sequence trace code rows
+    length bound hZero hStep hTraceBound hCodeEquality hFinal
+  apply function_equality_of_finite_values C.toFiniteCore S.toFiniteSequenceEvaluationSupport
+    sequence (rows.map (fun row => nat_sequence_graph_term row)) hFunction
+  · simpa only [List.length_map] using FirstOrder.Derives.eq_trans hDomain hUnique.1
+  · intro index hIndex
+    simpa only [List.getElem_map] using hUnique.2 index
+      (by simpa only [List.length_map] using hIndex)
 
 /-- 内在证明序列条件与规范 numeral 码直接决定规范二维有限图。 -/
 theorem proof_sequence_code_condition_unique_of_code_equality
@@ -580,38 +367,6 @@ theorem proof_sequence_code_condition_unique_of_code_equality
   have hDomainMember : Γ ⊢ₘ[T]
       domₘ(sequence) ∈ₘ numₘ(bound + 1) := by
     simpa [finite_numeral_term, successor_term] using hDomainSuccessor
-  have hNumeralMap : ∀ tokens : List Nat,
-      List.map (fun token =>
-        (numₘ(token) : SetOpenTerm free).weakenFree SetSort.set) tokens =
-          List.map (fun token =>
-            (numₘ(token) : SetOpenTerm (SetSort.set :: free))) tokens := by
-    intro tokens
-    induction tokens with
-    | nil => rfl
-    | cons token rest ih =>
-        simp []
-  have hRowWeaken : ∀ row : List Nat,
-      (nat_sequence_graph_term
-          (bound := []) (free := free) row).weakenFree SetSort.set =
-        nat_sequence_graph_term
-          (bound := []) (free := SetSort.set :: free) row := by
-    intro row
-    unfold nat_sequence_graph_term
-    rw [standard_sequence_from_weakenFree]
-    congr 1
-    simp [List.map_map, Function.comp_def]
-  have hGraphWeaken :
-      (proof_sequence_graph_term
-          (bound := []) (free := free) rows).weakenFree SetSort.set =
-        proof_sequence_graph_term
-          (bound := []) (free := SetSort.set :: free) rows := by
-    unfold proof_sequence_graph_term
-    rw [standard_sequence_from_weakenFree]
-    apply congrArg (standard_sequence_from 0)
-    rw [List.map_map]
-    apply List.map_congr_left
-    intro row _
-    exact hRowWeaken row
   apply C.member_elim (bound + 1) (domₘ(sequence))
     (sequence ≐ₘ proof_sequence_graph_term rows) hDomainMember
   intro length hLength
@@ -629,41 +384,20 @@ theorem proof_sequence_code_condition_unique_of_code_equality
   exact proof_sequence_code_trace_elim sequence code hTrace
     (conclusion := sequence ≐ₘ proof_sequence_graph_term rows) (by
       intro P
-      let base : Context signature (SetSort.set :: free) :=
-        FreshVariable.extendContext SetSort.set Δ
       let Ξ : Context signature (SetSort.set :: free) :=
         proof_sequence_trace_context Δ sequence code
       change Ξ ⊢ₘ[T]
         (sequence ≐ₘ proof_sequence_graph_term rows).weakenFree SetSort.set
-      have hFunctionDelta : Δ ⊢ₘ[T] is_function_formula sequence :=
-        FirstOrder.Derives.context_weaken_cons hFunction
-      have hFunctionBase : base ⊢ₘ[T]
-          is_function_formula (sequence.weakenFree SetSort.set) := by
-        simpa [base] using fresh_context_weaken hFunctionDelta
-      have hFunctionXi : Ξ ⊢ₘ[T]
-          is_function_formula (sequence.weakenFree SetSort.set) := by
+      have lift_to_trace {formula : SetOpenFormula free} (h : Δ ⊢ₘ[T] formula) :
+          Ξ ⊢ₘ[T] formula.weakenFree SetSort.set := by
         simpa [Ξ, proof_sequence_trace_context] using
-          FirstOrder.Derives.context_weaken_cons hFunctionBase
-      have hDomainDelta : Δ ⊢ₘ[T]
-          domₘ(sequence) ≐ₘ numₘ(length) :=
-        hDomain
-      have hDomainBase : base ⊢ₘ[T]
-          domₘ(sequence.weakenFree SetSort.set) ≐ₘ numₘ(length) := by
-        simpa [base] using fresh_context_weaken hDomainDelta
-      have hDomainXi : Ξ ⊢ₘ[T]
-          domₘ(sequence.weakenFree SetSort.set) ≐ₘ numₘ(length) := by
-        simpa [Ξ, proof_sequence_trace_context] using
-          FirstOrder.Derives.context_weaken_cons hDomainBase
-      have hCodeEqualityDelta : Δ ⊢ₘ[T]
-          code ≐ₘ numₘ(bound) :=
-        FirstOrder.Derives.context_weaken_cons hCodeEqualityBound
-      have hCodeEqualityBase : base ⊢ₘ[T]
-          code.weakenFree SetSort.set ≐ₘ numₘ(bound) := by
-        simpa [base] using fresh_context_weaken hCodeEqualityDelta
-      have hCodeEqualityXi : Ξ ⊢ₘ[T]
-          code.weakenFree SetSort.set ≐ₘ numₘ(bound) := by
-        simpa [Ξ, proof_sequence_trace_context] using
-          FirstOrder.Derives.context_weaken_cons hCodeEqualityBase
+          FirstOrder.Derives.context_weaken_cons (fresh_context_weaken h)
+      have hFunctionXi : Ξ ⊢ₘ[T] is_function_formula (sequence.weakenFree SetSort.set) :=
+        lift_to_trace (FirstOrder.Derives.context_weaken_cons hFunction)
+      have hDomainXi : Ξ ⊢ₘ[T] domₘ(sequence.weakenFree SetSort.set) ≐ₘ numₘ(length) := by
+        simpa using lift_to_trace hDomain
+      have hCodeEqualityXi : Ξ ⊢ₘ[T] code.weakenFree SetSort.set ≐ₘ numₘ(bound) := by
+        simpa using lift_to_trace (FirstOrder.Derives.context_weaken_cons hCodeEqualityBound)
       have hStepReplay : ∀ index, index < length →
           Ξ ⊢ₘ[T]
             proof_sequence_code_row_condition
@@ -683,91 +417,20 @@ theorem proof_sequence_code_condition_unique_of_code_equality
           proof_sequence_trace_term
           (code.weakenFree SetSort.set)
           (numₘ(index)) P.pointwise hIndexDomain
-      have hTraceDomain : Ξ ⊢ₘ[T]
-          domₘ(proof_sequence_trace_term) ≐ₘ numₘ(length + 1) := by
-        have hSuccessorDomain : Ξ ⊢ₘ[T]
-            Sₘ(domₘ(sequence.weakenFree SetSort.set)) ≐ₘ
-              Sₘ(numₘ(length)) :=
-          successor_term_congr_of_equality
-            (domₘ(sequence.weakenFree SetSort.set)) (numₘ(length))
-            hDomainXi
-        have hTraceDomainSucc := Metatheory.Derives.equality_trans
-          P.domain_eq hSuccessorDomain
-        simpa [finite_numeral_term, successor_term] using hTraceDomainSucc
-      have hTraceReplay : ∀ index, index ≤ length →
-          Ξ ⊢ₘ[T]
-            (proof_sequence_trace_term ·ₘ numₘ(index)) ∈ₘ
-              numₘ(bound + 1) := by
-        intro index hIndex
-        have hIndexNumeral : Ξ ⊢ₘ[T]
-            numₘ(index) ∈ₘ numₘ(length + 1) :=
-          FirstOrder.Derives.context_weaken
-            (Γ := ([] : Context signature (SetSort.set :: free)))
-            (Δ := Ξ) (by simp [Ξ])
-            (numeral_mem_of_lt
-              S.toFiniteSequenceSpaceSupport.toArithmeticSupport.contains_successor
-              (by omega))
-        have hIndexDomain : Ξ ⊢ₘ[T]
-            numₘ(index) ∈ₘ domₘ(proof_sequence_trace_term) :=
-          FirstOrder.Derives.iff_elim_right
-            (membership_right_iff_of_equality
-              (numₘ(index)) (domₘ(proof_sequence_trace_term))
-              (numₘ(length + 1)) hTraceDomain)
-            hIndexNumeral
-        have hTraceCode := sequence_trace_code_bound_at
-          proof_sequence_trace_term (code.weakenFree SetSort.set)
-          (numₘ(index)) P.code_bound hIndexDomain
-        have hSuccessorCodeEquality : Ξ ⊢ₘ[T]
-            Sₘ(code.weakenFree SetSort.set) ≐ₘ Sₘ(numₘ(bound)) :=
-          successor_term_congr_of_equality
-            (code.weakenFree SetSort.set) (numₘ(bound))
-            hCodeEqualityXi
-        have hTraceSuccessor := FirstOrder.Derives.iff_elim_left
-          (membership_right_iff_of_equality
-            ((proof_sequence_trace_term) ·ₘ numₘ(index))
-            (Sₘ(code.weakenFree SetSort.set)) (Sₘ(numₘ(bound)))
-            hSuccessorCodeEquality)
-          hTraceCode
-        simpa [finite_numeral_term, successor_term] using hTraceSuccessor
-      have hFinal : Ξ ⊢ₘ[T]
-          numₘ(proof_sequence_code_value rows) ≐ₘ
-            (proof_sequence_trace_term ·ₘ numₘ(length)) := by
-        have hNumeralCode : Ξ ⊢ₘ[T]
-            numₘ(bound) ≐ₘ code.weakenFree SetSort.set :=
-          Metatheory.Derives.equality_symm hCodeEqualityXi
-        have hNumeralToDomain : Ξ ⊢ₘ[T]
-            numₘ(bound) ≐ₘ
-              (proof_sequence_trace_term ·ₘ
-                domₘ(sequence.weakenFree SetSort.set)) :=
-          Metatheory.Derives.equality_trans hNumeralCode P.final_code
-        have hTraceDomainApplication : Ξ ⊢ₘ[T]
-            (proof_sequence_trace_term ·ₘ
-                domₘ(sequence.weakenFree SetSort.set)) ≐ₘ
-              (proof_sequence_trace_term ·ₘ numₘ(length)) :=
-          function_application_term_congr_argument_of_equality
-            proof_sequence_trace_term
-            (domₘ(sequence.weakenFree SetSort.set)) (numₘ(length))
-            hDomainXi
-        have hFinalBound := Metatheory.Derives.equality_trans
-          hNumeralToDomain hTraceDomainApplication
-        simpa [bound] using hFinalBound
+      have hTraceData := sequence_trace_numeral_data S.toFiniteSequenceSpaceSupport.toArithmeticSupport
+        (sequence.weakenFree SetSort.set) proof_sequence_trace_term
+        (code.weakenFree SetSort.set) length bound hDomainXi hCodeEqualityXi
+        P.domain_eq P.code_bound P.final_code
       have hReplay := proof_sequence_code_replay_of_data C
         S.toFiniteSequenceSpaceSupport
         (sequence.weakenFree SetSort.set)
         proof_sequence_trace_term
         (code.weakenFree SetSort.set)
         rows length bound hFunctionXi hDomainXi P.zero_value
-        hStepReplay hTraceReplay hCodeEqualityXi hFinal
-      rw [Formula.weakenFree_eq_renameMapped]
-      change Ξ ⊢ₘ[T]
-        sequence.renameMapped VariableRenaming.id
-            (VariableRenaming.weaken SetSort.set) ≐ₘ
-          (proof_sequence_graph_term rows).renameMapped
-            VariableRenaming.id (VariableRenaming.weaken SetSort.set)
-      rw [Term.renameMapped_id_weaken sequence]
-      rw [Term.renameMapped_id_weaken (proof_sequence_graph_term rows)]
-      rw [hGraphWeaken]
-      exact hReplay)
+        hStepReplay hTraceData.1 hCodeEqualityXi hTraceData.2
+      simpa [proof_sequence_graph_term, nat_sequence_graph_term,
+        standard_sequence_from_weakenFree, finite_numeral_term_weakenFree,
+        Function.comp_def] using! hReplay)
 
 end ProofT
 end FormalSystem

@@ -141,138 +141,48 @@ theorem scopedSupportAgreement_push {M : Model} {bound : List CoreSort} {left ri
 end Env
 mutual
 theorem Term.eval_eq_of_scopedSupportAgreement {M : Model} (bound : List CoreSort) (left right : Env M) (hAgreement : Env.ScopedSupportAgreement bound left right) (term : Term) (hScoped : Term.wellScopedWith bound term = true) : Term.eval left term = Term.eval right term := by
-  cases term with
-  | bvar sort index =>
-      cases hLookup : TypeCheck.lookupBound? bound index with
-      | none => simp [Term.wellScopedWith, hLookup] at hScoped
-      | some expected =>
-          have hSort : expected = sort := by simpa [Term.wellScopedWith, hLookup, beq_iff_eq] using hScoped
-          subst expected
-          simpa only [Term.eval] using hAgreement.1 sort index hLookup
-  | fvar sort id => simpa only [Term.eval] using hAgreement.2 sort id
-  | app symbol args =>
-      unfold Term.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      unfold Term.eval
-      congr 1
-      exact Term.evalList_eq_of_scopedSupportAgreement
-        bound left right hAgreement args hScoped.2
-  | apply fn arg =>
-      unfold Term.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      unfold Term.eval
-      rw [Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement fn hScoped.1, Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement arg hScoped.2]
-  | bool value =>
-      unfold Term.eval
-      rfl
-  | notE body =>
-      unfold Term.wellScopedWith at hScoped
-      unfold Term.eval
-      rw [Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement body hScoped]
-  | andE leftTerm rightTerm
-  | orE leftTerm rightTerm
-  | impE leftTerm rightTerm
-  | iffE leftTerm rightTerm =>
-      unfold Term.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      unfold Term.eval
-      rw [Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement leftTerm hScoped.1, Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement rightTerm hScoped.2]
-  | quote formula =>
-      unfold Term.wellScopedWith at hScoped
-      unfold Term.eval
-      congr 1
-      apply propext
-      exact Formula.satisfies_iff_of_scopedSupportAgreement
-        bound left right hAgreement formula hScoped
-  | lam domain codomain body =>
-      unfold Term.wellScopedWith at hScoped
-      unfold Term.eval
-      congr 1
-      funext value
-      exact Term.eval_eq_of_scopedSupportAgreement (domain :: bound) (left.push value) (right.push value)
-        (Env.scopedSupportAgreement_push hAgreement domain value) body hScoped
-  | ite sort condition thenTerm elseTerm =>
-      unfold Term.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      unfold Term.eval
-      congr 1
-      · apply propext
-        exact Formula.satisfies_iff_of_scopedSupportAgreement
-          bound left right hAgreement condition hScoped.1.1
-      · exact Term.eval_eq_of_scopedSupportAgreement
-          bound left right hAgreement thenTerm hScoped.1.2
-      · exact Term.eval_eq_of_scopedSupportAgreement
-          bound left right hAgreement elseTerm hScoped.2
+  cases term
+  case bvar sort index =>
+    cases hLookup : TypeCheck.lookupBound? bound index with
+    | none => simp [Term.wellScopedWith, hLookup] at hScoped
+    | some expected =>
+        have hSort : expected = sort := by
+          simpa [Term.wellScopedWith, hLookup, beq_iff_eq] using hScoped
+        subst expected
+        simpa only [Term.eval] using hAgreement.1 sort index hLookup
+  case lam domain codomain body =>
+    simp only [Term.eval]
+    congr 1
+    funext value
+    exact Term.eval_eq_of_scopedSupportAgreement (domain :: bound) (left.push value)
+      (right.push value) (Env.scopedSupportAgreement_push hAgreement domain value) body hScoped
+  all_goals simp only [Term.wellScopedWith, Bool.and_eq_true] at hScoped
+  all_goals simp only [Term.eval]
+  all_goals simp_all only [← Formula.Satisfies.eq_def, hAgreement.2,
+      Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement,
+      Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement,
+      Term.evalList_eq_of_scopedSupportAgreement bound left right hAgreement]
+
 theorem Formula.satisfies_iff_of_scopedSupportAgreement {M : Model} (bound : List CoreSort) (left right : Env M) (hAgreement : Env.ScopedSupportAgreement bound left right) (formula : Formula) (hScoped : Formula.wellScopedWith bound formula = true) : Formula.Satisfies left formula ↔ Formula.Satisfies right formula := by
-  cases formula with
-  | trueE
-  | falseE => simp [Formula.Satisfies, Formula.eval]
-  | atom predicate args =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [Term.evalList_eq_of_scopedSupportAgreement bound left right hAgreement args hScoped.2]
-  | equal sort leftTerm rightTerm =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement leftTerm hScoped.1, Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement rightTerm hScoped.2]
-  | boolTerm term =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement term hScoped]
-  | neg body =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      exact not_congr (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement body hScoped)
-  | imp leftFormula rightFormula
-  | conj leftFormula rightFormula
-  | disj leftFormula rightFormula
-  | iffE leftFormula rightFormula =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      first
-      | exact imp_congr (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement leftFormula hScoped.1)
-          (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement rightFormula hScoped.2)
-      | exact and_congr (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement leftFormula hScoped.1)
-          (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement rightFormula hScoped.2)
-      | exact or_congr (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement leftFormula hScoped.1)
-          (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement rightFormula hScoped.2)
-      | exact iff_congr (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement leftFormula hScoped.1)
-          (Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement rightFormula hScoped.2)
-  | forallE sort body =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      constructor <;> intro h value hSort
-      · exact (Formula.satisfies_iff_of_scopedSupportAgreement (sort :: bound) (left.push value) (right.push value) (Env.scopedSupportAgreement_push hAgreement sort value)
-            body hScoped).mp (h value hSort)
-      · exact (Formula.satisfies_iff_of_scopedSupportAgreement (sort :: bound) (left.push value) (right.push value) (Env.scopedSupportAgreement_push hAgreement sort value)
-            body hScoped).mpr (h value hSort)
-  | existsE sort body =>
-      unfold Formula.wellScopedWith at hScoped
-      simp only [Formula.Satisfies, Formula.eval]
-      constructor
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        exact (Formula.satisfies_iff_of_scopedSupportAgreement (sort :: bound) (left.push value) (right.push value) (Env.scopedSupportAgreement_push hAgreement sort value)
-            body hScoped).mp hBody
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        exact (Formula.satisfies_iff_of_scopedSupportAgreement (sort :: bound) (left.push value) (right.push value) (Env.scopedSupportAgreement_push hAgreement sort value)
-            body hScoped).mpr hBody
+  cases formula <;> simp only [Formula.wellScopedWith, Bool.and_eq_true] at hScoped
+  case forallE sort body | existsE sort body =>
+    simp only [Formula.Satisfies, Formula.eval]
+    simp only [← Formula.Satisfies.eq_def,
+      Formula.satisfies_iff_of_scopedSupportAgreement (sort :: bound) (left.push _)
+        (right.push _) (Env.scopedSupportAgreement_push hAgreement sort _) body hScoped]
+  all_goals simp only [Formula.Satisfies, Formula.eval]
+  all_goals simp_all only [← Formula.Satisfies.eq_def,
+      Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement,
+      Formula.satisfies_iff_of_scopedSupportAgreement bound left right hAgreement,
+      Term.evalList_eq_of_scopedSupportAgreement bound left right hAgreement]
+
 theorem Term.evalList_eq_of_scopedSupportAgreement {M : Model} (bound : List CoreSort) (left right : Env M) (hAgreement : Env.ScopedSupportAgreement bound left right) (terms : List Term) (hScoped : Term.wellScopedListWith bound terms = true) : terms.map (Term.eval left) = terms.map (Term.eval right) := by
-  cases terms with
-  | nil => rfl
-  | cons head tail =>
-      unfold Term.wellScopedListWith at hScoped
-      simp only [Bool.and_eq_true] at hScoped
-      simp only [List.map_cons]
-      congr 1
-      · exact Term.eval_eq_of_scopedSupportAgreement
-          bound left right hAgreement head hScoped.1
-      · exact Term.evalList_eq_of_scopedSupportAgreement
-          bound left right hAgreement tail hScoped.2
+  cases terms <;> simp only [Term.wellScopedListWith, Bool.and_eq_true] at hScoped
+  all_goals simp_all only [List.map_nil, List.map_cons,
+      Term.eval_eq_of_scopedSupportAgreement bound left right hAgreement,
+      Term.evalList_eq_of_scopedSupportAgreement bound left right hAgreement]
+
+
 end
 end Semantics
 end NormalForm

@@ -70,25 +70,7 @@ theorem disj_neg
     (hLeft : Γ ⊢ₘ[T] ¬ₘ left)
     (hRight : Γ ⊢ₘ[T] ¬ₘ right) :
     Γ ⊢ₘ[T] ¬ₘ(left ∨ₘ right) := by
-  apply FirstOrder.Derives.neg_intro
-  apply FirstOrder.Derives.disj_elim
-    (FirstOrder.Derives.assumption List.mem_cons_self)
-  · exact FirstOrder.Derives.neg_elim
-      (FirstOrder.Derives.assumption List.mem_cons_self)
-      (FirstOrder.Derives.context_weaken
-        (Γ := Γ) (Δ := left :: (left ∨ₘ right) :: Γ)
-        (by
-          intro candidate hCandidate
-          exact List.mem_cons_of_mem left
-            (List.mem_cons_of_mem (left ∨ₘ right) hCandidate)) hLeft)
-  · exact FirstOrder.Derives.neg_elim
-      (FirstOrder.Derives.assumption List.mem_cons_self)
-      (FirstOrder.Derives.context_weaken
-        (Γ := Γ) (Δ := right :: (left ∨ₘ right) :: Γ)
-        (by
-          intro candidate hCandidate
-          exact List.mem_cons_of_mem right
-            (List.mem_cons_of_mem (left ∨ₘ right) hCandidate)) hRight)
+  derive_prop
 
 theorem binary_condition_list_neg
     {T : SetTheory}

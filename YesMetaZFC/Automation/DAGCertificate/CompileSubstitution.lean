@@ -688,57 +688,9 @@ theorem formula?_applySubstitution
             formula?_applySubstitution registry substitution hCompile
             bound body compiledBody hBody]
           rfl
-  | bound, .conj left right, source, hSource => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.applySubstitution_conj, formula?,
-                formula?_applySubstitution registry substitution hCompile
-                  bound left compiledLeft hLeft,
-                formula?_applySubstitution registry substitution hCompile
-                  bound right compiledRight hRight]
-              rfl
-  | bound, .disj left right, source, hSource => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.applySubstitution_disj, formula?,
-                formula?_applySubstitution registry substitution hCompile
-                  bound left compiledLeft hLeft,
-                formula?_applySubstitution registry substitution hCompile
-                  bound right compiledRight hRight]
-              rfl
-  | bound, .imp left right, source, hSource => by
-      cases hLeft : formula? registry bound left with
-      | none =>
-          simp [formula?, hLeft] at hSource
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none =>
-              simp [formula?, hLeft, hRight] at hSource
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hSource
-              subst source
-              rw [Formula.applySubstitution_imp, formula?,
-                formula?_applySubstitution registry substitution hCompile
-                  bound left compiledLeft hLeft,
-                formula?_applySubstitution registry substitution hCompile
-                  bound right compiledRight hRight]
-              rfl
+  | bound, .conj left right, source, hSource
+  | bound, .disj left right, source, hSource
+  | bound, .imp left right, source, hSource
   | bound, .iff left right, source, hSource => by
       cases hLeft : formula? registry bound left with
       | none =>
@@ -750,26 +702,18 @@ theorem formula?_applySubstitution
           | some compiledRight =>
               simp [formula?, hLeft, hRight] at hSource
               subst source
-              rw [Formula.applySubstitution_iff, formula?,
+              first
+              | rw [Formula.applySubstitution_conj]
+              | rw [Formula.applySubstitution_disj]
+              | rw [Formula.applySubstitution_imp]
+              | rw [Formula.applySubstitution_iff]
+              rw [formula?,
                 formula?_applySubstitution registry substitution hCompile
                   bound left compiledLeft hLeft,
                 formula?_applySubstitution registry substitution hCompile
                   bound right compiledRight hRight]
               rfl
-  | bound, .forallE sort body, source, hSource => by
-      cases hBody : formula? registry (sort :: bound) body with
-      | none =>
-          simp [formula?, hBody] at hSource
-      | some compiledBody =>
-          simp [formula?, hBody] at hSource
-          subst source
-          rw [Formula.applySubstitution_forallE, formula?,
-            formula?_applySubstitution registry substitution hCompile
-            (sort :: bound) body compiledBody hBody]
-          simp [Logic.FirstOrder.Formula.substituteFree,
-            Logic.FirstOrder.Substitution.free_map,
-            Logic.FirstOrder.Formula.substitute,
-            Logic.FirstOrder.Formula.substituteMapped]
+  | bound, .forallE sort body, source, hSource
   | bound, .existsE sort body, source, hSource => by
       cases hBody : formula? registry (sort :: bound) body with
       | none =>
@@ -777,7 +721,10 @@ theorem formula?_applySubstitution
       | some compiledBody =>
           simp [formula?, hBody] at hSource
           subst source
-          rw [Formula.applySubstitution_existsE, formula?,
+          first
+          | rw [Formula.applySubstitution_forallE]
+          | rw [Formula.applySubstitution_existsE]
+          rw [formula?,
             formula?_applySubstitution registry substitution hCompile
             (sort :: bound) body compiledBody hBody]
           simp [Logic.FirstOrder.Formula.substituteFree,

@@ -141,172 +141,48 @@ mutual
 theorem Term.eval_override_of_predicate_lt {M : Model} (base : Env M) (definitions : Array DefinitionalCnf.Definition) (cutoff : Nat) (env : Env M) (extendedEnv : Env (Model.overrideDefinitions M base definitions))
     (hBound : ∀ index, extendedEnv.boundVal index = env.boundVal index) (hFree : ∀ sort id, extendedEnv.freeVal sort id = env.freeVal sort id) (hFresh : ∀ definition ∈ definitions.toList, cutoff ≤
     definition.predicate.id) (term : Term) (hMax : DefinitionalCnf.Term.maxPredicateIdSucc term ≤ cutoff) : Term.eval extendedEnv term = Term.eval env term := by
-  cases term with
-  | bvar sort index => simpa [Term.eval, Model.overrideDefinitions] using hBound index
-  | fvar sort id => simpa [Term.eval, Model.overrideDefinitions] using hFree sort id
-  | app symbol args =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc, Term.eval, Model.overrideDefinitions] at hMax ⊢
-      congr 1
-      exact Term.evalList_override_of_predicate_lt
-        base definitions cutoff env extendedEnv hBound hFree hFresh args hMax
-  | apply fn arg =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh fn hMax'.1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh arg hMax'.2
-  | bool value => simp [Term.eval, Model.overrideDefinitions]
-  | notE body =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      exact Term.eval_override_of_predicate_lt
-        base definitions cutoff env extendedEnv hBound hFree hFresh body hMax
-  | andE left right
-  | orE left right
-  | impE left right
-  | iffE left right =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2
-  | quote formula =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      apply propext
-      exact Formula.satisfies_override_of_predicate_lt
-        base definitions cutoff env extendedEnv hBound hFree hFresh formula hMax
-  | lam domain codomain body =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      funext value
-      apply Term.eval_override_of_predicate_lt
-        base definitions cutoff (env.push value) (extendedEnv.push value)
-      · intro index
-        cases index <;> simp [Env.push, hBound]
-      · intro sort id
-        simp [Env.push, hFree]
-      · exact hFresh
-      · exact hMax
-  | ite sort condition thenTerm elseTerm =>
-      simp only [DefinitionalCnf.Term.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      have hMax'' := Nat.max_le.mp hMax'.2
-      simp only [Term.eval, Model.overrideDefinitions]
-      congr 1
-      · apply propext
-        exact Formula.satisfies_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh condition hMax'.1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh thenTerm hMax''.1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh elseTerm hMax''.2
+  have hPush (value : M.Carrier) (index : Nat) :
+      (extendedEnv.push value).boundVal index = (env.push value).boundVal index := by
+    cases index <;> simp [Env.push, hBound]
+  cases term <;>
+    simp only [DefinitionalCnf.Term.maxPredicateIdSucc, Nat.max_le] at hMax
+  all_goals simp_all only [Term.eval, Model.overrideDefinitions,
+      ← Formula.Satisfies.eq_def,
+      Term.eval_override_of_predicate_lt base definitions cutoff (env.push _) (extendedEnv.push _) (hPush _) hFree hFresh,
+      Term.eval_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh,
+      Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh,
+      Term.evalList_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh]
+
 theorem Formula.satisfies_override_of_predicate_lt {M : Model} (base : Env M) (definitions : Array DefinitionalCnf.Definition) (cutoff : Nat) (env : Env M) (extendedEnv : Env (Model.overrideDefinitions M base
     definitions)) (hBound : ∀ index, extendedEnv.boundVal index = env.boundVal index) (hFree : ∀ sort id, extendedEnv.freeVal sort id = env.freeVal sort id) (hFresh : ∀ definition ∈ definitions.toList, cutoff ≤
     definition.predicate.id) (formula : Formula) (hMax : DefinitionalCnf.Formula.maxPredicateIdSucc formula ≤ cutoff) : Formula.Satisfies extendedEnv formula ↔ Formula.Satisfies env formula := by
-  cases formula with
-  | trueE
-  | falseE => simp [Formula.Satisfies, Formula.eval]
-  | atom predicate args =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      have hPred : predicate.id < cutoff := Nat.lt_of_succ_le hMax'.1
-      have hArgs := Term.evalList_override_of_predicate_lt
-        base definitions cutoff env extendedEnv hBound hFree hFresh args hMax'.2
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [hArgs]
-      rw [Model.overrideDefinitions_predicateInterp_of_id_lt M base definitions predicate (args.map (Term.eval env)) cutoff hPred hFresh]
-  | equal sort left right =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [Term.eval_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1, Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2]
-  | boolTerm term =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      rw [Term.eval_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh term hMax]
-      simp [Model.overrideDefinitions]
-  | neg body =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      simpa only [Formula.Satisfies] using
-        not_congr (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh body hMax)
-  | imp left right
-  | conj left right
-  | disj left right
-  | iffE left right =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      first
-      | exact and_congr (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1)
-          (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2)
-      | exact or_congr (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1)
-          (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2)
-      | exact imp_congr (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1)
-          (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2)
-      | exact iff_congr (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh left hMax'.1)
-          (Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh right hMax'.2)
-  | forallE sort body =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      constructor <;> intro h value hSort
-      · exact (Formula.satisfies_override_of_predicate_lt base definitions cutoff (env.push value) (extendedEnv.push value) (by
-            intro index
-            cases index <;> simp [Env.push, hBound]) (by
-            intro target id
-            simp [Env.push, hFree])
-          hFresh body hMax).mp (h value hSort)
-      · exact (Formula.satisfies_override_of_predicate_lt base definitions cutoff (env.push value) (extendedEnv.push value) (by
-            intro index
-            cases index <;> simp [Env.push, hBound]) (by
-            intro target id
-            simp [Env.push, hFree])
-          hFresh body hMax).mpr (h value hSort)
-  | existsE sort body =>
-      simp only [DefinitionalCnf.Formula.maxPredicateIdSucc] at hMax
-      simp only [Formula.Satisfies, Formula.eval]
-      constructor
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        exact (Formula.satisfies_override_of_predicate_lt base definitions cutoff (env.push value) (extendedEnv.push value) (by
-            intro index
-            cases index <;> simp [Env.push, hBound]) (by
-            intro target id
-            simp [Env.push, hFree])
-          hFresh body hMax).mp hBody
-      · rintro ⟨value, hSort, hBody⟩
-        refine ⟨value, hSort, ?_⟩
-        exact (Formula.satisfies_override_of_predicate_lt base definitions cutoff (env.push value) (extendedEnv.push value) (by
-            intro index
-            cases index <;> simp [Env.push, hBound]) (by
-            intro target id
-            simp [Env.push, hFree])
-          hFresh body hMax).mpr hBody
+  have hPush (value : M.Carrier) (index : Nat) :
+      (extendedEnv.push value).boundVal index = (env.push value).boundVal index := by
+    cases index <;> simp [Env.push, hBound]
+  cases formula <;>
+    simp only [DefinitionalCnf.Formula.maxPredicateIdSucc, Nat.max_le] at hMax
+  case atom predicate args =>
+    simp only [Formula.Satisfies, Formula.eval]
+    rw [Term.evalList_override_of_predicate_lt base definitions cutoff env extendedEnv
+      hBound hFree hFresh args hMax.2]
+    rw [Model.overrideDefinitions_predicateInterp_of_id_lt M base definitions predicate
+      (args.map (Term.eval env)) cutoff (Nat.lt_of_succ_le hMax.1) hFresh]
+  all_goals simp only [Formula.Satisfies, Formula.eval]
+  all_goals simp_all only [← Formula.Satisfies.eq_def, Model.overrideDefinitions,
+
+      Formula.satisfies_override_of_predicate_lt base definitions cutoff (env.push _) (extendedEnv.push _) (hPush _) hFree hFresh,
+      Term.eval_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh,
+      Formula.satisfies_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh]
+
 theorem Term.evalList_override_of_predicate_lt {M : Model} (base : Env M) (definitions : Array DefinitionalCnf.Definition) (cutoff : Nat) (env : Env M) (extendedEnv : Env (Model.overrideDefinitions M base definitions))
     (hBound : ∀ index, extendedEnv.boundVal index = env.boundVal index) (hFree : ∀ sort id, extendedEnv.freeVal sort id = env.freeVal sort id) (hFresh : ∀ definition ∈ definitions.toList, cutoff ≤
     definition.predicate.id) (terms : List Term) (hMax : DefinitionalCnf.Term.maxPredicateListIdSucc terms ≤ cutoff) : terms.map (Term.eval extendedEnv) = terms.map (Term.eval env) := by
-  cases terms with
-  | nil => rfl
-  | cons head tail =>
-      simp only [DefinitionalCnf.Term.maxPredicateListIdSucc] at hMax
-      have hMax' := Nat.max_le.mp hMax
-      simp only [List.map_cons]
-      congr 1
-      · exact Term.eval_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh head hMax'.1
-      · exact Term.evalList_override_of_predicate_lt
-          base definitions cutoff env extendedEnv hBound hFree hFresh tail hMax'.2
+  cases terms <;>
+    simp only [DefinitionalCnf.Term.maxPredicateListIdSucc, Nat.max_le] at hMax
+  all_goals simp_all only [List.map_nil, List.map_cons,
+      Term.eval_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh,
+      Term.evalList_override_of_predicate_lt base definitions cutoff env extendedEnv hBound hFree hFresh]
+
 end
 namespace Atom
 theorem satisfies_override_of_predicate_lt {M : Model} (base : Env M) (definitions : Array DefinitionalCnf.Definition) (cutoff : Nat) (env : Env M) (extendedEnv : Env (Model.overrideDefinitions M base definitions))
@@ -692,152 +568,35 @@ theorem BuildState.freshDefinition_includes (state : DefinitionalCnf.BuildState)
   intro definition hDefinition
   change definition ∈ (state.definitions.push _).toList
   simp [Array.toList_push, hDefinition]
+/-- 任何由 freshDefinition 保持的状态不变量，都沿整个 CNF 构造保持。 -/
+theorem BuildState.buildCore_invariant (invariant : DefinitionalCnf.BuildState → Prop)
+    (hFresh : ∀ state contextSorts body, invariant state →
+      invariant ((DefinitionalCnf.freshDefinition contextSorts body).run state).2)
+    (state : DefinitionalCnf.BuildState) (contextSorts : List CoreSort) (source : Nnf)
+    (hState : invariant state) :
+    invariant ((DefinitionalCnf.buildCore contextSorts source).run state).2 := by
+  induction source generalizing state with
+  | conj left right leftIH rightIH
+  | disj left right leftIH rightIH =>
+      change invariant ((DefinitionalCnf.freshDefinition contextSorts _).run
+        ((DefinitionalCnf.buildCore contextSorts right).run
+          ((DefinitionalCnf.buildCore contextSorts left).run state).2).2).2
+      exact hFresh _ _ _ (rightIH _ (leftIH _ hState))
+  | _ => exact hState
+
 theorem BuildState.buildCore_includes (state : DefinitionalCnf.BuildState) (contextSorts : List CoreSort) (source : Nnf) : BuildState.DefinitionsIncluded state ((DefinitionalCnf.buildCore contextSorts source).run state).2 := by
-  induction source generalizing state contextSorts with
-  | trueE => exact BuildState.definitionsIncluded_refl state
-  | falseE => exact BuildState.definitionsIncluded_refl state
-  | lit literal => exact BuildState.definitionsIncluded_refl state
-  | forallE sort body ih => exact BuildState.definitionsIncluded_refl state
-  | existsE sort body ih => exact BuildState.definitionsIncluded_refl state
-  | conj left right leftIH rightIH =>
-      cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
-      | mk leftResult leftState =>
-          have hLeftIncluded :
-              BuildState.DefinitionsIncluded state leftState := by
-            simpa [hLeftRun] using leftIH state contextSorts
-          cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
-          | mk rightResult rightState =>
-              have hRightIncluded :
-                  BuildState.DefinitionsIncluded leftState rightState := by
-                simpa [hRightRun] using rightIH leftState contextSorts
-              let finish :
-                  DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
-                    DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
-                fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.conj left right)
-                  let definitionClauses :=
-                    DefinitionalCnf.conjDefinitionClauses
-                      defLit leftResult.ref rightResult.ref
-                  pure {
-                    ref := DefinitionalCnf.Ref.lit defLit
-                    clauses :=
-                      leftResult.clauses ++ rightResult.clauses ++ definitionClauses
-                  }
-              change BuildState.DefinitionsIncluded state ((do
-                  let leftResult ← DefinitionalCnf.buildCore contextSorts left
-                  let rightResult ← DefinitionalCnf.buildCore contextSorts right
-                  finish leftResult rightResult).run state).2
-              rw [stateM_run_bind3_dep_snd (first := DefinitionalCnf.buildCore contextSorts left) (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish)
-                (state := state) (firstValue := leftResult) (firstState := leftState) (secondValue := rightResult)
-                (secondState := rightState) hLeftRun hRightRun]
-              unfold finish
-              rw [stateM_run_bind_pure_snd]
-              exact BuildState.definitionsIncluded_trans hLeftIncluded
-                (BuildState.definitionsIncluded_trans hRightIncluded (BuildState.freshDefinition_includes rightState contextSorts (Nnf.conj left right)))
-  | disj left right leftIH rightIH =>
-      cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
-      | mk leftResult leftState =>
-          have hLeftIncluded :
-              BuildState.DefinitionsIncluded state leftState := by
-            simpa [hLeftRun] using leftIH state contextSorts
-          cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
-          | mk rightResult rightState =>
-              have hRightIncluded :
-                  BuildState.DefinitionsIncluded leftState rightState := by
-                simpa [hRightRun] using rightIH leftState contextSorts
-              let finish :
-                  DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
-                    DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
-                fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.disj left right)
-                  let definitionClauses :=
-                    DefinitionalCnf.disjDefinitionClauses
-                      defLit leftResult.ref rightResult.ref
-                  pure {
-                    ref := DefinitionalCnf.Ref.lit defLit
-                    clauses :=
-                      leftResult.clauses ++ rightResult.clauses ++ definitionClauses
-                  }
-              change BuildState.DefinitionsIncluded state ((do
-                  let leftResult ← DefinitionalCnf.buildCore contextSorts left
-                  let rightResult ← DefinitionalCnf.buildCore contextSorts right
-                  finish leftResult rightResult).run state).2
-              rw [stateM_run_bind3_dep_snd (first := DefinitionalCnf.buildCore contextSorts left) (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish)
-                (state := state) (firstValue := leftResult) (firstState := leftState) (secondValue := rightResult)
-                (secondState := rightState) hLeftRun hRightRun]
-              unfold finish
-              rw [stateM_run_bind_pure_snd]
-              exact BuildState.definitionsIncluded_trans hLeftIncluded
-                (BuildState.definitionsIncluded_trans hRightIncluded (BuildState.freshDefinition_includes rightState contextSorts (Nnf.disj left right)))
+
+  exact BuildState.buildCore_invariant (BuildState.DefinitionsIncluded state)
+    (fun next context body h => BuildState.definitionsIncluded_trans h
+      (BuildState.freshDefinition_includes next context body))
+    state contextSorts source (BuildState.definitionsIncluded_refl state)
+
 theorem BuildState.buildCore_preserves {cutoff : Nat} {state : DefinitionalCnf.BuildState} (contextSorts : List CoreSort) (source : Nnf) (hState : BuildState.FreshFrom cutoff state) : BuildState.FreshFrom cutoff ((DefinitionalCnf.buildCore contextSorts source).run state).2 := by
-  induction source generalizing state contextSorts with
-  | trueE => simpa [DefinitionalCnf.buildCore] using! hState
-  | falseE => simpa [DefinitionalCnf.buildCore] using! hState
-  | lit literal => simpa [DefinitionalCnf.buildCore] using! hState
-  | forallE sort body ih => simpa [DefinitionalCnf.buildCore] using! hState
-  | existsE sort body ih => simpa [DefinitionalCnf.buildCore] using! hState
-  | conj left right leftIH rightIH =>
-      cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
-      | mk leftResult leftState =>
-          have hLeftState : BuildState.FreshFrom cutoff leftState := by simpa [hLeftRun] using leftIH contextSorts hState
-          cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
-          | mk rightResult rightState =>
-              have hRightState : BuildState.FreshFrom cutoff rightState := by simpa [hRightRun] using rightIH contextSorts hLeftState
-              let finish :
-                  DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
-                    DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
-                fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.conj left right)
-                  let definitionClauses :=
-                    DefinitionalCnf.conjDefinitionClauses
-                      defLit leftResult.ref rightResult.ref
-                  pure {
-                    ref := DefinitionalCnf.Ref.lit defLit
-                    clauses :=
-                      leftResult.clauses ++ rightResult.clauses ++ definitionClauses
-                  }
-              change BuildState.FreshFrom cutoff ((do
-                  let leftResult ← DefinitionalCnf.buildCore contextSorts left
-                  let rightResult ← DefinitionalCnf.buildCore contextSorts right
-                  finish leftResult rightResult).run state).2
-              rw [stateM_run_bind3_dep_snd (first := DefinitionalCnf.buildCore contextSorts left) (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish)
-                (state := state) (firstValue := leftResult) (firstState := leftState) (secondValue := rightResult)
-                (secondState := rightState) hLeftRun hRightRun]
-              unfold finish
-              rw [stateM_run_bind_pure_snd]
-              exact
-                BuildState.freshDefinition_preserves hRightState contextSorts (Nnf.conj left right)
-  | disj left right leftIH rightIH =>
-      cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
-      | mk leftResult leftState =>
-          have hLeftState : BuildState.FreshFrom cutoff leftState := by simpa [hLeftRun] using leftIH contextSorts hState
-          cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
-          | mk rightResult rightState =>
-              have hRightState : BuildState.FreshFrom cutoff rightState := by simpa [hRightRun] using rightIH contextSorts hLeftState
-              let finish :
-                  DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
-                    DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
-                fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.disj left right)
-                  let definitionClauses :=
-                    DefinitionalCnf.disjDefinitionClauses
-                      defLit leftResult.ref rightResult.ref
-                  pure {
-                    ref := DefinitionalCnf.Ref.lit defLit
-                    clauses :=
-                      leftResult.clauses ++ rightResult.clauses ++ definitionClauses
-                  }
-              change BuildState.FreshFrom cutoff ((do
-                  let leftResult ← DefinitionalCnf.buildCore contextSorts left
-                  let rightResult ← DefinitionalCnf.buildCore contextSorts right
-                  finish leftResult rightResult).run state).2
-              rw [stateM_run_bind3_dep_snd (first := DefinitionalCnf.buildCore contextSorts left) (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish)
-                (state := state) (firstValue := leftResult) (firstState := leftState) (secondValue := rightResult)
-                (secondState := rightState) hLeftRun hRightRun]
-              unfold finish
-              rw [stateM_run_bind_pure_snd]
-              exact
-                BuildState.freshDefinition_preserves hRightState contextSorts (Nnf.disj left right)
+
+  exact BuildState.buildCore_invariant (BuildState.FreshFrom cutoff)
+    (fun _ context body h => BuildState.freshDefinition_preserves h context body)
+    state contextSorts source hState
+
 end Definition
 namespace Ref
 def Satisfies {M : Model} (env : Env M) : DefinitionalCnf.Ref → Prop
@@ -855,79 +614,51 @@ theorem satisfies_negate_iff {M : Model} (env : Env M) (ref : DefinitionalCnf.Re
 theorem satisfies_lit_of_true {M : Model} (env : Env M) (literal : Literal) (h : Literal.Satisfies env literal) : Satisfies env (.lit literal) := h
 end Ref
 namespace DefinitionalCnf
+/-- 累积器和余下引用共同给出一条子句的完整析取语义。 -/
+theorem clauseOfRefsAux_satisfies {M : Model} (env : Env M)
+    (acc : List Literal) (refs : List DefinitionalCnf.Ref) :
+    (match DefinitionalCnf.clauseOfRefsAux acc refs with
+      | none => True
+      | some clause => Clause.Satisfies env clause) ↔
+      (∃ literal ∈ acc, Literal.Satisfies env literal) ∨
+        ∃ ref ∈ refs, Semantics.Ref.Satisfies env ref := by
+  induction refs generalizing acc with
+  | nil => simp [DefinitionalCnf.clauseOfRefsAux, Clause.Satisfies]
+  | cons ref refs ih =>
+      cases ref with
+      | truth value =>
+          cases value <;> simp [DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ih]
+      | lit literal =>
+          simp [DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ih,
+            or_assoc, or_left_comm]
+
+/-- 任意长度引用列表都复用同一个子句语义，不再按引用数量枚举真假。 -/
+theorem clausesOfRefs_satisfies {M : Model} (env : Env M) (refs : List DefinitionalCnf.Ref) :
+    ClauseSet.Satisfies env (DefinitionalCnf.clausesOfRefs refs) ↔
+      ∃ ref ∈ refs, Semantics.Ref.Satisfies env ref := by
+  have hAux := clauseOfRefsAux_satisfies env [] refs
+  cases hClause : DefinitionalCnf.clauseOfRefsAux [] refs <;>
+    simpa [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs,
+      ClauseSet.Satisfies, hClause] using hAux
+
 theorem clausesOfRefs_one_of {M : Model} (env : Env M) (ref : DefinitionalCnf.Ref) (h : Semantics.Ref.Satisfies env ref) : ClauseSet.Satisfies env (DefinitionalCnf.clausesOfRefs [ref]) := by
-  cases ref with
-  | truth value =>
-      cases value <;>
-        simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-  | lit literal =>
-      simpa [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies] using h
+  apply (clausesOfRefs_satisfies env _).mpr
+  simpa using h
+
 theorem clausesOfRefs_two_of_or {M : Model} (env : Env M) (left right : DefinitionalCnf.Ref) (h : Semantics.Ref.Satisfies env left ∨ Semantics.Ref.Satisfies env right) : ClauseSet.Satisfies env (DefinitionalCnf.clausesOfRefs [left, right]) := by
-  cases left with
-  | truth leftValue =>
-      cases right with
-      | truth rightValue =>
-          cases leftValue <;> cases rightValue <;>
-            simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-      | lit rightLiteral =>
-          cases leftValue <;>
-            simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-  | lit leftLiteral =>
-      cases right with
-      | truth rightValue =>
-          cases rightValue <;>
-            simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-      | lit rightLiteral =>
-          simpa [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies] using h
+  apply (clausesOfRefs_satisfies env _).mpr
+  simpa using h
+
 theorem clausesOfRefs_three_of_or {M : Model} (env : Env M) (first second third : DefinitionalCnf.Ref) : Semantics.Ref.Satisfies env first ∨ Semantics.Ref.Satisfies env second ∨ Semantics.Ref.Satisfies env third → ClauseSet.Satisfies env (DefinitionalCnf.clausesOfRefs [first, second, third]) := by
   intro h
-  cases first with
-  | truth firstValue =>
-      cases second with
-      | truth secondValue =>
-          cases third with
-          | truth thirdValue =>
-              cases firstValue <;> cases secondValue <;> cases thirdValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-          | lit thirdLiteral =>
-              cases firstValue <;> cases secondValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-      | lit secondLiteral =>
-          cases third with
-          | truth thirdValue =>
-              cases firstValue <;> cases thirdValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-          | lit thirdLiteral =>
-              cases firstValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-  | lit firstLiteral =>
-      cases second with
-      | truth secondValue =>
-          cases third with
-          | truth thirdValue =>
-              cases secondValue <;> cases thirdValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-          | lit thirdLiteral =>
-              cases secondValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-      | lit secondLiteral =>
-          cases third with
-          | truth thirdValue =>
-              cases thirdValue <;>
-                simp_all [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-          | lit thirdLiteral =>
-              simpa [DefinitionalCnf.clausesOfRefs, DefinitionalCnf.clauseOfRefs, DefinitionalCnf.clauseOfRefsAux, Semantics.Ref.Satisfies, ClauseSet.Satisfies, Clause.Satisfies]
-                using h
+  apply (clausesOfRefs_satisfies env _).mpr
+  simpa using h
+
 end DefinitionalCnf
 namespace ClauseSet
 theorem satisfies_append {M : Model} (env : Env M) (left right : ClauseSet) : ClauseSet.Satisfies env (left ++ right) ↔ ClauseSet.Satisfies env left ∧ ClauseSet.Satisfies env right := by
-  simp only [ClauseSet.Satisfies, Array.toList_append, List.mem_append]
-  constructor
-  · intro h
-    exact ⟨ fun clause hMem => h clause (Or.inl hMem), fun clause hMem => h clause (Or.inr hMem)⟩
-  · rintro ⟨hLeft, hRight⟩ clause (hMem | hMem)
-    · exact hLeft clause hMem
-    · exact hRight clause hMem
+  simp only [ClauseSet.Satisfies, Array.toList_append, List.mem_append, or_imp, forall_and]
+
 end ClauseSet
 namespace DefinitionalCnf
 theorem conjDefinitionClauses_satisfies {M : Model} (env : Env M) (defLit : Literal) (left right : DefinitionalCnf.Ref) (hDef : Literal.Satisfies env defLit ↔ Semantics.Ref.Satisfies env left ∧ Semantics.Ref.Satisfies env right) : ClauseSet.Satisfies env (DefinitionalCnf.conjDefinitionClauses defLit left right) := by
@@ -1038,148 +769,31 @@ theorem buildCore_sound {M : Model} (base env : Env M) (definitions : Array Defi
       change (body.quantifierCount + 1 == 0) = true at hQuantifierFree
       rw [Nat.beq_eq_true_eq] at hQuantifierFree
       omega
-  | conj left right leftIH rightIH =>
-      have hBounds := Nat.max_le.mp hMax
-      have hChecks :
-          Formula.checkWith contextSorts left.toFormula = true ∧
-            Formula.checkWith contextSorts right.toFormula = true := by
-        exact Formula.checkWith_of_check_conj (by simpa [Nnf.toFormula] using hCheck)
-      have hLeftQuantifierFree : left.quantifierFree = true := by
-        change (left.quantifierCount + right.quantifierCount == 0) = true at hQuantifierFree
-        rw [Nat.beq_eq_true_eq] at hQuantifierFree
-        change (left.quantifierCount == 0) = true
-        rw [Nat.beq_eq_true_eq]
-        omega
-      have hRightQuantifierFree : right.quantifierFree = true := by
-        change (left.quantifierCount + right.quantifierCount == 0) = true at hQuantifierFree
-        rw [Nat.beq_eq_true_eq] at hQuantifierFree
-        change (right.quantifierCount == 0) = true
-        rw [Nat.beq_eq_true_eq]
-        omega
-      cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
-      | mk leftResult leftState =>
-          cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
-          | mk rightResult rightState =>
-              let definition :=
-                Definition.BuildState.nextDefinition rightState contextSorts (Nnf.conj left right)
-              let finalState : DefinitionalCnf.BuildState := {
-                nextPredicate := rightState.nextPredicate + 1
-                definitions := rightState.definitions.push definition
-              }
-              let finalCore : DefinitionalCnf.BuildCore := {
-                ref := DefinitionalCnf.Ref.lit (definition.literal true)
-                clauses :=
-                  leftResult.clauses ++ rightResult.clauses ++
-                    DefinitionalCnf.conjDefinitionClauses (definition.literal true) leftResult.ref rightResult.ref
-              }
-              let finish :
-                  DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
-                    DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
-                fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.conj left right)
-                  pure {
-                    ref := DefinitionalCnf.Ref.lit defLit
-                    clauses :=
-                      leftResult.clauses ++ rightResult.clauses ++
-                        DefinitionalCnf.conjDefinitionClauses
-                          defLit leftResult.ref rightResult.ref
-                  }
-              have hFinishRun : (finish leftResult rightResult).run rightState = (finalCore, finalState) := by
-                unfold finish
-                rw [StateT.run_bind, Definition.BuildState.freshDefinition_run]
-                rfl
-              have hRun : (DefinitionalCnf.buildCore contextSorts (Nnf.conj left right)).run
-                      state = (finalCore, finalState) := by
-                change (do
-                  let leftResult ← DefinitionalCnf.buildCore contextSorts left
-                  let rightResult ← DefinitionalCnf.buildCore contextSorts right
-                  finish leftResult rightResult).run state = (finalCore, finalState)
-                exact Definition.stateM_run_bind3_dep (first := DefinitionalCnf.buildCore contextSorts left)
-                  (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish) (state := state) (firstValue := leftResult)
-                  (firstState := leftState) (secondValue := rightResult) (secondState := rightState) (thirdValue := finalCore)
-                  (thirdState := finalState) hLeftRun hRightRun hFinishRun
-              have hRightToFinal :
-                  Definition.BuildState.DefinitionsIncluded rightState finalState := by
-                simpa [Definition.BuildState.freshDefinition_run, finalState, definition] using
-                  Definition.BuildState.freshDefinition_includes
-                    rightState contextSorts (Nnf.conj left right)
-              have hLeftToRight :
-                  Definition.BuildState.DefinitionsIncluded leftState rightState := by
-                simpa [hRightRun] using
-                  Definition.BuildState.buildCore_includes
-                    leftState contextSorts right
-              have hFinalIncluded :
-                  ∀ candidate ∈ finalState.definitions.toList,
-                    candidate ∈ definitions.toList := by
-                intro candidate hCandidate
-                exact hIncluded candidate (by simpa [hRun] using hCandidate)
-              have hLeftSound :
-                  BuildCoreSound base env definitions left leftResult := by
-                simpa [hLeftRun] using
-                  leftIH state contextSorts hBounds.1 hLeftQuantifierFree hChecks.1 (by
-                      intro candidate hCandidate
-                      exact hFinalIncluded candidate (hRightToFinal candidate (hLeftToRight candidate (by
-                            simpa [hLeftRun] using hCandidate))))
-              have hRightSound :
-                  BuildCoreSound base env definitions right rightResult := by
-                simpa [hRightRun] using
-                  rightIH leftState contextSorts hBounds.2 hRightQuantifierFree
-                    hChecks.2 (by
-                      intro candidate hCandidate
-                      exact hFinalIncluded candidate (hRightToFinal candidate (by
-                          simpa [hRightRun] using hCandidate)))
-              have hDefinitionMem :
-                  definition ∈ definitions.toList := by
-                apply hFinalIncluded definition
-                simp [finalState, Array.toList_push]
-              have hDefinitionBody :
-                  Literal.Satisfies (Env.rebaseOverrideDefinitions base definitions env) (definition.literal true) ↔
-                    Nnf.Satisfies env (Nnf.conj left right) := by
-                simpa [definition, Definition.BuildState.nextDefinition] using
-                  Definition.literal_satisfies_iff_override_at
-                    base env definitions definition hDefinitionMem hUnique rfl (by simpa [Nnf.toFormula] using! hCheck)
-              have hDefinitionRefs :
-                  Literal.Satisfies (Env.rebaseOverrideDefinitions base definitions env) (definition.literal true) ↔
-                    Semantics.Ref.Satisfies (Env.rebaseOverrideDefinitions base definitions env)
-                        leftResult.ref ∧
-                      Semantics.Ref.Satisfies (Env.rebaseOverrideDefinitions base definitions env)
-                        rightResult.ref := by
-                constructor
-                · intro h
-                  have hBoth := hDefinitionBody.mp h
-                  exact ⟨ hLeftSound.refIff.mpr hBoth.1, hRightSound.refIff.mpr hBoth.2⟩
-                · rintro ⟨hLeft, hRight⟩
-                  exact hDefinitionBody.mpr ⟨ hLeftSound.refIff.mp hLeft, hRightSound.refIff.mp hRight⟩
-              rw [hRun]
-              constructor
-              · dsimp [finalCore]
-                rw [ClauseSet.satisfies_append, ClauseSet.satisfies_append]
-                exact ⟨⟨ hLeftSound.clausesSatisfied, hRightSound.clausesSatisfied⟩, DefinitionalCnf.conjDefinitionClauses_satisfies _ _ _ _ hDefinitionRefs⟩
-              · simpa [finalCore, Semantics.Ref.Satisfies] using hDefinitionBody
+  | conj left right leftIH rightIH
   | disj left right leftIH rightIH =>
       have hBounds := Nat.max_le.mp hMax
       have hChecks :
           Formula.checkWith contextSorts left.toFormula = true ∧
             Formula.checkWith contextSorts right.toFormula = true := by
-        exact Formula.checkWith_of_check_disj (by simpa [Nnf.toFormula] using hCheck)
-      have hLeftQuantifierFree : left.quantifierFree = true := by
+        first
+        | exact Formula.checkWith_of_check_conj (by simpa [Nnf.toFormula] using hCheck)
+        | exact Formula.checkWith_of_check_disj (by simpa [Nnf.toFormula] using hCheck)
+      have hQuantifiers : left.quantifierFree = true ∧ right.quantifierFree = true := by
         change (left.quantifierCount + right.quantifierCount == 0) = true at hQuantifierFree
-        rw [Nat.beq_eq_true_eq] at hQuantifierFree
-        change (left.quantifierCount == 0) = true
-        rw [Nat.beq_eq_true_eq]
-        omega
-      have hRightQuantifierFree : right.quantifierFree = true := by
-        change (left.quantifierCount + right.quantifierCount == 0) = true at hQuantifierFree
-        rw [Nat.beq_eq_true_eq] at hQuantifierFree
-        change (right.quantifierCount == 0) = true
-        rw [Nat.beq_eq_true_eq]
-        omega
+        simpa only [Nnf.quantifierFree, Nat.beq_eq_true_eq, Nat.add_eq_zero_iff] using hQuantifierFree
+      first
+      | change BuildCoreSound base env definitions (.conj left right) _
+        let node := Nnf.conj
+        let clauses := DefinitionalCnf.conjDefinitionClauses
+      | change BuildCoreSound base env definitions (.disj left right) _
+        let node := Nnf.disj
+        let clauses := DefinitionalCnf.disjDefinitionClauses
       cases hLeftRun : (DefinitionalCnf.buildCore contextSorts left).run state with
       | mk leftResult leftState =>
           cases hRightRun : (DefinitionalCnf.buildCore contextSorts right).run leftState with
           | mk rightResult rightState =>
               let definition :=
-                Definition.BuildState.nextDefinition rightState contextSorts (Nnf.disj left right)
+                Definition.BuildState.nextDefinition rightState contextSorts (node left right)
               let finalState : DefinitionalCnf.BuildState := {
                 nextPredicate := rightState.nextPredicate + 1
                 definitions := rightState.definitions.push definition
@@ -1188,25 +802,25 @@ theorem buildCore_sound {M : Model} (base env : Env M) (definitions : Array Defi
                 ref := DefinitionalCnf.Ref.lit (definition.literal true)
                 clauses :=
                   leftResult.clauses ++ rightResult.clauses ++
-                    DefinitionalCnf.disjDefinitionClauses (definition.literal true) leftResult.ref rightResult.ref
+                    clauses (definition.literal true) leftResult.ref rightResult.ref
               }
               let finish :
                   DefinitionalCnf.BuildCore → DefinitionalCnf.BuildCore →
                     DefinitionalCnf.BuildM DefinitionalCnf.BuildCore :=
                 fun leftResult rightResult => do
-                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (Nnf.disj left right)
+                  let defLit ← DefinitionalCnf.freshDefinition contextSorts (node left right)
                   pure {
                     ref := DefinitionalCnf.Ref.lit defLit
                     clauses :=
                       leftResult.clauses ++ rightResult.clauses ++
-                        DefinitionalCnf.disjDefinitionClauses
+                        clauses
                           defLit leftResult.ref rightResult.ref
                   }
               have hFinishRun : (finish leftResult rightResult).run rightState = (finalCore, finalState) := by
                 unfold finish
                 rw [StateT.run_bind, Definition.BuildState.freshDefinition_run]
                 rfl
-              have hRun : (DefinitionalCnf.buildCore contextSorts (Nnf.disj left right)).run
+              have hRun : (DefinitionalCnf.buildCore contextSorts (node left right)).run
                       state = (finalCore, finalState) := by
                 change (do
                   let leftResult ← DefinitionalCnf.buildCore contextSorts left
@@ -1216,11 +830,12 @@ theorem buildCore_sound {M : Model} (base env : Env M) (definitions : Array Defi
                   (second := fun _ => DefinitionalCnf.buildCore contextSorts right) (third := finish) (state := state) (firstValue := leftResult)
                   (firstState := leftState) (secondValue := rightResult) (secondState := rightState) (thirdValue := finalCore)
                   (thirdState := finalState) hLeftRun hRightRun hFinishRun
+              dsimp only [node] at hRun
               have hRightToFinal :
                   Definition.BuildState.DefinitionsIncluded rightState finalState := by
                 simpa [Definition.BuildState.freshDefinition_run, finalState, definition] using
                   Definition.BuildState.freshDefinition_includes
-                    rightState contextSorts (Nnf.disj left right)
+                    rightState contextSorts (node left right)
               have hLeftToRight :
                   Definition.BuildState.DefinitionsIncluded leftState rightState := by
                 simpa [hRightRun] using
@@ -1234,14 +849,14 @@ theorem buildCore_sound {M : Model} (base env : Env M) (definitions : Array Defi
               have hLeftSound :
                   BuildCoreSound base env definitions left leftResult := by
                 simpa [hLeftRun] using
-                  leftIH state contextSorts hBounds.1 hLeftQuantifierFree hChecks.1 (by
+                  leftIH state contextSorts hBounds.1 hQuantifiers.1 hChecks.1 (by
                       intro candidate hCandidate
                       exact hFinalIncluded candidate (hRightToFinal candidate (hLeftToRight candidate (by
                             simpa [hLeftRun] using hCandidate))))
               have hRightSound :
                   BuildCoreSound base env definitions right rightResult := by
                 simpa [hRightRun] using
-                  rightIH leftState contextSorts hBounds.2 hRightQuantifierFree
+                  rightIH leftState contextSorts hBounds.2 hQuantifiers.2
                     hChecks.2 (by
                       intro candidate hCandidate
                       exact hFinalIncluded candidate (hRightToFinal candidate (by
@@ -1252,107 +867,54 @@ theorem buildCore_sound {M : Model} (base env : Env M) (definitions : Array Defi
                 simp [finalState, Array.toList_push]
               have hDefinitionBody :
                   Literal.Satisfies (Env.rebaseOverrideDefinitions base definitions env) (definition.literal true) ↔
-                    Nnf.Satisfies env (Nnf.disj left right) := by
+                    Nnf.Satisfies env (node left right) := by
                 simpa [definition, Definition.BuildState.nextDefinition] using
                   Definition.literal_satisfies_iff_override_at
                     base env definitions definition hDefinitionMem hUnique rfl (by simpa [Nnf.toFormula] using! hCheck)
-              have hDefinitionRefs :
-                  Literal.Satisfies (Env.rebaseOverrideDefinitions base definitions env) (definition.literal true) ↔
-                    Semantics.Ref.Satisfies (Env.rebaseOverrideDefinitions base definitions env)
-                        leftResult.ref ∨
-                      Semantics.Ref.Satisfies (Env.rebaseOverrideDefinitions base definitions env)
-                        rightResult.ref := by
-                constructor
-                · intro h
-                  rcases hDefinitionBody.mp h with hLeft | hRight
-                  · exact Or.inl (hLeftSound.refIff.mpr hLeft)
-                  · exact Or.inr (hRightSound.refIff.mpr hRight)
-                · intro h
-                  apply hDefinitionBody.mpr
-                  rcases h with hLeft | hRight
-                  · exact Or.inl (hLeftSound.refIff.mp hLeft)
-                  · exact Or.inr (hRightSound.refIff.mp hRight)
+              have hDefinitionRefs := hDefinitionBody
+              dsimp [node, Nnf.Satisfies] at hDefinitionRefs
+              rw [← hLeftSound.refIff, ← hRightSound.refIff] at hDefinitionRefs
               rw [hRun]
               constructor
               · dsimp [finalCore]
                 rw [ClauseSet.satisfies_append, ClauseSet.satisfies_append]
-                exact ⟨⟨ hLeftSound.clausesSatisfied, hRightSound.clausesSatisfied⟩, DefinitionalCnf.disjDefinitionClauses_satisfies _ _ _ _ hDefinitionRefs⟩
+                refine ⟨⟨hLeftSound.clausesSatisfied, hRightSound.clausesSatisfied⟩, ?_⟩
+                first
+                | exact DefinitionalCnf.conjDefinitionClauses_satisfies _ _ _ _ hDefinitionRefs
+                | exact DefinitionalCnf.disjDefinitionClauses_satisfies _ _ _ _ hDefinitionRefs
               · simpa [finalCore, Semantics.Ref.Satisfies] using hDefinitionBody
+
+/-- 空定义表的运行一次性提供根引用与全部生成子句的语义合同。 -/
+theorem buildCore_from_empty_sound {M : Model} (base env : Env M)
+    (contextSorts : List CoreSort) (source : Nnf)
+    (hQuantifierFree : source.quantifierFree = true)
+    (hCheck : Formula.checkWith contextSorts source.toFormula = true) :
+    let initial : DefinitionalCnf.BuildState :=
+      { nextPredicate := DefinitionalCnf.nnfMaxPredicateIdSucc source, definitions := #[] }
+    let output := (DefinitionalCnf.buildCore contextSorts source).run initial
+    BuildCoreSound base env output.2.definitions source output.1 := by
+  dsimp only
+  have hFresh := Definition.BuildState.buildCore_preserves contextSorts source
+    (Definition.BuildState.freshFrom_empty (DefinitionalCnf.nnfMaxPredicateIdSucc source))
+  exact buildCore_sound base env _ _ (fun definition hMem => (hFresh.1 definition hMem).1)
+    hFresh.2.1 _ contextSorts source (Nat.le_refl _) hQuantifierFree hCheck
+    (fun _ hMem => hMem)
+
 theorem buildCoreResult_root_iff {M : Model} (base env : Env M) (contextSorts : List CoreSort) (source : Nnf) (hQuantifierFree : source.quantifierFree = true) (hCheck : Formula.checkWith contextSorts source.toFormula = true) : let result := DefinitionalCnf.buildCoreResult contextSorts source
     Semantics.Ref.Satisfies (Env.rebaseOverrideDefinitions base result.definitions env)
         result.root ↔
       Nnf.Satisfies env source := by
-  let cutoff := DefinitionalCnf.nnfMaxPredicateIdSucc source
-  let initial : DefinitionalCnf.BuildState := {
-    nextPredicate := cutoff
-    definitions := #[]
-  }
-  cases hRun : (DefinitionalCnf.buildCore contextSorts source).run initial with
-  | mk core finalState =>
-      have hFinalFresh :
-          Definition.BuildState.FreshFrom cutoff finalState := by
-        simpa [initial, hRun] using
-          Definition.BuildState.buildCore_preserves contextSorts source (Definition.BuildState.freshFrom_empty cutoff)
-      rcases hFinalFresh with ⟨hBounds, hUnique, hCutoff⟩
-      have hCoreSound :
-          BuildCoreSound base env finalState.definitions source core := by
-        simpa [initial, hRun] using
-          buildCore_sound base env finalState.definitions cutoff (fun definition hDefinition => (hBounds definition hDefinition).1)
-            hUnique initial contextSorts source (Nat.le_refl cutoff)
-            hQuantifierFree hCheck (by
-              intro definition hDefinition
-              simpa [initial, hRun] using hDefinition)
-      have hResult :
-          DefinitionalCnf.buildCoreResult contextSorts source = {
-            root := core.ref
-            clauses := core.clauses ++ DefinitionalCnf.clausesOfRefs [core.ref]
-            definitions := finalState.definitions
-          } := by
-        simp [DefinitionalCnf.buildCoreResult, initial, cutoff, hRun]
-      rw [hResult]
-      exact hCoreSound.refIff
+  exact (buildCore_from_empty_sound base env contextSorts source hQuantifierFree hCheck).refIff
+
 theorem buildCoreResult_clauses_satisfied {M : Model} (base env : Env M) (contextSorts : List CoreSort) (source : Nnf) (hQuantifierFree : source.quantifierFree = true) (hCheck : Formula.checkWith contextSorts source.toFormula = true) (hSource : Nnf.Satisfies env source) : let result := DefinitionalCnf.buildCoreResult contextSorts source
     ClauseSet.Satisfies (Env.rebaseOverrideDefinitions base result.definitions env)
       result.clauses := by
-  let cutoff := DefinitionalCnf.nnfMaxPredicateIdSucc source
-  let initial : DefinitionalCnf.BuildState := {
-    nextPredicate := cutoff
-    definitions := #[]
-  }
-  cases hRun : (DefinitionalCnf.buildCore contextSorts source).run initial with
-  | mk core finalState =>
-      have hFinalFresh :
-          Definition.BuildState.FreshFrom cutoff finalState := by
-        simpa [initial, hRun] using
-          Definition.BuildState.buildCore_preserves contextSorts source (Definition.BuildState.freshFrom_empty cutoff)
-      rcases hFinalFresh with ⟨hBounds, hUnique, hCutoff⟩
-      have hCoreSound :
-          BuildCoreSound base env finalState.definitions source core := by
-        simpa [initial, hRun] using
-          buildCore_sound base env finalState.definitions cutoff (fun definition hDefinition => (hBounds definition hDefinition).1)
-            hUnique initial contextSorts source (Nat.le_refl cutoff)
-            hQuantifierFree hCheck (by
-              intro definition hDefinition
-              simpa [initial, hRun] using hDefinition)
-      let extendedEnv : Env (Model.overrideDefinitions M base finalState.definitions) := {
-        boundVal := env.boundVal
-        freeVal := env.freeVal
-      }
-      have hRoot : Semantics.Ref.Satisfies extendedEnv core.ref :=
-        hCoreSound.refIff.mpr hSource
-      have hRootClause :
-          ClauseSet.Satisfies extendedEnv (DefinitionalCnf.clausesOfRefs [core.ref]) :=
-        DefinitionalCnf.clausesOfRefs_one_of extendedEnv core.ref hRoot
-      have hResult :
-          DefinitionalCnf.buildCoreResult contextSorts source = {
-            root := core.ref
-            clauses := core.clauses ++ DefinitionalCnf.clausesOfRefs [core.ref]
-            definitions := finalState.definitions
-          } := by
-        simp [DefinitionalCnf.buildCoreResult, initial, cutoff, hRun]
-      rw [hResult]
-      rw [ClauseSet.satisfies_append]
-      exact ⟨hCoreSound.clausesSatisfied, hRootClause⟩
+  have hSound := buildCore_from_empty_sound base env contextSorts source hQuantifierFree hCheck
+  change ClauseSet.Satisfies _ (_ ++ DefinitionalCnf.clausesOfRefs [_])
+  rw [ClauseSet.satisfies_append]
+  exact ⟨hSound.clausesSatisfied,
+    DefinitionalCnf.clausesOfRefs_one_of _ _ (hSound.refIff.mpr hSource)⟩
+
 theorem buildCoreResult_definitions_sound (contextSorts : List CoreSort) (source : Nnf) : let result := DefinitionalCnf.buildCoreResult contextSorts source
     (∀ definition ∈ result.definitions.toList, DefinitionalCnf.nnfMaxPredicateIdSucc source ≤ definition.predicate.id) ∧
       result.definitions.toList.Pairwise (fun left right => left.predicate ≠ right.predicate) := by

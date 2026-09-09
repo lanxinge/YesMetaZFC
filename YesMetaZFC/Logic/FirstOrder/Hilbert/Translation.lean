@@ -146,6 +146,54 @@ def hilbertize {σ : Signature.{u, v, w}}
     simp_all [hilbertize, hilbert_truth, hilbert_falsum,
       hilbert_conj, hilbert_iff]
 
+
+/-- Hilbert 编译与类型化重命名交换。 -/
+@[simp] theorem hilbertize_renameMapped {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    (anchorSort : σ.SortSymbol)
+    (boundRenaming : VariableRenaming sourceBound targetBound)
+    (freeRenaming : VariableRenaming sourceFree targetFree)
+    (formula : Formula σ sourceBound sourceFree) :
+    hilbertize anchorSort (formula.renameMapped boundRenaming freeRenaming) =
+      (hilbertize anchorSort formula).renameMapped boundRenaming freeRenaming := by
+  induction formula generalizing targetBound targetFree <;>
+    simp_all [hilbertize, hilbert_truth, hilbert_falsum, hilbert_conj, hilbert_iff,
+      Formula.renameMapped, Term.renameMapped, VariableRenaming.lift]
+
+/-- 编译像上的归纳只需五种原始构造；真、假与派生联结词统一在这里展开。 -/
+@[elab_as_elim] theorem hilbertize_induction {σ : Signature.{u, v, w}}
+    (anchorSort : σ.SortSymbol)
+    {motive : {bound free : SortContext σ} → Formula σ bound free → Prop}
+    (relation : ∀ {bound free} (r : σ.RelSymbol)
+      (args : Arguments σ bound free (σ.relDomain r)), motive (.rel r args))
+    (equality : ∀ {bound free sort} (left right : Term σ bound free sort),
+      motive (.equal left right))
+    (negation : ∀ {bound free} (body : Formula σ bound free),
+      motive body → motive (.neg body))
+    (implication : ∀ {bound free} (left right : Formula σ bound free),
+      motive left → motive right → motive (.imp left right))
+    (universal : ∀ {bound free} (sort : σ.SortSymbol)
+      (body : Formula σ (sort :: bound) free), motive body → motive (.forallE sort body))
+    {bound free} (formula : Formula σ bound free) : motive (hilbertize anchorSort formula) := by
+  have truth {bound free} : motive (hilbert_truth (bound := bound) (free := free) anchorSort) :=
+    universal anchorSort _ (equality (.bvar .here) (.bvar .here))
+  induction formula with
+  | falsum => exact negation _ truth
+  | truth => exact truth
+  | rel r args => exact relation r args
+  | equal left right => exact equality left right
+  | neg body ih => exact negation _ ih
+  | conj left right ihLeft ihRight =>
+      exact negation _ (implication _ _ ihLeft (negation _ ihRight))
+  | disj left right ihLeft ihRight =>
+      exact implication _ _ (negation _ ihLeft) ihRight
+  | imp left right ihLeft ihRight => exact implication _ _ ihLeft ihRight
+  | iff left right ihLeft ihRight =>
+      exact negation _ (implication _ _ (implication _ _ ihLeft ihRight)
+        (negation _ (implication _ _ ihRight ihLeft)))
+  | forallE sort body ih => exact universal sort _ ih
+  | existsE sort body ih => exact negation _ (universal sort _ (negation _ ih))
+
 end Formula
 
 namespace Theory

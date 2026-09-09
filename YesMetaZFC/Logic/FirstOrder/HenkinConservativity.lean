@@ -131,72 +131,9 @@ end
     {bound free : SortContext σ}
     (formula : Formula σ bound free) :
     Formula.lower? (liftFormula formula) = some formula := by
-  induction formula with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      change
-        (match Arguments.lower? (liftArguments arguments) with
-        | some lowered => some (Formula.rel relation lowered)
-        | none => none) = some (Formula.rel relation arguments)
-      rw [Arguments.lower?_liftArguments arguments]
-  | equal left right =>
-      change
-        (match Term.lower? (liftTerm left), Term.lower? (liftTerm right) with
-        | some loweredLeft, some loweredRight =>
-            some (Formula.equal loweredLeft loweredRight)
-        | _, _ => none) = some (Formula.equal left right)
-      rw [Term.lower?_liftTerm left, Term.lower?_liftTerm right]
-  | neg body ih =>
-      change
-        (match Formula.lower? (liftFormula body) with
-        | some lowered => some (Formula.neg lowered)
-        | none => none) = some (Formula.neg body)
-      rw [ih]
-  | conj left right ihLeft ihRight =>
-      change
-        (match Formula.lower? (liftFormula left),
-            Formula.lower? (liftFormula right) with
-        | some loweredLeft, some loweredRight =>
-            some (Formula.conj loweredLeft loweredRight)
-        | _, _ => none) = some (Formula.conj left right)
-      rw [ihLeft, ihRight]
-  | disj left right ihLeft ihRight =>
-      change
-        (match Formula.lower? (liftFormula left),
-            Formula.lower? (liftFormula right) with
-        | some loweredLeft, some loweredRight =>
-            some (Formula.disj loweredLeft loweredRight)
-        | _, _ => none) = some (Formula.disj left right)
-      rw [ihLeft, ihRight]
-  | imp left right ihLeft ihRight =>
-      change
-        (match Formula.lower? (liftFormula left),
-            Formula.lower? (liftFormula right) with
-        | some loweredLeft, some loweredRight =>
-            some (Formula.imp loweredLeft loweredRight)
-        | _, _ => none) = some (Formula.imp left right)
-      rw [ihLeft, ihRight]
-  | iff left right ihLeft ihRight =>
-      change
-        (match Formula.lower? (liftFormula left),
-            Formula.lower? (liftFormula right) with
-        | some loweredLeft, some loweredRight =>
-            some (Formula.iff loweredLeft loweredRight)
-        | _, _ => none) = some (Formula.iff left right)
-      rw [ihLeft, ihRight]
-  | forallE sort body ih =>
-      change
-        (match Formula.lower? (liftFormula body) with
-        | some lowered => some (Formula.forallE sort lowered)
-        | none => none) = some (Formula.forallE sort body)
-      rw [ih]
-  | existsE sort body ih =>
-      change
-        (match Formula.lower? (liftFormula body) with
-        | some lowered => some (Formula.existsE sort lowered)
-        | none => none) = some (Formula.existsE sort body)
-      rw [ih]
+  induction formula <;>
+    simp_all only [Formula.lower?, liftFormula, Term.lower?_liftTerm,
+      Arguments.lower?_liftArguments]
 
 /-- 原项提升是单射。 -/
 theorem liftTerm_injective
@@ -288,60 +225,27 @@ def Formula.lower {bound free : SortContext σ} :
 mutual
 
 /-- 降签名后再提升，恢复原 Henkin 项。 -/
-theorem Term.lift_lower
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (term : Term (HSignature σ) bound free sort)
-    (hSupport : Term.witnessSupport term = []) :
-    liftTerm (Term.lower term hSupport) = term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ∀ hSupport : Term.witnessSupport term = [],
-        liftTerm (Term.lower term hSupport) = term)
-    (motive_2 := fun _ arguments =>
-      ∀ hSupport : Arguments.witnessSupport arguments = [],
-        liftArguments (Arguments.lower arguments hSupport) = arguments)
-    (fun _ _ => rfl)
-    (fun _ _ => rfl)
-    (fun function arguments ih hSupport => by
-      cases function with
-      | base function =>
-          simpa [Term.lower, liftTerm] using ih hSupport
-      | witness sort index =>
-          simp [Term.witnessSupport] at hSupport)
-    (fun _ => rfl)
-    (fun head tail ihHead ihTail hSupport => by
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      simp [Arguments.lower,
-        ihHead hParts.1, ihTail hParts.2])
-    term hSupport
+theorem Term.lift_lower {bound free : SortContext σ} :
+    {sort : σ.SortSymbol} → (term : Term (HSignature σ) bound free sort) →
+    (hSupport : Term.witnessSupport term = []) →
+    liftTerm (Term.lower term hSupport) = term
+  | _, .bvar _, _ => rfl
+  | _, .fvar _, _ => rfl
+  | _, .app (HenkinFunc.base function) arguments, hSupport => by
+      simpa [Term.lower, liftTerm] using Arguments.lift_lower arguments hSupport
+  | _, .app (HenkinFunc.witness sort index) arguments, hSupport => by
+      simp [Term.witnessSupport] at hSupport
 
 /-- 降签名后再提升，恢复原 Henkin 参数列。 -/
-theorem Arguments.lift_lower
-    {bound free : SortContext σ} {sorts : List σ.SortSymbol}
-    (arguments : Arguments (HSignature σ) bound free sorts)
-    (hSupport : Arguments.witnessSupport arguments = []) :
-    liftArguments (Arguments.lower arguments hSupport) = arguments := by
-  exact Arguments.rec (σ := HSignature σ) (bound := bound) (free := free)
-    (motive_1 := fun _ term =>
-      ∀ hSupport : Term.witnessSupport term = [],
-        liftTerm (Term.lower term hSupport) = term)
-    (motive_2 := fun _ arguments =>
-      ∀ hSupport : Arguments.witnessSupport arguments = [],
-        liftArguments (Arguments.lower arguments hSupport) = arguments)
-    (fun _ _ => rfl)
-    (fun _ _ => rfl)
-    (fun function nested ih hNested => by
-      cases function with
-      | base function =>
-          simpa [Term.lower, liftTerm] using ih hNested
-      | witness sort index =>
-          simp [Term.witnessSupport] at hNested)
-    (fun _ => rfl)
-    (fun head tail ihHead ihTail hPartsSupport => by
-      have hParts := List.append_eq_nil_iff.mp hPartsSupport
-      simp [Arguments.lower,
-        ihHead hParts.1, ihTail hParts.2])
-    arguments hSupport
+theorem Arguments.lift_lower {bound free : SortContext σ} :
+    {sorts : List σ.SortSymbol} → (arguments : Arguments (HSignature σ) bound free sorts) →
+    (hSupport : Arguments.witnessSupport arguments = []) →
+    liftArguments (Arguments.lower arguments hSupport) = arguments
+  | _, .nil, _ => rfl
+  | _, .cons head tail, hSupport => by
+      have hParts := List.append_eq_nil_iff.mp hSupport
+      simp [Arguments.lower, Term.lift_lower head hParts.1,
+        Arguments.lift_lower tail hParts.2]
 
 end
 
@@ -351,47 +255,24 @@ theorem Formula.lift_lower
     (formula : Formula (HSignature σ) bound free)
     (hSupport : Formula.witnessSupport formula = []) :
     liftFormula (Formula.lower formula hSupport) = formula := by
-  exact Formula.rec
-    (motive := fun _ _ formula =>
-      ∀ hSupport : Formula.witnessSupport formula = [],
-        liftFormula (Formula.lower formula hSupport) = formula)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun relation arguments hFormula => by
-      simp only [Formula.lower, liftFormula]
-      exact congrArg (Formula.rel relation)
-        (Arguments.lift_lower (σ := σ) arguments hFormula))
-    (fun left right hTerms => by
-      have hParts := List.append_eq_nil_iff.mp hTerms
-      simp only [Formula.lower, liftFormula]
-      rw [Term.lift_lower (σ := σ) left hParts.1,
-        Term.lift_lower (σ := σ) right hParts.2])
-    (fun body ih hBody => by
-      simp only [Formula.lower, liftFormula]
-      rw [ih hBody])
-    (fun left right ihLeft ihRight hPartsSupport => by
-      have hParts := List.append_eq_nil_iff.mp hPartsSupport
-      simp only [Formula.lower, liftFormula]
-      rw [ihLeft hParts.1, ihRight hParts.2])
-    (fun left right ihLeft ihRight hPartsSupport => by
-      have hParts := List.append_eq_nil_iff.mp hPartsSupport
-      simp only [Formula.lower, liftFormula]
-      rw [ihLeft hParts.1, ihRight hParts.2])
-    (fun left right ihLeft ihRight hPartsSupport => by
-      have hParts := List.append_eq_nil_iff.mp hPartsSupport
-      simp only [Formula.lower, liftFormula]
-      rw [ihLeft hParts.1, ihRight hParts.2])
-    (fun left right ihLeft ihRight hPartsSupport => by
-      have hParts := List.append_eq_nil_iff.mp hPartsSupport
-      simp only [Formula.lower, liftFormula]
-      rw [ihLeft hParts.1, ihRight hParts.2])
-    (fun sort body ih hFormula => by
-      simp only [Formula.lower, liftFormula]
-      exact congrArg (Formula.forallE sort) (ih hFormula))
-    (fun sort body ih hFormula => by
-      simp only [Formula.lower, liftFormula]
-      exact congrArg (Formula.existsE sort) (ih hFormula))
-    formula hSupport
+  refine Formula.rec
+    (motive := fun _ _ formula => ∀ hSupport : Formula.witnessSupport formula = [],
+      liftFormula (Formula.lower formula hSupport) = formula)
+    ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ formula hSupport
+  case refine_3 =>
+    intro bound free relation args h
+    exact congrArg (Formula.rel relation) (Arguments.lift_lower (σ := σ) args h)
+  case refine_5 =>
+    intro bound free body ih h
+    exact congrArg Formula.neg (ih h)
+  case refine_10 =>
+    intro bound free sort body ih h
+    exact congrArg (Formula.forallE sort) (ih h)
+  case refine_11 =>
+    intro bound free sort body ih h
+    exact congrArg (Formula.existsE sort) (ih h)
+  all_goals intros
+  all_goals simp_all only [Formula.lower, liftFormula, Term.lift_lower]
 
 /-- 原公式提升后不含任何见证，因而其有限支持为空。 -/
 @[simp] theorem Formula.witnessSupport_liftFormula
@@ -523,155 +404,65 @@ def lower
       refine ⟨_, .self_implication formula', ?_⟩
       simp only [liftFormula_imp]
       exact congrArg (fun p => Formula.imp p (Formula.imp p p)) hLiftFormula
-  | weakening formula extra =>
+  | weakening left right
+  | contradiction left right
+  | explosion left right
+  | case_analysis left right
+  | conjunction_intro left right
+  | conjunction_elim_left left right
+  | conjunction_elim_right left right
+  | disjunction_intro_left left right
+  | disjunction_intro_right left right
+  | biconditional_intro left right
+  | biconditional_elim_left left right
+  | biconditional_elim_right left right =>
       have hParts := List.append_eq_nil_iff.mp hSupport
-      let formula' := Formula.lower (σ := σ) formula hParts.1
-      let extra' := Formula.lower (σ := σ) extra hParts.2
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hParts.1
-      have hLiftExtra : liftFormula extra' = extra :=
-        Formula.lift_lower (σ := σ) extra hParts.2
-      refine ⟨_, .weakening formula' extra', ?_⟩
-      simp only [liftFormula_imp]
-      exact eq_map₂ (fun p e => Formula.imp p (Formula.imp e p))
-        hLiftFormula hLiftExtra
-  | contradiction formula conclusion =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let formula' := Formula.lower (σ := σ) formula hParts.1
-      let conclusion' := Formula.lower (σ := σ) conclusion hParts.2
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hParts.1
-      have hLiftConclusion : liftFormula conclusion' = conclusion :=
-        Formula.lift_lower (σ := σ) conclusion hParts.2
-      refine ⟨_, .contradiction formula' conclusion', ?_⟩
-      simp only [liftFormula_imp, liftFormula_neg]
-      exact eq_map₂
-        (fun p c => Formula.imp p (Formula.imp (Formula.neg p) c))
-        hLiftFormula hLiftConclusion
-  | classical formula =>
-      let formula' := Formula.lower (σ := σ) formula hSupport
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hSupport
-      refine ⟨_, .classical formula', ?_⟩
-      simp only [liftFormula_imp, liftFormula_neg]
-      exact congrArg
-        (fun p => Formula.imp (Formula.imp (Formula.neg p) p) p)
-        hLiftFormula
-  | explosion formula conclusion =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let formula' := Formula.lower (σ := σ) formula hParts.1
-      let conclusion' := Formula.lower (σ := σ) conclusion hParts.2
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hParts.1
-      have hLiftConclusion : liftFormula conclusion' = conclusion :=
-        Formula.lift_lower (σ := σ) conclusion hParts.2
-      refine ⟨_, .explosion formula' conclusion', ?_⟩
-      simp only [liftFormula_imp, liftFormula_neg]
-      exact eq_map₂
-        (fun p c => Formula.imp (Formula.neg p) (Formula.imp p c))
-        hLiftFormula hLiftConclusion
-  | case_analysis formula conclusion =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let formula' := Formula.lower (σ := σ) formula hParts.1
-      let conclusion' := Formula.lower (σ := σ) conclusion hParts.2
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hParts.1
-      have hLiftConclusion : liftFormula conclusion' = conclusion :=
-        Formula.lift_lower (σ := σ) conclusion hParts.2
-      refine ⟨_, .case_analysis formula' conclusion', ?_⟩
-      simp only [liftFormula_imp, liftFormula_neg]
-      exact eq_map₂
-        (fun p c => Formula.imp (Formula.imp p c)
-          (Formula.imp (Formula.imp (Formula.neg p) c) c))
-        hLiftFormula hLiftConclusion
-  | truth_intro =>
-      exact ⟨.truth, .truth_intro, liftFormula_truth⟩
-  | falsum_elimination conclusion =>
-      let conclusion' := Formula.lower (σ := σ) conclusion hSupport
-      have hLiftConclusion : liftFormula conclusion' = conclusion :=
-        Formula.lift_lower (σ := σ) conclusion hSupport
-      refine ⟨_, .falsum_elimination conclusion', ?_⟩
-      simp only [liftFormula_imp, liftFormula_falsum]
-      exact congrArg (Formula.imp Formula.falsum) hLiftConclusion
-  | negation_intro formula =>
-      let formula' := Formula.lower (σ := σ) formula hSupport
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hSupport
-      refine ⟨_, .negation_intro formula', ?_⟩
-      simp only [liftFormula_imp, liftFormula_falsum, liftFormula_neg]
-      exact congrArg
-        (fun p => Formula.imp (Formula.imp p Formula.falsum)
-          (Formula.neg p)) hLiftFormula
+      let left' := Formula.lower (σ := σ) left hParts.1
+      let right' := Formula.lower (σ := σ) right hParts.2
+      have hLiftLeft : liftFormula left' = left := Formula.lift_lower left hParts.1
+      have hLiftRight : liftFormula right' = right := Formula.lift_lower right hParts.2
+      first
+      | refine ⟨_, .weakening left' right', ?_⟩
+        solve | simp only [liftFormula_imp, hLiftLeft, hLiftRight]
+      | refine ⟨_, .contradiction left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_neg, hLiftLeft, hLiftRight]
+      | refine ⟨_, .explosion left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_neg, hLiftLeft, hLiftRight]
+      | refine ⟨_, .case_analysis left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_neg, hLiftLeft, hLiftRight]
+      | refine ⟨_, .conjunction_intro left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_conj, hLiftLeft, hLiftRight]
+      | refine ⟨_, .conjunction_elim_left left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_conj, hLiftLeft, hLiftRight]
+      | refine ⟨_, .conjunction_elim_right left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_conj, hLiftLeft, hLiftRight]
+      | refine ⟨_, .disjunction_intro_left left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_disj, hLiftLeft, hLiftRight]
+      | refine ⟨_, .disjunction_intro_right left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_disj, hLiftLeft, hLiftRight]
+      | refine ⟨_, .biconditional_intro left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_iff, hLiftLeft, hLiftRight]
+      | refine ⟨_, .biconditional_elim_left left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_iff, hLiftLeft, hLiftRight]
+      | refine ⟨_, .biconditional_elim_right left' right', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_iff, hLiftLeft, hLiftRight]
+  | classical formula
+  | falsum_elimination formula
+  | negation_intro formula
   | negation_elimination formula =>
       let formula' := Formula.lower (σ := σ) formula hSupport
-      have hLiftFormula : liftFormula formula' = formula :=
-        Formula.lift_lower (σ := σ) formula hSupport
-      refine ⟨_, .negation_elimination formula', ?_⟩
-      simp only [liftFormula_imp, liftFormula_neg, liftFormula_falsum]
-      exact congrArg
-        (fun p => Formula.imp p
-          (Formula.imp (Formula.neg p) Formula.falsum)) hLiftFormula
-  | conjunction_intro left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .conjunction_intro left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_conj]
-      exact eq_map₂
-        (fun l r => Formula.imp l (Formula.imp r (Formula.conj l r)))
-        hLiftLeft hLiftRight
-  | conjunction_elim_left left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .conjunction_elim_left left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_conj]
-      exact eq_map₂ (fun l r => Formula.imp (Formula.conj l r) l)
-        hLiftLeft hLiftRight
-  | conjunction_elim_right left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .conjunction_elim_right left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_conj]
-      exact eq_map₂ (fun l r => Formula.imp (Formula.conj l r) r)
-        hLiftLeft hLiftRight
-  | disjunction_intro_left left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .disjunction_intro_left left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_disj]
-      exact eq_map₂ (fun l r => Formula.imp l (Formula.disj l r))
-        hLiftLeft hLiftRight
-  | disjunction_intro_right left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .disjunction_intro_right left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_disj]
-      exact eq_map₂ (fun l r => Formula.imp r (Formula.disj l r))
-        hLiftLeft hLiftRight
+      have hLiftFormula : liftFormula formula' = formula := Formula.lift_lower formula hSupport
+      first
+      | refine ⟨_, .classical formula', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_neg, hLiftFormula]
+      | refine ⟨_, .falsum_elimination formula', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_falsum, hLiftFormula]
+      | refine ⟨_, .negation_intro formula', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_falsum, liftFormula_neg, hLiftFormula]
+      | refine ⟨_, .negation_elimination formula', ?_⟩
+        solve | simp only [liftFormula_imp, liftFormula_neg, liftFormula_falsum, hLiftFormula]
+  | truth_intro =>
+      exact ⟨.truth, .truth_intro, liftFormula_truth⟩
   | disjunction_elimination left right conclusion =>
       have hParts := List.append_eq_nil_iff.mp hSupport
       have hHead := List.append_eq_nil_iff.mp hParts.1
@@ -691,46 +482,6 @@ def lower
           (Formula.imp (Formula.imp r c)
             (Formula.imp (Formula.disj l r) c)))
         hLiftLeft hLiftRight hLiftConclusion
-  | biconditional_intro left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .biconditional_intro left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_iff]
-      exact eq_map₂
-        (fun l r => Formula.imp (Formula.imp l r)
-          (Formula.imp (Formula.imp r l) (Formula.iff l r)))
-        hLiftLeft hLiftRight
-  | biconditional_elim_left left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .biconditional_elim_left left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_iff]
-      exact eq_map₂
-        (fun l r => Formula.imp (Formula.iff l r) (Formula.imp l r))
-        hLiftLeft hLiftRight
-  | biconditional_elim_right left right =>
-      have hParts := List.append_eq_nil_iff.mp hSupport
-      let left' := Formula.lower (σ := σ) left hParts.1
-      let right' := Formula.lower (σ := σ) right hParts.2
-      have hLiftLeft : liftFormula left' = left :=
-        Formula.lift_lower (σ := σ) left hParts.1
-      have hLiftRight : liftFormula right' = right :=
-        Formula.lift_lower (σ := σ) right hParts.2
-      refine ⟨_, .biconditional_elim_right left' right', ?_⟩
-      simp only [liftFormula_imp, liftFormula_iff]
-      exact eq_map₂
-        (fun l r => Formula.imp (Formula.iff l r) (Formula.imp r l))
-        hLiftLeft hLiftRight
   | forall_specialization sort body term =>
       have hParts := List.append_eq_nil_iff.mp hSupport
       let body' := Formula.lower (σ := σ) body hParts.1

@@ -74,57 +74,9 @@ theorem formula_exists_of_checkWith [DecidableEq σ.SortSymbol]
           (by simpa [Formula.freeSupport] using hSupport) with
         ⟨compiled, hCompiled⟩
       exact ⟨.neg compiled, by simp [formula?, hCompiled]⟩
-  | conj left right ihLeft ihRight =>
-      intro hCheck hSupport
-      have hParts := Bool.and_eq_true_iff.mp hCheck
-      have hLeftSupport : ∀ entry, entry ∈ left.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      have hRightSupport : ∀ entry, entry ∈ right.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      rcases ihLeft bound hParts.1 hLeftSupport with
-        ⟨compiledLeft, hCompiledLeft⟩
-      rcases ihRight bound hParts.2 hRightSupport with
-        ⟨compiledRight, hCompiledRight⟩
-      exact ⟨.conj compiledLeft compiledRight, by
-        simp [formula?, hCompiledLeft, hCompiledRight]⟩
-  | disj left right ihLeft ihRight =>
-      intro hCheck hSupport
-      have hParts := Bool.and_eq_true_iff.mp hCheck
-      have hLeftSupport : ∀ entry, entry ∈ left.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      have hRightSupport : ∀ entry, entry ∈ right.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      rcases ihLeft bound hParts.1 hLeftSupport with
-        ⟨compiledLeft, hCompiledLeft⟩
-      rcases ihRight bound hParts.2 hRightSupport with
-        ⟨compiledRight, hCompiledRight⟩
-      exact ⟨.disj compiledLeft compiledRight, by
-        simp [formula?, hCompiledLeft, hCompiledRight]⟩
-  | imp left right ihLeft ihRight =>
-      intro hCheck hSupport
-      have hParts := Bool.and_eq_true_iff.mp hCheck
-      have hLeftSupport : ∀ entry, entry ∈ left.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      have hRightSupport : ∀ entry, entry ∈ right.freeSupport →
-          entry ∈ registry.entries := by
-        intro entry hEntry
-        exact hSupport entry (by simp [Formula.freeSupport, hEntry])
-      rcases ihLeft bound hParts.1 hLeftSupport with
-        ⟨compiledLeft, hCompiledLeft⟩
-      rcases ihRight bound hParts.2 hRightSupport with
-        ⟨compiledRight, hCompiledRight⟩
-      exact ⟨.imp compiledLeft compiledRight, by
-        simp [formula?, hCompiledLeft, hCompiledRight]⟩
+  | conj left right ihLeft ihRight
+  | disj left right ihLeft ihRight
+  | imp left right ihLeft ihRight
   | iff left right ihLeft ihRight =>
       intro hCheck hSupport
       have hParts := Bool.and_eq_true_iff.mp hCheck
@@ -140,8 +92,7 @@ theorem formula_exists_of_checkWith [DecidableEq σ.SortSymbol]
         ⟨compiledLeft, hCompiledLeft⟩
       rcases ihRight bound hParts.2 hRightSupport with
         ⟨compiledRight, hCompiledRight⟩
-      exact ⟨.iff compiledLeft compiledRight, by
-        simp [formula?, hCompiledLeft, hCompiledRight]⟩
+      simp [formula?, hCompiledLeft, hCompiledRight]
   | forallE sort body ih =>
       intro hCheck hSupport
       rcases ih (sort :: bound)
@@ -469,84 +420,9 @@ theorem formula_support_of_compile
           intro entry hSupport
           exact formula_support_of_compile registry bound body compiledBody
             hBody entry hSupport
-  | bound, .conj left right, source, hCompile => by
-      cases hLeft : formula? registry bound left with
-      | none => simp [formula?, hLeft] at hCompile
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none => simp [formula?, hLeft, hRight] at hCompile
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hCompile
-              subst source
-              intro entry hSupport
-              have hParts :
-                  compiledLeft.freeSupport.Contains entry.position ∨
-                    compiledRight.freeSupport.Contains entry.position := by
-                simpa [Logic.FirstOrder.Formula.freeSupport,
-                  Logic.FirstOrder.FreeSupport.Contains,
-                  Logic.FirstOrder.FreeSupport.union,
-                  Bool.or_eq_true] using hSupport
-              rcases hParts with hLeftSupport | hRightSupport
-              · rcases formula_support_of_compile registry bound left compiledLeft
-                    hLeft entry hLeftSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_left _ hRawEntry, hFind⟩
-              · rcases formula_support_of_compile registry bound right compiledRight
-                    hRight entry hRightSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_right _ hRawEntry, hFind⟩
-  | bound, .disj left right, source, hCompile => by
-      cases hLeft : formula? registry bound left with
-      | none => simp [formula?, hLeft] at hCompile
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none => simp [formula?, hLeft, hRight] at hCompile
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hCompile
-              subst source
-              intro entry hSupport
-              have hParts :
-                  compiledLeft.freeSupport.Contains entry.position ∨
-                    compiledRight.freeSupport.Contains entry.position := by
-                simpa [Logic.FirstOrder.Formula.freeSupport,
-                  Logic.FirstOrder.FreeSupport.Contains,
-                  Logic.FirstOrder.FreeSupport.union,
-                  Bool.or_eq_true] using hSupport
-              rcases hParts with hLeftSupport | hRightSupport
-              · rcases formula_support_of_compile registry bound left compiledLeft
-                    hLeft entry hLeftSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_left _ hRawEntry, hFind⟩
-              · rcases formula_support_of_compile registry bound right compiledRight
-                    hRight entry hRightSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_right _ hRawEntry, hFind⟩
-  | bound, .imp left right, source, hCompile => by
-      cases hLeft : formula? registry bound left with
-      | none => simp [formula?, hLeft] at hCompile
-      | some compiledLeft =>
-          cases hRight : formula? registry bound right with
-          | none => simp [formula?, hLeft, hRight] at hCompile
-          | some compiledRight =>
-              simp [formula?, hLeft, hRight] at hCompile
-              subst source
-              intro entry hSupport
-              have hParts :
-                  compiledLeft.freeSupport.Contains entry.position ∨
-                    compiledRight.freeSupport.Contains entry.position := by
-                simpa [Logic.FirstOrder.Formula.freeSupport,
-                  Logic.FirstOrder.FreeSupport.Contains,
-                  Logic.FirstOrder.FreeSupport.union,
-                  Bool.or_eq_true] using hSupport
-              rcases hParts with hLeftSupport | hRightSupport
-              · rcases formula_support_of_compile registry bound left compiledLeft
-                    hLeft entry hLeftSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_left _ hRawEntry, hFind⟩
-              · rcases formula_support_of_compile registry bound right compiledRight
-                    hRight entry hRightSupport with
-                  ⟨id, hRawEntry, hFind⟩
-                exact ⟨id, List.mem_append_right _ hRawEntry, hFind⟩
+  | bound, .conj left right, source, hCompile
+  | bound, .disj left right, source, hCompile
+  | bound, .imp left right, source, hCompile
   | bound, .iff left right, source, hCompile => by
       cases hLeft : formula? registry bound left with
       | none => simp [formula?, hLeft] at hCompile

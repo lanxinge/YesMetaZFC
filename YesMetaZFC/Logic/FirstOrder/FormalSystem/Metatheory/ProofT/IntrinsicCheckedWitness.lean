@@ -154,69 +154,10 @@ theorem code_condition_outer_elim
       opened :: FreshVariable.extendContext SetSort.set Γ
         ⊢ₘ[T] result.weakenFree SetSort.set) :
     Γ ⊢ₘ[T] result := by
-  let proofCodeOne : SetTerm [SetSort.set] free :=
-    proofCode.weakenBound SetSort.set
-  let conclusionOne : SetTerm [SetSort.set] free :=
-    conclusion.weakenBound SetSort.set
-  let proofCodeTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    proofCodeOne.weakenBound SetSort.set
-  let conclusionTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    conclusionOne.weakenBound SetSort.set
-  let proofCodeThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeTwo.weakenBound SetSort.set
-  let conclusionThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionTwo.weakenBound SetSort.set
-  let proofCodeFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeThree.weakenBound SetSort.set
-  let conclusionFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionThree.weakenBound SetSort.set
-  let sequence : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there (.there .here)))
-  let certificates : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there .here))
-  let formulaCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there .here)
-  let certificateCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar .here
-  let body : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    code_condition_body verifier.as_object proofCodeFour conclusionFour
-      sequence certificates formulaCode certificateCode verifier.logical_condition
-  let bodyThree : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeThree)) body
-  let bodyTwo : SetFormula
-      [SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeTwo)) bodyThree
-  let bodyOne : SetFormula [SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (seq₊_spaceₘ(ωₘ)) bodyTwo
-  have hCode' : Γ ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne := by
-    simpa [CheckedVerifier.code_condition,
-      StructuredCertificateCondition.code_condition_apply,
-      bounded_witness_closure,
-      body, bodyThree, bodyTwo, bodyOne,
-      proofCodeOne, conclusionOne, proofCodeTwo, conclusionTwo,
-      proofCodeThree, conclusionThree, proofCodeFour, conclusionFour,
-      sequence, certificates, formulaCode, certificateCode] using! hCode
-  apply bounded_exists_elim
-    (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne result hCode'
-  simpa [body, bodyThree, bodyTwo, bodyOne,
-    proofCodeOne, conclusionOne, proofCodeTwo, conclusionTwo,
-    proofCodeThree, conclusionThree, proofCodeFour, conclusionFour,
-    sequence, certificates, formulaCode, certificateCode] using hCase
+  apply bounded_exists_elim _ _ result ?_ hCase
+  simpa [CheckedVerifier.code_condition,
+    StructuredCertificateCondition.code_condition_apply, bounded_witness_closure,
+    code_condition_plan] using hCode
 
 /--
 总证明码条件的前两层有界存在消去。
@@ -299,117 +240,24 @@ theorem code_condition_two_outer_elim
       openedTwo :: FreshVariable.extendContext SetSort.set contextOne
         ⊢ₘ[T] (result.weakenFree SetSort.set).weakenFree SetSort.set) :
     Γ ⊢ₘ[T] result := by
-  let proofCodeOne : SetTerm [SetSort.set] free :=
-    proofCode.weakenBound SetSort.set
-  let conclusionOne : SetTerm [SetSort.set] free :=
-    conclusion.weakenBound SetSort.set
-  let proofCodeTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    proofCodeOne.weakenBound SetSort.set
-  let conclusionTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    conclusionOne.weakenBound SetSort.set
-  let proofCodeThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeTwo.weakenBound SetSort.set
-  let conclusionThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionTwo.weakenBound SetSort.set
-  let proofCodeFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeThree.weakenBound SetSort.set
-  let conclusionFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionThree.weakenBound SetSort.set
-  let sequence : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there (.there .here)))
-  let certificates : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there .here))
-  let formulaCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there .here)
-  let certificateCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar .here
-  let body : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    code_condition_body verifier.as_object proofCodeFour conclusionFour
-      sequence certificates formulaCode certificateCode verifier.logical_condition
-  let bodyThree : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeThree)) body
-  let bodyTwo : SetFormula
-      [SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeTwo)) bodyThree
-  let bodyOne : SetFormula [SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (seq₊_spaceₘ(ωₘ)) bodyTwo
-  let openedOne : SetOpenFormula (SetSort.set :: free) :=
-    Formula.openBoundTop (σ := signature) SetSort.set
-      (bounded_exists_body
-        (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne)
-  let contextOne : Context signature (SetSort.set :: free) :=
-    openedOne :: FreshVariable.extendContext SetSort.set Γ
-  let bodyTwoOpened : SetFormula [SetSort.set]
-      (SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature) [SetSort.set]
-      SetSort.set bodyTwo
-  let boundTwo : SetOpenTerm (SetSort.set :: free) :=
-    Term.openBoundTop (σ := signature) SetSort.set
-      (seq₊_spaceₘ(ωₘ) : SetTerm [SetSort.set] free)
-  have hOuter : Γ ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne := by
-    simpa [CheckedVerifier.code_condition,
-      StructuredCertificateCondition.code_condition_apply,
-      bounded_witness_closure,
-      body, bodyThree, bodyTwo, bodyOne,
-      proofCodeOne, conclusionOne, proofCodeTwo, conclusionTwo,
-      proofCodeThree, conclusionThree, proofCodeFour, conclusionFour,
-      sequence, certificates, formulaCode, certificateCode] using! hCode
-  apply bounded_exists_elim
-    (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne result hOuter
+  extract_lets proofCodeOne conclusionOne proofCodeTwo conclusionTwo proofCodeThree conclusionThree
+    proofCodeFour conclusionFour sequence certificates formulaCode certificateCode body bodyThree
+    bodyTwo bodyOne openedOne contextOne bodyTwoOpened boundTwo openedTwo at hCase
+  apply code_condition_outer_elim verifier proofCode conclusion result hCode
+  change contextOne ⊢ₘ[T] result.weakenFree SetSort.set
   have hOpenedOne : contextOne ⊢ₘ[T] openedOne :=
     FirstOrder.Derives.assumption (by simp [contextOne])
   have hRest : contextOne ⊢ₘ[T]
-      Formula.openBoundTop (σ := signature) SetSort.set bodyOne := by
-    have hBody := FirstOrder.Derives.conj_elim_right hOpenedOne
-    simpa [openedOne, contextOne, bounded_exists_body,
-      Formula.openBoundTop, Formula.LevyBound.membership,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using
-      hBody
-  have hOpen :=
-    VariableSubstitution.openLastBound_single
-      (σ := signature) (free := free) SetSort.set SetSort.set
+      Formula.openBoundTop (σ := signature) SetSort.set bodyOne :=
+    FirstOrder.Derives.conj_elim_right hOpenedOne
   have hNext : contextOne ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        boundTwo bodyTwoOpened := by
-    dsimp [bodyTwoOpened, Formula.openBoundLast]
-    rw [hOpen]
-    simpa [bodyOne, boundTwo,
-      Formula.openBoundLast,
-      Formula.openBoundTop, Formula.LevyBound.boundedExists,
-      Formula.LevyBound.membership, Term.openBoundTop_weakenBound,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using!
-      hRest
+      Formula.LevyBound.boundedExists set_levy_bound boundTwo bodyTwoOpened := by
+    simpa only [bodyOne, boundTwo, bodyTwoOpened,
+      Formula.openBoundTop_eq_openBoundLast, Term.openBoundTop_eq_openBoundLast,
+      bounded_exists_openBoundLast] using hRest
   apply bounded_exists_elim
     boundTwo bodyTwoOpened (result.weakenFree SetSort.set) hNext
-  simpa [openedOne, contextOne, bodyTwoOpened, boundTwo,
-    bounded_exists_body, bodyOne, bodyTwo, bodyThree, body,
-    proofCodeOne, proofCodeTwo, proofCodeThree, proofCodeFour,
-    conclusionOne, conclusionTwo, conclusionThree, conclusionFour,
-    sequence, certificates, formulaCode, certificateCode,
-    bounded_exists_openBoundLast] using! hCase
+  exact hCase
 
 /-!
 总证明码条件的四层有界存在消去。
@@ -549,268 +397,42 @@ theorem code_condition_four_outer_elim
       contextFour ⊢ₘ[T]
         (((result.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set) :
     Γ ⊢ₘ[T] result := by
-  let proofCodeOne : SetTerm [SetSort.set] free :=
-    proofCode.weakenBound SetSort.set
-  let conclusionOne : SetTerm [SetSort.set] free :=
-    conclusion.weakenBound SetSort.set
-  let proofCodeTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    proofCodeOne.weakenBound SetSort.set
-  let conclusionTwo : SetTerm [SetSort.set, SetSort.set] free :=
-    conclusionOne.weakenBound SetSort.set
-  let proofCodeThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeTwo.weakenBound SetSort.set
-  let conclusionThree : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionTwo.weakenBound SetSort.set
-  let proofCodeFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    proofCodeThree.weakenBound SetSort.set
-  let conclusionFour : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    conclusionThree.weakenBound SetSort.set
-  let sequence : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there (.there .here)))
-  let certificates : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there (.there .here))
-  let formulaCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar (.there .here)
-  let certificateCode : SetTerm
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    .bvar .here
-  let body : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] free :=
-    code_condition_body verifier.as_object proofCodeFour conclusionFour
-      sequence certificates formulaCode certificateCode verifier.logical_condition
-  let bodyThree : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeThree)) body
-  let bodyTwo : SetFormula
-      [SetSort.set, SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (Sₘ(proofCodeTwo)) bodyThree
-  let bodyOne : SetFormula [SetSort.set] free :=
-    Formula.LevyBound.boundedExists set_levy_bound
-      (seq₊_spaceₘ(ωₘ)) bodyTwo
-  let openedOne : SetOpenFormula (SetSort.set :: free) :=
-    Formula.openBoundTop (σ := signature) SetSort.set
-      (bounded_exists_body
-        (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne)
-  let contextOne : Context signature (SetSort.set :: free) :=
-    openedOne :: FreshVariable.extendContext SetSort.set Γ
-  let bodyTwoOpened : SetFormula [SetSort.set]
-      (SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature) [SetSort.set]
-      SetSort.set bodyTwo
-  let boundTwo : SetOpenTerm (SetSort.set :: free) :=
-    Term.openBoundTop (σ := signature) SetSort.set
-      (seq₊_spaceₘ(ωₘ) : SetTerm [SetSort.set] free)
-  let openedTwo : SetOpenFormula (SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundTop (σ := signature) SetSort.set
-      (bounded_exists_body boundTwo bodyTwoOpened)
-  let contextTwo : Context signature (SetSort.set :: SetSort.set :: free) :=
-    openedTwo :: FreshVariable.extendContext SetSort.set contextOne
-  let bodyThreeSequenceOpened : SetFormula
-      [SetSort.set, SetSort.set] (SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature)
-      [SetSort.set, SetSort.set] SetSort.set bodyThree
-  let bodyThreeOpened : SetFormula [SetSort.set]
-      (SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature)
-      [SetSort.set] SetSort.set bodyThreeSequenceOpened
-  let proofCodeTwoSequenceOpened : SetTerm [SetSort.set]
-      (SetSort.set :: free) :=
-    Term.openBoundLast (σ := signature)
-      [SetSort.set] SetSort.set (Sₘ(proofCodeTwo))
-  let boundThree : SetOpenTerm
-      (SetSort.set :: SetSort.set :: free) :=
-    Term.openBoundLast (σ := signature)
-      [] SetSort.set proofCodeTwoSequenceOpened
-  let openedThree : SetOpenFormula
-      (SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundTop (σ := signature) SetSort.set
-      (bounded_exists_body boundThree bodyThreeOpened)
-  let contextThree : Context signature
-      (SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    openedThree :: FreshVariable.extendContext SetSort.set contextTwo
-  let bodySequenceOpened : SetFormula
-      [SetSort.set, SetSort.set, SetSort.set] (SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature)
-      [SetSort.set, SetSort.set, SetSort.set] SetSort.set body
-  let bodyCertificatesOpened : SetFormula
-      [SetSort.set, SetSort.set]
-      (SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature)
-      [SetSort.set, SetSort.set] SetSort.set bodySequenceOpened
-  let bodyFormulaOpened : SetFormula [SetSort.set]
-      (SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundLast (σ := signature)
-      [SetSort.set] SetSort.set bodyCertificatesOpened
-  let proofCodeThreeSequenceOpened : SetTerm
-      [SetSort.set, SetSort.set] (SetSort.set :: free) :=
-    Term.openBoundLast (σ := signature)
-      [SetSort.set, SetSort.set] SetSort.set (Sₘ(proofCodeThree))
-  let proofCodeThreeCertificatesOpened : SetTerm [SetSort.set]
-      (SetSort.set :: SetSort.set :: free) :=
-    Term.openBoundLast (σ := signature)
-      [SetSort.set] SetSort.set proofCodeThreeSequenceOpened
-  let boundFour : SetOpenTerm
-      (SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    Term.openBoundLast (σ := signature)
-      [] SetSort.set proofCodeThreeCertificatesOpened
-  let openedFour : SetOpenFormula
-      (SetSort.set :: SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    Formula.openBoundTop (σ := signature) SetSort.set
-      (bounded_exists_body boundFour bodyFormulaOpened)
-  let contextFour : Context signature
-      (SetSort.set :: SetSort.set :: SetSort.set :: SetSort.set :: free) :=
-    openedFour :: FreshVariable.extendContext SetSort.set contextThree
-  have hOuter : Γ ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne := by
-    simpa [CheckedVerifier.code_condition,
-      StructuredCertificateCondition.code_condition_apply,
-      bounded_witness_closure,
-      body, bodyThree, bodyTwo, bodyOne,
-      proofCodeOne, conclusionOne, proofCodeTwo, conclusionTwo,
-      proofCodeThree, conclusionThree, proofCodeFour, conclusionFour,
-      sequence, certificates, formulaCode, certificateCode] using! hCode
-  apply bounded_exists_elim
-    (seq₊_spaceₘ(syntax_formula_code_set_term)) bodyOne result hOuter
-  have hOpenedOne : contextOne ⊢ₘ[T] openedOne :=
-    FirstOrder.Derives.assumption (by simp [contextOne])
-  have hRest : contextOne ⊢ₘ[T]
-      Formula.openBoundTop (σ := signature) SetSort.set bodyOne := by
-    have hBody := FirstOrder.Derives.conj_elim_right hOpenedOne
-    simpa [openedOne, contextOne, bounded_exists_body,
-      Formula.openBoundTop, Formula.LevyBound.membership,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using
-      hBody
-  have hOpen :=
-    VariableSubstitution.openLastBound_single
-      (σ := signature) (free := free) SetSort.set SetSort.set
-  have hNextTwo : contextOne ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        boundTwo bodyTwoOpened := by
-    dsimp [bodyTwoOpened, Formula.openBoundLast]
-    rw [hOpen]
-    simpa [bodyOne, boundTwo,
-      Formula.openBoundLast,
-      Formula.openBoundTop, Formula.LevyBound.boundedExists,
-      Formula.LevyBound.membership, Term.openBoundTop_weakenBound,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using!
-      hRest
-  apply bounded_exists_elim
-    boundTwo bodyTwoOpened (result.weakenFree SetSort.set) hNextTwo
+  extract_lets proofCodeOne conclusionOne proofCodeTwo conclusionTwo proofCodeThree conclusionThree
+    proofCodeFour conclusionFour sequence certificates formulaCode certificateCode body bodyThree
+    bodyTwo bodyOne openedOne contextOne bodyTwoOpened boundTwo openedTwo contextTwo
+    bodyThreeSequenceOpened bodyThreeOpened proofCodeTwoSequenceOpened boundThree openedThree
+    contextThree bodySequenceOpened bodyCertificatesOpened bodyFormulaOpened
+    proofCodeThreeSequenceOpened proofCodeThreeCertificatesOpened boundFour openedFour contextFour
+    at hCase
+  apply code_condition_two_outer_elim verifier proofCode conclusion result hCode
+  change contextTwo ⊢ₘ[T] (result.weakenFree SetSort.set).weakenFree SetSort.set
   have hOpenedTwo : contextTwo ⊢ₘ[T] openedTwo :=
     FirstOrder.Derives.assumption (by simp [contextTwo])
   have hRestTwo : contextTwo ⊢ₘ[T]
-      Formula.openBoundTop (σ := signature) SetSort.set bodyTwoOpened := by
-    have hBody := FirstOrder.Derives.conj_elim_right hOpenedTwo
-    simpa [openedTwo, contextTwo, bounded_exists_body,
-      Formula.openBoundTop, Formula.LevyBound.membership,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using
-      hBody
+      Formula.openBoundTop (σ := signature) SetSort.set bodyTwoOpened :=
+    FirstOrder.Derives.conj_elim_right hOpenedTwo
   have hNextThree : contextTwo ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        boundThree bodyThreeOpened := by
-    have hComm :
-        Formula.openBoundTop (σ := signature) SetSort.set bodyTwoOpened =
-          Formula.LevyBound.boundedExists set_levy_bound
-            boundThree bodyThreeOpened := by
-      simp only [bodyTwoOpened, bodyThreeOpened, bodyThreeSequenceOpened,
-        bodyTwo, bodyThree, boundThree, proofCodeTwoSequenceOpened,
-        Formula.openBoundTop_eq_openBoundLast]
-      have hInner := bounded_exists_openBoundLast
-        (prefixContext := [SetSort.set]) (Sₘ(proofCodeTwo))
-          (Formula.LevyBound.boundedExists set_levy_bound
-            (Sₘ(proofCodeThree)) body)
-      have hOuter := bounded_exists_openBoundLast
-        (prefixContext := []) proofCodeTwoSequenceOpened
-          bodyThreeSequenceOpened
-      exact
-        (congrArg
-          (Formula.openBoundLast (σ := signature) [] SetSort.set)
-          hInner).trans hOuter
-    rw [← hComm]
-    exact hRestTwo
+      Formula.LevyBound.boundedExists set_levy_bound boundThree bodyThreeOpened := by
+    simpa only [bodyTwoOpened, bodyThreeOpened, bodyThreeSequenceOpened, bodyTwo, bodyThree, boundThree, proofCodeTwoSequenceOpened,
+      Formula.openBoundTop_eq_openBoundLast, bounded_exists_openBoundLast] using hRestTwo
   apply bounded_exists_elim
     boundThree bodyThreeOpened
       ((result.weakenFree SetSort.set).weakenFree SetSort.set) hNextThree
   have hOpenedThree : contextThree ⊢ₘ[T] openedThree :=
     FirstOrder.Derives.assumption (by simp [contextThree])
   have hRestThree : contextThree ⊢ₘ[T]
-      Formula.openBoundTop (σ := signature) SetSort.set bodyThreeOpened := by
-    have hBody := FirstOrder.Derives.conj_elim_right hOpenedThree
-    simpa [openedThree, contextThree, bounded_exists_body,
-      Formula.openBoundTop, Formula.LevyBound.membership,
-      Formula.substituteMapped, Term.substituteMapped,
-      Arguments.substituteMapped, VariableSubstitution.instantiateTop,
-      VariableSubstitution.of_renaming, VariableSubstitution.freeId,
-      VariableSubstitution.boundId, Term.renameMapped, Arguments.renameMapped,
-      VariableRenaming.comp, VariableRenaming.id, VariableRenaming.weaken] using
-      hBody
+      Formula.openBoundTop (σ := signature) SetSort.set bodyThreeOpened :=
+    FirstOrder.Derives.conj_elim_right hOpenedThree
   have hNextFour : contextThree ⊢ₘ[T]
-      Formula.LevyBound.boundedExists set_levy_bound
-        boundFour bodyFormulaOpened := by
-    have hComm :
-        Formula.openBoundTop (σ := signature) SetSort.set bodyThreeOpened =
-          Formula.LevyBound.boundedExists set_levy_bound
-            boundFour bodyFormulaOpened := by
-      simp only [bodyThreeOpened, bodyThreeSequenceOpened,
-        bodyFormulaOpened, bodyCertificatesOpened, bodySequenceOpened,
-        bodyThree, boundFour, proofCodeThreeSequenceOpened,
-        proofCodeThreeCertificatesOpened, Formula.openBoundTop_eq_openBoundLast]
-      have hInner := bounded_exists_openBoundLast
-        (prefixContext := [SetSort.set, SetSort.set]) (Sₘ(proofCodeThree)) body
-      have hMiddle := bounded_exists_openBoundLast
-        (prefixContext := [SetSort.set]) proofCodeThreeSequenceOpened
-          bodySequenceOpened
-      have hOuter := bounded_exists_openBoundLast
-        (prefixContext := []) proofCodeThreeCertificatesOpened
-          bodyCertificatesOpened
-      exact
-        (congrArg
-          (Formula.openBoundLast (σ := signature) [] SetSort.set)
-          (congrArg
-            (Formula.openBoundLast (σ := signature)
-              [SetSort.set] SetSort.set) hInner)).trans
-          ((congrArg
-            (Formula.openBoundLast (σ := signature) [] SetSort.set)
-            hMiddle).trans hOuter)
-    rw [← hComm]
-    exact hRestThree
+      Formula.LevyBound.boundedExists set_levy_bound boundFour bodyFormulaOpened := by
+    simpa only [bodyThreeOpened, bodyThreeSequenceOpened, bodyFormulaOpened, bodyCertificatesOpened, bodySequenceOpened,
+        bodyThree, boundFour, proofCodeThreeSequenceOpened, proofCodeThreeCertificatesOpened,
+      Formula.openBoundTop_eq_openBoundLast, bounded_exists_openBoundLast] using hRestThree
   apply bounded_exists_elim
     boundFour bodyFormulaOpened
       (((result.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree SetSort.set)
       hNextFour
-  simpa [openedOne, openedTwo, openedThree, openedFour,
-    contextOne, contextTwo, contextThree, contextFour,
-    bodyTwoOpened, boundTwo, bodyThreeSequenceOpened, bodyThreeOpened,
-    boundThree, bodySequenceOpened, bodyCertificatesOpened,
-    bodyFormulaOpened, boundFour, proofCodeTwoSequenceOpened,
-    proofCodeThreeSequenceOpened, proofCodeThreeCertificatesOpened,
-    bounded_exists_body, bodyOne, bodyTwo, bodyThree, body,
-    proofCodeOne, proofCodeTwo, proofCodeThree, proofCodeFour,
-    conclusionOne, conclusionTwo, conclusionThree, conclusionFour,
-    sequence, certificates, formulaCode, certificateCode,
-    bounded_exists_openBoundLast] using! hCase
+  exact hCase
 
 /-! ## 证明行公式码承载 -/
 

@@ -48,6 +48,8 @@ def liftSubstitution
       .map (liftVariableSubstitution boundSubstitution)
         (liftVariableSubstitution freeSubstitution)
 
+mutual
+
 theorem liftTerm_renameMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
     (boundRenaming : VariableRenaming sourceBound targetBound)
@@ -57,30 +59,14 @@ theorem liftTerm_renameMapped
     liftTerm (term.renameMapped boundRenaming freeRenaming) =
       Term.renameMapped (σ := HSignature σ)
         boundRenaming freeRenaming (liftTerm term) := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      liftTerm (term.renameMapped boundRenaming freeRenaming) =
-        Term.renameMapped (σ := HSignature σ)
-          boundRenaming freeRenaming (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      liftArguments
-          (arguments.renameMapped boundRenaming freeRenaming) =
-        Arguments.renameMapped (σ := HSignature σ)
-          boundRenaming freeRenaming (liftArguments arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
+
+  match term with
+  | .bvar _ | .fvar _ => rfl
+  | .app function arguments =>
       simpa only [Term.renameMapped, liftTerm_app] using
-        congrArg
-          (fun arguments =>
-            Term.app (σ := HSignature σ)
-              (HenkinFunc.base function) arguments)
-          ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
-      simp only [Arguments.renameMapped, liftArguments_cons,
-        ihHead, ihTail])
-    term
+        congrArg (fun arguments => Term.app (σ := HSignature σ)
+          (HenkinFunc.base function) arguments)
+          (liftArguments_renameMapped boundRenaming freeRenaming arguments)
 
 theorem liftArguments_renameMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -92,30 +78,14 @@ theorem liftArguments_renameMapped
         (arguments.renameMapped boundRenaming freeRenaming) =
       Arguments.renameMapped (σ := HSignature σ)
         boundRenaming freeRenaming (liftArguments arguments) := by
-  exact Arguments.rec (σ := σ) (bound := sourceBound) (free := sourceFree)
-    (motive_1 := fun _ term =>
-      liftTerm (term.renameMapped boundRenaming freeRenaming) =
-        Term.renameMapped (σ := HSignature σ)
-          boundRenaming freeRenaming (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      liftArguments
-          (arguments.renameMapped boundRenaming freeRenaming) =
-        Arguments.renameMapped (σ := HSignature σ)
-          boundRenaming freeRenaming (liftArguments arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
-      simpa only [Term.renameMapped, liftTerm_app] using
-        congrArg
-          (fun arguments =>
-            Term.app (σ := HSignature σ)
-              (HenkinFunc.base function) arguments)
-          ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
+
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
       simp only [Arguments.renameMapped, liftArguments_cons,
-        ihHead, ihTail])
-    arguments
+        liftTerm_renameMapped, liftArguments_renameMapped]
+
+end
 
 @[simp] theorem liftFormula_renameMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -126,45 +96,9 @@ theorem liftArguments_renameMapped
         (formula.renameMapped boundRenaming freeRenaming) =
       Formula.renameMapped (σ := HSignature σ)
         boundRenaming freeRenaming (liftFormula formula) := by
-  induction formula generalizing targetBound targetFree with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      simpa only [Formula.renameMapped, liftFormula_rel] using
-        congrArg (Formula.rel (σ := HSignature σ) relation)
-          (liftArguments_renameMapped
-            boundRenaming freeRenaming arguments)
-  | equal left right =>
-      simp only [Formula.renameMapped, liftFormula_equal]
-      rw [liftTerm_renameMapped boundRenaming freeRenaming left,
-        liftTerm_renameMapped boundRenaming freeRenaming right]
-  | neg body ih =>
-      simp only [Formula.renameMapped, liftFormula_neg]
-      rw [ih boundRenaming freeRenaming]
-  | conj left right ihLeft ihRight =>
-      simp only [Formula.renameMapped, liftFormula_conj]
-      rw [ihLeft boundRenaming freeRenaming,
-        ihRight boundRenaming freeRenaming]
-  | disj left right ihLeft ihRight =>
-      simp only [Formula.renameMapped, liftFormula_disj]
-      rw [ihLeft boundRenaming freeRenaming,
-        ihRight boundRenaming freeRenaming]
-  | imp left right ihLeft ihRight =>
-      simp only [Formula.renameMapped, liftFormula_imp]
-      rw [ihLeft boundRenaming freeRenaming,
-        ihRight boundRenaming freeRenaming]
-  | iff left right ihLeft ihRight =>
-      simp only [Formula.renameMapped, liftFormula_iff]
-      rw [ihLeft boundRenaming freeRenaming,
-        ihRight boundRenaming freeRenaming]
-  | forallE sort body ih =>
-      simp only [Formula.renameMapped, liftFormula_forallE]
-      exact congrArg (Formula.forallE (σ := HSignature σ) sort)
-        (ih (VariableRenaming.lift boundRenaming) freeRenaming)
-  | existsE sort body ih =>
-      simp only [Formula.renameMapped, liftFormula_existsE]
-      exact congrArg (Formula.existsE (σ := HSignature σ) sort)
-        (ih (VariableRenaming.lift boundRenaming) freeRenaming)
+  induction formula generalizing targetBound targetFree <;>
+    simp_all [liftFormula, Formula.renameMapped,
+      liftTerm_renameMapped, liftArguments_renameMapped] <;> rfl
 
 @[simp] theorem liftTerm_rename
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -395,6 +329,8 @@ theorem liftArguments_renameMapped
         (liftVariableSubstitution substitution)
   rw [liftVariableSubstitution_boundId]
 
+mutual
+
 theorem liftTerm_substituteMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
     (boundSubstitution :
@@ -408,34 +344,14 @@ theorem liftTerm_substituteMapped
       Term.substituteMapped (σ := HSignature σ)
         (liftVariableSubstitution boundSubstitution)
         (liftVariableSubstitution freeSubstitution) (liftTerm term) := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      liftTerm
-          (term.substituteMapped boundSubstitution freeSubstitution) =
-        Term.substituteMapped (σ := HSignature σ)
-          (liftVariableSubstitution boundSubstitution)
-          (liftVariableSubstitution freeSubstitution) (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      liftArguments
-          (arguments.substituteMapped boundSubstitution freeSubstitution) =
-        Arguments.substituteMapped (σ := HSignature σ)
-          (liftVariableSubstitution boundSubstitution)
-          (liftVariableSubstitution freeSubstitution)
-          (liftArguments arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
+
+  match term with
+  | .bvar _ | .fvar _ => rfl
+  | .app function arguments =>
       simpa only [Term.substituteMapped, liftTerm_app] using
-        congrArg
-          (fun arguments =>
-            Term.app (σ := HSignature σ)
-              (HenkinFunc.base function) arguments)
-          ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
-      simp only [Arguments.substituteMapped, liftArguments_cons,
-        ihHead, ihTail])
-    term
+        congrArg (fun arguments => Term.app (σ := HSignature σ)
+          (HenkinFunc.base function) arguments)
+          (liftArguments_substituteMapped boundSubstitution freeSubstitution arguments)
 
 theorem liftArguments_substituteMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -451,34 +367,14 @@ theorem liftArguments_substituteMapped
         (liftVariableSubstitution boundSubstitution)
         (liftVariableSubstitution freeSubstitution)
         (liftArguments arguments) := by
-  exact Arguments.rec (σ := σ) (bound := sourceBound) (free := sourceFree)
-    (motive_1 := fun _ term =>
-      liftTerm
-          (term.substituteMapped boundSubstitution freeSubstitution) =
-        Term.substituteMapped (σ := HSignature σ)
-          (liftVariableSubstitution boundSubstitution)
-          (liftVariableSubstitution freeSubstitution) (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      liftArguments
-          (arguments.substituteMapped boundSubstitution freeSubstitution) =
-        Arguments.substituteMapped (σ := HSignature σ)
-          (liftVariableSubstitution boundSubstitution)
-          (liftVariableSubstitution freeSubstitution)
-          (liftArguments arguments))
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function _ ih => by
-      simpa only [Term.substituteMapped, liftTerm_app] using
-        congrArg
-          (fun arguments =>
-            Term.app (σ := HSignature σ)
-              (HenkinFunc.base function) arguments)
-          ih)
-    rfl
-    (fun _ _ ihHead ihTail => by
+
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
       simp only [Arguments.substituteMapped, liftArguments_cons,
-        ihHead, ihTail])
-    arguments
+        liftTerm_substituteMapped, liftArguments_substituteMapped]
+
+end
 
 @[simp] theorem liftFormula_substituteMapped
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -493,87 +389,10 @@ theorem liftArguments_substituteMapped
         (liftVariableSubstitution boundSubstitution)
         (liftVariableSubstitution freeSubstitution)
         (liftFormula formula) := by
-  induction formula generalizing targetBound targetFree with
-  | falsum => rfl
-  | truth => rfl
-  | rel relation arguments =>
-      simpa only [Formula.substituteMapped, liftFormula_rel] using
-        congrArg (Formula.rel (σ := HSignature σ) relation)
-          (liftArguments_substituteMapped
-            boundSubstitution freeSubstitution arguments)
-  | equal left right =>
-      simp only [Formula.substituteMapped, liftFormula_equal]
-      rw [liftTerm_substituteMapped
-          boundSubstitution freeSubstitution left,
-        liftTerm_substituteMapped
-          boundSubstitution freeSubstitution right]
-  | neg body ih =>
-      simp only [Formula.substituteMapped, liftFormula_neg]
-      rw [ih boundSubstitution freeSubstitution]
-  | conj left right ihLeft ihRight =>
-      simp only [Formula.substituteMapped, liftFormula_conj]
-      rw [ihLeft boundSubstitution freeSubstitution,
-        ihRight boundSubstitution freeSubstitution]
-  | disj left right ihLeft ihRight =>
-      simp only [Formula.substituteMapped, liftFormula_disj]
-      rw [ihLeft boundSubstitution freeSubstitution,
-        ihRight boundSubstitution freeSubstitution]
-  | imp left right ihLeft ihRight =>
-      simp only [Formula.substituteMapped, liftFormula_imp]
-      rw [ihLeft boundSubstitution freeSubstitution,
-        ihRight boundSubstitution freeSubstitution]
-  | iff left right ihLeft ihRight =>
-      simp only [Formula.substituteMapped, liftFormula_iff]
-      rw [ihLeft boundSubstitution freeSubstitution,
-        ihRight boundSubstitution freeSubstitution]
-  | forallE sort body ih =>
-      simp only [Formula.substituteMapped, liftFormula_forallE]
-      apply congrArg (Formula.forallE (σ := HSignature σ) sort)
-      calc
-        liftFormula
-            (body.substituteMapped
-              (VariableSubstitution.liftBound sort boundSubstitution)
-              (VariableSubstitution.weakenBound sort freeSubstitution)) =
-          Formula.substituteMapped (σ := HSignature σ)
-            (liftVariableSubstitution
-              (VariableSubstitution.liftBound sort boundSubstitution))
-            (liftVariableSubstitution
-              (VariableSubstitution.weakenBound sort freeSubstitution))
-            (liftFormula body) :=
-          ih (VariableSubstitution.liftBound sort boundSubstitution)
-            (VariableSubstitution.weakenBound sort freeSubstitution)
-        _ = Formula.substituteMapped (σ := HSignature σ)
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              (liftVariableSubstitution boundSubstitution))
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              (liftVariableSubstitution freeSubstitution))
-            (liftFormula body) := by
-          rw [liftVariableSubstitution_liftBound,
-            liftVariableSubstitution_weakenBound]
-  | existsE sort body ih =>
-      simp only [Formula.substituteMapped, liftFormula_existsE]
-      apply congrArg (Formula.existsE (σ := HSignature σ) sort)
-      calc
-        liftFormula
-            (body.substituteMapped
-              (VariableSubstitution.liftBound sort boundSubstitution)
-              (VariableSubstitution.weakenBound sort freeSubstitution)) =
-          Formula.substituteMapped (σ := HSignature σ)
-            (liftVariableSubstitution
-              (VariableSubstitution.liftBound sort boundSubstitution))
-            (liftVariableSubstitution
-              (VariableSubstitution.weakenBound sort freeSubstitution))
-            (liftFormula body) :=
-          ih (VariableSubstitution.liftBound sort boundSubstitution)
-            (VariableSubstitution.weakenBound sort freeSubstitution)
-        _ = Formula.substituteMapped (σ := HSignature σ)
-            (VariableSubstitution.liftBound (σ := HSignature σ) sort
-              (liftVariableSubstitution boundSubstitution))
-            (VariableSubstitution.weakenBound (σ := HSignature σ) sort
-              (liftVariableSubstitution freeSubstitution))
-            (liftFormula body) := by
-          rw [liftVariableSubstitution_liftBound,
-            liftVariableSubstitution_weakenBound]
+  induction formula generalizing targetBound targetFree <;>
+    simp_all [liftFormula, Formula.substituteMapped, liftVariableSubstitution_liftBound,
+      liftVariableSubstitution_weakenBound,
+      liftTerm_substituteMapped, liftArguments_substituteMapped]
 
 @[simp] theorem liftTerm_substitute
     {sourceBound sourceFree targetBound targetFree : SortContext σ}
@@ -731,23 +550,12 @@ theorem liftTerm_not_usesWitness
     {bound free : SortContext σ} {sort : σ.SortSymbol}
     (term : Term σ bound free sort) :
     ¬ Term.usesWitness witnessSort witnessIndex (liftTerm term) := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ¬ Term.usesWitness witnessSort witnessIndex (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      ¬ Arguments.usesWitness witnessSort witnessIndex
-        (liftArguments arguments))
-    (fun _ hUses => by
-      simp [liftTerm, Term.usesWitness] at hUses)
-    (fun _ hUses => by
-      simp [liftTerm, Term.usesWitness] at hUses)
-    (fun _ _ ih => by
-      simpa [liftTerm, Term.usesWitness] using ih)
-    (by simp [liftArguments, Arguments.usesWitness])
-    (fun _ _ ihHead ihTail => by
-      simpa [liftArguments, Arguments.usesWitness] using
-        And.intro ihHead ihTail)
-    term
+
+  match term with
+  | .bvar _ | .fvar _ => simp [liftTerm, Term.usesWitness]
+  | .app function arguments =>
+      simpa [liftTerm, Term.usesWitness] using
+        liftArguments_not_usesWitness witnessSort witnessIndex arguments
 
 theorem liftArguments_not_usesWitness
     [DecidableEq σ.SortSymbol]
@@ -756,23 +564,13 @@ theorem liftArguments_not_usesWitness
     (arguments : Arguments σ bound free sorts) :
     ¬ Arguments.usesWitness witnessSort witnessIndex
       (liftArguments arguments) := by
-  exact Arguments.rec (σ := σ) (bound := bound) (free := free)
-    (motive_1 := fun _ term =>
-      ¬ Term.usesWitness witnessSort witnessIndex (liftTerm term))
-    (motive_2 := fun _ arguments =>
-      ¬ Arguments.usesWitness witnessSort witnessIndex
-        (liftArguments arguments))
-    (fun _ hUses => by
-      simp [liftTerm, Term.usesWitness] at hUses)
-    (fun _ hUses => by
-      simp [liftTerm, Term.usesWitness] at hUses)
-    (fun _ _ ih => by
-      simpa [liftTerm, Term.usesWitness] using ih)
-    (by simp [liftArguments, Arguments.usesWitness])
-    (fun _ _ ihHead ihTail => by
-      simpa [liftArguments, Arguments.usesWitness] using
-        And.intro ihHead ihTail)
-    arguments
+
+  match arguments with
+  | .nil => simp [liftArguments, Arguments.usesWitness]
+  | .cons head tail =>
+      simp only [liftArguments_cons, Arguments.usesWitness, not_or]
+      exact ⟨liftTerm_not_usesWitness witnessSort witnessIndex head,
+        liftArguments_not_usesWitness witnessSort witnessIndex tail⟩
 
 end
 
@@ -783,34 +581,9 @@ theorem liftFormula_not_usesWitness
     (formula : Formula σ bound free) :
     ¬ Formula.usesWitness witnessSort witnessIndex
       (liftFormula formula) := by
-  induction formula with
-  | falsum => simp [liftFormula, Formula.usesWitness]
-  | truth => simp [liftFormula, Formula.usesWitness]
-  | rel relation arguments =>
-      exact liftArguments_not_usesWitness
-        witnessSort witnessIndex arguments
-  | equal left right =>
-      simp [liftFormula, Formula.usesWitness,
-        liftTerm_not_usesWitness witnessSort witnessIndex left,
-        liftTerm_not_usesWitness witnessSort witnessIndex right]
-  | neg body ih =>
-      simpa [liftFormula, Formula.usesWitness] using ih
-  | conj left right ihLeft ihRight =>
-      simpa [liftFormula, Formula.usesWitness] using
-        And.intro ihLeft ihRight
-  | disj left right ihLeft ihRight =>
-      simpa [liftFormula, Formula.usesWitness] using
-        And.intro ihLeft ihRight
-  | imp left right ihLeft ihRight =>
-      simpa [liftFormula, Formula.usesWitness] using
-        And.intro ihLeft ihRight
-  | iff left right ihLeft ihRight =>
-      simpa [liftFormula, Formula.usesWitness] using
-        And.intro ihLeft ihRight
-  | forallE sort body ih =>
-      simpa [liftFormula, Formula.usesWitness] using ih
-  | existsE sort body ih =>
-      simpa [liftFormula, Formula.usesWitness] using ih
+  induction formula <;>
+    simp_all [liftFormula, Formula.usesWitness,
+      liftTerm_not_usesWitness, liftArguments_not_usesWitness]
 
 /-- 原理论在 Henkin 签名中的像。成员必须精确来自一条原理论闭句。 -/
 def liftTheory (T : Theory σ) : Theory (HSignature σ) :=
@@ -1156,30 +929,12 @@ mutual
     {sort : σ.SortSymbol} (term : Term σ bound free sort) :
     Term.eval env (liftTerm term) =
       Term.eval (henkinReductEnv env) term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.eval env (liftTerm term) =
-        Term.eval (henkinReductEnv env) term)
-    (motive_2 := fun _ arguments =>
-      Arguments.eval env (liftArguments arguments) =
-        Arguments.eval (henkinReductEnv env) arguments)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change M.funcInterp (.base function)
-          (Arguments.eval env (liftArguments arguments)) =
-        M.funcInterp (.base function)
-          (Arguments.eval (henkinReductEnv env) arguments)
-      exact congrArg (M.funcInterp (.base function)) ih)
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Values.cons (Term.eval env (liftTerm head))
-          (Arguments.eval env (liftArguments tail)) =
-        Values.cons (Term.eval (henkinReductEnv env) head)
-          (Arguments.eval (henkinReductEnv env) tail)
-      rw [ihHead, ihTail]
-      rfl)
-    term
+
+  match term with
+  | .bvar _ | .fvar _ => rfl
+  | .app function arguments =>
+      change M.funcInterp (.base function) _ = M.funcInterp (.base function) _
+      exact congrArg (M.funcInterp (.base function)) (eval_liftArguments env arguments)
 
 @[simp] theorem eval_liftArguments
     {M : Structure.{u, max u v, w, x} (HSignature σ)}
@@ -1188,30 +943,12 @@ mutual
     (arguments : Arguments σ bound free sorts) :
     Arguments.eval env (liftArguments arguments) =
       Arguments.eval (henkinReductEnv env) arguments := by
-  exact Arguments.rec (σ := σ) (bound := bound) (free := free)
-    (motive_1 := fun _ term =>
-      Term.eval env (liftTerm term) =
-        Term.eval (henkinReductEnv env) term)
-    (motive_2 := fun _ arguments =>
-      Arguments.eval env (liftArguments arguments) =
-        Arguments.eval (henkinReductEnv env) arguments)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change M.funcInterp (.base function)
-          (Arguments.eval env (liftArguments arguments)) =
-        M.funcInterp (.base function)
-          (Arguments.eval (henkinReductEnv env) arguments)
-      exact congrArg (M.funcInterp (.base function)) ih)
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Values.cons (Term.eval env (liftTerm head))
-          (Arguments.eval env (liftArguments tail)) =
-        Values.cons (Term.eval (henkinReductEnv env) head)
-          (Arguments.eval (henkinReductEnv env) tail)
-      rw [ihHead, ihTail]
-      rfl)
-    arguments
+
+  match arguments with
+  | .nil => rfl
+  | .cons head tail =>
+      simp only [liftArguments_cons, Arguments.eval, eval_liftTerm, eval_liftArguments]
+      rfl
 
 end
 
@@ -1221,66 +958,9 @@ end
     (formula : Formula σ bound free) :
     Formula.satisfies env (liftFormula formula) ↔
       Formula.satisfies (henkinReductEnv env) formula := by
-  induction formula with
-  | falsum => simp [liftFormula, Formula.satisfies]
-  | truth => simp [liftFormula, Formula.satisfies]
-  | rel relation arguments =>
-      change M.relInterp relation
-          (Arguments.eval env (liftArguments arguments)) ↔
-        M.relInterp relation
-          (Arguments.eval (henkinReductEnv env) arguments)
-      rw [eval_liftArguments]
-  | equal left right =>
-      change
-        (Term.eval env (liftTerm left) = Term.eval env (liftTerm right)) ↔
-          Term.eval (henkinReductEnv env) left =
-            Term.eval (henkinReductEnv env) right
-      rw [eval_liftTerm, eval_liftTerm]
-      rfl
-  | neg body ih =>
-      simp [liftFormula, Formula.satisfies, ih]
-  | conj left right ihLeft ihRight =>
-      simp [liftFormula, Formula.satisfies, ihLeft, ihRight]
-  | disj left right ihLeft ihRight =>
-      simp [liftFormula, Formula.satisfies, ihLeft, ihRight]
-  | imp left right ihLeft ihRight =>
-      simp [liftFormula, Formula.satisfies, ihLeft, ihRight]
-  | iff left right ihLeft ihRight =>
-      simp [liftFormula, Formula.satisfies, ihLeft, ihRight]
-  | forallE sort body ih =>
-      constructor
-      · intro hFormula value
-        have hBody :=
-          (ih (env := env.pushBound value)).mp (hFormula value)
-        exact Eq.mp
-          (congrArg (fun environment =>
-            Formula.satisfies environment body)
-            (henkinReductEnv_pushBound env value))
-          hBody
-      · intro hFormula value
-        apply (ih (env := env.pushBound value)).mpr
-        exact Eq.mp
-          (congrArg (fun environment =>
-            Formula.satisfies environment body)
-            (henkinReductEnv_pushBound env value).symm)
-          (hFormula value)
-  | existsE sort body ih =>
-      constructor
-      · rintro ⟨value, hBody⟩
-        have hLifted := (ih (env := env.pushBound value)).mp hBody
-        exact ⟨value, Eq.mp
-          (congrArg (fun environment =>
-            Formula.satisfies environment body)
-            (henkinReductEnv_pushBound env value))
-          hLifted⟩
-      · rintro ⟨value, hBody⟩
-        apply Exists.intro value
-        apply (ih (env := env.pushBound value)).mpr
-        exact Eq.mp
-          (congrArg (fun environment =>
-            Formula.satisfies environment body)
-            (henkinReductEnv_pushBound env value).symm)
-          hBody
+  induction formula <;>
+    simp_all only [liftFormula, Formula.satisfies, eval_liftTerm, eval_liftArguments,
+      henkinReductEnv_pushBound] <;> rfl
 
 @[simp] theorem trueIn_liftFormula
     {M : Structure.{u, max u v, w, x} (HSignature σ)}

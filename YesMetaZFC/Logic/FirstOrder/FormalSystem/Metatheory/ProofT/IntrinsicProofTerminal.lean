@@ -147,54 +147,7 @@ private theorem open_term_bound_substitute_newest
         (VariableSubstitution.of_renaming
           (VariableRenaming.weaken SetSort.set)) =
       term.weakenFree SetSort.set := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      (term.weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := signature) (free := free)
-              SetSort.set))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        term.weakenFree SetSort.set)
-    (motive_2 := fun _ arguments =>
-      (arguments.weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := signature) (free := free)
-              SetSort.set))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        arguments.weakenFree SetSort.set)
-    (fun _ => rfl)
-    (fun entry => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          ((arguments.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Term.app function (arguments.weakenFree SetSort.set)
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set)))
-          ((tail.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Arguments.cons (head.weakenFree SetSort.set)
-          (tail.weakenFree SetSort.set)
-      rw [ihHead, ihTail])
-    term
+  exact Term.openBoundTop_weakenBound SetSort.set term
 
 /-- 有限定义域的终端条件在最后值不匹配时推出矛盾。 -/
 theorem terminal_falsum_of_domain_eq
@@ -429,18 +382,11 @@ theorem terminal_falsum_of_standard_sequence_mismatch
     C (standard_sequence elements) conclusion elements.length
     hDomain hTerminal
   intro index hIndex hLast
-  have hValue : Γ ⊢ₘ[T]
-      elements[index]'hIndex ≐ₘ
-        (standard_sequence elements ·ₘ numₘ(index)) :=
-    by
-      simpa [standard_sequence] using
-        (row_value_of_standard_sequence
-          (Γ := Γ) S 0 index hIndex)
   apply falsum_of_equality_context_transport
     (elements[index]'hIndex)
-    (standard_sequence elements ·ₘ numₘ(index))
-    conclusion hValue
-  exact hMismatch index hIndex hLast
+    (standard_sequence elements ·ₘ numₘ(index)) conclusion
+  · simpa [standard_sequence] using (row_value_of_standard_sequence (Γ := Γ) S 0 index hIndex)
+  · exact hMismatch index hIndex hLast
 
 /-- 证明行图按外部行值不匹配时直接推出矛盾。 -/
 theorem terminal_falsum_of_proof_sequence_row_mismatch
@@ -463,19 +409,11 @@ theorem terminal_falsum_of_proof_sequence_row_mismatch
             nat_sequence_graph_term (rows[index]'hIndex)) :: Γ
           ⊢ₘ[T] Formula.falsum) :
     Γ ⊢ₘ[T] Formula.falsum := by
-  apply terminal_falsum_of_domain_eq
-    C (proof_sequence_graph_term rows) conclusion rows.length
-    hDomain hTerminal
-  intro index hIndex hLast
-  have hValue : Γ ⊢ₘ[T]
-      nat_sequence_graph_term (rows[index]'hIndex) ≐ₘ
-        (proof_sequence_graph_term rows ·ₘ numₘ(index)) :=
-    proof_row_value_of_graph S rows index hIndex
-  apply falsum_of_equality_context_transport
-    (nat_sequence_graph_term (rows[index]'hIndex))
-    (proof_sequence_graph_term rows ·ₘ numₘ(index))
-    conclusion hValue
-  exact hMismatch index hIndex hLast
+  apply terminal_falsum_of_standard_sequence_mismatch C S
+    (rows.map nat_sequence_graph_term) conclusion
+  · simpa [proof_sequence_graph_term, standard_sequence] using hDomain
+  · exact hTerminal
+  · simpa only [List.length_map, List.getElem_map] using hMismatch
 
 /-- 证明行列表与目标行列表不匹配时，终端条件直接矛盾。 -/
 theorem terminal_falsum_of_proof_sequence_list_mismatch
@@ -499,37 +437,16 @@ theorem terminal_falsum_of_proof_sequence_list_mismatch
         rows.length = index + 1 →
         targetRow ≠ rows[index]'hIndex) :
     Γ ⊢ₘ[T] Formula.falsum := by
-  apply terminal_falsum_of_domain_eq
-    C (proof_sequence_graph_term rows) conclusion rows.length
-    hDomain hTerminal
+  apply terminal_falsum_of_proof_sequence_row_mismatch
+    C S rows conclusion hDomain hTerminal
   intro index hIndex hLast
-  let row : SetOpenTerm free :=
-    nat_sequence_graph_term (rows[index]'hIndex)
-  let application : SetOpenTerm free :=
-    proof_sequence_graph_term rows ·ₘ numₘ(index)
-  have hValue : Γ ⊢ₘ[T] row ≐ₘ application := by
-    simpa [row, application] using
-      (proof_row_value_of_graph S rows index hIndex)
-  have hRowMismatch : (conclusion ≐ₘ row) :: Γ ⊢ₘ[T]
-      Formula.falsum := by
-    let Δ : Context signature free := (conclusion ≐ₘ row) :: Γ
-    have hTarget : Δ ⊢ₘ[T]
-        nat_sequence_graph_term targetRow ≐ₘ row := by
-      have hConclusionAt : Δ ⊢ₘ[T]
-          conclusion ≐ₘ nat_sequence_graph_term targetRow :=
-        FirstOrder.Derives.context_weaken_cons hConclusion
-      have hRowAt : Δ ⊢ₘ[T] conclusion ≐ₘ row :=
-        FirstOrder.Derives.assumption List.mem_cons_self
-      exact Metatheory.Derives.equality_trans
-        (Metatheory.Derives.equality_symm hConclusionAt) hRowAt
-    exact FirstOrder.Derives.neg_elim
-      hTarget
-      (FirstOrder.Derives.context_weaken_cons
-        (nat_sequence_graph_ne
-          (Γ := Γ) S
-          (hMismatch index hIndex hLast)))
-  exact falsum_of_equality_context_transport
-    row application conclusion hValue hRowMismatch
+  apply FirstOrder.Derives.neg_elim
+    (Metatheory.Derives.equality_trans
+      (Metatheory.Derives.equality_symm
+        (FirstOrder.Derives.context_weaken_cons hConclusion))
+      (FirstOrder.Derives.assumption List.mem_cons_self))
+  exact FirstOrder.Derives.context_weaken_cons
+    (nat_sequence_graph_ne (Γ := Γ) S (hMismatch index hIndex hLast))
 
 end ProofT
 end FormalSystem

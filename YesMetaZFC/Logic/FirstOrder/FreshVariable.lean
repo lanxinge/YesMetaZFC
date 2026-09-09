@@ -445,53 +445,14 @@ theorem openBoundTop_eq_openBoundLast
     (term : Term σ [] free resultSort) :
     Term.openBoundTop sort (term.weakenBound sort) =
       term.weakenFree sort := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      Term.openBoundTop sort (term.weakenBound sort) =
-        term.weakenFree sort)
-    (motive_2 := fun _ arguments =>
-      (arguments.weakenBound sort).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := σ) (free := free) sort))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken sort)) =
-        arguments.weakenFree sort)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          ((arguments.weakenBound sort).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := σ) (free := free) sort))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken sort))) =
-        Term.app function (arguments.weakenFree sort)
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenBound sort).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := σ) (free := free) sort))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken sort)))
-          ((tail.weakenBound sort).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := σ) (free := free) sort))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken sort))) =
-        Arguments.cons (head.weakenFree sort)
-          (tail.weakenFree sort)
-      have hHead :
-          (head.weakenBound sort).substituteMapped
-              (VariableSubstitution.instantiateTop
-                (FreshVariable.newest (σ := σ) (free := free) sort))
-              (VariableSubstitution.of_renaming
-                (VariableRenaming.weaken sort)) =
-            head.weakenFree sort := by
-        simpa [Term.openBoundTop] using ihHead
-      rw [hHead, ihTail])
-    term
+
+  change (term.renameMapped (VariableRenaming.weaken sort) VariableRenaming.id).substituteMapped
+      (VariableSubstitution.instantiateTop (FreshVariable.newest (σ := σ) (free := free) sort))
+      (VariableSubstitution.of_renaming (VariableRenaming.weaken sort)) =
+    term.renameMapped VariableRenaming.id (VariableRenaming.weaken sort)
+  rw [← Term.substituteMapped_of_bound_renaming, Term.substituteMapped_comp,
+    ← Term.substituteMapped_of_renaming]
+  rfl
 
 end Term
 

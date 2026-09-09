@@ -510,107 +510,29 @@ theorem pair_union_spec_implies_binary_union_spec
             |>.weakenFree SetSort.set) :=
       FirstOrder.Derives.assumption (by
         simp [Ω, Δ, FreshVariable.extendContext])
-    have hPairAtRaw := FirstOrder.Derives.forall_elim
-      witness hPairWeak'
-    have hPairAt :
-        Ω ⊢ₘ[T]
-          (witness ∈ₘ
-              (pair.weakenFree SetSort.set).weakenFree SetSort.set) ↔ₘ
-            ((witness ≐ₘ
-                (left.weakenFree SetSort.set).weakenFree SetSort.set) ∨ₘ
-              (witness ≐ₘ
-                (right.weakenFree SetSort.set).weakenFree SetSort.set)) := by
-      simp only [Formula.renameMapped_comp] at hPairAtRaw
-      dsimp [witness] at hPairAtRaw
-      have hBound :
-          (VariableRenaming.comp
-              (VariableRenaming.lift (introduced := SetSort.set)
-                (VariableRenaming.id :
-                  VariableRenaming ([] : SetContext) []))
-              (VariableRenaming.lift (introduced := SetSort.set)
-                (VariableRenaming.id :
-                  VariableRenaming ([] : SetContext) [])) :
-            VariableRenaming [SetSort.set] [SetSort.set]) =
-            (VariableRenaming.id :
-              VariableRenaming [SetSort.set] [SetSort.set]) := by
-        funext resultSort entry
-        cases entry <;> rfl
-      rw [hBound,
-        Formula.instantiateTop_renameMapped_abstractFreeTop_fvar]
-        at hPairAtRaw
-      let ρ : VariableRenaming free
-          (SetSort.set :: SetSort.set :: free) :=
-        VariableRenaming.comp
-          (VariableRenaming.weaken SetSort.set)
-          (VariableRenaming.weaken SetSort.set)
-      let κ : VariableRenaming (SetSort.set :: free)
-          (SetSort.set :: SetSort.set :: free) :=
-        VariableRenaming.cons .here ρ
-      have hRename (term : SetOpenTerm free) :
-          (term.weakenFree SetSort.set).renameMapped
-              VariableRenaming.id κ =
-            (term.weakenFree SetSort.set).weakenFree SetSort.set := by
-        have hDrop := Term.renameMapped_weakenFree_cons
-          (σ := signature)
-          (boundRenaming := VariableRenaming.id)
-          (head := (.here :
-            Variable (SetSort.set :: SetSort.set :: free)
-              SetSort.set))
-          (tail := ρ) term
-        have hTwo := Term.renameMapped_two_weakenFree
-          (σ := signature) (first := SetSort.set)
-          (second := SetSort.set) term
-        simpa [κ, ρ] using hDrop.trans hTwo
-      change
-        Ω ⊢ₘ[T]
-          (witness ∈ₘ
-              (pair.weakenFree SetSort.set).renameMapped
-                VariableRenaming.id κ) ↔ₘ
-            ((witness ≐ₘ
-                (left.weakenFree SetSort.set).renameMapped
-                  VariableRenaming.id κ) ∨ₘ
-              (witness ≐ₘ
-                (right.weakenFree SetSort.set).renameMapped
-                  VariableRenaming.id κ)) at hPairAtRaw
-      rw [hRename pair, hRename left, hRename right] at hPairAtRaw
-      simpa [witness] using hPairAtRaw
+    have hPairAt := pair_spec_membership_iff
+      ((left.weakenFree SetSort.set).weakenFree SetSort.set)
+      ((right.weakenFree SetSort.set).weakenFree SetSort.set)
+      ((pair.weakenFree SetSort.set).weakenFree SetSort.set) witness (by
+        have h := hPairWeak'
+        change Ω ⊢ₘ[T] ((pair_spec left right pair).renameMapped
+          VariableRenaming.id (VariableRenaming.weaken SetSort.set)).renameMapped
+          VariableRenaming.id (VariableRenaming.weaken SetSort.set) at h
+        rw [pair_spec_renameMapped, pair_spec_renameMapped] at h
+        exact h)
     have hChoice := FirstOrder.Derives.iff_elim_left
       hPairAt hWitnessInPair
     apply FirstOrder.Derives.disj_elim hChoice
-    · have hEquality :
-          ((witness ≐ₘ
-              (left.weakenFree SetSort.set).weakenFree SetSort.set) :: Ω)
-              ⊢ₘ[T]
-            witness ≐ₘ
-              (left.weakenFree SetSort.set).weakenFree SetSort.set :=
-        FirstOrder.Derives.assumption List.mem_cons_self
-      have hMembership := FirstOrder.Derives.context_weaken_cons
-        (assumption := witness ≐ₘ
-          (left.weakenFree SetSort.set).weakenFree SetSort.set)
-        hElementInWitness
-      have hTransport := membership_right_iff_of_equality
-        element' witness
-        ((left.weakenFree SetSort.set).weakenFree SetSort.set)
-        hEquality
-      exact FirstOrder.Derives.disj_intro_left
-        (FirstOrder.Derives.iff_elim_left hTransport hMembership)
-    · have hEquality :
-          ((witness ≐ₘ
-              (right.weakenFree SetSort.set).weakenFree SetSort.set) :: Ω)
-              ⊢ₘ[T]
-            witness ≐ₘ
-              (right.weakenFree SetSort.set).weakenFree SetSort.set :=
-        FirstOrder.Derives.assumption List.mem_cons_self
-      have hMembership := FirstOrder.Derives.context_weaken_cons
-        (assumption := witness ≐ₘ
-          (right.weakenFree SetSort.set).weakenFree SetSort.set)
-        hElementInWitness
-      have hTransport := membership_right_iff_of_equality
-        element' witness
-        ((right.weakenFree SetSort.set).weakenFree SetSort.set)
-        hEquality
-      exact FirstOrder.Derives.disj_intro_right
-        (FirstOrder.Derives.iff_elim_left hTransport hMembership)
+    · apply FirstOrder.Derives.disj_intro_left
+      exact FirstOrder.Derives.iff_elim_left
+        (membership_right_iff_of_equality _ _ _
+          (FirstOrder.Derives.assumption List.mem_cons_self))
+        (FirstOrder.Derives.context_weaken_cons hElementInWitness)
+    · apply FirstOrder.Derives.disj_intro_right
+      exact FirstOrder.Derives.iff_elim_left
+        (membership_right_iff_of_equality _ _ _
+          (FirstOrder.Derives.assumption List.mem_cons_self))
+        (FirstOrder.Derives.context_weaken_cons hElementInWitness)
   · let choice : SetOpenFormula (SetSort.set :: free) :=
       (element ∈ₘ left.weakenFree SetSort.set) ∨ₘ
         (element ∈ₘ right.weakenFree SetSort.set)
@@ -623,90 +545,29 @@ theorem pair_union_spec_implies_binary_union_spec
             union_witness_condition
               (pair.weakenFree SetSort.set) element :=
       FirstOrder.Derives.context_weaken_cons hUnionAt
-    have hBoundOne :
-        (VariableRenaming.lift (introduced := SetSort.set)
-            (VariableRenaming.id :
-              VariableRenaming ([] : SetContext) []) :
-          VariableRenaming [SetSort.set] [SetSort.set]) =
-        (VariableRenaming.id :
-          VariableRenaming [SetSort.set] [SetSort.set]) :=
-      VariableRenaming.lift_id
-    have hExists :
-        Θ ⊢ₘ[T]
-          union_witness_condition
-            (pair.weakenFree SetSort.set) element := by
-      apply FirstOrder.Derives.disj_elim hChoice
-      · have hElementInLeft :
-            ((element ∈ₘ left.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              element ∈ₘ left.weakenFree SetSort.set :=
-          FirstOrder.Derives.assumption List.mem_cons_self
-        have hPairBranch :
-            ((element ∈ₘ left.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              (pair_spec left right pair).weakenFree SetSort.set :=
-          FirstOrder.Derives.context_weaken_cons
-            (assumption := element ∈ₘ left.weakenFree SetSort.set)
-            (FirstOrder.Derives.context_weaken_cons
-              (assumption := choice) hPairWeak)
-        have hPairAtRaw := FirstOrder.Derives.forall_elim
-          (left.weakenFree SetSort.set) hPairBranch
-        rw [hBoundOne,
-          Formula.instantiateTop_renameMapped_abstractFreeTop_weakenFree]
-          at hPairAtRaw
-        have hPairAt :
-            ((element ∈ₘ left.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              (left.weakenFree SetSort.set ∈ₘ
-                  pair.weakenFree SetSort.set) ↔ₘ
-                ((left.weakenFree SetSort.set ≐ₘ
-                    left.weakenFree SetSort.set) ∨ₘ
-                  (left.weakenFree SetSort.set ≐ₘ
-                    right.weakenFree SetSort.set)) := by
-          simpa [pair_member_condition] using! hPairAtRaw
-        have hLeftInPair := FirstOrder.Derives.iff_elim_right hPairAt
-          (FirstOrder.Derives.disj_intro_left
-            (Metatheory.Derives.equality_refl
-              (T := T)
-              (Γ := (element ∈ₘ left.weakenFree SetSort.set) :: Θ)
-              (left.weakenFree SetSort.set)))
-        apply FirstOrder.Derives.exists_intro
-          (left.weakenFree SetSort.set)
-        simpa [union_witness_condition] using!
-          FirstOrder.Derives.conj_intro hLeftInPair hElementInLeft
-      · have hElementInRight :
-            ((element ∈ₘ right.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              element ∈ₘ right.weakenFree SetSort.set :=
-          FirstOrder.Derives.assumption List.mem_cons_self
-        have hPairBranch :
-            ((element ∈ₘ right.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              (pair_spec left right pair).weakenFree SetSort.set :=
-          FirstOrder.Derives.context_weaken_cons
-            (assumption := element ∈ₘ right.weakenFree SetSort.set)
-            (FirstOrder.Derives.context_weaken_cons
-              (assumption := choice) hPairWeak)
-        have hPairAtRaw := FirstOrder.Derives.forall_elim
-          (right.weakenFree SetSort.set) hPairBranch
-        rw [hBoundOne,
-          Formula.instantiateTop_renameMapped_abstractFreeTop_weakenFree]
-          at hPairAtRaw
-        have hPairAt :
-            ((element ∈ₘ right.weakenFree SetSort.set) :: Θ) ⊢ₘ[T]
-              (right.weakenFree SetSort.set ∈ₘ
-                  pair.weakenFree SetSort.set) ↔ₘ
-                ((right.weakenFree SetSort.set ≐ₘ
-                    left.weakenFree SetSort.set) ∨ₘ
-                  (right.weakenFree SetSort.set ≐ₘ
-                    right.weakenFree SetSort.set)) := by
-          simpa [pair_member_condition] using! hPairAtRaw
-        have hRightInPair := FirstOrder.Derives.iff_elim_right hPairAt
-          (FirstOrder.Derives.disj_intro_right
-            (Metatheory.Derives.equality_refl
-              (T := T)
-              (Γ := (element ∈ₘ right.weakenFree SetSort.set) :: Θ)
-              (right.weakenFree SetSort.set)))
-        apply FirstOrder.Derives.exists_intro
-          (right.weakenFree SetSort.set)
-        simpa [union_witness_condition] using!
-          FirstOrder.Derives.conj_intro hRightInPair hElementInRight
-    exact FirstOrder.Derives.iff_elim_right hUnionAt' hExists
+    have hPairSpec : Θ ⊢ₘ[T] pair_spec (left.weakenFree SetSort.set)
+        (right.weakenFree SetSort.set) (pair.weakenFree SetSort.set) := by
+      have h := FirstOrder.Derives.context_weaken_cons (assumption := choice) hPairWeak
+      change Θ ⊢ₘ[T] (pair_spec left right pair).renameMapped
+        VariableRenaming.id (VariableRenaming.weaken SetSort.set) at h
+      rw [pair_spec_renameMapped] at h
+      exact h
+    have hLeftInPair := FirstOrder.Derives.iff_elim_right
+      (pair_spec_membership_iff _ _ _ (left.weakenFree SetSort.set) hPairSpec)
+      (FirstOrder.Derives.disj_intro_left (FirstOrder.Derives.eq_refl _))
+    have hRightInPair := FirstOrder.Derives.iff_elim_right
+      (pair_spec_membership_iff _ _ _ (right.weakenFree SetSort.set) hPairSpec)
+      (FirstOrder.Derives.disj_intro_right (FirstOrder.Derives.eq_refl _))
+    apply FirstOrder.Derives.iff_elim_right hUnionAt'
+    apply FirstOrder.Derives.disj_elim hChoice
+    · apply FirstOrder.Derives.exists_intro (left.weakenFree SetSort.set)
+      simpa [union_witness_condition] using! FirstOrder.Derives.conj_intro
+        (FirstOrder.Derives.context_weaken_cons hLeftInPair)
+        (FirstOrder.Derives.assumption List.mem_cons_self)
+    · apply FirstOrder.Derives.exists_intro (right.weakenFree SetSort.set)
+      simpa [union_witness_condition] using! FirstOrder.Derives.conj_intro
+        (FirstOrder.Derives.context_weaken_cons hRightInPair)
+        (FirstOrder.Derives.assumption List.mem_cons_self)
 
 /-- 二元并项满足成员析取规格。 -/
 theorem binary_union_term_spec_derives

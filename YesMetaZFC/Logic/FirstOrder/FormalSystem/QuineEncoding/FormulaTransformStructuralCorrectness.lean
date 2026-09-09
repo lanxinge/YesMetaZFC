@@ -49,41 +49,14 @@ theorem formula_transform_binary_shape
         (structural_node_code_term tag [sourceLeft, sourceRight])
         (structural_node_code_term tag [targetLeft, targetRight]) := by
     dsimp [binary_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceLeft
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro sourceRight
-    rw [Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetLeft
-    rw [Formula.substituteFree_existsFreeTop,
-      Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetRight
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [four_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetRight
-        (VariableSubstitution.cons targetLeft
-          (VariableSubstitution.cons sourceRight
-            (VariableSubstitution.cons sourceLeft
-              VariableSubstitution.empty)))
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_four_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      structural_node_code_term, structural_raw_node_code_term,
-      godel_pairing_term, term_weaken_free_four, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetRight (.cons targetLeft (.cons sourceRight (.cons sourceLeft .nil))))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, structural_node_code_term,
+      structural_raw_node_code_term, godel_pairing_term, term_weaken_free_four] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl
@@ -131,41 +104,15 @@ theorem formula_transform_predicate_shape
         (pred_codeₘ(arity, symbol, sourceArguments))
         (pred_codeₘ(arity, symbol, targetArguments)) := by
     dsimp [predicate_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro arity
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro symbol
-    rw [Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro sourceArguments
-    rw [Formula.substituteFree_existsFreeTop,
-      Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetArguments
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [four_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetArguments
-        (VariableSubstitution.cons sourceArguments
-          (VariableSubstitution.cons symbol
-            (VariableSubstitution.cons arity VariableSubstitution.empty)))
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_four_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      predicate_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_four, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetArguments (.cons sourceArguments (.cons symbol (.cons arity .nil))))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, predicate_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_four] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro hArity hSymbol)
         (FirstOrder.Derives.conj_intro
@@ -206,29 +153,15 @@ theorem formula_transform_negation_shape
         depth variableIndex replacement
         (neg_codeₘ(sourceBody)) (neg_codeₘ(targetBody)) := by
     dsimp [negation_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceBody
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetBody
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [two_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetBody
-        (VariableSubstitution.cons sourceBody VariableSubstitution.empty)
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_two_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      negation_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_two, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetBody (.cons sourceBody .nil))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, negation_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_two] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl
@@ -275,42 +208,15 @@ theorem formula_transform_implication_shape
         (imp_codeₘ(sourceLeft, sourceRight))
         (imp_codeₘ(targetLeft, targetRight)) := by
     dsimp [implication_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceLeft
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro sourceRight
-    rw [Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetLeft
-    rw [Formula.substituteFree_existsFreeTop,
-      Formula.substituteFree_existsFreeTop]
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetRight
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [four_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetRight
-        (VariableSubstitution.cons targetLeft
-          (VariableSubstitution.cons sourceRight
-            (VariableSubstitution.cons sourceLeft
-              VariableSubstitution.empty)))
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-              SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_four_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      implication_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_four, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetRight (.cons targetLeft (.cons sourceRight (.cons sourceLeft .nil))))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, implication_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_four] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl
@@ -385,29 +291,15 @@ theorem formula_transform_universal_preserve_shape
         depth variableIndex replacement
         (all_codeₘ(sourceBody)) (all_codeₘ(targetBody)) := by
     dsimp [universal_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceBody
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetBody
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [two_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetBody
-        (VariableSubstitution.cons sourceBody VariableSubstitution.empty)
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_two_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      universal_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_two, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetBody (.cons sourceBody .nil))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, universal_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_two] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl
@@ -457,29 +349,15 @@ theorem formula_transform_universal_weaken_shape
         depth variableIndex replacement
         (all_codeₘ(sourceBody)) (all_codeₘ(targetBody)) := by
     dsimp [universal_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceBody
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetBody
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [two_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetBody
-        (VariableSubstitution.cons sourceBody VariableSubstitution.empty)
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_two_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      universal_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_two, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetBody (.cons sourceBody .nil))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, universal_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_two] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl
@@ -529,29 +407,15 @@ theorem formula_transform_universal_swap_shape
         depth variableIndex replacement
         (all_codeₘ(sourceBody)) (all_codeₘ(targetBody)) := by
     dsimp [universal_formula_transform_condition]
-    apply FirstOrder.Derives.exists_intro sourceBody
-    rw [Formula.instantiateTop_abstractFreeTop,
-      Formula.instantiateFreeTop_existsFreeTop]
-    apply FirstOrder.Derives.exists_intro targetBody
-    rw [Formula.instantiateTop_abstractFreeTop]
-    rw [two_free_substitution_beta]
-    simp only [Formula.substituteFree]
-    let τ : VariableSubstitution signature
-        [SetSort.set, SetSort.set] [] [] :=
-      VariableSubstitution.cons targetBody
-        (VariableSubstitution.cons sourceBody VariableSubstitution.empty)
-    have hClosed : ∀ term : (SetOpenTerm []),
-        Term.substituteMapped VariableSubstitution.boundId τ
-            ((term.weakenFree SetSort.set).weakenFree SetSort.set) = term :=
-      gq_closed_two_weaken_substitute τ
-    simpa [Formula.substitute, Formula.substituteMapped,
-      Substitution.free_map, VariableSubstitution.cons,
-      VariableSubstitution.empty, VariableSubstitution.liftFree,
-      VariableSubstitution.boundId, Term.substituteMapped,
-      Arguments.substituteMapped, structural_list_code_term,
-      universal_formula_code_term, structural_node_code_term,
-      structural_raw_node_code_term, godel_pairing_term,
-      term_weaken_free_two, τ, hClosed] using
+    apply FirstOrder.Derives.existsFreePrefix_intro
+      (.cons targetBody (.cons sourceBody .nil))
+    simpa [Arguments.substitutionWith, VariableSubstitution.freeId,
+      Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
+      Formula.substituteFree, Formula.substitute, Formula.substituteMapped,
+      Substitution.free_map, VariableSubstitution.cons, Term.substituteMapped,
+      Arguments.substituteMapped, structural_list_code_term, universal_formula_code_term,
+      structural_node_code_term, structural_raw_node_code_term, godel_pairing_term,
+      term_weaken_free_two] using
       FirstOrder.Derives.conj_intro
         (FirstOrder.Derives.conj_intro
           (Metatheory.Derives.equality_refl

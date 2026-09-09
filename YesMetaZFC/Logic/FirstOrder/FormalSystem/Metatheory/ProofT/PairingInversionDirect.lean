@@ -54,17 +54,6 @@ private theorem pair_formula_rename_empty
     Formula.renameMapped, Term.renameMapped, Arguments.renameMapped,
     finite_numeral_term_renameMapped]
 
-private theorem numeral_equality_rename_empty
-    {free : SetContext} (left right : Nat) :
-    Formula.renameFree
-        (VariableRenaming.empty : VariableRenaming [] free)
-        ((numₘ(left) : SetTerm [] []) ≐ₘ
-          (numₘ(right) : SetTerm [] [])) =
-      ((numₘ(left) : SetTerm [] free) ≐ₘ
-        (numₘ(right) : SetTerm [] free)) := by
-  simp only [Formula.renameFree, Formula.rename, Renaming.free,
-    Formula.renameMapped, finite_numeral_term_renameMapped]
-
 private theorem neg_numeral_equality_rename_empty
     {free : SetContext} (left right : Nat) :
     Formula.renameFree

@@ -211,49 +211,8 @@ private theorem disj_conj_imp
       (left₂ ∧ₘ right₂) ⟶ₘ conclusion) :
     ([] : Context signature free) ⊢ₘ[T]
       ((left₁ ∨ₘ left₂) ∧ₘ (right₁ ∨ₘ right₂)) ⟶ₘ conclusion := by
-  let source : SetOpenFormula free :=
-    (left₁ ∨ₘ left₂) ∧ₘ (right₁ ∨ₘ right₂)
-  apply FirstOrder.Derives.imp_intro
-  let Γ : Context signature free := [source]
-  have hSource : Γ ⊢ₘ[T] source :=
-    FirstOrder.Derives.assumption List.mem_cons_self
-  have hLeft : Γ ⊢ₘ[T] left₁ ∨ₘ left₂ :=
-    FirstOrder.Derives.conj_elim_left hSource
-  have hRight : Γ ⊢ₘ[T] right₁ ∨ₘ right₂ :=
-    FirstOrder.Derives.conj_elim_right hSource
-  apply FirstOrder.Derives.disj_elim hLeft
-  · let ΓLeft : Context signature free := left₁ :: Γ
-    have hRightLeft : ΓLeft ⊢ₘ[T] right₁ ∨ₘ right₂ :=
-      hRight.context_weaken_cons
-    apply FirstOrder.Derives.disj_elim hRightLeft
-    · have hCase := h₁₁.context_weaken_prefix
-        (initial := [right₁, left₁, source])
-      exact FirstOrder.Derives.imp_elim hCase
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.assumption (by simp [ΓLeft]))
-          (FirstOrder.Derives.assumption List.mem_cons_self))
-    · have hCase := h₁₂.context_weaken_prefix
-        (initial := [right₂, left₁, source])
-      exact FirstOrder.Derives.imp_elim hCase
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.assumption (by simp [ΓLeft]))
-          (FirstOrder.Derives.assumption List.mem_cons_self))
-  · let ΓLeft : Context signature free := left₂ :: Γ
-    have hRightLeft : ΓLeft ⊢ₘ[T] right₁ ∨ₘ right₂ :=
-      hRight.context_weaken_cons
-    apply FirstOrder.Derives.disj_elim hRightLeft
-    · have hCase := h₂₁.context_weaken_prefix
-        (initial := [right₁, left₂, source])
-      exact FirstOrder.Derives.imp_elim hCase
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.assumption (by simp [ΓLeft]))
-          (FirstOrder.Derives.assumption List.mem_cons_self))
-    · have hCase := h₂₂.context_weaken_prefix
-        (initial := [right₂, left₂, source])
-      exact FirstOrder.Derives.imp_elim hCase
-        (FirstOrder.Derives.conj_intro
-          (FirstOrder.Derives.assumption (by simp [ΓLeft]))
-          (FirstOrder.Derives.assumption List.mem_cons_self))
+
+  derive_prop
 
 private theorem pair_condition_unique
     {T : SetTheory} (A : ArithmeticSupport T)

@@ -297,83 +297,52 @@ theorem nnfFreeClosed_sound {nnf : Nnf} (h : nnfFreeClosed nnf = true) : NnfSupp
       exact ⟨ihLeft hLeft, ihRight hRight⟩
   | forallE sort body ih
   | existsE sort body ih => exact ih h
+/-- 支持集拼接只保留成员关系；构造算法的去重顺序不进入上层证明。 -/
+theorem mem_merge_iff {parameter : DefinitionalCnf.FreeVarParam}
+    {left right : List DefinitionalCnf.FreeVarParam} :
+    parameter ∈ DefinitionalCnf.FreeVarParam.merge left right ↔
+      parameter ∈ left ∨ parameter ∈ right :=
+  ⟨mem_merge_cases, fun h => h.elim mem_merge_left mem_merge_right⟩
+
 mutual
-  theorem term_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ term, TermSupportedBy parameters term → ∀ parameter, parameter ∈ DefinitionalCnf.Term.freeVarParams term → parameter ∈ parameters := by
-    intro term hSupported parameter hParameter
-    cases term with
-    | bvar => simp [DefinitionalCnf.Term.freeVarParams] at hParameter
-    | fvar sort id =>
-        simp only [DefinitionalCnf.Term.freeVarParams, List.mem_singleton] at hParameter
-        subst parameter
-        exact hSupported
-    | app symbol args =>
-        exact termList_freeVarParams_mem parameters args hSupported
-          parameter hParameter
-    | apply fn arg =>
-        rcases mem_merge_cases hParameter with hFn | hArg
-        · exact term_freeVarParams_mem parameters fn hSupported.1 parameter hFn
-        · exact term_freeVarParams_mem parameters arg hSupported.2 parameter hArg
-    | bool => simp [DefinitionalCnf.Term.freeVarParams] at hParameter
-    | notE body => exact term_freeVarParams_mem parameters body hSupported parameter hParameter
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        rcases mem_merge_cases hParameter with hLeft | hRight
-        · exact term_freeVarParams_mem parameters left hSupported.1 parameter hLeft
-        · exact term_freeVarParams_mem parameters right hSupported.2 parameter hRight
-    | quote formula =>
-        exact formula_freeVarParams_mem parameters formula hSupported
-          parameter hParameter
-    | lam domain codomain body => exact term_freeVarParams_mem parameters body hSupported parameter hParameter
-    | ite sort condition thenTerm elseTerm =>
-        rcases mem_merge_cases hParameter with hCondition | hBranches
-        · exact formula_freeVarParams_mem parameters condition hSupported.1
-            parameter hCondition
-        · rcases mem_merge_cases hBranches with hThen | hElse
-          · exact term_freeVarParams_mem parameters thenTerm hSupported.2.1
-              parameter hThen
-          · exact term_freeVarParams_mem parameters elseTerm hSupported.2.2
-              parameter hElse
-  theorem formula_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ formula, FormulaSupportedBy parameters formula → ∀ parameter, parameter ∈ DefinitionalCnf.Formula.freeVarParams formula → parameter ∈ parameters := by
-    intro formula hSupported parameter hParameter
-    cases formula with
-    | trueE
-    | falseE => simp [DefinitionalCnf.Formula.freeVarParams] at hParameter
-    | atom predicate args =>
-        exact termList_freeVarParams_mem parameters args hSupported
-          parameter hParameter
-    | equal sort left right =>
-        rcases mem_merge_cases hParameter with hLeft | hRight
-        · exact term_freeVarParams_mem parameters left hSupported.1 parameter hLeft
-        · exact term_freeVarParams_mem parameters right hSupported.2 parameter hRight
-    | boolTerm term => exact term_freeVarParams_mem parameters term hSupported parameter hParameter
-    | neg body =>
-        exact formula_freeVarParams_mem parameters body hSupported
-          parameter hParameter
-    | imp left right
-    | conj left right
-    | disj left right
-    | iffE left right =>
-        rcases mem_merge_cases hParameter with hLeft | hRight
-        · exact formula_freeVarParams_mem parameters left hSupported.1
-            parameter hLeft
-        · exact formula_freeVarParams_mem parameters right hSupported.2
-            parameter hRight
-    | forallE sort body
-    | existsE sort body =>
-        exact formula_freeVarParams_mem parameters body hSupported
-          parameter hParameter
-  theorem termList_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ terms, TermListSupportedBy parameters terms → ∀ parameter, parameter ∈ DefinitionalCnf.Term.freeVarParamsList terms → parameter ∈ parameters := by
-    intro terms hSupported parameter hParameter
-    cases terms with
-    | nil => simp [DefinitionalCnf.Term.freeVarParamsList] at hParameter
-    | cons term terms =>
-        rcases mem_merge_cases hParameter with hTerm | hTerms
-        · exact term_freeVarParams_mem parameters term hSupported.1 parameter hTerm
-        · exact termList_freeVarParams_mem parameters terms hSupported.2
-            parameter hTerms
+  /-- 结构支持与实际收集的自由参数精确对应。 -/
+  theorem termSupportedBy_iff (parameters : List DefinitionalCnf.FreeVarParam) (term : Term) :
+      TermSupportedBy parameters term ↔
+        ∀ parameter ∈ DefinitionalCnf.Term.freeVarParams term, parameter ∈ parameters := by
+    cases term <;> simp only [TermSupportedBy, DefinitionalCnf.Term.freeVarParams,
+      termSupportedBy_iff, formulaSupportedBy_iff, termListSupportedBy_iff,
+      mem_merge_iff, or_imp, forall_and, List.mem_singleton, List.not_mem_nil,
+      implies_true, false_implies, forall_eq]
+  theorem formulaSupportedBy_iff (parameters : List DefinitionalCnf.FreeVarParam) (formula : Formula) :
+      FormulaSupportedBy parameters formula ↔
+        ∀ parameter ∈ DefinitionalCnf.Formula.freeVarParams formula, parameter ∈ parameters := by
+    cases formula <;> simp only [FormulaSupportedBy, DefinitionalCnf.Formula.freeVarParams,
+      termSupportedBy_iff, formulaSupportedBy_iff, termListSupportedBy_iff,
+      mem_merge_iff, or_imp, forall_and, List.not_mem_nil, implies_true, false_implies]
+  theorem termListSupportedBy_iff (parameters : List DefinitionalCnf.FreeVarParam) (terms : List Term) :
+      TermListSupportedBy parameters terms ↔
+        ∀ parameter ∈ DefinitionalCnf.Term.freeVarParamsList terms, parameter ∈ parameters := by
+    cases terms <;> simp only [TermListSupportedBy, DefinitionalCnf.Term.freeVarParamsList,
+      termSupportedBy_iff, termListSupportedBy_iff, mem_merge_iff, or_imp, forall_and,
+      List.not_mem_nil, implies_true, false_implies]
 end
+
+theorem term_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ term, TermSupportedBy parameters
+    term → ∀ parameter, parameter ∈ DefinitionalCnf.Term.freeVarParams term → parameter ∈ parameters := by
+  intro syntaxValue hSupported
+  exact (termSupportedBy_iff parameters syntaxValue).mp hSupported
+
+theorem formula_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ formula, FormulaSupportedBy
+    parameters formula → ∀ parameter, parameter ∈ DefinitionalCnf.Formula.freeVarParams formula → parameter ∈ parameters
+    := by
+  intro syntaxValue hSupported
+  exact (formulaSupportedBy_iff parameters syntaxValue).mp hSupported
+
+theorem termList_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) : ∀ terms, TermListSupportedBy
+    parameters terms → ∀ parameter, parameter ∈ DefinitionalCnf.Term.freeVarParamsList terms → parameter ∈ parameters :=
+    by
+  intro syntaxValue hSupported
+  exact (termListSupportedBy_iff parameters syntaxValue).mp hSupported
 theorem atom_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) (atom : Atom) (hSupported : AtomSupportedBy parameters atom) (parameter : DefinitionalCnf.FreeVarParam) (hParameter : parameter ∈ DefinitionalCnf.atomFreeVarParams atom) : parameter ∈ parameters := by
   cases atom with
   | predicate predicate args =>
@@ -399,50 +368,25 @@ theorem nnf_freeVarParams_mem (parameters : List DefinitionalCnf.FreeVarParam) :
       · exact ihRight hSupported.2 hRight
   | forallE sort body ih
   | existsE sort body ih => exact ih hSupported hParameter
-mutual
-  theorem termSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈ smaller → parameter ∈ larger) : ∀ term, TermSupportedBy smaller term → TermSupportedBy larger term := by
-    intro term hSupported
-    cases term with
-    | bvar => trivial
-    | fvar sort id => exact hSubset _ hSupported
-    | app symbol args => exact termListSupportedBy_mono hSubset args hSupported
-    | apply fn arg =>
-        exact ⟨termSupportedBy_mono hSubset fn hSupported.1, termSupportedBy_mono hSubset arg hSupported.2⟩
-    | bool => trivial
-    | notE body => exact termSupportedBy_mono hSubset body hSupported
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        exact ⟨termSupportedBy_mono hSubset left hSupported.1, termSupportedBy_mono hSubset right hSupported.2⟩
-    | quote formula => exact formulaSupportedBy_mono hSubset formula hSupported
-    | lam domain codomain body => exact termSupportedBy_mono hSubset body hSupported
-    | ite sort condition thenTerm elseTerm =>
-        exact ⟨formulaSupportedBy_mono hSubset condition hSupported.1, termSupportedBy_mono hSubset thenTerm hSupported.2.1, termSupportedBy_mono hSubset elseTerm hSupported.2.2⟩
-  theorem formulaSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈ smaller → parameter ∈ larger) : ∀ formula, FormulaSupportedBy smaller formula → FormulaSupportedBy larger formula := by
-    intro formula hSupported
-    cases formula with
-    | trueE
-    | falseE => trivial
-    | atom predicate args => exact termListSupportedBy_mono hSubset args hSupported
-    | equal sort left right =>
-        exact ⟨termSupportedBy_mono hSubset left hSupported.1, termSupportedBy_mono hSubset right hSupported.2⟩
-    | boolTerm term => exact termSupportedBy_mono hSubset term hSupported
-    | neg body => exact formulaSupportedBy_mono hSubset body hSupported
-    | imp left right
-    | conj left right
-    | disj left right
-    | iffE left right =>
-        exact ⟨formulaSupportedBy_mono hSubset left hSupported.1, formulaSupportedBy_mono hSubset right hSupported.2⟩
-    | forallE sort body
-    | existsE sort body => exact formulaSupportedBy_mono hSubset body hSupported
-  theorem termListSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈ smaller → parameter ∈ larger) : ∀ terms, TermListSupportedBy smaller terms → TermListSupportedBy larger terms := by
-    intro terms hSupported
-    cases terms with
-    | nil => trivial
-    | cons term terms =>
-        exact ⟨termSupportedBy_mono hSubset term hSupported.1, termListSupportedBy_mono hSubset terms hSupported.2⟩
-end
+theorem termSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈
+    smaller → parameter ∈ larger) : ∀ term, TermSupportedBy smaller term → TermSupportedBy larger term := by
+  intro syntaxValue hSupported
+  exact (termSupportedBy_iff larger syntaxValue).mpr (fun parameter hParameter =>
+    hSubset parameter ((termSupportedBy_iff smaller syntaxValue).mp hSupported parameter hParameter))
+
+theorem formulaSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈
+    smaller → parameter ∈ larger) : ∀ formula, FormulaSupportedBy smaller formula → FormulaSupportedBy larger formula :=
+    by
+  intro syntaxValue hSupported
+  exact (formulaSupportedBy_iff larger syntaxValue).mpr (fun parameter hParameter =>
+    hSubset parameter ((formulaSupportedBy_iff smaller syntaxValue).mp hSupported parameter hParameter))
+
+theorem termListSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter
+    ∈ smaller → parameter ∈ larger) : ∀ terms, TermListSupportedBy smaller terms → TermListSupportedBy larger terms :=
+    by
+  intro syntaxValue hSupported
+  exact (termListSupportedBy_iff larger syntaxValue).mpr (fun parameter hParameter =>
+    hSubset parameter ((termListSupportedBy_iff smaller syntaxValue).mp hSupported parameter hParameter))
 theorem atomSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam} (hSubset : ∀ parameter, parameter ∈ smaller → parameter ∈ larger) (atom : Atom) (hSupported : AtomSupportedBy smaller atom) : AtomSupportedBy larger atom := by
   cases atom with
   | predicate predicate args => exact termListSupportedBy_mono hSubset args hSupported
@@ -461,138 +405,48 @@ theorem nnfSupportedBy_mono {smaller larger : List DefinitionalCnf.FreeVarParam}
   | existsE sort body ih => exact ih hSupported
 mutual
   theorem termSupportedBy_shiftAbove (parameters : List DefinitionalCnf.FreeVarParam) (amount : Nat) : ∀ term cutoff, TermSupportedBy parameters term → TermSupportedBy parameters (Term.shiftAbove amount cutoff term) := by
+
     intro term cutoff hSupported
-    cases term with
-    | bvar sort index =>
-        simp only [Term.shiftAbove]
-        split <;> trivial
-    | fvar sort id => exact hSupported
-    | app symbol args => exact termListSupportedBy_shiftAbove parameters amount args cutoff hSupported
-    | apply fn arg =>
-        exact ⟨termSupportedBy_shiftAbove parameters amount fn cutoff hSupported.1, termSupportedBy_shiftAbove parameters amount arg cutoff hSupported.2⟩
-    | bool => trivial
-    | notE body => exact termSupportedBy_shiftAbove parameters amount body cutoff hSupported
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        exact ⟨termSupportedBy_shiftAbove parameters amount left cutoff hSupported.1, termSupportedBy_shiftAbove parameters amount right cutoff hSupported.2⟩
-    | quote formula =>
-        exact formulaSupportedBy_shiftAbove
-          parameters amount formula cutoff hSupported
-    | lam domain codomain body =>
-        exact termSupportedBy_shiftAbove
-          parameters amount body (cutoff + 1) hSupported
-    | ite sort condition thenTerm elseTerm =>
-        exact ⟨formulaSupportedBy_shiftAbove parameters amount condition cutoff hSupported.1, termSupportedBy_shiftAbove parameters amount thenTerm cutoff hSupported.2.1,
-          termSupportedBy_shiftAbove
-            parameters amount elseTerm cutoff hSupported.2.2⟩
+    cases term <;> simp_all only [Term.shiftAbove, TermSupportedBy,
+      termSupportedBy_shiftAbove,
+      formulaSupportedBy_shiftAbove, termListSupportedBy_shiftAbove, true_and]
+    all_goals split <;> trivial
+
   theorem formulaSupportedBy_shiftAbove (parameters : List DefinitionalCnf.FreeVarParam) (amount : Nat) : ∀ formula cutoff, FormulaSupportedBy parameters formula → FormulaSupportedBy parameters (Formula.shiftAbove amount cutoff formula) := by
+
     intro formula cutoff hSupported
-    cases formula with
-    | trueE
-    | falseE => trivial
-    | atom predicate args =>
-        exact termListSupportedBy_shiftAbove
-          parameters amount args cutoff hSupported
-    | equal sort left right =>
-        exact ⟨termSupportedBy_shiftAbove parameters amount left cutoff hSupported.1, termSupportedBy_shiftAbove parameters amount right cutoff hSupported.2⟩
-    | boolTerm term =>
-        exact termSupportedBy_shiftAbove
-          parameters amount term cutoff hSupported
-    | neg body =>
-        exact formulaSupportedBy_shiftAbove
-          parameters amount body cutoff hSupported
-    | imp left right
-    | conj left right
-    | disj left right
-    | iffE left right =>
-        exact ⟨formulaSupportedBy_shiftAbove parameters amount left cutoff hSupported.1, formulaSupportedBy_shiftAbove parameters amount right cutoff hSupported.2⟩
-    | forallE sort body
-    | existsE sort body =>
-        exact formulaSupportedBy_shiftAbove
-          parameters amount body (cutoff + 1) hSupported
+    cases formula <;> simp_all only [Formula.shiftAbove, FormulaSupportedBy, termSupportedBy_shiftAbove,
+      formulaSupportedBy_shiftAbove, termListSupportedBy_shiftAbove, true_and]
+
   theorem termListSupportedBy_shiftAbove (parameters : List DefinitionalCnf.FreeVarParam) (amount : Nat) : ∀ terms cutoff, TermListSupportedBy parameters terms → TermListSupportedBy parameters (Term.shiftListAbove amount cutoff terms) := by
+
     intro terms cutoff hSupported
-    cases terms with
-    | nil => trivial
-    | cons term terms =>
-        exact ⟨termSupportedBy_shiftAbove parameters amount term cutoff hSupported.1, termListSupportedBy_shiftAbove parameters amount terms cutoff hSupported.2⟩
+    cases terms <;> simp_all only [Term.shiftListAbove, TermListSupportedBy, termSupportedBy_shiftAbove,
+      termListSupportedBy_shiftAbove, true_and]
+
 end
 mutual
   theorem termSupportedBy_instantiateAt (parameters : List DefinitionalCnf.FreeVarParam) (replacement : Term) (hReplacement : TermSupportedBy parameters replacement) : ∀ term depth, TermSupportedBy parameters term → TermSupportedBy parameters (Term.instantiateAt depth replacement term) := by
+
     intro term depth hSupported
-    cases term with
-    | bvar sort index =>
-        simp only [Term.instantiateAt]
-        split
-        · trivial
-        · split
-          · exact termSupportedBy_shiftAbove
-              parameters depth replacement 0 hReplacement
-          · trivial
-    | fvar sort id => exact hSupported
-    | app symbol args =>
-        exact termListSupportedBy_instantiateAt
-          parameters replacement hReplacement args depth hSupported
-    | apply fn arg =>
-        exact ⟨termSupportedBy_instantiateAt parameters replacement hReplacement fn depth hSupported.1, termSupportedBy_instantiateAt
-            parameters replacement hReplacement arg depth hSupported.2⟩
-    | bool => trivial
-    | notE body =>
-        exact termSupportedBy_instantiateAt
-          parameters replacement hReplacement body depth hSupported
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        exact ⟨termSupportedBy_instantiateAt parameters replacement hReplacement left depth hSupported.1, termSupportedBy_instantiateAt
-            parameters replacement hReplacement right depth hSupported.2⟩
-    | quote formula =>
-        exact formulaSupportedBy_instantiateAt
-          parameters replacement hReplacement formula depth hSupported
-    | lam domain codomain body =>
-        exact termSupportedBy_instantiateAt
-          parameters replacement hReplacement body (depth + 1) hSupported
-    | ite sort condition thenTerm elseTerm =>
-        exact ⟨formulaSupportedBy_instantiateAt parameters replacement hReplacement condition depth hSupported.1, termSupportedBy_instantiateAt
-            parameters replacement hReplacement thenTerm depth hSupported.2.1,
-          termSupportedBy_instantiateAt
-            parameters replacement hReplacement elseTerm depth hSupported.2.2⟩
+    cases term <;> simp_all only [Term.instantiateAt, TermSupportedBy,
+      termSupportedBy_instantiateAt,
+      formulaSupportedBy_instantiateAt, termListSupportedBy_instantiateAt, true_and]
+    all_goals split <;> first | trivial | skip
+    all_goals split <;> first | trivial | exact termSupportedBy_shiftAbove parameters depth replacement 0 hReplacement
+
   theorem formulaSupportedBy_instantiateAt (parameters : List DefinitionalCnf.FreeVarParam) (replacement : Term) (hReplacement : TermSupportedBy parameters replacement) : ∀ formula depth, FormulaSupportedBy parameters formula → FormulaSupportedBy parameters (Formula.instantiateAt depth replacement formula) := by
+
     intro formula depth hSupported
-    cases formula with
-    | trueE
-    | falseE => trivial
-    | atom predicate args =>
-        exact termListSupportedBy_instantiateAt
-          parameters replacement hReplacement args depth hSupported
-    | equal sort left right =>
-        exact ⟨termSupportedBy_instantiateAt parameters replacement hReplacement left depth hSupported.1, termSupportedBy_instantiateAt
-            parameters replacement hReplacement right depth hSupported.2⟩
-    | boolTerm term =>
-        exact termSupportedBy_instantiateAt
-          parameters replacement hReplacement term depth hSupported
-    | neg body =>
-        exact formulaSupportedBy_instantiateAt
-          parameters replacement hReplacement body depth hSupported
-    | imp left right
-    | conj left right
-    | disj left right
-    | iffE left right =>
-        exact ⟨formulaSupportedBy_instantiateAt parameters replacement hReplacement left depth hSupported.1, formulaSupportedBy_instantiateAt
-            parameters replacement hReplacement right depth hSupported.2⟩
-    | forallE sort body
-    | existsE sort body =>
-        exact formulaSupportedBy_instantiateAt
-          parameters replacement hReplacement body (depth + 1) hSupported
+    cases formula <;> simp_all only [Formula.instantiateAt, FormulaSupportedBy, termSupportedBy_instantiateAt,
+      formulaSupportedBy_instantiateAt, termListSupportedBy_instantiateAt, true_and]
+
   theorem termListSupportedBy_instantiateAt (parameters : List DefinitionalCnf.FreeVarParam) (replacement : Term) (hReplacement : TermSupportedBy parameters replacement) : ∀ terms depth, TermListSupportedBy parameters terms → TermListSupportedBy parameters (Term.instantiateListAt depth replacement terms) := by
+
     intro terms depth hSupported
-    cases terms with
-    | nil => trivial
-    | cons term terms =>
-        exact ⟨termSupportedBy_instantiateAt parameters replacement hReplacement term depth hSupported.1, termListSupportedBy_instantiateAt
-            parameters replacement hReplacement terms depth hSupported.2⟩
+    cases terms <;> simp_all only [Term.instantiateListAt, TermListSupportedBy, termSupportedBy_instantiateAt,
+      termListSupportedBy_instantiateAt, true_and]
+
 end
 theorem atomSupportedBy_instantiateAt (parameters : List DefinitionalCnf.FreeVarParam) (replacement : Term) (hReplacement : TermSupportedBy parameters replacement) (atom : Atom) (depth : Nat) (hSupported : AtomSupportedBy parameters atom) : AtomSupportedBy parameters (LocalSkolem.instantiateAtomAt depth replacement atom) := by
   cases atom with
@@ -620,135 +474,51 @@ theorem nnfSupportedBy_instantiateAt (parameters : List DefinitionalCnf.FreeVarP
 theorem nnfSupportedBy_instantiate (parameters : List DefinitionalCnf.FreeVarParam) (replacement : Term) (hReplacement : TermSupportedBy parameters replacement) (body : Nnf) (hBody : NnfSupportedBy parameters body) : NnfSupportedBy parameters (LocalSkolem.instantiateNnf replacement body) :=
   nnfSupportedBy_instantiateAt parameters replacement hReplacement body 0 hBody
 end FreeSupport
+theorem Env.FreeAgreement.merge_iff {M : Model}
+    (first second : List DefinitionalCnf.FreeVarParam) (left right : Env M) :
+    Env.FreeAgreement (DefinitionalCnf.FreeVarParam.merge first second) left right ↔
+      Env.FreeAgreement first left right ∧ Env.FreeAgreement second left right := by
+  simp only [Env.FreeAgreement, FreeSupport.mem_merge_iff, or_imp, forall_and]
+
+theorem Env.FreeAgreement.push_iff {M : Model}
+    (parameters : List DefinitionalCnf.FreeVarParam) (left right : Env M) (value : M.Carrier) :
+    Env.FreeAgreement parameters (left.push value) (right.push value) ↔
+      Env.FreeAgreement parameters left right := Iff.rfl
+
 mutual
   theorem Term.eval_eq_of_freeAgreement {M : Model} (left right : Env M) (hBound : ∀ index, left.boundVal index = right.boundVal index) (term : Term) (hAgreement : Env.FreeAgreement (DefinitionalCnf.Term.freeVarParams term) left right) : Term.eval left term = Term.eval right term := by
-    cases term with
-    | bvar sort index =>
-        simp only [Term.eval]
-        exact hBound index
-    | fvar sort id =>
-        simp only [Term.eval]
-        apply hAgreement ({ sort := sort, varId := id })
-        change ({ sort := sort, varId := id } : DefinitionalCnf.FreeVarParam) ∈
-            [{ sort := sort, varId := id }]
-        exact List.mem_singleton_self _
-    | app symbol args =>
-        simp only [Term.eval]
-        congr 1
-        exact Term.evalList_eq_of_freeAgreement left right hBound args hAgreement
-    | apply fn arg =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_freeAgreement left right hBound fn (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter),
-          Term.eval_eq_of_freeAgreement left right hBound arg (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter)]
-    | bool value => simp [Term.eval]
-    | notE body =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_freeAgreement left right hBound body hAgreement]
-    | andE leftTerm rightTerm
-    | orE leftTerm rightTerm
-    | impE leftTerm rightTerm
-    | iffE leftTerm rightTerm =>
-        simp only [Term.eval]
-        rw [Term.eval_eq_of_freeAgreement left right hBound leftTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter),
-          Term.eval_eq_of_freeAgreement left right hBound rightTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter)]
-    | quote formula =>
-        simp only [Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_iff_of_freeAgreement
-          left right hBound formula hAgreement
-    | lam domain codomain body =>
-        simp only [Term.eval]
-        congr 1
-        funext value
-        apply Term.eval_eq_of_freeAgreement (left.push value) (right.push value)
-        · intro index
-          cases index <;> simp
-          exact hBound _
-        · exact hAgreement.push value
-    | ite sort condition thenTerm elseTerm =>
-        simp only [Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_iff_of_freeAgreement
-            left right hBound condition (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter)
-        · exact Term.eval_eq_of_freeAgreement
-            left right hBound thenTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right (FreeSupport.mem_merge_left hParameter))
-        · exact Term.eval_eq_of_freeAgreement
-            left right hBound elseTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right (FreeSupport.mem_merge_right hParameter))
+    have hPush (value : M.Carrier) (index : Nat) :
+        (left.push value).boundVal index = (right.push value).boundVal index := by
+      cases index <;> simp [Env.push, hBound]
+    cases term <;>
+      simp only [DefinitionalCnf.Term.freeVarParams, Env.FreeAgreement.merge_iff] at hAgreement
+    case fvar sort id =>
+      simpa only [Term.eval] using hAgreement ⟨sort, id⟩ (List.mem_singleton_self _)
+    all_goals simp only [Term.eval]
+    all_goals simp_all only [← Formula.Satisfies.eq_def, Env.FreeAgreement.push_iff,
+        Term.eval_eq_of_freeAgreement left right hBound,
+        Formula.satisfies_iff_of_freeAgreement left right hBound,
+        Term.evalList_eq_of_freeAgreement left right hBound,
+        Term.eval_eq_of_freeAgreement (left.push _) (right.push _) (hPush _)]
   theorem Formula.satisfies_iff_of_freeAgreement {M : Model} (left right : Env M) (hBound : ∀ index, left.boundVal index = right.boundVal index) (formula : Formula) (hAgreement : Env.FreeAgreement (DefinitionalCnf.Formula.freeVarParams formula) left right) : Formula.Satisfies left formula ↔ Formula.Satisfies right formula := by
-    cases formula with
-    | trueE
-    | falseE => simp [Formula.Satisfies, Formula.eval]
-    | atom predicate args =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_eq_of_freeAgreement left right hBound args hAgreement]
-    | equal sort leftTerm rightTerm =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_eq_of_freeAgreement left right hBound leftTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter),
-          Term.eval_eq_of_freeAgreement left right hBound rightTerm (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter)]
-    | boolTerm term =>
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_eq_of_freeAgreement left right hBound term hAgreement]
-    | neg body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        exact not_congr (Formula.satisfies_iff_of_freeAgreement left right hBound body hAgreement)
-    | imp leftFormula rightFormula
-    | conj leftFormula rightFormula
-    | disj leftFormula rightFormula
-    | iffE leftFormula rightFormula =>
-        simp only [Formula.Satisfies, Formula.eval]
-        first
-        | exact imp_congr
-            (Formula.satisfies_iff_of_freeAgreement left right hBound leftFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter))
-            (Formula.satisfies_iff_of_freeAgreement left right hBound rightFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter))
-        | exact and_congr
-            (Formula.satisfies_iff_of_freeAgreement left right hBound leftFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter))
-            (Formula.satisfies_iff_of_freeAgreement left right hBound rightFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter))
-        | exact or_congr
-            (Formula.satisfies_iff_of_freeAgreement left right hBound leftFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter))
-            (Formula.satisfies_iff_of_freeAgreement left right hBound rightFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter))
-        | exact iff_congr
-            (Formula.satisfies_iff_of_freeAgreement left right hBound leftFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter))
-            (Formula.satisfies_iff_of_freeAgreement left right hBound rightFormula (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter))
-    | forallE sort body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor <;> intro h value hSort
-        · exact (Formula.satisfies_iff_of_freeAgreement (left.push value) (right.push value) (by
-                intro index
-                cases index <;> simp
-                exact hBound _)
-              body (hAgreement.push value)).mp (h value hSort)
-        · exact (Formula.satisfies_iff_of_freeAgreement (left.push value) (right.push value) (by
-                intro index
-                cases index <;> simp
-                exact hBound _)
-              body (hAgreement.push value)).mpr (h value hSort)
-    | existsE sort body =>
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨value, hSort, hBody⟩
-          exact ⟨value, hSort, (Formula.satisfies_iff_of_freeAgreement (left.push value) (right.push value) (by
-                intro index
-                cases index <;> simp
-                exact hBound _)
-              body (hAgreement.push value)).mp hBody⟩
-        · rintro ⟨value, hSort, hBody⟩
-          exact ⟨value, hSort, (Formula.satisfies_iff_of_freeAgreement (left.push value) (right.push value) (by
-                intro index
-                cases index <;> simp
-                exact hBound _)
-              body (hAgreement.push value)).mpr hBody⟩
+    have hPush (value : M.Carrier) (index : Nat) :
+        (left.push value).boundVal index = (right.push value).boundVal index := by
+      cases index <;> simp [Env.push, hBound]
+    cases formula <;>
+      simp only [DefinitionalCnf.Formula.freeVarParams, Env.FreeAgreement.merge_iff] at hAgreement
+    all_goals simp only [Formula.Satisfies, Formula.eval]
+    all_goals simp_all only [← Formula.Satisfies.eq_def, Env.FreeAgreement.push_iff,
+        Term.eval_eq_of_freeAgreement left right hBound,
+        Formula.satisfies_iff_of_freeAgreement left right hBound,
+        Term.evalList_eq_of_freeAgreement left right hBound,
+        Formula.satisfies_iff_of_freeAgreement (left.push _) (right.push _) (hPush _)]
   theorem Term.evalList_eq_of_freeAgreement {M : Model} (left right : Env M) (hBound : ∀ index, left.boundVal index = right.boundVal index) (terms : List Term) (hAgreement : Env.FreeAgreement (DefinitionalCnf.Term.freeVarParamsList terms) left right) : terms.map (Term.eval left) = terms.map (Term.eval right) := by
-    cases terms with
-    | nil => rfl
-    | cons head tail =>
-        simp only [List.map_cons]
-        congr 1
-        · exact Term.eval_eq_of_freeAgreement
-            left right hBound head (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_left hParameter)
-        · exact Term.evalList_eq_of_freeAgreement
-            left right hBound tail (hAgreement.mono fun parameter hParameter => FreeSupport.mem_merge_right hParameter)
+    cases terms <;>
+      simp only [DefinitionalCnf.Term.freeVarParamsList, Env.FreeAgreement.merge_iff] at hAgreement
+    all_goals simp_all only [List.map_nil, List.map_cons,
+        Term.eval_eq_of_freeAgreement left right hBound,
+        Term.evalList_eq_of_freeAgreement left right hBound]
+
 end
 namespace FreeSupport
 theorem Atom.freeVarParams_toFormula (atom : Atom) : DefinitionalCnf.Formula.freeVarParams atom.toFormula = DefinitionalCnf.atomFreeVarParams atom := by
@@ -888,161 +658,38 @@ theorem Nnf.maxFunctionIdSucc_toFormula (nnf : Nnf) : LocalSkolem.formulaMaxFunc
       rw [ihLeft, ihRight]
   | forallE sort body ih
   | existsE sort body ih => exact ih
+theorem Env.rebaseOverrideFunction_push {M : Model} (env : Env M)
+    (symbol : FunctionSymbol) (interpretation : List M.Carrier → M.Carrier)
+    (value : M.Carrier) :
+    (Env.rebaseOverrideFunction env symbol interpretation).push value =
+      Env.rebaseOverrideFunction (env.push value) symbol interpretation := rfl
+
 mutual
   theorem Term.eval_overrideFunctionWith_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (interpretation : List M.Carrier → M.Carrier) (term : Term) (hMax : LocalSkolem.termMaxFunctionIdSucc term ≤ symbol.id) : Term.eval (Env.rebaseOverrideFunction env symbol interpretation) term = Term.eval env term := by
-    cases term with
-    | bvar => simp [Term.eval, Env.rebaseOverrideFunction, Model.overrideFunction]
-    | fvar => simp [Term.eval, Env.rebaseOverrideFunction, Model.overrideFunction]
-    | app target args =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Term.eval, Model.overrideFunction, Env.rebaseOverrideFunction]
-        have hNe : target ≠ symbol := by
-          intro hEq
-          subst hEq
-          omega
-        simp [hNe]
-        congr 1
-        exact Term.evalList_overrideFunctionWith_of_max_le
-          env symbol interpretation args hMax.2
-    | apply fn arg =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation fn hMax.1
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation arg hMax.2
-    | bool => simp [Term.eval, Model.overrideFunction]
-    | notE body =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc] at hMax
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        exact Term.eval_overrideFunctionWith_of_max_le
-          env symbol interpretation body hMax
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation left hMax.1
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation right hMax.2
-    | quote formula =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc] at hMax
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        apply propext
-        exact Formula.satisfies_overrideFunctionWith_of_max_le
-          env symbol interpretation formula hMax
-    | lam domain codomain body =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc] at hMax
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        funext argument
-        exact Term.eval_overrideFunctionWith_of_max_le (env.push argument) symbol interpretation body hMax
-    | ite sort condition thenTerm elseTerm =>
-        simp only [LocalSkolem.termMaxFunctionIdSucc, Nat.max_le] at hMax
-        rcases hMax with ⟨hCondition, hThen, hElse⟩
-        simp only [Term.eval, Model.overrideFunction]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_overrideFunctionWith_of_max_le
-            env symbol interpretation condition hCondition
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation thenTerm hThen
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation elseTerm hElse
+    cases term <;> simp only [LocalSkolem.termMaxFunctionIdSucc, Nat.max_le] at hMax
+    case app target args =>
+      have hNe : target ≠ symbol := by intro hEq; subst hEq; omega
+      simp only [Term.eval, Model.overrideFunction, if_neg hNe]
+      rw [Term.evalList_overrideFunctionWith_of_max_le env symbol interpretation args hMax.2]
+    all_goals simp only [Term.eval, Model.overrideFunction]
+    all_goals first | rfl | simp_all only [← Formula.Satisfies.eq_def, Env.rebaseOverrideFunction_push,
+        Term.eval_overrideFunctionWith_of_max_le env symbol interpretation,
+        Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation,
+        Term.eval_overrideFunctionWith_of_max_le (env.push _) symbol interpretation]
   theorem Formula.satisfies_overrideFunctionWith_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (interpretation : List M.Carrier → M.Carrier) (formula : Formula) (hMax : LocalSkolem.formulaMaxFunctionIdSucc formula ≤ symbol.id) : Formula.Satisfies (Env.rebaseOverrideFunction env symbol interpretation) formula ↔ Formula.Satisfies env formula := by
-    cases formula with
-    | trueE | falseE => simp [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-    | atom predicate args =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        have hArgs :=
-          Term.evalList_overrideFunctionWith_of_max_le
-            env symbol interpretation args hMax
-        have hProp :=
-          congrArg (fun values : List M.Carrier => M.predicateInterp predicate values)
-            hArgs
-        exact ⟨Eq.mp hProp, Eq.mpr hProp⟩
-    | equal sort left right =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        have hLeft :=
-          Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation left hMax.1
-        have hRight :=
-          Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation right hMax.2
-        have hPair :
-            (Term.eval (Env.rebaseOverrideFunction env symbol interpretation) left, Term.eval (Env.rebaseOverrideFunction env symbol interpretation) right) =
-              (Term.eval env left, Term.eval env right) := by
-          apply Prod.ext
-          · exact hLeft
-          · exact hRight
-        have hProp :=
-          congrArg (fun pair : M.Carrier × M.Carrier => pair.1 = pair.2) hPair
-        exact ⟨Eq.mp hProp, Eq.mpr hProp⟩
-    | boolTerm term =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        have hTerm :=
-          Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation term hMax
-        have hProp := congrArg (fun result : M.Carrier => M.boolHolds result) hTerm
-        exact ⟨Eq.mp hProp, Eq.mpr hProp⟩
-    | neg body =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        exact not_congr (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation body hMax)
-    | imp left right =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        exact imp_congr (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation left hMax.1)
-          (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation right hMax.2)
-    | conj left right =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        exact and_congr (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation left hMax.1)
-          (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation right hMax.2)
-    | disj left right =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        exact or_congr (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation left hMax.1)
-          (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation right hMax.2)
-    | iffE left right =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        exact iff_congr (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation left hMax.1)
-          (Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation right hMax.2)
-    | forallE sort body =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        constructor <;> intro h argument hSort
-        · exact (Formula.satisfies_overrideFunctionWith_of_max_le (env.push argument) symbol interpretation body hMax).mp (h argument hSort)
-        · exact (Formula.satisfies_overrideFunctionWith_of_max_le (env.push argument) symbol interpretation body hMax).mpr (h argument hSort)
-    | existsE sort body =>
-        simp only [LocalSkolem.formulaMaxFunctionIdSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
-        constructor
-        · rintro ⟨argument, hSort, hBody⟩
-          exact ⟨argument, hSort, (Formula.satisfies_overrideFunctionWith_of_max_le (env.push argument) symbol interpretation body hMax).mp hBody⟩
-        · rintro ⟨argument, hSort, hBody⟩
-          exact ⟨argument, hSort, (Formula.satisfies_overrideFunctionWith_of_max_le (env.push argument) symbol interpretation body hMax).mpr hBody⟩
+    cases formula <;> simp only [LocalSkolem.formulaMaxFunctionIdSucc, Nat.max_le] at hMax
+    all_goals simp only [Formula.Satisfies, Formula.eval, Model.overrideFunction]
+    all_goals first | rfl | simp_all only [← Formula.Satisfies.eq_def, Env.rebaseOverrideFunction_push,
+        Term.eval_overrideFunctionWith_of_max_le env symbol interpretation,
+        Formula.satisfies_overrideFunctionWith_of_max_le env symbol interpretation,
+        Term.evalList_overrideFunctionWith_of_max_le env symbol interpretation,
+        Formula.satisfies_overrideFunctionWith_of_max_le (env.push _) symbol interpretation]
   theorem Term.evalList_overrideFunctionWith_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (interpretation : List M.Carrier → M.Carrier) (terms : List Term) (hMax : LocalSkolem.termListMaxFunctionIdSucc terms ≤ symbol.id) : terms.map (Term.eval (Env.rebaseOverrideFunction env symbol interpretation)) = terms.map (Term.eval env) := by
-    cases terms with
-    | nil => rfl
-    | cons head tail =>
-        simp only [LocalSkolem.termListMaxFunctionIdSucc, Nat.max_le] at hMax
-        simp only [List.map_cons]
-        congr 1
-        · exact Term.eval_overrideFunctionWith_of_max_le
-            env symbol interpretation head hMax.1
-        · exact Term.evalList_overrideFunctionWith_of_max_le
-            env symbol interpretation tail hMax.2
+    cases terms <;> simp only [LocalSkolem.termListMaxFunctionIdSucc, Nat.max_le] at hMax
+    all_goals simp_all only [List.map_nil, List.map_cons,
+        Term.eval_overrideFunctionWith_of_max_le env symbol interpretation,
+        Term.evalList_overrideFunctionWith_of_max_le env symbol interpretation]
+
 end
 theorem Term.eval_overrideFunction_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (value : M.Carrier) (term : Term) (hMax : LocalSkolem.termMaxFunctionIdSucc term ≤ symbol.id) : Term.eval (Env.rebaseOverride env symbol value) term = Term.eval env term :=
   Term.eval_overrideFunctionWith_of_max_le env symbol (fun _ => value) term hMax
@@ -1052,126 +699,66 @@ theorem Formula.satisfies_overrideFunction_of_max_le {M : Model} (env : Env M) (
 theorem Term.evalList_overrideFunction_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (value : M.Carrier) (terms : List Term) (hMax : LocalSkolem.termListMaxFunctionIdSucc terms ≤ symbol.id) : terms.map (Term.eval (Env.rebaseOverride env symbol value)) = terms.map (Term.eval env) :=
   Term.evalList_overrideFunctionWith_of_max_le
     env symbol (fun _ => value) terms hMax
+end Freshness
+namespace FreeSupport
 mutual
-  theorem Term.eval_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value : M.Carrier) (term : Term) (hMax : LocalSkolem.termMaxFVarSucc term ≤ freshId) : Term.eval (env.setFree freshSort freshId value) term = Term.eval env term := by
-    cases term with
-    | bvar => simp [Term.eval, Env.setFree]
-    | fvar sort id =>
-        simp only [LocalSkolem.termMaxFVarSucc] at hMax
-        simp only [Term.eval, Env.setFree]
-        split
-        · next h =>
-          rcases h with ⟨_, rfl⟩
-          omega
-        · rfl
-    | app symbol args =>
-        simp only [LocalSkolem.termMaxFVarSucc] at hMax
-        simp only [Term.eval]
-        congr 1
-        exact Term.evalList_setFree_of_max_le env freshSort freshId value args hMax
-    | apply fn arg =>
-        simp only [LocalSkolem.termMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Term.eval]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value fn hMax.1, Term.eval_setFree_of_max_le env freshSort freshId value arg hMax.2]
-    | bool => simp [Term.eval]
-    | notE body =>
-        simp only [LocalSkolem.termMaxFVarSucc] at hMax
-        simp only [Term.eval]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value body hMax]
-    | andE left right
-    | orE left right
-    | impE left right
-    | iffE left right =>
-        simp only [LocalSkolem.termMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Term.eval]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value left hMax.1, Term.eval_setFree_of_max_le env freshSort freshId value right hMax.2]
-    | quote formula =>
-        simp only [LocalSkolem.termMaxFVarSucc] at hMax
-        simp only [Term.eval]
-        congr 1
-        apply propext
-        exact Formula.satisfies_setFree_of_max_le
-          env freshSort freshId value formula hMax
-    | lam domain codomain body =>
-        simp only [LocalSkolem.termMaxFVarSucc] at hMax
-        simp only [Term.eval]
-        congr 1
-        funext argument
-        simpa only [Env.push, Env.setFree] using
-          Term.eval_setFree_of_max_le (env.push argument) freshSort freshId value body hMax
-    | ite sort condition thenTerm elseTerm =>
-        simp only [LocalSkolem.termMaxFVarSucc, Nat.max_le] at hMax
-        rcases hMax with ⟨hCondition, hThen, hElse⟩
-        simp only [Term.eval]
-        congr 1
-        · apply propext
-          exact Formula.satisfies_setFree_of_max_le
-            env freshSort freshId value condition hCondition
-        · exact Term.eval_setFree_of_max_le
-            env freshSort freshId value thenTerm hThen
-        · exact Term.eval_setFree_of_max_le
-            env freshSort freshId value elseTerm hElse
-  theorem Formula.satisfies_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value : M.Carrier) (formula : Formula) (hMax : LocalSkolem.formulaMaxFVarSucc formula ≤ freshId) : Formula.Satisfies (env.setFree freshSort freshId value) formula ↔ Formula.Satisfies env formula := by
-    cases formula with
-    | trueE | falseE => simp [Formula.Satisfies, Formula.eval]
-    | atom predicate args =>
-        simp only [LocalSkolem.formulaMaxFVarSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.evalList_setFree_of_max_le env freshSort freshId value args hMax]
-    | equal sort left right =>
-        simp only [LocalSkolem.formulaMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value left hMax.1, Term.eval_setFree_of_max_le env freshSort freshId value right hMax.2]
-    | boolTerm term =>
-        simp only [LocalSkolem.formulaMaxFVarSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value term hMax]
-    | neg body =>
-        simp only [LocalSkolem.formulaMaxFVarSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        exact not_congr (Formula.satisfies_setFree_of_max_le env freshSort freshId value body hMax)
-    | imp left right =>
-        simp only [LocalSkolem.formulaMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        exact imp_congr (Formula.satisfies_setFree_of_max_le env freshSort freshId value left hMax.1)
-          (Formula.satisfies_setFree_of_max_le env freshSort freshId value right hMax.2)
-    | conj left right =>
-        simp only [LocalSkolem.formulaMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        exact and_congr (Formula.satisfies_setFree_of_max_le env freshSort freshId value left hMax.1)
-          (Formula.satisfies_setFree_of_max_le env freshSort freshId value right hMax.2)
-    | disj left right =>
-        simp only [LocalSkolem.formulaMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        exact or_congr (Formula.satisfies_setFree_of_max_le env freshSort freshId value left hMax.1)
-          (Formula.satisfies_setFree_of_max_le env freshSort freshId value right hMax.2)
-    | iffE left right =>
-        simp only [LocalSkolem.formulaMaxFVarSucc, Nat.max_le] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        exact iff_congr (Formula.satisfies_setFree_of_max_le env freshSort freshId value left hMax.1)
-          (Formula.satisfies_setFree_of_max_le env freshSort freshId value right hMax.2)
-    | forallE sort body =>
-        simp only [LocalSkolem.formulaMaxFVarSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor <;> intro h argument hSort
-        · exact (Formula.satisfies_setFree_of_max_le (env.push argument) freshSort freshId value body hMax).mp (h argument hSort)
-        · exact (Formula.satisfies_setFree_of_max_le (env.push argument) freshSort freshId value body hMax).mpr (h argument hSort)
-    | existsE sort body =>
-        simp only [LocalSkolem.formulaMaxFVarSucc] at hMax
-        simp only [Formula.Satisfies, Formula.eval]
-        constructor
-        · rintro ⟨argument, hSort, hBody⟩
-          exact ⟨argument, hSort, (Formula.satisfies_setFree_of_max_le (env.push argument) freshSort freshId value body hMax).mp hBody⟩
-        · rintro ⟨argument, hSort, hBody⟩
-          exact ⟨argument, hSort, (Formula.satisfies_setFree_of_max_le (env.push argument) freshSort freshId value body hMax).mpr hBody⟩
-  theorem Term.evalList_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value : M.Carrier) (terms : List Term) (hMax : LocalSkolem.termListMaxFVarSucc terms ≤ freshId) : terms.map (Term.eval (env.setFree freshSort freshId value)) = terms.map (Term.eval env) := by
-    cases terms with
-    | nil => rfl
-    | cons head tail =>
-        simp only [LocalSkolem.termListMaxFVarSucc, Nat.max_le] at hMax
-        simp only [List.map_cons]
-        rw [Term.eval_setFree_of_max_le env freshSort freshId value head hMax.1, Term.evalList_setFree_of_max_le env freshSort freshId value tail hMax.2]
+  /-- 自由变量最大编号的数值界，等价于实际支持中每个参数的严格界。 -/
+  theorem termMaxFVarSucc_le_iff (term : Term) (cutoff : Nat) :
+      LocalSkolem.termMaxFVarSucc term ≤ cutoff ↔
+        ∀ parameter ∈ DefinitionalCnf.Term.freeVarParams term, parameter.varId < cutoff := by
+    cases term <;>
+      simp [LocalSkolem.termMaxFVarSucc, DefinitionalCnf.Term.freeVarParams, mem_merge_iff,
+        or_imp, forall_and, Nat.max_le, Nat.succ_le_iff, termMaxFVarSucc_le_iff,
+        formulaMaxFVarSucc_le_iff, termListMaxFVarSucc_le_iff]
+  theorem formulaMaxFVarSucc_le_iff (formula : Formula) (cutoff : Nat) :
+      LocalSkolem.formulaMaxFVarSucc formula ≤ cutoff ↔
+        ∀ parameter ∈ DefinitionalCnf.Formula.freeVarParams formula, parameter.varId < cutoff := by
+    cases formula <;>
+      simp [LocalSkolem.formulaMaxFVarSucc, DefinitionalCnf.Formula.freeVarParams, mem_merge_iff,
+        or_imp, forall_and, Nat.max_le, termMaxFVarSucc_le_iff,
+        formulaMaxFVarSucc_le_iff, termListMaxFVarSucc_le_iff]
+  theorem termListMaxFVarSucc_le_iff (terms : List Term) (cutoff : Nat) :
+      LocalSkolem.termListMaxFVarSucc terms ≤ cutoff ↔
+        ∀ parameter ∈ DefinitionalCnf.Term.freeVarParamsList terms, parameter.varId < cutoff := by
+    cases terms <;>
+      simp [LocalSkolem.termListMaxFVarSucc, DefinitionalCnf.Term.freeVarParamsList, mem_merge_iff,
+        or_imp, forall_and, Nat.max_le, termMaxFVarSucc_le_iff,
+        termListMaxFVarSucc_le_iff]
 end
+end FreeSupport
+
+theorem Env.FreeAgreement.setFree_of_lt {M : Model} (env : Env M)
+    (parameters : List DefinitionalCnf.FreeVarParam) (freshSort : CoreSort)
+    (freshId : VarId) (value : M.Carrier)
+    (hIds : ∀ parameter ∈ parameters, parameter.varId < freshId) :
+    Env.FreeAgreement parameters (env.setFree freshSort freshId value) env := by
+  intro parameter hParameter
+  have hNe := Nat.ne_of_lt (hIds parameter hParameter)
+  simp [Env.setFree, hNe]
+
+namespace Freshness
+theorem Term.eval_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value :
+    M.Carrier) (term : Term) (hMax : LocalSkolem.termMaxFVarSucc term ≤ freshId) : Term.eval (env.setFree freshSort
+    freshId value) term = Term.eval env term := by
+  apply Term.eval_eq_of_freeAgreement (env.setFree freshSort freshId value) env (fun _ => rfl)
+  exact Env.FreeAgreement.setFree_of_lt env (DefinitionalCnf.Term.freeVarParams term)
+    freshSort freshId value ((FreeSupport.termMaxFVarSucc_le_iff term freshId).mp hMax)
+
+theorem Formula.satisfies_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value :
+    M.Carrier) (formula : Formula) (hMax : LocalSkolem.formulaMaxFVarSucc formula ≤ freshId) : Formula.Satisfies
+    (env.setFree freshSort freshId value) formula ↔ Formula.Satisfies env formula := by
+  apply Formula.satisfies_iff_of_freeAgreement (env.setFree freshSort freshId value) env (fun _ => rfl)
+  exact Env.FreeAgreement.setFree_of_lt env (DefinitionalCnf.Formula.freeVarParams formula)
+    freshSort freshId value ((FreeSupport.formulaMaxFVarSucc_le_iff formula freshId).mp hMax)
+
+theorem Term.evalList_setFree_of_max_le {M : Model} (env : Env M) (freshSort : CoreSort) (freshId : VarId) (value :
+    M.Carrier) (terms : List Term) (hMax : LocalSkolem.termListMaxFVarSucc terms ≤ freshId) : terms.map (Term.eval
+    (env.setFree freshSort freshId value)) = terms.map (Term.eval env) := by
+  apply Term.evalList_eq_of_freeAgreement (env.setFree freshSort freshId value) env (fun _ => rfl)
+  exact Env.FreeAgreement.setFree_of_lt env (DefinitionalCnf.Term.freeVarParamsList terms)
+    freshSort freshId value ((FreeSupport.termListMaxFVarSucc_le_iff terms freshId).mp hMax)
+
+
 theorem Nnf.satisfies_overrideFunctionWith_of_max_le {M : Model} (env : Env M) (symbol : FunctionSymbol) (interpretation : List M.Carrier → M.Carrier) (nnf : Nnf) (hMax : LocalSkolem.nnfMaxFunctionIdSucc nnf ≤ symbol.id) : Nnf.Satisfies (Env.rebaseOverrideFunction env symbol interpretation) nnf ↔ Nnf.Satisfies env nnf := by
   rw [← Nnf.satisfies_toFormula, ← Nnf.satisfies_toFormula]
   apply Formula.satisfies_overrideFunctionWith_of_max_le
@@ -1471,53 +1058,24 @@ theorem skolemizeAt_bounds : ∀ (path : Path) (context : Context) (nnf : Nnf) (
     change (Nnf.lit literal, state) = (result, output) at hRun
     cases hRun
     exact ⟨Nat.le_refl _, Nat.le_refl _, hFVar, hFunction⟩
-  case case4 =>
+  case case4 | case5 =>
     intro path context left right ihLeft ihRight state result output
       hContext hFVar hFunction hRun
-    rw [skolemizeAt.eq_4] at hRun
-    change (match (skolemizeAt (path ++ [PathStep.left]) context left).run state with
-        | (leftResult, leftState) =>
-          match
-              (skolemizeAt (path ++ [PathStep.right]) context right).run
-                leftState with
-          | (rightResult, rightState) => (Nnf.conj leftResult rightResult, rightState)) = (result, output) at hRun
-    cases hLeft : (skolemizeAt (path ++ [PathStep.left]) context left).run state with
-    | mk leftResult leftState =>
-      cases hRight : (skolemizeAt (path ++ [PathStep.right]) context right).run leftState with
-      | mk rightResult rightState =>
-        simp only [hLeft, hRight] at hRun
-        cases hRun
-        have hLeftFVar : nnfMaxFVarSucc left ≤ state.nextFVar :=
-          Nat.le_trans (Nat.le_max_left _ _) hFVar
-        have hRightFVar : nnfMaxFVarSucc right ≤ state.nextFVar :=
-          Nat.le_trans (Nat.le_max_right _ _) hFVar
-        have hLeftFunction : nnfMaxFunctionIdSucc left ≤ state.nextSkolem :=
-          Nat.le_trans (Nat.le_max_left _ _) hFunction
-        have hRightFunction : nnfMaxFunctionIdSucc right ≤ state.nextSkolem :=
-          Nat.le_trans (Nat.le_max_right _ _) hFunction
-        have leftBounds :=
-          ihLeft state leftResult leftState hContext hLeftFVar hLeftFunction hLeft
-        have rightBounds :=
-          ihRight leftState rightResult output (hContext.mono leftBounds.fvarMono) (Nat.le_trans hRightFVar leftBounds.fvarMono)
-            (Nat.le_trans hRightFunction leftBounds.skolemMono) hRight
-        exact {
-          fvarMono := Nat.le_trans leftBounds.fvarMono rightBounds.fvarMono
-          skolemMono := Nat.le_trans leftBounds.skolemMono rightBounds.skolemMono
-          resultFVar := Nat.max_le.mpr
-            ⟨Nat.le_trans leftBounds.resultFVar rightBounds.fvarMono, rightBounds.resultFVar⟩
-          resultFunction := Nat.max_le.mpr
-            ⟨Nat.le_trans leftBounds.resultFunction rightBounds.skolemMono, rightBounds.resultFunction⟩
-        }
-  case case5 =>
-    intro path context left right ihLeft ihRight state result output
-      hContext hFVar hFunction hRun
-    rw [skolemizeAt.eq_5] at hRun
-    change (match (skolemizeAt (path ++ [PathStep.left]) context left).run state with
-        | (leftResult, leftState) =>
-          match
-              (skolemizeAt (path ++ [PathStep.right]) context right).run
-                leftState with
-          | (rightResult, rightState) => (Nnf.disj leftResult rightResult, rightState)) = (result, output) at hRun
+    first | rw [skolemizeAt.eq_4] at hRun
+          | rw [skolemizeAt.eq_5] at hRun
+    first
+    | change (match (skolemizeAt (path ++ [PathStep.left]) context left).run state with
+          | (leftResult, leftState) =>
+            match
+                (skolemizeAt (path ++ [PathStep.right]) context right).run
+                  leftState with
+            | (rightResult, rightState) => (Nnf.conj leftResult rightResult, rightState)) = (result, output) at hRun
+    | change (match (skolemizeAt (path ++ [PathStep.left]) context left).run state with
+          | (leftResult, leftState) =>
+            match
+                (skolemizeAt (path ++ [PathStep.right]) context right).run
+                  leftState with
+            | (rightResult, rightState) => (Nnf.disj leftResult rightResult, rightState)) = (result, output) at hRun
     cases hLeft : (skolemizeAt (path ++ [PathStep.left]) context left).run state with
     | mk leftResult leftState =>
       cases hRight : (skolemizeAt (path ++ [PathStep.right]) context right).run leftState with
@@ -1700,6 +1258,51 @@ structure UniformSoundExtension (state : LocalSkolem.BuildState) (source result 
       LocalSkolemChoice.SameBoundStack env base →
       Nnf.Satisfies env source →
       Nnf.Satisfies (extension.rebase env) result
+/-- 恒等模型扩张同时保持所有环境合同与有界 frame。 -/
+def UniformFrameExtension.refl (state : LocalSkolem.BuildState) (M : Model) :
+    UniformFrameExtension state M where
+  target := M
+  rebase := id
+  unbase := id
+  rebase_unbase := fun _ => rfl
+  unbase_rebase := fun _ => rfl
+  unbaseRespectsFree := fun _ h => h
+  unbaseSameBound := fun h => h
+  functionSort := fun h => h
+  foolContract := id
+  contract := id
+  respectsFree := fun _ h => h
+  sameBound := fun h => h
+  preserves := fun _ _ _ _ h => h
+
+/-- 两段模型扩张沿单调增长的新鲜变量和函数界复合。 -/
+def UniformFrameExtension.trans {state next : LocalSkolem.BuildState} {M : Model}
+    (first : UniformFrameExtension state M)
+    (second : UniformFrameExtension next first.target)
+    (hFVar : state.nextFVar ≤ next.nextFVar)
+    (hFunction : state.nextSkolem ≤ next.nextSkolem) :
+    UniformFrameExtension state M where
+  target := second.target
+  rebase := fun env => second.rebase (first.rebase env)
+  unbase := fun env => first.unbase (second.unbase env)
+  rebase_unbase := by intro env; rw [first.rebase_unbase, second.rebase_unbase]
+  unbase_rebase := by intro env; rw [second.unbase_rebase, first.unbase_rebase]
+  unbaseRespectsFree := fun env h => first.unbaseRespectsFree _ (second.unbaseRespectsFree env h)
+  unbaseSameBound := fun h => first.unbaseSameBound (second.unbaseSameBound h)
+  functionSort := fun h => second.functionSort (first.functionSort h)
+  foolContract := fun h => second.foolContract (first.foolContract h)
+  contract := fun h => second.contract (first.contract h)
+  respectsFree := fun env h => second.respectsFree _ (first.respectsFree env h)
+  sameBound := fun h => second.sameBound (first.sameBound h)
+  preserves := fun env frame hf hs h => second.preserves (first.rebase env) frame
+    (Nat.le_trans hf hFVar) (Nat.le_trans hs hFunction) (first.preserves env frame hf hs h)
+
+/-- 不改变公式的步骤直接使用恒等扩张。 -/
+def UniformSoundExtension.refl (state : LocalSkolem.BuildState) (formula : Nnf)
+    (M : Model) (base : Env M) : UniformSoundExtension state formula formula M base where
+  extension := UniformFrameExtension.refl state M
+  resultSat := fun _ _ _ h => h
+
 theorem skolemizeAt_uniformSound : ∀ (path : LocalSkolem.Path) (context : LocalSkolem.Context) (nnf : Nnf) (state : LocalSkolem.BuildState) (result : Nnf) (output : LocalSkolem.BuildState), LocalSkolem.Context.Bounded
     context state.nextFVar → LocalSkolem.Context.Supports context nnf → LocalSkolem.nnfMaxFVarSucc nnf ≤ state.nextFVar → LocalSkolem.nnfMaxFunctionIdSucc nnf ≤ state.nextSkolem → (LocalSkolem.skolemizeAt path context
     nnf).run state = (result, output) → ∀ (M : Model) (base : Env M), Nonempty (UniformSoundExtension state nnf result M base) := by
@@ -1710,106 +1313,39 @@ theorem skolemizeAt_uniformSound : ∀ (path : LocalSkolem.Path) (context : Loca
     rw [LocalSkolem.skolemizeAt.eq_1] at hRun
     change (Nnf.trueE, state) = (result, output) at hRun
     cases hRun
-    exact ⟨{
-      extension := {
-        target := M
-        rebase := id
-        unbase := id
-        rebase_unbase := by intro env; rfl
-        unbase_rebase := by intro env; rfl
-        unbaseRespectsFree := by intros; assumption
-        unbaseSameBound := by intros; assumption
-        functionSort := fun hFunction => hFunction
-        foolContract := id
-        contract := id
-        respectsFree := by
-          intro env hFree
-          exact hFree
-        sameBound := by
-          intro left right hBound
-          exact hBound
-        preserves := by
-          intro env frame hFrameFVar hFrameFunction hFrame
-          exact hFrame
-      }
-      resultSat := by
-        intro env hFree hBound hSat
-        exact hSat
-    }⟩
+    exact ⟨UniformSoundExtension.refl state _ M base⟩
   case case2 =>
     intro path context state result output hContext hSupported hFVar hFunction
       hRun M base
     rw [LocalSkolem.skolemizeAt.eq_2] at hRun
     change (Nnf.falseE, state) = (result, output) at hRun
     cases hRun
-    exact ⟨{
-      extension := {
-        target := M
-        rebase := id
-        unbase := id
-        rebase_unbase := by intro env; rfl
-        unbase_rebase := by intro env; rfl
-        unbaseRespectsFree := by intros; assumption
-        unbaseSameBound := by intros; assumption
-        functionSort := fun hFunction => hFunction
-        foolContract := id
-        contract := id
-        respectsFree := by
-          intro env hFree
-          exact hFree
-        sameBound := by
-          intro left right hBound
-          exact hBound
-        preserves := by
-          intro env frame hFrameFVar hFrameFunction hFrame
-          exact hFrame
-      }
-      resultSat := by
-        intro env hFree hBound hSat
-        exact hSat
-    }⟩
+    exact ⟨UniformSoundExtension.refl state _ M base⟩
   case case3 =>
     intro path context literal state result output hContext hSupported hFVar
       hFunction hRun M base
     rw [LocalSkolem.skolemizeAt.eq_3] at hRun
     change (Nnf.lit literal, state) = (result, output) at hRun
     cases hRun
-    exact ⟨{
-      extension := {
-        target := M
-        rebase := id
-        unbase := id
-        rebase_unbase := by intro env; rfl
-        unbase_rebase := by intro env; rfl
-        unbaseRespectsFree := by intros; assumption
-        unbaseSameBound := by intros; assumption
-        functionSort := fun hFunction => hFunction
-        foolContract := id
-        contract := id
-        respectsFree := by
-          intro env hFree
-          exact hFree
-        sameBound := by
-          intro left right hBound
-          exact hBound
-        preserves := by
-          intro env frame hFrameFVar hFrameFunction hFrame
-          exact hFrame
-      }
-      resultSat := by
-        intro env hFree hBound hSat
-        exact hSat
-    }⟩
-  case case4 =>
+    exact ⟨UniformSoundExtension.refl state _ M base⟩
+  case case4 | case5 =>
     intro path context left right ihLeft ihRight state result output
       hContext hSupported hFVar hFunction hRun M base
-    rw [LocalSkolem.skolemizeAt.eq_4] at hRun
-    change (match (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
-        | (leftResult, leftState) =>
-          match
-              (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run
-                leftState with
-          | (rightResult, rightState) => (Nnf.conj leftResult rightResult, rightState)) = (result, output) at hRun
+    first | rw [LocalSkolem.skolemizeAt.eq_4] at hRun
+          | rw [LocalSkolem.skolemizeAt.eq_5] at hRun
+    first
+    | change (match (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
+          | (leftResult, leftState) =>
+            match
+                (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run
+                  leftState with
+            | (rightResult, rightState) => (Nnf.conj leftResult rightResult, rightState)) = (result, output) at hRun
+    | change (match (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
+          | (leftResult, leftState) =>
+            match
+                (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run
+                  leftState with
+            | (rightResult, rightState) => (Nnf.disj leftResult rightResult, rightState)) = (result, output) at hRun
     cases hLeft : (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
     | mk leftResult leftState =>
       cases hRight : (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run leftState with
@@ -1836,140 +1372,32 @@ theorem skolemizeAt_uniformSound : ∀ (path : LocalSkolem.Path) (context : Loca
           (Nat.le_trans hRightFunction leftBounds.skolemMono)
           hRight leftSound.extension.target rightBase with ⟨rightSound⟩
         exact ⟨{
-          extension := {
-            target := rightSound.extension.target
-            rebase := fun env => rightSound.extension.rebase (leftSound.extension.rebase env)
-            unbase := fun env =>
-              leftSound.extension.unbase (rightSound.extension.unbase env)
-            rebase_unbase := by
-              intro env
-              rw [leftSound.extension.rebase_unbase, rightSound.extension.rebase_unbase]
-            unbase_rebase := by
-              intro env
-              rw [rightSound.extension.unbase_rebase, leftSound.extension.unbase_rebase]
-            unbaseRespectsFree := by
-              intro env hFree
-              exact leftSound.extension.unbaseRespectsFree _ (rightSound.extension.unbaseRespectsFree env hFree)
-            unbaseSameBound := by
-              intro left right hBound
-              exact leftSound.extension.unbaseSameBound (rightSound.extension.unbaseSameBound hBound)
-            functionSort := fun hFunction =>
-              rightSound.extension.functionSort (leftSound.extension.functionSort hFunction)
-            foolContract := fun contract =>
-              rightSound.extension.foolContract (leftSound.extension.foolContract contract)
-            contract := fun contract =>
-              rightSound.extension.contract (leftSound.extension.contract contract)
-            respectsFree := by
-              intro env hFree
-              exact rightSound.extension.respectsFree _ (leftSound.extension.respectsFree env hFree)
-            sameBound := by
-              intro envLeft envRight hBound
-              exact rightSound.extension.sameBound (leftSound.extension.sameBound hBound)
-            preserves := by
-              intro env frame hFrameFVar hFrameFunction hFrame
-              apply rightSound.extension.preserves (leftSound.extension.rebase env) frame (Nat.le_trans hFrameFVar leftBounds.fvarMono)
-                (Nat.le_trans hFrameFunction leftBounds.skolemMono)
-              exact leftSound.extension.preserves env frame
-                hFrameFVar hFrameFunction hFrame
-          }
+          extension := leftSound.extension.trans rightSound.extension
+            leftBounds.fvarMono leftBounds.skolemMono
           resultSat := by
             intro env hFree hBound hSat
-            have hLeftResult :=
-              leftSound.resultSat env hFree hBound hSat.1
-            have hRightSource :=
-              leftSound.extension.preserves env right
-                hRightFVar hRightFunction hSat.2
-            have hRightResult :=
-              rightSound.resultSat (leftSound.extension.rebase env) (leftSound.extension.respectsFree env hFree) (leftSound.extension.sameBound hBound)
-                hRightSource
-            exact ⟨ rightSound.extension.preserves (leftSound.extension.rebase env) leftResult leftBounds.resultFVar leftBounds.resultFunction hLeftResult, hRightResult⟩
-        }⟩
-  case case5 =>
-    intro path context left right ihLeft ihRight state result output
-      hContext hSupported hFVar hFunction hRun M base
-    rw [LocalSkolem.skolemizeAt.eq_5] at hRun
-    change (match (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
-        | (leftResult, leftState) =>
-          match
-              (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run
-                leftState with
-          | (rightResult, rightState) => (Nnf.disj leftResult rightResult, rightState)) = (result, output) at hRun
-    cases hLeft : (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.left]) context left).run state with
-    | mk leftResult leftState =>
-      cases hRight : (LocalSkolem.skolemizeAt (path ++ [LocalSkolem.PathStep.right]) context right).run leftState with
-      | mk rightResult rightState =>
-        simp only [hLeft, hRight] at hRun
-        cases hRun
-        have hLeftFVar : LocalSkolem.nnfMaxFVarSucc left ≤ state.nextFVar :=
-          Nat.le_trans (Nat.le_max_left _ _) hFVar
-        have hRightFVar : LocalSkolem.nnfMaxFVarSucc right ≤ state.nextFVar :=
-          Nat.le_trans (Nat.le_max_right _ _) hFVar
-        have hLeftFunction :
-            LocalSkolem.nnfMaxFunctionIdSucc left ≤ state.nextSkolem :=
-          Nat.le_trans (Nat.le_max_left _ _) hFunction
-        have hRightFunction :
-            LocalSkolem.nnfMaxFunctionIdSucc right ≤ state.nextSkolem :=
-          Nat.le_trans (Nat.le_max_right _ _) hFunction
-        rcases ihLeft state leftResult leftState hContext hSupported.1
-          hLeftFVar hLeftFunction hLeft M base with ⟨leftSound⟩
-        have leftBounds :=
-          LocalSkolem.skolemizeAt_bounds (path ++ [LocalSkolem.PathStep.left]) context left state
-            leftResult leftState hContext hLeftFVar hLeftFunction hLeft
-        let rightBase := leftSound.extension.rebase base
-        rcases ihRight leftState rightResult output (hContext.mono leftBounds.fvarMono) hSupported.2 (Nat.le_trans hRightFVar leftBounds.fvarMono)
-          (Nat.le_trans hRightFunction leftBounds.skolemMono)
-          hRight leftSound.extension.target rightBase with ⟨rightSound⟩
-        exact ⟨{
-          extension := {
-            target := rightSound.extension.target
-            rebase := fun env => rightSound.extension.rebase (leftSound.extension.rebase env)
-            unbase := fun env =>
-              leftSound.extension.unbase (rightSound.extension.unbase env)
-            rebase_unbase := by
-              intro env
-              rw [leftSound.extension.rebase_unbase, rightSound.extension.rebase_unbase]
-            unbase_rebase := by
-              intro env
-              rw [rightSound.extension.unbase_rebase, leftSound.extension.unbase_rebase]
-            unbaseRespectsFree := by
-              intro env hFree
-              exact leftSound.extension.unbaseRespectsFree _ (rightSound.extension.unbaseRespectsFree env hFree)
-            unbaseSameBound := by
-              intro left right hBound
-              exact leftSound.extension.unbaseSameBound (rightSound.extension.unbaseSameBound hBound)
-            functionSort := fun hFunction =>
-              rightSound.extension.functionSort (leftSound.extension.functionSort hFunction)
-            foolContract := fun contract =>
-              rightSound.extension.foolContract (leftSound.extension.foolContract contract)
-            contract := fun contract =>
-              rightSound.extension.contract (leftSound.extension.contract contract)
-            respectsFree := by
-              intro env hFree
-              exact rightSound.extension.respectsFree _ (leftSound.extension.respectsFree env hFree)
-            sameBound := by
-              intro envLeft envRight hBound
-              exact rightSound.extension.sameBound (leftSound.extension.sameBound hBound)
-            preserves := by
-              intro env frame hFrameFVar hFrameFunction hFrame
-              apply rightSound.extension.preserves (leftSound.extension.rebase env) frame (Nat.le_trans hFrameFVar leftBounds.fvarMono)
-                (Nat.le_trans hFrameFunction leftBounds.skolemMono)
-              exact leftSound.extension.preserves env frame
-                hFrameFVar hFrameFunction hFrame
-          }
-          resultSat := by
-            intro env hFree hBound hSat
-            rcases hSat with hLeftSat | hRightSat
-            · have hLeftResult :=
-                leftSound.resultSat env hFree hBound hLeftSat
-              exact Or.inl <|
-                rightSound.extension.preserves (leftSound.extension.rebase env) leftResult
-                  leftBounds.resultFVar leftBounds.resultFunction hLeftResult
-            · have hRightSource :=
+            first
+            | have hLeftResult :=
+                leftSound.resultSat env hFree hBound hSat.1
+              have hRightSource :=
                 leftSound.extension.preserves env right
-                  hRightFVar hRightFunction hRightSat
-              exact Or.inr <|
+                  hRightFVar hRightFunction hSat.2
+              have hRightResult :=
                 rightSound.resultSat (leftSound.extension.rebase env) (leftSound.extension.respectsFree env hFree) (leftSound.extension.sameBound hBound)
                   hRightSource
+              exact ⟨ rightSound.extension.preserves (leftSound.extension.rebase env) leftResult leftBounds.resultFVar leftBounds.resultFunction hLeftResult, hRightResult⟩
+            | rcases hSat with hLeftSat | hRightSat
+              · have hLeftResult :=
+                  leftSound.resultSat env hFree hBound hLeftSat
+                exact Or.inl <|
+                  rightSound.extension.preserves (leftSound.extension.rebase env) leftResult
+                    leftBounds.resultFVar leftBounds.resultFunction hLeftResult
+              · have hRightSource :=
+                  leftSound.extension.preserves env right
+                    hRightFVar hRightFunction hRightSat
+                exact Or.inr <|
+                  rightSound.resultSat (leftSound.extension.rebase env) (leftSound.extension.respectsFree env hFree) (leftSound.extension.sameBound hBound)
+                    hRightSource
         }⟩
   case case6 =>
     intro path context sort body ih state result output

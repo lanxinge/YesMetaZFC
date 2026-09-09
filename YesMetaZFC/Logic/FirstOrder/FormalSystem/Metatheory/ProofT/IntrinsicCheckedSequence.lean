@@ -163,33 +163,9 @@ theorem intro_of_numeral_domain
         Formula.LevyBound.boundedForall set_levy_bound
           (numₘ(length)) lineBody :=
     bounded_forall_numeral_intro C length lineBody hLineAt
-  let boundTemplate : SetFormula [SetSort.set] free :=
-    Formula.LevyBound.boundedForall set_levy_bound
-      ((.bvar .here) : SetTerm [SetSort.set] free)
-      (lineBody.weakenBoundUnderTop SetSort.set)
-  have hAllNumeralAt :
-      Γ ⊢ₘ[T] boundTemplate.instantiateTop (numₘ(length)) := by
-    change Γ ⊢ₘ[T]
-      (Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (lineBody.weakenBoundUnderTop SetSort.set)).instantiateTop
-          (numₘ(length))
-    rw [Formula.LevyBound.boundedForall_instantiateTop_bvar]
-    exact hAllNumeral
-  have hAllDomainRaw := FirstOrder.Derives.eq_subst
-    (body := boundTemplate)
-    (FirstOrder.Derives.eq_symm hDomain) hAllNumeralAt
-  have hAllDomain :
-      Γ ⊢ₘ[T]
-        Formula.LevyBound.boundedForall set_levy_bound
-          (domₘ(sequence)) lineBody := by
-    change Γ ⊢ₘ[T]
-      (Formula.LevyBound.boundedForall set_levy_bound
-        ((.bvar .here) : SetTerm [SetSort.set] free)
-        (lineBody.weakenBoundUnderTop SetSort.set)).instantiateTop
-          (domₘ(sequence)) at hAllDomainRaw
-    rw [Formula.LevyBound.boundedForall_instantiateTop_bvar] at hAllDomainRaw
-    exact hAllDomainRaw
+  have hAllDomain : Γ ⊢ₘ[T]
+      Formula.LevyBound.boundedForall set_levy_bound (domₘ(sequence)) lineBody :=
+    bounded_forall_of_bound_eq hDomain hAllNumeral
   have hPrefix :
       Γ ⊢ₘ[T]
         ((((sequence ∈ₘ
@@ -341,6 +317,51 @@ theorem intro_of_standard_sequences
     elements.length
     hSequenceSpace hCertificatesSpace hDomains hSequenceDomain
     hPositive hRows
+
+/-- 同一行列表生成两列；取值对应、长度及成员装配只证明一次。 -/
+theorem intro_of_mapped_rows
+    {T : SetTheory} (R : IntrinsicProofRowSupport T)
+    {free : SetContext} {Γ : Context signature free} {Row : Type _}
+    (verifier : CheckedVerifier) (rows : List Row)
+    (formulaCode certificateCode : Row → SetOpenTerm free)
+    (hNonempty : rows ≠ [])
+    (hLengthOmega : Γ ⊢ₘ[T] numₘ(rows.length) ∈ₘ ωₘ)
+    (hFormula : ∀ row, row ∈ rows →
+      Γ ⊢ₘ[T] formulaCode row ∈ₘ syntax_formula_code_set_term)
+    (hCertificate : ∀ row, row ∈ rows →
+      Γ ⊢ₘ[T] certificateCode row ∈ₘ ωₘ)
+    (hRow : ∀ (index : Nat) (hIndex : index < rows.length),
+      Γ ⊢ₘ[T] (standard_sequence (rows.map formulaCode) ·ₘ numₘ(index)) ≐ₘ
+        formulaCode rows[index] →
+      Γ ⊢ₘ[T] (standard_sequence (rows.map certificateCode) ·ₘ numₘ(index)) ≐ₘ
+        certificateCode rows[index] →
+      Γ ⊢ₘ[T] row_instance verifier
+        (standard_sequence (rows.map formulaCode))
+        (standard_sequence (rows.map certificateCode)) index) :
+    Γ ⊢ₘ[T] verifier.sequence_condition
+      (standard_sequence (rows.map formulaCode))
+      (standard_sequence (rows.map certificateCode)) := by
+  apply intro_of_standard_sequences R verifier
+  · simp
+  · simpa using hLengthOmega
+  · intro element hElement
+    obtain ⟨row, hMember, rfl⟩ := List.mem_map.mp hElement
+    exact hFormula row hMember
+  · intro certificate hCertificateMember
+    obtain ⟨row, hMember, rfl⟩ := List.mem_map.mp hCertificateMember
+    exact hCertificate row hMember
+  · simpa using hNonempty
+  · intro index hIndex
+    have hIndexRows : index < rows.length := by simpa using hIndex
+    have hAt (code : Row → SetOpenTerm free) :
+        Γ ⊢ₘ[T] (standard_sequence (rows.map code) ·ₘ numₘ(index)) ≐ₘ code rows[index] := by
+      apply Metatheory.Derives.equality_symm
+      simpa only [Nat.zero_add] using
+        (standard_sequence_from_getElem?_apply_eq
+          (S := R.toFiniteSequenceEvaluationSupport) (start := 0)
+          (elements := rows.map code) (index := index) (element := code rows[index])
+          (by simp [List.getElem?_eq_getElem hIndexRows]))
+    exact hRow index hIndexRows (hAt formulaCode) (hAt certificateCode)
 
 end IntrinsicCheckedSequence
 end ProofT

@@ -860,26 +860,13 @@ theorem Formula.weakenFree_eq_renameMapped
     (replacement : Term σ bound free sort)
     (term : Term σ bound free resultSort) :
     (term.weakenBound sort).instantiateTop replacement = term := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      (term.weakenBound sort).instantiateTop replacement = term)
-    (motive_2 := fun _ arguments =>
-      (arguments.weakenBound sort).instantiateTop replacement = arguments)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          ((arguments.weakenBound sort).instantiateTop replacement) =
-        Term.app function arguments
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenBound sort).instantiateTop replacement)
-          ((tail.weakenBound sort).instantiateTop replacement) =
-        Arguments.cons head tail
-      rw [ihHead, ihTail])
-    term
+
+  change (term.renameMapped (VariableRenaming.weaken sort)
+    VariableRenaming.id).substituteMapped
+      (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId = _
+  rw [← Term.substituteMapped_of_bound_renaming, Term.substituteMapped_comp]
+  change term.substituteMapped VariableSubstitution.boundId VariableSubstitution.freeId = _
+  exact Term.substituteMapped_id term
 
 /-- 参数列穿过一个 binder 后再以任意项实例化该 binder，严格恢复原参数列。 -/
 @[simp] theorem Arguments.instantiateTop_weakenBound
@@ -889,26 +876,13 @@ theorem Formula.weakenFree_eq_renameMapped
     (replacement : Term σ bound free sort)
     (arguments : Arguments σ bound free sorts) :
     (arguments.weakenBound sort).instantiateTop replacement = arguments := by
-  exact Arguments.rec
-    (motive_1 := fun _ term =>
-      (term.weakenBound sort).instantiateTop replacement = term)
-    (motive_2 := fun _ nested =>
-      (nested.weakenBound sort).instantiateTop replacement = nested)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function nested ih => by
-      change Term.app function
-          ((nested.weakenBound sort).instantiateTop replacement) =
-        Term.app function nested
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenBound sort).instantiateTop replacement)
-          ((tail.weakenBound sort).instantiateTop replacement) =
-        Arguments.cons head tail
-      rw [ihHead, ihTail])
-    arguments
+
+  change (arguments.renameMapped (VariableRenaming.weaken sort)
+    VariableRenaming.id).substituteMapped
+      (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId = _
+  rw [← Arguments.substituteMapped_of_bound_renaming, Arguments.substituteMapped_comp]
+  change arguments.substituteMapped VariableSubstitution.boundId VariableSubstitution.freeId = _
+  exact Arguments.substituteMapped_id arguments
 
 /-- 公式穿过一个 binder 后再以任意项实例化该 binder，严格恢复原公式。 -/
 @[simp] theorem Formula.instantiateTop_weakenBound
@@ -917,33 +891,12 @@ theorem Formula.weakenFree_eq_renameMapped
     (replacement : Term σ bound free sort)
     (formula : Formula σ bound free) :
     (formula.weakenBound sort).instantiateTop replacement = formula := by
-  change
-    (formula.renameMapped (VariableRenaming.weaken sort)
-        VariableRenaming.id).substituteMapped
-          (VariableSubstitution.instantiateTop replacement)
-          VariableSubstitution.freeId = formula
-  rw [← Formula.substituteMapped_of_bound_renaming]
-  rw [Formula.substituteMapped_comp]
-  have hBound :
-      (fun {resultSort} (entry : Variable bound resultSort) =>
-        (VariableSubstitution.of_bound_renaming
-          (free := free) (VariableRenaming.weaken sort) entry).substituteMapped
-            (VariableSubstitution.instantiateTop replacement)
-            VariableSubstitution.freeId) =
-        (VariableSubstitution.boundId :
-          VariableSubstitution σ bound bound free) := by
-    funext resultSort entry
-    rfl
-  have hFree :
-      (fun {resultSort} (entry : Variable free resultSort) =>
-        (VariableSubstitution.freeId entry).substituteMapped
-          (VariableSubstitution.instantiateTop replacement)
-          VariableSubstitution.freeId) =
-        (VariableSubstitution.freeId :
-          VariableSubstitution σ free bound free) := by
-    funext resultSort entry
-    rfl
-  rw [hBound, hFree]
+
+  change (formula.renameMapped (VariableRenaming.weaken sort)
+    VariableRenaming.id).substituteMapped
+      (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId = _
+  rw [← Formula.substituteMapped_of_bound_renaming, Formula.substituteMapped_comp]
+  change formula.substituteMapped VariableSubstitution.boundId VariableSubstitution.freeId = _
   exact Formula.substituteMapped_id formula
 
 /-- 最新 bound 变量以给定项实例化为该项。 -/
@@ -1355,39 +1308,13 @@ end
         (VariableSubstitution.abstractBound introduced)
         VariableSubstitution.abstractFreeTop =
       term.weakenBound introduced := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      (term.weakenFree introduced).substituteMapped
-          (VariableSubstitution.abstractBound introduced)
-          VariableSubstitution.abstractFreeTop =
-        term.weakenBound introduced)
-    (motive_2 := fun _ arguments =>
-      (arguments.weakenFree introduced).substituteMapped
-          (VariableSubstitution.abstractBound introduced)
-          VariableSubstitution.abstractFreeTop =
-        arguments.weakenBound introduced)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          ((arguments.weakenFree introduced).substituteMapped
-            (VariableSubstitution.abstractBound introduced)
-            VariableSubstitution.abstractFreeTop) =
-        Term.app function (arguments.weakenBound introduced)
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenFree introduced).substituteMapped
-            (VariableSubstitution.abstractBound introduced)
-            VariableSubstitution.abstractFreeTop)
-          ((tail.weakenFree introduced).substituteMapped
-            (VariableSubstitution.abstractBound introduced)
-            VariableSubstitution.abstractFreeTop) =
-        Arguments.cons (head.weakenBound introduced)
-          (tail.weakenBound introduced)
-      rw [ihHead, ihTail])
-    term
+
+  change (term.renameMapped VariableRenaming.id (VariableRenaming.weaken introduced)).substituteMapped
+      (VariableSubstitution.abstractBound introduced) VariableSubstitution.abstractFreeTop =
+    term.renameMapped (VariableRenaming.weaken introduced) VariableRenaming.id
+  rw [← Term.substituteMapped_of_renaming, Term.substituteMapped_comp,
+    ← Term.substituteMapped_of_bound_renaming]
+  rfl
 
 /-- bound 恒等的非恒等替换与规范全称封闭交换。 -/
 @[simp] theorem Formula.substituteMapped_forallFreeTop_boundId

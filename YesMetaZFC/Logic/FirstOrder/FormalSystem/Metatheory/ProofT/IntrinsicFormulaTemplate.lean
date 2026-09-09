@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.Language
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Basic
+import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Algebra
 import YesMetaZFC.Logic.FirstOrder.FreshVariable
 import YesMetaZFC.Logic.FirstOrder.LevyHierarchy
 
@@ -66,9 +66,7 @@ theorem instantiate_delta0
     (template.instantiate substitution).substituteMapped
         boundSubstitution freeSubstitution =
       template.instantiate
-        (fun {_sort} entry =>
-          (substitution entry).substituteMapped
-            boundSubstitution freeSubstitution) := by
+        (VariableSubstitution.postcompose boundSubstitution freeSubstitution substitution) := by
   change
     (template.body.substituteMapped
       VariableSubstitution.empty substitution).substituteMapped
@@ -97,21 +95,8 @@ theorem instantiate_delta0
           (substitution entry).substituteMapped
             (VariableSubstitution.instantiateTop replacement)
             VariableSubstitution.freeId) := by
-  change
-    (template.body.substituteMapped
-      VariableSubstitution.empty substitution).substituteMapped
-        (VariableSubstitution.instantiateTop replacement)
-        VariableSubstitution.freeId =
-      template.body.substituteMapped
-        VariableSubstitution.empty
-        (fun {sort} entry =>
-          (substitution entry).substituteMapped
-            (VariableSubstitution.instantiateTop replacement)
-            VariableSubstitution.freeId)
-  rw [Formula.substituteMapped_comp]
-  congr
-  funext sort entry
-  exact nomatch entry
+  exact instantiate_substituteMapped template substitution _ _
+
 
 /-- 模板实例化与规范 bound 打开交换，公式树只遍历一次。 -/
 @[simp] theorem instantiate_openBoundTop
@@ -125,27 +110,8 @@ theorem instantiate_delta0
         (fun {_sort} entry =>
           Term.openBoundTop (σ := signature) SetSort.set
             (substitution entry)) := by
-  change
-    (template.body.substituteMapped
-      VariableSubstitution.empty substitution).substituteMapped
-        (VariableSubstitution.instantiateTop
-          (FreshVariable.newest
-            (σ := signature) (free := free) SetSort.set))
-        (VariableSubstitution.of_renaming
-          (VariableRenaming.weaken SetSort.set)) =
-      template.body.substituteMapped
-        VariableSubstitution.empty
-        (fun {sort} entry =>
-          (substitution entry).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest
-                (σ := signature) (free := free) SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set)))
-  rw [Formula.substituteMapped_comp]
-  congr
-  funext sort entry
-  exact nomatch entry
+  exact instantiate_substituteMapped template substitution _ _
+
 
 /-- 顶部实例化的映射表示直接恢复穿过 binder 的项。 -/
 @[simp] theorem term_substituteMapped_instantiateTop_weakenBound
@@ -250,20 +216,9 @@ def apply_four
         boundSubstitution freeSubstitution =
       template.apply_one
         (term.substituteMapped boundSubstitution freeSubstitution) := by
-  change
-    (template.instantiate
-      (VariableSubstitution.cons term VariableSubstitution.empty)).substituteMapped
-        boundSubstitution freeSubstitution =
-      template.instantiate
-        (VariableSubstitution.cons
-          (term.substituteMapped boundSubstitution freeSubstitution)
-          VariableSubstitution.empty)
-  rw [instantiate_substituteMapped]
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there previous => exact nomatch previous
+  simp only [apply_one, instantiate_substituteMapped,
+    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+
 
 /-- 双参数模板的实例化与后续替换交换。 -/
 @[simp] theorem apply_two_substituteMapped
@@ -279,26 +234,9 @@ def apply_four
       template.apply_two
         (left.substituteMapped boundSubstitution freeSubstitution)
         (right.substituteMapped boundSubstitution freeSubstitution) := by
-  change
-    (template.instantiate
-      (VariableSubstitution.cons left
-        (VariableSubstitution.cons right VariableSubstitution.empty))).substituteMapped
-        boundSubstitution freeSubstitution =
-      template.instantiate
-        (VariableSubstitution.cons
-          (left.substituteMapped boundSubstitution freeSubstitution)
-          (VariableSubstitution.cons
-            (right.substituteMapped boundSubstitution freeSubstitution)
-            VariableSubstitution.empty))
-  rw [instantiate_substituteMapped]
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      cases previous with
-      | here => rfl
-      | there previous => exact nomatch previous
+  simp only [apply_two, instantiate_substituteMapped,
+    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+
 
 /-- 单参数模板沿 free 上下文顶部弱化。 -/
 @[simp] theorem apply_one_weakenFree
@@ -341,21 +279,9 @@ def apply_four
     Formula.instantiateTop replacement
         (template.apply_one (.bvar .here)) =
       template.apply_one replacement := by
-  change Formula.instantiateTop replacement
-      (template.instantiate
-        (VariableSubstitution.cons
-          (.bvar .here : SetTerm [SetSort.set] free)
-          VariableSubstitution.empty)) =
-    template.instantiate
-      (VariableSubstitution.cons replacement
-        VariableSubstitution.empty)
-  rw [instantiate_top]
-  unfold instantiate
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there impossible => exact nomatch impossible
+  exact apply_one_substituteMapped template (.bvar .here)
+    (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId
+
 
 /-- 双参数模板的首参数为顶部 bound 变量时直接执行 β 归约。 -/
 @[simp] theorem apply_two_instantiateTop_bvar
@@ -366,27 +292,11 @@ def apply_four
         (template.apply_two (.bvar .here)
           (right.weakenBound SetSort.set)) =
       template.apply_two replacement right := by
-  change Formula.instantiateTop replacement
-      (template.instantiate
-        (VariableSubstitution.cons
-          (.bvar .here : SetTerm [SetSort.set] free)
-          (VariableSubstitution.cons
-            (right.weakenBound SetSort.set)
-            VariableSubstitution.empty))) =
-    template.instantiate
-      (VariableSubstitution.cons replacement
-        (VariableSubstitution.cons right VariableSubstitution.empty))
-  rw [instantiate_top]
-  unfold instantiate
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          simp [VariableSubstitution.cons]
-      | there impossible => exact nomatch impossible
+  change (template.apply_two (.bvar .here) (right.weakenBound SetSort.set)).substituteMapped
+    (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId = _
+  simp only [apply_two_substituteMapped, Term.substituteMapped,
+    VariableSubstitution.instantiateTop, term_substituteMapped_instantiateTop_weakenBound]
+
 
 /-- 三参数模板的实例化与后续替换交换。 -/
 @[simp] theorem apply_three_substituteMapped
@@ -403,32 +313,9 @@ def apply_four
         (first.substituteMapped boundSubstitution freeSubstitution)
         (second.substituteMapped boundSubstitution freeSubstitution)
         (third.substituteMapped boundSubstitution freeSubstitution) := by
-  change
-    (template.instantiate
-      (VariableSubstitution.cons first
-        (VariableSubstitution.cons second
-          (VariableSubstitution.cons third VariableSubstitution.empty)))).substituteMapped
-        boundSubstitution freeSubstitution =
-      template.instantiate
-        (VariableSubstitution.cons
-          (first.substituteMapped boundSubstitution freeSubstitution)
-          (VariableSubstitution.cons
-            (second.substituteMapped boundSubstitution freeSubstitution)
-            (VariableSubstitution.cons
-              (third.substituteMapped boundSubstitution freeSubstitution)
-              VariableSubstitution.empty)))
-  rw [instantiate_substituteMapped]
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      cases previous with
-      | here => rfl
-      | there previous =>
-          cases previous with
-          | here => rfl
-          | there previous => exact nomatch previous
+  simp only [apply_three, instantiate_substituteMapped,
+    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+
 
 /-- 四参数模板的实例化与后续替换交换。 -/
 @[simp] theorem apply_four_substituteMapped
@@ -446,39 +333,8 @@ def apply_four
         (second.substituteMapped boundSubstitution freeSubstitution)
         (third.substituteMapped boundSubstitution freeSubstitution)
         (fourth.substituteMapped boundSubstitution freeSubstitution) := by
-  change
-    (template.instantiate
-      (VariableSubstitution.cons first
-        (VariableSubstitution.cons second
-          (VariableSubstitution.cons third
-            (VariableSubstitution.cons fourth
-              VariableSubstitution.empty))))).substituteMapped
-        boundSubstitution freeSubstitution =
-      template.instantiate
-        (VariableSubstitution.cons
-          (first.substituteMapped boundSubstitution freeSubstitution)
-          (VariableSubstitution.cons
-            (second.substituteMapped boundSubstitution freeSubstitution)
-            (VariableSubstitution.cons
-              (third.substituteMapped boundSubstitution freeSubstitution)
-              (VariableSubstitution.cons
-                (fourth.substituteMapped boundSubstitution freeSubstitution)
-                VariableSubstitution.empty))))
-  rw [instantiate_substituteMapped]
-  congr
-  funext sort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      cases previous with
-      | here => rfl
-      | there previous =>
-          cases previous with
-          | here => rfl
-          | there previous =>
-              cases previous with
-              | here => rfl
-              | there previous => exact nomatch previous
+  simp only [apply_four, instantiate_substituteMapped,
+    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
 
 instance unary_coe_fun : CoeFun Unary
     (fun _ => ∀ {bound free : SetContext},
@@ -518,43 +374,8 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (second.instantiateTop replacement)
         (third.instantiateTop replacement)
         (fourth.instantiateTop replacement) := by
-  change
-    Formula.instantiateTop replacement
-        (template.instantiate
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second
-              (VariableSubstitution.cons third
-                (VariableSubstitution.cons fourth
-                  VariableSubstitution.empty))))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (first.instantiateTop replacement)
-          (VariableSubstitution.cons
-            (second.instantiateTop replacement)
-            (VariableSubstitution.cons
-              (third.instantiateTop replacement)
-              (VariableSubstitution.cons
-                (fourth.instantiateTop replacement)
-                VariableSubstitution.empty))))
-  rw [instantiate_top]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          rfl
-      | there previous =>
-          cases previous with
-          | here =>
-              rfl
-          | there previous =>
-              cases previous with
-              | here =>
-                  rfl
-              | there previous => exact nomatch previous
+  exact apply_four_substituteMapped template first second third fourth _ _
+
 
 /-- 三参数模板与任意顶部 bound 实例化交换。 -/
 @[simp] theorem apply_three_instantiateTop_arguments
@@ -568,36 +389,8 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (first.instantiateTop replacement)
         (second.instantiateTop replacement)
         (third.instantiateTop replacement) := by
-  change
-    Formula.instantiateTop replacement
-        (template.instantiate
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second
-              (VariableSubstitution.cons third
-                VariableSubstitution.empty)))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (first.instantiateTop replacement)
-          (VariableSubstitution.cons
-            (second.instantiateTop replacement)
-            (VariableSubstitution.cons
-              (third.instantiateTop replacement)
-              VariableSubstitution.empty)))
-  rw [instantiate_top]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          rfl
-      | there previous =>
-          cases previous with
-          | here =>
-              rfl
-          | there previous => exact nomatch previous
+  exact apply_three_substituteMapped template first second third _ _
+
 
 /-- 三参数模板直接穿过规范 bound 打开。 -/
 @[simp] theorem apply_three_openBoundTop_arguments
@@ -610,36 +403,8 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (Term.openBoundTop (σ := signature) SetSort.set first)
         (Term.openBoundTop (σ := signature) SetSort.set second)
         (Term.openBoundTop (σ := signature) SetSort.set third) := by
-  change
-    Formula.openBoundTop (σ := signature) SetSort.set
-        (template.instantiate
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second
-              (VariableSubstitution.cons third
-                VariableSubstitution.empty)))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (Term.openBoundTop (σ := signature) SetSort.set first)
-          (VariableSubstitution.cons
-            (Term.openBoundTop (σ := signature) SetSort.set second)
-            (VariableSubstitution.cons
-              (Term.openBoundTop (σ := signature) SetSort.set third)
-              VariableSubstitution.empty)))
-  rw [instantiate_openBoundTop]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          rfl
-      | there previous =>
-          cases previous with
-          | here =>
-              rfl
-          | there previous => exact nomatch previous
+  exact apply_three_substituteMapped template first second third _ _
+
 
 /-- 四参数模板直接穿过规范 bound 打开。 -/
 @[simp] theorem apply_four_openBoundTop_arguments
@@ -653,43 +418,8 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (Term.openBoundTop (σ := signature) SetSort.set second)
         (Term.openBoundTop (σ := signature) SetSort.set third)
         (Term.openBoundTop (σ := signature) SetSort.set fourth) := by
-  change
-    Formula.openBoundTop (σ := signature) SetSort.set
-        (template.instantiate
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second
-              (VariableSubstitution.cons third
-                (VariableSubstitution.cons fourth
-                  VariableSubstitution.empty))))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (Term.openBoundTop (σ := signature) SetSort.set first)
-          (VariableSubstitution.cons
-            (Term.openBoundTop (σ := signature) SetSort.set second)
-            (VariableSubstitution.cons
-              (Term.openBoundTop (σ := signature) SetSort.set third)
-              (VariableSubstitution.cons
-                (Term.openBoundTop (σ := signature) SetSort.set fourth)
-                VariableSubstitution.empty))))
-  rw [instantiate_openBoundTop]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      rfl
-  | there previous =>
-      cases previous with
-      | here =>
-          rfl
-      | there previous =>
-          cases previous with
-          | here =>
-              rfl
-          | there previous =>
-              cases previous with
-              | here =>
-                  rfl
-              | there previous => exact nomatch previous
+  exact apply_four_substituteMapped template first second third fourth _ _
+
 
 /-- 单参数模板穿过一个新 bound 槽位后直接顶部实例化。 -/
 @[simp] theorem apply_one_instantiateTop
@@ -700,25 +430,11 @@ instance quaternary_coe_fun : CoeFun Quaternary
       (template
         (term.weakenBound SetSort.set ·ₘ (.bvar .here))) =
       template (term ·ₘ replacement) := by
-  change
-    Formula.instantiateTop replacement
-      (template.instantiate
-        (VariableSubstitution.cons
-          (term.weakenBound SetSort.set ·ₘ (.bvar .here))
-          VariableSubstitution.empty)) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (term ·ₘ replacement) VariableSubstitution.empty)
-  rw [instantiate_top]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, Term.substituteMapped,
-        Arguments.substituteMapped,
-        term_substituteMapped_instantiateTop_weakenBound,
-        VariableSubstitution.instantiateTop]
-  | there previous => exact nomatch previous
+  change (template.apply_one (term.weakenBound SetSort.set ·ₘ (.bvar .here))).substituteMapped
+    (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId =
+      template.apply_one (term ·ₘ replacement)
+  simp only [apply_one_substituteMapped, Term.substituteMapped, Arguments.substituteMapped,
+    term_substituteMapped_instantiateTop_weakenBound, VariableSubstitution.instantiateTop]
 
  /-- 单参数模板的底层替换表示同样直接恢复。 -/
 @[simp] theorem apply_one_substituteMapped_instantiateTop
@@ -748,36 +464,12 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (left.weakenBound SetSort.set ·ₘ (.bvar .here))
         (right.weakenBound SetSort.set ·ₘ (.bvar .here))) =
       template (left ·ₘ replacement) (right ·ₘ replacement) := by
-  change
-    Formula.instantiateTop replacement
-      (template.instantiate
-        (VariableSubstitution.cons
-          (left.weakenBound SetSort.set ·ₘ (.bvar .here))
-          (VariableSubstitution.cons
-            (right.weakenBound SetSort.set ·ₘ (.bvar .here))
-            VariableSubstitution.empty))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (left ·ₘ replacement)
-          (VariableSubstitution.cons
-            (right ·ₘ replacement) VariableSubstitution.empty))
-  rw [instantiate_top]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, Term.substituteMapped,
-        Arguments.substituteMapped,
-        term_substituteMapped_instantiateTop_weakenBound,
-        VariableSubstitution.instantiateTop]
-  | there previous =>
-      cases previous with
-      | here =>
-          simp [ VariableSubstitution.cons, Term.substituteMapped,
-            Arguments.substituteMapped,
-            term_substituteMapped_instantiateTop_weakenBound,
-            VariableSubstitution.instantiateTop]
-      | there previous => exact nomatch previous
+  change (template.apply_two (left.weakenBound SetSort.set ·ₘ (.bvar .here)) (right.weakenBound SetSort.set ·ₘ (.bvar .here))).substituteMapped
+    (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId =
+      template.apply_two (left ·ₘ replacement) (right ·ₘ replacement)
+  simp only [apply_two_substituteMapped, Term.substituteMapped, Arguments.substituteMapped,
+    term_substituteMapped_instantiateTop_weakenBound, VariableSubstitution.instantiateTop]
+
 
 /-- 四参数模板穿过一个新 bound 槽位后直接顶部实例化。 -/
 @[simp] theorem apply_four_instantiateTop
@@ -792,58 +484,11 @@ instance quaternary_coe_fun : CoeFun Quaternary
         (fourth.weakenBound SetSort.set ·ₘ (.bvar .here))) =
       template (first ·ₘ replacement) (second ·ₘ replacement)
         (third ·ₘ replacement) (fourth ·ₘ replacement) := by
-  change
-    Formula.instantiateTop replacement
-      (template.instantiate
-        (VariableSubstitution.cons
-          (first.weakenBound SetSort.set ·ₘ (.bvar .here))
-          (VariableSubstitution.cons
-            (second.weakenBound SetSort.set ·ₘ (.bvar .here))
-            (VariableSubstitution.cons
-              (third.weakenBound SetSort.set ·ₘ (.bvar .here))
-              (VariableSubstitution.cons
-                (fourth.weakenBound SetSort.set ·ₘ (.bvar .here))
-                VariableSubstitution.empty))))) =
-      template.instantiate
-        (VariableSubstitution.cons
-          (first ·ₘ replacement)
-          (VariableSubstitution.cons
-            (second ·ₘ replacement)
-            (VariableSubstitution.cons
-              (third ·ₘ replacement)
-              (VariableSubstitution.cons
-                (fourth ·ₘ replacement) VariableSubstitution.empty))))
-  rw [instantiate_top]
-  congr
-  funext sort entry
-  cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, Term.substituteMapped,
-        Arguments.substituteMapped,
-        term_substituteMapped_instantiateTop_weakenBound,
-        VariableSubstitution.instantiateTop]
-  | there previous =>
-      cases previous with
-      | here =>
-          simp [ VariableSubstitution.cons, Term.substituteMapped,
-            Arguments.substituteMapped,
-            term_substituteMapped_instantiateTop_weakenBound,
-            VariableSubstitution.instantiateTop]
-      | there previous =>
-          cases previous with
-          | here =>
-              simp [ VariableSubstitution.cons, Term.substituteMapped,
-                Arguments.substituteMapped,
-                term_substituteMapped_instantiateTop_weakenBound,
-                VariableSubstitution.instantiateTop]
-          | there previous =>
-              cases previous with
-              | here =>
-                  simp [ VariableSubstitution.cons, Term.substituteMapped,
-                    Arguments.substituteMapped,
-                    term_substituteMapped_instantiateTop_weakenBound,
-                    VariableSubstitution.instantiateTop]
-              | there previous => exact nomatch previous
+  change (template.apply_four (first.weakenBound SetSort.set ·ₘ (.bvar .here)) (second.weakenBound SetSort.set ·ₘ (.bvar .here)) (third.weakenBound SetSort.set ·ₘ (.bvar .here)) (fourth.weakenBound SetSort.set ·ₘ (.bvar .here))).substituteMapped
+    (VariableSubstitution.instantiateTop replacement) VariableSubstitution.freeId =
+      template.apply_four (first ·ₘ replacement) (second ·ₘ replacement) (third ·ₘ replacement) (fourth ·ₘ replacement)
+  simp only [apply_four_substituteMapped, Term.substituteMapped, Arguments.substituteMapped,
+    term_substituteMapped_instantiateTop_weakenBound, VariableSubstitution.instantiateTop]
 
 end FormulaTemplate
 

@@ -11,6 +11,7 @@ namespace ProofT
 namespace ZFC
 
 open Nonlogical.BasicSetTheory
+open QuineEncoding
 open StructuredCertificateCondition
 open IntrinsicLogicalCertificate
 open IntrinsicCheckedLine
@@ -22,6 +23,57 @@ open scoped Nonlogical.BasicSetTheory.Symbols
 open scoped Symbols
 
 set_option autoImplicit false
+
+/-- 实际 quotation 的载体成员事实一次性提升到目标上下文。 -/
+theorem intrinsic_zfc_quote_formula_mem
+    {σ : Signature} [QuotationNumbering σ] {bound free : SortContext σ}
+    {Γ : Context signature []} (formula : Formula σ bound free) :
+    Γ ⊢ₘ[intrinsic_zfc_theory]
+      (quote formula : SetOpenTerm []) ∈ₘ syntax_formula_code_set_term :=
+  FirstOrder.Derives.context_weaken (by simp)
+    (FirstOrder.Derives.theory_weaken
+      intrinsic_syntax_carrier_theory_subset_intrinsic_zfc_theory
+      (intrinsic_syntax_carrier_quote_formula_mem formula))
+
+/-- 实际 quotation 的深度识别，不再按每条逻辑公理重建构造树。 -/
+theorem intrinsic_zfc_quote_formula_code_at
+    {σ : Signature} [QuotationNumbering σ] {bound free : SortContext σ}
+    {Γ : Context signature []} (formula : Formula σ bound free) :
+    Γ ⊢ₘ[intrinsic_zfc_theory] formula_code_atₘ(numₘ(bound.length), quote formula) :=
+  FirstOrder.Derives.context_weaken (by simp)
+    (FirstOrder.Derives.theory_weaken
+      formal_language_encoding_theory_subset_intrinsic_zfc_theory
+      (quote_formula_code_at formula))
+
+/-- quotation 的内部自然数界随任意源公式直接取得。 -/
+theorem intrinsic_zfc_quote_formula_mem_omega
+    {σ : Signature} [QuotationNumbering σ] {bound free : SortContext σ}
+    {Γ : Context signature []} (formula : Formula σ bound free) :
+    Γ ⊢ₘ[intrinsic_zfc_theory] (quote formula : SetOpenTerm []) ∈ₘ ωₘ :=
+  FirstOrder.Derives.context_weaken (by simp)
+    (FirstOrder.Derives.theory_weaken
+      formal_language_encoding_theory_subset_intrinsic_zfc_theory
+      (formula_code_at_code_mem_of_derives _ _ (quote_formula_code_at formula)))
+
+/-- quotation 的内部自然数界随任意源项直接取得。 -/
+theorem intrinsic_zfc_quote_term_mem_omega
+    {σ : Signature} [QuotationNumbering σ] {bound free : SortContext σ}
+    {sort : σ.SortSymbol} {Γ : Context signature []} (term : Term σ bound free sort) :
+    Γ ⊢ₘ[intrinsic_zfc_theory] (quote_term term : SetOpenTerm []) ∈ₘ ωₘ :=
+  FirstOrder.Derives.context_weaken (by simp)
+    (FirstOrder.Derives.theory_weaken
+      formal_language_encoding_theory_subset_intrinsic_zfc_theory
+      (term_code_at_code_mem_of_derives _ _ (quote_term_code_at term)))
+
+/-- 逻辑证书的公共外壳保持内部自然数码域。 -/
+theorem intrinsic_zfc_logical_certificate_mem_omega
+    {free : SetContext} {Γ : Context signature free}
+    (certificate : SetOpenTerm free)
+    (hCertificate : Γ ⊢ₘ[intrinsic_zfc_theory] certificate ∈ₘ ωₘ) :
+    Γ ⊢ₘ[intrinsic_zfc_theory] logical_certificate_code certificate ∈ₘ ωₘ :=
+  godel_pairing_mem_omega_of_extends
+    godel_pairing_core_theory_subset_intrinsic_zfc_theory _ _
+    (intrinsic_zfc_arithmetic_support.finite_numeral_mem_omega 0) hCertificate
 
 theorem intrinsic_zfc_certificate_payload_bound_of_at
     {free : SetContext} {Γ : Context signature free}

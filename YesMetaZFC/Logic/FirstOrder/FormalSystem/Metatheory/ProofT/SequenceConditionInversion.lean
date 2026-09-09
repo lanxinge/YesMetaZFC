@@ -1,3 +1,4 @@
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteSequenceConstruction
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SequenceCondition
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.IntrinsicQuantifier
 
@@ -128,54 +129,7 @@ theorem term_weakenBound_substitute_newest
         (VariableSubstitution.of_renaming
           (VariableRenaming.weaken SetSort.set)) =
       term.weakenFree SetSort.set := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      (term.weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := signature) (free := free)
-              SetSort.set))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        term.weakenFree SetSort.set)
-    (motive_2 := fun _ arguments =>
-      (arguments.weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := signature) (free := free)
-              SetSort.set))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        arguments.weakenFree SetSort.set)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          ((arguments.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Term.app function (arguments.weakenFree SetSort.set)
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          ((head.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set)))
-          ((tail.weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Arguments.cons (head.weakenFree SetSort.set)
-          (tail.weakenFree SetSort.set)
-      rw [ihHead, ihTail])
-    term
+  exact Term.openBoundTop_weakenBound SetSort.set term
 
 /-- 有界量词体中的第二层 bound weakening 也可直接打开为 free weakening。 -/
 theorem term_two_weakenBound_substitute_newest
@@ -189,61 +143,20 @@ theorem term_two_weakenBound_substitute_newest
         (VariableSubstitution.of_renaming
           (VariableRenaming.weaken SetSort.set)) =
       (term.weakenFree SetSort.set).weakenBound SetSort.set := by
-  exact Term.rec
-    (motive_1 := fun _ term =>
-      ((term.weakenBound SetSort.set).weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.liftBound SetSort.set
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set)))
+  calc
+    _ = ((term.weakenBound SetSort.set).substituteMapped
+          (VariableSubstitution.instantiateTop
+            (FreshVariable.newest (σ := signature) (free := free) SetSort.set))
           (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        (term.weakenFree SetSort.set).weakenBound SetSort.set)
-    (motive_2 := fun _ arguments =>
-      ((arguments.weakenBound SetSort.set).weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.liftBound SetSort.set
-            (VariableSubstitution.instantiateTop
-              (FreshVariable.newest (σ := signature) (free := free)
-                SetSort.set)))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        (arguments.weakenFree SetSort.set).weakenBound SetSort.set)
-    (fun _ => rfl)
-    (fun _ => rfl)
-    (fun function arguments ih => by
-      change Term.app function
-          (((arguments.weakenBound SetSort.set).weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.liftBound SetSort.set
-              (VariableSubstitution.instantiateTop
-                (FreshVariable.newest (σ := signature) (free := free)
-                  SetSort.set)))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Term.app function
-          ((arguments.weakenFree SetSort.set).weakenBound SetSort.set)
-      rw [ih])
-    rfl
-    (fun head tail ihHead ihTail => by
-      change Arguments.cons
-          (((head.weakenBound SetSort.set).weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.liftBound SetSort.set
-              (VariableSubstitution.instantiateTop
-                (FreshVariable.newest (σ := signature) (free := free)
-                  SetSort.set)))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set)))
-          (((tail.weakenBound SetSort.set).weakenBound SetSort.set).substituteMapped
-            (VariableSubstitution.liftBound SetSort.set
-              (VariableSubstitution.instantiateTop
-                (FreshVariable.newest (σ := signature) (free := free)
-                  SetSort.set)))
-            (VariableSubstitution.of_renaming
-              (VariableRenaming.weaken SetSort.set))) =
-        Arguments.cons
-          ((head.weakenFree SetSort.set).weakenBound SetSort.set)
-          ((tail.weakenFree SetSort.set).weakenBound SetSort.set)
-      rw [ihHead, ihTail])
-    term
+            (VariableRenaming.weaken SetSort.set))).weakenBound SetSort.set := by
+      simpa only [VariableSubstitution.weakenBound_of_renaming] using
+        (Term.substituteMapped_weakenBound SetSort.set
+          (VariableSubstitution.instantiateTop
+            (FreshVariable.newest (σ := signature) (free := free) SetSort.set))
+          (VariableSubstitution.of_renaming (VariableRenaming.weaken SetSort.set))
+          (term.weakenBound SetSort.set))
+    _ = _ := congrArg (Term.weakenBound SetSort.set)
+      (term_weakenBound_substitute_newest term)
 
 /-- 规范轨迹见证上下文中暴露的五个直接分量。 -/
 structure NatSequenceTraceParts
@@ -774,6 +687,32 @@ theorem proof_sequence_code_trace_elim
   simpa [body, proof_sequence_trace_context] using
     hCase (proof_sequence_code_trace_parts_of_assumption
       sequence code hOpened)
+
+/-- 统一运输递归轨迹的内部界与末值，不依赖具体行编码。 -/
+theorem sequence_trace_numeral_data
+    {T : SetTheory} (A : ArithmeticSupport T)
+    {free : SetContext} {Γ : Context signature free}
+    (sequence trace code : SetOpenTerm free) (length bound : Nat)
+    (hDomain : Γ ⊢ₘ[T] domₘ(sequence) ≐ₘ numₘ(length))
+    (hCode : Γ ⊢ₘ[T] code ≐ₘ numₘ(bound))
+    (hTraceDomain : Γ ⊢ₘ[T] domₘ(trace) ≐ₘ Sₘ(domₘ(sequence)))
+    (hBound : Γ ⊢ₘ[T] sequence_trace_code_bound trace code)
+    (hFinal : Γ ⊢ₘ[T] code ≐ₘ (trace ·ₘ domₘ(sequence))) :
+    (∀ index, index ≤ length → Γ ⊢ₘ[T] (trace ·ₘ numₘ(index)) ∈ₘ numₘ(bound + 1)) ∧
+      (Γ ⊢ₘ[T] numₘ(bound) ≐ₘ (trace ·ₘ numₘ(length))) := by
+  have hTrace : Γ ⊢ₘ[T] domₘ(trace) ≐ₘ numₘ(length + 1) :=
+    FirstOrder.Derives.eq_trans hTraceDomain
+      (successor_term_congr_of_equality _ _ hDomain)
+  constructor
+  · intro index hIndex
+    have hMember := sequence_trace_code_bound_at trace code (numₘ(index)) hBound
+      (row_index_mem_of_domain A trace (length + 1) index hTrace (by omega))
+    exact FirstOrder.Derives.iff_elim_left
+      (membership_right_iff_of_equality _ _ _ (successor_term_congr_of_equality _ _ hCode))
+      hMember
+  · exact FirstOrder.Derives.eq_trans (FirstOrder.Derives.eq_symm hCode)
+      (FirstOrder.Derives.eq_trans hFinal
+        (function_application_term_congr_argument_of_equality trace _ _ hDomain))
 
 end ProofT
 end FormalSystem
