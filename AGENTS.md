@@ -8,13 +8,21 @@
 | 合并重复证明、复用公共接口、定位性能热点 | [ENGINEERING.md](ENGINEERING.md) |
 | 当前自然数证书、quotation 与对象表示 | [NAT_DECODING.md](NAT_DECODING.md) |
 | 纯定义、阶段扩张与原规格 | [ELIMINATION.md](ELIMINATION.md) |
-| 原公理覆盖、任意原模型对应、Rosser 与 Δ₀ 边界 | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
+| 原公理覆盖、模型对应、Rosser／Löb／哥二／Tarski 与可信依赖 | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
 | 成果入口、命名规范 | [TROPHIES.md](TROPHIES.md)、[ProofNaming.md](ProofNaming.md) |
 
 裸 ZFC Rosser 实例已经完成：`PureRosser.agreement` 有实际证明，
 `PureRosser.independent` 仅假定裸 ZFC 一致。相关重构必须保留这一终点、
 源句子、签名、公理、quotation 与既定可信基；进入对应层时先读上表的使用边界。
 本文件维护长期规范，完成的计划改写为接口导航，不追加逐轮日志。
+`PureProvability` 已在裸 ZFC 中完成原编码表示的 D1–D3、Löb 与哥二；
+纯句子的双向推导及源句子往返所需的对应条件见 `PureSentenceTransfer` 和上述指南。
+`ReducedTarski` 已完成原支撑理论的无参数真值不可定义性；`ReducedTarski.Parameters`
+进一步排除每组任意有限参数下的开放公式真值定义。实际 liar 构造复用
+`ObjectDiagonal` 的原自代入图。`PureTarskiSource` 已把保留原编码的带参数实例落到裸 ZFC；
+候选和反例均为纯公式，真值合同按源公式索引。`PureQuotation`、`PureFixedPoint` 和
+`PureTarski` 另已完成最终纯公式自身完整 AST 编码、带参数固定点及裸 ZFC 真不可定义性。
+开放公式的环境往返和双向推导见 `PureOpenTransfer`，精确边界见成果表和编码指南。
 
 ## 元数学内核
 

@@ -1,9 +1,13 @@
-# 公理验证与 Rosser 接口指路表
+# 公理验证与不完备性接口指路表
 
 验证对象是原 `intrinsic_proof_theory`、`intrinsic_zfc_theory` 及纯语言中的
-`PureModel.theory`。裸 ZFC Rosser 实例已完成；独立性定理假定裸 ZFC 一致，
+`PureModel.theory`。裸 ZFC 的 Rosser、原编码表示的 D1–D3、Löb 与哥二实例已完成；
+独立性与哥二的不可证性定理假定裸 ZFC 一致，
 不证明 ZFC 自身的一致性。纯定义构造见 [ELIMINATION.md](ELIMINATION.md)，
 证书与检查器见 [NAT_DECODING.md](NAT_DECODING.md)。
+原支撑理论的无参数及任意有限参数 Tarski 真不可定义性也已完成；语义终点覆盖
+任意原模型及每一组参数赋值。`PureTarskiSource` 另已给出保留源编码的裸 ZFC 版本；
+其合同按源公式索引。`PureTarski` 现已完成只量化纯公式、使用最终纯公式自身编码的版本。
 
 ## 模型、公理与推导
 
@@ -14,9 +18,11 @@
 | 原 ZFC 像及实际纯翻译 | [PureZFCModels](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureZFCModels.lean) 的 `models`、`translated_models` | 不弱化原公理或 guard |
 | 模型扩张与约化 | [PureZFCModels](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureZFCModels.lean) 的 `expands`、`reduct_models`、`reduction` | 约化适用于任意原模型，不仅规范扩张 |
 | 公平调度与正向推导传输 | [PureRosserSchedule](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserSchedule.lean) 的 `source`、`target`；[PureRosser](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosser.lean) 的 `translate_derives` | 使用 Henkin 强完备性传输源闭句推导；一般反向句法保守性不在此结论中 |
+| 纯句子嵌入与双向推导 | [PureSentenceTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSentenceTransfer.lean) 的 `embed_m`、`translate_embed_m`、`derives_iff_m` | 对任意纯句子成立；任意源句子的反向往返 `embed_translate_m` 仍须提供其实际 `Agreement` |
 | 实际纯固定点 | [PureRosser](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosser.lean) 的 `sentence`、`comparison`、`fixed_point` | 当前源 Rosser 及源 quotation 的实际纯翻译，不是纯语言 quotation 上重新对角化 |
 | 任意原模型上的句子对应 | [PureRosserComplete](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean) 中 `PureRosser.agreement` | `Agreement` 已有证明；[PureRosser](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosser.lean) 的 `truth_iff` 只涉及规范扩张，不能单独代替它 |
 | 裸 ZFC 双侧不可证性 | [PureRosserComplete](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean) 中 `PureRosser.independent` | 仅由裸 ZFC 一致性推出当前句子及其否定均不可推导 |
+| 裸 ZFC 的 Löb 与第二不完备 | [PureLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean)、[PureSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSecondIncompleteness.lean) | 全部句子使用纯签名，理论为 `PureModel.theory`；可证明性使用纯嵌入后的原 quotation 和检查器 |
 
 ## 任意原模型的内部证明码对应
 
@@ -185,9 +191,9 @@
 | 118 | `SupportAssembly.closedTemplate .range` | `PureSupportSeparation.parameter_template`；[PureSupportSeparation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSupportSeparation.lean) |
 | 119 | `SupportAssembly.closedTemplate .symmetricDifference` | `PureSupportSeparation.parameter_template`；[PureSupportSeparation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSupportSeparation.lean) |
 
-## D3 与任意内部轨迹反射核验
+## 可导性、内部反射与不完备性核验
 
-在 `9045935` 及下述 D1、D2 工作区修改之上，累计新增一百零一个模块，完成
+在既有 D1、D2 接口之上，已完成
 内部数码总性与唯一性、固定 AST 的非标准自由代入、模式 2 点实例化连接、
 任意内部上下文下的数码语法，以及内部结论码上的节点装配、MP 和数码存在引入。
 现已补上任意有限参数定理的非标准数码特化、自然数 guard 反射、零测试
@@ -212,16 +218,50 @@
 `ReducedProvability.introspection` 已给出无附加反射假设的 D3 普通推导。
 归纳消费最终解释的纯公式，未假定内部自然数或轨迹在外部标准、有限或良基。
 
-当前 `lake --wfail build` 完成 921 个任务；`bash scripts/check-all.sh` 检查全部
-924 个 Lean 模块，完成 926 个全源构建任务及 320 个扫描工具任务，零错误、零警告。
-这是恢复环境中的增量内核核验，没有运行冷构建或远端 CI。
+当前源码包含原理论及裸 ZFC 的 Löb、第二不完备定理，原支撑理论的 Tarski 实例，
+以及保留源编码和最终纯公式自身编码的裸 ZFC 带参数 Tarski 实例。
+`lake --wfail build` 完成 947 个任务。
+`bash scripts/check-all.sh` 检查全部 950 个 Lean 模块，完成 952 个全源构建任务及
+320 个扫描工具任务，零错误、零警告。
+这些核验在恢复环境中实际运行；没有运行远端 CI。
 
-最新 `#print axioms` 检查覆盖 271 个入口，包括 D2、D3 与 Rosser 终点。
-上一状态的 247 个入口依赖集合逐项不变，24 个新入口也均未超出保存的
-Rosser 32 项可信基：
+最新 `#print axioms` 检查覆盖 530 个入口，包括 D1–D3、Löb、哥二、Rosser、原理论及纯语言表示的 Tarski 终点。
+上一状态的 440 个入口依赖集合逐项不变；90 个新增核验入口覆盖通用语义外壳、表达式迭代、
+最小输出、纯 AST 编解码、数码求值、自身编码图、固定点及纯 Tarski。
+全部新增依赖均未超出保存的 Rosser 32 项可信基，没有新可信依赖或 `sorryAx`：
 
 | 核验入口 | 依赖数量及比较 |
 | --- | --- |
+| `DerivabilityConditions_m.imp_m`、`iff_m` | 各 0 项 |
+| `DerivabilityConditions_m.loeb_axiom_m`、`loeb_m` | 各 1 项，仅 `propext` |
+| `ObjectLoeb.reflection_apply_m`、`fixed_point_m` | 分别为 2 项、3 项，仅既有 Lean 基础依赖 |
+| `ReducedProvability.loeb_fixed_point_m` | 11 项，包含于既有 Rosser 可信基 |
+| `ReducedProvability.derivability_m`、`loeb_axiom_m`、`loeb_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `DerivabilityConditions_m.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 1 项，仅 `propext` |
+| `ReducedProvability.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `PureSentenceTransfer.translate_embed_m`、`derives_iff_m` | 各 31 项，均包含于既有 Rosser 可信基 |
+| `PureProvability.checked_iff_m`、`source_canonical_m`、`source_roundtrip_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `PureProvability.necessitation_m`、`distribution_m`、`introspection_m`、`derivability_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `PureProvability.loeb_fixed_point_m`、`loeb_axiom_m`、`loeb_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `PureProvability.consistency_translation_m` | 11 项，包含于既有 Rosser 可信基 |
+| `PureProvability.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `Tarski.liar_refutes_m`、`biconditional_unprovable_m`、`not_truth_schema_m` | 各 1 项，仅 `propext` |
+| `Tarski.not_defines_truth_m`、`ObjectTarski.liar_fixed_point_m` | 各 3 项，仅既有 Lean 基础依赖 |
+| `ReducedTarski.liar_fixed_point_m`、`liar_refutes_m`、`biconditional_unprovable_m` | 各 10 项，均包含于既有 Rosser 可信基 |
+| `ReducedTarski.undefinable_syntax_m`、`undefinable_semantics_m` | 各 10 项，均包含于既有 Rosser 可信基 |
+| `ObjectNumeralSyntax.value_encode_m` | 0 项 |
+| `ObjectParameterDiagonal.fixed_point_m`、`ObjectTarski.Parameters.liar_fixed_point_m` | 各 3 项，仅既有 Lean 基础依赖 |
+| `Tarski.not_defines_satisfaction_m` | 3 项，仅既有 Lean 基础依赖 |
+| `ReducedTarski.Parameters.liar_fixed_point_m`、`liar_refutes_closed_m`、`liar_fails_at_m` | 各 10 项，均包含于既有 Rosser 可信基 |
+| `ReducedTarski.Parameters.undefinable_syntax_m`、`undefinable_at_m`、`undefinable_parameters_m` | 各 10 项，均包含于既有 Rosser 可信基 |
+| `SemanticTransfer.derives_open_m`、`consistent_open_m` | 各 3 项，仅既有 Lean 基础依赖 |
+| `PureOpenTransfer.embed_canonical_m`、`translate_embed_m`、`derives_iff_m` | 各 31 项，均包含于既有 Rosser 可信基 |
+| `PureTarskiSource.predicate_satisfies_m`、`liar_fixed_point_m`、`liar_refutes_closed_m` | 各 31 项，均包含于既有 Rosser 可信基 |
+| `PureTarskiSource.undefinable_syntax_m`、`undefinable_at_m`、`undefinable_parameters_m`、`undefinable_source_at_m` | 各 31 项，均包含于既有 Rosser 可信基 |
+| `PureQuotation.self_code_m`、`code_injective_m`、`decode_tree_m` | 各 3 项，仅既有 Lean 基础依赖 |
+| `PureDiagonalGraph.source_satisfies_m` | 10 项，均包含于既有 Rosser 可信基 |
+| `PureQuotation.numeral_satisfies_m`、`PureDiagonalGraph.satisfies_m`、`PureFixedPoint.fixed_point_m` | 各 31 项，均包含于既有 Rosser 可信基 |
+| `PureTarski.liar_fixed_point_m`、`liar_refutes_closed_m`、`undefinable_syntax_m`、`undefinable_parameters_m` | 各 31 项，均包含于既有 Rosser 可信基 |
 | `ObjectCodeInstantiation.formula_values_congr` | 1 项，为既有 Rosser 32 项依赖的子集 |
 | `PureSourceTraceComposition.witness_agrees`；`PureSourceNumeralSyntax.graph_transform` | 各 31 项，均包含于同一既有可信基 |
 | `PureSourceInstantiation.formula_mapped_transform`、`numeral_point`、`numeral_wellFormed` | 各 31 项，均包含于同一既有可信基 |
@@ -376,7 +416,136 @@ D1、D2 与 Rosser 的公开结论保持；当前证明图、quotation、
 `proofMatrix_exists` 保持原普通可证明性句子；[ReducedIntrospection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedIntrospection.lean) 的
 `ReducedProvability.introspection` 因而给出 $T\vdash\Box\varphi\to\Box\Box\varphi$。
 这些入口不要求外部有限骨架、逐条连边证明、额外反射、一致性或标准模型假设。
-本次已核验完整 D3；Löb、哥德尔第二不完备定理及裸 ZFC 原生证明谓词的传输另列后续目标。
+
+[Loeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Loeb.lean) 将 D1–D3
+封装为 `DerivabilityConditions_m`。给定固定点 $\psi\leftrightarrow(\Box\psi\to\varphi)$，
+先由 D2、D3 得到 $\Box\psi\to\Box\varphi$，再推出
+$(\Box\varphi\to\varphi)\to\psi$；D1、D2 提升后一推导，给出内部 Löb 公式。
+[ReducedLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedLoeb.lean)
+实际构造 `loebSentence_m` 并证明 `loeb_fixed_point_m`，因此 `loeb_axiom_m` 无额外固定点或
+反射前提；`loeb_m` 将 $T\vdash\Box\varphi\to\varphi$ 转为 $T\vdash\varphi$。
+这里 $T$ 与 $\Box$ 仍是原 `intrinsic_zfc_theory` 与 `ReducedProvability.provable`。
+
+[ReducedSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedSecondIncompleteness.lean)
+复用 $\varphi=\bot$ 的固定点，保持已有 $\mathrm{Con}(T)=\neg\Box\bot$。
+`second_incompleteness_internal_m` 证明 $T\vdash\mathrm{Con}(T)\to\neg\Box\mathrm{Con}(T)$；
+`second_incompleteness_m` 只假定 `Derives.Consistent T []`，便排除 $T\vdash\mathrm{Con}(T)$。
+通用证明见 [SecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/SecondIncompleteness.lean)：
+若有一致性句子的推导，否定消去将它转成 $\Box\bot\to\bot$，Löb 规则随即推出矛盾。
+
+## 裸 ZFC 的语言、可证明性与固定点传输
+
+令 $Z=\texttt{PureModel.theory}$，$e=\texttt{PureSentenceTransfer.embed_m}$，
+$\tau=\texttt{PureRosser.translate}$。[PureSentenceTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSentenceTransfer.lean)
+使用模型扩张后的约化等于原纯模型，证明 $Z\vdash\tau(e(\varphi))\leftrightarrow\varphi$；
+结合原模型约化和强完备性，得到 $T\vdash e(\varphi)\iff Z\vdash\varphi$。
+对于任意源句子 $\psi$，$T\vdash\psi\leftrightarrow e(\tau(\psi))$ 仍需其任意模型对应。
+
+[PureProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean)
+定义 $\Box_Z\varphi=\tau(\Box_T e(\varphi))$。`checked_iff_m` 证明原检查器接受某个
+$e(\varphi)$ 的证书当且仅当 $Z\vdash\varphi$，因此这个纯算子确实表示裸 ZFC 的推导。
+`source_canonical_m` 使用已完成的全部内部证明码对应和 quotation 对应，
+使 $\Box_T\psi$ 在任意原模型及其规范重扩张中同真。
+D1、D2 直接经嵌入和翻译传输；D3 还用
+$T\vdash\Box_T e(\varphi)\leftrightarrow e(\Box_Z\varphi)$ 的正向推导提升可证明性，
+接上原 D3，得到 $Z\vdash\Box_Z\varphi\to\Box_Z\Box_Z\varphi$。
+
+[PureLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean)
+从原固定点 $\psi\leftrightarrow(\Box_T\psi\to e(\varphi))$ 出发，
+通过右侧的实际对应证明 $\psi$ 的任意模型对应；再把
+$\psi\leftrightarrow e(\tau(\psi))$ 提升到可证明性层，得到
+$Z\vdash\tau(\psi)\leftrightarrow(\Box_Z\tau(\psi)\to\varphi)$。
+`loeb_axiom_m` 和 `loeb_m` 因而使用纯算子的实际固定点，未留下固定点或反射假设。
+
+[PureSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSecondIncompleteness.lean)
+令 $\mathrm{Con}_Z=\neg\Box_Z\bot$，证明内部公式
+$Z\vdash\mathrm{Con}_Z\to\neg\Box_Z\mathrm{Con}_Z$；只由裸 ZFC 一致便推出
+$Z\nvdash\mathrm{Con}_Z$。`consistency_translation_m` 还确认 $\mathrm{Con}_Z=\tau(\mathrm{Con}_T)$。
+这些是纯隶属语言、原始 ZFC 公理下的普通 `Derives` 结论。
+编码仍是嵌入句子的原 quotation 与检查器；另选直接编码纯 ZFC 证明树的谓词，
+及其与当前算子的内部等价，不属于此处已证内容。
+
+## 原支撑理论的真不可定义性
+
+[Tarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Tarski.lean)
+将候选闭句算子 $F$ 的两种合同分开：`TruthSchema_m T F` 要求所有
+$T\vdash F(\varphi)\leftrightarrow\varphi$；`DefinesTruth_m ℳ F` 要求所有
+$\mathcal M\models F(\varphi)\leftrightarrow\varphi$。
+`liar_refutes_m` 仅从 $T\vdash L\leftrightarrow\neg F(L)$ 推出
+$T\vdash\neg(F(L)\leftrightarrow L)$，其逻辑核心还允许开放公式和任意局部上下文。
+一致性排除相应等价式的推导，可靠性排除模型中的全部真值对应。
+
+[ObjectTarskiFixedPoint](YesMetaZFC/Automation/ObjectTarskiFixedPoint.lean)
+对任意 `FormulaTemplate.Unary` 的正文取否定，调用原 `ObjectDiagonal.fixedPoint_spec`。
+[ReducedTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarski.lean)
+以 `ReducedRosser.diagonalSupport` 实例化，令
+$F(\varphi)=P(\texttt{IntrinsicQuotation.quote}\ \varphi)$，并实际生成 `liarSentence_m P`。
+`liar_fixed_point_m` 与 `liar_refutes_m` 没有额外固定点、一致性或反射前提。
+`undefinable_syntax_m` 只假定 `Derives.Consistent intrinsic_zfc_theory []`，排除所有候选一元公式；
+`undefinable_semantics_m` 对任意载体宇宙的 $\mathcal M\models\texttt{intrinsic_zfc_theory}$ 成立。
+
+候选只有编码变量这一自由槽位，不携带任意模型参数；真值合同量化宿主 `SetSentence`，
+不把非标准内部语法当作宿主有限语法，也不要求模型的内部自然数标准。
+既有 `TarskiTruth` 是集合结构满足关系的对象定义规格，不是此全局真谓词。
+最终纯公式自身编码的对角化由下述 `PureFixedPoint` 独立完成；
+原 `PureLoeb` 的特定算子固定点仍保留其既有编码合同。
+
+### 参数上下文与逐赋值反例
+
+[ObjectParameterDiagonal](YesMetaZFC/Automation/ObjectParameterDiagonal.lean)
+对任意有限 `parameters : SetContext` 和 $P(x,\bar z)$ 实际生成固定点，
+将原同时自由代入图的表尾推广为参数变量的恒等替换。对象输出唯一性复用既有最小见证论证。
+[ReducedTarskiParameters](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarskiParameters.lean)
+在同一支撑理论上证明
+$T\vdash L_P(\bar z)\leftrightarrow\neg P(\ulcorner L_P\urcorner,\bar z)$，并全称闭合其反驳式。
+`undefinable_syntax_m` 只假定原理论在闭上下文中的一致性；开放上下文一致性由闭项代入推出。
+`liar_fails_at_m` 与 `undefinable_at_m` 对每个任意模型赋值 `env` 成立；
+`undefinable_parameters_m` 同时排除参数上下文、赋值及候选公式的存在。
+
+这里 `DefinesSatisfaction_m env` 要求相同自由上下文中的全部宿主开放公式同真。
+任意参数取值不需要能被闭项命名，也不要求模型标准；quotation 只编码实际公式语法。
+只定义无参数闭句真值的带参数谓词不满足这个合同的全部要求，不能据此宣称已排除它。
+原闭固定点的空参数构造与修改前 AST 已通过通用定义等式核验；原 quotation 随之保持。
+
+### 保留源编码的裸 ZFC 终点
+
+[PureOpenTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureOpenTransfer.lean)
+将纯候选按同一参数槽嵌入原语言，证明规范扩张中的逐环境真值往返及开放公式双向推导。
+纯签名没有闭项，故开放上下文的一致性通过既有模型存在性与模型非空性取得。
+[PureTarskiSource](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarskiSource.lean)
+对任意纯候选 $P(x,\bar z)$ 构造源反例 $S_P$ 和纯反例 $L_P=\tau(S_P)$。
+`liar_fixed_point_m`、`liar_refutes_closed_m` 的实际推导理论是裸 `PureModel.theory`；
+`undefinable_syntax_m` 只假定该裸理论在闭上下文中的一致性。
+
+`predicate_satisfies_m` 证明消元后的候选实例在任意裸模型和任意参数环境中，恰好是原纯
+$P$ 在源 quotation 值处的应用。`undefinable_source_at_m` 直接排除
+$P(\ulcorner\varphi\urcorner,\bar a)\leftrightarrow\varphi^{\mathcal M^+}(\bar a)$
+对全部源开放公式成立；$\mathcal M^+$ 是现有规范扩张。参数个数和取值任意，模型无需标准。
+`undefinable_parameters_m` 对所有这些参数上下文和赋值统一排除纯翻译的真值合同。
+
+这里保留原自代入图及原 quotation，没有加入消元编码图或纯语法专用 quotation。
+固定点使用的是 $\ulcorner S_P\urcorner$，不是 $\ulcorner\tau(S_P)\urcorner$；
+不能把这个已证合同直接换成仅量化纯公式并使用纯公式自身编码的合同。
+也没有由规范扩张的正确性推断任意原模型对全部源公式的约化往返。
+
+### 最终纯公式自身编码的裸 ZFC 终点
+
+[PureQuotationFaithful](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotationFaithful.lean) 给出纯 AST 数值编码的单射性，
+并证明结构嵌入与现有完整 AST 编解码器的逐节点对应。纯数码公式 $N_n(x)$
+在任意裸模型中唯一定义规范扩张内相应的有限数码值；不对内部自然数作标准性假设。
+
+[PureDiagonalGraph](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureDiagonalGraph.lean) 的实际纯图在标准输入 $n$ 处，
+对任意对象输出 $a$ 恰好等价于 $a=d(n)$。递推只用两条固定 Horn 规则；
+最小见证论证消费标准正负实例，从而排除任意内部伪轨迹产生的错误输出。
+`self_code_m` 是最终 $\exists x(N_n(x)\land B)$ 的 AST 编码等式，
+[PureFixedPoint](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFixedPoint.lean) 的 `fixed_point_m` 据此在普通裸 ZFC 推导中成立。
+
+[PureTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarski.lean) 中候选、反例及合同量化的公式全是纯公式，
+`quotation_m hℳ φ` 命名 $\varphi$ 自身的完整 AST 码。
+`liar_fixed_point_m` 与全称闭合反驳式没有一致性前提；句法不可定义性只假定裸 ZFC 一致。
+`undefinable_parameters_m` 对任意裸模型和每组任意有限参数成立，参数无需闭项名称。
+合同包含使用这些参数的所有宿主开放公式；不将它改称只判定无参数闭句的带参数合同，
+也不声称已构造非标准内部语法的满足关系。
 
 ## D1、D2 增量核验
 

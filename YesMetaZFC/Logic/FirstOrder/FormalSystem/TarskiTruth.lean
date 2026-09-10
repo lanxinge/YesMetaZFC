@@ -6,6 +6,8 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.SemanticInterpretation
 本模块在结构化 Quine 语法上直接定义公式阶段、满足、真、模型、语义后承与普遍真。
 量词采用 de Bruijn 赋值压栈：新值写入第零个 bound 变量，旧 bound 变量整体后移；
 因此语义核不再携带变量新鲜性见证，也不再依赖全局项求值函数。
+这里给出集合结构的满足关系及对象定义规格；原支撑理论的无参数真值
+不可定义性见 `ProofT.ZFC.ReducedTarski`，其证明直接消费实际对角固定点。
 -/
 namespace YesMetaZFC
 namespace Logic

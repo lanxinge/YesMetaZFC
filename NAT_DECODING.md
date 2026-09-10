@@ -109,6 +109,68 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 当前 Δ₀ 图中的幂集界由内部集合轨迹反演、合并和插入直接处理，未将它改写为外部列表，
 也未调用额外的一阶算术 Σ₁ 完备性。
 
+Löb 固定点继续使用同一 `code_domain`、`presentation.graph` 和结构 quotation。
+[ObjectLoebFixedPoint](YesMetaZFC/Automation/ObjectLoebFixedPoint.lean) 的 `reflectionTemplate_m`
+表示 $\Box x\to\varphi$，`fixed_point_m` 从原对角构造导出其实际固定点等价。
+[ReducedLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedLoeb.lean)
+的 `loeb_fixed_point_m`、`loeb_axiom_m`、`loeb_m` 直接消费该表示和 D1–D3。
+[ReducedSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedSecondIncompleteness.lean)
+以矛盾句的同一固定点证明 `second_incompleteness_internal_m` 与 `second_incompleteness_m`；
+一致性句子仍为已有的 `consistency`，即原普通谓词下的 $\neg\Box\bot$。
+
+裸 ZFC 的 [PureProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean)
+将纯句子 `φ` 先经 `PureSentenceTransfer.embed_m` 嵌入，再使用原结构 quotation、原检查器和
+完整对象图，最后翻译为纯公式 `provable_m φ`。`checked_iff_m` 证明
+`∃ p, presentation.checked p (embed_m φ) = true` 当且仅当 `Derives PureModel.theory [] φ`。
+`source_canonical_m`、`source_roundtrip_m` 在任意原模型上保持可证明性，覆盖全部内部证明码，
+从而可以证明纯算子的 D3 及其实际 Löb 固定点。纯一致性句子 `consistency_m`
+等于原 `consistency` 的消元翻译；这是已有编码的纯语言表示，没有重新定义纯证明树编码。
+
+Tarski 的 [ObjectTarskiFixedPoint](YesMetaZFC/Automation/ObjectTarskiFixedPoint.lean)
+使用同一原码域、自代入图与 `IntrinsicQuotation.quote`，将任意一元模板的否定交给原对角构造。
+[ReducedTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarski.lean)
+的 `predicate_m P φ` 精确为 `P (IntrinsicQuotation.quote φ)`；反例句在理论内部满足
+$L_P\leftrightarrow\neg P(\ulcorner L_P\urcorner)$。
+候选公式及句子是宿主语法对象，模型不必标准；此接口不声称构造了全部非标准内部语法的满足关系。
+纯公式自身编码的对应由下述 `PureQuotation.self_code_m` 核验，不以可证明等价代替编码相等。
+
+带参数的 [ObjectParameterDiagonal](YesMetaZFC/Automation/ObjectParameterDiagonal.lean)
+保留任意有限自由上下文。自代入表为“首槽数码项的码 + 尾部恒等变量项的码”，
+继续由原模式 3、深度 0 的同时自由代入图检查；两层最小输出给出对象唯一性。
+`quote_m` 只将原 `IntrinsicQuotation.quote` 闭项放入参数上下文，
+不编码参数的模型取值。$L_P(\bar z)$ 的编码固定，模型参数 $\bar a$ 可以任意且无闭项名称。
+[ReducedTarskiParameters](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarskiParameters.lean)
+的合同量化相同自由上下文中的全部宿主开放公式，并在每个固定参数赋值下失败；
+不能将它缩成“仅判定无参数闭句”的合同后仍沿用同一结论。
+空参数自代入保留原定义，原闭固定点及其 quotation 不变。
+
+[PureTarskiSource](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarskiSource.lean)
+保留源编码而消去候选实例和反例中的全部支撑符号。`quotation_m hℳ φ` 精确为
+源 `IntrinsicQuotation.quote φ` 在规范扩张中的闭项值，没有参数赋值输入；
+`predicate_satisfies_m` 证明这个值进入原纯候选的首槽，其余参数取值不变。
+`TruthSchema_m` 与 `DefinesSatisfaction_m` 均按源开放公式索引，右侧为其纯翻译。
+该裸 ZFC 结果不要求语法消元在对象理论中已被编码为可计算图，故不能据此取得
+最终纯反例自身 quotation 的固定点；该义务现由独立的纯构造完成。
+
+[PureQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotation.lean) 直接遍历纯公式 AST，沿用当前完整编码的
+变量、原子与全部联结词／量词标签。[PureQuotationFaithful](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotationFaithful.lean)
+证明 `code_injective_m`、`tree_source_m` 和 `decode_tree_m`；结构嵌入逐节点保留纯 AST，不插入翻译见证。
+纯语言没有闭数码项，`numeral_m n` 用有限纯公式 $N_n(x)$ 唯一定义相应有限 von Neumann 数码。
+[PureNumeralFormula](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureNumeralFormula.lean)
+的 `numeral_satisfies_m` 在任意裸模型和任意上下文中成立，归纳只针对宿主有限 $n$；
+`specialize_satisfies_m`、`instance_satisfies_m` 供绑定槽与自由首槽两种消费者使用。
+
+对带一个绑定编码槽的纯正文 $B(x,\bar z)$，定义
+$\operatorname{specialize}(B,n)=\exists x(N_n(x)\land B(x,\bar z))$。
+`self_code_m` 证明该式在 $n=\ulcorner B\urcorner$ 时的自身码恰好为
+$d(n)=\operatorname{node}_{10}[\operatorname{node}_5[\ulcorner N_n\urcorner,n]]$。
+[ObjectExpressionIteration](YesMetaZFC/Automation/ObjectExpressionIteration.lean) 的两条固定 Horn 规则
+给出 $\ulcorner N_n\urcorner$ 的正负表示；最小输出语义排除任意模型中的伪见证。
+[PureDiagonalGraph](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureDiagonalGraph.lean) 将该实际图消元为纯公式，
+[PureFixedPoint](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFixedPoint.lean) 因而得到最终纯公式自身编码的固定点。
+[PureTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarski.lean) 的合同只量化纯开放公式，保留全部任意有限参数。
+原源 quotation、自代入图、证明检查器和既有 Löb／哥二接口均不因本编码而改定义。
+
 ## 模式表示的公共接口
 
 下表的正负表示使用普通 `Derives`；拒绝结论覆盖任意错误候选输出及对象界内见证，

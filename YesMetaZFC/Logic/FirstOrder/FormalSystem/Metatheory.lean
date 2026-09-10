@@ -102,6 +102,13 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalTr
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalSchemaQueries
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalCheckedStepReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedIntrospection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedLoeb
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedSecondIncompleteness
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSecondIncompleteness
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedTarski
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedTarskiParameters
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureTarskiSource
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureTarski
 
 /-!
 # 一阶形式系统编码元理论入口
@@ -125,6 +132,24 @@ D2 使用原有内部自然数证明图，实际轨迹合成见 `ReducedProofCom
 `proof_trace_positive` 已反射原证明树的任意内部 checked 轨迹，消去有限骨架及连边证明输入。
 `verification_reflection`、`proof_matrix_reflection` 精确接回原验证矩阵与自然数 guard；
 `ReducedProvability.introspection` 已完成当前原可证明性谓词的 D3。
+`ReducedProvability.loeb_axiom_m` 和 `loeb_m` 给出同一谓词的内部 Löb 公式及普通 Löb 规则；
+固定点由 `ObjectLoeb.fixedPoint_m` 使用原对角构造实际生成。
+`second_incompleteness_m` 只假定原理论一致，排除已有一致性句子的普通推导；
+`second_incompleteness_internal_m` 给出同一句子的内部第二不完备公式。
+`PureSentenceTransfer` 提供纯句子的嵌入往返及双向推导接口。
+`PureProvability` 使用嵌入后的原 quotation 与检查器，在 `PureModel.theory` 中
+证明 D1–D3、实际固定点、Löb 和第二不完备定理；`checked_iff_m` 精确表示裸 ZFC 推导。
+`consistency_translation_m` 确认纯一致性句子等于原一致性句子的消元翻译。
+`ReducedTarski` 为任意候选一元真谓词实际构造 `liarSentence_m`，
+`liar_refutes_m` 在原支撑理论中否定相应真值等价式；
+`undefinable_syntax_m` 只假定原理论一致，`undefinable_semantics_m` 覆盖任意原模型。
+`ReducedTarski.Parameters` 进一步保留任意有限参数上下文，构造实际 `liarFormula_m`，
+并在每个模型参数赋值下排除正确判定全部相应开放公式的谓词。
+`PureTarskiSource` 将候选、反例和推导落到裸 ZFC 的纯语言中，
+`predicate_satisfies_m` 保留原纯候选及每组参数赋值，`undefinable_source_at_m`
+排除对规范扩张中全部源公式真值的定义。其编码仍指向源公式。
+`PureQuotation` 与 `PureFixedPoint` 进一步给出最终纯公式自身完整 AST 编码的带参数固定点；
+`PureTarski` 仅量化纯公式，并在每组任意有限参数赋值下排除纯真值定义。
 
 该入口导出内在 quotation、结构语法正确性、对象证明图及抽象 Rosser 终局。
 `AxiomPresentation` 与 `ProofCertificate` 已在完整支撑公理理论上实例化，

@@ -8,6 +8,13 @@
 统一解释为 [PureCompletedStage](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureCompletedStage.lean)；原支撑公理验证见 [PureSupportModels](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSupportModels.lean)，
 裸 ZFC 模型扩张与原模型约化见 [PureZFCModels](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureZFCModels.lean)。指定 Rosser 的任意原模型对应和
 独立性由 [PureRosserComplete](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean) 给出，均不再是支撑消去待办。
+纯句子的双向推导见 [PureSentenceTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSentenceTransfer.lean)；
+原编码表示的纯语言可证明性、Löb 与哥二已落在 `PureModel.theory`，入口见 [TROPHIES.md](TROPHIES.md)。
+[PureOpenTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureOpenTransfer.lean)
+补齐任意有限参数下的环境往返和双向推导；`PureTarskiSource` 在同一裸理论中给出
+保留源公式编码的带参数真不可定义性。`PureQuotation`／`PureFixedPoint`／`PureTarski`
+另已完成最终纯公式自身编码的固定点及真不可定义性：只消元实际的自编码图，
+最终纯 AST 的编码由结构等式单独核验。
 
 ## 集合构造与规格传输
 

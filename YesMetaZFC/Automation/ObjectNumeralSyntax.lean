@@ -21,13 +21,17 @@ def value : Nat → Nat
   | 0 => zeroCode
   | n + 1 => nodeValue 2 [successorSymbol, value n]
 
-theorem value_encode (number : Nat) : value number = treeValue (SyntaxEncode.term (numₘ(number) : Code)) := by
+theorem value_encode_m {bound free : SetContext} (number : Nat) :
+    value number = treeValue (SyntaxEncode.term (numₘ(number) : SetTerm bound free)) := by
   induction number with
   | zero => rfl
   | succ number ih =>
     change nodeValue 2 [successorSymbol, value number] =
-      nodeValue 2 [successorSymbol, treeValue (SyntaxEncode.term (numₘ(number) : Code))]
+      nodeValue 2 [successorSymbol, treeValue (SyntaxEncode.term (numₘ(number) : SetTerm bound free))]
     rw [ih]
+
+theorem value_encode (number : Nat) : value number = treeValue (SyntaxEncode.term (numₘ(number) : Code)) :=
+  value_encode_m number
 
 abbrev zeroRule : Rule where
   arity := 0

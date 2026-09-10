@@ -14,7 +14,7 @@ set_option maxRecDepth 4096
 
 def diagonalBody (D : Delta0CodeDomain) (P : FormulaTemplate.Unary) {bound free : SetContext}
     (input : SetTerm bound free) : SetFormula (SetSort.set :: bound) free :=
-  relation D (input.weakenBound SetSort.set) (.bvar .here) ∧ₘ P (.bvar .here)
+  relation D (parameters := []) (input.weakenBound SetSort.set) (.bvar .here) ∧ₘ P (.bvar .here)
 
 def diagonalCondition (D : Delta0CodeDomain) (P : FormulaTemplate.Unary) {bound free : SetContext}
     (input : SetTerm bound free) : SetFormula bound free :=
@@ -56,7 +56,7 @@ theorem fixedPoint_shape (D : Delta0CodeDomain) (P : FormulaTemplate.Unary) :
 
 private theorem diagonalBody_at (D : Delta0CodeDomain) (P : FormulaTemplate.Unary)
     {free : SetContext} (input point : SetOpenTerm free) :
-    (diagonalBody D P input).instantiateTop point = (relation D input point ∧ₘ P point) := by
+    (diagonalBody D P input).instantiateTop point = (relation D (parameters := []) input point ∧ₘ P point) := by
   rw [diagonalBody, Formula.instantiateTop_conj,
     ObjectRelationBinder.second_at (relation D) input point,
     FormulaTemplate.apply_one_instantiateTop_bvar P point]
@@ -64,7 +64,7 @@ private theorem diagonalBody_at (D : Delta0CodeDomain) (P : FormulaTemplate.Unar
 private theorem diagonalBody_open (D : Delta0CodeDomain) (P : FormulaTemplate.Unary)
     {free : SetContext} (input : SetOpenTerm free) :
     Formula.openBoundTop (σ := signature) SetSort.set (diagonalBody D P input) =
-      (relation D (input.weakenFree SetSort.set) (.fvar .here) ∧ₘ P (.fvar .here)) := by
+      (relation D (parameters := []) (input.weakenFree SetSort.set) (.fvar .here) ∧ₘ P (.fvar .here)) := by
   simp only [diagonalBody, Formula.openBoundTop_eq_instantiateTop_weakenFree,
     Formula.weakenFree_conj, FormulaTemplate.apply_two_weakenFree,
     FormulaTemplate.apply_one_weakenFree, Term.weakenFree_bvar,
@@ -91,7 +91,7 @@ private theorem fixedPoint_numeral {T : SetTheory} (S : Support T) (P : FormulaT
     rw [diagonalBody_open]
     simp only [finite_numeral_term_weakenFree, FormulaTemplate.apply_one_weakenFree]
     let opened : SetOpenFormula [SetSort.set] :=
-      relation S.core.code_domain (numₘ(code body)) (.fvar .here) ∧ₘ P (.fvar .here)
+      relation S.core.code_domain (parameters := []) (numₘ(code body)) (.fvar .here) ∧ₘ P (.fvar .here)
     have hBoth : Derives T (opened :: FreshVariable.extendContext SetSort.set [fixedPoint S.core.code_domain P]) opened :=
       FirstOrder.Derives.assumption List.mem_cons_self
     have hEq := unique S body (.fvar .here) (FirstOrder.Derives.conj_elim_left hBoth)

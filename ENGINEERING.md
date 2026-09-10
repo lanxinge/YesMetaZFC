@@ -4,6 +4,20 @@
 已完成计划的实施过程、逐轮行数和耗时记录由 Git 历史保存。
 裸 ZFC 与编码接口分别见 [ELIMINATION.md](ELIMINATION.md)、[NAT_DECODING.md](NAT_DECODING.md)。
 
+## 元数学调用入口
+
+| 调用方要完成的工作 | 先用的接口 | 保留的合同 |
+| --- | --- | --- |
+| 从原证明谓词取得 D1–D3 | [ReducedProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProvability.lean)、[ReducedDerivability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedDerivability.lean)、[ReducedIntrospection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedIntrospection.lean) | 原完整 AST quotation 和任意内部自然数证明码；反射链见本页下文 |
+| 复用 Löb、哥二或 Tarski 的一般逻辑推导 | [Loeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Loeb.lean)、[SecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/SecondIncompleteness.lean)、[Tarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Tarski.lean) | 通用层显式消费其推导条件；具体实例中的固定点已有构造 |
+| 把句子或开放公式的推导传回裸 ZFC | [PureSentenceTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSentenceTransfer.lean)、[PureOpenTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureOpenTransfer.lean) | 保留原模型对应和自由参数环境；无闭项时使用开放完备性 |
+| 直接调用裸 ZFC 的可证明性、Löb 与哥二 | [PureProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean)、[PureLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean)、[PureSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSecondIncompleteness.lean) | 使用原检查器的纯语言表示，不替换证明编码 |
+| 构造最终纯公式自身编码的固定点 | [PureQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotation.lean)、[PureFixedPoint](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFixedPoint.lean) | 有限纯数码公式绑定编码槽；参数保留为自由变量 |
+| 排除带参数的纯真值定义 | [PureTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarski.lean) | 全部相同参数上下文的纯公式；编码不随赋值改变 |
+
+最终结论及其前提集中在 [TROPHIES.md](TROPHIES.md)，可信依赖和验证范围集中在
+[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+
 ## 语法、替换与 Quine
 
 | 调用方需要 | 公共接口与源码 | 使用边界 |
@@ -63,6 +77,74 @@ Horn 图的内部反射先复用 [PureSourceHornElimination](YesMetaZFC/Logic/Fi
 [InternalVerificationReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalVerificationReflection.lean) 的 `verification_reflection`、`proof_matrix_reflection` 精确接回原矩阵，
 [ReducedIntrospection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedIntrospection.lean) 的 `ReducedProvability.introspection` 给出 D3 普通推导。
 
+Löb 推导复用 [Loeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Loeb.lean) 的
+`DerivabilityConditions_m`，任意签名、理论和算子共用 `imp_m`、`iff_m`、`loeb_axiom_m`、`loeb_m`。
+[ObjectLoebFixedPoint](YesMetaZFC/Automation/ObjectLoebFixedPoint.lean) 将原证明图包装为
+反射模板；`reflection_apply_m` 用公共自由代入定律恢复原句子，`fixed_point_m`
+消费既有 `ObjectDiagonal.fixedPoint_spec`，不展开巨大 quotation。
+[ReducedLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedLoeb.lean)
+组装原 D1–D3 和实际固定点，公开内部 Löb 公式及普通 Löb 规则。
+[SecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/SecondIncompleteness.lean)
+将同一接口特化到矛盾反射，导出内部与通常的第二不完备结论；
+[ReducedSecondIncompleteness](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedSecondIncompleteness.lean)
+直接接上 `loebSentence_m .falsum` 和已有 `consistency`，复用原否定消去规则。
+
+纯语言传输复用 [PureSentenceTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSentenceTransfer.lean)：
+`embed_m` 使用公共关系翻译，`translate_embed_m`、`derives_iff_m` 给出纯句子往返与双向推导。
+反向 `embed_translate_m` 要求指定源句子的任意模型 `Agreement`；
+`agreement_imp_m`、`agreement_of_iff_m` 复用已证对应，不扩大到任意支撑句子。
+`translate_derives_imp_m`、`translate_derives_imp_imp_m`、`translate_derives_iff_m`、
+`translate_derives_iff_imp_m` 在抽象公式参数上固定逻辑外壳，避免实例层展开检查器和 quotation。
+[PureProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean) 的
+`source_canonical_m` 连接全部内部证明码对应；D3 经 `source_roundtrip_m` 将原二次可证明性
+接到纯语言的二次可证明性。[PureLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean)
+用固定点等价取得指定固定点的对应，再用通用 `iff_m` 提升到可证明性层。
+
+真不可定义性复用 [Tarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/Tarski.lean)：
+`liar_refutes_m` 对任意签名、自由上下文和局部假设成立，只消费否定固定点；
+`TruthSchema_m` 覆盖任意自由上下文的可证真值等价式，`DefinesTruth_m` 描述闭句真值；
+`DefinesSatisfaction_m` 固定任意模型环境，描述同一参数列下的开放公式真值。
+[ObjectTarskiFixedPoint](YesMetaZFC/Automation/ObjectTarskiFixedPoint.lean)
+把候选一元模板取否定后交给 `ObjectDiagonal.fixedPoint_spec`，公共代入保持直接恢复正文。
+[ReducedTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarski.lean)
+使用 `ReducedRosser.diagonalSupport`，实际生成每个候选的反例句；
+句法终点消费一致性，语义终点消费任意原模型的可靠性，不依赖 D1–D3。
+
+带参数固定点使用 [ObjectParameterDiagonal](YesMetaZFC/Automation/ObjectParameterDiagonal.lean)。
+`ObjectDiagonal.instantiate` 将首个编码槽替换为数码、尾部使用 `parameterIdentity_m`；
+`parameterCodes_m` 给出这段恒等替换的原项码表。正负表示及任意对象输出唯一性
+直接推广原 `ObjectDiagonalSyntax`／`ObjectDiagonalRelation`，不复制图或最小输出证明。
+`abstractFreeTop`、弱化及公共 binder 代入定律保留参数上下文；quotation 仍取实际开放公式。
+空参数分支保留原空替换，原闭固定点构造的 AST 与推广前定义相等。
+[ReducedTarskiParameters](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarskiParameters.lean)
+导出开放反例、全称闭合反驳及每组参数赋值下的不可定义性；全称闭合复用 `forall_close_of_derives`。
+
+纯关系语言可能没有闭项；开放完备性和一致性使用
+[OpenCompleteness](YesMetaZFC/Automation/OpenCompleteness.lean) 的 `derives_open_m`、`consistent_open_m`，
+复用 `ModelClosure.forall_close_iff` 和规范重新打开，不逐变量选择闭项。
+[PureOpenTransfer](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureOpenTransfer.lean)
+只递归参数变量，公式与 binder 仍交给 `RelationalTranslation`；`embed_canonical_m` 在同一纯模型
+的同一环境中保留真值，`translate_embed_m`、`derives_iff_m` 给出开放往返和双向推导。
+[PureTarskiSource](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarskiSource.lean)
+消费这些接口及已有源反例。`predicate_satisfies_m` 将纯候选与编码首槽、原参数环境明确连接，
+不需要额外的原模型全语言对应，也不重写自代入图。
+
+纯公式自身编码固定点复用 [ObjectExpressionIteration](YesMetaZFC/Automation/ObjectExpressionIteration.lean)
+的固定表达式递推图与 [ObjectMinimumSemantics](YesMetaZFC/Automation/ObjectMinimumSemantics.lean)
+的任意模型最小输出合同；具体数码、码形状及纯图按下表实例化。
+绑定输入槽让最终编码只需计算固定语法外壳，无需给整套消元翻译另造编码算法。
+[FormulaBinderSemantics](YesMetaZFC/Automation/FormulaBinderSemantics.lean) 先对抽象公式核验
+存在、合取、否定、等价的语义外壳及绑定弱化；大纯图的装配使用这些引理。
+不要对具体大图用 `change` 依赖语义递归的定义相等，避免内核展开整张图。
+纯、源排序不同，弱化处显式给出纯签名和上下文。
+
+| 纯自身编码构造步骤 | 接口与源码 | 调用时须保留 |
+| --- | --- | --- |
+| 完整纯 AST 的编码及可逆性 | [PureQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotation.lean)：`tree_m`、`code_m`；[PureQuotationFaithful](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotationFaithful.lean)：`code_injective_m`、`decode_tree_m` | 编码结构嵌入逐节点保留原纯 AST，不经过插入见证的消元翻译 |
+| 用公式定义标准数码并绑定输入槽 | [PureNumeralFormula](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureNumeralFormula.lean)：`PureQuotation.numeral_satisfies_m`、`specialize_satisfies_m`、`instance_satisfies_m` | 纯语言无闭数码项；归纳输入为宿主有限自然数，模型及环境任意 |
+| 连接最终公式自身码与实际纯图 | [PureQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureQuotation.lean)：`self_code_m`；[PureDiagonalGraph](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureDiagonalGraph.lean)：`satisfies_m` | 标准编码输入处排除任意对象输出伪见证，不要求模型内部自然数标准 |
+| 装配带参数固定点及 Tarski 反例 | [PureFixedPoint](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFixedPoint.lean)：`fixed_point_m`；[PureTarski](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarski.lean)：`liar_fixed_point_m`、`undefinable_parameters_m` | 最终推导理论为裸 ZFC，语义合同保留每个参数赋值 |
+
 ## 有限序列、轨迹与 ProofT
 
 下列 ProofT 文件的命名空间前缀为 `YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT`；
@@ -106,11 +188,13 @@ bash scripts/check-all.sh
 `ProveAutoBranchProbe` 不得仅因默认导入图不可达而删除。工具依赖改变时，
 检查 `--help` 和一次实际目标扫描，命令使用 `lake env .lake/build/bin/prove_auto_sweep ...`。
 
-当前源码基点为 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)：
-806 个 Lean 文件、224,509 行；含 Python/Shell 共 225,346 行，严格低于 200,000
-还需净减 25,347 行。文档删除不计入代码减量。该基点全源 808 个构建任务、扫描工具
-320 个任务通过，零错误、零警告；声明与可信依赖的核验摘要见
-[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+当前纯自身编码 Tarski 节点有 950 个 Lean 文件、237,149 行；含 Python/Shell 共
+237,986 行，严格低于 200,000 还需净减 37,987 行。计数包含规范源码中的空行与注释，
+排除构建缓存和临时文件；文档删除不计入代码减量。
+当前严格构建 947 个任务、全源 952 个任务及扫描工具 320 个任务通过，零错误、零警告；
+声明与可信依赖的核验摘要见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+此前 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)
+的 806 个 Lean 文件、225,346 行总代码是重构历史基点，不是当前规模。
 
 Lean 4.33.1 适配约定：必要的类型别名使用 `@[implicit_reducible]`，定义相等转换
 可用 `simpa ... using!`，自由闭合性消费 `code_freeClosed`。

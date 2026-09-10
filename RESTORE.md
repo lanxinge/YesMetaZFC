@@ -8,20 +8,23 @@
 | 资源 | 位置与用途 |
 | --- | --- |
 | Git 仓库 | [lanxinge/YesMetaZFC](https://github.com/lanxinge/YesMetaZFC)，主分支 `main` |
-| 持续更新的源码包 | [YesMetaZFC-source.zip](https://drive.google.com/file/d/1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID/view)；保持同一文件身份 |
+| Drive 备用源码包 | [YesMetaZFC-source.zip](https://drive.google.com/file/d/1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID/view)；保持同一文件身份，已知保存的是下述 D3 节点 |
 | Drive 源码目录 | `1KFNGtD8yE-rp1Jk4UfH6BTbnpp9cQSEx` |
-| 当前容器入口 | `source /workspace/scratch/fb4803f63959/activate-yesmetazfc.sh` |
-| 当前工作区 | `/workspace/scratch/fb4803f63959/YesMetaZFC` |
-| 当前容器工具链 | `/workspace/scratch/fb4803f63959/toolchains/lean-4.33.1-linux` |
+| 当前容器入口 | `source /workspace/scratch/028f3653c405/activate-yesmetazfc.sh` |
+| 当前工作区 | `/workspace/scratch/028f3653c405/YesMetaZFC` |
+| 当前容器工具链 | `/workspace/scratch/028f3653c405/toolchains/lean-4.33.1-linux` |
 
 恢复源码应得到 `lakefile.toml`、`lean-toolchain`、`YesMetaZFC.lean` 和 `YesMetaZFC/`。
-当前源码包保存 [9045935](https://github.com/lanxinge/YesMetaZFC/commit/9045935fbbe9466cf246cad009acf1de4385d5a2)
-之上的完整工作树，包含 D1、D2、任意内部 checked 轨迹反射及 D3，相关修改尚未推送 Git。
-该节点有 924 个 Lean 模块；严格构建 921 个任务、全源构建 926 个任务及扫描工具
-320 个任务通过。271 个入口的公理依赖审计未超出原有 32 项可信基。
-成果入口为 `ReducedProvability.introspection`，详细接口和核验范围见
-[TROPHIES.md](TROPHIES.md)、[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
-恢复本节点应使用此源码包；仅检出上述 Git 提交不能恢复未提交的 D3 工作。
+本次发布的 Git 源码包含 D1–D3、任意内部 checked 轨迹反射、支撑理论及裸 ZFC 的
+Löb 与哥二、带参数 Tarski，以及最终纯公式自身编码的固定点和 Tarski 定理。
+恢复最新成果应检出 Git 仓库 `main`，以 [TROPHIES.md](TROPHIES.md) 和
+[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) 核对接口与核验范围。
+当前有 950 个 Lean 模块；严格构建 947 个任务、全源构建 952 个任务及扫描工具
+320 个任务通过。530 个入口的依赖审计未超出原有 32 项可信基，没有新可信依赖或 `sorryAx`。
+
+Drive 备用包最近一次已确认内容为 [9045935](https://github.com/lanxinge/YesMetaZFC/commit/9045935fbbe9466cf246cad009acf1de4385d5a2)
+之上的 D3 工作树，含 924 个 Lean 模块；本次 Git 发布没有更新该备用包。
+它适合恢复旧 D3 节点，不能替代当前 `main` 的 Löb、哥二及 Tarski 源码。
 
 ## 已有的 Lean Linux 运行时
 
@@ -44,6 +47,8 @@
 
 运行时校验后的 Lean 提交为 `819816b2e0a3bf405af45ae5c7af2491d8f5bee6`。
 将解压目录的 `bin` 加入 `PATH`，在源码根目录构建；可设 `LEAN_NUM_THREADS=4` 控制并发资源。
+解压后应核对归档成员大小；该运行时的 `lib/lean/libLean.a` 为 315,493,554 字节。
+扫描工具链接所需的静态库也须完整，不能仅以 `lean --version` 成功判定恢复完成。
 
 在 Work Mode 获取大文件时，可以逐片请求原始下载，然后将返回的完整连接器文件引用
 物化到本地。保留返回引用的 `sediment://` 前缀和原文件名；不要将其误当成源码文件身份。
@@ -62,7 +67,8 @@
 | 构建默认完整库 | `lake --wfail build` |
 | 覆盖全部独立源模块及扫描工具 | `bash scripts/check-all.sh` |
 | 找公共证明和后续重构方向 | [ENGINEERING.md](ENGINEERING.md) |
-| 找纯模型、119 条原公理验证与 Rosser 终局 | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
-| 查证书格式与对象图 | [NAT_DECODING.md](NAT_DECODING.md) |
+| 找 Rosser、Löb、哥二与带参数 Tarski 的最终声明 | [TROPHIES.md](TROPHIES.md) |
+| 找纯模型、119 条原公理验证、终局合同与可信依赖 | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
+| 查证书格式、对象图与纯公式自身编码 | [NAT_DECODING.md](NAT_DECODING.md) |
 
 源码包不包含运行时、兼容层、构建缓存和临时分析；恢复时分别处理这些资源。
