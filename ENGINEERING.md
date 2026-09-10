@@ -18,6 +18,51 @@
 | 共同 guard 下的命题等价 | [FirstOrder/Metatheory/Propositional](YesMetaZFC/Logic/FirstOrder/Metatheory/Propositional.lean) 的 `guarded_conj_congr_m` | 保留原 guard，不通过增强调用方前提缩短证明 |
 | 当前完整公式的单射 quotation | [IntrinsicQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/IntrinsicQuotation.lean) 的 `unquote_quote`、`quote_injective`、`quote_ne` | 保留全部十一种构造子；紧凑结构项不展开为巨大一元 numeral |
 
+含量词公式的参数化码与类型化代入交换，复用
+[ObjectCodeSubstitution](YesMetaZFC/Automation/ObjectCodeSubstitution.lean) 的
+`formula_mapped_of_depth` 与 `formula_substituteFree`。自由重命名复用同一公式遍历，
+binder 骨架复用 `SyntaxTransform.boundLift` / `freeLift`。图谓词的数码同余消费
+[InternalPredicateTransport](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPredicateTransport.lean) 的 `predicate_transport`。
+
+Horn 图的内部反射先复用 [PureSourceHornElimination](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceHornElimination.lean)
+的 `rule_cases` 反演原集合轨迹，再用 [InternalHornReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalHornReflection.lean)
+的 `horn_rule_values` 装配实际规则证明；不为每条规则重复数码命名、项求值或守卫反射。
+[InternalProjectionReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProjectionReflection.lean) 提供非标准索引归纳的完整实例。
+[InternalSyntaxReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalSyntaxReflection.lean) 提供项、参数列和公式的同时强归纳实例。
+[PureSourceStrongInduction](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceStrongInduction.lean) 的 `strong_induction` 只对具有最终阶段对应的实际正文
+使用有界全称归纳；[PureSourceSyntaxRank](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceSyntaxRank.lean) 的 `rule_ranked` 和 `rank_unique`
+保证递归按输入语法码下降，量词下的上下文增长不进入秩。
+
+分层递归图复用 [InternalHornRanking](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalHornRanking.lean) 的 `horn_valid_positive`：
+[SchemaReflectionPlans](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/SchemaReflectionPlans.lean) 和 [ObjectTransformRanking](YesMetaZFC/Automation/ObjectTransformRanking.lean)
+只提供原规则的有限形状／阶段证书，同层使用具有最终阶段对应的实际公式作内部强归纳。
+有隐含中间参数的规则使用 `rule_cases_bounds`、`horn_rule_bounded_values`，保留原量词界。
+[InternalPacketReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPacketReflection.lean) 的非结构下降由 [PureSourcePacketBounds](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourcePacketBounds.lean) 的 `affine_bounds` 给出。
+
+正向查询的组合使用 [InternalPositiveFormula](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPositiveFormula.lean) 的 `Positive`、`Evaluates`、`instantiate`，
+及 [InternalPositiveQuantifiers](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPositiveQuantifiers.lean) 的 `boundedExists`、`quantify`。
+这些接口保留实际模板和 binder，不要求 Horn 图的负反射；
+[InternalSchemaQueries](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalSchemaQueries.lean) 提供完整 schema／公理查询的调用实例。
+
+有限局部规则表使用 [InternalLocalDecisionReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalLocalDecisionReflection.lean) 的 `localMatrix`、`localRule`、`localTest`。
+每个查询只提供其实际模板的正反射，头表达式、见证界及有限合取／析取由公共层处理。
+[InternalProofQueries](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofQueries.lean) 复用该接口覆盖原逻辑公理、六类节点和完整行封装；
+[InternalProofRowReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofRowReflection.lean) 提供复合项、数码和普通 `Derives` 终点。
+[InternalCheckedStepReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedStepReflection.lean) 的 `proof_step_values` 将原 Horn 连边证明与局部真值
+合成为实际 `ObjectCheckedTrace.step` 的证明；不要求轨迹项可求值为自然数。
+`finite_verification_of_links` 继续复用原有限轨迹装配，只保留连边证明和局部真值输入。
+
+
+任意已检查轨迹复用 [PureSourceCheckedConstruction](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceCheckedConstruction.lean) 的 `rule_cases_bounds`、`rule_intro_bounds`：
+根行反演保留局部查询，前提重用原内部集合；构造端用公共 `collect` / `insert` 合并。
+[InternalCheckedReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedReflection.lean) 的 `checked_rule_bounded_values` 把局部真值与前提实例证明装配为结论实例证明。
+[InternalCheckedRanking](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedRanking.lean) 的 `checked_valid_positive` 消费原规则的阶段／字段秩证书、局部正反射及最终阶段对应。
+[ObjectCheckedReflection](YesMetaZFC/Automation/ObjectCheckedReflection.lean) 的 `proof_valid` 核验原证明树全部十二条规则，
+节点阶段按子证明编码下降，根阶段进入节点阶段。
+[InternalProofTraceReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofTraceReflection.lean) 的 `proof_trace_positive` 已为原证明树消去上述合同；
+[InternalVerificationReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalVerificationReflection.lean) 的 `verification_reflection`、`proof_matrix_reflection` 精确接回原矩阵，
+[ReducedIntrospection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedIntrospection.lean) 的 `ReducedProvability.introspection` 给出 D3 普通推导。
+
 ## 有限序列、轨迹与 ProofT
 
 下列 ProofT 文件的命名空间前缀为 `YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT`；

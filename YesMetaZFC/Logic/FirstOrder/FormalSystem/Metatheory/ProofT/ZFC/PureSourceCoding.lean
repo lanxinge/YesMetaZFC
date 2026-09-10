@@ -28,6 +28,17 @@ theorem numeral_natural (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory) (numbe
     mem 𝒩 (numeral 𝒩 number) (w 𝒩) :=
   (intrinsic_zfc_arithmetic_support.finite_numeral_mem_omega (free := []) (Γ := []) number).semantically_entails 𝒩 h𝒩
 
+/-- 外部有限序号的严格次序在任意原模型中保持。 -/
+theorem numeral_lt (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
+    {left right : Nat} (h : left < right) : mem 𝒩 (numeral 𝒩 left) (numeral 𝒩 right) := by
+  induction right with
+  | zero => omega
+  | succ right ih =>
+    apply (successor_spec h𝒩 _ _).mpr
+    by_cases hEqual : left = right
+    · exact Or.inr (congrArg (numeral 𝒩) hEqual)
+    · exact Or.inl (ih (by omega))
+
 theorem pairing_spec (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     {left right : 𝒩.Carrier .set} (hLeft : mem 𝒩 left (w 𝒩)) (hRight : mem 𝒩 right (w 𝒩)) :
     mem 𝒩 (pair 𝒩 left right) (w 𝒩) ∧

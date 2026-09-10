@@ -83,6 +83,32 @@ def freeLift {sf tb tf : SetContext} (fs : VariableSubstitution signature sf tb 
   | 0 => fs
   | depth + 1 => VariableSubstitution.weakenBound SetSort.set (freeLift fs depth)
 
+/-- 恒等变量像跨过任意多个量词仍保持恒等。 -/
+theorem boundLift_id {bound free : SetContext} (depth : Nat) {sort : SetSort}
+    (entry : Variable (extend bound depth) sort) :
+    boundLift (VariableSubstitution.boundId : VariableSubstitution signature bound bound free) depth entry = .bvar entry := by
+  induction depth with
+  | zero => rfl
+  | succ depth ih =>
+    cases entry with
+    | here => rfl
+    | there entry =>
+      change (boundLift (VariableSubstitution.boundId : VariableSubstitution signature bound bound free)
+        depth entry).weakenBound SetSort.set = _
+      rw [ih]
+      rfl
+
+theorem freeLift_id {bound free : SetContext} (depth : Nat) {sort : SetSort}
+    (entry : Variable free sort) :
+    freeLift (VariableSubstitution.freeId : VariableSubstitution signature free bound free) depth entry = .fvar entry := by
+  induction depth with
+  | zero => rfl
+  | succ depth ih =>
+    change (freeLift (VariableSubstitution.freeId : VariableSubstitution signature free bound free)
+      depth entry).weakenBound SetSort.set = _
+    rw [ih]
+    rfl
+
 /-- 对全部深度给出变量编码交换后，公式交换由完整 AST 的递归直接导出。 -/
 theorem formula_substitute {sb sf tb tf : SetContext} (mode parameter : Nat) (hMode : mode < 4)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf)

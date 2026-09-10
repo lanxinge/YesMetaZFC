@@ -90,9 +90,41 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureMappin
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureCoordinateSpecifications
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureMappingOperations
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserTransfer
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedDerivability
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralOrderReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalQuotationEvaluation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalVerificationTrace
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralTraceDecision
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalProjectionReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalSyntaxReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalTransformReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalSchemaQueries
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalCheckedStepReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedIntrospection
 
 /-!
 # 一阶形式系统编码元理论入口
+
+当前普通可证明性及对象一致性句子见 `ReducedProvability`；
+`necessitation`、`distribution`、`introspection` 已分别证明 D1、D2、D3。
+D2 使用原有内部自然数证明图，实际轨迹合成见 `ReducedProofComposition`。
+`InternalNumeralSubstitution` 提供整个内部 ω 上的合法数码及固定公式代入总性。
+`ReducedProofComposition` 与 `ReducedProofLogicalConstruction` 支持内部结论码上的节点装配、MP 与存在引入。
+`InternalNumeralProof.exists_introduction` 已消去数码实例的全部语法和模式 2 变换义务。
+`InternalNumeralReflection.natural`、`zero`、`nonzero` 已构造自然数 guard 和零测试的内部证明。
+`natural_derives` 给出统一闭句子；内部归纳使用实际反射公式及最终阶段对应。
+`InternalNumeralProof.specialize_finite` 覆盖任意有限参数数目的数码特化；单参数入口复用它的构造。
+`InternalNumeralReflection.equal`、`unequal` 已证明任意两个内部自然数的数码相等／不等反射。
+`InternalNumeralReflection.order`、`weak_order` 提供序关系的正负反射；`arithmetic_evaluation` 给出加乘幂求值。
+`InternalCodingEvaluation` 将求值扩展到 Gödel 配对、复合项、节点、字段列和参数化 AST 码项；
+`InternalQuotationEvaluation` 保留既有结构 quotation，所有结果均生成原证明图接受的等式证明。
+`atomic_reflection` 与 `boolean_reflection` 组合原子判断及逻辑联结词；
+`bounded_term_reflection` 覆盖自然数复合界项的全称／存在正负反射。
+`finite_verification` 保留给定有限骨架的装配接口。
+`proof_trace_positive` 已反射原证明树的任意内部 checked 轨迹，消去有限骨架及连边证明输入。
+`verification_reflection`、`proof_matrix_reflection` 精确接回原验证矩阵与自然数 guard；
+`ReducedProvability.introspection` 已完成当前原可证明性谓词的 D3。
 
 该入口导出内在 quotation、结构语法正确性、对象证明图及抽象 Rosser 终局。
 `AxiomPresentation` 与 `ProofCertificate` 已在完整支撑公理理论上实例化，
@@ -103,7 +135,7 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosser
 `intrinsic_zfc_nat_encode` 与 `intrinsic_zfc_nat_decode_encode` 已完成逆向编码和
 完整证书往返；`intrinsic_zfc_derives_iff_nat_certificate` 给出自然数入口的完备性。
 完整等价公理基的对象表示已由下述 ReducedAxiomPacket 完成；整棵证明树的对象图
-及其正负表示合同仍待完成。现有 ZFC 对象 verifier
+及其正负表示合同由 `ReducedProofPresentation` 完成。旧 ZFC 对象 verifier
 只装配 ZFC 固定公理和 schema，不能据其名称推断其已覆盖整个支撑理论。
 
 `IntrinsicQuotation.quote` 保留当前全部公式构造子，并有宿主往返、单射及对象码不等
@@ -139,9 +171,10 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosser
 `ReducedAxiomPacket.presentation` 已给出整个等价公理基的具体 Delta1AxiomPresentation，
 包含原 ZFC 基础分支、支撑有限表、实际自然数包解码以及当前 quotation 上的正负推导。
 它表示等价公理基的成员关系，不声称表示原参数证书逐字装配关系；后者不再阻塞本路线。
-完整证明树表示完成后，`ReducedAxioms.liftProofPresentation` 可直接恢复原目标理论接口。
+`ReducedProofPresentation.presentation` 已通过 `ReducedAxioms.liftProofPresentation`
+恢复原目标理论的完整证明表示。
 
 `Delta0ProofGraph` 记录对象图的量词分类，`RosserPresentation` 在证明表示、
-有限比较装配和给定的固定点证明上推出抽象不完备结论。具体固定点构造与
-ZFC Rosser 终局尚未在当前架构中闭合。
+有限比较装配和给定的固定点证明上推出抽象不完备结论。`ReducedRosser` 已有具体
+固定点构造，`PureRosserComplete` 完成任意原模型对应与裸 ZFC Rosser 不完备终点。
 -/

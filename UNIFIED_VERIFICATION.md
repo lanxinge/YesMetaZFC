@@ -185,7 +185,215 @@
 | 118 | `SupportAssembly.closedTemplate .range` | `PureSupportSeparation.parameter_template`；[PureSupportSeparation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSupportSeparation.lean) |
 | 119 | `SupportAssembly.closedTemplate .symmetricDifference` | `PureSupportSeparation.parameter_template`；[PureSupportSeparation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSupportSeparation.lean) |
 
-## 当前核验基点
+## D3 与任意内部轨迹反射核验
+
+在 `9045935` 及下述 D1、D2 工作区修改之上，累计新增一百零一个模块，完成
+内部数码总性与唯一性、固定 AST 的非标准自由代入、模式 2 点实例化连接、
+任意内部上下文下的数码语法，以及内部结论码上的节点装配、MP 和数码存在引入。
+现已补上任意有限参数定理的非标准数码特化、自然数 guard 反射、零测试
+正负反射、任意两个内部自然数的数码相等／不等与严格／非严格序反射，
+以及加、乘、幂、Gödel 配对与复合编码项的数码求值。
+编码项入口覆盖字段列、节点、Horn 表达式、参数化 AST 码项和既定 quotation。
+原子判断及命题联结词的正负反射已完成；自然数有界全称／存在也有正负反射，
+界可为已求值的复合项。固定有限轨迹骨架的逐行内部证明可经 `finite_verification`
+接回原验证矩阵。数码递归图已完成任意内部轨迹的正负反射，并接入复合项；
+投影图也完成了全部七条规则的内部正反射；一般语法图的项、参数列和全部公式
+构造子已完成内部正反射。原四种语法变换、schema 各递归图、传输包解码以及
+完整 schema／公理行查询现已完成正反射。原 27 类逻辑公理、6 类证明节点、
+实际局部行查询也已完成正反射，并接入原检查步骤。完整 checked 轨迹的任意内部
+根行反射现已完成，原验证矩阵与完整证明矩阵均已反射。
+公共入口为 [InternalNumeralProof](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralProof.lean)
+和 [ReducedProofReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofReflection.lean)。
+`InternalNumeralReflection.natural`、`natural_derives`、`zero`、`nonzero` 均已证明，
+`equal`、`unequal`、`unequal_derives`、`order`、`weak_order`、`order_derives`
+及 `arithmetic_evaluation_derives` 也已证明，没有相应反射前提。
+`ReducedProvability.matrix_of_verification` 用自然数反射补齐
+原矩阵的 guard；`verification_reflection` 填入原检查器正文反射，
+`ReducedProvability.introspection` 已给出无附加反射假设的 D3 普通推导。
+归纳消费最终解释的纯公式，未假定内部自然数或轨迹在外部标准、有限或良基。
+
+当前 `lake --wfail build` 完成 921 个任务；`bash scripts/check-all.sh` 检查全部
+924 个 Lean 模块，完成 926 个全源构建任务及 320 个扫描工具任务，零错误、零警告。
+这是恢复环境中的增量内核核验，没有运行冷构建或远端 CI。
+
+最新 `#print axioms` 检查覆盖 271 个入口，包括 D2、D3 与 Rosser 终点。
+上一状态的 247 个入口依赖集合逐项不变，24 个新入口也均未超出保存的
+Rosser 32 项可信基：
+
+| 核验入口 | 依赖数量及比较 |
+| --- | --- |
+| `ObjectCodeInstantiation.formula_values_congr` | 1 项，为既有 Rosser 32 项依赖的子集 |
+| `PureSourceTraceComposition.witness_agrees`；`PureSourceNumeralSyntax.graph_transform` | 各 31 项，均包含于同一既有可信基 |
+| `PureSourceInstantiation.formula_mapped_transform`、`numeral_point`、`numeral_wellFormed` | 各 31 项，均包含于同一既有可信基 |
+| `InternalNumeralProof.forall_elimination`、`specialize_values`、`specialize_finite`、`specialize`、`values_modus_ponens` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| `InternalNumeralReflection.equal`、`successor_inequality`、`unequalAll_agrees`、`unequal`、`unequal_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| `InternalNumeralReflection.natural`；`ReducedProvability.matrix_of_verification` | 重新核验后仍为同一组 32 项依赖；后者仍须提供检查器正文证明 |
+| `ReducedProvability.distribution`、`PureRosser.independent` | 重新核验后仍为同一组 32 项依赖 |
+| `PureSourceArithmetic.at_zero`、`at_successor`；`InternalNumeralReflection.source_complete` | 前两项各 31 项，开放完备性入口 10 项，均为既有可信基的子集 |
+| `InternalNumeralReflection.orderAll_agrees`、`order`、`weak_order`、`order_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| `InternalNumeralReflection.evaluationAll_agrees`、`evaluation_induction`、`evaluation_zero`、`evaluation_successor` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| `InternalNumeralReflection.addition_evaluation`、`multiplication_evaluation`、`exponentiation_evaluation`、`arithmetic_evaluation_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| `ObjectCodeInstantiation.term_mapped`、`term_weakenFree`；`InternalNumeralReflection.composition_derives` | 分别为 0、1、10 项，均包含于既有可信基 |
+| `InternalNumeralReflection.binary_term_evaluation`、`arithmetic_term_evaluation`；配对多项式求值、`pairing_evaluation`、`pairing_evaluation_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
+| 字段列、节点、Horn 表达式、参数化项／参数列／公式、quotation 树与 `quotation_evaluation` | 八个入口各 32 项，与此前 Rosser 依赖集合相同 |
+| `ObjectCodeInstantiation.term_weakenBound`、`formula_renamed`、`formula_weakenFree` | 分别为 1、2、2 项，均包含于既有可信基 |
+| 原子同余、全称零点／后继／反例的源推导 | 四个入口各 10 项；内部原子反射、逻辑组合、量词见证及实际有界反射均为原 32 项依赖 |
+| `bounded_bundle_parameters`、`bounded_bundle`、`bundleAt_agrees` | 各 32 项；`parameterValues_agrees` 为 31 项，均包含于既有可信基 |
+| `finite_trace_derives`、`verificationMatrix_trace` | 分别为 9、11 项，均包含于既有可信基 |
+| `allOf_values`、`natural_term_proof`、`finite_trace_values`、`checked_trace_values`、`finite_verification` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `term_embedBoundClosed`；`formula_mapped_of_depth`、`formula_substituteFree`、`binary_template` | 前者 1 项，其余各 2 项；自由重命名改为复用该遍历后，旧入口依赖集合不变 |
+| 数码图 `template_apply`；`predicate_terms_code`、`predicate_names_code` | 各 2 项，均包含于既有可信基 |
+| `predicate_transport_derives`；`predicate_transport`、`nextTerm_evaluation` | 分别为 10、32、32 项，均包含于既有可信基 |
+| `numeral_trace_zero_derives`、`numeral_trace_step_derives`、`numeral_trace_reject_derives` | 各 31 项，均包含于既有可信基 |
+| `numeral_trace_zero`、`numeral_trace_step`、`numeralTraceAt_agrees`、`numeral_trace_positive`、`numeral_trace_positive_derives`、`numeral_trace_negative`、`numeral_trace_reflection` | 七个入口各 32 项，与既有 Rosser 依赖集合相同 |
+| Horn `template_apply`、`horn_satisfies`；`hornAt_satisfies`、`projectionGet_satisfies` | 前两项各 2 项，后两项各 11 项，均包含于既有可信基 |
+| `rule_cases`、`node_head_injective`、`horn_rule_derives` | 各 31 项，均包含于既有可信基 |
+| `horn_term_transfer`、`horn_rule_terms`、`horn_rule_values`、`hornProv_agrees` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `projectionGet_agrees`、`projection_get_step`、`projection_get_positive`、`projection_positive`、`projection_term_positive`、`projection_positive_derives` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
+| `ObjectSyntaxReflection.Row.map_tag`、`map_fields`、`map_input`；`PureSourceSyntaxRank.value_map` | 四个入口均为 0 项依赖 |
+| `ObjectSyntaxReflection.Row.input_mem`、`PureSourceSyntaxRank.input_natural` | 各 1 项，均包含于既有可信基 |
+| `ObjectSyntaxReflection.ranked`、`head_variables` | 各 2 项，纯规则形状及变量出现证明 |
+| `PureSourceSyntaxRank.value_natural`、`map_natural` | 各 10 项，均包含于既有可信基 |
+| `PureSourceInduction.strong_induction`；`PureSourceSyntaxRank.rank_unique`、`below_value`、`rule_ranked` | 四个入口各 31 项，均包含于既有可信基 |
+| `syntaxAt_satisfies` | 11 项，实际同时归纳公式的语义接口 |
+| `syntaxAt_agrees`、`syntax_step`、`syntax_at_positive`、`syntax_positive`、`syntax_term_positive`、`syntax_positive_derives` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
+| 分层规则 `transform_valid`、`iteration_valid`、`project_valid`；schema 三项 `*_valid` 和 packet `shapes` | 各 2 项，由内核核验原固定规则表 |
+| `rule_intro_bounds`、`rule_cases_bounds`；`affine_bounds` | 分别为 10、31、31 项，均包含于既有可信基 |
+| `rankedAt_satisfies`；`rankedAt_agrees`、`horn_ranked_positive`、`horn_valid_positive` | 语义接口为 11 项，其余各 32 项，均包含于既有可信基 |
+| `transform_positive_derives`；`InternalPositiveFormula.boundedExists`、`positive_derives` | 各 32 项，与既有 Rosser 依赖集合相同 |
+| `axiom_query_positive`、`axiom_query_named`、`axiom_query_positive_derives` | 各 32 项，实际一元公理行查询的内部与普通推导终点 |
+| `InternalPositiveFormula.localMatrix`、`localRule`、`localTest` | 三个公共局部规则组合入口，各 32 项 |
+| `InternalProofQueryReflection.logical`、`query`、`node`、`row`、`currentNode`、`currentRow` | 六个原局部查询反射入口，各 32 项 |
+| `logical_term_positive`、`node_term_positive`、`row_term_positive`、`row_named_positive` 及三项 `*_positive_derives` | 七个复合项、数码及普通推导终点，各 32 项 |
+| `checked_step_values`、`proof_step_values`、`finite_verification_of_links` | 三个实际步骤／矩阵装配入口，各 32 项；仍显式保留连边证明输入 |
+
+| checked `template_apply`、`proof_valid`、`step_satisfies`、`checked_satisfies` | 四个入口各 2 项，由原公式语义及内核规则核验给出 |
+| checked `rule_cases_bounds`、`checked_step_agrees` | 各 31 项，均包含于既有可信基 |
+| checked `rule_intro_bounds`、`checked_rule_bounded_derives` | 各 10 项，内部集合构造及源规则推导 |
+| `checkedAt_satisfies`、`checkedRankedAt_satisfies` | 各 11 项，原反射公式的语义接口 |
+| `checked_term_transfer`、`checked_rule_bounded_terms`、`checked_rule_bounded_values`、`checkedProv_agrees`、`checkedRankedAt_agrees`、`checked_valid_positive` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
+| `proof_trace_positive`、`proof_trace_values`、`proofTrace`、`proof_trace_positive_derives` | 四个任意内部原证明树轨迹终点，各 32 项 |
+| `verificationRoot_evaluation`、`verification_reflection`、`proof_matrix_reflection`、`ReducedProvability.introspection` | 四个原矩阵／D3 终点，各 32 项；无新增可信依赖 |
+
+
+此前数码、节点装配、模式 2 变换与逻辑公理入口的审计也未超出上述可信基。
+新增源码无 `sorry`、`admit`、自定义公理或原生验证调用；这里保留原有原生
+支撑依赖，不声称整个仓库没有原生依赖。
+
+数码的 `graph_term` 使用带 bound/free 参数的实际对象公式归纳，旧闭项接口
+作为零上下文特例保留。自由代入和点实例化共用 `formula_mapped_transform` 的
+AST 遍历；公式语法构造统一于 `PureSourceFormulaConstruction`，逻辑层复用它。
+`InternalNumeralProof.exists_introduction` 只消费数码图和实例内部证明，自动填入
+正文、项、实例语法及实际模式 2 变换。`codeProof_agreement` 还将最终阶段对应
+推广到非标准结论码。新增 `ObjectNumeralReflection.atNumber` 由实际数码图、
+参数化 AST 码项和原可证明性图组成，归纳前已证明其与最终规范扩张逐值一致。
+自然数反射的后继步骤使用源无穷公理定理的内部特化及 MP，零测试的负分支
+只反演数码图的根行。AST 的自然性、求值与模型传输复用关系保持遍历。
+变换遍历现在允许两端都含内部数码，自由槽位相等只须覆盖实际上下文。
+`graph_transform` 对任意内部深度证明数码不变，`specialize_values` 以同一全称
+消去构造递归消费有限自由上下文；`specialize_finite` 不约束上下文外的槽位。
+二元不等反射的归纳性质是 `ObjectNumeralComparison.unequalAll`，全称覆盖
+第二个内部自然数和两个数码，零与后继分支均构造实际证明码。
+序关系的归纳性质为 `ObjectNumeralOrder.atRight`，后继使用隶属后继的析取刻画。
+算术的 `ObjectNumeralEvaluation.atRight` 同时量化两个操作数及运算结果的数码，
+`evaluationAll_agrees` 先验证自然数封闭性与最终阶段对应，再用 `evaluation_induction`。
+加法、乘法、幂依次提供实际后继证明；源递推由既有纯序数算术规格传回。
+受限数码量词和联结词语义共用 `ObjectNumeralQuantifiers`／`InternalNumeralQuantifiers`，
+避免展开整个验证器；所有数码实例仍交给原 `ProvableCode`。
+复合项的 `binary_term_evaluation` 通过源同余推导组合子项等式与运算等式，
+`term_mapped` 统一证明槽位代入与项码构造交换。配对的两分支消费序关系
+正负反射和复合算术求值；节点、字段列及 Horn 表达式沿原编码构造组合，
+参数化 AST 码项复用 `ObjectCodeInstantiation` 的既有关系保持遍历。
+`quotation_evaluation` 直接覆盖原结构树。此处项骨架固定于元层，输入值、
+数码与内部证明不要求外部标准；并未声称任意内部 AST 的统一解释器已完成。
+D1、D2 与 Rosser 的公开结论保持；当前证明图、quotation、
+公理和 Rosser 终点源码未改动。
+
+`bounded_bundle` 的归纳性质是 `ObjectBoundedReflection.bundleAt`：内部区间上
+所有数码实例的可证明性，蕴含有界全称实例的可证明性。性质只含实际数码图、
+原证明图及固定 AST 码项；`bundleAt_agrees`、`parameterValues_agrees` 完成最终阶段对应，
+没有把任意外部谓词当作可分离公式。反例方向及存在双重否定对偶保留原量词 AST。
+
+`numeral_trace_positive` 的归纳性质是 `ObjectNumeralTraceReflection.atInput`，
+包含原数码图、数码实例编码与原证明谓词。`numeralTraceAt_agrees` 完成最终阶段对应，
+后继步从任意原内部轨迹反演前驱，并用 `numeral_trace_step` 构造下一图实例的证明。
+`numeral_trace_negative` 使用已证明的总性与唯一性及不等式反射，不枚举拒绝轨迹。
+`predicate_transport` 通过含量词模板同余和项求值，把两种反射传到复合项。
+这些结论没有标准性、外部有限性或额外反射假设。
+
+`projection_get_positive` 按内部索引归纳，性质为 `ObjectHornReflection.getAt`；
+`projectionGet_agrees` 证明最终阶段对应。`rule_cases` 只读取原内部轨迹根行，
+`horn_rule_values` 统一生成参数命名、守卫证明及前提／结论的数码传输。
+`projection_positive` 据此覆盖原 `ObjectProjection.rules` 的全部七条规则，
+`projection_term_positive` 接入复合行项，`projection_positive_derives` 给出源理论统一闭句。
+不要求规范树／列表外壳，未假定内部索引或轨迹外部标准、有限或良基。
+本入口只证明投影图正反射，不登记一般负反射。
+
+`syntax_positive` 覆盖原 `ObjectFormulaSyntax.rules` 的任意内部根行。
+[PureSourceSyntaxRank](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceSyntaxRank.lean) 的 `rule_ranked` 从实际规则表证明子输入严格小于头输入；
+`rank_unique` 用编码单射性恢复输入秩，量词下增长的 bound 长度不影响下降。
+归纳正文为 `ObjectSyntaxReflection.atInput`，同时量化内部上下文和参数个数；
+`syntaxAt_agrees` 证明最终阶段对应，`PureSourceInduction.strong_induction` 通过
+较小输入的有界全称公式实现内部强归纳。规则装配复用 `horn_rule_values`。
+`syntax_term_positive` 支持复合行项，`syntax_positive_derives` 给出统一闭句推导。
+本入口证明一般语法图正反射，不登记一般负反射。
+
+[InternalTransformReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalTransformReflection.lean) 用 `horn_valid_positive` 覆盖原 28 条变换规则。
+查表先按表尾下降，再对语法输入下降；元层有限阶段与内部输入强归纳分开。
+[InternalSchemaGraphs](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalSchemaGraphs.lean) 覆盖正文、重命名、表生成、闭合和 quotation 转换。
+[InternalPacketReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPacketReflection.lean) 覆盖原传输包十条规则；token 的递归输入下降
+由原 radix 128 仿射图的正尾增长界推出，不依赖外部数值解码。
+原规则量化的隐含中间参数通过 `rule_cases_bounds`／`horn_rule_bounded_values`
+保留实际边界，未加入“所有变量必须出现在头部”的额外条件。
+
+[InternalSchemaReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalSchemaReflection.lean) 将上述图和固定表组合为原 schema 的完整有界查询。
+[InternalPositiveQuantifiers](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPositiveQuantifiers.lean) 只用正向见证引入，复用规范 binder 打开与替换，
+不假设各图具有负反射。[InternalSchemaQueries](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalSchemaQueries.lean) 的 `axiom_query_positive`
+支持已求值复合项，`axiom_query_positive_derives` 是实际 `ReducedAxiomNumber.localTest`
+成立时数码实例可证明性的普通闭句推导。输入、见证、数码及原集合轨迹都允许非标准。
+
+[InternalLocalDecisionReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalLocalDecisionReflection.lean) 对任意原局部规则表统一处理头等式、全部子查询
+与有界存在块；没有逐条复制 27 类逻辑公理的证明。
+[InternalProofQueries](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofQueries.lean) 消费已完成的一般语法、变换、投影及实际公理查询，
+得到六类节点及原零码／零标签／其他标签行封装的正反射。
+[InternalProofRowReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofRowReflection.lean) 将其导出为复合项、任意内部数码及统一普通推导入口。
+[InternalCheckedStepReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedStepReflection.lean) 的 `proof_step_values` 消去实际检查步骤中的
+局部证明输入，只保留原 Horn 连边证明和局部真值；轨迹项不要求是自然数。
+`finite_verification_of_links` 把同一装配接回原 `verificationMatrix`，仍显式要求有限骨架及连边证明。
+
+[PureSourceCheckedConstruction](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSourceCheckedConstruction.lean) 在根行反演时同时取得原 Horn 规则、参数界、守卫、局部真值及前提见证。
+各前提保留同一原内部集合轨迹；构造时用公共集合 `collect` / `insert` 合并并插入头行。
+[InternalCheckedReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedReflection.lean) 将实际局部查询正反射与前提数码证明组合，得到原规则结论的数码证明。
+
+[InternalCheckedRanking](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedRanking.lean) 的 `checked_valid_positive` 对实际
+`ObjectCheckedReflection.atPhase` 公式作内部强归纳，`checkedRankedAt_agrees` 核验最终阶段对应。
+[ObjectCheckedReflection](YesMetaZFC/Automation/ObjectCheckedReflection.lean) 的 `proof_valid` 以 Lean 内核核验原十二条规则：
+节点阶段沿子证明编码下降，根阶段进入节点阶段。[InternalProofTraceReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofTraceReflection.lean)
+的 `proof_trace_positive` 已填入原行查询正反射和对应合同，覆盖任意内部根行与轨迹。
+
+[InternalVerificationReflection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalVerificationReflection.lean) 的 `verification_reflection` 通过
+`verificationMatrix_trace` 精确接回原检查器正文，`proof_matrix_reflection` 补齐自然数 guard。
+`proofMatrix_exists` 保持原普通可证明性句子；[ReducedIntrospection](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedIntrospection.lean) 的
+`ReducedProvability.introspection` 因而给出 $T\vdash\Box\varphi\to\Box\Box\varphi$。
+这些入口不要求外部有限骨架、逐条连边证明、额外反射、一致性或标准模型假设。
+本次已核验完整 D3；Löb、哥德尔第二不完备定理及裸 ZFC 原生证明谓词的传输另列后续目标。
+
+## D1、D2 增量核验
+
+在 `9045935` 基础上新增普通可证明性与内部 MP 构造，入口为
+[ReducedDerivability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedDerivability.lean)。
+`lake --wfail build` 完成 820 个任务；`bash scripts/check-all.sh` 检查全部
+823 个 Lean 模块，完成 825 个全源构建任务及 320 个扫描工具任务，零错误、零警告。
+这是恢复环境中的增量内核构建，不声称冷构建或远端 CI 已运行。
+
+新增源码没有 `sorry`、`admit`、自定义公理或原生计算验证调用。
+实际 `#print axioms` 核验显示：通用 D1 依赖 `propext`、`Quot.sound`；
+源理论 D1 的 11 项依赖是既有 Rosser 终点依赖的子集；D2 和内部 MP 构造的
+32 项依赖集合均与 `PureRosser.independent` 相同。这里保留仓库已有的原生
+支撑依赖，不把“无新增依赖”表述为“没有原生依赖”。
+原有证明图、quotation、公理和 Rosser 终点的源码均未修改。
+
+## Rosser 与既有声明的核验基点
 
 源码基点为 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)。
 该源码的全源检查完成 808 个构建任务、扫描工具检查完成 320 个任务，零错误、零警告。

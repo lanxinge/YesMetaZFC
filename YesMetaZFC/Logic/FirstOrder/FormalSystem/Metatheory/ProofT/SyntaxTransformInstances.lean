@@ -10,7 +10,7 @@ set_option autoImplicit false
     (extend base depth).length = depth + base.length := by
   induction depth <;> simp_all [extend, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
 
-private theorem boundLift_empty {tb tf : SetContext} (bs : VariableSubstitution signature [] tb tf)
+theorem boundLift_empty {tb tf : SetContext} (bs : VariableSubstitution signature [] tb tf)
     (depth : Nat) {sort : SetSort} (entry : Variable (extend [] depth) sort) :
     SyntaxEncode.term (boundLift bs depth entry) = SyntaxSubstitution.bvar entry.index := by
   induction depth with
@@ -36,7 +36,7 @@ private theorem freeLift_closed {sf tf : SetContext} (fs : VariableSubstitution 
       rw [ih]
   rw [h, encode_embedBoundClosed]
 
-private theorem freeLift_abstract {free : SetContext} (depth : Nat)
+theorem freeLift_abstract {free : SetContext} (depth : Nat)
     {sort : SetSort} (entry : Variable (SetSort.set :: free) sort) :
     SyntaxEncode.term (freeLift (VariableSubstitution.abstractFreeTop (bound := [])) depth entry) =
       match entry with

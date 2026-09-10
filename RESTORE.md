@@ -15,9 +15,13 @@
 | 当前容器工具链 | `/workspace/scratch/fb4803f63959/toolchains/lean-4.33.1-linux` |
 
 恢复源码应得到 `lakefile.toml`、`lean-toolchain`、`YesMetaZFC.lean` 和 `YesMetaZFC/`。
-源码核验基点为 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)。
-Drive 已核验版本的 Lean 源码、配置和脚本与该基点相同；较新的文档以 Git 为准。
-早期来源包未同步当前精简，不应覆盖当前工作树。
+当前源码包保存 [9045935](https://github.com/lanxinge/YesMetaZFC/commit/9045935fbbe9466cf246cad009acf1de4385d5a2)
+之上的完整工作树，包含 D1、D2、任意内部 checked 轨迹反射及 D3，相关修改尚未推送 Git。
+该节点有 924 个 Lean 模块；严格构建 921 个任务、全源构建 926 个任务及扫描工具
+320 个任务通过。271 个入口的公理依赖审计未超出原有 32 项可信基。
+成果入口为 `ReducedProvability.introspection`，详细接口和核验范围见
+[TROPHIES.md](TROPHIES.md)、[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+恢复本节点应使用此源码包；仅检出上述 Git 提交不能恢复未提交的 D3 工作。
 
 ## 已有的 Lean Linux 运行时
 

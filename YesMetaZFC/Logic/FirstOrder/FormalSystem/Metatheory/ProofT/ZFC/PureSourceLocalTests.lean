@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceSchemas
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureNaturalRosserAgreement
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofCodeSemantics
 
 /-! # 当前节点、局部行与完整证明图的对应
 
@@ -89,6 +89,30 @@ theorem row_agrees {value : 𝒩.Carrier .set} (hValue : mem 𝒩 value (w 𝒩)
   apply and_congr (step_agrees h𝒩 _ hValue trace)
   rw [NaturalRosserSemantics.unary_satisfies, NaturalRosserSemantics.unary_satisfies]
   exact currentRow h𝒩 value hValue
+
+/-- 结论码也可非标准；为内部证明构造的可分离性质提供最终阶段对应。 -/
+theorem codeProof_agreement {code conclusion : 𝒩.Carrier .set}
+    (hCode : mem 𝒩 code (w 𝒩)) (hConclusion : mem 𝒩 conclusion (w 𝒩)) :
+    ReducedProofCodeSemantics.CodeProof 𝒩 code conclusion ↔
+      ReducedProofCodeSemantics.CodeProof (canonical h𝒩) code conclusion := by
+  unfold ReducedProofCodeSemantics.CodeProof
+  rw [ReducedProofPresentation.graph_condition]
+  apply PureSourceBounds.trace_agrees h𝒩
+  · simp only [PureSourceCoding.node_eval, List.map_cons, List.map_nil]
+    change PureSourceCoding.node 𝒩 1 [code, conclusion] = PureSourceCoding.node (canonical h𝒩) 1 [code, conclusion]
+    exact PureSourceCoding.node_agrees h𝒩 1 (by simp [hCode, hConclusion])
+  · intro trace _ row _ hRow
+    exact row_agrees h𝒩 hRow trace
+
+theorem provableCode_agreement {conclusion : 𝒩.Carrier .set}
+    (hConclusion : mem 𝒩 conclusion (w 𝒩)) :
+    ReducedProofCodeSemantics.ProvableCode 𝒩 conclusion ↔
+      ReducedProofCodeSemantics.ProvableCode (canonical h𝒩) conclusion := by
+  apply exists_congr
+  intro proof
+  change (mem 𝒩 proof (w 𝒩) ∧ _) ↔ (mem 𝒩 proof (w (canonical h𝒩)) ∧ _)
+  rw [← PureSourceInfinity.omega_agrees h𝒩]
+  exact and_congr_right (fun hProof => codeProof_agreement h𝒩 hProof hConclusion)
 
 /-- 任意固定结论的完整证明关系，在全部内部自然数证明码上对应。 -/
 theorem proof_agreement (formula : SetSentence) : PureNaturalRosserAgreement.ProofAgreement h𝒩 formula := by
