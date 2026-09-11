@@ -1,4 +1,5 @@
 import YesMetaZFC.Automation.DAGCertificate.IntrinsicReplay.LocalRules
+import YesMetaZFC.Automation.GuardSemantics
 
 /-!
 # DAG 内在语义回放
@@ -44,16 +45,7 @@ theorem neg_of_not_holds
     {valuation : PropResolution.Valuation} (lit : PropResolution.Lit)
     (hNot : ¬ lit.Holds valuation) :
     lit.neg.Holds valuation := by
-  rcases lit with ⟨v, positive⟩
-  cases positive with
-  | false =>
-      change ¬¬ valuation v at hNot
-      change valuation v
-      exact Classical.byContradiction fun hFalse => hNot hFalse
-  | true =>
-      change ¬ valuation v at hNot
-      change ¬ valuation v
-      exact hNot
+  exact PropResolution.Lit.holds_neg_iff.mpr hNot
 
 end GuardsHold
 
@@ -399,15 +391,10 @@ theorem guardsHold_of_unguarded
     {valuation : PropResolution.Valuation} {guards : GuardSet}
     (hUnguarded : guards.isEmpty = true) :
     GuardsHold valuation guards := by
-  have hGuards : guards = #[] := by
-    apply Array.toList_inj.mp
-    simpa [Clause.isEmpty, Array.isEmpty_iff] using hUnguarded
-  subst guards
-  intro lit hLit
-  exact False.elim <| by
-    simp [Guards.canonical, PropResolution.canonicalClause,
-      PropResolution.canonicalClauseList,
-      PropResolution.mergeCanonicalRuns] at hLit
+  intro lit hMem
+  have hRaw := Guards.mem_of_mem_canonical hMem
+  have hEmpty : guards = #[] := Array.isEmpty_iff.mp hUnguarded
+  simp [hEmpty] at hRaw
 
 theorem parentNode_trueIn_of_unguarded
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -431,6 +418,26 @@ theorem parentNode_trueIn_of_unguarded
   apply hGuarded
   rw [hParentGuards]
   exact guardsHold_of_unguarded hUnguarded
+
+/-- 编译后真文字沿已检查的链接数组映射到命题子句。 -/
+theorem literalLinks_satisfies
+    (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
+    {registry : Compile.FreeRegistry σ}
+    (assignment : Assignment M registry.context)
+    (valuation : PropResolution.Valuation) (atomMap : Array (Formula σ))
+    (links : Array (PropLiteralLink σ)) (parent : Compile.CompiledClause registry)
+    (hRaw : parent.raw.literals = links.map (fun item => item.object))
+    (hChecks : links.all (fun item => item.check atomMap) = true)
+    (hTrue : parent.TrueIn M) :
+    PropResolution.Clause.Satisfies (overlayValuation M assignment valuation atomMap)
+      (links.map (fun item => item.prop)) := by
+  rcases compiledClause_exists_trueLiteral M parent assignment hTrue with
+    ⟨literal, hMem, formula, hCompile, hSat⟩
+  rw [hRaw] at hMem
+  rcases Array.mem_map.mp (Array.mem_def.mpr hMem) with ⟨item, hItem, rfl⟩
+  exact ⟨item.prop, Array.mem_def.mp (Array.mem_map_of_mem hItem),
+    overlayLit_holds_of_link M assignment valuation atomMap item
+      (Array.all_eq_true'.mp hChecks item hItem) hCompile hSat⟩
 
 theorem parentClause_initial_satisfies
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -472,51 +479,13 @@ theorem parentClause_initial_satisfies
       hParents link.parent.id hParentMem hParentIndex
       (guards := (cert.dag.nodeAt link.parent.id hParentIndex).guards)
       (by simpa [Node.unguarded] using hParentUnguarded) rfl
-  rcases DAG.parentSnapshotChecked_sound hSnapshot with
-    ⟨snapshotNode, hSnapshotNode, hSnapshotClause⟩
-  have hSnapshotNodeEq :
-      snapshotNode = cert.dag.nodeAt link.parent.id hParentIndex := by
-    exact Option.some.inj <| hSnapshotNode.symm.trans
-      (cert.dag.node?_eq_some_nodeAt hParentIndex)
-  subst snapshotNode
-  have hParentRaw :
-      (compiled.nodeAt link.parent.id hParentIndex).raw = link.parent.clause :=
-    (compiled.nodeAt_raw link.parent.id hParentIndex).trans hSnapshotClause
-  rcases compiledClause_exists_trueLiteral M
-      (compiled.nodeAt link.parent.id hParentIndex) assignment hParentTrue with
-    ⟨literal, hLiteralMem, formula, hLiteralCompile, hLiteralSat⟩
-  rw [hParentRaw] at hLiteralMem
-  have hObjectMem : literal ∈ link.objectClause.literals.toList := by
-    simpa [hObjectEq] using hLiteralMem
-  have hMappedMem : literal ∈
-      (link.literalLinks.map (fun item => item.object)).toList := by
-    simpa [PropParentClauseLink.objectClause] using hObjectMem
-  have hMappedMem' : literal ∈
-      List.map (fun item => item.object) link.literalLinks.toList := by
-    simpa [Array.toList_map] using hMappedMem
-  rcases List.mem_map.mp hMappedMem' with
-    ⟨item, hItemMem, hItemObject⟩
-  have hItemCheck : item.check atomMap = true :=
-    array_check_of_mem hLinkChecks hItemMem
-  have hItemCompile :
-      Compile.formula? compiled.compilation.registry [] item.object.toFormula =
-        some formula := by
-    simpa [hItemObject] using hLiteralCompile
-  have hItemHolds := overlayLit_holds_of_link M assignment valuation atomMap
-    item hItemCheck hItemCompile hLiteralSat
-  have hPropMem' : item.prop ∈
-      List.map (fun current => current.prop) link.literalLinks.toList :=
-    List.mem_map.mpr ⟨item, hItemMem, rfl⟩
-  have hPropMem : item.prop ∈
-      (link.literalLinks.map (fun current => current.prop)).toList := by
-    simpa [Array.toList_map] using hPropMem'
-  have hPropCanonical : item.prop ∈ link.encodedClause.toList := by
-    simpa [PropParentClauseLink.encodedClause] using
-      PropResolution.mem_canonicalClause_of_mem hPropMem
-  have hPropInitial : item.prop ∈ initial.clause.toList := by
-    rw [hInitialEq]
-    exact hPropCanonical
-  exact ⟨item.prop, hPropInitial, hItemHolds⟩
+  rw [hInitialEq]
+  apply PropResolution.Clause.satisfies_canonical_iff.mpr
+  exact literalLinks_satisfies M assignment valuation atomMap link.literalLinks
+    (compiled.nodeAt link.parent.id hParentIndex)
+    (congrArg Clause.literals
+      ((parent_compiled_raw_of_snapshot compiled link.parent hParentIndex hSnapshot).trans
+        hObjectEq)) hLinkChecks hParentTrue
 
 theorem guardActivationClause_initial_satisfies
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -555,104 +524,19 @@ theorem guardActivationClause_initial_satisfies
     ParentClause.mem_toList_of_idIn hParentIdAndObject.1
   have hOutsideGuards := hClauseParts.2
   have hLinkChecks := hCheckParts.2
-  by_cases hAllGuards : GuardsHold valuation link.guards
-  · have hParentGuards : GuardsHold valuation
-        (cert.dag.nodeAt link.parent.id hParentIndex).guards :=
-      GuardsHold.of_eq hParentGuardsEq hAllGuards
+  rw [hInitialEq]
+  apply Guards.activation_satisfies
+  · intro lit hMem
+    exact holds_of_outside_overlay M assignment valuation atomMap lit
+      (array_check_of_mem hOutsideGuards hMem)
+  · intro hAllGuards
     have hParentTrue : NodeTrueIn M compiled link.parent.id hParentIndex :=
-      hParents link.parent.id hParentMem hParentGuards
-    rcases DAG.parentSnapshotChecked_sound hSnapshot with
-      ⟨snapshotNode, hSnapshotNode, hSnapshotClause⟩
-    have hSnapshotNodeEq :
-        snapshotNode = cert.dag.nodeAt link.parent.id hParentIndex := by
-      exact Option.some.inj <| hSnapshotNode.symm.trans
-        (cert.dag.node?_eq_some_nodeAt hParentIndex)
-    subst snapshotNode
-    have hParentRaw :
-        (compiled.nodeAt link.parent.id hParentIndex).raw = link.parent.clause :=
-      (compiled.nodeAt_raw link.parent.id hParentIndex).trans hSnapshotClause
-    rcases compiledClause_exists_trueLiteral M
-        (compiled.nodeAt link.parent.id hParentIndex) assignment hParentTrue with
-      ⟨literal, hLiteralMem, formula, hLiteralCompile, hLiteralSat⟩
-    rw [hParentRaw] at hLiteralMem
-    have hObjectMem : literal ∈ link.objectClause.literals.toList := by
-      simpa [hObjectEq] using hLiteralMem
-    have hMappedMem : literal ∈
-        (link.literalLinks.map (fun item => item.object)).toList := by
-      simpa [PropGuardActivationLink.objectClause] using hObjectMem
-    have hMappedMem' : literal ∈
-        List.map (fun item => item.object) link.literalLinks.toList := by
-      simpa [Array.toList_map] using hMappedMem
-    rcases List.mem_map.mp hMappedMem' with
-      ⟨item, hItemMem, hItemObject⟩
-    have hItemCheck : item.check atomMap = true :=
-      array_check_of_mem hLinkChecks hItemMem
-    have hItemCompile :
-        Compile.formula? compiled.compilation.registry [] item.object.toFormula =
-          some formula := by
-      simpa [hItemObject] using hLiteralCompile
-    have hItemHolds := overlayLit_holds_of_link M assignment valuation atomMap
-      item hItemCheck hItemCompile hLiteralSat
-    have hPropMem' : item.prop ∈
-        List.map (fun current => current.prop) link.literalLinks.toList :=
-      List.mem_map.mpr ⟨item, hItemMem, rfl⟩
-    have hPropMem : item.prop ∈
-        (link.literalLinks.map (fun current => current.prop)).toList := by
-      simpa [Array.toList_map] using hPropMem'
-    have hPropCanonical : item.prop ∈ link.encodedClause.toList := by
-      simpa [PropGuardActivationLink.encodedClause] using
-        PropResolution.mem_canonicalClause_of_mem
-          (show item.prop ∈
-              (link.guards.map PropResolution.Lit.neg ++
-                link.literalLinks.map (fun current => current.prop)).toList by
-            simp only [Array.toList_append, List.mem_append]
-            exact Or.inr hPropMem)
-    have hPropInitial : item.prop ∈ initial.clause.toList := by
-      rw [hInitialEq]
-      exact hPropCanonical
-    exact ⟨item.prop, hPropInitial, hItemHolds⟩
-  · have hGuardExists : ∃ guard,
-        guard ∈ (Guards.canonical link.guards).toList ∧
-          ¬ guard.Holds valuation := by
-      apply Classical.byContradiction
-      intro hNone
-      apply hAllGuards
-      intro guard hGuard
-      exact Classical.byContradiction (fun hNot =>
-        hNone ⟨guard, hGuard, hNot⟩)
-    rcases hGuardExists with ⟨guard, hGuardMem, hGuardFalse⟩
-    have hGuardRaw : guard ∈ link.guards.toList :=
-      Guards.mem_of_mem_canonical hGuardMem
-    have hGuardArrayMem : guard ∈ link.guards.toList := hGuardRaw
-    have hGuardOutside :
-        PropLiteralLink.outsideAtomMap atomMap guard = true :=
-      array_check_of_mem hOutsideGuards hGuardArrayMem
-    have hNegOutside :
-        PropLiteralLink.outsideAtomMap atomMap guard.neg = true :=
-      PropLiteralLink.outsideAtomMap_neg hGuardOutside
-    have hNegHoldsBase : guard.neg.Holds valuation :=
-      GuardsHold.neg_of_not_holds guard hGuardFalse
-    have hNegHoldsOverlay :
-        guard.neg.Holds (overlayValuation M assignment valuation atomMap) :=
-      (holds_of_outside_overlay M assignment valuation atomMap guard.neg
-        hNegOutside).mpr hNegHoldsBase
-    have hNegRaw : guard.neg ∈
-        (link.guards.map PropResolution.Lit.neg).toList := by
-      simpa [Array.toList_map] using
-        (List.mem_map.mpr ⟨guard, hGuardRaw, rfl⟩ :
-          guard.neg ∈ List.map PropResolution.Lit.neg link.guards.toList)
-    have hNegEncoded : guard.neg ∈ link.encodedClause.toList := by
-      simpa [PropGuardActivationLink.encodedClause] using
-        PropResolution.mem_canonicalClause_of_mem
-          (show guard.neg ∈
-              (link.guards.map PropResolution.Lit.neg ++
-                link.literalLinks.map (fun current => current.prop)).toList by
-            simp only [Array.toList_append, List.mem_append]
-            exact Or.inl hNegRaw)
-    have hNegInitial : guard.neg ∈ initial.clause.toList := by
-      rw [hInitialEq]
-      exact hNegEncoded
-    exact ⟨guard.neg, hNegInitial, hNegHoldsOverlay⟩
+      hParents link.parent.id hParentMem (GuardsHold.of_eq hParentGuardsEq hAllGuards)
+    exact literalLinks_satisfies M assignment valuation atomMap link.literalLinks
+      (compiled.nodeAt link.parent.id hParentIndex)
+      (congrArg Clause.literals
+        ((parent_compiled_raw_of_snapshot compiled link.parent hParentIndex hSnapshot).trans
+          hObjectEq)) hLinkChecks hParentTrue
 
 theorem propLearnedClause_initial_satisfies
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -741,69 +625,25 @@ theorem propLearnedClause_initial_satisfies
           have hLearnedEq : payload.learned =
               Guards.learnedClause conflictNode.guards :=
             PropResolution.clauseEq_eq.mp hLearnedCheck
-          by_cases hParentGuards : GuardsHold valuation
-              (cert.dag.nodeAt link.parent hParentIndex).guards
-          · have hParentTrue : NodeTrueIn M compiled link.parent hParentIndex :=
-              hParents link.parent hParentMem hParentGuards
-            exact False.elim <|
-              compiledClause_not_trueIn_of_raw_empty M
-                (compiled.nodeAt link.parent hParentIndex)
-                (by
-                  rw [compiled.nodeAt_raw]
-                  exact hConclusionEmpty) hParentTrue
-          · have hGuardExists : ∃ guard,
-                guard ∈
-                    (Guards.canonical
-                      (cert.dag.nodeAt link.parent hParentIndex).guards).toList ∧
-                  ¬ guard.Holds valuation := by
-              apply Classical.byContradiction
-              intro hNone
-              apply hParentGuards
-              intro guard hGuard
-              exact Classical.byContradiction (fun hNot =>
-                hNone ⟨guard, hGuard, hNot⟩)
-            rcases hGuardExists with ⟨guard, hGuardMem, hGuardFalse⟩
-            have hGuardCanonicalEq :
-                Guards.canonical
-                    (cert.dag.nodeAt link.parent hParentIndex).guards =
-                  Guards.canonical conflictNode.guards :=
+          have hNotGuards : ¬ GuardsHold valuation conflictNode.guards := by
+            intro hGuards
+            have hCanonical : Guards.canonical
+                (cert.dag.nodeAt link.parent hParentIndex).guards =
+                Guards.canonical conflictNode.guards :=
               PropResolution.clauseEq_eq.mp hGuardEq
-            have hConflictGuardMem : guard ∈
-                (Guards.canonical conflictNode.guards).toList := by
-              rw [← hGuardCanonicalEq]
-              exact hGuardMem
-            have hConflictGuardRaw : guard ∈ conflictNode.guards.toList :=
-              Guards.mem_of_mem_canonical hConflictGuardMem
-            have hNegLearned : guard.neg ∈
-                (Guards.learnedClause conflictNode.guards).toList := by
-              have hNegRaw : guard.neg ∈
-                  (conflictNode.guards.map PropResolution.Lit.neg).toList := by
-                simpa [Array.toList_map] using
-                  (List.mem_map.mpr ⟨guard, hConflictGuardRaw, rfl⟩ :
-                    guard.neg ∈
-                      List.map PropResolution.Lit.neg conflictNode.guards.toList)
-              simpa [Guards.learnedClause] using!
-                PropResolution.mem_canonicalClause_of_mem hNegRaw
-            have hNegPayload : guard.neg ∈ payload.learned.toList := by
-              rw [hLearnedEq]
-              exact hNegLearned
-            have hNegLink : guard.neg ∈ link.clause.toList := by
-              rw [hClauseLearned]
-              exact hNegPayload
-            have hNegOutside :
-                PropLiteralLink.outsideAtomMap atomMap guard.neg = true :=
-              array_check_of_mem hOutside hNegLink
-            have hNegBase : guard.neg.Holds valuation :=
-              GuardsHold.neg_of_not_holds guard hGuardFalse
-            have hNegOverlay :
-                guard.neg.Holds
-                  (overlayValuation M assignment valuation atomMap) :=
-              (holds_of_outside_overlay M assignment valuation atomMap guard.neg
-                hNegOutside).mpr hNegBase
-            have hNegInitial : guard.neg ∈ initial.clause.toList := by
-              rw [hInitialEq]
-              exact hNegLink
-            exact ⟨guard.neg, hNegInitial, hNegOverlay⟩
+            have hParentTrue := hParents link.parent hParentMem
+              (show GuardsHold valuation _ from fun lit hMem =>
+                hGuards lit (hCanonical ▸ hMem))
+            exact compiledClause_not_trueIn_of_raw_empty M
+              (compiled.nodeAt link.parent hParentIndex)
+              (by rw [compiled.nodeAt_raw]; exact hConclusionEmpty) hParentTrue
+          have hLearned : PropResolution.Clause.Satisfies valuation link.clause := by
+            rw [hClauseLearned, hLearnedEq]
+            exact Guards.learnedClause_satisfies_iff.mpr hNotGuards
+          rw [hInitialEq]
+          exact hLearned.transfer fun lit hMem hHolds =>
+            (holds_of_outside_overlay M assignment valuation atomMap lit
+              (array_check_of_mem hOutside hMem)).mpr hHolds
       | _ =>
           simp [hConflictPayload] at hConflictParts
 
@@ -878,32 +718,15 @@ theorem initialJustification_satisfies
         Nat.lt_trans
           (cert.contract.parents_before index hIndex link.parent hParentMem)
           hIndex
-      cases hNode : cert.dag.node? link.parent with
-      | none =>
-          have hDag' := hDag
-          unfold DAG.propLearnedInitialLinkOk at hDag'
-          rw [hNode] at hDag'
-          simp at hDag'
-      | some parentNode =>
-          cases hPayload : parentNode.payload with
-          | propositionalLearnedClause payload =>
-              have hNodeEq : parentNode =
-                  cert.dag.nodeAt link.parent hParentIndex := by
-                rw [cert.dag.node?_eq_some_nodeAt hParentIndex] at hNode
-                exact (Option.some.inj hNode).symm
-              have hPayloadAt :
-                  (cert.dag.nodeAt link.parent hParentIndex).payload =
-                    .propositionalLearnedClause payload := by
-                rw [← hNodeEq]
-                exact hPayload
-              exact propLearnedClause_initial_satisfies M valuation cert compiled
-                index hIndex assignment atomMap link initial payload hCheck
-                hParents hParentIndex hPayloadAt hDag
-          | _ =>
-              have hDag' := hDag
-              unfold DAG.propLearnedInitialLinkOk at hDag'
-              rw [hNode] at hDag'
-              simp [hPayload] at hDag'
+      have hDagFields := hDag
+      simp only [DAG.propLearnedInitialLinkOk,
+        cert.dag.node?_eq_some_nodeAt hParentIndex] at hDagFields
+      cases hPayload : (cert.dag.nodeAt link.parent hParentIndex).payload with
+      | propositionalLearnedClause payload =>
+          exact propLearnedClause_initial_satisfies M valuation cert compiled
+            index hIndex assignment atomMap link initial payload hCheck
+            hParents hParentIndex hPayload hDag
+      | _ => simp [hPayload] at hDagFields
   | avatarSkeleton link =>
       simp [PropInitialJustification.guardedSoundnessSupported] at hSupported
 
@@ -936,37 +759,22 @@ theorem initialSatisfies_of_justificationsListCheck
           (overlayValuation M assignment valuation atomMap) initial.clause := by
   intro initials
   induction initials with
-  | nil =>
-      intro justifications hCheck hDag hSupported target hTarget
-      simp at hTarget
+  | nil => simp
   | cons initial initials ih =>
       intro justifications
       cases justifications with
-      | nil =>
-          intro hCheck hDag hSupported target hTarget
-          simp [PropositionalClosurePayload.justificationsListCheck] at hCheck
+      | nil => simp [PropositionalClosurePayload.justificationsListCheck]
       | cons justification justifications =>
           intro hCheck hDag hSupported target hTarget
-          have hCheckParts := Bool.and_eq_true_iff.mp hCheck
-          have hHeadCheck := hCheckParts.1
-          have hTailCheck := hCheckParts.2
-          have hHeadDag := hDag justification (by simp)
-          have hHeadSupported := hSupported justification (by simp)
-          have hHeadSat := initialJustification_satisfies M valuation cert compiled
-            index hIndex assignment atomMap justification initial hHeadCheck
-            hHeadDag hHeadSupported hParents
-          have hTailDag : ∀ item, item ∈ justifications →
-              cert.dag.propInitialJustificationDagOk
-                  (cert.dag.nodeAt index hIndex).parents item = true := by
-            intro item hItem
-            exact hDag item (by simp [hItem])
-          have hTailSupported : ∀ item, item ∈ justifications →
-              item.guardedSoundnessSupported = true := by
-            intro item hItem
-            exact hSupported item (by simp [hItem])
           rcases List.mem_cons.mp hTarget with rfl | hTarget
-          · exact hHeadSat
-          · exact ih hTailCheck hTailDag hTailSupported target hTarget
+          · exact initialJustification_satisfies M valuation cert compiled
+              index hIndex assignment atomMap justification target
+              (Bool.and_eq_true_iff.mp hCheck).1 (hDag justification (by simp))
+              (hSupported justification (by simp)) hParents
+          · exact ih (Bool.and_eq_true_iff.mp hCheck).2
+              (fun item hItem => hDag item (List.mem_cons_of_mem _ hItem))
+              (fun item hItem => hSupported item (List.mem_cons_of_mem _ hItem))
+              target hTarget
 
 theorem residualCdcl_guardedNodeTrueIn
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -1143,18 +951,8 @@ theorem theoryConflict_guardedNodeTrueIn
       payload.conflict.idIn (cert.dag.nodeAt index hIndex).parents = true ∧
         payload.conflict.clause.isEmpty = true ∧
           (cert.dag.nodeAt index hIndex).conclusion.isEmpty = true := by
-    have hParts :=
-      Bool.and_eq_true_iff.mp
-        (show
-          payload.conflict.idIn (cert.dag.nodeAt index hIndex).parents &&
-              payload.conflict.clause.isEmpty &&
-                (cert.dag.nodeAt index hIndex).conclusion.isEmpty = true by
-          simpa [Payload.check, TheoryConflictPayload.check] using hCheck)
-    have hPrefix := Bool.and_eq_true_iff.mp hParts.1
-    have hConclusion :
-        (cert.dag.nodeAt index hIndex).conclusion.isEmpty = true := by
-      exact of_decide_eq_true hParts.2
-    exact ⟨hPrefix.1, hPrefix.2, hConclusion⟩
+    simpa [Payload.check, TheoryConflictPayload.check, Bool.and_eq_true_iff,
+      and_assoc] using hCheck
   have hParentMem :
       payload.conflict.id ∈
         (cert.dag.nodeAt index hIndex).parents.toList :=
@@ -1167,21 +965,8 @@ theorem theoryConflict_guardedNodeTrueIn
     parentSnapshotChecked_of_payload_mem cert index hIndex hPayload
       (parent := payload.conflict)
       (by simp [Payload.parentClauses, TheoryConflictPayload.parentClauses])
-  rcases DAG.parentSnapshotChecked_sound hSnapshot with
-    ⟨snapshotNode, hSnapshotNode, hSnapshotClause⟩
-  have hSnapshotNodeEq :
-      snapshotNode = cert.dag.nodeAt payload.conflict.id hParentIndex := by
-    rw [cert.dag.node?_eq_some_nodeAt hParentIndex] at hSnapshotNode
-    exact (Option.some.inj hSnapshotNode).symm
-  have hParentConclusion :
-      (cert.dag.nodeAt payload.conflict.id hParentIndex).conclusion =
-        payload.conflict.clause := by
-    simpa [hSnapshotNodeEq] using hSnapshotClause
-  have hParentRaw :
-      (compiled.nodeAt payload.conflict.id hParentIndex).raw =
-        payload.conflict.clause :=
-    (compiled.nodeAt_raw payload.conflict.id hParentIndex).trans
-      hParentConclusion
+  have hParentRaw :=
+    parent_compiled_raw_of_snapshot compiled payload.conflict hParentIndex hSnapshot
   have hParentGuards :=
     parentGuardsHold_of_theoryConflictNodeGuardsOk cert index hIndex
       payload hPayload payload.conflict.id hParentMem
@@ -1216,74 +1001,22 @@ theorem propositionalLearned_guardedNodeTrueIn
     GuardedNodeTrueIn M valuation compiled index hIndex := by
   intro hCurrent
   have hCheck := payloadCheck_of_payload_eq cert index hIndex hPayload
-  have hPayloadCheck :
-      PropositionalLearnedClausePayload.check
-        (cert.dag.nodeAt index hIndex).parents payload
-        (cert.dag.nodeAt index hIndex).conclusion = true := by
-    simpa [Payload.check] using hCheck
   have hParentMem :
       payload.conflict ∈ (cert.dag.nodeAt index hIndex).parents.toList := by
-    have hPrefix :
-        (cert.dag.nodeAt index hIndex).parents.contains
-          payload.conflict = true :=
-      (Bool.and_eq_true_iff.mp
-        (show
-          (cert.dag.nodeAt index hIndex).parents.contains
-              payload.conflict &&
-            (cert.dag.nodeAt index hIndex).conclusion.isEmpty = true by
-          simpa [PropositionalLearnedClausePayload.check] using hPayloadCheck)).1
-    exact Array.mem_def.mp (by simpa using hPrefix)
-  let hConflictIndex :=
-    Nat.lt_trans
-      (cert.contract.parents_before index hIndex payload.conflict hParentMem)
-      hIndex
-  have hGuardCheck :=
-    (cert.contract.node_contract index hIndex).guards_checked
-  unfold DAG.localNodeGuardsOk at hGuardCheck
-  simp [hPayload] at hGuardCheck
-  have hGuardData := hGuardCheck.2
-  cases hConflictNode :
-      cert.dag.node? payload.conflict with
-  | none =>
-      simp [hConflictNode] at hGuardCheck
-  | some conflictNode =>
-      have hConflictFields :
-          conflictNode.theoryConflict &&
-            Guards.eq (cert.dag.nodeAt index hIndex).guards
-              conflictNode.guards &&
-            (match conflictNode.payload with
-            | .theoryConflict _ =>
-                PropResolution.clauseEq payload.learned
-                  (Guards.learnedClause conflictNode.guards)
-            | _ => false) = true := by
-        simpa [hConflictNode] using! hGuardData
-      have hConflictParts := Bool.and_eq_true_iff.mp hConflictFields
-      have hTheoryAndGuard := Bool.and_eq_true_iff.mp hConflictParts.1
-      have hTheory : conflictNode.theoryConflict = true :=
-        hTheoryAndGuard.1
-      have hGuardEq : Guards.eq
-          (cert.dag.nodeAt index hIndex).guards conflictNode.guards = true :=
-        hTheoryAndGuard.2
-      have hConflictCanonical :
-          conflictNode = cert.dag.nodeAt payload.conflict hConflictIndex := by
-        apply Option.some.inj
-        rw [cert.dag.node?_eq_some_nodeAt hConflictIndex] at hConflictNode
-        exact hConflictNode.symm
-      subst conflictNode
-      have hConflictGuards :=
-        GuardsHold.of_eq hGuardEq hCurrent
-      have hConflictTrue :=
-        hParents payload.conflict hParentMem hConflictGuards
-      have hConflictEmpty :
-          (cert.dag.nodeAt payload.conflict hConflictIndex).conclusion.isEmpty =
-            true :=
-        (Node.theoryConflict_fields hTheory).2
-      exact False.elim <|
-        compiledClause_not_trueIn_of_raw_empty M
-          (compiled.nodeAt payload.conflict hConflictIndex)
-          (by
-            rw [compiled.nodeAt_raw]
-            exact hConflictEmpty) hConflictTrue
+    have hParts := Bool.and_eq_true_iff.mp hCheck
+    exact Array.mem_def.mp (by simpa using hParts.1)
+  let hConflictIndex := Nat.lt_trans
+    (cert.contract.parents_before index hIndex payload.conflict hParentMem) hIndex
+  have hGuardCheck := (cert.contract.node_contract index hIndex).guards_checked
+  simp only [DAG.localNodeGuardsOk, hPayload,
+    cert.dag.node?_eq_some_nodeAt hConflictIndex, Bool.and_eq_true_iff] at hGuardCheck
+  have hTheory := hGuardCheck.2.1.1
+  have hConflictGuards := GuardsHold.of_eq hGuardCheck.2.1.2 hCurrent
+  have hConflictTrue := hParents payload.conflict hParentMem hConflictGuards
+  exact False.elim <| compiledClause_not_trueIn_of_raw_empty M
+    (compiled.nodeAt payload.conflict hConflictIndex)
+    (by rw [compiled.nodeAt_raw]; exact (Node.theoryConflict_fields hTheory).2)
+    hConflictTrue
 
 theorem guardedNodeTrueIn_of_supported
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)

@@ -501,26 +501,12 @@ def formal_language_encoding_theory : SetTheory :=
   Theory.insert structural_syntax_definition_axiom
     (Theory.union successor_operator_theory natural_addition_bound_theory)
 
-theorem natural_addition_bound_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : natural_addition_bound_theory sentence) :
-    formal_language_encoding_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset natural_addition_bound_theory ⊆ formal_language_encoding_theory
 
 /-- 配数核心理论经算术有界层嵌入形式语言编码理论。 -/
-theorem godel_pairing_core_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : godel_pairing_core_theory sentence) :
-    formal_language_encoding_theory sentence :=
-  natural_addition_bound_theory_subset_formal_language_encoding_theory
-    (natural_exponentiation_bound_theory_subset_addition_bound_theory
-      (godel_pairing_core_theory_subset_bound_theory hSentence))
+derive_theory_subset godel_pairing_core_theory ⊆ formal_language_encoding_theory
 
-theorem successor_operator_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : successor_operator_theory sentence) :
-    formal_language_encoding_theory sentence :=
-  Or.inr (Or.inl hSentence)
+derive_theory_subset successor_operator_theory ⊆ formal_language_encoding_theory
 
 end FormalSystem
 end FirstOrder

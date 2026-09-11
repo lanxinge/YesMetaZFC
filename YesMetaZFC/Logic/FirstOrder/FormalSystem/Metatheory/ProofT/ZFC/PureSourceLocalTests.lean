@@ -66,19 +66,14 @@ theorem row (test : ObjectCheckedTrace.LocalTest T) (hTest : UnaryAgreement h�
   · intro query hq
     cases hq
 
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory
-      (power_set_operator_theory_subset_relation_plane_theory h))
-
 theorem currentNode : UnaryAgreement h𝒩 ReducedProofPresentation.nodeTest.condition :=
   node h𝒩 intrinsic_zfc_certificate_core intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest PureSourceSchemas.axiomTest
 
 theorem currentRow : UnaryAgreement h𝒩 ReducedProofPresentation.rowTest.condition :=
   row h𝒩 intrinsic_zfc_certificate_core intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedProofPresentation.nodeTest (currentNode h𝒩)
 
 /-- 实际整树轨迹的行正文：Horn 连边及当前局部检查同时保持。 -/

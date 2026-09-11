@@ -59,10 +59,6 @@ theorem restriction_correct (output function source : Carrier ℳ) :
 private def identitySchema : Project.UnarySchema 1 where
   body := .existsE <| .conj (.mem (.bound 0) (.bound 2))
     (PureKuratowskiProject.convention.code (.bound 1) (.bound 0) (.bound 0))
-  freeClosed := by
-    simp [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
-    exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
 private theorem identitySchema_correct (hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 1) (pair : Carrier ℳ) :
     Project.Formula.satisfies (env.push pair) identitySchema.body ↔

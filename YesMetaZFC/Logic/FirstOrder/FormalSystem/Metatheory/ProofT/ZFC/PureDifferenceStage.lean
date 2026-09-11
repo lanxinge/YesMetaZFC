@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureMinimumDifference
 
 /-! # 最小差异点的统一纯扩张
@@ -30,18 +31,10 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureSequenceStage.interpretation.relation
 
-theorem map_values {ℳ : Structure.{0,0,0,x} ℒ} {sorts : SortContext S}
-    (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureSequenceStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory) :
     Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case minimumDifference =>
     cases args with | cons relation tail =>
     cases tail with | cons carrier tail =>
@@ -63,9 +56,7 @@ theorem transfer_from_sequence {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Mo
     (args : Values (expansion hℳ).model.Carrier parameters) :
     spec.satisfies (templateEnv args : Env (PureSequenceStage.expansion hℳ).model [] parameters) ↔
       spec.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) spec args
-  rw [hTranslate, map_values] at hNew
-  exact (openFormula_correct (PureSequenceStage.expansion hℳ) (PureSequenceStage.realizes hℳ) spec args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureSequenceStage.realizes hℳ) _ (realizes hℳ) spec hTranslate args
 
 /-- 其余函数仍实现同一纯图；用图的唯一性比较选择值。 -/
 theorem function_preserved {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
@@ -74,17 +65,13 @@ theorem function_preserved {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models
     (expansion hℳ).function symbol args = (PureSequenceStage.expansion hℳ).function symbol args := by
   have hGraph : interpretation.function symbol = PureSequenceStage.interpretation.function symbol := by
     cases symbol <;> first | rfl | exact False.elim (hSymbol rfl)
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph, map_values] at hNew
-  exact ((PureSequenceStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureSequenceStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem relation_preserved {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (symbol : Nonlogical.BasicSetTheory.RelationSymbol)
     (args : Values (expansion hℳ).model.Carrier (S.relDomain symbol)) :
     (expansion hℳ).relation symbol args ↔ (PureSequenceStage.expansion hℳ).relation symbol args := by
-  have hNew := ((realizes hℳ).relation symbol args).symm
-  rw [map_values] at hNew
-  exact hNew.trans ((PureSequenceStage.realizes hℳ).relation symbol args)
+  exact relation_regraph _ _ _ _ (PureSequenceStage.realizes hℳ) _ (realizes hℳ) symbol rfl args
 
 /-- 新的选择值在原 guard 下逐参数满足原最小差异点规格。 -/
 theorem minimum_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
@@ -93,10 +80,8 @@ theorem minimum_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Mod
     (hFirst : (expansion hℳ).relation .isMapping (.cons first (.cons carrier (.cons target .nil))))
     (hSecond : (expansion hℳ).relation .isMapping (.cons second (.cons carrier (.cons target .nil))))
     (hNe : first ≠ second) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .minimumDifference (.cons relation (.cons carrier (.cons first (.cons second .nil)))) ↔
-      PureMinimumDifference.specification.satisfies
-        (templateEnv (.cons output (.cons relation (.cons carrier (.cons first (.cons second .nil))))) :
-          Env (expansion hℳ).model [] [s,s,s,s,s]) := by
+    FunctionSpecification (expansion hℳ) .minimumDifference
+      (PureMinimumDifference.specification) (.cons relation (.cons carrier (.cons first (.cons second .nil)))) output := by
   apply ((realizes hℳ).function .minimumDifference (.cons relation (.cons carrier (.cons first (.cons second .nil)))) output).symm.trans
   exact (PureMinimumDifference.agrees hℳ
     ((relation_preserved hℳ .isWellOrder _).mp hOrder)
@@ -119,42 +104,35 @@ theorem definition_instance_correct {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theo
 theorem bounded_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureBoundedDefinitions.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureBoundedDefinitions.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
+    FunctionSpecification (expansion hℳ) symbol ((PureBoundedDefinitions.specification primitive)) args output := by
   have hSymbol : symbol ≠ .minimumDifference := by cases primitive <;> intro h <;> cases h
-  rw [function_preserved hℳ symbol hSymbol args]
+  rw [FunctionSpecification, function_preserved hℳ symbol hSymbol args]
   apply (PureSequenceStage.bounded_specification hℳ primitive args output).trans
   apply transfer_from_sequence hℳ
   cases primitive <;> rfl
 
 theorem finite_sequence_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceSpace (.cons source .nil) ↔
-      (Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model [] [s,s]) := by
-  rw [function_preserved hℳ .finiteSequenceSpace (by intro h; cases h)]
+    FunctionSpecification (expansion hℳ) .finiteSequenceSpace
+      ((Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here))) (.cons source .nil) output := by
+  rw [FunctionSpecification, function_preserved hℳ .finiteSequenceSpace (by intro h; cases h)]
   exact (PureSequenceStage.finite_sequence_specification hℳ source output).trans
     (transfer_from_sequence hℳ _ rfl (.cons output (.cons source .nil)))
 
 theorem filter_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureSequenceFilters.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureSequenceFilters.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
+    FunctionSpecification (expansion hℳ) symbol ((PureSequenceFilters.specification primitive)) args output := by
   have hSymbol : symbol ≠ .minimumDifference := by cases primitive <;> intro h <;> cases h
-  rw [function_preserved hℳ symbol hSymbol args]
+  rw [FunctionSpecification, function_preserved hℳ symbol hSymbol args]
   apply (PureSequenceStage.filter_specification hℳ primitive args output).trans
   apply transfer_from_sequence hℳ
   cases primitive <;> rfl
 
 theorem omega_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (source seed recursion output : Carrier ℳ) :
-    output = (expansion hℳ).function .omegaRecursiveSequence (.cons source (.cons seed (.cons recursion .nil))) ↔
-      PureSequenceStage.omegaSpec.satisfies
-        (templateEnv (.cons output (.cons source (.cons seed (.cons recursion .nil)))) : Env (expansion hℳ).model [] [s,s,s,s]) := by
-  rw [function_preserved hℳ .omegaRecursiveSequence (by intro h; cases h)]
+    FunctionSpecification (expansion hℳ) .omegaRecursiveSequence (PureSequenceStage.omegaSpec) (.cons source (.cons seed (.cons recursion .nil))) output := by
+  rw [FunctionSpecification, function_preserved hℳ .omegaRecursiveSequence (by intro h; cases h)]
   exact (PureSequenceStage.omega_specification hℳ source seed recursion output).trans
     (transfer_from_sequence hℳ _ rfl (.cons output (.cons source (.cons seed (.cons recursion .nil)))))
 

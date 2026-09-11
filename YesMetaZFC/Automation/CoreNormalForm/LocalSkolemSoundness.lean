@@ -560,20 +560,8 @@ def values {M : Model} (env : Env M) (universals : List LocalSkolem.UniversalInt
 def SameBoundStack {M : Model} (left right : Env M) : Prop :=
   ∀ index, left.boundVal index = right.boundVal index
 theorem eval_terms_eq_values {M : Model} (env : Env M) (universals : List LocalSkolem.UniversalIntro) (hWellFormed : ∀ universal ∈ universals, universal.term = Term.fvar universal.sort universal.varId) : (universals.map fun universal => universal.term).map (Term.eval env) = values env universals := by
-  induction universals with
-  | nil => rfl
-  | cons universal universals ih =>
-      have hHead :
-          universal.term =
-            Term.fvar universal.sort universal.varId :=
-        hWellFormed universal (by simp)
-      have hTail :
-          ∀ candidate ∈ universals,
-            candidate.term =
-              Term.fvar candidate.sort candidate.varId := by
-        intro candidate hCandidate
-        exact hWellFormed candidate (by simp [hCandidate])
-      simp [values, hHead, Term.eval, ih hTail]
+  induction universals <;>
+    simp_all [values, Term.eval]
 theorem freeAgreement_of_values_eq {M : Model} (left right : Env M) (universals : List LocalSkolem.UniversalIntro) (hValues : values left universals = values right universals) : Env.FreeAgreement (parameters universals) left right := by
   intro parameter hParameter
   rcases List.mem_map.mp hParameter with ⟨universal, hUniversal, rfl⟩

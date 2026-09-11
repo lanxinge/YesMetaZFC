@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRoundTwoStage
 
 /-! # 第二轮终点对旧规格的保持
@@ -19,46 +20,37 @@ variable {ℳ : Structure.{0,0,0,x} ℒ}
 theorem bounded_specification (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureBoundedDefinitions.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureBoundedDefinitions.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) :=
+    FunctionSpecification (expansion hℳ) symbol ((PureBoundedDefinitions.specification primitive)) args output :=
   inherited_specification hℳ symbol _ (by cases primitive <;> rfl) (by cases primitive <;> rfl) args output
     (PureNaturalDifferenceStage.bounded_specification hℳ primitive args output)
 
 theorem filter_specification (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureSequenceFilters.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureSequenceFilters.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) :=
+    FunctionSpecification (expansion hℳ) symbol ((PureSequenceFilters.specification primitive)) args output :=
   inherited_specification hℳ symbol _ (by cases primitive <;> rfl) (by cases primitive <;> rfl) args output
     (PureNaturalDifferenceStage.filter_specification hℳ primitive args output)
 
 theorem finite_sequence_specification (hℳ : Theory.Models ℳ theory) (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceSpace (.cons source .nil) ↔
-      (Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .finiteSequenceSpace
+      ((Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here))) (.cons source .nil) output :=
   inherited_specification hℳ .finiteSequenceSpace _ rfl rfl (.cons source .nil) output
     (PureNaturalDifferenceStage.finite_sequence_specification hℳ source output)
 
 theorem omega_specification (hℳ : Theory.Models ℳ theory) (source seed recursion output : Carrier ℳ) :
-    output = (expansion hℳ).function .omegaRecursiveSequence (.cons source (.cons seed (.cons recursion .nil))) ↔
-      PureSequenceStage.omegaSpec.satisfies
-        (templateEnv (.cons output (.cons source (.cons seed (.cons recursion .nil)))) : Env (expansion hℳ).model [] [s,s,s,s]) :=
+    FunctionSpecification (expansion hℳ) .omegaRecursiveSequence (PureSequenceStage.omegaSpec) (.cons source (.cons seed (.cons recursion .nil))) output :=
   inherited_specification hℳ .omegaRecursiveSequence _ rfl rfl _ output
     (PureNaturalDifferenceStage.omega_specification hℳ source seed recursion output)
 
 theorem difference_specification (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .naturalDifference (.cons left (.cons right .nil)) ↔
-      PureNaturalDifference.specification.satisfies (templateEnv (.cons output (.cons left (.cons right .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
+    FunctionSpecification (expansion hℳ) .naturalDifference (PureNaturalDifference.specification) (.cons left (.cons right .nil)) output :=
   inherited_specification hℳ .naturalDifference _ rfl rfl _ output
     (PureNaturalDifferenceStage.difference_specification hℳ hLeft hRight output)
 
 theorem godel_specification (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .godelPairing (.cons left (.cons right .nil)) ↔
-      PureGodelPairing.specification.satisfies (templateEnv (.cons output (.cons left (.cons right .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
+    FunctionSpecification (expansion hℳ) .godelPairing (PureGodelPairing.specification) (.cons left (.cons right .nil)) output :=
   inherited_specification hℳ .godelPairing _ rfl rfl _ output
     (PureNaturalDifferenceStage.godel_specification hℳ hLeft hRight output)
 
@@ -77,8 +69,7 @@ theorem arithmetic_specification (hℳ : Theory.Models ℳ theory) (operation : 
   cases operation <;> simp only [arithmetic] <;> rw [prior_function hℳ _ rfl] <;> exact hOld.trans hTransfer
 
 theorem closure_specification (hℳ : Theory.Models ℳ theory) (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .transitiveClosure (.cons source .nil) ↔
-      PureTransitiveClosure.specification.satisfies (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .transitiveClosure (PureTransitiveClosure.specification) (.cons source .nil) output :=
   inherited_specification hℳ .transitiveClosure _ rfl rfl _ output
     (PureNaturalDifferenceStage.closure_specification hℳ source output)
 
@@ -88,8 +79,7 @@ theorem hierarchy_specification (hℳ : Theory.Models ℳ theory) :
   exact (prior_transfer hℳ _ rfl _).mp (PureNaturalDifferenceStage.hierarchy_specification hℳ)
 
 theorem universe_specification (hℳ : Theory.Models ℳ theory) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteUniverse .nil ↔
-      PureFiniteUniverseStage.universeSpec.satisfies (templateEnv (.cons output .nil) : Env (expansion hℳ).model [] [s]) :=
+    FunctionSpecification (expansion hℳ) .finiteUniverse (PureFiniteUniverseStage.universeSpec) .nil output :=
   inherited_specification hℳ .finiteUniverse _ rfl rfl .nil output
     (PureNaturalDifferenceStage.universe_specification hℳ output)
 

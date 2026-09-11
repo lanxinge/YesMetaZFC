@@ -13,20 +13,25 @@ namespace BinarySchema
 def instantiate {parameterCount depth : Nat} (schema : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (left right : Term depth) : Formula 1 depth :=
   schema.body.bind <| Fin.cases right <| Fin.cases left parameters
+@[simp] theorem instantiate_freeClosed {parameterCount depth : Nat} (schema : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
+    (left right : Term depth)
+    (h_parameters : parameters.FreeClosed)
+    (h_left : left.freeSupport = [])
+    (h_right : right.freeSupport = [])
+    : (instantiate schema parameters left right).FreeClosed := by
+  unfold instantiate
+  apply (Formula.freeClosed_bind_iff_of_closed _ ?_ schema.body).2 schema.freeClosed
+  intro entry
+  exact Fin.cases h_right (Fin.cases h_left h_parameters) entry
 end BinarySchema
 namespace RelationSchema
 /-- 原始隶属关系。 -/
 def membership : BinarySchema 0 where
   body := .mem (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.FreeClosed]
 /-- 由有序对集合编码的二元关系；唯一参数是关系集合。 -/
 def setCoded (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body :=
     Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 2)
-  freeClosed := by
-    simp only [Formula.orderedPairMem, Definitional.Formula.FreeClosed]
-    exact ⟨𝒞.code_freeClosed _ _ _ rfl rfl rfl, rfl, rfl⟩
 end RelationSchema
 namespace Formula
 /-- `left` 与 `right` 满足给定二元关系。 -/
@@ -38,16 +43,7 @@ def related {parameterCount depth : Nat} (relation : BinarySchema parameterCount
     {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth) (left right : Term depth)
     (hParameters : parameters.FreeClosed) (hLeft : left.freeSupport = []) (hRight : right.freeSupport = []) :
     (related relation parameters left right).FreeClosed := by
-  unfold related BinarySchema.instantiate
-  let substitution : Fin (parameterCount + 2) → Term depth :=
-    fun entry =>
-      Fin.cases right (fun previous => Fin.cases left parameters.get previous)
-        entry
-  apply (Formula.freeClosed_bind_iff_of_closed substitution (formula := relation.body) ?_).2 relation.freeClosed
-  intro entry
-  refine Fin.cases hRight ?_ entry
-  intro previous
-  exact Fin.cases hLeft hParameters previous
+  exact relation.instantiate_freeClosed parameters left right hParameters hLeft hRight
 @[simp] theorem related_membership {depth : Nat} (left right : Term depth) :
     related RelationSchema.membership TermVector.empty left right =
       .mem left right := by
@@ -56,11 +52,13 @@ def related {parameterCount depth : Nat} (relation : BinarySchema parameterCount
 def lessOrEqual {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (left right : Term depth) : Formula 1 depth :=
   .disj (extensionalEq left right) (related relation parameters left right)
+derive_free_closed lessOrEqual
 /-- 关系在 `carrier` 上自反空缺。 -/
 def isIrreflexiveOn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier : Term depth) : Formula 1 depth :=
   Formula.forallMem carrier <|
     .neg (related relation parameters.weaken Term.newest Term.newest)
+derive_free_closed isIrreflexiveOn
 /-- 关系在 `carrier` 上传递。 -/
 def isTransitiveOn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier : Term depth) : Formula 1 depth :=
@@ -68,10 +66,12 @@ def isTransitiveOn {parameterCount depth : Nat} (relation : BinarySchema paramet
     Formula.forallMem carrier.weaken.weaken <|
       .imp (.conj (related relation parameters.weaken.weaken.weaken (.bound 2) (.bound 1)) (related relation parameters.weaken.weaken.weaken
             (.bound 1) (.bound 0))) (related relation parameters.weaken.weaken.weaken (.bound 2) (.bound 0))
+derive_free_closed isTransitiveOn
 /-- `relation` 是 `carrier` 上的严格偏序。 -/
 def isStrictPartialOrderOn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier : Term depth) : Formula 1 depth :=
   .conj (isIrreflexiveOn relation parameters carrier) (isTransitiveOn relation parameters carrier)
+derive_free_closed isStrictPartialOrderOn
 /-- `relation` 是 `carrier` 上的严格线序。 -/
 def isLinearOrderOn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier : Term depth) : Formula 1 depth :=
@@ -79,38 +79,45 @@ def isLinearOrderOn {parameterCount depth : Nat} (relation : BinarySchema parame
     Formula.forallMem carrier <| Formula.forallMem carrier.weaken <|
       .disj (extensionalEq (.bound 1) (.bound 0)) <|
         .disj (related relation parameters.weaken.weaken (.bound 1) (.bound 0)) (related relation parameters.weaken.weaken (.bound 0) (.bound 1))
+derive_free_closed isLinearOrderOn
 /-- `candidate` 是 `carrier` 的最小元。 -/
 def isLeastOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <| Formula.forallMem carrier <|
     lessOrEqual relation parameters.weaken candidate.weaken Term.newest
+derive_free_closed isLeastOf
 /-- `candidate` 是 `carrier` 的极小元。 -/
 def isMinimalOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <| Formula.forallMem carrier <|
     .neg (related relation parameters.weaken Term.newest candidate.weaken)
+derive_free_closed isMinimalOf
 /-- `candidate` 是 `carrier` 的最大元。 -/
 def isGreatestOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <| Formula.forallMem carrier <|
     lessOrEqual relation parameters.weaken Term.newest candidate.weaken
+derive_free_closed isGreatestOf
 /-- `candidate` 是 `carrier` 的极大元。 -/
 def isMaximalOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <| Formula.forallMem carrier <|
     .neg (related relation parameters.weaken candidate.weaken Term.newest)
+derive_free_closed isMaximalOf
 /-- `candidate` 是 `subset` 在 `carrier` 中的下界。 -/
 def isLowerBoundIn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier subset candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <|
     .conj (Formula.subset subset carrier) <| Formula.forallMem subset <|
       lessOrEqual relation parameters.weaken candidate.weaken Term.newest
+derive_free_closed isLowerBoundIn
 /-- `candidate` 是 `subset` 在 `carrier` 中的上界。 -/
 def isUpperBoundIn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier subset candidate : Term depth) : Formula 1 depth :=
   .conj (.mem candidate carrier) <|
     .conj (Formula.subset subset carrier) <| Formula.forallMem subset <|
       lessOrEqual relation parameters.weaken Term.newest candidate.weaken
+derive_free_closed isUpperBoundIn
 /-- `candidate` 是 `subset` 在 `carrier` 中的下确界。 -/
 def isInfimumIn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier subset candidate : Term depth) : Formula 1 depth :=
@@ -118,6 +125,7 @@ def isInfimumIn {parameterCount depth : Nat} (relation : BinarySchema parameterC
     Formula.forallMem carrier <|
       .imp (isLowerBoundIn relation parameters.weaken carrier.weaken
           subset.weaken Term.newest) (lessOrEqual relation parameters.weaken Term.newest candidate.weaken)
+derive_free_closed isInfimumIn
 /-- `candidate` 是 `subset` 在 `carrier` 中的上确界。 -/
 def isSupremumIn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier subset candidate : Term depth) : Formula 1 depth :=
@@ -125,16 +133,19 @@ def isSupremumIn {parameterCount depth : Nat} (relation : BinarySchema parameter
     Formula.forallMem carrier <|
       .imp (isUpperBoundIn relation parameters.weaken carrier.weaken
           subset.weaken Term.newest) (lessOrEqual relation parameters.weaken candidate.weaken Term.newest)
+derive_free_closed isSupremumIn
 /-- `segment` 是 `carrier` 的向下闭初段。 -/
 def isInitialSegmentOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (segment carrier : Term depth) : Formula 1 depth :=
   .conj (Formula.subset segment carrier) <|
     Formula.forallMem segment <| Formula.forallMem carrier.weaken <|
       .imp (related relation parameters.weaken.weaken Term.newest (.bound 1)) (.mem Term.newest segment.weaken.weaken)
+derive_free_closed isInitialSegmentOf
 /-- `segment` 是 `carrier` 的真初段。 -/
 def isProperInitialSegmentOf {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (segment carrier : Term depth) : Formula 1 depth :=
   .conj (isInitialSegmentOf relation parameters segment carrier) (Formula.extensionalNe segment carrier)
+derive_free_closed isProperInitialSegmentOf
 /-- `relation` 良序 `carrier`。 -/
 def isWellOrderOn {parameterCount depth : Nat} (relation : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (carrier : Term depth) : Formula 1 depth :=
@@ -142,6 +153,7 @@ def isWellOrderOn {parameterCount depth : Nat} (relation : BinarySchema paramete
     .forallE <|
       .imp (.conj (Formula.subset Term.newest carrier.weaken) (Formula.existsMem Term.newest .truth)) (.existsE <|
           isLeastOf relation parameters.weaken.weaken (.bound 1) Term.newest)
+derive_free_closed isWellOrderOn
 /-- `function` 从 `source` 到 `target` 保序。 -/
 def isOrderPreserving {sourceCount targetCount depth : Nat} (𝒞 : OrderedPairConvention) (sourceRelation : BinarySchema sourceCount)
     (sourceParameters : TermVector sourceCount depth) (targetRelation : BinarySchema targetCount) (targetParameters : TermVector targetCount depth)
@@ -155,6 +167,7 @@ def isOrderPreserving {sourceCount targetCount depth : Nat} (𝒞 : OrderedPairC
                 function.weaken.weaken.weaken.weaken)) (.imp (related sourceRelation
                 sourceParameters.weaken.weaken.weaken.weaken (.bound 3) (.bound 2)) (related targetRelation
                 targetParameters.weaken.weaken.weaken.weaken (.bound 1) (.bound 0)))
+derive_free_closed isOrderPreserving
 /-- `function` 反映并保持两个严格关系。 -/
 def isOrderEmbedding {sourceCount targetCount depth : Nat} (𝒞 : OrderedPairConvention) (sourceRelation : BinarySchema sourceCount)
     (sourceParameters : TermVector sourceCount depth) (targetRelation : BinarySchema targetCount) (targetParameters : TermVector targetCount depth)
@@ -168,6 +181,7 @@ def isOrderEmbedding {sourceCount targetCount depth : Nat} (𝒞 : OrderedPairCo
                 function.weaken.weaken.weaken.weaken)) (.iff (related sourceRelation
                 sourceParameters.weaken.weaken.weaken.weaken (.bound 3) (.bound 2)) (related targetRelation
                 targetParameters.weaken.weaken.weaken.weaken (.bound 1) (.bound 0)))
+derive_free_closed isOrderEmbedding
 /-- `function` 是两个序之间的同构。 -/
 def isOrderIsomorphism {sourceCount targetCount depth : Nat} (𝒞 : OrderedPairConvention) (sourceRelation : BinarySchema sourceCount)
     (sourceParameters : TermVector sourceCount depth) (targetRelation : BinarySchema targetCount) (targetParameters : TermVector targetCount depth)
@@ -175,23 +189,28 @@ def isOrderIsomorphism {sourceCount targetCount depth : Nat} (𝒞 : OrderedPair
   .conj (isOrderEmbedding 𝒞 sourceRelation sourceParameters
       targetRelation targetParameters function source target) <|
     .conj (isInjective 𝒞 function) (isSurjectiveOnto 𝒞 function source target)
+derive_free_closed isOrderIsomorphism
 /-- `function` 是一个序的自同构。 -/
 def isOrderAutomorphism {parameterCount depth : Nat} (𝒞 : OrderedPairConvention) (relation : BinarySchema parameterCount)
     (parameters : TermVector parameterCount depth) (function carrier : Term depth) : Formula 1 depth :=
   isOrderIsomorphism 𝒞 relation parameters relation parameters
     function carrier carrier
+derive_free_closed isOrderAutomorphism
 /-- 集合编码关系是 `carrier` 上的严格偏序。 -/
 def isStrictOrderRelation (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier : Term depth) : Formula 1 depth :=
   isStrictPartialOrderOn (RelationSchema.setCoded 𝒞) (.singleton relation) carrier
+derive_free_closed isStrictOrderRelation
 /-- 集合编码关系是 `carrier` 上的严格线序。 -/
 def isLinearOrderRelation (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier : Term depth) : Formula 1 depth :=
   isLinearOrderOn (RelationSchema.setCoded 𝒞) (.singleton relation) carrier
+derive_free_closed isLinearOrderRelation
 /-- 集合编码关系良序 `carrier`。 -/
 def isWellOrderRelation (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier : Term depth) : Formula 1 depth :=
   isWellOrderOn (RelationSchema.setCoded 𝒞) (.singleton relation) carrier
+derive_free_closed isWellOrderRelation
 end Formula
 end Project
 end Definitional

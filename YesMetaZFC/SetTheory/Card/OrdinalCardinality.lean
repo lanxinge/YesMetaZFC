@@ -14,34 +14,6 @@ namespace ZF
 private def ordinalCardinalCandidate (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.UnarySchema 1 where
   body := .conj (Definitional.Project.Formula.isOrdinal (.bound 0)) (Definitional.Project.Formula.equinumerous 𝒞 (.bound 0) (.bound 1))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isOrdinal,
-      Definitional.Project.Formula.isTransitive,
-      Definitional.Project.Formula.isWellOrderOn,
-      Definitional.Project.Formula.isLinearOrderOn,
-      Definitional.Project.Formula.isStrictPartialOrderOn,
-      Definitional.Project.Formula.isIrreflexiveOn,
-      Definitional.Project.Formula.isTransitiveOn,
-      Definitional.Project.Formula.isLeastOf,
-      Definitional.Project.Formula.lessOrEqual,
-      Definitional.Project.Formula.equinumerous,
-      Definitional.Project.Formula.isBijectionFromTo,
-      Definitional.Project.Formula.isInjectionFromTo,
-      Definitional.Project.Formula.isFunctionFromTo,
-      Definitional.Project.Formula.isFunction,
-      Definitional.Project.Formula.isRelation,
-      Definitional.Project.Formula.isDomain,
-      Definitional.Project.Formula.isSurjectiveOnto,
-      Definitional.Project.Formula.isInjective,
-      Definitional.Project.Formula.orderedPairMem,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Formula.subset,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 序数基数候选模式的模型语义。 -/
 private theorem satisfies_ordinalCardinalCandidate_iff
     {ℳ : Structure.{u}}

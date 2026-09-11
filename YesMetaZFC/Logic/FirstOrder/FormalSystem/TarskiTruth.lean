@@ -44,13 +44,6 @@ private def exists_set_two {bound free : SetContext}
     SetFormula bound free :=
   body.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
 
-private def exists_set_three {bound free : SetContext}
-    (body : SetFormula bound
-      ([SetSort.set, SetSort.set, SetSort.set] ++ free)) :
-    SetFormula bound free :=
-  body.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
-    |>.existsFreeTop SetSort.set
-
 private def exists_set_four {bound free : SetContext}
     (body : SetFormula bound
       ([SetSort.set, SetSort.set, SetSort.set, SetSort.set] ++ free)) :
@@ -581,41 +574,17 @@ def tarski_truth_model_theory : SetTheory :=
 def tarski_truth_theory : SetTheory :=
   Theory.insert semantic_truth_definition_axiom tarski_truth_model_theory
 
-theorem semantic_interpretation_theory_subset_formula_stage_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : semantic_interpretation_theory sentence) :
-    formula_stage_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset semantic_interpretation_theory ⊆ formula_stage_semantics_theory
 
-theorem formula_stage_semantics_theory_subset_atomic_satisfaction_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : formula_stage_semantics_theory sentence) :
-    atomic_satisfaction_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset formula_stage_semantics_theory ⊆ atomic_satisfaction_semantics_theory
 
-theorem atomic_satisfaction_semantics_theory_subset_staged_satisfaction_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : atomic_satisfaction_semantics_theory sentence) :
-    staged_satisfaction_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset atomic_satisfaction_semantics_theory ⊆ staged_satisfaction_semantics_theory
 
-theorem staged_satisfaction_semantics_theory_subset_formula_satisfaction_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : staged_satisfaction_semantics_theory sentence) :
-    formula_satisfaction_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset staged_satisfaction_semantics_theory ⊆ formula_satisfaction_semantics_theory
 
-theorem formula_satisfaction_semantics_theory_subset_tarski_truth_model_theory
-    {sentence : SetSentence}
-    (hSentence : formula_satisfaction_semantics_theory sentence) :
-    tarski_truth_model_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset formula_satisfaction_semantics_theory ⊆ tarski_truth_model_theory
 
-theorem tarski_truth_model_theory_subset_tarski_truth_theory
-    {sentence : SetSentence}
-    (hSentence : tarski_truth_model_theory sentence) :
-    tarski_truth_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset tarski_truth_model_theory ⊆ tarski_truth_theory
 
 end FormalSystem
 end FirstOrder

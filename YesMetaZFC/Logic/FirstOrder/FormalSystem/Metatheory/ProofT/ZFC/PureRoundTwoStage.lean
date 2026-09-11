@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSequenceFlatten
 
 /-! # 第二轮全部符号的统一纯扩张
@@ -30,15 +31,9 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureConcatenationStage.interpretation.relation
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureConcatenationStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case finiteSequenceFlatten =>
     cases args with | cons family tail =>
     cases tail
@@ -52,45 +47,31 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogica
     (hGraph : interpretation.function symbol = PureConcatenationStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureConcatenationStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureConcatenationStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureConcatenationStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureConcatenationStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureConcatenationStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureConcatenationStage.expansion hℳ) (PureConcatenationStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureConcatenationStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem relation_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogical.BasicSetTheory.RelationSymbol)
     (args : Values (expansion hℳ).model.Carrier (S.relDomain symbol)) :
     (expansion hℳ).relation symbol args ↔ (PureConcatenationStage.expansion hℳ).relation symbol args := by
-  have hNew := (realizes hℳ).relation symbol args
-  rw [map_values] at hNew
-  exact hNew.symm.trans ((PureConcatenationStage.realizes hℳ).relation symbol args)
-
-theorem prior_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureNaturalDifferenceStage.interpretation args :=
-  (map_values args).trans (PureConcatenationStage.map_values args)
+  exact relation_regraph _ _ _ _ (PureConcatenationStage.realizes hℳ) _ (realizes hℳ) symbol rfl args
 
 theorem prior_function (hℳ : Theory.Models ℳ theory) (symbol : Nonlogical.BasicSetTheory.FunctionSymbol)
     (hGraph : interpretation.function symbol = PureNaturalDifferenceStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureNaturalDifferenceStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,prior_map_values] at hNew
-  exact ((PureNaturalDifferenceStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem prior_transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureNaturalDifferenceStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureNaturalDifferenceStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,prior_map_values] at hNew
-  exact (openFormula_correct (PureNaturalDifferenceStage.expansion hℳ) (PureNaturalDifferenceStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 /-- 任一既有实际图与规格正文保持时，整个定义等价在第二轮终点保持。 -/
 theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : Nonlogical.BasicSetTheory.FunctionSymbol)
@@ -98,38 +79,32 @@ theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : Nonl
     (hGraph : interpretation.function symbol = PureNaturalDifferenceStage.interpretation.function symbol)
     (hTranslate : openFormula interpretation spec = openFormula PureNaturalDifferenceStage.interpretation spec)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ)
-    (hSpec : output = (PureNaturalDifferenceStage.expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (PureNaturalDifferenceStage.expansion hℳ).model [] (s :: S.funcDomain symbol))) :
-    output = (expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
-  rw [prior_function hℳ symbol hGraph args]
-  exact hSpec.trans (prior_transfer hℳ spec hTranslate (.cons output args))
+    (hSpec : FunctionSpecification (PureNaturalDifferenceStage.expansion hℳ) symbol spec args output) :
+    FunctionSpecification (expansion hℳ) symbol (spec) args output :=
+  specification_regraph _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) symbol spec
+    hGraph hTranslate args output hSpec
 
 theorem order_type_specification (hℳ : Theory.Models ℳ theory) {relation carrier : Carrier ℳ}
     (hGuard : (expansion hℳ).relation .isNaturalDiscreteLinearOrder (.cons relation (.cons carrier .nil))) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .naturalOrderType (.cons relation (.cons carrier .nil)) ↔
-      PureNaturalOrderType.specification.satisfies (templateEnv (.cons output (.cons relation (.cons carrier .nil))) : Env (expansion hℳ).model [] [s,s,s]) := by
-  rw [function_preserved hℳ .naturalOrderType rfl]
+    FunctionSpecification (expansion hℳ) .naturalOrderType (PureNaturalOrderType.specification) (.cons relation (.cons carrier .nil)) output := by
+  rw [FunctionSpecification, function_preserved hℳ .naturalOrderType rfl]
   exact (PureConcatenationStage.order_type_specification hℳ ((relation_preserved hℳ _ _).mp hGuard) output).trans (transfer hℳ _ rfl _)
 
 theorem subset_type_specification (hℳ : Theory.Models ℳ theory) {subset : Carrier ℳ}
     (hGuard : ∀ input, membership ℳ input subset → membership ℳ input (omega hℳ)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .naturalSubsetType (.cons subset .nil) ↔
-      PureNaturalSubsetType.specification.satisfies (templateEnv (.cons output (.cons subset .nil)) : Env (expansion hℳ).model [] [s,s]) := by
-  rw [function_preserved hℳ .naturalSubsetType rfl]
+    FunctionSpecification (expansion hℳ) .naturalSubsetType (PureNaturalSubsetType.specification) (.cons subset .nil) output := by
+  rw [FunctionSpecification, function_preserved hℳ .naturalSubsetType rfl]
   exact (PureConcatenationStage.subset_type_specification hℳ hGuard output).trans (transfer hℳ _ rfl _)
 
 theorem concatenation_specification (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : PureFiniteSequenceCore.Finite hℳ left) (hRight : PureFiniteSequenceCore.Finite hℳ right) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceConcatenation (.cons left (.cons right .nil)) ↔
-      PureSequenceConcatenation.specification.satisfies (templateEnv (.cons output (.cons left (.cons right .nil))) : Env (expansion hℳ).model [] [s,s,s]) := by
-  rw [function_preserved hℳ .finiteSequenceConcatenation rfl]
+    FunctionSpecification (expansion hℳ) .finiteSequenceConcatenation (PureSequenceConcatenation.specification) (.cons left (.cons right .nil)) output := by
+  rw [FunctionSpecification, function_preserved hℳ .finiteSequenceConcatenation rfl]
   exact (PureConcatenationStage.concatenation_specification hℳ hLeft hRight output).trans (transfer hℳ _ rfl _)
 
 theorem flatten_specification (hℳ : Theory.Models ℳ theory) {family : Carrier ℳ}
     (hFamily : PureSequenceFlatten.Family hℳ family) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceFlatten (.cons family .nil) ↔
-      PureSequenceFlatten.specification.satisfies (templateEnv (.cons output (.cons family .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .finiteSequenceFlatten (PureSequenceFlatten.specification) (.cons family .nil) output :=
   ((realizes hℳ).function .finiteSequenceFlatten (.cons family .nil) output).symm.trans
     ((PureSequenceFlatten.agrees hℳ hFamily output).trans (transfer hℳ _ rfl _))
 

@@ -14,62 +14,31 @@ namespace BinarySchema
 def ordinalValueClosure {parameterCount : Nat} (function : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .imp (Formula.related function (TermVector.boundParameters parameterCount 2) (.bound 1) Term.newest) (Formula.isOrdinal Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-      Formula.isTransitiveOn, Formula.isLeastOf,
-      Formula.lessOrEqual, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 /-- “当前序数以下的函数值都严格小于当前函数值”的一元归纳模式。 -/
 def ordinalIncreasingAt {parameterCount : Nat} (function : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .imp (.mem Term.newest (.bound 1)) <|
     .forallE <| .forallE <| .imp (.conj (Formula.related function (TermVector.boundParameters parameterCount 4) (.bound 2) (.bound 1)) (Formula.related function
           (TermVector.boundParameters parameterCount 4) (.bound 3) Term.newest)) (.mem (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 /-- “当前输入处的全部函数值都为空”的一元归纳模式。 -/
 def emptyValueAt {parameterCount : Nat} (function : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .imp (Formula.related function (TermVector.boundParameters parameterCount 2) (.bound 1) Term.newest) (Formula.isEmpty Term.newest)
-  freeClosed := by
-    simp [Formula.isEmpty, Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 /-- “当前输入处的全部函数值都非空”的一元归纳模式。 -/
 def nonemptyValueAt {parameterCount : Nat} (function : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .imp (Formula.related function (TermVector.boundParameters parameterCount 2) (.bound 1) Term.newest)
     (.existsE <| .mem Term.newest (.bound 1))
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 /-- “当前输入不大于当前函数值”的一元归纳模式。 -/
 def inputLeValueAt {parameterCount : Nat} (function : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .imp (Formula.related function (TermVector.boundParameters parameterCount 2) (.bound 1) Term.newest) <|
     .disj (Formula.extensionalEq (.bound 1) Term.newest) (.mem (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.extensionalEq,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 /-- “两个类关系在当前输入处的任意函数值相等”的一元归纳模式。 -/
 def agreeAt {parameterCount : Nat} (first second : BinarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .forallE <| .forallE <| .imp (.conj (Formula.related first (TermVector.boundParameters parameterCount 3) (.bound 2) (.bound 1))
       (Formula.related second (TermVector.boundParameters parameterCount 3) (.bound 2) Term.newest)) (Formula.extensionalEq (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.extensionalEq, Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals apply Formula.related_freeClosed_of_closed <;> simp
 end BinarySchema
 namespace Formula
 /-- 序数值闭包模式的语义正是“该输入处的全部函数值都是序数”。 -/

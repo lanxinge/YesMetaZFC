@@ -1047,32 +1047,14 @@ def expression_encoding_theory : SetTheory :=
           formal_language_encoding_theory))
       empty_set_symbol_theory)
 
-theorem membership_irreflexive_theory_subset_expression_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : membership_irreflexive_theory sentence) :
-    expression_encoding_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset membership_irreflexive_theory ⊆ expression_encoding_theory
 
-theorem formal_language_encoding_theory_subset_expression_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : formal_language_encoding_theory sentence) :
-    expression_encoding_theory sentence :=
-  Or.inr <| Or.inl <| Or.inr <| Or.inr hSentence
+derive_theory_subset formal_language_encoding_theory ⊆ expression_encoding_theory
 
-theorem empty_set_symbol_theory_subset_expression_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : empty_set_symbol_theory sentence) :
-    expression_encoding_theory sentence :=
-  Or.inr <| Or.inr hSentence
+derive_theory_subset empty_set_symbol_theory ⊆ expression_encoding_theory
 
 /-- 表达式编码理论直接包含配数核心公理。 -/
-theorem godel_pairing_core_theory_subset_expression_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : godel_pairing_core_theory sentence) :
-    expression_encoding_theory sentence :=
-  formal_language_encoding_theory_subset_expression_encoding_theory
-    (godel_pairing_core_theory_subset_formal_language_encoding_theory
-      hSentence)
+derive_theory_subset godel_pairing_core_theory ⊆ expression_encoding_theory
 
 end FormalSystem
 end FirstOrder

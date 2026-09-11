@@ -30,11 +30,7 @@ structure ArithmeticEvaluationSupport (T : SetTheory)
   contains_godel_pairing_core :
     ∀ {sentence}, godel_pairing_core_theory sentence → T sentence
 
-private theorem natural_exponentiation_theory_subset_godel_pairing_core_theory
-    {sentence : SetSentence}
-    (hSentence : natural_exponentiation_theory sentence) :
-    godel_pairing_core_theory sentence :=
-  Or.inr hSentence
+private derive_theory_subset natural_exponentiation_theory ⊆ godel_pairing_core_theory
 
 namespace ArithmeticEvaluationSupport
 
@@ -68,11 +64,8 @@ theorem addition_definition_instance_derives
     (left right result : SetOpenTerm free) :
     Γ ⊢ₘ[T] natural_addition_definition_instance left right result := by
   apply FirstOrder.Derives.theory_weaken
-    (fun hSentence => S.contains_godel_pairing_core
-      (natural_exponentiation_theory_subset_godel_pairing_core_theory
-        (natural_multiplication_theory_subset_natural_exponentiation_theory
-          (natural_addition_theory_subset_natural_multiplication_theory
-            hSentence))))
+    (show Theory.Extends T natural_addition_theory from by
+      intro sentence hSentence; apply S.contains_godel_pairing_core; theory_inclusion)
   exact natural_addition_definition_instance_derives left right result
 
 /-- 乘法定义合同可在当前求值支撑中直接使用。 -/
@@ -82,10 +75,8 @@ theorem multiplication_definition_instance_derives
     (left right result : SetOpenTerm free) :
     Γ ⊢ₘ[T] natural_multiplication_definition_instance left right result := by
   apply FirstOrder.Derives.theory_weaken
-    (fun hSentence => S.contains_godel_pairing_core
-      (natural_exponentiation_theory_subset_godel_pairing_core_theory
-        (natural_multiplication_theory_subset_natural_exponentiation_theory
-          hSentence)))
+    (show Theory.Extends T natural_multiplication_theory from by
+      intro sentence hSentence; apply S.contains_godel_pairing_core; theory_inclusion)
   exact natural_multiplication_definition_instance_derives left right result
 
 /-- 幂定义合同可在当前求值支撑中直接使用。 -/
@@ -116,64 +107,13 @@ def intrinsic_arithmetic_evaluation_theory : SetTheory :=
   Theory.union formal_language_encoding_theory
     finite_sequence_support_theory
 
-private theorem infinity_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : infinity_theory sentence) :
-    formal_language_encoding_theory sentence := by
-  exact natural_addition_bound_theory_subset_formal_language_encoding_theory
-    (natural_exponentiation_bound_theory_subset_addition_bound_theory
-      (godel_pairing_core_theory_subset_bound_theory
-        (natural_exponentiation_theory_subset_godel_pairing_core_theory
-          (natural_multiplication_theory_subset_natural_exponentiation_theory
-            (natural_addition_theory_subset_natural_multiplication_theory
-              (natural_set_theory_subset_natural_addition_theory
-                (natural_order_type_theory_subset_natural_subset_type_theory
-                  (bounded_subset_theory_subset_natural_order_type_theory
-                    (unbounded_subset_theory_subset_bounded_subset_theory
-                      (infinity_theory_subset_unbounded_subset_theory
-                        hSentence))))))))))
-
-private theorem godel_pairing_core_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : godel_pairing_core_theory sentence) :
-    formal_language_encoding_theory sentence :=
-  natural_addition_bound_theory_subset_formal_language_encoding_theory
-    (natural_exponentiation_bound_theory_subset_addition_bound_theory
-      (godel_pairing_core_theory_subset_bound_theory hSentence))
-
 /-- 新联合理论的有限序列算术求值支撑实例。 -/
 theorem intrinsic_arithmetic_evaluation_support :
     ArithmeticEvaluationSupport intrinsic_arithmetic_evaluation_theory where
   toFiniteSequenceEvaluationSupport :=
-    { toFiniteSequenceGraphSupport :=
-        { toArithmeticSupport :=
-            { contains_membership_irreflexive := fun hSentence =>
-                Or.inr (finite_sequence_support_theory.contains_membership_irreflexive
-                  hSentence)
-              contains_empty_set := fun hSentence =>
-                Or.inr (finite_sequence_support_theory.contains_empty_set_symbol
-                  hSentence)
-              contains_successor := fun hSentence =>
-                Or.inr (finite_sequence_support_theory.contains_successor
-                  hSentence) }
-          contains_binary_union := fun hSentence =>
-            Or.inr (finite_sequence_support_theory.contains_binary_union hSentence)
-          contains_ordered_pair := fun hSentence =>
-            Or.inr (finite_sequence_support_theory.contains_ordered_pair hSentence)
-          contains_function_predicate := fun hSentence =>
-            Or.inr (finite_sequence_support_theory.contains_function_predicate hSentence)
-          contains_finite_sequence_concatenation := fun hSentence =>
-            Or.inr (finite_sequence_support_theory.contains_finite_sequence_concatenation
-              hSentence) }
-      contains_function_application := fun hSentence =>
-        Or.inr (finite_sequence_support_theory.contains_function_application hSentence)
-      contains_finite_sequence_formal_system := fun hSentence =>
-        Or.inr (finite_sequence_support_theory.contains_finite_sequence_formal_system
-          hSentence) }
-  contains_infinity := fun hSentence =>
-    Or.inl (infinity_theory_subset_formal_language_encoding_theory hSentence)
-  contains_godel_pairing_core := fun hSentence =>
-    Or.inl (godel_pairing_core_theory_subset_formal_language_encoding_theory hSentence)
+    finite_sequence_support_instance.toFiniteSequenceEvaluationSupport.theory_weaken (by theory_inclusion)
+  contains_infinity := by theory_inclusion
+  contains_godel_pairing_core := by theory_inclusion
 
 end ProofT
 end FormalSystem

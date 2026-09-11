@@ -150,10 +150,8 @@ theorem standard_sequence_from_range_subset
             relation_range_member_condition sequence₁ value₁)) := by
     simpa using
       (FirstOrder.Derives.theory_weaken
-        (fun hSentence => S.contains_function_predicate
-          (relation_plane_theory_subset_function_predicate_theory
-            (relation_range_operator_theory_subset_relation_plane_theory
-              hSentence)))
+        (show Theory.Extends T relation_range_operator_theory from by
+          intro sentence hSentence; apply S.contains_function_predicate; theory_inclusion)
         (is_relation_range_member_iff
           (Γ := Γ₁) sequence₁ value₁))
   have hRangeIff : Δ₁ ⊢ₘ[T]
@@ -227,10 +225,8 @@ theorem standard_sequence_from_range_subset
       pair ≐ₘ ⟨(pair)₀ₘ, (pair)₁ₘ⟩ₘ :=
     FirstOrder.Derives.imp_elim
       (FirstOrder.Derives.theory_weaken
-        (fun hSentence => S.contains_function_predicate
-          (relation_plane_theory_subset_function_predicate_theory
-            (right_projection_operator_theory_subset_relation_plane_theory
-              hSentence)))
+        (show Theory.Extends T right_projection_operator_theory from by
+          intro sentence hSentence; apply S.contains_function_predicate; theory_inclusion)
         (is_ordered_pair_eq_ordered_pair_projections
           (Γ := Ξ) pair))
       hOrdered

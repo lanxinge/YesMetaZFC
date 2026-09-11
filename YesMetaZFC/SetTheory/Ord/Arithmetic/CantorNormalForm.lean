@@ -108,6 +108,7 @@ def isCantorNormalFormStep (𝒞 : OrderedPairConvention)
               .existsE <| .conj (isOrdinalAddition 𝒞 Term.newest (.bound 1) (.bound 4)) (.conj (.disj (extensionalEq (.bound 2) Term.newest)
                     (.mem (.bound 2) Term.newest)) (orderedPairMem 𝒞 (.bound 3) Term.newest
                     values.weaken.weaken.weaken.weaken.weaken.weaken.weaken))
+derive_free_closed isCantorNormalFormStep
 /-- 带环境上界的对象层有限 Cantor 正规形。 -/
 def isCantorNormalFormBelow (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω bound α length exponents coefficients values : Term depth) :
@@ -126,12 +127,14 @@ def isCantorNormalFormBelow (𝒞 : OrderedPairConvention)
           ω.weaken.weaken bound.weaken.weaken
           exponents.weaken.weaken coefficients.weaken.weaken
           values.weaken.weaken Term.newest
+derive_free_closed isCantorNormalFormBelow
 /-- 环境上界取表示值本身时，得到普通对象层有限 Cantor 正规形。 -/
 def isCantorNormalForm (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω α length exponents coefficients values : Term depth) :
     Formula 1 depth :=
   isCantorNormalFormBelow 𝒞
     ω α α length exponents coefficients values
+derive_free_closed isCantorNormalForm
 /-- 单个正规形递推步骤的公式语义。 -/
 @[prove_auto_norm semantic]
 theorem satisfies_isCantorNormalFormStep_iff
@@ -235,43 +238,10 @@ namespace UnarySchema
 private def cantorNormalFormExistence (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .existsE <| .existsE <| .existsE <| .existsE <|
     Formula.isCantorNormalForm 𝒞 (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) Term.newest
-  freeClosed := by
-    simp [Formula.isCantorNormalForm,
-      Formula.isCantorNormalFormBelow,
-      Formula.isCantorNormalFormStep,
-      Formula.isIncreasingOrdinalSequence,
-      Formula.isOrdinalValuedSequence,
-      Formula.isSequenceOfLength, Formula.isSequenceIn,
-      Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.isEmpty,
-      Formula.isSuccessor, Formula.isOrdinalExponentiation,
-      Formula.isOrdinalMultiplication,
-      Formula.isOrdinalAddition, Formula.related,
-      Formula.forallMem, Formula.existsMem,
-      Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed,
-      Term.newest, Term.weaken]
-    repeat' apply And.intro
-    all_goals
-      first
-      | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
-      | apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 当前指数的 `ω` 幂严格越过固定序数。 -/
 private def ordinalExponentiationStrictUpperBound (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalExponentiation 𝒞
       Term.newest (.bound 2) (.bound 1)) (.mem (.bound 3) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalExponentiation, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 当前序数的任意两套同上界 Cantor 正规形完全相等。 -/
 private def cantorNormalFormBelowUniqueness (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .forallE <| .forallE <| .forallE <| .forallE <|
@@ -281,33 +251,6 @@ private def cantorNormalFormBelowUniqueness (𝒞 : OrderedPairConvention) : Una
       .conj (Formula.extensionalEq (.bound 7) (.bound 3)) <|
       .conj (Formula.extensionalEq (.bound 6) (.bound 2)) <|
       .conj (Formula.extensionalEq (.bound 5) (.bound 1)) (Formula.extensionalEq (.bound 4) Term.newest)
-  freeClosed := by
-    simp [Formula.isCantorNormalFormBelow,
-      Formula.isCantorNormalFormStep,
-      Formula.isIncreasingOrdinalSequence,
-      Formula.isOrdinalValuedSequence,
-      Formula.isSequenceOfLength, Formula.isSequenceIn,
-      Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.isEmpty,
-      Formula.isSuccessor, Formula.isOrdinalExponentiation,
-      Formula.isOrdinalMultiplication,
-      Formula.isOrdinalAddition, Formula.related,
-      Formula.forallMem, Formula.existsMem,
-      Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed,
-      Term.newest, Term.weaken]
-    repeat' apply And.intro
-    all_goals
-      first
-      | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
-      | apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
 end UnarySchema
 namespace Formula
 private theorem satisfies_cantorNormalFormExistence_iff

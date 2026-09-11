@@ -17,10 +17,6 @@ namespace UnarySchema
 /-- 从目标序数中筛出给定集合的全部非严格上界。 -/
 private def ordinalUpperBoundCandidate : UnarySchema 1 where
   body := Formula.isOrdinalUpperBound (.bound 1) Term.newest
-  freeClosed := by
-    simp [Formula.isOrdinalUpperBound, Formula.forallMem,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
 end UnarySchema
 namespace BinarySchema
 /-- 为模型内部集合族的每个成员选择目标序数中的最小上界。 -/
@@ -29,13 +25,6 @@ private def leastFamilyBoundValue (𝒞 : OrderedPairConvention) : BinarySchema 
       (Formula.isOrdinalUpperBound (.bound 0) (.bound 1))) <|
     Formula.forallMem (.bound 0) <| .neg <| .existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 3) (.bound 0) (.bound 5)) (Formula.isOrdinalUpperBound
         (.bound 0) (.bound 1))
-  freeClosed := by
-    simp [Formula.orderedPairMem,
-      Formula.isOrdinalUpperBound, Formula.forallMem,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 序数上界公式与“每个成员不超过给定界”一致。 -/

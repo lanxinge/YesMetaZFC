@@ -57,17 +57,9 @@ def intrinsic_proof_row_theory : SetTheory :=
   Theory.union intrinsic_syntax_carrier_theory
     finite_sequence_support_theory
 
-theorem intrinsic_syntax_carrier_theory_subset_intrinsic_proof_row_theory
-    {sentence : SetSentence}
-    (hSentence : intrinsic_syntax_carrier_theory sentence) :
-    intrinsic_proof_row_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset intrinsic_syntax_carrier_theory ⊆ intrinsic_proof_row_theory
 
-theorem finite_sequence_support_theory_subset_intrinsic_proof_row_theory
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_support_theory sentence) :
-    intrinsic_proof_row_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset finite_sequence_support_theory ⊆ intrinsic_proof_row_theory
 
 theorem intrinsic_finite_sequence_space_support :
     FiniteSequenceSpaceSupport intrinsic_proof_row_theory :=

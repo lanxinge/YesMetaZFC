@@ -8,23 +8,24 @@
 | 资源 | 位置与用途 |
 | --- | --- |
 | Git 仓库 | [lanxinge/YesMetaZFC](https://github.com/lanxinge/YesMetaZFC)，主分支 `main` |
-| Drive 备用源码包 | [YesMetaZFC-source.zip](https://drive.google.com/file/d/1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID/view)；保持同一文件身份，已知保存的是下述 D3 节点 |
+| Drive 备用源码包 | [YesMetaZFC-source.zip](https://drive.google.com/file/d/1b9gV-m5sT7DEVhgNNSzsV9ZrkpzYeUID/view)；保持同一文件身份，当前减负源码与计数见 [PROOF_REDUCTION.md](PROOF_REDUCTION.md) |
 | Drive 源码目录 | `1KFNGtD8yE-rp1Jk4UfH6BTbnpp9cQSEx` |
-| 当前容器入口 | `source /workspace/scratch/028f3653c405/activate-yesmetazfc.sh` |
-| 当前工作区 | `/workspace/scratch/028f3653c405/YesMetaZFC` |
-| 当前容器工具链 | `/workspace/scratch/028f3653c405/toolchains/lean-4.33.1-linux` |
+| 当前容器入口 | `source /workspace/scratch/912110a3042a/activate-yesmetazfc.sh` |
+| 当前工作区 | `/workspace/scratch/912110a3042a/YesMetaZFC` |
+| 当前容器工具链 | `/workspace/scratch/912110a3042a/toolchains/lean-4.33.1-linux` |
 
 恢复源码应得到 `lakefile.toml`、`lean-toolchain`、`YesMetaZFC.lean` 和 `YesMetaZFC/`。
-本次发布的 Git 源码包含 D1–D3、任意内部 checked 轨迹反射、支撑理论及裸 ZFC 的
+当前规范源码保留 D1–D3、任意内部 checked 轨迹反射、支撑理论及裸 ZFC 的
 Löb 与哥二、带参数 Tarski，以及最终纯公式自身编码的固定点和 Tarski 定理。
-恢复最新成果应检出 Git 仓库 `main`，以 [TROPHIES.md](TROPHIES.md) 和
-[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) 核对接口与核验范围。
-当前有 950 个 Lean 模块；严格构建 947 个任务、全源构建 952 个任务及扫描工具
-320 个任务通过。530 个入口的依赖审计未超出原有 32 项可信基，没有新可信依赖或 `sorryAx`。
+本轮证明减负基于 Git 提交 `7195271ee67fcdb46c2e744a8e6b717c1e01c926`，
+规范 Drive 包和 Git 仓库用于保存稳定减负节点；恢复时应核对减负记录中的源码指纹。
+恢复这份工作可从上表的 Git 仓库或 Drive 包取得源码，再以 [TROPHIES.md](TROPHIES.md)、
+[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) 核对数学成果；以
+[PROOF_REDUCTION.md](PROOF_REDUCTION.md) 核对减量、当前验证和测量范围。
 
-Drive 备用包最近一次已确认内容为 [9045935](https://github.com/lanxinge/YesMetaZFC/commit/9045935fbbe9466cf246cad009acf1de4385d5a2)
-之上的 D3 工作树，含 924 个 Lean 模块；本次 Git 发布没有更新该备用包。
-它适合恢复旧 D3 节点，不能替代当前 `main` 的 Löb、哥二及 Tarski 源码。
+当前共有 955 个 Lean 模块。当前构建结果在减负记录中维护；原源码节点的 530 个入口
+可信依赖审计仍见 UNIFIED_VERIFICATION，不把原节点审计数冒称为本次重新审计的结果。
+规范源码包不包含 `.git/`；继续开发时保留减负记录中的 Git 基点和源码指纹。
 
 ## 已有的 Lean Linux 运行时
 
@@ -47,6 +48,7 @@ Drive 备用包最近一次已确认内容为 [9045935](https://github.com/lanxi
 
 运行时校验后的 Lean 提交为 `819816b2e0a3bf405af45ae5c7af2491d8f5bee6`。
 将解压目录的 `bin` 加入 `PATH`，在源码根目录构建；可设 `LEAN_NUM_THREADS=4` 控制并发资源。
+容器中解压可使用 `tar --no-same-owner --zstd -xf <归档>`，避免恢复归档所有者时失败。
 解压后应核对归档成员大小；该运行时的 `lib/lean/libLean.a` 为 315,493,554 字节。
 扫描工具链接所需的静态库也须完整，不能仅以 `lean --version` 成功判定恢复完成。
 

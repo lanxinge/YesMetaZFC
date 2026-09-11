@@ -20,22 +20,12 @@ namespace BinarySchema
 def disjointUnionValue (𝒞 : OrderedPairConvention) : BinarySchema 4 where
   body := .disj (.conj (.mem (.bound 1) (.bound 4)) (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 2))) (.conj (.mem (.bound 1) (.bound 5))
       (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 3)))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 分别映射两个坐标的笛卡尔积值关系。 -/
 def cartesianProductValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .existsE <| .existsE <| .existsE <|
     .conj (𝒞.code (.bound 5) (.bound 3) (.bound 2)) <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 3) (.bound 1) (.bound 6)) <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 2) (.bound 0) (.bound 7)) (𝒞.code (.bound 4) (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /--
 把序数笛卡尔积中的 `(left, right)` 映到序数乘法的第 `right` 块中偏移 `left`
 的位置。
@@ -44,16 +34,6 @@ def ordinalMultiplicationValue (𝒞 : OrderedPairConvention) : BinarySchema 1 w
   body := .existsE <| .existsE <| .existsE <|
     .conj (𝒞.code (.bound 4) (.bound 2) (.bound 1)) <|
     .conj (Formula.isOrdinalMultiplication 𝒞 (.bound 0) (.bound 5) (.bound 1)) (Formula.isOrdinalAddition 𝒞 (.bound 3) (.bound 0) (.bound 2))
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication,
-      Formula.isOrdinalAddition, Formula.related,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals
-      first
-      | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
-      | apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
 /--
 把后继中新加入的点送到零，把自然数整体后移一位，其余元素保持不变。
 -/
@@ -62,30 +42,18 @@ def successorAbsorptionValue : BinarySchema 3 where
     .disj (.conj (.mem (.bound 1) (.bound 3)) (Formula.isSuccessor (.bound 0) (.bound 1))) <|
       .conj (.neg <| Formula.extensionalEq (.bound 1) (.bound 2)) <|
         .conj (.neg <| .mem (.bound 1) (.bound 3)) (Formula.extensionalEq (.bound 0) (.bound 1))
-  freeClosed := by
-    simp [Formula.isSuccessor, Formula.extensionalEq,
-      Formula.FreeClosed]
 /-- 交换坐标后分别应用给定双射的笛卡尔积值关系。 -/
 def swappedCartesianProductValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .existsE <| .existsE <| .existsE <|
     .conj (𝒞.code (.bound 5) (.bound 3) (.bound 2)) <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 3) (.bound 0) (.bound 6)) <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 2) (.bound 1) (.bound 7)) (𝒞.code (.bound 4) (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 把 `((a, b), c)` 重括号为 `(a, (b, c))`。 -/
 def associateCartesianProductValue (𝒞 : OrderedPairConvention) : BinarySchema 0 where
   body := .existsE <| .existsE <| .existsE <| .existsE <| .existsE <|
     .conj (𝒞.code (.bound 1) (.bound 4) (.bound 3)) <|
     .conj (𝒞.code (.bound 6) (.bound 1) (.bound 2)) <|
     .conj (𝒞.code (.bound 0) (.bound 3) (.bound 2)) (𝒞.code (.bound 5) (.bound 4) (.bound 0))
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 把左结合的二元标签编码重括号为右结合编码。 -/
 def associateTaggedUnionValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .disj (.existsE <| .existsE <|
@@ -97,10 +65,6 @@ def associateTaggedUnionValue (𝒞 : OrderedPairConvention) : BinarySchema 2 wh
         .conj (𝒞.code (.bound 0) (.bound 5) (.bound 1)) (𝒞.code (.bound 3) (.bound 6) (.bound 0))) (.existsE <| .existsE <|
         .conj (𝒞.code (.bound 3) (.bound 5) (.bound 1)) <|
         .conj (𝒞.code (.bound 0) (.bound 5) (.bound 1)) (𝒞.code (.bound 2) (.bound 5) (.bound 0)))
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 不交并分片值关系的纸面解释。 -/

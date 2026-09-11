@@ -46,27 +46,6 @@ def ordinalIterationOperator (𝒞 : OrderedPairConvention)
               Formula.related function (TermVector.boundParameters parameterCount 3)
                 Term.newest (.bound 1)) (.conj (.neg <| Formula.isOrdinal Term.newest) (Formula.isEmpty (.bound 1)))) (Formula.isLimitLengthSequenceWithUnion 𝒞
           (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isZeroLengthSequence,
-      Formula.isSuccessorLengthSequenceWithLast,
-      Formula.isLimitLengthSequenceWithUnion,
-      Formula.isSequenceOfLength,
-      Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-      Formula.isTransitiveOn, Formula.isLeastOf,
-      Formula.lessOrEqual, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain, Formula.isRange,
-      Formula.isEmpty, Formula.isSuccessor,
-      Formula.isLimitOrdinal, Formula.isUnion,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest,
-      TermVector.boundParameters, Term.weaken]
-    repeat' apply And.intro
-    all_goals first | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl | skip
-    exact Formula.related_freeClosed_of_closed (relation := function) (parameters := TermVector.boundParameters parameterCount 3)
-      (left := Term.newest) (right := .bound 1) (by simp) (by simp) (by simp)
 /-- 由超限递归得到的序数函数迭代关系。 -/
 def ordinalIteration (𝒞 : OrderedPairConvention)
     {parameterCount : Nat} (function : BinarySchema parameterCount) :
@@ -86,6 +65,7 @@ def isEpsilonNumber (𝒞 : OrderedPairConvention)
     Formula 1 depth :=
   .conj (isOrdinal α) <|
     isOrdinalExponentiation 𝒞 α ω α
+derive_free_closed isEpsilonNumber
 /-- `epsilon` 是最小的以 `ω` 为底的序数幂不动点。 -/
 def isEpsilonZero (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω epsilon : Term depth) :
@@ -99,20 +79,6 @@ namespace UnarySchema
 def epsilonNumber (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body :=
     Formula.isEpsilonNumber 𝒞 (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.isEpsilonNumber,
-      Formula.isOrdinalExponentiation,
-      Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-      Formula.isTransitiveOn, Formula.isLeastOf,
-      Formula.lessOrEqual, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed,
-      TermVector.singleton, Term.newest,
-      Term.weaken]
-    exact Formula.related_freeClosed_of_closed (relation := BinarySchema.ordinalExponentiation 𝒞) (parameters := TermVector.ofFn fun _ => Term.bound 1)
-      (left := .bound 0) (right := .bound 0) (by intro entry; simp) (by simp) (by simp)
 end UnarySchema
 namespace BinarySchema
 @[prove_auto_norm semantic]

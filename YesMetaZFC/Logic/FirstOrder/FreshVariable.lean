@@ -635,43 +635,12 @@ def weakenBoundUnderTop
         (VariableSubstitution.liftBound top
           (VariableSubstitution.instantiateTop replacement))
         VariableSubstitution.freeId = body := by
-  change
-    (body.renameMapped
-        (VariableRenaming.lift
-          (VariableRenaming.weaken introduced))
-        VariableRenaming.id).substituteMapped
-          (VariableSubstitution.liftBound top
-            (VariableSubstitution.instantiateTop replacement))
-          VariableSubstitution.freeId = body
-  rw [← Formula.substituteMapped_of_bound_renaming]
-  rw [Formula.substituteMapped_comp]
-  have hBound :
-      (fun {resultSort}
-          (entry : Variable (top :: bound) resultSort) =>
-        (VariableSubstitution.of_bound_renaming
-          (free := free)
-          (VariableRenaming.lift
-            (VariableRenaming.weaken introduced)) entry).substituteMapped
-              (VariableSubstitution.liftBound top
-                (VariableSubstitution.instantiateTop replacement))
-              VariableSubstitution.freeId) =
-        (VariableSubstitution.boundId :
-          VariableSubstitution σ (top :: bound)
-            (top :: bound) free) := by
-    funext resultSort entry
-    cases entry <;> rfl
-  have hFree :
-      (fun {resultSort} (entry : Variable free resultSort) =>
-        (VariableSubstitution.freeId entry).substituteMapped
-          (VariableSubstitution.liftBound top
-            (VariableSubstitution.instantiateTop replacement))
-          VariableSubstitution.freeId) =
-        (VariableSubstitution.freeId :
-          VariableSubstitution σ free (top :: bound) free) := by
-    funext resultSort entry
-    rfl
-  rw [hBound, hFree]
-  exact Formula.substituteMapped_id body
+  change (body.renameMapped _ _).substituteMapped _ _ = body
+  rw [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
+  conv => rhs; rw [← Formula.substituteMapped_id body]
+  congr 1
+  funext resultSort entry
+  cases entry <;> rfl
 
 /-- bound 顶部实例化与 free weakening 在公式层严格交换。 -/
 @[simp] theorem instantiateTop_weakenFree
@@ -800,55 +769,14 @@ theorem openBoundTop_eq_openBoundLast
     {free : SortContext σ} (sort : σ.SortSymbol)
     (body : Formula σ [sort] free) :
     (body.openBoundTop sort).abstractFreeTop = body := by
-  change
-    (body.substituteMapped
-      (VariableSubstitution.instantiateTop
-        (FreshVariable.newest (σ := σ) (free := free) sort))
-      (VariableSubstitution.of_renaming (σ := σ) (bound := [])
-        (VariableRenaming.weaken sort))).substituteMapped
-          (VariableSubstitution.abstractBound (σ := σ) sort)
-          (VariableSubstitution.abstractFreeTop (σ := σ)) = body
+  change (body.substituteMapped _ _).substituteMapped _ _ = body
   rw [Formula.substituteMapped_comp]
-  have hBound :
-      (fun {resultSort} (entry : Variable [sort] resultSort) =>
-        (VariableSubstitution.instantiateTop
-          (FreshVariable.newest (σ := σ) (free := free) sort)
-          entry).substituteMapped
-            (VariableSubstitution.abstractBound (σ := σ) sort)
-            (VariableSubstitution.abstractFreeTop (σ := σ))) =
-        (VariableSubstitution.boundId :
-          VariableSubstitution σ [sort] [sort] free) := by
-    funext resultSort entry
-    cases entry with
-    | here => rfl
-    | there previous => exact nomatch previous
-  have hFree :
-      (fun {resultSort} (entry : Variable free resultSort) =>
-        (VariableSubstitution.of_renaming (σ := σ) (bound := [])
-          (VariableRenaming.weaken sort) entry).substituteMapped
-            (VariableSubstitution.abstractBound (σ := σ) sort)
-            (VariableSubstitution.abstractFreeTop (σ := σ))) =
-        (VariableSubstitution.freeId :
-          VariableSubstitution σ free [sort] free) := by
-    funext resultSort entry
-    cases entry <;> rfl
-  calc
-    body.substituteMapped
-        (fun entry =>
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := σ) (free := free) sort)
-            entry).substituteMapped
-              (VariableSubstitution.abstractBound (σ := σ) sort)
-              (VariableSubstitution.abstractFreeTop (σ := σ)))
-        (fun entry =>
-          (VariableSubstitution.of_renaming (σ := σ) (bound := [])
-            (VariableRenaming.weaken sort) entry).substituteMapped
-              (VariableSubstitution.abstractBound (σ := σ) sort)
-              (VariableSubstitution.abstractFreeTop (σ := σ))) =
-      body.substituteMapped VariableSubstitution.boundId
-        VariableSubstitution.freeId := by
-      rw [hBound, hFree]
-    _ = body := Formula.substituteMapped_id body
+  conv => rhs; rw [← Formula.substituteMapped_id body]
+  congr 1
+  funext resultSort entry
+  cases entry with
+  | here => rfl
+  | there previous => exact nomatch previous
 
 /-- 规范打开后重新全称封闭，严格恢复原全称式。 -/
 @[simp] theorem forallFreeTop_openBoundTop

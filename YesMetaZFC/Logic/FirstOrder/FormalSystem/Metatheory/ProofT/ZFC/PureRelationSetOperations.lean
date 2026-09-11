@@ -23,9 +23,6 @@ def binaryUnionMember (ℳ : Structure.{0, 0, 0, x} ℒ) (left right element : C
 
 def binaryUnionSchema : Project.UnarySchema 2 where
   body := .disj (.mem (.bound 0) (.bound 1)) (.mem (.bound 0) (.bound 2))
-  freeClosed := by
-    simp [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
-
 theorem binaryUnionSchema_correct (_hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 2) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) binaryUnionSchema.body ↔
@@ -52,9 +49,6 @@ def symmetricDifferenceMember (ℳ : Structure.{0, 0, 0, x} ℒ) (left right ele
 def symmetricDifferenceSchema : Project.UnarySchema 2 where
   body := .disj (.conj (.mem (.bound 0) (.bound 1)) (.neg (.mem (.bound 0) (.bound 2))))
     (.conj (.mem (.bound 0) (.bound 2)) (.neg (.mem (.bound 0) (.bound 1))))
-  freeClosed := by
-    simp [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
-
 theorem symmetricDifferenceSchema_correct (_hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 2) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) symmetricDifferenceSchema.body ↔
@@ -83,12 +77,6 @@ def relationConverseSchema : Project.UnarySchema 1 where
   body := .existsE <| .existsE <| .conj
     (PureKuratowskiProject.convention.code (.bound 2) (.bound 1) (.bound 0))
     (Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 0) (.bound 1) (.bound 3))
-  freeClosed := by
-    simp [Project.Formula.orderedPairMem, _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed,
-      _root_.YesMetaZFC.SetTheory.Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
 theorem relationConverseSchema_correct (hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 1) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) relationConverseSchema.body ↔
@@ -123,12 +111,6 @@ def relationCompositionSchema : Project.UnarySchema 2 where
     (PureKuratowskiProject.convention.code (.bound 3) (.bound 2) (.bound 1)) <| .conj
     (Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 2) (.bound 0) (.bound 4))
     (Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 0) (.bound 1) (.bound 5))
-  freeClosed := by
-    simp [Project.Formula.orderedPairMem, _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed,
-      _root_.YesMetaZFC.SetTheory.Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
 theorem relationCompositionSchema_correct (hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 2) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) relationCompositionSchema.body ↔
@@ -174,11 +156,6 @@ def membershipRelationSchema : Project.UnarySchema 1 where
   body := .existsE <| .existsE <| .conj (.mem (.bound 1) (.bound 3)) <|
     .conj (.mem (.bound 0) (.bound 3)) <| .conj
     (PureKuratowskiProject.convention.code (.bound 2) (.bound 1) (.bound 0)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
 theorem membershipRelationSchema_correct (hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 1) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) membershipRelationSchema.body ↔
@@ -210,12 +187,6 @@ def imageMember (ℳ : Structure.{0, 0, 0, x} ℒ) (function source element : Ca
 def imageSchema : Project.UnarySchema 2 where
   body := .existsE <| .conj (.mem (.bound 0) (.bound 3))
     (Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 0) (.bound 1) (.bound 2))
-  freeClosed := by
-    simp [Project.Formula.orderedPairMem, _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed,
-      _root_.YesMetaZFC.SetTheory.Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
 theorem imageSchema_correct (hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 2) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) imageSchema.body ↔
@@ -248,11 +219,6 @@ def inductiveCoreMember (ℳ : Structure.{0, 0, 0, x} ℒ) (source element : Car
 def inductiveCoreSchema : Project.UnarySchema 1 where
   body := .conj (.mem (.bound 0) (.bound 1)) <| .forallE <|
     .imp (Project.Formula.isInductive (.bound 0)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Project.Formula.isInductive, Project.Formula.isEmpty, Project.Formula.isSuccessor,
-      Project.Formula.forallMem, Project.Formula.extensionalEq, _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed,
-      _root_.YesMetaZFC.SetTheory.Definitional.Term.newest]
-
 theorem inductiveCoreSchema_correct (_hℳ : Theory.Models ℳ theory)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 1) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) inductiveCoreSchema.body ↔

@@ -148,30 +148,15 @@ def ordinal_natural_theory : SetTheory :=
   Theory.insert natural_membership_maximum_definition_axiom
     ordinal_membership_minimum_theory
 
-theorem well_order_comparison_theory_subset_well_order_comparison_map_theory
-    {sentence : SetSentence}
-    (hSentence : well_order_comparison_theory sentence) :
-    well_order_comparison_map_theory sentence := Or.inr hSentence
+derive_theory_subset well_order_comparison_theory ⊆ well_order_comparison_map_theory
 
-theorem well_order_comparison_map_theory_subset_ordinal_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : well_order_comparison_map_theory sentence) :
-    ordinal_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset well_order_comparison_map_theory ⊆ ordinal_predicate_theory
 
-theorem ordinal_predicate_theory_subset_natural_number_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : ordinal_predicate_theory sentence) :
-    natural_number_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset ordinal_predicate_theory ⊆ natural_number_predicate_theory
 
-theorem natural_number_predicate_theory_subset_ordinal_membership_minimum_theory
-    {sentence : SetSentence}
-    (hSentence : natural_number_predicate_theory sentence) :
-    ordinal_membership_minimum_theory sentence := Or.inr hSentence
+derive_theory_subset natural_number_predicate_theory ⊆ ordinal_membership_minimum_theory
 
-theorem ordinal_membership_minimum_theory_subset_ordinal_natural_theory
-    {sentence : SetSentence}
-    (hSentence : ordinal_membership_minimum_theory sentence) :
-    ordinal_natural_theory sentence := Or.inr hSentence
+derive_theory_subset ordinal_membership_minimum_theory ⊆ ordinal_natural_theory
 
 end BasicSetTheory
 end Nonlogical

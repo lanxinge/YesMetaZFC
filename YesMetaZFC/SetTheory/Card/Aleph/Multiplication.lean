@@ -18,40 +18,6 @@ private def infiniteCardinalSelfMultiplicationAt (𝒞 : Definitional.Project.Or
     Definitional.Project.UnarySchema 1 where
   body := .imp (Definitional.Project.Formula.isInfiniteCardinal 𝒞 (.bound 1) (.bound 0)) (Definitional.Project.Formula.isCardinalMultiplication 𝒞
       (.bound 0) (.bound 0) (.bound 0))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isInfiniteCardinal,
-      Definitional.Project.Formula.isCardinalMultiplication,
-      Definitional.Project.Formula.isCardinalOf,
-      Definitional.Project.Formula.isCardinal,
-      Definitional.Project.Formula.cardinalLessOrEqual,
-      Definitional.Project.Formula.equinumerous,
-      Definitional.Project.Formula.isBijectionFromTo,
-      Definitional.Project.Formula.isInjectionFromTo,
-      Definitional.Project.Formula.isFunctionFromTo,
-      Definitional.Project.Formula.isFunction,
-      Definitional.Project.Formula.isRelation,
-      Definitional.Project.Formula.isDomain,
-      Definitional.Project.Formula.isSurjectiveOnto,
-      Definitional.Project.Formula.isInjective,
-      Definitional.Project.Formula.isCartesianProduct,
-      Definitional.Project.Formula.isOrdinal,
-      Definitional.Project.Formula.isTransitive,
-      Definitional.Project.Formula.isWellOrderOn,
-      Definitional.Project.Formula.isLinearOrderOn,
-      Definitional.Project.Formula.isStrictPartialOrderOn,
-      Definitional.Project.Formula.isIrreflexiveOn,
-      Definitional.Project.Formula.isTransitiveOn,
-      Definitional.Project.Formula.isLeastOf,
-      Definitional.Project.Formula.lessOrEqual,
-      Definitional.Project.Formula.orderedPairMem,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Formula.subset,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 无限基数自乘封闭模式的模型语义。 -/
 private theorem satisfies_infiniteCardinalSelfMultiplicationAt_iff
     {ℳ : Structure.{u}}

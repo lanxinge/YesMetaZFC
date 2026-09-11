@@ -17,6 +17,7 @@ def isZeroLengthSequence (𝒞 : OrderedPairConvention)
     {depth : Nat} (sequence : Term depth) : Formula 1 depth :=
   .existsE <|
     .conj (isSequenceOfLength 𝒞 sequence.weaken Term.newest) (isEmpty Term.newest)
+derive_free_closed isZeroLengthSequence
 /--
 `sequence` 的定义域是某个序数的后继，且 `last` 是其最后一个值。
 -/
@@ -28,6 +29,7 @@ def isSuccessorLengthSequenceWithLast (𝒞 : OrderedPairConvention)
         .conj (isSequenceOfLength 𝒞 sequence.weaken.weaken
             Term.newest) (orderedPairMem 𝒞 (.bound 1) last.weaken.weaken
             sequence.weaken.weaken)
+derive_free_closed isSuccessorLengthSequenceWithLast
 /--
 `sequence` 的定义域是极限序数，且 `limit` 是其值域的并。
 -/
@@ -38,10 +40,12 @@ def isLimitLengthSequenceWithUnion (𝒞 : OrderedPairConvention)
       .conj (isSequenceOfLength 𝒞 sequence.weaken Term.newest) <|
         .existsE <|
           .conj (isRange 𝒞 Term.newest sequence.weaken.weaken) (isUnion limit.weaken.weaken Term.newest)
+derive_free_closed isLimitLengthSequenceWithUnion
 /-- `one` 是空序数的后继。 -/
 def isOrdinalOne {depth : Nat} (one : Term depth) : Formula 1 depth :=
   .existsE <|
     .conj (isEmpty Term.newest) (isSuccessor one.weaken Term.newest)
+derive_free_closed isOrdinalOne
 end Formula
 namespace BinarySchema
 /--
@@ -54,24 +58,6 @@ def ordinalAdditionOperator (𝒞 : OrderedPairConvention) : BinarySchema 1 wher
       .disj (.existsE <|
           .conj (Formula.isSuccessorLengthSequenceWithLast 𝒞 (.bound 2) Term.newest) (Formula.isSuccessor (.bound 1) Term.newest))
         (Formula.isLimitLengthSequenceWithUnion 𝒞 (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isZeroLengthSequence,
-      Formula.isSuccessorLengthSequenceWithLast,
-      Formula.isLimitLengthSequenceWithUnion,
-      Formula.isSequenceOfLength, Formula.isOrdinal,
-      Formula.isTransitive, Formula.isWellOrderOn,
-      Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isFunction, Formula.isRelation, Formula.isDomain,
-      Formula.isRange, Formula.isEmpty, Formula.isSuccessor,
-      Formula.isLimitOrdinal, Formula.isUnion,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest,
-      Term.weaken]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 由超限递归得到的序数加法类关系。 -/
 def ordinalAddition (𝒞 : OrderedPairConvention) :
     BinarySchema 1 :=
@@ -82,6 +68,7 @@ namespace Formula
 def isOrdinalAddition (𝒞 : OrderedPairConvention)
     {depth : Nat} (sum left right : Term depth) : Formula 1 depth :=
   related (BinarySchema.ordinalAddition 𝒞) (.singleton left) right sum
+derive_free_closed isOrdinalAddition
 end Formula
 namespace BinarySchema
 /--
@@ -98,27 +85,6 @@ def ordinalMultiplicationOperator (𝒞 : OrderedPairConvention) : BinarySchema 
           .disj (.existsE <|
               .conj (Formula.isSuccessorLengthSequenceWithLast 𝒞 (.bound 2) Term.newest) (Formula.isOrdinalAddition 𝒞 (.bound 1) Term.newest (.bound 3)))
             (Formula.isLimitLengthSequenceWithUnion 𝒞 (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isZeroLengthSequence,
-      Formula.isSuccessorLengthSequenceWithLast,
-      Formula.isLimitLengthSequenceWithUnion,
-      Formula.isOrdinalAddition, Formula.isSequenceOfLength,
-      Formula.isOrdinal, Formula.isTransitive,
-      Formula.isWellOrderOn, Formula.isLinearOrderOn,
-      Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-      Formula.isTransitiveOn, Formula.isLeastOf,
-      Formula.lessOrEqual, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain, Formula.isRange,
-      Formula.isEmpty, Formula.isSuccessor,
-      Formula.isLimitOrdinal, Formula.isUnion,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest,
-      TermVector.singleton, Term.weaken]
-    repeat' apply And.intro
-    all_goals first | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl | skip
-    exact Formula.related_freeClosed_of_closed (relation := ordinalAddition 𝒞) (parameters := TermVector.ofFn fun _ => Term.newest)
-      (left := .bound 3) (right := .bound 1) (by intro entry; simp) (by simp) (by simp)
 /-- 由超限递归得到的序数乘法类关系。 -/
 def ordinalMultiplication (𝒞 : OrderedPairConvention) :
     BinarySchema 1 :=
@@ -129,6 +95,7 @@ namespace Formula
 def isOrdinalMultiplication (𝒞 : OrderedPairConvention)
     {depth : Nat} (product left right : Term depth) : Formula 1 depth :=
   related (BinarySchema.ordinalMultiplication 𝒞) (.singleton left) right product
+derive_free_closed isOrdinalMultiplication
 end Formula
 namespace BinarySchema
 /--
@@ -141,27 +108,6 @@ def ordinalExponentiationOperator (𝒞 : OrderedPairConvention) : BinarySchema 
       .disj (.existsE <|
           .conj (Formula.isSuccessorLengthSequenceWithLast 𝒞 (.bound 2) Term.newest) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) Term.newest (.bound 3)))
         (Formula.isLimitLengthSequenceWithUnion 𝒞 (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isZeroLengthSequence,
-      Formula.isSuccessorLengthSequenceWithLast,
-      Formula.isLimitLengthSequenceWithUnion,
-      Formula.isOrdinalOne, Formula.isOrdinalMultiplication,
-      Formula.isSequenceOfLength, Formula.isOrdinal,
-      Formula.isTransitive, Formula.isWellOrderOn,
-      Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isFunction, Formula.isRelation, Formula.isDomain,
-      Formula.isRange, Formula.isEmpty, Formula.isSuccessor,
-      Formula.isLimitOrdinal, Formula.isUnion,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest,
-      TermVector.singleton, Term.weaken]
-    repeat' apply And.intro
-    all_goals first | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl | skip
-    exact Formula.related_freeClosed_of_closed (relation := ordinalMultiplication 𝒞) (parameters := TermVector.ofFn fun _ => Term.newest)
-      (left := .bound 3) (right := .bound 1) (by intro entry; simp) (by simp) (by simp)
 /-- 由超限递归得到的序数幂类关系。 -/
 def ordinalExponentiation (𝒞 : OrderedPairConvention) :
     BinarySchema 1 :=
@@ -172,6 +118,7 @@ namespace Formula
 def isOrdinalExponentiation (𝒞 : OrderedPairConvention)
     {depth : Nat} (power base exponent : Term depth) : Formula 1 depth :=
   related (BinarySchema.ordinalExponentiation 𝒞) (.singleton base) exponent power
+derive_free_closed isOrdinalExponentiation
 /-- `dividend = divisor * quotient + remainder`，且余项严格小于除数。 -/
 def isOrdinalDivision (𝒞 : OrderedPairConvention)
     {depth : Nat} (dividend divisor quotient remainder : Term depth) :

@@ -1184,25 +1184,12 @@ theorem avatarSkeletonInitialSatisfies
     have hSelectors := (cert.splitSelectorSemantics base
         hParentLookup hParentPayload).mp hSourceValid
     rw [hSkeletonEq]
-    rcases hSelectors with ⟨literal, hLiteralMem, hLiteral⟩
-    exact
-      ⟨literal,
-        PropResolution.mem_canonicalClause_of_mem hLiteralMem,
-        hLiteral⟩
-  rcases hSkeletonBase with ⟨literal, hLiteralMem, hLiteral⟩
-  have hLiteralOutside :
-      PropLiteralLink.outsideAtomMap payload.atomMap literal = true := by
-    have hArrayMem : literal ∈ link.skeleton :=
-      Array.mem_def.mpr hLiteralMem
-    rcases Array.mem_iff_getElem.mp hArrayMem with
-      ⟨literalSlot, hLiteralSlot, hLiteralGet⟩
-    have hAt := (Array.all_eq_true.mp hOutside) literalSlot hLiteralSlot
-    simpa [hLiteralGet] using hAt
-  have hLiteralMixed :
-      literal.Holds (PropLiteralLink.valuation (cert.selectorValuation base) payload.atomMap env) := (PropLiteralLink.holds_valuation_iff_of_outsideAtomMap
-      (base := cert.selectorValuation base) (env := env)
-      hLiteralOutside).2 hLiteral
-  exact PropResolution.Clause.satisfies_of_mem (by simpa only [hInitialEq] using hLiteralMem) hLiteralMixed
+    exact PropResolution.Clause.satisfies_canonical_iff.mpr hSelectors
+  rw [hInitialEq]
+  exact hSkeletonBase.transfer fun lit hMem hHolds =>
+    (PropLiteralLink.holds_valuation_iff_of_outsideAtomMap
+      (Array.all_eq_true'.mp hOutside lit (Array.mem_def.mpr hMem))).mpr hHolds
+
 theorem avatarSplitBoundStackGuardedTopologicalStep
      [DecidableEq σ.BaseSort]
     [DecidableEq σ.FuncSymbol] [DecidableEq σ.RelSymbol]
@@ -1356,181 +1343,98 @@ theorem ordinaryBoundStackGuardedTopologicalStep
     exact cert.parentClauseSatisfiesOnBoundStackOfGuards
       base valuation index hIndex (hMergeOfParent parent hParent)
       hParents hGuards parent hParent env hEnv hBound
-  cases hPayload : (cert.dag.nodeAt index hIndex).payload with
-  | source initialIndex =>
-      exact cert.sourceBoundStackGuardedTopologicalStep
-        base valuation hProblem index hIndex initialIndex hPayload
-  | avatarSplit payload =>
-      simp [hPayload, Payload.soundnessSupported,
-        Payload.soundnessSupportedWithWitness] at hPayloadSupported
-  | avatarComponent payload =>
-      simp [hPayload, Payload.soundnessSupported,
-        Payload.soundnessSupportedWithWitness] at hPayloadSupported
-  | betaEta payload =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hPayloadCheck : payload.check = true := (Bool.and_eq_true_iff.mp (Payload.ruleCheck_of_check hNodeCheck)).2
-      refine
-        ⟨payload.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv _hBound _hGuards
-      exact BetaEta.Payload.sound contract payload env hEnv hPayloadCheck
-  | substitution evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      simp only [Substitution.Evidence.check, Bool.and_eq_true_iff]
-        at hEvidenceCheck
-      rcases hEvidenceCheck with
-        ⟨⟨⟨_hParent, _hParentCheck⟩, hSubstitutionCheck⟩,
-          _hConclusionCheck⟩
-      have hAdmissible : evidence.substitution.Admissible :=
-        TermSubstitution.check_sound hSubstitutionCheck
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      let targetEnv :=
-        TermSubstitution.semanticEnv evidence.substitution env
-      have hTargetEnv : targetEnv.WellSorted [] :=
-        TermSubstitution.semanticEnv_wellSorted hAdmissible hEnv
-      have hEnvMatches :=
-        TermSubstitution.semanticEnv_matches (substitution := evidence.substitution) (sourceEnv := env)
-      have hTargetBound :
-          Avatar.SameBoundStack targetEnv base := by
-        intro boundIndex
-        exact (hEnvMatches.1 boundIndex).trans (hBound boundIndex)
-      have hParent :=
-        hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          targetEnv hTargetEnv hTargetBound hGuards
-      exact (Clause.satisfies_applySubstitution_iff_of_envMatches
-          hAdmissible hEnvMatches evidence.parent.clause).mpr hParent
-  | standardizeApart evidence =>
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      let targetEnv :=
-        FreeVarRenaming.semanticEnv evidence.offset env
-      have hTargetEnv : targetEnv.WellSorted [] :=
-        FreeVarRenaming.semanticEnv_wellSorted hEnv
-      have hEnvMatches :=
-        FreeVarRenaming.semanticEnv_matches (offset := evidence.offset) (sourceEnv := env)
-      have hTargetBound :
-          Avatar.SameBoundStack targetEnv base := by
-        intro boundIndex
-        exact (hEnvMatches.1 boundIndex).trans (hBound boundIndex)
-      have hParent :=
-        hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          targetEnv hTargetEnv hTargetBound hGuards
-      exact (Clause.satisfies_renameFreeVars_iff_of_envMatches
-          hEnvMatches evidence.parent.clause).mpr hParent
-  | resolution evidence =>
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact Clause.satisfies_resolutionResult (hParentSat evidence.left (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards) (hParentSat evidence.right (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | factoring evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      simp only [Factoring.Evidence.check, Bool.and_eq_true_iff]
-        at hEvidenceCheck
-      have hCovered :
-          evidence.parent.clause.allLiteralsCovered evidence.conclusion =
-            true :=
-        hEvidenceCheck.1.2.2
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact Clause.satisfies_of_allLiteralsCovered hCovered (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | equalityResolution evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      simp only [EqualityResolution.Evidence.check,
-        Bool.and_eq_true_iff] at hEvidenceCheck
-      have hTerm :
-          StructuralEq.term evidence.left evidence.right = true :=
-        hEvidenceCheck.1.2.1
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact Clause.satisfies_equalityResolutionResult hTerm (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | booleanExtensionality evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      apply Clause.satisfies_normalize
-      exact Clause.satisfies_replaceLiteralAtEnd (evidence.selected_of_check hEvidenceCheck) ((evidence.satisfies_iff_replacement
-          contract hEvidenceCheck env hEnv).mp) (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | rewrite kind evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check kind (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact evidence.sound contract hEvidenceCheck (hParentSat evidence.equality (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards) (hParentSat evidence.target (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | argumentCongruence evidence =>
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact evidence.sound (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | functionExtensionality evidence =>
-      have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
-      rw [Node.check, hPayload] at hNodeCheck
-      have hEvidenceCheck :
-          evidence.check (cert.dag.nodeAt index hIndex).parents = true := by
-        simpa [Payload.ruleCheck] using
-          Payload.ruleCheck_of_check hNodeCheck
-      refine
-        ⟨evidence.conclusion,
-          by simp [Node.conclusion?, hPayload, Payload.conclusion?], ?_⟩
-      intro env hEnv hBound hGuards
-      exact evidence.sound witnessContract hEnv hEvidenceCheck (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
-          env hEnv hBound hGuards)
-  | theoryConflict payload =>
-      simp [hPayload, Payload.soundnessSupported,
-        Payload.soundnessSupportedWithWitness] at hPayloadSupported
-  | propositionalLearnedClause payload =>
-      simp [hPayload, Payload.soundnessSupported,
-        Payload.soundnessSupportedWithWitness] at hPayloadSupported
-  | residualCdcl payload =>
-      simp [hPayload, Payload.soundnessSupported,
-        Payload.soundnessSupportedWithWitness] at hPayloadSupported
+  have hNodeCheck := (cert.contract.node_contract index hIndex).node_checked
+  have hRuleCheck := Payload.ruleCheck_of_check hNodeCheck
+  cases hPayload : (cert.dag.nodeAt index hIndex).payload
+  case source initialIndex =>
+    exact cert.sourceBoundStackGuardedTopologicalStep
+      base valuation hProblem index hIndex initialIndex hPayload
+  case avatarSplit | avatarComponent | theoryConflict | propositionalLearnedClause | residualCdcl =>
+    simp [hPayload, Payload.soundnessSupported,
+      Payload.soundnessSupportedWithWitness] at hPayloadSupported
+  all_goals
+    refine ⟨_, by simp only [Node.conclusion?, hPayload, Payload.conclusion?]; rfl, ?_⟩
+    intro env hEnv hBound hGuards
+    simp only [hPayload, Payload.ruleCheck] at hRuleCheck
+  case betaEta payload =>
+    have hPayloadCheck : payload.check = true := (Bool.and_eq_true_iff.mp hRuleCheck).2
+    exact BetaEta.Payload.sound contract payload env hEnv hPayloadCheck
+  case substitution evidence =>
+    simp only [Substitution.Evidence.check, Bool.and_eq_true_iff]
+      at hRuleCheck
+    rcases hRuleCheck with
+      ⟨⟨⟨_hParent, _hParentCheck⟩, hSubstitutionCheck⟩,
+        _hConclusionCheck⟩
+    have hAdmissible : evidence.substitution.Admissible :=
+      TermSubstitution.check_sound hSubstitutionCheck
+    let targetEnv :=
+      TermSubstitution.semanticEnv evidence.substitution env
+    have hTargetEnv : targetEnv.WellSorted [] :=
+      TermSubstitution.semanticEnv_wellSorted hAdmissible hEnv
+    have hEnvMatches :=
+      TermSubstitution.semanticEnv_matches (substitution := evidence.substitution) (sourceEnv := env)
+    have hTargetBound :
+        Avatar.SameBoundStack targetEnv base := by
+      intro boundIndex
+      exact (hEnvMatches.1 boundIndex).trans (hBound boundIndex)
+    have hParent :=
+      hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        targetEnv hTargetEnv hTargetBound hGuards
+    exact (Clause.satisfies_applySubstitution_iff_of_envMatches
+        hAdmissible hEnvMatches evidence.parent.clause).mpr hParent
+  case standardizeApart evidence =>
+    let targetEnv :=
+      FreeVarRenaming.semanticEnv evidence.offset env
+    have hTargetEnv : targetEnv.WellSorted [] :=
+      FreeVarRenaming.semanticEnv_wellSorted hEnv
+    have hEnvMatches :=
+      FreeVarRenaming.semanticEnv_matches (offset := evidence.offset) (sourceEnv := env)
+    have hTargetBound :
+        Avatar.SameBoundStack targetEnv base := by
+      intro boundIndex
+      exact (hEnvMatches.1 boundIndex).trans (hBound boundIndex)
+    have hParent :=
+      hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        targetEnv hTargetEnv hTargetBound hGuards
+    exact (Clause.satisfies_renameFreeVars_iff_of_envMatches
+        hEnvMatches evidence.parent.clause).mpr hParent
+  case resolution evidence =>
+    exact Clause.satisfies_resolutionResult (hParentSat evidence.left (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards) (hParentSat evidence.right (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case factoring evidence =>
+    simp only [Factoring.Evidence.check, Bool.and_eq_true_iff]
+      at hRuleCheck
+    have hCovered :
+        evidence.parent.clause.allLiteralsCovered evidence.conclusion =
+          true :=
+      hRuleCheck.1.2.2
+    exact Clause.satisfies_of_allLiteralsCovered hCovered (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case equalityResolution evidence =>
+    simp only [EqualityResolution.Evidence.check,
+      Bool.and_eq_true_iff] at hRuleCheck
+    have hTerm :
+        StructuralEq.term evidence.left evidence.right = true :=
+      hRuleCheck.1.2.1
+    exact Clause.satisfies_equalityResolutionResult hTerm (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case booleanExtensionality evidence =>
+    apply Clause.satisfies_normalize
+    exact Clause.satisfies_replaceLiteralAtEnd (evidence.selected_of_check hRuleCheck) ((evidence.satisfies_iff_replacement
+        contract hRuleCheck env hEnv).mp) (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case rewrite kind evidence =>
+    exact evidence.sound contract hRuleCheck (hParentSat evidence.equality (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards) (hParentSat evidence.target (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case argumentCongruence evidence =>
+    exact evidence.sound (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+  case functionExtensionality evidence =>
+    exact evidence.sound witnessContract hEnv hRuleCheck (hParentSat evidence.parent (by simp [hPayload, Payload.parentClauses])
+        env hEnv hBound hGuards)
+
 theorem theoryConflictBoundStackGuardedTopologicalStep
      [DecidableEq σ.BaseSort]
     [DecidableEq σ.FuncSymbol] [DecidableEq σ.RelSymbol]

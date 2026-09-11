@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SyntaxEncode
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Basic
+import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Algebra
 import YesMetaZFC.Logic.FirstOrder.Metatheory.Quantifier.Closure
 
 /-! # 当前内核编码上的无捕获代入与全称闭合
@@ -11,58 +11,47 @@ namespace YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.SyntaxSubstitution
 open Nonlogical.BasicSetTheory NatPacket
 set_option autoImplicit false
 
-mutual
 /-- 重命名后代入只复合变量像，避免重新展开参数项的语法树。 -/
 theorem term_rename_substitute {sb sf mb mf tb tf : SetContext}
     (br : VariableRenaming sb mb) (fr : VariableRenaming sf mf)
     (bs : VariableSubstitution signature mb tb tf) (fs : VariableSubstitution signature mf tb tf) :
     {sort : SetSort} → (input : Term signature sb sf sort) →
     (input.renameMapped br fr).substituteMapped bs fs =
-      input.substituteMapped (fun entry => bs (br entry)) (fun entry => fs (fr entry))
-  | _, .bvar _ => rfl
-  | _, .fvar _ => rfl
-  | _, .app symbol args => by
-    simp only [Term.renameMapped, Term.substituteMapped]
-    rw [arguments_rename_substitute br fr bs fs args]
+      input.substituteMapped (fun entry => bs (br entry)) (fun entry => fs (fr entry)) := by
+  intro sort input
+  rw [Term.renameMapped_eq_substituteMapped, Term.substituteMapped_comp]
+  rfl
 
 theorem arguments_rename_substitute {sb sf mb mf tb tf : SetContext}
     (br : VariableRenaming sb mb) (fr : VariableRenaming sf mf)
     (bs : VariableSubstitution signature mb tb tf) (fs : VariableSubstitution signature mf tb tf) :
     {sorts : SetContext} → (args : Arguments signature sb sf sorts) →
     (args.renameMapped br fr).substituteMapped bs fs =
-      args.substituteMapped (fun entry => bs (br entry)) (fun entry => fs (fr entry))
-  | _, .nil => rfl
-  | _, .cons head tail => by
-    simp only [Arguments.renameMapped, Arguments.substituteMapped]
-    rw [term_rename_substitute br fr bs fs head, arguments_rename_substitute br fr bs fs tail]
-end
+      args.substituteMapped (fun entry => bs (br entry)) (fun entry => fs (fr entry)) := by
+  intro sort args
+  rw [Arguments.renameMapped_eq_substituteMapped, Arguments.substituteMapped_comp]
+  rfl
 
-mutual
+
 /-- 无论束缚变量如何代入，跨过新增自由槽只需跳过替换表的首项。 -/
 theorem term_weakenFree_substitute {sb sf tb tf : SetContext} (introduced : SetSort)
     (bs : VariableSubstitution signature sb tb tf)
     (fs : VariableSubstitution signature (introduced :: sf) tb tf) :
     {sort : SetSort} → (input : Term signature sb sf sort) →
     (input.weakenFree introduced).substituteMapped bs fs =
-      input.substituteMapped bs (fun entry => fs (.there entry))
-  | _, .bvar _ => rfl
-  | _, .fvar _ => rfl
-  | _, .app symbol args => by
-    simp only [Term.weakenFree_app, Term.substituteMapped]
-    rw [arguments_weakenFree_substitute introduced bs fs args]
+      input.substituteMapped bs (fun entry => fs (.there entry)) := by
+  intro sort input
+  exact Term.substituteMapped_weakenFree_tail introduced bs fs input
 
 theorem arguments_weakenFree_substitute {sb sf tb tf : SetContext} (introduced : SetSort)
     (bs : VariableSubstitution signature sb tb tf)
     (fs : VariableSubstitution signature (introduced :: sf) tb tf) :
     {sorts : SetContext} → (args : Arguments signature sb sf sorts) →
     (args.weakenFree introduced).substituteMapped bs fs =
-      args.substituteMapped bs (fun entry => fs (.there entry))
-  | _, .nil => rfl
-  | _, .cons head tail => by
-    simp only [Arguments.weakenFree_cons, Arguments.substituteMapped]
-    rw [term_weakenFree_substitute introduced bs fs head,
-      arguments_weakenFree_substitute introduced bs fs tail]
-end
+      args.substituteMapped bs (fun entry => fs (.there entry)) := by
+  intro sort args
+  exact Arguments.substituteMapped_weakenFree_tail introduced bs fs args
+
 
 mutual
 /-- 原项没有束缚变量时，任意束缚变量替换都不起作用。 -/
@@ -97,21 +86,17 @@ theorem term_weakenBound_substitute {sb sf tb tf : SetContext} (introduced : Set
     (input : Term signature sb sf sort) :
     (input.weakenBound introduced).substituteMapped bs fs =
       input.substituteMapped (fun entry => bs (.there entry)) fs := by
-  simpa only [Term.weakenBound, Term.rename, Renaming.weakenBound, Renaming.bound,
-    VariableRenaming.weaken, VariableRenaming.id, Variable.weaken] using
-    term_rename_substitute (VariableRenaming.weaken introduced) VariableRenaming.id bs fs input
+  exact Term.substituteMapped_weakenBound_tail introduced bs fs input
 
 theorem closed_term_substitute_id {free bound : SetContext}
     (bs : VariableSubstitution signature [] bound free) {sort : SetSort}
     (input : Term signature [] free sort) :
     input.substituteMapped bs (fun entry => .fvar entry) = input.embedBoundClosed bound := by
-  have h := closed_term_substitute bs VariableRenaming.id input
-  simp only [Term.renameFree, Term.rename, Renaming.free] at h
-  rw [← Term.substituteMapped_of_renaming] at h
-  change input.substituteMapped bs VariableSubstitution.freeId =
-    (input.substituteMapped VariableSubstitution.boundId VariableSubstitution.freeId).embedBoundClosed bound at h
-  rw [Term.substituteMapped_id] at h
-  exact h
+  have hid : input.renameFree VariableRenaming.id = input :=
+    (Term.substituteMapped_of_renaming VariableRenaming.id input).symm.trans
+      (Term.substituteMapped_id input)
+  simpa only [hid, VariableRenaming.id] using closed_term_substitute bs VariableRenaming.id input
+
 
 def bvar (index : Nat) : Tree := .node 0 [leaf index]
 def fvar (index : Nat) : Tree := .node 1 [leaf index]

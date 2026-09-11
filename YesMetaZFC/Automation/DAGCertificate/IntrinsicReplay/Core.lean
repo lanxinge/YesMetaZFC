@@ -28,6 +28,18 @@ def NodeTrueIn
     (index : Nat) (hIndex : index < dag.nodes.size) : Prop :=
   (compiled.nodeAt index hIndex).TrueIn M
 
+/-- 已检查快照与实际索引唯一确定编译后的父子句，不要求新的父边假设。 -/
+theorem parent_compiled_raw_of_snapshot
+    {dag : DAG σ} (compiled : Compile.CheckedDAGClauses dag)
+    (parent : ParentClause σ) (hIndex : parent.id < dag.nodes.size)
+    (hSnapshot : dag.parentSnapshotChecked parent = true) :
+    (compiled.nodeAt parent.id hIndex).raw = parent.clause := by
+  rcases DAG.parentSnapshotChecked_sound hSnapshot with ⟨node, hNode, hClause⟩
+  have hEq : node = dag.nodeAt parent.id hIndex :=
+    Option.some.inj (hNode.symm.trans (dag.node?_eq_some_nodeAt hIndex))
+  subst node
+  exact (compiled.nodeAt_raw parent.id hIndex).trans hClause
+
 /-- source 节点从同索引初始 compiled clause 直接取得真实性。 -/
 theorem source_trueIn
     (M : Logic.FirstOrder.Structure.{0, 0, 0, x} σ)
@@ -94,17 +106,7 @@ theorem parentCopy_trueIn
       (cert.dag.nodeAt index hIndex).conclusion = parent.clause :=
     LocalRuleEvidence.parentCopy_check_sound <|
       LocalRuleEvidence.ruleCheck_of_check hCheck
-  rcases DAG.parentSnapshotChecked_sound hSnapshot with
-    ⟨snapshotNode, hSnapshotNode, hSnapshotClause⟩
-  have hCanonicalNode :
-      snapshotNode = cert.dag.nodeAt parent.id hParentIndex := by
-    exact Option.some.inj <|
-      hSnapshotNode.symm.trans
-        (cert.dag.node?_eq_some_nodeAt hParentIndex)
-  subst snapshotNode
-  have hParentRaw :
-      (compiled.nodeAt parent.id hParentIndex).raw = parent.clause :=
-    (compiled.nodeAt_raw parent.id hParentIndex).trans hSnapshotClause
+  have hParentRaw := parent_compiled_raw_of_snapshot compiled parent hParentIndex hSnapshot
   have hNodeRaw :
       (compiled.nodeAt index hIndex).raw =
         (compiled.nodeAt parent.id hParentIndex).raw :=

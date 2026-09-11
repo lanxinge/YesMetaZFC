@@ -88,12 +88,8 @@ theorem right_spec_semantics (𝒩 : Structure.{0,0,0,x} S) (a output : 𝒩.Car
 
 theorem ordered_pair (hℳ : Theory.Models ℳ theory) :
     ordered_pair_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output b a
   apply (ordered_value hℳ a b output).trans
   apply Iff.trans ?_ (ordered_spec_semantics (E hℳ).model a b output).symm
   constructor
@@ -107,31 +103,24 @@ theorem ordered_pair (hℳ : Theory.Models ℳ theory) :
 
 theorem is_ordered_pair (hℳ : Theory.Models ℳ theory) :
     is_ordered_pair_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply (ordered_predicate hℳ a).trans
   apply Iff.trans ?_ (ordered_condition_semantics (E hℳ).model a).symm
   exact exists_congr (fun left => exists_congr (fun right => (ordered_value hℳ left right a).symm))
 
 theorem is_relation (hℳ : Theory.Models ℳ theory) :
     is_relation_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply (relation_predicate hℳ a).trans
   apply Iff.trans ?_ (relation_condition_semantics (E hℳ).model a).symm
   exact forall_congr' (fun element => imp_congr Iff.rfl (ordered_predicate hℳ element).symm)
 
 theorem left_projection (hℳ : Theory.Models ℳ theory) :
     left_projection_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro hPair
   have hCode := (ordered_predicate hℳ a).mp hPair
   have hGraph := ((PureCompletedStage.realizes hℳ).function .leftProjection (.cons a .nil) output).symm
@@ -140,11 +129,8 @@ theorem left_projection (hℳ : Theory.Models ℳ theory) :
 
 theorem right_projection (hℳ : Theory.Models ℳ theory) :
     right_projection_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro hPair
   have hCode := (ordered_predicate hℳ a).mp hPair
   have hGraph := ((PureCompletedStage.realizes hℳ).function .rightProjection (.cons a .nil) output).symm
@@ -156,11 +142,8 @@ theorem right_projection (hℳ : Theory.Models ℳ theory) :
 /-- 无 guard 反转定义：任意输入都交换实际总投影，再组成有序对。 -/
 theorem reverse (hℳ : Theory.Models ℳ theory) :
     ordered_pair_reverse_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons input tail =>
-  cases tail
+  apply close_of_curried
+  intro output input
   apply ((PureCompletedStage.realizes hℳ).function .orderedPairReverse (.cons input .nil) output).symm.trans
   apply (PureOmegaAndReverse.reverse_graph_correct output input).trans
   apply Iff.trans ?_ (ordered_value hℳ

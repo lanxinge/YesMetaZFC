@@ -13,8 +13,6 @@ namespace BinarySchema
 /-- 忽略固定参数、把每个输入映到自身的恒等类关系。 -/
 private def ordinalIdentity : BinarySchema 1 where
   body := Formula.extensionalEq (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.extensionalEq, Formula.FreeClosed]
 private theorem denote_ordinalIdentity_iff
     {ℳ : Structure.{u}} (hExt : Extensional ℳ) (env : Env ℳ 1) (input output : ℳ.Domain) :
     ordinalIdentity.denote env input output ↔ input = output := by

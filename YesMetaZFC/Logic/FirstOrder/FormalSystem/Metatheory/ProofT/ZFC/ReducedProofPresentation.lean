@@ -14,22 +14,17 @@ open _root_.YesMetaZFC.Automation ObjectHorn
 set_option autoImplicit false
 attribute [local irreducible] ReducedAxioms.basis
 
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory
-      (power_set_operator_theory_subset_relation_plane_theory h))
-
 /-- 已构造的一元 Δ₀ 节点条件及其全自然数正负普通推导。 -/
 def nodeTest : ObjectCheckedTrace.LocalTest intrinsic_zfc_theory :=
   ObjectProofNode.localTest intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest
 
 theorem nodeTest_checked : nodeTest.checked = ObjectProofNode.checked ReducedAxiomNumber.localTest.checked :=
   ObjectProofNode.localTest_checked intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest
 
 private theorem node_sound (code : Nat) (h : nodeTest.checked code = true) :
@@ -52,7 +47,7 @@ private theorem node_accept {free : SetContext} {formula : SetOpenFormula free}
 def reduced : Delta1ProofPresentation intrinsic_zfc_theory ReducedAxioms.theory :=
   ObjectProofNode.ofNodeTest ReducedProofTree.codec intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity nodeTest node_sound node_accept
 
 /-- 最终对象证明关系表示原支撑理论的普通 Hilbert 推导。 -/
@@ -63,7 +58,7 @@ def presentation : Delta1ProofPresentation intrinsic_zfc_theory intrinsic_zfc_th
 def rowTest : ObjectCheckedTrace.LocalTest intrinsic_zfc_theory :=
   ObjectProofRow.localTest intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity nodeTest
 
 theorem graph_condition : presentation.graph.condition = ObjectProofTree.template rowTest.condition := rfl

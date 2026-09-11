@@ -21,78 +21,49 @@ theorem structural_syntax (hℳ : Theory.Models ℳ theory) :
     structural_syntax_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ structural_syntax_definition_axiom (by decide +kernel)).mp
   refine ⟨⟨?_, ?_⟩, ?_⟩
-  · apply close_of_values
-    intro args
-    cases args with | cons b tail1 =>
-    cases tail1 with | cons a tail2 =>
-    cases tail2
+  · apply close_of_curried
+    intro b a
     exact PureRelatedStage.term_definition hℳ a b
-  · apply close_of_values
-    intro args
-    cases args with | cons c tail1 =>
-    cases tail1 with | cons b tail2 =>
-    cases tail2 with | cons a tail3 =>
-    cases tail3
+  · apply close_of_curried
+    intro c b a
     exact PureRelatedStage.term_list_definition hℳ a b c
-  · apply close_of_values
-    intro args
-    cases args with | cons b tail1 =>
-    cases tail1 with | cons a tail2 =>
-    cases tail2
+  · apply close_of_curried
+    intro b a
     exact PureRelatedStage.formula_definition hℳ a b
 
 theorem related_term (hℳ : Theory.Models ℳ theory) :
     related_term_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_term_code_at_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRelatedStage.related_term_definition hℳ a b c
 
 theorem related_term_list (hℳ : Theory.Models ℳ theory) :
     related_term_list_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_term_list_code_at_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons d tail1 =>
-  cases tail1 with | cons c tail2 =>
-  cases tail2 with | cons b tail3 =>
-  cases tail3 with | cons a tail4 =>
-  cases tail4
+  apply close_of_curried
+  intro d c b a
   exact PureRelatedStage.related_term_list_definition hℳ a b c d
 
 theorem related_formula (hℳ : Theory.Models ℳ theory) :
     related_formula_code_at_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_formula_code_at_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRelatedStage.related_formula_definition hℳ a b c
 
 theorem related_term_set (hℳ : Theory.Models ℳ theory) :
     related_term_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_term_set_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRelatedStage.term_set_definition hℳ a b
 
 theorem related_formula_set (hℳ : Theory.Models ℳ theory) :
     related_formula_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_formula_set_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRelatedStage.formula_set_definition hℳ a b
 
 theorem syntax_transform_parameter_order (𝒩 : Structure.{0,0,0,x} S) (a b c d e f g : 𝒩.Carrier s) :
@@ -107,31 +78,7 @@ theorem syntax_transform_parameter_order (𝒩 : Structure.{0,0,0,x} S) (a b c d
   rw [syntax_transform_definition_instance_substituteFree] at h
   have hEnv : env.pullback (Substitution.free_map (argumentsSubstitution args)) =
       (templateEnv (.cons a (.cons b (.cons c (.cons d (.cons e (.cons f (.cons g .nil))))))) : Env 𝒩 [] [s,s,s,s,s,s,s]) := by
-    apply Env.ext
-    · intro sort entry; cases entry
-    · intro sort entry
-      cases entry with
-      | here => rfl
-      | there entry =>
-        cases entry with
-        | here => rfl
-        | there entry =>
-          cases entry with
-          | here => rfl
-          | there entry =>
-            cases entry with
-            | here => rfl
-            | there entry =>
-              cases entry with
-              | here => rfl
-              | there entry =>
-                cases entry with
-                | here => rfl
-                | there entry =>
-                  cases entry with
-                  | here => rfl
-                  | there entry =>
-                    cases entry
+    exact pullback_free_arguments env args
   rw [hEnv] at h
   exact h
 
@@ -163,19 +110,7 @@ theorem free_variable_occurs_parameter_order (𝒩 : Structure.{0,0,0,x} S) (a b
   rw [free_variable_occurs_definition_instance_substituteFree] at h
   have hEnv : env.pullback (Substitution.free_map (argumentsSubstitution args)) =
       (templateEnv (.cons a (.cons b (.cons c .nil))) : Env 𝒩 [] [s,s,s]) := by
-    apply Env.ext
-    · intro sort entry; cases entry
-    · intro sort entry
-      cases entry with
-      | here => rfl
-      | there entry =>
-        cases entry with
-        | here => rfl
-        | there entry =>
-          cases entry with
-          | here => rfl
-          | there entry =>
-            cases entry
+    exact pullback_free_arguments env args
   rw [hEnv] at h
   exact h
 
@@ -194,50 +129,27 @@ theorem free_variable_occurs (hℳ : Theory.Models ℳ theory) :
 theorem structure_axiom (hℳ : Theory.Models ℳ theory) :
     structure_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ structure_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRelatedStage.structure_definition hℳ a b c
 
 theorem modus_ponens (hℳ : Theory.Models ℳ theory) :
     modus_ponens_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ modus_ponens_definition_axiom (by decide +kernel)).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRelatedStage.modus_ponens_definition hℳ a b c
 
 theorem term_value (hℳ : Theory.Models ℳ theory) :
     term_value_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons f tail1 =>
-  cases tail1 with | cons e tail2 =>
-  cases tail2 with | cons d tail3 =>
-  cases tail3 with | cons c tail4 =>
-  cases tail4 with | cons b tail5 =>
-  cases tail5 with | cons a tail6 =>
-  cases tail6
+  apply close_of_curried
+  intro f e d c b a
   exact PureCompletedStage.termValue_definition hℳ a b c d e f
 
 theorem term_list_value (hℳ : Theory.Models ℳ theory) :
     term_list_value_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons g tail1 =>
-  cases tail1 with | cons f tail2 =>
-  cases tail2 with | cons e tail3 =>
-  cases tail3 with | cons d tail4 =>
-  cases tail4 with | cons c tail5 =>
-  cases tail5 with | cons b tail6 =>
-  cases tail6 with | cons a tail7 =>
-  cases tail7
+  apply close_of_curried
+  intro g f e d c b a
   exact PureCompletedStage.termListValue_definition hℳ a b c d e f g
 
 theorem related_syntax (hℳ : Theory.Models ℳ theory) :
@@ -248,24 +160,18 @@ theorem nonlogical_symbols (hℳ : Theory.Models ℳ theory) :
     related_nonlogical_symbol_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRelatedSentence hℳ related_nonlogical_symbol_set_definition_axiom (by decide +kernel)).mp
   have h := PureRelatedStage.nonlogical_definition hℳ
-  have hEnv : (templateEnv .nil : Env (PureRelatedStage.expansion hℳ).model [] []) = Env.empty := by
-    apply Env.ext <;> intro sort entry <;> cases entry
-  rwa [hEnv] at h
+  rwa [templateEnv_nil] at h
 
 theorem schema_axioms (hℳ : Theory.Models ℳ theory) :
     (propositional_axiom_schema_definition_axiom.conj
       (quantifier_axiom_schema_definition_axiom.conj equality_axiom_schema_definition_axiom)).satisfies
       (Env.empty : Env (E hℳ).model [] []) := by
   have h := PureCompletedStage.schema_axioms hℳ
-  have hEnv : (templateEnv .nil : Env (E hℳ).model [] []) = Env.empty := by
-    apply Env.ext <;> intro sort entry <;> cases entry
-  rwa [hEnv] at h
+  rwa [templateEnv_nil] at h
 
 theorem logical_axioms (hℳ : Theory.Models ℳ theory) :
     logical_axiom_code_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   have h := PureCompletedStage.logical_code_axioms hℳ
-  have hEnv : (templateEnv .nil : Env (E hℳ).model [] []) = Env.empty := by
-    apply Env.ext <;> intro sort entry <;> cases entry
-  rwa [hEnv] at h
+  rwa [templateEnv_nil] at h
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureFinalSyntax

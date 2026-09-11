@@ -252,62 +252,21 @@ def mapping_predicate_theory : SetTheory :=
 def function_application_theory : SetTheory :=
   Theory.insert function_application_definition_axiom mapping_predicate_theory
 
-theorem relation_composition_operator_theory_subset_equivalence_relation_theory
-    {sentence : SetSentence}
-    (hSentence : relation_composition_operator_theory sentence) :
-    equivalence_relation_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_composition_operator_theory ⊆ equivalence_relation_theory
 
-theorem equivalence_relation_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : equivalence_relation_theory sentence) :
-    function_predicate_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset equivalence_relation_theory ⊆ function_predicate_theory
 
-theorem function_predicate_theory_subset_mapping_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : function_predicate_theory sentence) :
-    mapping_predicate_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset function_predicate_theory ⊆ mapping_predicate_theory
 
-theorem mapping_predicate_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : mapping_predicate_theory sentence) :
-    function_application_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset mapping_predicate_theory ⊆ function_application_theory
 
-theorem relation_composition_operator_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_composition_operator_theory sentence) :
-    function_predicate_theory sentence :=
-  equivalence_relation_theory_subset_function_predicate_theory
-    (relation_composition_operator_theory_subset_equivalence_relation_theory
-      hSentence)
+derive_theory_subset relation_composition_operator_theory ⊆ function_predicate_theory
 
-theorem relation_function_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    function_predicate_theory sentence :=
-  relation_composition_operator_theory_subset_function_predicate_theory
-    (relation_plane_theory_subset_relation_composition_operator_theory
-      (relation_function_theory_subset_relation_plane_theory hSentence))
+derive_theory_subset relation_function_theory ⊆ function_predicate_theory
 
-theorem relation_predicate_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_predicate_theory sentence) :
-    function_predicate_theory sentence :=
-  relation_composition_operator_theory_subset_function_predicate_theory
-    (relation_plane_theory_subset_relation_composition_operator_theory
-      (relation_predicate_theory_subset_relation_plane_theory hSentence))
+derive_theory_subset relation_predicate_theory ⊆ function_predicate_theory
 
-theorem relation_composition_operator_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : relation_composition_operator_theory sentence) :
-    function_application_theory sentence :=
-  mapping_predicate_theory_subset_function_application_theory
-    (function_predicate_theory_subset_mapping_predicate_theory
-      (relation_composition_operator_theory_subset_function_predicate_theory
-        hSentence))
+derive_theory_subset relation_composition_operator_theory ⊆ function_application_theory
 
 /-! ## 项自然性 -/
 

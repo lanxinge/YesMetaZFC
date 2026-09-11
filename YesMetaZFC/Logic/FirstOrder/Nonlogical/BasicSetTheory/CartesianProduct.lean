@@ -250,49 +250,19 @@ def cartesian_product_operator_theory : SetTheory :=
 
 /-! ## 理论嵌入 -/
 
-theorem ordered_pair_operator_theory_subset_cartesian_product_base_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    cartesian_product_base_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset ordered_pair_operator_theory ⊆ cartesian_product_base_theory
 
-theorem power_set_operator_theory_subset_cartesian_product_base_theory
-    {sentence : SetSentence}
-    (hSentence : power_set_operator_theory sentence) :
-    cartesian_product_base_theory sentence :=
-  Or.inr (Or.inl hSentence)
+derive_theory_subset power_set_operator_theory ⊆ cartesian_product_base_theory
 
-theorem binary_union_operator_theory_subset_cartesian_product_base_theory
-    {sentence : SetSentence}
-    (hSentence : binary_union_operator_theory sentence) :
-    cartesian_product_base_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset binary_union_operator_theory ⊆ cartesian_product_base_theory
 
-theorem cartesian_product_base_theory_subset_cartesian_product_theory
-    {sentence : SetSentence}
-    (hSentence : cartesian_product_base_theory sentence) :
-    cartesian_product_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset cartesian_product_base_theory ⊆ cartesian_product_theory
 
-theorem cartesian_product_theory_subset_cartesian_product_operator_theory
-    {sentence : SetSentence}
-    (hSentence : cartesian_product_theory sentence) :
-    cartesian_product_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset cartesian_product_theory ⊆ cartesian_product_operator_theory
 
-theorem cartesian_product_base_theory_subset_cartesian_product_operator_theory
-    {sentence : SetSentence}
-    (hSentence : cartesian_product_base_theory sentence) :
-    cartesian_product_operator_theory sentence :=
-  cartesian_product_theory_subset_cartesian_product_operator_theory
-    (cartesian_product_base_theory_subset_cartesian_product_theory hSentence)
+derive_theory_subset cartesian_product_base_theory ⊆ cartesian_product_operator_theory
 
-theorem extensionality_theory_subset_cartesian_product_base_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    cartesian_product_base_theory sentence :=
-  ordered_pair_operator_theory_subset_cartesian_product_base_theory
-    (extensionality_theory_subset_ordered_pair_operator_theory hSentence)
+derive_theory_subset extensionality_theory ⊆ cartesian_product_base_theory
 
 /-! ## 复合母集合同 -/
 

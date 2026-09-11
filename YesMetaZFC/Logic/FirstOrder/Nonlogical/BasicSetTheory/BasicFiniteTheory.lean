@@ -134,35 +134,17 @@ def basic_finite_theory : SetTheory :=
 
 /-! ## 理论嵌入 -/
 
-theorem symmetric_difference_theory_subset_finite_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : symmetric_difference_theory sentence) :
-    finite_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset symmetric_difference_theory ⊆ finite_predicate_theory
 
-theorem finite_predicate_theory_subset_equinumerous_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : finite_predicate_theory sentence) :
-    equinumerous_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset finite_predicate_theory ⊆ equinumerous_predicate_theory
 
-theorem equinumerous_predicate_theory_subset_cardinality_leq_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : equinumerous_predicate_theory sentence) :
-    cardinality_leq_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset equinumerous_predicate_theory ⊆ cardinality_leq_predicate_theory
 
-theorem cardinality_leq_predicate_theory_subset_cardinality_strict_less_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : cardinality_leq_predicate_theory sentence) :
-    cardinality_strict_less_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset cardinality_leq_predicate_theory ⊆ cardinality_strict_less_predicate_theory
 
-theorem cardinality_strict_less_predicate_theory_subset_dedekind_finite_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : cardinality_strict_less_predicate_theory sentence) :
-    dedekind_finite_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset cardinality_strict_less_predicate_theory ⊆ dedekind_finite_predicate_theory
 
-theorem dedekind_finite_predicate_theory_subset_basic_finite_theory
-    {sentence : SetSentence}
-    (hSentence : dedekind_finite_predicate_theory sentence) :
-    basic_finite_theory sentence := hSentence
+derive_theory_subset dedekind_finite_predicate_theory ⊆ basic_finite_theory
 
 end BasicSetTheory
 end Nonlogical

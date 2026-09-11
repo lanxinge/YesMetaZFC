@@ -138,25 +138,13 @@ def natural_subset_type_theory : SetTheory :=
 def natural_set_theory : SetTheory :=
   natural_subset_type_theory
 
-theorem infinity_theory_subset_unbounded_subset_theory
-    {sentence : SetSentence}
-    (hSentence : infinity_theory sentence) :
-    unbounded_subset_theory sentence := Or.inr hSentence
+derive_theory_subset infinity_theory ⊆ unbounded_subset_theory
 
-theorem unbounded_subset_theory_subset_bounded_subset_theory
-    {sentence : SetSentence}
-    (hSentence : unbounded_subset_theory sentence) :
-    bounded_subset_theory sentence := Or.inr hSentence
+derive_theory_subset unbounded_subset_theory ⊆ bounded_subset_theory
 
-theorem bounded_subset_theory_subset_natural_order_type_theory
-    {sentence : SetSentence}
-    (hSentence : bounded_subset_theory sentence) :
-    natural_order_type_theory sentence := Or.inr hSentence
+derive_theory_subset bounded_subset_theory ⊆ natural_order_type_theory
 
-theorem natural_order_type_theory_subset_natural_subset_type_theory
-    {sentence : SetSentence}
-    (hSentence : natural_order_type_theory sentence) :
-    natural_subset_type_theory sentence := Or.inr hSentence
+derive_theory_subset natural_order_type_theory ⊆ natural_subset_type_theory
 
 end BasicSetTheory
 end Nonlogical

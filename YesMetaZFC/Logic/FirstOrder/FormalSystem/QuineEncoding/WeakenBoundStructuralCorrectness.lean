@@ -29,18 +29,6 @@ private theorem finite_numeral_not_mem_expression
         (successor_operator_theory_subset_formal_language_encoding_theory
           hFormula)) h
 
-private theorem finite_numeral_ne_expression
-    {left right : Nat} (hNe : left ≠ right) :
-    ([] : Context signature []) ⊢ₘ[expression_encoding_theory]
-      ¬ₘ (numₘ(left) ≐ₘ numₘ(right)) := by
-  exact ProofT.numeral_ne
-    (hIrreflexive := fun {formula} hFormula =>
-      membership_irreflexive_theory_subset_expression_encoding_theory hFormula)
-    (hSuccessor := fun {formula} hFormula =>
-      formal_language_encoding_theory_subset_expression_encoding_theory
-        (successor_operator_theory_subset_formal_language_encoding_theory
-          hFormula)) hNe
-
 private theorem term_weaken_bound_scope
     (depth variableIndex source target : SetOpenTerm [])
     (hVariable : ([] : Context signature []) ⊢ₘ[expression_encoding_theory]

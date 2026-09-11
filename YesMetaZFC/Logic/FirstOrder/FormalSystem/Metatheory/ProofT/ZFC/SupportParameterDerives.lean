@@ -19,17 +19,13 @@ def condition {bound free : SetContext} (kind : Kind) (input : SetTerm bound fre
 theorem condition_delta0 {bound free : SetContext} (kind : Kind) (input : SetTerm bound free) :
     Formula.IsDelta0 set_levy_bound (condition kind input) := ObjectTermSyntax.parameter_delta0 _ _
 
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory (power_set_operator_theory_subset_relation_plane_theory h))
-
 /-- 实际原公理分支的成功直接给出数值树码上的普通推导。 -/
 theorem positive (kind : Kind) (input : Tree) (h : actual kind input = true) :
     Derives intrinsic_zfc_theory [] (condition kind (numₘ(treeValue input) : Code)) := by
   rw [actual_eq_decode] at h
   obtain ⟨parameters, hParameters⟩ := Option.isSome_iff_exists.mp h
   exact ObjectTermSyntax.parameter_positive intrinsic_zfc_certificate_core
-    intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport containsPower
+    intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity kind.arity input parameters hParameters
 
 theorem negative (kind : Kind) (input : Tree) (h : actual kind input = false) :
@@ -44,7 +40,7 @@ theorem positive_at_tree (kind : Kind) (input : Tree) (h : actual kind input = t
   rw [actual_eq_decode] at h
   obtain ⟨parameters, hParameters⟩ := Option.isSome_iff_exists.mp h
   exact ObjectTermSyntax.parameter_positive_at_tree intrinsic_zfc_certificate_core
-    intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport containsPower
+    intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity kind.arity input parameters hParameters
 
 theorem negative_at_tree (kind : Kind) (input : Tree) (h : actual kind input = false) :

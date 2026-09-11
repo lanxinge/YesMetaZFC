@@ -30,123 +30,47 @@ def finite_sequence_support_theory : SetTheory :=
 
 namespace finite_sequence_support_theory
 
-theorem contains_membership_irreflexive
-    {sentence : SetSentence}
-    (hSentence : membership_irreflexive_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset membership_irreflexive_theory ⊆ finite_sequence_support_theory => contains_membership_irreflexive
 
-theorem contains_empty_set_symbol
-    {sentence : SetSentence}
-    (hSentence : empty_set_symbol_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inl hSentence
+derive_theory_subset empty_set_symbol_theory ⊆ finite_sequence_support_theory => contains_empty_set_symbol
 
-theorem contains_successor
-    {sentence : SetSentence}
-    (hSentence : successor_operator_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inl hSentence
+derive_theory_subset successor_operator_theory ⊆ finite_sequence_support_theory => contains_successor
 
-theorem contains_binary_union
-    {sentence : SetSentence}
-    (hSentence : binary_union_operator_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inr <| Or.inl hSentence
+derive_theory_subset binary_union_operator_theory ⊆ finite_sequence_support_theory => contains_binary_union
 
-theorem contains_ordered_pair
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl hSentence
+derive_theory_subset ordered_pair_operator_theory ⊆ finite_sequence_support_theory => contains_ordered_pair
 
-theorem contains_function_application
-    {sentence : SetSentence}
-    (hSentence : function_application_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl hSentence
+derive_theory_subset function_application_theory ⊆ finite_sequence_support_theory => contains_function_application
 
-theorem contains_function_predicate
-    {sentence : SetSentence}
-    (hSentence : function_predicate_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  contains_function_application
-    (function_predicate_theory_subset_function_application_theory hSentence)
+derive_theory_subset function_predicate_theory ⊆ finite_sequence_support_theory => contains_function_predicate
 
-theorem contains_finite_sequence_flatten
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_flatten_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inl hSentence
+derive_theory_subset finite_sequence_flatten_theory ⊆ finite_sequence_support_theory => contains_finite_sequence_flatten
 
-theorem contains_finite_sequence_concatenation
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_concatenation_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  contains_finite_sequence_flatten
-    (nonempty_sequence_space_theory_subset_finite_sequence_flatten_theory
-      (nonempty_sequence_separation_theory_subset_nonempty_sequence_space_theory
-        (finite_sequence_concatenation_theory_subset_nonempty_sequence_separation_theory
-          hSentence)))
+derive_theory_subset finite_sequence_concatenation_theory ⊆ finite_sequence_support_theory => contains_finite_sequence_concatenation
 
-theorem contains_finite_sequence_formal_system
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_formal_system_theory sentence) :
-    finite_sequence_support_theory sentence := by
-  apply contains_finite_sequence_flatten
-  change finite_sequence_flatten_theory sentence
-  exact hSentence
+derive_theory_subset finite_sequence_formal_system_theory ⊆ finite_sequence_support_theory => contains_finite_sequence_formal_system
 
-theorem contains_finite_sequence_space
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_space_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr <| Or.inr hSentence
+derive_theory_subset finite_sequence_space_theory ⊆ finite_sequence_support_theory => contains_finite_sequence_space
 
-theorem contains_nonempty_finite_sequence_space
-    {sentence : SetSentence}
-    (hSentence : nonempty_finite_sequence_space_theory sentence) :
-    finite_sequence_support_theory sentence :=
-  contains_finite_sequence_flatten
-    (nonempty_sequence_space_theory_subset_finite_sequence_flatten_theory
-      hSentence)
+derive_theory_subset nonempty_finite_sequence_space_theory ⊆ finite_sequence_support_theory => contains_nonempty_finite_sequence_space
 
 end finite_sequence_support_theory
 
+open finite_sequence_support_theory in
 /-- 最小有限序列支撑理论的规范支撑实例。 -/
 theorem finite_sequence_support_instance :
     FiniteSequenceSpaceSupport finite_sequence_support_theory where
-  toFiniteSequenceEvaluationSupport :=
-    { toFiniteSequenceGraphSupport :=
-        { toArithmeticSupport :=
-            { contains_membership_irreflexive := fun hSentence =>
-                finite_sequence_support_theory.contains_membership_irreflexive
-                  hSentence
-              contains_empty_set := fun hSentence =>
-                finite_sequence_support_theory.contains_empty_set_symbol
-                  hSentence
-              contains_successor := fun hSentence =>
-                finite_sequence_support_theory.contains_successor hSentence }
-          contains_binary_union := fun hSentence =>
-            finite_sequence_support_theory.contains_binary_union hSentence
-          contains_ordered_pair := fun hSentence =>
-            finite_sequence_support_theory.contains_ordered_pair hSentence
-          contains_function_predicate := fun hSentence =>
-            finite_sequence_support_theory.contains_function_predicate
-              hSentence
-          contains_finite_sequence_concatenation := fun hSentence =>
-            finite_sequence_support_theory.contains_finite_sequence_concatenation
-              hSentence }
-      contains_function_application := fun hSentence =>
-        finite_sequence_support_theory.contains_function_application hSentence
-      contains_finite_sequence_formal_system := fun hSentence =>
-        finite_sequence_support_theory.contains_finite_sequence_formal_system
-          hSentence }
-  contains_finite_sequence_space := fun hSentence =>
-    finite_sequence_support_theory.contains_finite_sequence_space hSentence
-  contains_nonempty_finite_sequence_space := fun hSentence =>
-    finite_sequence_support_theory.contains_nonempty_finite_sequence_space
-      hSentence
+  contains_membership_irreflexive := contains_membership_irreflexive
+  contains_empty_set := contains_empty_set_symbol
+  contains_successor := contains_successor
+  contains_binary_union := contains_binary_union
+  contains_ordered_pair := contains_ordered_pair
+  contains_function_predicate := contains_function_predicate
+  contains_finite_sequence_concatenation := contains_finite_sequence_concatenation
+  contains_function_application := contains_function_application
+  contains_finite_sequence_formal_system := contains_finite_sequence_formal_system
+  contains_finite_sequence_space := contains_finite_sequence_space
+  contains_nonempty_finite_sequence_space := contains_nonempty_finite_sequence_space
 
 /-- 任意包含最小支撑理论的对象理论直接获得有限序列空间支撑。 -/
 theorem finite_sequence_space_support_of_extends

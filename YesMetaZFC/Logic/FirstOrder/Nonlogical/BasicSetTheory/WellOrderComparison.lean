@@ -141,30 +141,15 @@ def well_order_comparison_theory : SetTheory :=
   Theory.insert relation_restriction_definition_axiom
     initial_segment_operator_theory
 
-theorem order_operator_theory_subset_well_order_comparison_base_theory
-    {sentence : SetSentence}
-    (hSentence : order_operator_theory sentence) :
-    well_order_comparison_base_theory sentence := Or.inl hSentence
+derive_theory_subset order_operator_theory ⊆ well_order_comparison_base_theory
 
-theorem binary_intersection_operator_theory_subset_well_order_comparison_base_theory
-    {sentence : SetSentence}
-    (hSentence : binary_intersection_operator_theory sentence) :
-    well_order_comparison_base_theory sentence := Or.inr hSentence
+derive_theory_subset binary_intersection_operator_theory ⊆ well_order_comparison_base_theory
 
-theorem well_order_comparison_base_theory_subset_strict_initial_segment_separation_theory
-    {sentence : SetSentence}
-    (hSentence : well_order_comparison_base_theory sentence) :
-    strict_initial_segment_separation_theory sentence := Or.inr hSentence
+derive_theory_subset well_order_comparison_base_theory ⊆ strict_initial_segment_separation_theory
 
-theorem strict_initial_segment_separation_theory_subset_initial_segment_operator_theory
-    {sentence : SetSentence}
-    (hSentence : strict_initial_segment_separation_theory sentence) :
-    initial_segment_operator_theory sentence := Or.inr hSentence
+derive_theory_subset strict_initial_segment_separation_theory ⊆ initial_segment_operator_theory
 
-theorem initial_segment_operator_theory_subset_well_order_comparison_theory
-    {sentence : SetSentence}
-    (hSentence : initial_segment_operator_theory sentence) :
-    well_order_comparison_theory sentence := Or.inr hSentence
+derive_theory_subset initial_segment_operator_theory ⊆ well_order_comparison_theory
 
 end BasicSetTheory
 end Nonlogical

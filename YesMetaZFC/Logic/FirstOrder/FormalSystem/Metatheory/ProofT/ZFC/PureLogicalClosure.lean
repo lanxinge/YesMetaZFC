@@ -103,10 +103,7 @@ theorem body_mono (hℳ : Theory.Models ℳ theory) (first second : Carrier ℳ)
   · exact Or.inr ⟨source,index,hSubset source hMember,hClosure⟩
 
 theorem syntax_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues PureAllSchemaStage.interpretation args = mapValues PureSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+    mapValues PureAllSchemaStage.interpretation args = mapValues PureSyntaxStage.interpretation args := rfl
 
 theorem universal_bounded (hℳ : Theory.Models ℳ theory) (code : Carrier ℳ) :
     membership ℳ ((universal_formula_code_term (.fvar .here)).eval (templateEnv (.cons code .nil) : Env (E hℳ).model [] [s])) (PureNaturalInduction.omega hℳ) := by

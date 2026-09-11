@@ -16,51 +16,22 @@ namespace BinarySchema
 /-- 输出 `left + input` 的直接关系模式。 -/
 private def naturalAdditionLeft (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := Formula.isOrdinalAddition 𝒞 (.bound 0) (.bound 2) (.bound 1)
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 输出 `input + left` 的直接关系模式。 -/
 private def naturalAdditionRight (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := Formula.isOrdinalAddition 𝒞 (.bound 0) (.bound 1) (.bound 2)
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 输出 `left * input` 的直接关系模式。 -/
 private def naturalMultiplicationLeft (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := Formula.isOrdinalMultiplication 𝒞 (.bound 0) (.bound 2) (.bound 1)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 输出 `input * left` 的直接关系模式。 -/
 private def naturalMultiplicationRight (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := Formula.isOrdinalMultiplication 𝒞 (.bound 0) (.bound 1) (.bound 2)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- `successor * input` 与 `predecessor * input + input` 的关系模式。 -/
 private def naturalMultiplicationSuccessorAdd (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
       Term.newest (.bound 3) (.bound 2)) (Formula.isOrdinalAddition 𝒞 (.bound 1) Term.newest (.bound 2))
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication,
-      Formula.isOrdinalAddition, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 固定后继左因子的乘法关系模式。 -/
 private def naturalMultiplicationAtSuccessor (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := Formula.isOrdinalMultiplication 𝒞 (.bound 0) (.bound 3) (.bound 1)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 end BinarySchema
 namespace UnarySchema
 /--
@@ -70,14 +41,6 @@ namespace UnarySchema
 private def natPrimeMultiplier (𝒞 : OrderedPairConvention) : UnarySchema 3 where
   body := .conj (.existsE <| .mem (.bound 0) (.bound 1)) (.existsE <| .conj (Formula.isOrdinalMultiplication 𝒞 (.bound 0) (.bound 3) (.bound 1)) (.conj
         (.mem (.bound 4) (.bound 2)) (.existsE <| .conj (.mem (.bound 0) (.bound 3)) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) (.bound 5) (.bound 0)))))
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /--
 固定自然数 `base` 与素数 `prime` 后，筛出所有指数 `exponent`，
 使 `prime ∣ base ^ exponent`。
@@ -85,15 +48,6 @@ private def natPrimeMultiplier (𝒞 : OrderedPairConvention) : UnarySchema 3 wh
 private def natPrimePowerExponent (𝒞 : OrderedPairConvention) : UnarySchema 3 where
   body := .existsE <| .conj (Formula.isOrdinalExponentiation 𝒞 (.bound 0) (.bound 4) (.bound 1)) (.conj (.mem (.bound 3) (.bound 2)) (.existsE <| .conj
         (.mem (.bound 0) (.bound 3)) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) (.bound 4) (.bound 0))))
-  freeClosed := by
-    simp [Formula.isOrdinalExponentiation,
-      Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 end UnarySchema
 end Project
 end Definitional

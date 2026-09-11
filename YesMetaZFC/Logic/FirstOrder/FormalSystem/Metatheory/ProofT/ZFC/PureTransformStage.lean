@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Automation.RelationalCongruence
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSyntaxTransform
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureFreeVariableOccurs
@@ -29,10 +30,7 @@ noncomputable def localExpansion (hℳ : Theory.Models ℳ theory) : Expansion l
   function := (E hℳ).function
   relation := relations hℳ (state hℳ)
 theorem local_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues localInterpretation args = mapValues PureSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+    mapValues localInterpretation args = mapValues PureSyntaxStage.interpretation args := rfl
 
 theorem local_realizes (hℳ : Theory.Models ℳ theory) : Realizes (localExpansion hℳ) where
   function symbol args output := by
@@ -75,10 +73,7 @@ noncomputable def localExpansion (hℳ : Theory.Models ℳ theory) : Expansion l
   function := (E hℳ).function
   relation := relations hℳ (state hℳ)
 theorem local_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues localInterpretation args = mapValues PureSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+    mapValues localInterpretation args = mapValues PureSyntaxStage.interpretation args := rfl
 
 theorem local_realizes (hℳ : Theory.Models ℳ theory) : Realizes (localExpansion hℳ) where
   function symbol args output := by
@@ -121,18 +116,13 @@ def relationCovered : RelationSymbol → Bool
   | .syntaxTransform | .freeVariableOccurs => true
   | symbol => PureLogicalSchemaStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureLogicalSchemaStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+/-- 当前扩张保留上一完整阶段的覆盖与实际图。 -/
+theorem prior_extension : CoveredExtension PureLogicalSchemaStage.interpretation interpretation.function interpretation.relation
+    PureLogicalSchemaStage.functionCovered PureLogicalSchemaStage.relationCovered functionCovered relationCovered := by
+  constructor <;> intro symbol h <;> cases symbol <;> first | exact ⟨rfl, rfl⟩ | contradiction
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
-  intro symbol args
-  change ∃ output, (PureLogicalSchemaStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ∧
-    ∀ other, (PureLogicalSchemaStage.interpretation.function symbol).satisfies (templateEnv (.cons other (mapValues interpretation args))) → other = output
-  rw [map_values]
-  exact PureLogicalSchemaStage.functional hℳ symbol args
+  exact PureLogicalSchemaStage.functional hℳ
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
   _root_.YesMetaZFC.Automation.RelationalTranslation.expansion (functional hℳ)
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) := expansion_realizes (functional hℳ)
@@ -142,36 +132,16 @@ theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} 
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureLogicalSchemaStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureLogicalSchemaStage.expansion hℳ) (PureLogicalSchemaStage.realizes hℳ) body args).symm.trans hNew
-
-theorem syntax_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+  exact transfer_regraph _ _ _ _ (PureLogicalSchemaStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem syntax_transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureSyntaxStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureSyntaxStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,syntax_map_values] at hNew
-  exact (openFormula_correct (PureSyntaxStage.expansion hℳ) (PureSyntaxStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureSyntaxStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem prior_function_graph (symbol : FunctionSymbol) : interpretation.function symbol = PureLogicalSchemaStage.interpretation.function symbol := rfl
-theorem prior_relation_graph (symbol : RelationSymbol) (hCovered : PureLogicalSchemaStage.relationCovered symbol = true) :
-    interpretation.relation symbol = PureLogicalSchemaStage.interpretation.relation symbol := by
-  cases symbol <;> first | rfl | contradiction
-
-theorem syntaxTransform_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureSyntaxTransform.localInterpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 def syntaxTransform_covered : RelationSymbol → Bool
   | .syntaxTransform => true
   | symbol => PureSyntaxStage.relationCovered symbol
@@ -190,16 +160,10 @@ theorem syntaxTransform_definition (hℳ : Theory.Models ℳ theory) (a0 a1 a2 a
   let sentence : Formula S [] [s,s,s,s,s,s,s] := FormalSystem.syntax_transform_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here))) (.fvar (.there (.there (.there .here)))) (.fvar (.there (.there (.there (.there .here))))) (.fvar (.there (.there (.there (.there (.there .here)))))) (.fvar (.there (.there (.there (.there (.there (.there .here)))))))
   have hOld := (openFormula_correct (PureSyntaxTransform.localExpansion hℳ) (PureSyntaxTransform.local_realizes hℳ) sentence (.cons a0 (.cons a1 (.cons a2 (.cons a3 (.cons a4 (.cons a5 (.cons a6 .nil)))))))).mpr (PureSyntaxTransform.local_definition hℳ a0 a1 a2 a3 a4 a5 a6)
   apply (openFormula_correct (expansion hℳ) (realizes hℳ) sentence (.cons a0 (.cons a1 (.cons a2 (.cons a3 (.cons a4 (.cons a5 (.cons a6 .nil)))))))).mp
-  rw [syntaxTransform_translation sentence rfl,syntaxTransform_map_values]
+  rw [syntaxTransform_translation sentence rfl]
   exact hOld
 
 theorem syntaxTransform_dependencies : formulaCovered functionCovered relationCovered PureSyntaxTransform.condition = true := rfl
-
-theorem freeVariableOccurs_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureFreeVariableOccurs.localInterpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
 
 def freeVariableOccurs_covered : RelationSymbol → Bool
   | .freeVariableOccurs => true
@@ -219,7 +183,7 @@ theorem freeVariableOccurs_definition (hℳ : Theory.Models ℳ theory) (a0 a1 a
   let sentence : Formula S [] [s,s,s] := FormalSystem.free_variable_occurs_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))
   have hOld := (openFormula_correct (PureFreeVariableOccurs.localExpansion hℳ) (PureFreeVariableOccurs.local_realizes hℳ) sentence (.cons a0 (.cons a1 (.cons a2 .nil)))).mpr (PureFreeVariableOccurs.local_definition hℳ a0 a1 a2)
   apply (openFormula_correct (expansion hℳ) (realizes hℳ) sentence (.cons a0 (.cons a1 (.cons a2 .nil)))).mp
-  rw [freeVariableOccurs_translation sentence rfl,freeVariableOccurs_map_values]
+  rw [freeVariableOccurs_translation sentence rfl]
   exact hOld
 
 theorem freeVariableOccurs_dependencies : formulaCovered functionCovered relationCovered PureFreeVariableOccurs.condition = true := rfl

@@ -38,11 +38,8 @@ theorem core_semantics (𝒩 : Structure.{0,0,0,x} S) (source candidate : 𝒩.C
 
 theorem inductive_core (hℳ : Theory.Models ℳ theory) :
     inductive_core_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons candidate tail =>
-  cases tail with | cons source tail =>
-  cases tail
+  apply close_of_curried
+  intro candidate source
   intro _
   apply ((PureCompletedStage.realizes hℳ).function .inductiveCore (.cons source .nil) candidate).symm.trans
   apply (PureRelationSetOperations.inductiveCore_correct hℳ candidate source).trans
@@ -57,10 +54,8 @@ theorem inductive_core (hℳ : Theory.Models ℳ theory) :
 
 theorem omega (hℳ : Theory.Models ℳ theory) :
     omega_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons candidate tail =>
-  cases tail
+  apply close_of_curried
+  intro candidate
   have hCore := ((PureCompletedStage.realizes hℳ).function .inductiveCore (.cons candidate .nil)
     (F hℳ .inductiveCore (.cons candidate .nil))).mpr rfl
   change candidate = F hℳ .omega .nil ↔

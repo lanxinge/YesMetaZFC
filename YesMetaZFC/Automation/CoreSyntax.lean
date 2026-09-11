@@ -67,11 +67,6 @@ namespace PredicateSymbol
 def arityOk (symbol : PredicateSymbol) : Bool :=
   symbol.inputSorts.isEmpty || symbol.inputSorts.length == symbol.arity
 end PredicateSymbol
-inductive BinderKind where
-  | forallE
-  | existsE
-  | lambda
-  deriving Repr, Inhabited, BEq, DecidableEq, Lean.ToExpr
 mutual
   /--
   核心项语法。

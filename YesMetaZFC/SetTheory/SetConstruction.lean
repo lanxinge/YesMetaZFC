@@ -122,6 +122,7 @@ def isCartesianProduct (𝒞 : OrderedPairConvention)
       Formula.existsMem left.weaken <|
         Formula.existsMem right.weaken.weaken <|
           𝒞.code (.bound 2) (.bound 1) Term.newest
+derive_free_closed isCartesianProduct
 /-- `space` 是从 `source` 到 `target` 的全部函数组成的集合。 -/
 def isFunctionSpace (𝒞 : OrderedPairConvention)
     {depth : Nat} (space source target : Term depth) : Formula 1 depth :=

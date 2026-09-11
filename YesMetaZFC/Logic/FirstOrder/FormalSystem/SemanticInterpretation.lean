@@ -41,18 +41,6 @@ private def weaken_set_five {bound free : SetContext}
     (SetSort.set :: SetSort.set :: SetSort.set :: SetSort.set :: free)
     SetSort.set SetSort.set (weaken_set_four term)
 
-private def exists_set_two {bound free : SetContext}
-    (body : SetFormula bound ([SetSort.set, SetSort.set] ++ free)) :
-    SetFormula bound free :=
-  body.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
-
-private def exists_set_three {bound free : SetContext}
-    (body : SetFormula bound
-      ([SetSort.set, SetSort.set, SetSort.set] ++ free)) :
-    SetFormula bound free :=
-  body.existsFreeTop SetSort.set |>.existsFreeTop SetSort.set
-    |>.existsFreeTop SetSort.set
-
 private def exists_set_four {bound free : SetContext}
     (body : SetFormula bound
       ([SetSort.set, SetSort.set, SetSort.set, SetSort.set] ++ free)) :
@@ -696,35 +684,15 @@ def term_value_semantics_theory : SetTheory :=
 def semantic_interpretation_theory : SetTheory :=
   term_value_semantics_theory
 
-theorem logical_rule_encoding_theory_subset_related_symbol_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : logical_rule_encoding_theory sentence) :
-    related_symbol_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset logical_rule_encoding_theory ⊆ related_symbol_semantics_theory
 
-theorem related_symbol_semantics_theory_subset_related_syntax_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : related_symbol_semantics_theory sentence) :
-    related_syntax_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset related_symbol_semantics_theory ⊆ related_syntax_semantics_theory
 
-theorem related_syntax_semantics_theory_subset_structure_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : related_syntax_semantics_theory sentence) :
-    structure_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset related_syntax_semantics_theory ⊆ structure_semantics_theory
 
-theorem structure_semantics_theory_subset_term_value_semantics_theory
-    {sentence : SetSentence}
-    (hSentence : structure_semantics_theory sentence) :
-    term_value_semantics_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset structure_semantics_theory ⊆ term_value_semantics_theory
 
-theorem term_value_semantics_theory_subset_semantic_interpretation_theory
-    {sentence : SetSentence}
-    (hSentence : term_value_semantics_theory sentence) :
-    semantic_interpretation_theory sentence :=
-  hSentence
+derive_theory_subset term_value_semantics_theory ⊆ semantic_interpretation_theory
 
 end FormalSystem
 end FirstOrder

@@ -61,12 +61,8 @@ theorem restriction_semantics (𝒩 : Structure.{0,0,0,x} S) (a b output : 𝒩.
 
 theorem cartesian_product (hℳ : Theory.Models ℳ theory) :
     cartesian_product_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output b a
   apply ((PureCompletedStage.realizes hℳ).function .cartesianProduct (.cons a (.cons b .nil)) output).symm.trans
   apply (PureMappingSpecifications.cartesian_spec output a b _ _ _ (binary_union_value hℳ a b)
     (power_value hℳ (binUnion (E hℳ).model a b))
@@ -84,12 +80,8 @@ theorem cartesian_product (hℳ : Theory.Models ℳ theory) :
 
 theorem mapping_collection (hℳ : Theory.Models ℳ theory) :
     mapping_collection_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output b a
   apply ((PureCompletedStage.realizes hℳ).function .mappingCollection (.cons a (.cons b .nil)) output).symm.trans
   apply (PureMappingSpecifications.mappingCollection_spec output a b _ _ (cartesian_graph hℳ a b)
     (power_value hℳ (prod (E hℳ).model a b))).trans
@@ -99,11 +91,8 @@ theorem mapping_collection (hℳ : Theory.Models ℳ theory) :
 
 theorem identity (hℳ : Theory.Models ℳ theory) :
     identity_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   apply ((PureCompletedStage.realizes hℳ).function .identity (.cons a .nil) output).symm.trans
   apply (PureMappingOperations.identity_spec output a _ (cartesian_graph hℳ a a)).trans
   apply Iff.trans ?_ (identity_semantics (E hℳ).model a output).symm
@@ -112,14 +101,8 @@ theorem identity (hℳ : Theory.Models ℳ theory) :
 
 theorem restriction (hℳ : Theory.Models ℳ theory) :
     restriction_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons subset tail =>
-  cases tail with | cons target tail =>
-  cases tail with | cons source tail =>
-  cases tail with | cons function tail =>
-  cases tail
+  apply close_of_curried
+  intro output subset target source function
   intro _ _
   apply ((PureCompletedStage.realizes hℳ).function .restriction (.cons function (.cons subset .nil)) output).symm.trans
   apply (PureMappingOperations.restriction_correct output function subset).trans

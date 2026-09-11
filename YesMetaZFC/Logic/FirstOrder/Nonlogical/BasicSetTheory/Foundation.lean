@@ -95,10 +95,7 @@ theorem epsilon_minimal_axiom_mem_foundation_theory
     foundation_theory predicate.epsilon_minimal_axiom :=
   Or.inr (epsilon_minimal_axiom_mem predicate)
 
-theorem ordinal_natural_theory_subset_foundation_theory
-    {sentence : SetSentence}
-    (hSentence : ordinal_natural_theory sentence) :
-    foundation_theory sentence := Or.inl hSentence
+derive_theory_subset ordinal_natural_theory ⊆ foundation_theory
 
 theorem epsilon_minimal_schema_subset_foundation_theory
     {sentence : SetSentence}

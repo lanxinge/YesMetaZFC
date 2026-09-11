@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureFiniteSequenceSpace
 
 /-! # 第二轮集合收集阶段的统一模型
@@ -31,18 +32,10 @@ def interpretation : Interpretation Nonlogical.BasicSetTheory.signature ℒ wher
   function := functionGraph
   relation := PureNaturalRelations.interpretation.relation
 
-theorem map_values {ℳ : Structure.{0,0,0,x} ℒ} {sorts : SortContext Nonlogical.BasicSetTheory.signature}
-    (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureNaturalRelations.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory) :
     Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case finiteSubsetCollection => exact PureBoundedDefinitions.functional hℳ .finiteSubsetCollection args
   case powerSetBijection => exact PureBoundedDefinitions.functional hℳ .powerSetBijection args
   case indexOrder => exact PureBoundedDefinitions.functional hℳ .indexOrder args
@@ -76,9 +69,7 @@ theorem specification_transfer {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Mo
     (args : Values (expansion hℳ).model.Carrier parameters) :
     spec.satisfies (templateEnv args : Env (PureStageTwoSemantics.expansion hℳ).model [] parameters) ↔
       spec.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) spec args
-  rw [hTranslate, map_values] at hNew
-  exact (openFormula_correct (PureStageTwoSemantics.expansion hℳ) (PureStageTwoSemantics.realizes hℳ) spec args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureStageTwoSemantics.realizes hℳ) _ (realizes hℳ) spec hTranslate args
 
 theorem bounded_graph_equation {symbol : Nonlogical.BasicSetTheory.FunctionSymbol}
     (primitive : PureBoundedDefinitions.Primitive symbol) :
@@ -95,21 +86,16 @@ theorem bounded_translation {symbol : Nonlogical.BasicSetTheory.FunctionSymbol}
 theorem bounded_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureBoundedDefinitions.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (Nonlogical.BasicSetTheory.signature.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureBoundedDefinitions.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model []
-          (Nonlogical.BasicSetTheory.SetSort.set :: Nonlogical.BasicSetTheory.signature.funcDomain symbol)) := by
+    FunctionSpecification (expansion hℳ) symbol ((PureBoundedDefinitions.specification primitive)) args output := by
   apply ((realizes hℳ).function symbol args output).symm.trans
-  rw [bounded_graph_equation primitive, map_values]
+  rw [bounded_graph_equation primitive]
   exact (PureBoundedDefinitions.graph_correct hℳ primitive args output).trans
     (specification_transfer hℳ _ (bounded_translation primitive) (.cons output args))
 
 theorem finite_sequence_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceSpace (.cons source .nil) ↔
-      (Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model []
-          [Nonlogical.BasicSetTheory.SetSort.set,Nonlogical.BasicSetTheory.SetSort.set]) := by
+    FunctionSpecification (expansion hℳ) .finiteSequenceSpace
+      ((Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here))) (.cons source .nil) output := by
   apply ((realizes hℳ).function .finiteSequenceSpace (.cons source .nil) output).symm.trans
   exact (PureFiniteSequenceSpace.graph_correct hℳ output source).trans
     (specification_transfer hℳ _ rfl (.cons output (.cons source .nil)))

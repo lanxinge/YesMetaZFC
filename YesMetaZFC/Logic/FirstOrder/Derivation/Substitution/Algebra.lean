@@ -74,6 +74,19 @@ theorem Arguments.substituteMapped_weakenFree_tail
   rw [← Arguments.substituteMapped_of_renaming, Arguments.substituteMapped_comp]
   rfl
 
+/-- 公式自由弱化后再替换，只保留自由映射的尾部；bound 映射任意。 -/
+theorem Formula.substituteMapped_weakenFree_tail
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    (introduced : σ.SortSymbol)
+    (b : VariableSubstitution σ sourceBound targetBound targetFree)
+    (f : VariableSubstitution σ (introduced :: sourceFree) targetBound targetFree)
+    (body : Formula σ sourceBound sourceFree) :
+    (body.weakenFree introduced).substituteMapped b f =
+      body.substituteMapped b (fun entry => f (.there entry)) := by
+  change (body.renameMapped _ _).substituteMapped _ _ = _
+  rw [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
+  rfl
+
 /-- bound 弱化与替换复合时忽略新槽，允许同时改变 free 上下文。 -/
 theorem Term.substituteMapped_weakenBound_tail
     {sourceBound sourceFree targetBound targetFree : SortContext σ}

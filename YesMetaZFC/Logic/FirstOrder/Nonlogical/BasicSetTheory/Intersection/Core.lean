@@ -188,76 +188,34 @@ def binary_intersection_operator_theory : SetTheory :=
     binary_intersection_base_theory
 
 /-- 公共元素分离理论嵌入交集基础理论。 -/
-theorem intersection_separation_theory_subset_intersection_base_theory
-    {sentence : SetSentence}
-    (hSentence : intersection_separation_theory sentence) :
-    intersection_base_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset intersection_separation_theory ⊆ intersection_base_theory
 
 /-- 空集符号理论嵌入交集基础理论。 -/
-theorem empty_set_symbol_theory_subset_intersection_base_theory
-    {sentence : SetSentence}
-    (hSentence : empty_set_symbol_theory sentence) :
-    intersection_base_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset empty_set_symbol_theory ⊆ intersection_base_theory
 
 /-- 外延理论嵌入交集基础理论。 -/
-theorem extensionality_theory_subset_intersection_base_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    intersection_base_theory sentence :=
-  Or.inl (Or.inr hSentence)
+derive_theory_subset extensionality_theory ⊆ intersection_base_theory
 
 /-- 交集基础理论嵌入一元交函数符号理论。 -/
-theorem intersection_base_theory_subset_intersection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : intersection_base_theory sentence) :
-    intersection_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset intersection_base_theory ⊆ intersection_operator_theory
 
 /-- 配对函数符号理论嵌入二元交基础理论。 -/
-theorem pairing_operator_theory_subset_binary_intersection_base_theory
-    {sentence : SetSentence}
-    (hSentence : pairing_operator_theory sentence) :
-    binary_intersection_base_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset pairing_operator_theory ⊆ binary_intersection_base_theory
 
 /-- 一元交函数符号理论嵌入二元交基础理论。 -/
-theorem intersection_operator_theory_subset_binary_intersection_base_theory
-    {sentence : SetSentence}
-    (hSentence : intersection_operator_theory sentence) :
-    binary_intersection_base_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset intersection_operator_theory ⊆ binary_intersection_base_theory
 
 /-- 二元交基础理论嵌入二元交函数符号理论。 -/
-theorem binary_intersection_base_theory_subset_binary_intersection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : binary_intersection_base_theory sentence) :
-    binary_intersection_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset binary_intersection_base_theory ⊆ binary_intersection_operator_theory
 
 /-- 一元交函数符号理论嵌入二元交函数符号理论。 -/
-theorem intersection_operator_theory_subset_binary_intersection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : intersection_operator_theory sentence) :
-    binary_intersection_operator_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset intersection_operator_theory ⊆ binary_intersection_operator_theory
 
 /-- 配对函数符号理论嵌入二元交函数符号理论。 -/
-theorem pairing_operator_theory_subset_binary_intersection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : pairing_operator_theory sentence) :
-    binary_intersection_operator_theory sentence :=
-  Or.inr (Or.inl hSentence)
+derive_theory_subset pairing_operator_theory ⊆ binary_intersection_operator_theory
 
 /-- 外延理论嵌入二元交函数符号理论。 -/
-theorem extensionality_theory_subset_binary_intersection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    binary_intersection_operator_theory sentence :=
-  intersection_operator_theory_subset_binary_intersection_operator_theory
-    (intersection_base_theory_subset_intersection_operator_theory
-      (extensionality_theory_subset_intersection_base_theory hSentence))
+derive_theory_subset extensionality_theory ⊆ binary_intersection_operator_theory
 
 /-- 公共成员条件可在任意给定族成员处消去。 -/
 theorem intersection_member_condition_elim

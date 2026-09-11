@@ -29,46 +29,15 @@ def intrinsic_syntax_carrier_theory : SetTheory :=
   Theory.union (Theory.union subset_theory empty_set_symbol_theory)
     semantic_interpretation_theory
 
-theorem subset_theory_subset_intrinsic_syntax_carrier_theory
-    {sentence : SetSentence}
-    (hSentence : subset_theory sentence) :
-    intrinsic_syntax_carrier_theory sentence :=
-  Or.inl (Or.inl hSentence)
+derive_theory_subset subset_theory ⊆ intrinsic_syntax_carrier_theory
 
-theorem empty_set_symbol_theory_subset_intrinsic_syntax_carrier_theory
-    {sentence : SetSentence}
-    (hSentence : empty_set_symbol_theory sentence) :
-    intrinsic_syntax_carrier_theory sentence :=
-  Or.inl (Or.inr hSentence)
+derive_theory_subset empty_set_symbol_theory ⊆ intrinsic_syntax_carrier_theory
 
-theorem semantic_interpretation_theory_subset_intrinsic_syntax_carrier_theory
-    {sentence : SetSentence}
-    (hSentence : semantic_interpretation_theory sentence) :
-    intrinsic_syntax_carrier_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset semantic_interpretation_theory ⊆ intrinsic_syntax_carrier_theory
 
-theorem expression_encoding_theory_subset_intrinsic_syntax_carrier_theory
-    {sentence : SetSentence}
-    (hSentence : expression_encoding_theory sentence) :
-    intrinsic_syntax_carrier_theory sentence := by
-  apply semantic_interpretation_theory_subset_intrinsic_syntax_carrier_theory
-  apply term_value_semantics_theory_subset_semantic_interpretation_theory
-  apply structure_semantics_theory_subset_term_value_semantics_theory
-  apply related_syntax_semantics_theory_subset_structure_semantics_theory
-  apply related_symbol_semantics_theory_subset_related_syntax_semantics_theory
-  apply logical_rule_encoding_theory_subset_related_symbol_semantics_theory
-  apply logical_axiom_code_theory_subset_logical_rule_encoding_theory
-  apply equality_axiom_schema_theory_subset_logical_axiom_code_theory
-  apply quantifier_axiom_schema_theory_subset_equality_axiom_schema_theory
-  apply propositional_axiom_schema_theory_subset_quantifier_axiom_schema_theory
-  exact expression_encoding_theory_subset_propositional_axiom_schema_theory hSentence
+derive_theory_subset expression_encoding_theory ⊆ intrinsic_syntax_carrier_theory
 
-theorem formal_language_encoding_theory_subset_intrinsic_syntax_carrier_theory
-    {sentence : SetSentence}
-    (hSentence : formal_language_encoding_theory sentence) :
-    intrinsic_syntax_carrier_theory sentence := by
-  exact expression_encoding_theory_subset_intrinsic_syntax_carrier_theory
-    (formal_language_encoding_theory_subset_expression_encoding_theory hSentence)
+derive_theory_subset formal_language_encoding_theory ⊆ intrinsic_syntax_carrier_theory
 
 theorem related_nonlogical_symbol_set_subset_derives
     {free : SetContext} {Γ : Context signature free} :

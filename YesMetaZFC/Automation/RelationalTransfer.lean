@@ -18,10 +18,7 @@ variable {ℳ : Structure.{0,0,0,x} τ}
 
 theorem regraph_mapValues {sorts : SortContext σ}
     (args : Values (fun sort => ℳ.Carrier (I.sort sort)) sorts) :
-    mapValues (regraph I functions relations) args = mapValues I args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]
+    mapValues (regraph I functions relations) args = mapValues I args := rfl
 
 /-- 相同实际图的函数值由其实现唯一性保持。 -/
 theorem function_regraph (source : Expansion I ℳ) (hSource : Realizes source)
@@ -35,6 +32,29 @@ theorem function_regraph (source : Expansion I ℳ) (hSource : Realizes source)
   rw [hGraph, regraph_mapValues] at hNew
   exact (hSource.function symbol args _).mp hNew
 
+/-- 任意开放正文的纯翻译相同即可直接跨阶段传输，无须逐层比较模型。 -/
+theorem transfer_regraph (source : Expansion I ℳ) (hSource : Realizes source)
+    (target : Expansion (regraph I functions relations) ℳ) (hTarget : Realizes target)
+    {free : SortContext σ} (body : Formula σ [] free)
+    (hTranslate : openFormula (regraph I functions relations) body = openFormula I body)
+    (args : Values source.model.Carrier free) :
+    body.satisfies (templateEnv args : Env source.model [] free) ↔
+      body.satisfies (templateEnv args : Env target.model [] free) := by
+  have hNew := openFormula_correct target hTarget body args
+  rw [hTranslate] at hNew
+  exact (openFormula_correct source hSource body args).symm.trans hNew
+
+/-- 相同实际关系图的实现直接保持；参数映射已在定义上与扩张层数无关。 -/
+theorem relation_regraph (source : Expansion I ℳ) (hSource : Realizes source)
+    (target : Expansion (regraph I functions relations) ℳ) (hTarget : Realizes target)
+    (symbol : σ.RelSymbol) (hGraph : relations symbol = I.relation symbol)
+    (args : Values source.model.Carrier (σ.relDomain symbol)) :
+    target.relation symbol args ↔ source.relation symbol args := by
+  have hNew := (hTarget.relation symbol args).symm
+  change target.relation symbol args ↔ (relations symbol).satisfies (templateEnv (mapValues I args)) at hNew
+  rw [hGraph] at hNew
+  exact hNew.trans (hSource.relation symbol args)
+
 theorem transfer_covered (source : Expansion I ℳ) (hSource : Realizes source)
     (target : Expansion (regraph I functions relations) ℳ) (hTarget : Realizes target)
     (fc : σ.FuncSymbol → Bool) (rc : σ.RelSymbol → Bool)
@@ -44,9 +64,7 @@ theorem transfer_covered (source : Expansion I ℳ) (hSource : Realizes source)
     (hCovered : formulaCovered fc rc body = true) (args : Values source.model.Carrier free) :
     body.satisfies (templateEnv args : Env source.model [] free) ↔
       body.satisfies (templateEnv args : Env target.model [] free) := by
-  have hTranslate := openFormula_congr I functions relations fc rc hFunctions hRelations body hCovered
-  have hNew := openFormula_correct target hTarget body args
-  rw [hTranslate, regraph_mapValues] at hNew
-  exact (openFormula_correct source hSource body args).symm.trans hNew
+  exact transfer_regraph I functions relations source hSource target hTarget body
+    (openFormula_congr I functions relations fc rc hFunctions hRelations body hCovered) args
 
 end YesMetaZFC.Automation.RelationalTranslation

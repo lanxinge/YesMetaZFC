@@ -81,20 +81,10 @@ def successor_operator_theory : SetTheory :=
   Theory.insert successor_definition_axiom successor_base_theory
 
 /-- 二元并函数符号理论嵌入后继函数符号理论。 -/
-theorem binary_union_operator_theory_subset_successor_operator_theory
-    {sentence : SetSentence}
-    (hSentence : binary_union_operator_theory sentence) :
-    successor_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset binary_union_operator_theory ⊆ successor_operator_theory
 
 /-- 外延理论嵌入后继函数符号理论。 -/
-theorem extensionality_theory_subset_successor_operator_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    successor_operator_theory sentence :=
-  binary_union_operator_theory_subset_successor_operator_theory
-    (pairing_operator_theory_subset_binary_union_operator_theory
-      (Or.inr (Or.inr hSentence)))
+derive_theory_subset extensionality_theory ⊆ successor_operator_theory
 
 /-- 后继成员条件与 free 重命名自然交换。 -/
 @[simp] theorem successor_member_condition_renameMapped

@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureLogicalSchemaSets
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRelatedStage
 
@@ -50,17 +51,10 @@ def functionCovered : FunctionSymbol → Bool
   | symbol => PureRelatedStage.functionCovered symbol
 def relationCovered := PureRelatedStage.relationCovered
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureRelatedStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
-theorem syntax_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+/-- 当前扩张保留上一完整阶段的覆盖与实际图。 -/
+theorem prior_extension : CoveredExtension PureRelatedStage.interpretation interpretation.function interpretation.relation
+    PureRelatedStage.functionCovered PureRelatedStage.relationCovered functionCovered relationCovered := by
+  constructor <;> intro symbol h <;> cases symbol <;> first | exact ⟨rfl, rfl⟩ | contradiction
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
@@ -92,9 +86,7 @@ theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation
   case equalityReflexivityAxiomSet =>
     cases args
     exact PureLogicalSchemaSets.functional hℳ .equalityReflexivity
-  all_goals
-    simp only [map_values]
-    exact PureRelatedStage.functional hℳ _ args
+  all_goals exact PureRelatedStage.functional hℳ _ args
 
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
   _root_.YesMetaZFC.Automation.RelationalTranslation.expansion (functional hℳ)
@@ -129,9 +121,7 @@ theorem syntax_transfer (hℳ : Theory.Models ℳ theory) {parameters : SortCont
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureSyntaxStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,syntax_map_values] at hNew
-  exact (openFormula_correct (PureSyntaxStage.expansion hℳ) (PureSyntaxStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureSyntaxStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 /-- 九种模式的精确成员规格在同一个实际扩张中成立。 -/
 theorem membership_specification (hℳ : Theory.Models ℳ theory) (kind : Kind) (code : Carrier ℳ) :
@@ -166,10 +156,6 @@ theorem equality_reflexivity_definition (hℳ : Theory.Models ℳ theory) (code 
 
 theorem dependencies_covered (kind : Kind) : formulaCovered functionCovered relationCovered (condition kind) = true := by cases kind <;> rfl
 
-theorem prior_function_graph (symbol : FunctionSymbol) (hCovered : PureRelatedStage.functionCovered symbol = true) :
-    interpretation.function symbol = PureRelatedStage.interpretation.function symbol := by
-  cases symbol <;> first | rfl | contradiction
-
 theorem prior_relation_graph (symbol : RelationSymbol) :
     interpretation.relation symbol = PureRelatedStage.interpretation.relation symbol := rfl
 
@@ -177,18 +163,14 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : FunctionS
     (hGraph : interpretation.function symbol = PureRelatedStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureRelatedStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureRelatedStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureRelatedStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureRelatedStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureRelatedStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureRelatedStage.expansion hℳ) (PureRelatedStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureRelatedStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 /-- 旧函数图及原规格正文的纯翻译保持时，整个规格在当前模型中保持。 -/
 theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : FunctionSymbol)
@@ -196,11 +178,9 @@ theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : Func
     (hGraph : interpretation.function symbol = PureRelatedStage.interpretation.function symbol)
     (hTranslate : openFormula interpretation spec = openFormula PureRelatedStage.interpretation spec)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ)
-    (hSpec : output = (PureRelatedStage.expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (PureRelatedStage.expansion hℳ).model [] (s :: S.funcDomain symbol))) :
-    output = (expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
-  rw [function_preserved hℳ symbol hGraph args]
-  exact hSpec.trans (transfer hℳ spec hTranslate (.cons output args))
+    (hSpec : FunctionSpecification (PureRelatedStage.expansion hℳ) symbol spec args output) :
+    FunctionSpecification (expansion hℳ) symbol (spec) args output :=
+  specification_regraph _ (PureRelatedStage.realizes hℳ) _ (realizes hℳ) symbol spec
+    hGraph hTranslate args output hSpec
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureLogicalSchemaStage

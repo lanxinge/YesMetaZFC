@@ -141,15 +141,9 @@ def mapping_product_theory : SetTheory :=
   Theory.insert mapping_product_definition_axiom
     mapping_product_separation_theory
 
-theorem order_product_theory_subset_mapping_product_separation_theory
-    {sentence : SetSentence}
-    (hSentence : order_product_theory sentence) :
-    mapping_product_separation_theory sentence := Or.inr hSentence
+derive_theory_subset order_product_theory ⊆ mapping_product_separation_theory
 
-theorem mapping_product_separation_theory_subset_mapping_product_theory
-    {sentence : SetSentence}
-    (hSentence : mapping_product_separation_theory sentence) :
-    mapping_product_theory sentence := Or.inr hSentence
+derive_theory_subset mapping_product_separation_theory ⊆ mapping_product_theory
 
 end BasicSetTheory
 end Nonlogical

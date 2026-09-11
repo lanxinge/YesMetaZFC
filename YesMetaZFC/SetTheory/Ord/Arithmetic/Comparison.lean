@@ -54,15 +54,6 @@ private def ordinalAdditionMembership (𝒞 : OrderedPairConvention) : UnarySche
       .disj (.mem Term.newest (.bound 3)) <|
         Formula.existsMem (.bound 2) <|
           Formula.isOrdinalAddition 𝒞 (.bound 1) (.bound 4) Term.newest
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related,
-      Formula.existsMem, Formula.FreeClosed,
-      Term.newest]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 当前乘法值的成员按右参数分解为唯一块中的加法余项。 -/
 private def ordinalMultiplicationMembership (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .forallE <| .imp (Formula.isOrdinalMultiplication 𝒞
@@ -72,41 +63,15 @@ private def ordinalMultiplicationMembership (𝒞 : OrderedPairConvention) : Una
         .conj (Formula.isOrdinalMultiplication 𝒞
             Term.newest (.bound 5) (.bound 1)) (Formula.existsMem (.bound 5) <|
             Formula.isOrdinalAddition 𝒞 (.bound 3) (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication,
-      Formula.isOrdinalAddition, Formula.related,
-      Formula.existsMem, Formula.FreeClosed,
-      Term.newest]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · constructor
-      · apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
-      · apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 当前候选满足固定目标不大于对应的加法值。 -/
 private def ordinalAdditionUpperBound (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalAddition 𝒞
       Term.newest (.bound 2) (.bound 1)) (.disj (Formula.extensionalEq (.bound 3) Term.newest) (.mem (.bound 3) Term.newest))
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /-- 当前候选的后继乘法块严格越过固定被除数。 -/
 private def ordinalMultiplicationUpperBlock (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := .existsE <| .conj (Formula.isSuccessor Term.newest (.bound 1)) <|
     .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
         Term.newest (.bound 3) (.bound 1)) (.mem (.bound 4) Term.newest)
-  freeClosed := by
-    simp [Formula.isSuccessor,
-      Formula.isOrdinalMultiplication, Formula.related,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 end UnarySchema
 namespace Formula
 private theorem satisfies_ordinalAdditionMembership_iff

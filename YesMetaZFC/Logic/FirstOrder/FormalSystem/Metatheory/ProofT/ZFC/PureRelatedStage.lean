@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRelatedSyntaxSets
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.LogicalRuleEncoding
 
@@ -48,11 +49,10 @@ def relationCovered : RelationSymbol → Bool
   | .modusPonens => true
   | symbol => PureRelatedSyntaxStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureRelatedSyntaxStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+/-- 上一阶段完成清单中的函数图、关系图均保持不变，且仍被当前清单覆盖。 -/
+theorem prior_extension : CoveredExtension PureStructureStage.interpretation interpretation.function interpretation.relation
+    PureStructureStage.functionCovered PureStructureStage.relationCovered functionCovered relationCovered := by
+  constructor <;> intro symbol h <;> cases symbol <;> first | exact ⟨rfl, rfl⟩ | contradiction
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
@@ -65,9 +65,7 @@ theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation
     cases args with | cons symbols tail =>
     cases tail
     exact PureRelatedSyntaxSets.functional hℳ .formula symbols
-  all_goals
-    simp only [map_values]
-    exact PureRelatedSyntaxStage.functional hℳ _ args
+  all_goals exact PureRelatedSyntaxStage.functional hℳ _ args
 
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
   _root_.YesMetaZFC.Automation.RelationalTranslation.expansion (functional hℳ)
@@ -77,30 +75,22 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : FunctionS
     (hGraph : interpretation.function symbol = PureRelatedSyntaxStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureRelatedSyntaxStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureRelatedSyntaxStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureRelatedSyntaxStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureRelatedSyntaxStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureRelatedSyntaxStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureRelatedSyntaxStage.expansion hℳ) (PureRelatedSyntaxStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureRelatedSyntaxStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem term_set_specification (hℳ : Theory.Models ℳ theory) (symbols output : Carrier ℳ) :
-    output = (expansion hℳ).function .relatedTermSet (.cons symbols .nil) ↔
-      (PureRelatedSyntaxSets.specification .term).satisfies
-        (templateEnv (.cons output (.cons symbols .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .relatedTermSet ((PureRelatedSyntaxSets.specification .term)) (.cons symbols .nil) output :=
   ((realizes hℳ).function .relatedTermSet (.cons symbols .nil) output).symm.trans
     ((PureRelatedSyntaxSets.graph_correct hℳ .term symbols output).trans (transfer hℳ _ rfl _))
 
 theorem formula_set_specification (hℳ : Theory.Models ℳ theory) (symbols output : Carrier ℳ) :
-    output = (expansion hℳ).function .relatedFormulaSet (.cons symbols .nil) ↔
-      (PureRelatedSyntaxSets.specification .formula).satisfies
-        (templateEnv (.cons output (.cons symbols .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .relatedFormulaSet ((PureRelatedSyntaxSets.specification .formula)) (.cons symbols .nil) output :=
   ((realizes hℳ).function .relatedFormulaSet (.cons symbols .nil) output).symm.trans
     ((PureRelatedSyntaxSets.graph_correct hℳ .formula symbols output).trans (transfer hℳ _ rfl _))
 
@@ -121,24 +111,13 @@ theorem prior_transfer (hℳ : Theory.Models ℳ theory) {parameters : SortConte
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureStructureStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) :=
-  (PureRelatedSyntaxStage.transfer hℳ body hRelations args).trans (transfer hℳ body hSets args)
+  transfer_regraph _ _ _ _ (PureStructureStage.realizes hℳ) _ (realizes hℳ) body (hSets.trans hRelations) args
 
 theorem prior_function (hℳ : Theory.Models ℳ theory) (symbol : FunctionSymbol)
     (hGraph : interpretation.function symbol = PureStructureStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureStructureStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values,PureRelatedSyntaxStage.map_values] at hNew
-  exact ((PureStructureStage.realizes hℳ).function symbol args _).mp hNew
-
-/-- 上一阶段计入完成清单的全部函数图、关系图均未被替换。 -/
-theorem prior_function_graph (symbol : FunctionSymbol) (hCovered : PureStructureStage.functionCovered symbol = true) :
-    interpretation.function symbol = PureStructureStage.interpretation.function symbol := by
-  cases symbol <;> first | rfl | contradiction
-
-theorem prior_relation_graph (symbol : RelationSymbol) (hCovered : PureStructureStage.relationCovered symbol = true) :
-    interpretation.relation symbol = PureStructureStage.interpretation.relation symbol := by
-  cases symbol <;> first | rfl | contradiction
+  exact function_regraph _ _ _ _ (PureStructureStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 /-- 旧实际函数图及正文在本批保持时，原规格整体保持。 -/
 theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : FunctionSymbol)
@@ -147,12 +126,10 @@ theorem inherited_specification (hℳ : Theory.Models ℳ theory) (symbol : Func
     (hRelations : openFormula PureRelatedSyntaxStage.interpretation spec = openFormula PureStructureStage.interpretation spec)
     (hSets : openFormula interpretation spec = openFormula PureRelatedSyntaxStage.interpretation spec)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ)
-    (hSpec : output = (PureStructureStage.expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (PureStructureStage.expansion hℳ).model [] (s :: S.funcDomain symbol))) :
-    output = (expansion hℳ).function symbol args ↔
-      spec.satisfies (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
-  rw [prior_function hℳ symbol hGraph args]
-  exact hSpec.trans (prior_transfer hℳ spec hRelations hSets (.cons output args))
+    (hSpec : FunctionSpecification (PureStructureStage.expansion hℳ) symbol spec args output) :
+    FunctionSpecification (expansion hℳ) symbol (spec) args output :=
+  specification_regraph _ (PureStructureStage.realizes hℳ) _ (realizes hℳ) symbol spec
+    hGraph (hSets.trans hRelations) args output hSpec
 
 theorem related_term_definition (hℳ : Theory.Models ℳ theory) (symbols depth code : Carrier ℳ) :
     (FormalSystem.related_term_code_at_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))).satisfies
@@ -173,44 +150,25 @@ theorem related_formula_definition (hℳ : Theory.Models ℳ theory) (symbols de
 theorem term_definition (hℳ : Theory.Models ℳ theory) (depth code : Carrier ℳ) :
     (FormalSystem.term_code_at_definition_instance (.fvar .here) (.fvar (.there .here))).satisfies
       (templateEnv (.cons depth (.cons code .nil)) : Env (expansion hℳ).model [] [s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.term_definition hℳ depth code)
+  (transfer_regraph _ _ _ _ (PureSyntaxStage.realizes hℳ) _ (realizes hℳ) _ rfl _).mp
+    (PureSyntaxStage.term_definition hℳ depth code)
 
 theorem term_list_definition (hℳ : Theory.Models ℳ theory) (depth length code : Carrier ℳ) :
     (FormalSystem.term_list_code_at_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))).satisfies
       (templateEnv (.cons depth (.cons length (.cons code .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.term_list_definition hℳ depth length code)
+  (transfer_regraph _ _ _ _ (PureSyntaxStage.realizes hℳ) _ (realizes hℳ) _ rfl _).mp
+    (PureSyntaxStage.term_list_definition hℳ depth length code)
 
 theorem formula_definition (hℳ : Theory.Models ℳ theory) (depth code : Carrier ℳ) :
     (FormalSystem.formula_code_at_definition_instance (.fvar .here) (.fvar (.there .here))).satisfies
       (templateEnv (.cons depth (.cons code .nil)) : Env (expansion hℳ).model [] [s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.formula_definition hℳ depth code)
+  (transfer_regraph _ _ _ _ (PureSyntaxStage.realizes hℳ) _ (realizes hℳ) _ rfl _).mp
+    (PureSyntaxStage.formula_definition hℳ depth code)
 
 theorem nonlogical_definition (hℳ : Theory.Models ℳ theory) :
     FormalSystem.related_nonlogical_symbol_set_definition_axiom.satisfies
       (templateEnv .nil : Env (expansion hℳ).model [] []) :=
   (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.nonlogical_definition hℳ )
-
-theorem order_type_definition (hℳ : Theory.Models ℳ theory) (relation carrier output : Carrier ℳ) :
-    (Nonlogical.BasicSetTheory.natural_order_type_definition_instance
-      (.fvar (.there .here)) (.fvar (.there (.there .here))) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons relation (.cons carrier .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.order_type_definition hℳ relation carrier output)
-
-theorem subset_type_definition (hℳ : Theory.Models ℳ theory) (subset output : Carrier ℳ) :
-    (Nonlogical.BasicSetTheory.natural_subset_type_definition_instance (.fvar (.there .here)) (.fvar .here)).satisfies
-      (templateEnv (.cons output (.cons subset .nil)) : Env (expansion hℳ).model [] [s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.subset_type_definition hℳ subset output)
-
-theorem concatenation_definition (hℳ : Theory.Models ℳ theory) (left right output : Carrier ℳ) :
-    (FormalSystem.finite_sequence_concatenation_definition_instance
-      (.fvar (.there .here)) (.fvar (.there (.there .here))) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons left (.cons right .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.concatenation_definition hℳ left right output)
-
-theorem flatten_definition (hℳ : Theory.Models ℳ theory) (family output : Carrier ℳ) :
-    (FormalSystem.finite_sequence_flatten_definition_instance (.fvar (.there .here)) (.fvar .here)).satisfies
-      (templateEnv (.cons output (.cons family .nil)) : Env (expansion hℳ).model [] [s,s]) :=
-  (prior_transfer hℳ _ rfl rfl _).mp (PureStructureStage.flatten_definition hℳ family output)
 
 theorem structure_definition (hℳ : Theory.Models ℳ theory) (carrier assignment symbols : Carrier ℳ) :
     (expansion hℳ).relation .isStructure (.cons carrier (.cons assignment (.cons symbols .nil))) ↔

@@ -60,22 +60,7 @@ theorem weakenFree_substitute {sb sf tb tf : SetContext} (introduced : SetSort)
     (input : SetFormula sb sf) :
     (input.weakenFree introduced).substituteMapped bs fs =
       input.substituteMapped bs (fun entry => fs (.there entry)) := by
-  induction input generalizing tb tf with
-  | falsum | truth => rfl
-  | rel symbol args =>
-    simp only [Formula.weakenFree_rel, Formula.substituteMapped]
-    rw [SyntaxSubstitution.arguments_weakenFree_substitute introduced bs fs args]
-  | equal left right =>
-    simp only [Formula.weakenFree_equal, Formula.substituteMapped]
-    rw [SyntaxSubstitution.term_weakenFree_substitute introduced bs fs left,
-      SyntaxSubstitution.term_weakenFree_substitute introduced bs fs right]
-  | neg body ih => simp [Formula.substituteMapped, ih]
-  | conj left right ihl ihr | disj left right ihl ihr | imp left right ihl ihr | iff left right ihl ihr =>
-    simp [Formula.substituteMapped, ihl, ihr]
-  | forallE sort body ih | existsE sort body ih =>
-    simp only [Formula.weakenFree_forallE, Formula.weakenFree_existsE, Formula.substituteMapped]
-    congr 1
-    exact ih _ _
+  exact Formula.substituteMapped_weakenFree_tail introduced bs fs input
 
 /-- 在空束缚上下文中先加强再抽象，不改变正文 quotation。 -/
 theorem vacuous_body {free : SetContext} (input : SetOpenFormula free) :

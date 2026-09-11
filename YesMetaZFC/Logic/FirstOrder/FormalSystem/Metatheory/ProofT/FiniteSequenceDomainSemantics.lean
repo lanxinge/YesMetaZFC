@@ -161,10 +161,8 @@ theorem standard_sequence_from_domain_mem_implies_numeral_mem
       pair ≐ₘ ⟨(pair)₀ₘ, (pair)₁ₘ⟩ₘ :=
     FirstOrder.Derives.imp_elim
       (FirstOrder.Derives.theory_weaken
-        (fun hSentence => S.contains_function_predicate
-          (relation_plane_theory_subset_function_predicate_theory
-            (right_projection_operator_theory_subset_relation_plane_theory
-              hSentence)))
+        (show Theory.Extends T right_projection_operator_theory from by
+          intro sentence hSentence; apply S.contains_function_predicate; theory_inclusion)
         (is_ordered_pair_eq_ordered_pair_projections
           (Γ := Ξ) pair))
       hOrdered
@@ -321,9 +319,8 @@ theorem standard_sequence_domain_eq
         (domₘ(standard_sequence elements))
         (numₘ(elements.length)) := by
     exact FirstOrder.Derives.theory_weaken
-      (fun hSentence => S.contains_function_predicate
-        (relation_plane_theory_subset_function_predicate_theory
-          (extensionality_theory_subset_relation_plane_theory hSentence)))
+      (show Theory.Extends T extensionality_theory from by
+        intro sentence hSentence; apply S.contains_function_predicate; theory_inclusion)
       (extensionality_instance_derives
         (Γ := Γ)
         (domₘ(standard_sequence elements))

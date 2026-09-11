@@ -301,35 +301,17 @@ def natural_discrete_linear_order_theory : SetTheory :=
   Theory.insert is_natural_discrete_linear_order_definition_axiom
     order_embeddable_theory
 
-theorem membership_relation_operator_theory_subset_linear_order_theory
-    {sentence : SetSentence}
-    (hSentence : membership_relation_operator_theory sentence) :
-    linear_order_theory sentence := Or.inr hSentence
+derive_theory_subset membership_relation_operator_theory ⊆ linear_order_theory
 
-theorem linear_order_theory_subset_order_isomorphism_theory
-    {sentence : SetSentence}
-    (hSentence : linear_order_theory sentence) :
-    order_isomorphism_theory sentence := Or.inr hSentence
+derive_theory_subset linear_order_theory ⊆ order_isomorphism_theory
 
-theorem order_isomorphism_theory_subset_order_isomorphic_theory
-    {sentence : SetSentence}
-    (hSentence : order_isomorphism_theory sentence) :
-    order_isomorphic_theory sentence := Or.inr hSentence
+derive_theory_subset order_isomorphism_theory ⊆ order_isomorphic_theory
 
-theorem order_isomorphic_theory_subset_order_embedding_theory
-    {sentence : SetSentence}
-    (hSentence : order_isomorphic_theory sentence) :
-    order_embedding_theory sentence := Or.inr hSentence
+derive_theory_subset order_isomorphic_theory ⊆ order_embedding_theory
 
-theorem order_embedding_theory_subset_order_embeddable_theory
-    {sentence : SetSentence}
-    (hSentence : order_embedding_theory sentence) :
-    order_embeddable_theory sentence := Or.inr hSentence
+derive_theory_subset order_embedding_theory ⊆ order_embeddable_theory
 
-theorem order_embeddable_theory_subset_natural_discrete_linear_order_theory
-    {sentence : SetSentence}
-    (hSentence : order_embeddable_theory sentence) :
-    natural_discrete_linear_order_theory sentence := Or.inr hSentence
+derive_theory_subset order_embeddable_theory ⊆ natural_discrete_linear_order_theory
 
 end BasicSetTheory
 end Nonlogical

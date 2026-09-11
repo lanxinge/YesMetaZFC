@@ -20,12 +20,8 @@ def Power (input output : Carrier ℳ) : Prop := ∀ subset, membership ℳ subs
 
 def unionStep : Project.BinarySchema 0 where
   body := Project.Formula.isUnion (.bound 0) (.bound 1)
-  freeClosed := by simp [Project.Formula.isUnion,Formula.FreeClosed,Term.newest,Term.weaken]
-
 def powerStep : Project.BinarySchema 0 where
   body := Project.Formula.isPowerSet (.bound 0) (.bound 1)
-  freeClosed := by simp [Project.Formula.isPowerSet,Project.Formula.subset,Formula.FreeClosed,Term.newest,Term.weaken]
-
 theorem union_rep : PureOmegaIteration.Represents (ℳ := ℳ) unionStep Union := by
   intro env input output
   exact Project.Formula.satisfies_isUnion_iff ((env.push input).push output) (.bound 0) (.bound 1)

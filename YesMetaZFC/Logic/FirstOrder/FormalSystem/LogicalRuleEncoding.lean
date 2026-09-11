@@ -430,35 +430,15 @@ def logical_rule_encoding_theory : SetTheory :=
   Theory.insert modus_ponens_definition_axiom
     logical_axiom_code_theory
 
-theorem expression_encoding_theory_subset_propositional_axiom_schema_theory
-    {sentence : SetSentence}
-    (hSentence : expression_encoding_theory sentence) :
-    propositional_axiom_schema_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset expression_encoding_theory ⊆ propositional_axiom_schema_theory
 
-theorem propositional_axiom_schema_theory_subset_quantifier_axiom_schema_theory
-    {sentence : SetSentence}
-    (hSentence : propositional_axiom_schema_theory sentence) :
-    quantifier_axiom_schema_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset propositional_axiom_schema_theory ⊆ quantifier_axiom_schema_theory
 
-theorem quantifier_axiom_schema_theory_subset_equality_axiom_schema_theory
-    {sentence : SetSentence}
-    (hSentence : quantifier_axiom_schema_theory sentence) :
-    equality_axiom_schema_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset quantifier_axiom_schema_theory ⊆ equality_axiom_schema_theory
 
-theorem equality_axiom_schema_theory_subset_logical_axiom_code_theory
-    {sentence : SetSentence}
-    (hSentence : equality_axiom_schema_theory sentence) :
-    logical_axiom_code_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset equality_axiom_schema_theory ⊆ logical_axiom_code_theory
 
-theorem logical_axiom_code_theory_subset_logical_rule_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : logical_axiom_code_theory sentence) :
-    logical_rule_encoding_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset logical_axiom_code_theory ⊆ logical_rule_encoding_theory
 
 end FormalSystem
 end FirstOrder

@@ -14,21 +14,25 @@ def isInjectionFromTo (𝒞 : OrderedPairConvention)
     {depth : Nat} (function source target : Term depth) :
     Formula 1 depth :=
   .conj (isFunctionFromTo 𝒞 function source target) (isInjective 𝒞 function)
+derive_free_closed isInjectionFromTo
 /-- `function` 是从 `source` 到 `target` 的双射。 -/
 def isBijectionFromTo (𝒞 : OrderedPairConvention)
     {depth : Nat} (function source target : Term depth) :
     Formula 1 depth :=
   .conj (isInjectionFromTo 𝒞 function source target) (isSurjectiveOnto 𝒞 function source target)
+derive_free_closed isBijectionFromTo
 /-- `left` 与 `right` 等势。 -/
 def equinumerous (𝒞 : OrderedPairConvention)
     {depth : Nat} (left right : Term depth) : Formula 1 depth :=
   .existsE <|
     isBijectionFromTo 𝒞 Term.newest left.weaken right.weaken
+derive_free_closed equinumerous
 /-- `left` 的基数不大于 `right` 的基数。 -/
 def cardinalLessOrEqual (𝒞 : OrderedPairConvention)
     {depth : Nat} (left right : Term depth) : Formula 1 depth :=
   .existsE <|
     isInjectionFromTo 𝒞 Term.newest left.weaken right.weaken
+derive_free_closed cardinalLessOrEqual
 /-- `left` 的基数严格小于 `right` 的基数。 -/
 def cardinalLess (𝒞 : OrderedPairConvention)
     {depth : Nat} (left right : Term depth) : Formula 1 depth :=
@@ -40,10 +44,12 @@ def isCardinal (𝒞 : OrderedPairConvention)
   .conj (isOrdinal κ) <|
     Formula.forallMem κ <|
       .neg (equinumerous 𝒞 Term.newest κ.weaken)
+derive_free_closed isCardinal
 /-- `κ` 是集合 `set` 的基数。 -/
 def isCardinalOf (𝒞 : OrderedPairConvention)
     {depth : Nat} (κ set : Term depth) : Formula 1 depth :=
   .conj (isCardinal 𝒞 κ) (equinumerous 𝒞 κ set)
+derive_free_closed isCardinalOf
 end Formula
 end Project
 end Definitional

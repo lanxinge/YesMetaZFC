@@ -81,11 +81,7 @@ def syntax_numeral_coding_theory : SetTheory :=
   Theory.insert syntax_numeral_code_definition_axiom
     formal_language_encoding_theory
 
-theorem formal_language_encoding_theory_subset_syntax_numeral_coding_theory
-    {sentence : SetSentence}
-    (hSentence : formal_language_encoding_theory sentence) :
-    syntax_numeral_coding_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset formal_language_encoding_theory ⊆ syntax_numeral_coding_theory
 
 private theorem syntax_numeral_code_axiom_derives :
     ([] : Context signature []) ⊢ₘ[syntax_numeral_coding_theory]

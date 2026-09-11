@@ -14,6 +14,7 @@ namespace Formula
 def isInfiniteCardinal (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω κ : Term depth) : Formula 1 depth :=
   .conj (isCardinal 𝒞 κ) (cardinalLessOrEqual 𝒞 ω κ)
+derive_free_closed isInfiniteCardinal
 /-- `set` 与 `ω` 等势，即 `set` 是可数无限集。 -/
 def isCountablyInfinite (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω set : Term depth) : Formula 1 depth :=
@@ -32,6 +33,7 @@ def isCardinalSuccessor (𝒞 : OrderedPairConvention)
   .conj (isCardinal 𝒞 successor) <| .conj (.mem predecessor successor) <|
     .forallE <| .imp (.conj (isCardinal 𝒞 Term.newest) (.mem predecessor.weaken Term.newest)) <|
       .disj (extensionalEq successor.weaken Term.newest) (.mem successor.weaken Term.newest)
+derive_free_closed isCardinalSuccessor
 end Formula
 namespace BinarySchema
 /--
@@ -45,29 +47,6 @@ def alephOperator (𝒞 : OrderedPairConvention) : BinarySchema 1 where
       .disj (.existsE <| .conj (Formula.isSuccessorLengthSequenceWithLast 𝒞 (.bound 2) Term.newest) <|
           .disj (.conj (Formula.isOrdinal Term.newest) (Formula.isCardinalSuccessor 𝒞 (.bound 1) Term.newest)) (.conj (.neg <| Formula.isOrdinal Term.newest)
               (Formula.isEmpty (.bound 1)))) (Formula.isLimitLengthSequenceWithUnion 𝒞 (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isZeroLengthSequence,
-      Formula.isSuccessorLengthSequenceWithLast,
-      Formula.isLimitLengthSequenceWithUnion,
-      Formula.isCardinalSuccessor,
-      Formula.isCardinal,
-      Formula.equinumerous, Formula.isBijectionFromTo,
-      Formula.isInjectionFromTo,
-      Formula.isSequenceOfLength, Formula.isOrdinal,
-      Formula.isTransitive, Formula.isWellOrderOn,
-      Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.isSurjectiveOnto, Formula.isInjective,
-      Formula.isRange, Formula.isEmpty, Formula.isSuccessor,
-      Formula.isLimitOrdinal, Formula.isUnion,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest, Term.weaken]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 由超限递归得到的 Aleph 类关系。 -/
 def aleph (𝒞 : OrderedPairConvention) : BinarySchema 1 :=
   transfiniteRecursion 𝒞 (alephOperator 𝒞)
@@ -77,6 +56,7 @@ namespace Formula
 def isAlephNumber (𝒞 : OrderedPairConvention)
     {depth : Nat} (ω index aleph : Term depth) : Formula 1 depth :=
   related (BinarySchema.aleph 𝒞) (.singleton ω) index aleph
+derive_free_closed isAlephNumber
 end Formula
 end Project
 end Definitional

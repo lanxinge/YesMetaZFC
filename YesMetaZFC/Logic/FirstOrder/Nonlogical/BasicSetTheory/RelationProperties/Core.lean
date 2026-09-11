@@ -24,121 +24,33 @@ def relation_plane_theory : SetTheory :=
     (Theory.union cartesian_product_operator_theory
       ordered_pair_reverse_operator_theory)
 
-theorem relation_range_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : relation_range_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset relation_range_operator_theory ⊆ relation_plane_theory
 
-theorem cartesian_product_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : cartesian_product_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  Or.inr (Or.inl hSentence)
+derive_theory_subset cartesian_product_operator_theory ⊆ relation_plane_theory
 
-theorem ordered_pair_reverse_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_reverse_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset ordered_pair_reverse_operator_theory ⊆ relation_plane_theory
 
-theorem relation_predicate_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : relation_predicate_theory sentence) :
-    relation_plane_theory sentence :=
-  relation_range_operator_theory_subset_relation_plane_theory
-    (relation_range_theory_subset_relation_range_operator_theory
-      (relation_domain_operator_theory_subset_relation_range_theory
-        (relation_domain_theory_subset_relation_domain_operator_theory
-          (relation_predicate_theory_subset_relation_domain_theory
-            hSentence))))
+derive_theory_subset relation_predicate_theory ⊆ relation_plane_theory
 
-theorem relation_function_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    relation_plane_theory sentence :=
-  relation_predicate_theory_subset_relation_plane_theory
-    (relation_base_theory_subset_relation_predicate_theory
-      (relation_function_theory_subset_relation_base_theory hSentence))
+derive_theory_subset relation_function_theory ⊆ relation_plane_theory
 
-theorem union_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : union_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  relation_range_operator_theory_subset_relation_plane_theory
-    (relation_range_theory_subset_relation_range_operator_theory
-      (relation_base_theory_subset_relation_range_theory
-        (union_operator_theory_subset_relation_base_theory hSentence)))
+derive_theory_subset union_operator_theory ⊆ relation_plane_theory
 
-theorem right_projection_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : right_projection_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  relation_range_operator_theory_subset_relation_plane_theory
-    (relation_range_theory_subset_relation_range_operator_theory
-      (relation_base_theory_subset_relation_range_theory
-        (right_projection_operator_theory_subset_relation_base_theory
-          hSentence)))
+derive_theory_subset right_projection_operator_theory ⊆ relation_plane_theory
 
-theorem subset_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : subset_theory sentence) :
-    relation_plane_theory sentence :=
-  cartesian_product_operator_theory_subset_relation_plane_theory
-    (cartesian_product_base_theory_subset_cartesian_product_operator_theory
-      (power_set_operator_theory_subset_cartesian_product_base_theory
-        (Or.inr (Or.inr hSentence))))
+derive_theory_subset subset_theory ⊆ relation_plane_theory
 
-theorem binary_union_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : binary_union_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  cartesian_product_operator_theory_subset_relation_plane_theory
-    (cartesian_product_base_theory_subset_cartesian_product_operator_theory
-      (binary_union_operator_theory_subset_cartesian_product_base_theory
-        hSentence))
+derive_theory_subset binary_union_operator_theory ⊆ relation_plane_theory
 
-theorem power_set_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : power_set_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  cartesian_product_operator_theory_subset_relation_plane_theory
-    (cartesian_product_base_theory_subset_cartesian_product_operator_theory
-      (power_set_operator_theory_subset_cartesian_product_base_theory
-        hSentence))
+derive_theory_subset power_set_operator_theory ⊆ relation_plane_theory
 
-theorem ordered_pair_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  cartesian_product_operator_theory_subset_relation_plane_theory
-    (cartesian_product_base_theory_subset_cartesian_product_operator_theory
-      (ordered_pair_operator_theory_subset_cartesian_product_base_theory
-        hSentence))
+derive_theory_subset ordered_pair_operator_theory ⊆ relation_plane_theory
 
-theorem pairing_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : pairing_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  ordered_pair_operator_theory_subset_relation_plane_theory
-    (singleton_operator_theory_subset_ordered_pair_operator_theory
-      (Or.inr hSentence))
+derive_theory_subset pairing_operator_theory ⊆ relation_plane_theory
 
-theorem singleton_operator_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : singleton_operator_theory sentence) :
-    relation_plane_theory sentence :=
-  ordered_pair_operator_theory_subset_relation_plane_theory
-    (singleton_operator_theory_subset_ordered_pair_operator_theory
-      hSentence)
+derive_theory_subset singleton_operator_theory ⊆ relation_plane_theory
 
-theorem extensionality_theory_subset_relation_plane_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    relation_plane_theory sentence :=
-  cartesian_product_operator_theory_subset_relation_plane_theory
-    (cartesian_product_base_theory_subset_cartesian_product_operator_theory
-      (extensionality_theory_subset_cartesian_product_base_theory hSentence))
+derive_theory_subset extensionality_theory ⊆ relation_plane_theory
 
 /-! ## 并集与子集 -/
 

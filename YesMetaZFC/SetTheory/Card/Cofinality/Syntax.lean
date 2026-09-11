@@ -49,6 +49,7 @@ def isCofinalSubset {depth : Nat} (set α : Term depth) : Formula 1 depth :=
 def isOrdinalUpperBound {depth : Nat} (set bound : Term depth) : Formula 1 depth :=
   Formula.forallMem set <|
     .disj (extensionalEq Term.newest bound.weaken) (.mem Term.newest bound.weaken)
+derive_free_closed isOrdinalUpperBound
 /-- `set` 是序数 `α` 的有界子集：存在 `α` 中的一个序数上界。 -/
 def isBoundedSubsetOfOrdinal {depth : Nat} (set α : Term depth) : Formula 1 depth :=
   .conj (isOrdinal α) <|

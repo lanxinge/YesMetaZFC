@@ -400,76 +400,27 @@ def ordered_pair_reverse_operator_theory : SetTheory :=
 
 /-! ## 理论嵌入 -/
 
-theorem singleton_operator_theory_subset_ordered_pair_operator_theory
-    {sentence : SetSentence}
-    (hSentence : singleton_operator_theory sentence) :
-    ordered_pair_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset singleton_operator_theory ⊆ ordered_pair_operator_theory
 
-theorem ordered_pair_operator_theory_subset_relation_function_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    relation_function_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset ordered_pair_operator_theory ⊆ relation_function_theory
 
-theorem singleton_operator_theory_subset_relation_function_theory
-    {sentence : SetSentence}
-    (hSentence : singleton_operator_theory sentence) :
-    relation_function_theory sentence :=
-  ordered_pair_operator_theory_subset_relation_function_theory
-    (singleton_operator_theory_subset_ordered_pair_operator_theory hSentence)
+derive_theory_subset singleton_operator_theory ⊆ relation_function_theory
 
-theorem extensionality_theory_subset_ordered_pair_operator_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    ordered_pair_operator_theory sentence :=
-  Or.inr (Or.inr (Or.inr (Or.inr hSentence)))
+derive_theory_subset extensionality_theory ⊆ ordered_pair_operator_theory
 
-theorem relation_function_theory_subset_left_projection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    left_projection_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_function_theory ⊆ left_projection_operator_theory
 
-theorem ordered_pair_operator_theory_subset_left_projection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    left_projection_operator_theory sentence :=
-  relation_function_theory_subset_left_projection_operator_theory
-    (ordered_pair_operator_theory_subset_relation_function_theory hSentence)
+derive_theory_subset ordered_pair_operator_theory ⊆ left_projection_operator_theory
 
-theorem left_projection_operator_theory_subset_right_projection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : left_projection_operator_theory sentence) :
-    right_projection_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset left_projection_operator_theory ⊆ right_projection_operator_theory
 
-theorem right_projection_operator_theory_subset_ordered_pair_reverse_operator_theory
-    {sentence : SetSentence}
-    (hSentence : right_projection_operator_theory sentence) :
-    ordered_pair_reverse_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset right_projection_operator_theory ⊆ ordered_pair_reverse_operator_theory
 
-theorem relation_function_theory_subset_right_projection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    right_projection_operator_theory sentence :=
-  left_projection_operator_theory_subset_right_projection_operator_theory
-    (relation_function_theory_subset_left_projection_operator_theory hSentence)
+derive_theory_subset relation_function_theory ⊆ right_projection_operator_theory
 
-theorem ordered_pair_operator_theory_subset_right_projection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : ordered_pair_operator_theory sentence) :
-    right_projection_operator_theory sentence :=
-  relation_function_theory_subset_right_projection_operator_theory
-    (ordered_pair_operator_theory_subset_relation_function_theory hSentence)
+derive_theory_subset ordered_pair_operator_theory ⊆ right_projection_operator_theory
 
-theorem relation_function_theory_subset_ordered_pair_reverse_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    ordered_pair_reverse_operator_theory sentence :=
-  right_projection_operator_theory_subset_ordered_pair_reverse_operator_theory
-    (relation_function_theory_subset_right_projection_operator_theory hSentence)
+derive_theory_subset relation_function_theory ⊆ ordered_pair_reverse_operator_theory
 
 /-! ## 有序对存在、唯一性与定义合同 -/
 

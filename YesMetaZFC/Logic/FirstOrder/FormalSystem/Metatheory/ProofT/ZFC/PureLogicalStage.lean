@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureLogicalClosure
 
 /-! # 逻辑公理集合与识别关系的统一扩张
@@ -56,20 +57,17 @@ def relationCovered : RelationSymbol → Bool
   | .isLogicalAxiomCode => true
   | symbol => PureAllSchemaStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureAllSchemaStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+/-- 当前扩张保留上一完整阶段的覆盖与实际图。 -/
+theorem prior_extension : CoveredExtension PureAllSchemaStage.interpretation interpretation.function interpretation.relation
+    PureAllSchemaStage.functionCovered PureAllSchemaStage.relationCovered functionCovered relationCovered := by
+  constructor <;> intro symbol h <;> cases symbol <;> first | exact ⟨rfl, rfl⟩ | contradiction
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
   case baseLogicalAxiomSet => cases args; exact base_functional hℳ
   case logicalAxiomSet => cases args; exact logical_functional hℳ
-  all_goals
-    simp only [map_values]
-    exact PureAllSchemaStage.functional hℳ _ args
+  all_goals exact PureAllSchemaStage.functional hℳ _ args
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
   _root_.YesMetaZFC.Automation.RelationalTranslation.expansion (functional hℳ)
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) := expansion_realizes (functional hℳ)
@@ -84,19 +82,14 @@ theorem logical_graph (hℳ : Theory.Models ℳ theory) : logicalGraph.satisfies
 theorem prior_translation {parameters : SortContext S} (body : Formula S [] parameters)
     (hCovered : formulaCovered PureAllSchemaStage.functionCovered PureAllSchemaStage.relationCovered body = true) :
     openFormula interpretation body = openFormula PureAllSchemaStage.interpretation body :=
-  openFormula_congr PureAllSchemaStage.interpretation interpretation.function interpretation.relation
-    PureAllSchemaStage.functionCovered PureAllSchemaStage.relationCovered
-    (by intro symbol h; cases symbol <;> first | rfl | contradiction)
-    (by intro symbol h; cases symbol <;> first | rfl | contradiction) body hCovered
+  prior_extension.translation body hCovered
 
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureAllSchemaStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureAllSchemaStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureAllSchemaStage.expansion hℳ) (PureAllSchemaStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureAllSchemaStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem base_membership (hℳ : Theory.Models ℳ theory) (code : Carrier ℳ) :
     membership ℳ code (baseValue hℳ) ↔ baseCondition.satisfies
@@ -157,8 +150,4 @@ theorem logical_code_axioms (hℳ : Theory.Models ℳ theory) :
     logical_axiom_code_definition_axiom.satisfies (templateEnv .nil : Env (expansion hℳ).model [] []) :=
   ⟨base_definition hℳ,logical_definition hℳ,fun code => code_definition hℳ code⟩
 
-theorem prior_function_graph (symbol : FunctionSymbol) (hCovered : PureAllSchemaStage.functionCovered symbol = true) :
-    interpretation.function symbol = PureAllSchemaStage.interpretation.function symbol := by cases symbol <;> first | rfl | contradiction
-theorem prior_relation_graph (symbol : RelationSymbol) (hCovered : PureAllSchemaStage.relationCovered symbol = true) :
-    interpretation.relation symbol = PureAllSchemaStage.interpretation.relation symbol := by cases symbol <;> first | rfl | contradiction
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureLogicalStage

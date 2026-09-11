@@ -124,22 +124,11 @@ def natural_addition_bound_theory : SetTheory :=
         (Theory.insert natural_godel_pairing_coordinate_bound_axiom
           natural_exponentiation_bound_theory)))
 
-theorem natural_exponentiation_theory_subset_bound_theory
-    {sentence : SetSentence}
-    (hSentence : natural_exponentiation_theory sentence) :
-    natural_exponentiation_bound_theory sentence :=
-  Or.inr (Or.inr (Or.inr hSentence))
+derive_theory_subset natural_exponentiation_theory ⊆ natural_exponentiation_bound_theory => natural_exponentiation_theory_subset_bound_theory
 
-theorem godel_pairing_core_theory_subset_bound_theory
-    {sentence : SetSentence}
-    (hSentence : godel_pairing_core_theory sentence) :
-    natural_exponentiation_bound_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset godel_pairing_core_theory ⊆ natural_exponentiation_bound_theory => godel_pairing_core_theory_subset_bound_theory
 
-theorem natural_exponentiation_bound_theory_subset_addition_bound_theory
-    {sentence : SetSentence}
-    (hSentence : natural_exponentiation_bound_theory sentence) :
-    natural_addition_bound_theory sentence := Or.inr (Or.inr (Or.inr (Or.inr hSentence)))
+derive_theory_subset natural_exponentiation_bound_theory ⊆ natural_addition_bound_theory => natural_exponentiation_bound_theory_subset_addition_bound_theory
 
 /-! ## 配数坐标严格下降合同 -/
 

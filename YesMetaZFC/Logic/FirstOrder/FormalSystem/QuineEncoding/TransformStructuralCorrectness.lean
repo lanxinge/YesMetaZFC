@@ -71,69 +71,6 @@ theorem syntax_transform_intro
   exact FirstOrder.Derives.conj_intro
     (FirstOrder.Derives.conj_intro hGlobal hScope) hShape
 
-theorem four_free_substitution_beta
-    {body : SetOpenFormula
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set]}
-    (first second third fourth : SetOpenTerm []) :
-    Formula.instantiateFreeTop first
-      (Formula.substituteFree
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.instantiateFreeTop second))
-        (Formula.substituteFree
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.instantiateFreeTop third)))
-          (Formula.substituteFree
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.liftFree SetSort.set
-                (VariableSubstitution.liftFree SetSort.set
-                  (VariableSubstitution.instantiateFreeTop fourth))))
-            body))) =
-      Formula.substituteFree
-        (VariableSubstitution.cons first
-          (VariableSubstitution.cons second
-            (VariableSubstitution.cons third
-              (VariableSubstitution.cons fourth
-                VariableSubstitution.empty)))) body := by
-  change (((body.substituteFree _).substituteFree _).substituteFree _).substituteFree _ = _
-  rw [Formula.substituteFree_comp, Formula.substituteFree_comp, Formula.substituteFree_comp]
-  congr 1
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there entry =>
-    cases entry with
-    | here => exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
-    | there entry =>
-      cases entry with
-      | here =>
-        simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
-          VariableSubstitution.instantiateFreeTop,
-          Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
-          VariableSubstitution.cons]
-        rfl
-      | there entry =>
-        cases entry with
-        | here =>
-          simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
-            VariableSubstitution.instantiateFreeTop,
-            Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
-            VariableSubstitution.cons]
-        | there entry => exact nomatch entry
-
-
-/-- 任意四槽替换消去闭项的四层自由上下文提升。 -/
-theorem gq_closed_four_weaken_substitute
-    (τ : VariableSubstitution signature
-      [SetSort.set, SetSort.set, SetSort.set, SetSort.set] [] [])
-    {resultSort : signature.SortSymbol}
-    (term : Term signature [] [] resultSort) :
-    Term.substituteMapped VariableSubstitution.boundId τ
-        ((((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-          SetSort.set).weakenFree SetSort.set) =
-      term := by
-  simp only [Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree]
-
 /-! ## 操作无关的项与参数列构造
 
 这些定理只证明 shape；操作码合法性、作用域与总码域由 `syntax_transform_intro`

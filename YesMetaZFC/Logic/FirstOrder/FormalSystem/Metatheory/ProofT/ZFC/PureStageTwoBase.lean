@@ -29,10 +29,7 @@ def interpretation : Interpretation Nonlogical.BasicSetTheory.signature ℒ wher
 
 theorem map_values {ℳ : Structure.{0, 0, 0, x} ℒ} {sorts : SortContext Nonlogical.BasicSetTheory.signature}
     (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureRoundOneRelations.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+    mapValues interpretation args = mapValues PureRoundOneRelations.interpretation args := rfl
 
 theorem functional {ℳ : Structure.{0, 0, 0, x} ℒ} (hℳ : Theory.Models ℳ theory) :
     Functional interpretation ℳ := by
@@ -40,8 +37,6 @@ theorem functional {ℳ : Structure.{0, 0, 0, x} ℒ} (hℳ : Theory.Models ℳ 
   cases symbol
   case minimum => exact PureOrderExtrema.functional hℳ .minimum (mapValues interpretation args)
   case maximum => exact PureOrderExtrema.functional hℳ .maximum (mapValues interpretation args)
-  all_goals
-    simp only [map_values]
-    exact PureRoundOneRelations.functional hℳ _ args
+  all_goals exact PureRoundOneRelations.functional hℳ _ args
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureStageTwoBase

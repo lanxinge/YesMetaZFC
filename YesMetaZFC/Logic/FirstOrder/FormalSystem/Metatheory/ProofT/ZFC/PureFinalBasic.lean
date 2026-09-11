@@ -106,57 +106,40 @@ theorem subset_value (hℳ : Theory.Models ℳ theory) (a b : Carrier ℳ) :
 /-! 原基础闭句。 -/
 theorem extensionality_axiom (hℳ : Theory.Models ℳ theory) :
     Nonlogical.BasicSetTheory.extensionality_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro b a
   exact (extensionality_semantics (E hℳ).model a b).mpr (PureModel.extensionality hℳ a b)
 
 theorem empty_set (hℳ : Theory.Models ℳ theory) :
     empty_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   exact (empty_value hℳ a).trans (empty_semantics (E hℳ).model a).symm
 
 theorem pairing (hℳ : Theory.Models ℳ theory) :
     pair_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons c tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro c b a
   exact (pair_value hℳ a b c).trans (pair_semantics (E hℳ).model a b c).symm
 
 theorem subset (hℳ : Theory.Models ℳ theory) :
     subset_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro b a
   exact (subset_value hℳ a b).trans (subset_semantics (E hℳ).model a b).symm
 
 theorem singleton (hℳ : Theory.Models ℳ theory) :
     singleton_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply (pair_value hℳ a a _).mpr
   intro element
   exact (singleton_value hℳ a element).trans ⟨Or.inl, fun h => h.elim id id⟩
 
 theorem binary_union (hℳ : Theory.Models ℳ theory) :
     binary_union_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro b a
   apply PureModel.extensionality hℳ
   intro element
   change membership ℳ element (F hℳ .binaryUnion (.cons a (.cons b .nil))) ↔
@@ -175,10 +158,8 @@ theorem binary_union (hℳ : Theory.Models ℳ theory) :
 
 theorem successor (hℳ : Theory.Models ℳ theory) :
     successor_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply PureModel.extensionality hℳ
   intro element
   change membership ℳ element (F hℳ .successor (.cons a .nil)) ↔
@@ -248,54 +229,41 @@ theorem power_definition_semantics (𝒩 : Structure.{0,0,0,x} S) (a : 𝒩.Carr
 
 theorem pairing_exists (hℳ : Theory.Models ℳ theory) :
     pairing_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro b a
   exact (pair_exists_semantics (E hℳ).model a b).mpr (PureModel.pair hℳ a b)
 
 theorem union_exists_axiom (hℳ : Theory.Models ℳ theory) :
     union_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   exact (union_exists_semantics (E hℳ).model a).mpr (PureModel.union hℳ a)
 
 theorem union_definition (hℳ : Theory.Models ℳ theory) :
     union_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   exact (union_definition_semantics (E hℳ).model a).mpr (union_value hℳ a)
 
 theorem power_exists_axiom (hℳ : Theory.Models ℳ theory) :
     power_set_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply (power_exists_semantics (E hℳ).model a).mpr
   exact ⟨F hℳ .powerSet (.cons a .nil), fun element =>
     (power_value hℳ a element).trans (subset_value hℳ element a).symm⟩
 
 theorem power_definition (hℳ : Theory.Models ℳ theory) :
     power_set_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   exact (power_definition_semantics (E hℳ).model a).mpr (fun element =>
     (power_value hℳ a element).trans (subset_value hℳ element a).symm)
 
 theorem irreflexivity (hℳ : Theory.Models ℳ theory) :
     membership_irreflexive_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   exact _root_.YesMetaZFC.SetTheory.KP.mem_irrefl_d
     (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) a
 

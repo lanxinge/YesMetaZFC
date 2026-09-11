@@ -78,15 +78,9 @@ def symmetric_difference_theory : SetTheory :=
   Theory.insert symmetric_difference_definition_axiom
     symmetric_difference_separation_theory
 
-theorem power_set_bijection_theory_subset_symmetric_difference_separation_theory
-    {sentence : SetSentence}
-    (hSentence : power_set_bijection_theory sentence) :
-    symmetric_difference_separation_theory sentence := Or.inr hSentence
+derive_theory_subset power_set_bijection_theory ⊆ symmetric_difference_separation_theory
 
-theorem symmetric_difference_separation_theory_subset_symmetric_difference_theory
-    {sentence : SetSentence}
-    (hSentence : symmetric_difference_separation_theory sentence) :
-    symmetric_difference_theory sentence := Or.inr hSentence
+derive_theory_subset symmetric_difference_separation_theory ⊆ symmetric_difference_theory
 
 end BasicSetTheory
 end Nonlogical

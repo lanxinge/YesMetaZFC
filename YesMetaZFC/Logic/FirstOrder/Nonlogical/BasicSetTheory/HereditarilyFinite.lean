@@ -173,40 +173,17 @@ def finite_subset_collection_operator_theory : SetTheory :=
 def hereditarily_finite_theory : SetTheory :=
   finite_subset_collection_operator_theory
 
-theorem natural_arithmetic_theory_subset_transitive_closure_operator_theory
-    {sentence : SetSentence} (hSentence : natural_arithmetic_theory sentence) :
-    transitive_closure_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset natural_arithmetic_theory ⊆ transitive_closure_operator_theory
 
-theorem transitive_closure_operator_theory_subset_finite_hierarchy_operator_theory
-    {sentence : SetSentence}
-    (hSentence : transitive_closure_operator_theory sentence) :
-    finite_hierarchy_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset transitive_closure_operator_theory ⊆ finite_hierarchy_operator_theory
 
-theorem finite_hierarchy_operator_theory_subset_finite_universe_operator_theory
-    {sentence : SetSentence}
-    (hSentence : finite_hierarchy_operator_theory sentence) :
-    finite_universe_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset finite_hierarchy_operator_theory ⊆ finite_universe_operator_theory
 
-theorem finite_universe_operator_theory_subset_hereditarily_finite_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : finite_universe_operator_theory sentence) :
-    hereditarily_finite_predicate_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset finite_universe_operator_theory ⊆ hereditarily_finite_predicate_theory
 
-theorem hereditarily_finite_predicate_theory_subset_finite_subset_collection_separation_theory
-    {sentence : SetSentence}
-    (hSentence : hereditarily_finite_predicate_theory sentence) :
-    finite_subset_collection_separation_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset hereditarily_finite_predicate_theory ⊆ finite_subset_collection_separation_theory
 
-theorem finite_subset_collection_separation_theory_subset_hereditarily_finite_theory
-    {sentence : SetSentence}
-    (hSentence : finite_subset_collection_separation_theory sentence) :
-    hereditarily_finite_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset finite_subset_collection_separation_theory ⊆ hereditarily_finite_theory
 
 end BasicSetTheory
 end Nonlogical

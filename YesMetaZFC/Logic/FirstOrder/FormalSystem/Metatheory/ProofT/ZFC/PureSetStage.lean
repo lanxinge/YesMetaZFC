@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureTransitiveClosure
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureGodelPairing
 
@@ -31,16 +32,9 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureArithmeticStage.interpretation.relation
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureArithmeticStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case godelPairing =>
     cases args with | cons left tail =>
     cases tail with | cons right tail =>
@@ -61,18 +55,14 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogica
     (hGraph : interpretation.function symbol = PureArithmeticStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureArithmeticStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureArithmeticStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureArithmeticStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureArithmeticStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureArithmeticStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureArithmeticStage.expansion hℳ) (PureArithmeticStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureArithmeticStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem omega_eq (hℳ : Theory.Models ℳ theory) : (expansion hℳ).function .omega .nil = omega hℳ :=
   (function_preserved hℳ .omega rfl .nil).trans (PureArithmeticStage.omega_eq hℳ)
@@ -87,14 +77,12 @@ theorem value_eq (hℳ : Theory.Models ℳ theory) (function input : Carrier ℳ
 
 theorem godel_specification (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .godelPairing (.cons left (.cons right .nil)) ↔
-      PureGodelPairing.specification.satisfies (templateEnv (.cons output (.cons left (.cons right .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
+    FunctionSpecification (expansion hℳ) .godelPairing (PureGodelPairing.specification) (.cons left (.cons right .nil)) output :=
   ((realizes hℳ).function .godelPairing _ output).symm.trans
     ((PureGodelPairing.agrees hℳ hLeft hRight output).trans (transfer hℳ _ rfl (.cons output (.cons left (.cons right .nil)))))
 
 theorem closure_specification (hℳ : Theory.Models ℳ theory) (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .transitiveClosure (.cons source .nil) ↔
-      PureTransitiveClosure.specification.satisfies (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .transitiveClosure (PureTransitiveClosure.specification) (.cons source .nil) output :=
   ((realizes hℳ).function .transitiveClosure _ output).symm.trans
     ((openFormula_correct (PureArithmeticStage.expansion hℳ) (PureArithmeticStage.realizes hℳ)
       PureTransitiveClosure.specification (.cons output (.cons source .nil))).trans (transfer hℳ _ rfl (.cons output (.cons source .nil))))

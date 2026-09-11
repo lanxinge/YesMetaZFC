@@ -60,18 +60,21 @@ namespace Formula
 def isSetCodedWellOrder (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier : Term depth) : Formula 1 depth :=
   .conj (isRelation 𝒞 relation) (isWellOrderRelation 𝒞 relation carrier)
+derive_free_closed isSetCodedWellOrder
 def isPredecessorSet (𝒞 : OrderedPairConvention)
     {depth : Nat} (predecessors relation carrier current : Term depth) :
     Formula 1 depth :=
   .forallE <| .iff (.mem Term.newest predecessors.weaken) <|
     .conj (.mem Term.newest carrier.weaken) (orderedPairMem 𝒞 Term.newest current.weaken
         relation.weaken)
+derive_free_closed isPredecessorSet
 def isRelationInitialSegment (𝒞 : OrderedPairConvention)
     {depth : Nat} (segment relation carrier : Term depth) :
     Formula 1 depth :=
   .conj (subset segment carrier) <|
     forallMem segment <| forallMem carrier.weaken <| .imp (orderedPairMem 𝒞 Term.newest (.bound 1)
         relation.weaken.weaken) (.mem Term.newest segment.weaken.weaken)
+derive_free_closed isRelationInitialSegment
 def isWellOrderCollapseFunction (𝒞 : OrderedPairConvention)
     {depth : Nat} (function relation carrier domain : Term depth) :
     Formula 1 depth :=
@@ -83,6 +86,7 @@ def isWellOrderCollapseFunction (𝒞 : OrderedPairConvention)
               relation.weaken.weaken.weaken.weaken) <|
             orderedPairMem 𝒞 Term.newest (.bound 1)
               function.weaken.weaken.weaken.weaken
+derive_free_closed isWellOrderCollapseFunction
 def isWellOrderCollapseValue (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier current value : Term depth) :
     Formula 1 depth :=
@@ -90,6 +94,7 @@ def isWellOrderCollapseValue (𝒞 : OrderedPairConvention)
       relation.weaken.weaken carrier.weaken.weaken
       current.weaken.weaken) <| .conj (isWellOrderCollapseFunction 𝒞 Term.newest
       relation.weaken.weaken carrier.weaken.weaken (.bound 1)) (isRange 𝒞 value.weaken.weaken Term.newest)
+derive_free_closed isWellOrderCollapseValue
 theorem satisfies_isPredecessorSet_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)
     {depth : Nat} (env : Env ℳ depth) (predecessors relation carrier current : Term depth) :
@@ -227,64 +232,23 @@ namespace BinarySchema
 def transportedOrdinalMembership (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := .existsE <| .existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 3) (.bound 1) (.bound 4)) <| .conj (Formula.orderedPairMem 𝒞
       (.bound 2) (.bound 0) (.bound 4)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 def wellOrderCollapseValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := Formula.isWellOrderCollapseValue 𝒞 (.bound 2) (.bound 3) (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.isWellOrderCollapseValue,
-      Formula.isPredecessorSet,
-      Formula.isWellOrderCollapseFunction,
-      Formula.isRelationInitialSegment,
-      Formula.isFunction, Formula.isRelation,
-      Formula.isDomain, Formula.isRange,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace UnarySchema
 /-- 从固定载体中分离当前点的全部严格前驱。 -/
 def wellOrderPredecessorMembership (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := Formula.orderedPairMem 𝒞
     Term.newest (.bound 2) (.bound 1)
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 从良序载体中分离函数值落入固定子集的输入。 -/
 def wellOrderRangePreimageMembership (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := Formula.existsMem (.bound 2) <|
     Formula.orderedPairMem 𝒞 (.bound 1) Term.newest (.bound 2)
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.existsMem,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 当前点的良序坍缩值存在且唯一。 -/
 def wellOrderCollapseValueExistsUnique (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := .conj (.existsE <| Formula.isWellOrderCollapseValue 𝒞 (.bound 2) (.bound 3) (.bound 1) (.bound 0)) <|
     .forallE <| .forallE <| .imp (.conj (Formula.isWellOrderCollapseValue 𝒞 (.bound 3) (.bound 4) (.bound 2) (.bound 1)) (Formula.isWellOrderCollapseValue 𝒞
           (.bound 3) (.bound 4) (.bound 2) (.bound 0))) (Formula.extensionalEq (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isWellOrderCollapseValue,
-      Formula.isPredecessorSet,
-      Formula.isWellOrderCollapseFunction,
-      Formula.isRelationInitialSegment,
-      Formula.isFunction, Formula.isRelation,
-      Formula.isDomain, Formula.isRange,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.subset,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace Formula
 /-- 传输后的序关系由逆双射像之间的序数隶属关系精确刻画。 -/
@@ -897,6 +861,7 @@ def isWellOrderType (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation carrier ordinal : Term depth) : Formula 1 depth :=
   .existsE <| .conj (isWellOrderCollapseFunction 𝒞 Term.newest
       relation.weaken carrier.weaken carrier.weaken) (isRange 𝒞 ordinal.weaken Term.newest)
+derive_free_closed isWellOrderType
 /-- 良序规范序型公式与纸面坍缩值域一致。 -/
 theorem satisfies_isWellOrderType_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)

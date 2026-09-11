@@ -24,23 +24,6 @@ def history (step : Project.BinarySchema 0) : Project.BinarySchema 1 where
     .disj (.existsE <| .conj (Project.Formula.isSuccessorLengthSequenceWithLast PureKuratowskiProject.convention (.bound 2) (.bound 0))
       (Project.Formula.related step .empty (.bound 0) (.bound 1)))
       (Project.Formula.isLimitLengthSequenceWithUnion PureKuratowskiProject.convention (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Project.Formula.isZeroLengthSequence,
-      Project.Formula.isSuccessorLengthSequenceWithLast, Project.Formula.isLimitLengthSequenceWithUnion,
-      Project.Formula.isSequenceOfLength, Project.Formula.isOrdinal, Project.Formula.isTransitive,
-      Project.Formula.isWellOrderOn, Project.Formula.isLinearOrderOn, Project.Formula.isStrictPartialOrderOn,
-      Project.Formula.isIrreflexiveOn, Project.Formula.isTransitiveOn, Project.Formula.isLeastOf,
-      Project.Formula.lessOrEqual, Project.Formula.isFunction, Project.Formula.isRelation, Project.Formula.isDomain,
-      Project.Formula.isRange, Project.Formula.isEmpty, Project.Formula.isSuccessor, Project.Formula.isLimitOrdinal,
-      Project.Formula.isUnion, Project.Formula.orderedPairMem, Project.Formula.forallMem,
-      Project.Formula.existsMem, Project.Formula.subset, Project.Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest, Term.weaken]
-    repeat' apply And.intro
-    all_goals
-      first
-      | exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-      | apply Project.Formula.related_freeClosed_of_closed <;> simp
-
 def Operator (hℳ : Theory.Models ℳ theory) (relation : Carrier ℳ → Carrier ℳ → Prop) (seed : Carrier ℳ) :
     Carrier ℳ → Carrier ℳ → Prop :=
   (Project.FirstOrderSemantics.reduct ℳ).IsZeroSuccessorLimitStep (PureKuratowskiProject.interpretation hℳ)

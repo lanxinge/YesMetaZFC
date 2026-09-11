@@ -15,22 +15,10 @@ private def cantorDiagonalSchema (𝒞 : Definitional.Project.OrderedPairConvent
     Definitional.Project.UnarySchema 1 where
   body := .neg <| .existsE <| .conj (Definitional.Project.Formula.orderedPairMem
       𝒞 (.bound 1) (.bound 0) (.bound 2)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Definitional.Project.Formula.orderedPairMem,
-      Definitional.Formula.FreeClosed, Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 生成 `x ↦ ⟨x, {x}⟩` 函数图成员的模式。 -/
 private def singletonGraphSchema (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.BinarySchema 0 where
   body := .existsE <| .conj (Definitional.Project.Formula.isSingleton (.bound 0) (.bound 2)) (𝒞.code (.bound 1) (.bound 2) (.bound 0))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isSingleton,
-      Definitional.Project.Formula.isUnorderedPair,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed, Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 对角模式恰好表达 `x ∉ f(x)`。 -/
 private theorem satisfies_cantorDiagonalSchema_iff
     {ℳ : Structure.{u}}

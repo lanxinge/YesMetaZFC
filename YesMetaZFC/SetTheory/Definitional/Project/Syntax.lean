@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.Definitional.Theory.Basic
+import YesMetaZFC.Automation.DeriveFreeClosed
 
 /-!
 # 项目定义原子核的纯语法层
@@ -164,6 +165,22 @@ def existsMem {depth : Nat}
 abbrev forallClosure (depth : Nat)
     (formula : Formula 1 depth) : OpenFormula :=
   _root_.YesMetaZFC.SetTheory.Definitional.Formula.forallClosure depth formula
+
+/-- 有界量词只要求集合项和正文自由闭合。 -/
+@[simp] theorem forallMem_freeClosed {depth : Nat} (set : Term depth)
+    (body : Formula 1 (depth + 1)) :
+    (forallMem set body).FreeClosed ↔ set.freeSupport = [] ∧ body.FreeClosed := by
+  simp [forallMem, Definitional.Formula.FreeClosed]
+@[simp] theorem existsMem_freeClosed {depth : Nat} (set : Term depth)
+    (body : Formula 1 (depth + 1)) :
+    (existsMem set body).FreeClosed ↔ set.freeSupport = [] ∧ body.FreeClosed := by
+  simp [existsMem, Definitional.Formula.FreeClosed]
+@[simp] theorem extensionalNe_freeClosed {depth : Nat} (left right : Term depth) :
+    (extensionalNe left right).FreeClosed ↔ left.freeSupport = [] ∧ right.freeSupport = [] := by
+  simp [extensionalNe, Definitional.Formula.FreeClosed]
+@[simp] theorem properSubset_freeClosed {depth : Nat} (left right : Term depth) :
+    (properSubset left right).FreeClosed ↔ left.freeSupport = [] ∧ right.freeSupport = [] := by
+  simp [properSubset, Definitional.Formula.FreeClosed]
 
 end Formula
 

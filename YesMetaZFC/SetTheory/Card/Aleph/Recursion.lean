@@ -32,35 +32,6 @@ namespace ZF
 private def cardinalAboveMembership (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.UnarySchema 1 where
   body := .conj (Definitional.Project.Formula.isCardinal 𝒞 (.bound 0)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isCardinal,
-      Definitional.Project.Formula.equinumerous,
-      Definitional.Project.Formula.isBijectionFromTo,
-      Definitional.Project.Formula.isInjectionFromTo,
-      Definitional.Project.Formula.isFunctionFromTo,
-      Definitional.Project.Formula.isFunction,
-      Definitional.Project.Formula.isRelation,
-      Definitional.Project.Formula.isDomain,
-      Definitional.Project.Formula.isSurjectiveOnto,
-      Definitional.Project.Formula.isInjective,
-      Definitional.Project.Formula.isOrdinal,
-      Definitional.Project.Formula.isTransitive,
-      Definitional.Project.Formula.isWellOrderOn,
-      Definitional.Project.Formula.isLinearOrderOn,
-      Definitional.Project.Formula.isStrictPartialOrderOn,
-      Definitional.Project.Formula.isIrreflexiveOn,
-      Definitional.Project.Formula.isTransitiveOn,
-      Definitional.Project.Formula.isLeastOf,
-      Definitional.Project.Formula.lessOrEqual,
-      Definitional.Project.Formula.orderedPairMem,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Formula.subset,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 基数上界分离模式的模型语义。 -/
 private theorem satisfies_cardinalAboveMembership_iff
     {ℳ : Structure.{u}}
@@ -81,46 +52,6 @@ private def alephValueCardinalAt (𝒞 : Definitional.Project.OrderedPairConvent
     Definitional.Project.UnarySchema 1 where
   body := .forallE <| .imp (Definitional.Project.Formula.isAlephNumber 𝒞 (.bound 2) (.bound 1) (.bound 0))
     (Definitional.Project.Formula.isCardinal 𝒞 (.bound 0))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isAlephNumber,
-      Definitional.Project.Formula.isCardinal,
-      Definitional.Project.Formula.equinumerous,
-      Definitional.Project.Formula.isBijectionFromTo,
-      Definitional.Project.Formula.isInjectionFromTo,
-      Definitional.Project.Formula.isFunctionFromTo,
-      Definitional.Project.Formula.isFunction,
-      Definitional.Project.Formula.isRelation,
-      Definitional.Project.Formula.isDomain,
-      Definitional.Project.Formula.isSurjectiveOnto,
-      Definitional.Project.Formula.isInjective,
-      Definitional.Project.Formula.isOrdinal,
-      Definitional.Project.Formula.isTransitive,
-      Definitional.Project.Formula.isWellOrderOn,
-      Definitional.Project.Formula.isLinearOrderOn,
-      Definitional.Project.Formula.isStrictPartialOrderOn,
-      Definitional.Project.Formula.isIrreflexiveOn,
-      Definitional.Project.Formula.isTransitiveOn,
-      Definitional.Project.Formula.isLeastOf,
-      Definitional.Project.Formula.lessOrEqual,
-      Definitional.Project.Formula.orderedPairMem,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Formula.subset,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Project.Formula.related,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    constructor
-    · exact Definitional.Project.Formula.related_freeClosed_of_closed (relation := Definitional.Project.BinarySchema.aleph 𝒞) (parameters :=
-          (Definitional.TermVector.singleton (.bound 2) :
-            Definitional.TermVector 1 3)) (left := (.bound 1 : Definitional.Term 3)) (right := (.bound 0 : Definitional.Term 3))
-        (by intro entry; simp [Definitional.TermVector.singleton]) (by simp) (by simp)
-    · repeat' apply And.intro
-      all_goals first | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl | skip
-      all_goals
-        apply Definitional.Project.Formula.related_freeClosed_of_closed <;>
-          simp [Definitional.TermVector.FreeClosed,
-            Definitional.TermVector.empty]
 /-- Aleph 值基数性归纳模式的模型语义。 -/
 private theorem satisfies_alephValueCardinalAt_iff
     {ℳ : Structure.{u}}

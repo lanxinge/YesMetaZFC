@@ -57,7 +57,8 @@
 - 扩张复合保留新鲜变量、函数界的单调性以及类型与环境条件。FOOL guard、高阶 λ
   同余和 HO bound stack 约束不得在公共化时省略。
 - 大模型跨阶段比较复用 `RelationalCongruence.openFormula_congr`、
-  `RelationalTransfer` 和 `ModelClosure`，先证明覆盖与逐符号图相等；
+  `RelationalTransfer`、`RelationalInheritance` 和 `ModelClosure`；
+  用 `CoveredExtension.trans` 组合覆盖与旧图保持，不逐层重抄参数映射和规格包装；
   不通过展开整个选择模型或不动点完成定义相等转换。
 - 原正文形状与递归参数保持先在抽象源模型证明，再用 `PredicateCongruence`
   接入实际解释。多变量算子优先直接 `existsE` 块与模板接口。

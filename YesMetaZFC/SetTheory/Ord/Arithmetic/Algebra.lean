@@ -14,22 +14,10 @@ namespace BinarySchema
 private def ordinalAdditionLeftAssociated (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalAddition 𝒞
       Term.newest (.bound 4) (.bound 2)) (Formula.isOrdinalAddition 𝒞 (.bound 1) (.bound 3) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor <;>
-      apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /-- `right ↦ (left + middle) + right` 的类关系。 -/
 private def ordinalAdditionRightAssociated (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalAddition 𝒞
       Term.newest (.bound 3) (.bound 4)) (Formula.isOrdinalAddition 𝒞 (.bound 1) Term.newest (.bound 2))
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor <;>
-      apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 private theorem denote_ordinalAdditionLeftAssociated_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ) (env : Env ℳ 2) (right result : ℳ.Domain) :
     (ordinalAdditionLeftAssociated 𝒞).denote env right result ↔
@@ -64,29 +52,12 @@ private theorem denote_ordinalAdditionRightAssociated_iff
 private def ordinalMultiplicationAdditionLeft (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalAddition 𝒞
       Term.newest (.bound 4) (.bound 2)) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) (.bound 3) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalAddition,
-      Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor <;>
-      apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /-- `right ↦ left * middle + left * right` 的类关系。 -/
 private def ordinalMultiplicationAdditionRight (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
       Term.newest (.bound 3) (.bound 4)) <|
     .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
         Term.newest (.bound 4) (.bound 3)) (Formula.isOrdinalAddition 𝒞 (.bound 2) (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalAddition,
-      Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor
-    · apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
-    · constructor <;>
-        apply Formula.related_freeClosed_of_closed <;>
-          simp [TermVector.FreeClosed, TermVector.singleton]
 private theorem denote_ordinalMultiplicationAdditionLeft_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ) (env : Env ℳ 2) (right result : ℳ.Domain) :
     (ordinalMultiplicationAdditionLeft 𝒞).denote
@@ -130,22 +101,10 @@ private theorem denote_ordinalMultiplicationAdditionRight_iff
 private def ordinalMultiplicationLeftAssociated (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
       Term.newest (.bound 4) (.bound 2)) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) (.bound 3) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor <;>
-      apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 /-- `right ↦ (left * middle) * right` 的类关系。 -/
 private def ordinalMultiplicationRightAssociated (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .existsE <| .conj (Formula.isOrdinalMultiplication 𝒞
       Term.newest (.bound 3) (.bound 4)) (Formula.isOrdinalMultiplication 𝒞 (.bound 1) Term.newest (.bound 2))
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication, Formula.related,
-      Formula.FreeClosed, Term.newest]
-    constructor <;>
-      apply Formula.related_freeClosed_of_closed <;>
-        simp [TermVector.FreeClosed, TermVector.singleton]
 private theorem denote_ordinalMultiplicationLeftAssociated_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ) (env : Env ℳ 2) (right result : ℳ.Domain) :
     (ordinalMultiplicationLeftAssociated 𝒞).denote

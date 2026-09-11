@@ -148,18 +148,10 @@ def binary_union_operator_theory : SetTheory :=
     binary_union_base_theory
 
 /-- 配对函数符号理论嵌入二元并函数符号理论。 -/
-theorem pairing_operator_theory_subset_binary_union_operator_theory
-    {sentence : SetSentence}
-    (hSentence : pairing_operator_theory sentence) :
-    binary_union_operator_theory sentence :=
-  Or.inr (Or.inl hSentence)
+derive_theory_subset pairing_operator_theory ⊆ binary_union_operator_theory
 
 /-- 一元并函数符号理论嵌入二元并函数符号理论。 -/
-theorem union_operator_theory_subset_binary_union_operator_theory
-    {sentence : SetSentence}
-    (hSentence : union_operator_theory sentence) :
-    binary_union_operator_theory sentence :=
-  Or.inr (Or.inr hSentence)
+derive_theory_subset union_operator_theory ⊆ binary_union_operator_theory
 
 /-- 并集存在公理可在任意集合项处实例化。 -/
 theorem union_exists_derives

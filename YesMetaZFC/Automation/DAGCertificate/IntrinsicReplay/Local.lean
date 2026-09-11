@@ -66,16 +66,8 @@ theorem parent_compiled_raw
     change (cert.dag.nodeAt index hIndex).payload.parentClauses.all
       (fun candidate => cert.dag.parentSnapshotChecked candidate) = true at hNodeSnapshots
     exact array_check_of_mem hNodeSnapshots hParentPayloadMem
-  rcases DAG.parentSnapshotChecked_sound hSnapshot with
-    ⟨snapshotNode, hSnapshotNode, hSnapshotClause⟩
-  have hCanonicalNode :
-      snapshotNode = cert.dag.nodeAt parent.id hParentIndex := by
-    exact Option.some.inj <|
-      hSnapshotNode.symm.trans
-        (cert.dag.node?_eq_some_nodeAt hParentIndex)
-  subst snapshotNode
   exact ⟨hParentIndex,
-    (compiled.nodeAt_raw parent.id hParentIndex).trans hSnapshotClause⟩
+    parent_compiled_raw_of_snapshot compiled parent hParentIndex hSnapshot⟩
 
 /-- 节点 payload 覆盖替换支持时，唯一整图 registry 上的 typed 编译必成功。 -/
 theorem compileSubstitution?_exists_of_nodeSupport

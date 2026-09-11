@@ -33,6 +33,24 @@ def templateEnv {M : Structure.{0, 0, 0, x} τ} {sorts : SortContext τ}
     | here => rfl
     | there previous => exact argumentsSubstitution_eval env tail previous
 
+theorem pullback_arguments {M : Structure.{0, 0, 0, x} τ}
+    {bound free sorts : SortContext τ} (env : Env M bound free)
+    (args : Arguments τ bound free sorts) :
+    env.pullback (Substitution.map VariableSubstitution.empty (argumentsSubstitution args)) =
+      templateEnv (args.eval env) := by
+  apply Env.ext
+  · intro sort entry; exact nomatch entry
+  · intro sort entry; exact argumentsSubstitution_eval env args entry
+
+theorem pullback_free_arguments {M : Structure.{0, 0, 0, x} τ}
+    {free sorts : SortContext τ} (env : Env M [] free)
+    (args : Arguments τ [] free sorts) :
+    env.pullback (Substitution.free_map (argumentsSubstitution args)) =
+      templateEnv (args.eval env) := by
+  apply Env.ext
+  · intro sort entry; exact nomatch entry
+  · intro sort entry; exact argumentsSubstitution_eval env args entry
+
 /-- 固定关系模板的语义只依赖实际参数值。 -/
 theorem applyTemplate_satisfies {M : Structure.{0, 0, 0, x} τ}
     {bound free sorts : SortContext τ} (env : Env M bound free)
@@ -41,14 +59,7 @@ theorem applyTemplate_satisfies {M : Structure.{0, 0, 0, x} τ}
   have h := Formula.satisfies_substitute env
     (Substitution.map VariableSubstitution.empty (argumentsSubstitution args)) body
   change (applyTemplate body args).satisfies env ↔ _ at h
-  have hEnv : env.pullback (Substitution.map VariableSubstitution.empty (argumentsSubstitution args)) =
-      templateEnv (args.eval env) := by
-    apply Env.ext
-    · intro sort entry
-      exact nomatch entry
-    · intro sort entry
-      exact argumentsSubstitution_eval env args entry
-  rwa [hEnv] at h
+  rwa [pullback_arguments] at h
 
 /-- 在旧环境前加入一个异质 bound 值块。 -/
 def pushBlock {M : Structure.{0, 0, 0, x} τ} {bound free sorts : SortContext τ}
@@ -119,11 +130,17 @@ theorem existsBlock_satisfies {M : Structure.{0, 0, 0, x} τ}
       cases values with
       | cons head tail => exact ⟨tail, head, h⟩
 
+/-- 参数列的递归只依赖排序映射，不携带函数图、关系图或所选扩张。 -/
+def mapSortValues (sortMap : σ.SortSymbol → τ.SortSymbol) {M : Structure.{0, 0, 0, x} τ}
+    {sorts : SortContext σ} (values : Values (fun sort => M.Carrier (sortMap sort)) sorts) :
+    Values M.Carrier (sorts.map sortMap) :=
+  match values with
+  | .nil => .nil
+  | .cons head tail => .cons head (mapSortValues sortMap tail)
+
 /-- 沿源到目标的排序映射转换语义参数列。 -/
 def mapValues (I : Interpretation σ τ) {M : Structure.{0, 0, 0, x} τ} {sorts : SortContext σ}
     (values : Values (fun sort => M.Carrier (I.sort sort)) sorts) : Values M.Carrier (sorts.map I.sort) :=
-  match values with
-  | .nil => .nil
-  | .cons head tail => .cons head (mapValues I tail)
+  mapSortValues I.sort values
 
 end YesMetaZFC.Automation.RelationalTranslation

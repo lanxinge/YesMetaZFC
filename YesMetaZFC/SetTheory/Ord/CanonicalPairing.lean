@@ -30,6 +30,7 @@ namespace Formula
 /-- 两个序数中的较大者，相等时固定选择左侧。 -/
 def isOrdinalMaximum {depth : Nat} (left right maximum : Term depth) : Formula 1 depth :=
   .disj (.conj (extensionalEq maximum left) (.disj (extensionalEq right left) (.mem right left))) (.conj (extensionalEq maximum right) (.mem left right))
+derive_free_closed isOrdinalMaximum
 /-- 文献中的序数对典范次序。 -/
 def canonicalOrdinalPairLess (𝒞 : OrderedPairConvention) {depth : Nat} (first second : Term depth) : Formula 1 depth :=
   .existsE <| .existsE <| .existsE <| .existsE <| .existsE <| .existsE <|
@@ -39,55 +40,29 @@ def canonicalOrdinalPairLess (𝒞 : OrderedPairConvention) {depth : Nat} (first
     .conj (isOrdinalMaximum (.bound 3) (.bound 2) (.bound 0)) <|
       .disj (.mem (.bound 1) (.bound 0)) (.conj (extensionalEq (.bound 1) (.bound 0)) <|
           .disj (.mem (.bound 5) (.bound 3)) (.conj (extensionalEq (.bound 5) (.bound 3)) (.mem (.bound 4) (.bound 2))))
+derive_free_closed canonicalOrdinalPairLess
 end Formula
 namespace BinarySchema
 /-- 无参数的序数对典范次序 schema。 -/
 def canonicalOrdinalPairLess (𝒞 : OrderedPairConvention) : BinarySchema 0 where
   body := Formula.canonicalOrdinalPairLess 𝒞 (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.canonicalOrdinalPairLess, Formula.isOrdinalMaximum,
-      Formula.extensionalEq, Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 从有序对编码取第一坐标。 -/
 def orderedPairFirst (𝒞 : OrderedPairConvention) : BinarySchema 0 where
   body := .existsE <| 𝒞.code (.bound 2) (.bound 1) (.bound 0)
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 从有序对编码取第二坐标。 -/
 def orderedPairSecond (𝒞 : OrderedPairConvention) : BinarySchema 0 where
   body := .existsE <| 𝒞.code (.bound 2) (.bound 0) (.bound 1)
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 从有序数坐标编码取规范最大坐标。 -/
 def ordinalPairMaximum (𝒞 : OrderedPairConvention) : BinarySchema 0 where
   body := .existsE <| .existsE <| .conj (𝒞.code (.bound 3) (.bound 1) (.bound 0)) (Formula.isOrdinalMaximum (.bound 1) (.bound 0) (.bound 2))
-  freeClosed := by
-    simp [Formula.isOrdinalMaximum, Formula.extensionalEq,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace UnarySchema
 /-- 候选有序对的规范最大坐标等于给定参数。 -/
 def hasOrdinalPairMaximum (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .existsE <| .existsE <| .conj (𝒞.code (.bound 2) (.bound 1) (.bound 0)) (Formula.isOrdinalMaximum (.bound 1) (.bound 0) (.bound 3))
-  freeClosed := by
-    simp [Formula.isOrdinalMaximum, Formula.extensionalEq,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 候选有序对的第一坐标等于给定参数。 -/
 def hasOrderedPairFirst (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .existsE <| 𝒞.code (.bound 1) (.bound 2) (.bound 0)
-  freeClosed := by
-    simp [Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace Formula
 /-- 序数最大值公式的模型语义。 -/

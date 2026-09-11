@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalTransfer
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSyntaxFixedPoint
 
 /-! # 三个递归语法谓词的模型扩张
@@ -33,18 +34,8 @@ def relationCovered : RelationSymbol → Bool
   | .isTermCodeAt | .isTermListCodeAt | .isFormulaCodeAt => true
   | symbol => PureRoundTwoStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureRoundTwoStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
-  intro symbol args
-  change ∃ output, (PureRoundTwoStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ∧
-    ∀ other, (PureRoundTwoStage.interpretation.function symbol).satisfies (templateEnv (.cons other (mapValues interpretation args))) → other = output
-  rw [map_values]
-  exact PureRoundTwoStage.functional hℳ symbol args
+  exact PureRoundTwoStage.functional hℳ
 
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ where
   function := (E hℳ).function
@@ -53,7 +44,6 @@ noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interp
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) where
   function symbol args output := by
     change (PureRoundTwoStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ↔ _
-    rw [map_values]
     exact (PureRoundTwoStage.realizes hℳ).function symbol args output
   relation symbol args := by
     cases symbol
@@ -74,7 +64,6 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
       cases tail
       exact graph2_correct hℳ .formula depth code
     all_goals
-      rw [map_values]
       exact (PureRoundTwoStage.realizes hℳ).relation _ args
 
 theorem satisfaction (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
@@ -120,8 +109,6 @@ theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} 
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (E hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (E hℳ) (PureRoundTwoStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureRoundTwoStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureSyntaxStage

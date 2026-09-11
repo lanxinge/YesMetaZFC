@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureNaturalSubsetType
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSequenceConcatenation
 
@@ -30,15 +31,9 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureNaturalDifferenceStage.interpretation.relation
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureNaturalDifferenceStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case naturalOrderType =>
     cases args with | cons relation tail =>
     cases tail with | cons carrier tail =>
@@ -62,24 +57,18 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogica
     (hGraph : interpretation.function symbol = PureNaturalDifferenceStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureNaturalDifferenceStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureNaturalDifferenceStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureNaturalDifferenceStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureNaturalDifferenceStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureNaturalDifferenceStage.expansion hℳ) (PureNaturalDifferenceStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem relation_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogical.BasicSetTheory.RelationSymbol)
     (args : Values (expansion hℳ).model.Carrier (S.relDomain symbol)) :
     (expansion hℳ).relation symbol args ↔ (PureNaturalDifferenceStage.expansion hℳ).relation symbol args := by
-  have hNew := (realizes hℳ).relation symbol args
-  rw [map_values] at hNew
-  exact hNew.symm.trans ((PureNaturalDifferenceStage.realizes hℳ).relation symbol args)
+  exact relation_regraph _ _ _ _ (PureNaturalDifferenceStage.realizes hℳ) _ (realizes hℳ) symbol rfl args
 
 theorem value_eq (hℳ : Theory.Models ℳ theory) (function input : Carrier ℳ) :
     (expansion hℳ).function .application (.cons function (.cons input .nil)) = value hℳ function input :=
@@ -114,15 +103,13 @@ theorem concat_correct (hℳ : Theory.Models ℳ theory) {left right : Carrier �
 
 theorem order_type_specification (hℳ : Theory.Models ℳ theory) {relation carrier : Carrier ℳ}
     (hGuard : (expansion hℳ).relation .isNaturalDiscreteLinearOrder (.cons relation (.cons carrier .nil))) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .naturalOrderType (.cons relation (.cons carrier .nil)) ↔
-      PureNaturalOrderType.specification.satisfies (templateEnv (.cons output (.cons relation (.cons carrier .nil))) : Env (expansion hℳ).model [] [s,s,s]) :=
+    FunctionSpecification (expansion hℳ) .naturalOrderType (PureNaturalOrderType.specification) (.cons relation (.cons carrier .nil)) output :=
   ((realizes hℳ).function .naturalOrderType (.cons relation (.cons carrier .nil)) output).symm.trans
     ((PureNaturalOrderType.agrees hℳ ((relation_preserved hℳ _ _).mp hGuard) output).trans (transfer hℳ _ rfl _))
 
 theorem subset_type_specification (hℳ : Theory.Models ℳ theory) {subset : Carrier ℳ}
     (hGuard : ∀ input, membership ℳ input subset → membership ℳ input (omega hℳ)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .naturalSubsetType (.cons subset .nil) ↔
-      PureNaturalSubsetType.specification.satisfies (templateEnv (.cons output (.cons subset .nil)) : Env (expansion hℳ).model [] [s,s]) :=
+    FunctionSpecification (expansion hℳ) .naturalSubsetType (PureNaturalSubsetType.specification) (.cons subset .nil) output :=
   ((realizes hℳ).function .naturalSubsetType (.cons subset .nil) output).symm.trans
     ((PureNaturalSubsetType.agrees hℳ hGuard output).trans (transfer hℳ _ rfl _))
 

@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureLogicalStage
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureValueStage
 
@@ -31,48 +32,29 @@ def relationCovered : RelationSymbol → Bool
   | .termValue | .termListValue => true
   | symbol => PureLogicalStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureLogicalStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+/-- 当前扩张保留上一完整阶段的覆盖与实际图。 -/
+theorem prior_extension : CoveredExtension PureLogicalStage.interpretation interpretation.function interpretation.relation
+    PureLogicalStage.functionCovered PureLogicalStage.relationCovered functionCovered relationCovered := by
+  constructor <;> intro symbol h <;> cases symbol <;> first | exact ⟨rfl, rfl⟩ | contradiction
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
-  intro symbol args
-  change ∃ output, (PureLogicalStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ∧
-    ∀ other, (PureLogicalStage.interpretation.function symbol).satisfies (templateEnv (.cons other (mapValues interpretation args))) → other = output
-  rw [map_values]
-  exact PureLogicalStage.functional hℳ symbol args
+  exact PureLogicalStage.functional hℳ
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
   _root_.YesMetaZFC.Automation.RelationalTranslation.expansion (functional hℳ)
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) := expansion_realizes (functional hℳ)
 
 theorem prior_function_graph (symbol : FunctionSymbol) : interpretation.function symbol = PureLogicalStage.interpretation.function symbol := rfl
-theorem prior_relation_graph (symbol : RelationSymbol) (hCovered : PureLogicalStage.relationCovered symbol = true) :
-    interpretation.relation symbol = PureLogicalStage.interpretation.relation symbol := by cases symbol <;> first | rfl | contradiction
-
 theorem prior_translation {parameters : SortContext S} (body : Formula S [] parameters)
     (hCovered : formulaCovered PureLogicalStage.functionCovered PureLogicalStage.relationCovered body = true) :
     openFormula interpretation body = openFormula PureLogicalStage.interpretation body :=
-  openFormula_congr PureLogicalStage.interpretation interpretation.function interpretation.relation
-    PureLogicalStage.functionCovered PureLogicalStage.relationCovered
-    (by intro symbol _; rfl)
-    (by intro symbol h; cases symbol <;> first | rfl | contradiction) body hCovered
+  prior_extension.translation body hCovered
 
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureLogicalStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureLogicalStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureLogicalStage.expansion hℳ) (PureLogicalStage.realizes hℳ) body args).symm.trans hNew
-
-theorem value_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureValueStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+  exact transfer_regraph _ _ _ _ (PureLogicalStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem value_translation {parameters : SortContext S} (body : Formula S [] parameters)
     (hCovered : formulaCovered PureRelatedStage.functionCovered PureValueStage.relationCovered body = true) :
@@ -84,19 +66,13 @@ theorem value_translation {parameters : SortContext S} (body : Formula S [] para
 
 theorem termValue_definition (hℳ : Theory.Models ℳ theory) (carrier interpretation symbols assignment code result : Carrier ℳ) :
     PureValueStage.termValueDefinition.satisfies (templateEnv (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons code (.cons result .nil)))))) : Env (expansion hℳ).model [] [s,s,s,s,s,s]) := by
-  have hOld := (openFormula_correct (PureValueStage.expansion hℳ) (PureValueStage.realizes hℳ)
-    PureValueStage.termValueDefinition (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons code (.cons result .nil))))))).mpr (PureValueStage.termValue_definition hℳ carrier interpretation symbols assignment code result)
-  apply (openFormula_correct (expansion hℳ) (realizes hℳ) PureValueStage.termValueDefinition (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons code (.cons result .nil))))))).mp
-  rw [value_translation _ rfl,value_map_values]
-  exact hOld
+  exact (transfer_regraph _ _ _ _ (PureValueStage.realizes hℳ) _ (realizes hℳ)
+    _ (value_translation _ rfl) _).mp (PureValueStage.termValue_definition hℳ carrier interpretation symbols assignment code result)
 
 theorem termListValue_definition (hℳ : Theory.Models ℳ theory) (carrier interpretation symbols assignment length code result : Carrier ℳ) :
     PureValueStage.termListValueDefinition.satisfies (templateEnv (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons length (.cons code (.cons result .nil))))))) : Env (expansion hℳ).model [] [s,s,s,s,s,s,s]) := by
-  have hOld := (openFormula_correct (PureValueStage.expansion hℳ) (PureValueStage.realizes hℳ)
-    PureValueStage.termListValueDefinition (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons length (.cons code (.cons result .nil)))))))).mpr (PureValueStage.termListValue_definition hℳ carrier interpretation symbols assignment length code result)
-  apply (openFormula_correct (expansion hℳ) (realizes hℳ) PureValueStage.termListValueDefinition (.cons carrier (.cons interpretation (.cons symbols (.cons assignment (.cons length (.cons code (.cons result .nil)))))))).mp
-  rw [value_translation _ rfl,value_map_values]
-  exact hOld
+  exact (transfer_regraph _ _ _ _ (PureValueStage.realizes hℳ) _ (realizes hℳ)
+    _ (value_translation _ rfl) _).mp (PureValueStage.termListValue_definition hℳ carrier interpretation symbols assignment length code result)
 
 theorem logical_code_axioms (hℳ : Theory.Models ℳ theory) :
     logical_axiom_code_definition_axiom.satisfies (templateEnv .nil : Env (expansion hℳ).model [] []) :=
@@ -113,8 +89,6 @@ theorem schema_axioms (hℳ : Theory.Models ℳ theory) :
       PureAllSchemaStage.functionCovered PureAllSchemaStage.relationCovered
       (by intro symbol h; cases symbol <;> first | rfl | contradiction)
       (by intro symbol h; cases symbol <;> first | rfl | contradiction) sentence rfl
-  have hPure := (openFormula_correct (PureAllSchemaStage.expansion hℳ) (PureAllSchemaStage.realizes hℳ) sentence .nil).mpr hOld
-  apply (openFormula_correct (expansion hℳ) (realizes hℳ) sentence .nil).mp
-  rw [hTranslate]
-  exact hPure
+  exact (transfer_regraph _ _ _ _ (PureAllSchemaStage.realizes hℳ) _ (realizes hℳ)
+    sentence hTranslate .nil).mp hOld
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureCompletedStage

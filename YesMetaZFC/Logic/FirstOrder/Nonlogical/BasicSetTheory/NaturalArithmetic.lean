@@ -647,70 +647,31 @@ theorem godel_pairing_mem_omega_of_extends
 
 /-! ## 理论嵌入 -/
 
-theorem natural_set_theory_subset_natural_addition_theory
-    {sentence : SetSentence}
-    (hSentence : natural_set_theory sentence) :
-    natural_addition_theory sentence := Or.inr hSentence
+derive_theory_subset natural_set_theory ⊆ natural_addition_theory
 
-theorem natural_addition_theory_subset_natural_multiplication_theory
-    {sentence : SetSentence}
-    (hSentence : natural_addition_theory sentence) :
-    natural_multiplication_theory sentence := Or.inr hSentence
+derive_theory_subset natural_addition_theory ⊆ natural_multiplication_theory
 
-theorem natural_multiplication_theory_subset_natural_exponentiation_theory
-    {sentence : SetSentence}
-    (hSentence : natural_multiplication_theory sentence) :
-    natural_exponentiation_theory sentence := Or.inr hSentence
+derive_theory_subset natural_multiplication_theory ⊆ natural_exponentiation_theory
 
-theorem natural_exponentiation_theory_subset_infinite_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : natural_exponentiation_theory sentence) :
-    infinite_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset natural_exponentiation_theory ⊆ infinite_predicate_theory
 
-theorem infinite_predicate_theory_subset_countable_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : infinite_predicate_theory sentence) :
-    countable_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset infinite_predicate_theory ⊆ countable_predicate_theory
 
-theorem countable_predicate_theory_subset_uncountable_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : countable_predicate_theory sentence) :
-    uncountable_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset countable_predicate_theory ⊆ uncountable_predicate_theory
 
-theorem uncountable_predicate_theory_subset_countably_infinite_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : uncountable_predicate_theory sentence) :
-    countably_infinite_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset uncountable_predicate_theory ⊆ countably_infinite_predicate_theory
 
-theorem cardinality_classification_theory_subset_finite_sequence_space_theory
-    {sentence : SetSentence}
-    (hSentence : cardinality_classification_theory sentence) :
-    finite_sequence_space_theory sentence := Or.inr hSentence
+derive_theory_subset cardinality_classification_theory ⊆ finite_sequence_space_theory
 
-theorem finite_sequence_space_theory_subset_recursive_sequence_space_theory
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_space_theory sentence) :
-    recursive_sequence_space_theory sentence := Or.inr hSentence
+derive_theory_subset finite_sequence_space_theory ⊆ recursive_sequence_space_theory
 
-theorem recursive_sequence_space_theory_subset_omega_recursive_sequence_theory
-    {sentence : SetSentence}
-    (hSentence : recursive_sequence_space_theory sentence) :
-    omega_recursive_sequence_theory sentence := Or.inr hSentence
+derive_theory_subset recursive_sequence_space_theory ⊆ omega_recursive_sequence_theory
 
-theorem omega_recursive_sequence_theory_subset_natural_difference_theory
-    {sentence : SetSentence}
-    (hSentence : omega_recursive_sequence_theory sentence) :
-    natural_difference_theory sentence := Or.inr hSentence
+derive_theory_subset omega_recursive_sequence_theory ⊆ natural_difference_theory
 
-theorem natural_difference_theory_subset_omega_pair_order_theory
-    {sentence : SetSentence}
-    (hSentence : natural_difference_theory sentence) :
-    omega_pair_order_theory sentence := Or.inr hSentence
+derive_theory_subset natural_difference_theory ⊆ omega_pair_order_theory
 
-theorem omega_pair_order_theory_subset_godel_pairing_theory
-    {sentence : SetSentence}
-    (hSentence : omega_pair_order_theory sentence) :
-    godel_pairing_theory sentence := Or.inr hSentence
+derive_theory_subset omega_pair_order_theory ⊆ godel_pairing_theory
 
 end BasicSetTheory
 end Nonlogical

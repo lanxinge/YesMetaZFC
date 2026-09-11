@@ -105,7 +105,7 @@ theorem arguments_correct {I : Interpretation σ τ} {M : Structure.{0, 0, 0, x}
     cases output with
     | cons first rest =>
       simp only [arguments, Formula.satisfies, term_correct E hE env bs fs head first,
-        arguments_correct E hE env bs fs tail rest, Arguments.eval, mapValues]
+        arguments_correct E hE env bs fs tail rest, Arguments.eval, mapValues, mapSortValues]
       constructor
       · rintro ⟨hFirst, hRest⟩
         rw [hFirst, hRest]

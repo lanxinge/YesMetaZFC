@@ -46,6 +46,7 @@ def isCantorBernsteinClosed (𝒞 : OrderedPairConvention)
         .imp (.conj (orderedPairMem 𝒞 (.bound 2) (.bound 1)
               forward.weaken.weaken.weaken) (orderedPairMem 𝒞 (.bound 1) (.bound 0)
               reverse.weaken.weaken.weaken)) (.mem (.bound 0) closed.weaken.weaken.weaken)
+derive_free_closed isCantorBernsteinClosed
 theorem satisfies_isCantorBernsteinClosed_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)
     {depth : Nat} (env : Env ℳ depth) (forward reverse source target closed : Term depth) :
@@ -76,23 +77,12 @@ namespace UnarySchema
 def cantorBernsteinClosure (𝒞 : OrderedPairConvention) : UnarySchema 4 where
   body := .forallE <|
     .imp (Formula.isCantorBernsteinClosed 𝒞 (.bound 2) (.bound 3) (.bound 4) (.bound 5) (.bound 0)) (.mem (.bound 1) (.bound 0))
-  freeClosed := by
-    simp [Formula.isCantorBernsteinClosed,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace BinarySchema
 /-- 生成 Cantor--Bernstein 分片函数图成员的模式。 -/
 def cantorBernsteinGraph (𝒞 : OrderedPairConvention) : BinarySchema 3 where
   body := .existsE <| .conj (.disj (.conj (.mem (.bound 2) (.bound 5)) (Formula.orderedPairMem 𝒞 (.bound 2) (.bound 0) (.bound 3))) (.conj
         (.neg (.mem (.bound 2) (.bound 5))) (Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 4)))) (𝒞.code (.bound 1) (.bound 2) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 theorem satisfies_cantorBernsteinClosure_iff

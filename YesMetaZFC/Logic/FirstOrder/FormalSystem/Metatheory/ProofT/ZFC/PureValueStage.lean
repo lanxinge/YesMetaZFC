@@ -39,16 +39,9 @@ noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interp
   function := (E hℳ).function
   relation := valueRelations hℳ
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureRelatedStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) where
   function symbol args output := by
     change (PureRelatedStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ↔ _
-    rw [map_values]
     exact (PureValueOperator.realizes hℳ).function symbol args output
   relation symbol args := by
     cases symbol
@@ -72,7 +65,6 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
       cases tail6
       exact list_graph_correct hℳ carrier interpretation symbols assignment length code result
     all_goals
-      rw [map_values]
       exact (PureValueOperator.realizes hℳ).relation _ args
 
 def sourceFamilyRelations (𝒩 : Structure.{0,0,0,x} S)

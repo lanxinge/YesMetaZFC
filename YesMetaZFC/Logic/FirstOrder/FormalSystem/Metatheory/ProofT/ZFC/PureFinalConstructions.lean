@@ -21,150 +21,98 @@ variable {ℳ : Structure.{0,0,0,x} ℒ}
 theorem finite_subset_collection (hℳ : Theory.Models ℳ theory) :
     finite_subset_collection_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRoundTwoSpecifications.bounded_specification hℳ .finiteSubsetCollection (.cons a .nil) b
 
 theorem power_set_bijection (hℳ : Theory.Models ℳ theory) :
     power_set_bijection_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   intro _
   exact PureRoundTwoSpecifications.bounded_specification hℳ .powerSetBijection (.cons a .nil) b
 
 theorem index_order (hℳ : Theory.Models ℳ theory) :
     index_order_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons e tail1 =>
-  cases tail1 with | cons d tail2 =>
-  cases tail2 with | cons c tail3 =>
-  cases tail3 with | cons b tail4 =>
-  cases tail4 with | cons a tail5 =>
-  cases tail5
+  apply close_of_curried
+  intro e d c b a
   intro _
   exact PureRoundTwoSpecifications.bounded_specification hℳ .indexOrder (.cons a (.cons b (.cons c (.cons d .nil)))) e
 
 theorem finite_sequence_space (hℳ : Theory.Models ℳ theory) :
     finite_sequence_space_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   intro _
   exact PureRoundTwoSpecifications.finite_sequence_specification hℳ a b
 
 theorem nonempty_finite_sequence_space (hℳ : Theory.Models ℳ theory) :
     nonempty_finite_sequence_space_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   intro _
   exact PureRoundTwoSpecifications.filter_specification hℳ .nonemptyFiniteSequenceSpace (.cons a .nil) b
 
 theorem recursive_sequence_space (hℳ : Theory.Models ℳ theory) :
     recursive_sequence_space_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons d tail1 =>
-  cases tail1 with | cons c tail2 =>
-  cases tail2 with | cons b tail3 =>
-  cases tail3 with | cons a tail4 =>
-  cases tail4
+  apply close_of_curried
+  intro d c b a
   intro _
   exact PureRoundTwoSpecifications.filter_specification hℳ .recursiveSequenceSpace (.cons a (.cons b (.cons c .nil))) d
 
 theorem omega_recursive_sequence (hℳ : Theory.Models ℳ theory) :
     omega_recursive_sequence_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons d tail1 =>
-  cases tail1 with | cons c tail2 =>
-  cases tail2 with | cons b tail3 =>
-  cases tail3 with | cons a tail4 =>
-  cases tail4
+  apply close_of_curried
+  intro d c b a
   intro _
   exact PureRoundTwoSpecifications.omega_specification hℳ a b c d
 
 theorem transitive_closure (hℳ : Theory.Models ℳ theory) :
     transitive_closure_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRoundTwoSpecifications.closure_specification hℳ a b
 
 theorem natural_order_type (hℳ : Theory.Models ℳ theory) :
     natural_order_type_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRoundTwoStage.order_type_definition hℳ a b c
 
 theorem natural_subset_type (hℳ : Theory.Models ℳ theory) :
     natural_subset_type_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRoundTwoStage.subset_type_definition hℳ a b
 
 theorem finite_sequence_concatenation (hℳ : Theory.Models ℳ theory) :
     finite_sequence_concatenation_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact PureRoundTwoStage.concatenation_definition hℳ a b c
 
 theorem finite_sequence_flatten (hℳ : Theory.Models ℳ theory) :
     finite_sequence_flatten_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact PureRoundTwoStage.flatten_definition hℳ a b
 
 theorem minimum_difference (hℳ : Theory.Models ℳ theory) :
     minimum_difference_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons f tail1 =>
-  cases tail1 with | cons e tail2 =>
-  cases tail2 with | cons d tail3 =>
-  cases tail3 with | cons c tail4 =>
-  cases tail4 with | cons b tail5 =>
-  cases tail5 with | cons a tail6 =>
-  cases tail6
+  apply close_of_curried
+  intro f e d c b a
   exact PureRoundTwoSpecifications.minimum_definition hℳ
     (.cons f (.cons a (.cons b (.cons c (.cons d (.cons e .nil))))))
 
@@ -176,12 +124,8 @@ theorem old_omega (hℳ : Theory.Models ℳ theory) :
 theorem natural_addition (hℳ : Theory.Models ℳ theory) :
     natural_addition_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons right tail =>
-  cases tail with | cons left tail =>
-  cases tail
+  apply close_of_curried
+  intro output right left
   rintro ⟨hLeft, hRight⟩
   change membership ℳ left ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hLeft
   change membership ℳ right ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hRight
@@ -191,12 +135,8 @@ theorem natural_addition (hℳ : Theory.Models ℳ theory) :
 theorem natural_multiplication (hℳ : Theory.Models ℳ theory) :
     natural_multiplication_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons right tail =>
-  cases tail with | cons left tail =>
-  cases tail
+  apply close_of_curried
+  intro output right left
   rintro ⟨hLeft, hRight⟩
   change membership ℳ left ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hLeft
   change membership ℳ right ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hRight
@@ -206,12 +146,8 @@ theorem natural_multiplication (hℳ : Theory.Models ℳ theory) :
 theorem natural_exponentiation (hℳ : Theory.Models ℳ theory) :
     natural_exponentiation_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons right tail =>
-  cases tail with | cons left tail =>
-  cases tail
+  apply close_of_curried
+  intro output right left
   rintro ⟨hLeft, hRight⟩
   change membership ℳ left ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hLeft
   change membership ℳ right ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hRight
@@ -221,12 +157,8 @@ theorem natural_exponentiation (hℳ : Theory.Models ℳ theory) :
 theorem natural_difference (hℳ : Theory.Models ℳ theory) :
     natural_difference_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons right tail =>
-  cases tail with | cons left tail =>
-  cases tail
+  apply close_of_curried
+  intro output right left
   rintro ⟨hLeft, hRight⟩
   change membership ℳ left ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hLeft
   change membership ℳ right ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hRight
@@ -236,12 +168,8 @@ theorem natural_difference (hℳ : Theory.Models ℳ theory) :
 theorem godel_pairing (hℳ : Theory.Models ℳ theory) :
     godel_pairing_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons right tail =>
-  cases tail with | cons left tail =>
-  cases tail
+  apply close_of_curried
+  intro output right left
   rintro ⟨hLeft, hRight⟩
   change membership ℳ left ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hLeft
   change membership ℳ right ((PureRoundTwoStage.expansion hℳ).function .omega .nil) at hRight

@@ -18,69 +18,21 @@ open scoped Symbols
 
 /-! ## 理论嵌入 -/
 
-theorem relation_plane_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_plane_theory sentence) :
-    function_predicate_theory sentence :=
-  relation_composition_operator_theory_subset_function_predicate_theory
-    (relation_plane_theory_subset_relation_composition_operator_theory
-      hSentence)
+derive_theory_subset relation_plane_theory ⊆ function_predicate_theory
 
-theorem relation_domain_operator_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_domain_operator_theory sentence) :
-    function_predicate_theory sentence :=
-  relation_plane_theory_subset_function_predicate_theory
-    (relation_range_operator_theory_subset_relation_plane_theory
-      (relation_range_theory_subset_relation_range_operator_theory
-        (relation_domain_operator_theory_subset_relation_range_theory
-          hSentence)))
+derive_theory_subset relation_domain_operator_theory ⊆ function_predicate_theory
 
-theorem function_predicate_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : function_predicate_theory sentence) :
-    function_application_theory sentence :=
-  mapping_predicate_theory_subset_function_application_theory
-    (function_predicate_theory_subset_mapping_predicate_theory hSentence)
+derive_theory_subset function_predicate_theory ⊆ function_application_theory
 
-theorem relation_plane_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : relation_plane_theory sentence) :
-    function_application_theory sentence :=
-  function_predicate_theory_subset_function_application_theory
-    (relation_plane_theory_subset_function_predicate_theory hSentence)
+derive_theory_subset relation_plane_theory ⊆ function_application_theory
 
-theorem relation_domain_operator_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : relation_domain_operator_theory sentence) :
-    function_application_theory sentence :=
-  function_predicate_theory_subset_function_application_theory
-    (relation_domain_operator_theory_subset_function_predicate_theory
-      hSentence)
+derive_theory_subset relation_domain_operator_theory ⊆ function_application_theory
 
-theorem extensionality_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    function_application_theory sentence :=
-  relation_plane_theory_subset_function_application_theory
-    (extensionality_theory_subset_relation_plane_theory hSentence)
+derive_theory_subset extensionality_theory ⊆ function_application_theory
 
-theorem left_projection_operator_theory_subset_function_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : left_projection_operator_theory sentence) :
-    function_predicate_theory sentence :=
-  relation_plane_theory_subset_function_predicate_theory
-    (right_projection_operator_theory_subset_relation_plane_theory
-      (left_projection_operator_theory_subset_right_projection_operator_theory
-        hSentence))
+derive_theory_subset left_projection_operator_theory ⊆ function_predicate_theory
 
-theorem left_projection_operator_theory_subset_function_application_theory
-    {sentence : SetSentence}
-    (hSentence : left_projection_operator_theory sentence) :
-    function_application_theory sentence :=
-  function_predicate_theory_subset_function_application_theory
-    (left_projection_operator_theory_subset_function_predicate_theory
-      hSentence)
+derive_theory_subset left_projection_operator_theory ⊆ function_application_theory
 
 /-! ## 闭定义公理实例化 -/
 
@@ -426,10 +378,7 @@ theorem relation_member_right_coordinate_mem_range
       (FirstOrder.Derives.context_weaken_cons
         (assumption := relationFormula)
         (FirstOrder.Derives.theory_weaken
-          (fun hFormula =>
-            relation_plane_theory_subset_function_predicate_theory
-              (relation_range_operator_theory_subset_relation_plane_theory
-                hFormula))
+          (show Theory.Extends function_predicate_theory relation_range_operator_theory from by theory_inclusion)
           (is_relation_range_member_iff
             (Γ := Γ) relation value)))
     exact FirstOrder.Derives.imp_elim hIff hRelation
@@ -473,10 +422,7 @@ theorem relation_member_right_coordinate_mem_range
         VariableSubstitution.boundId,
         VariableSubstitution.freeId] using hMembership
     · have hProjection := FirstOrder.Derives.theory_weaken
-        (fun hFormula =>
-          relation_plane_theory_subset_function_predicate_theory
-            (right_projection_operator_theory_subset_relation_plane_theory
-              hFormula))
+        (show Theory.Extends function_predicate_theory right_projection_operator_theory from by theory_inclusion)
         (ordered_pair_term_right_projection_eq
           (Γ := Δ) input value)
       exact Metatheory.Derives.equality_symm
@@ -716,9 +662,7 @@ theorem is_mapping_application_mem_target
       Δ ⊢ₘ[function_application_theory]
         (function ·ₘ argument) ∈ₘ target :=
     subset_membership
-      (fun hFormula =>
-        relation_plane_theory_subset_function_application_theory
-          (subset_theory_subset_relation_plane_theory hFormula))
+      (show Theory.Extends function_application_theory subset_theory from by theory_inclusion)
       (ranₘ(function)) target (function ·ₘ argument)
       hRangeSubset hRangeMembership
   simpa [mapping, domainMembership, Δ] using hTarget
@@ -762,10 +706,7 @@ theorem is_function_member_iff_coordinates
         Δ ⊢ₘ[function_application_theory]
           is_ordered_pair_formula member := by
       have hImp := FirstOrder.Derives.theory_weaken
-        (fun hFormula =>
-          relation_plane_theory_subset_function_application_theory
-            (relation_predicate_theory_subset_relation_plane_theory
-              hFormula))
+        (show Theory.Extends function_application_theory relation_predicate_theory from by theory_inclusion)
         (is_relation_member_is_ordered_pair
           (Γ := Γ) function member)
       have hImp' := FirstOrder.Derives.context_weaken_cons
@@ -871,10 +812,7 @@ theorem is_function_member_iff_coordinates
         Δ ⊢ₘ[function_application_theory]
           member ≐ₘ represented := by
       have hImp := FirstOrder.Derives.theory_weaken
-        (fun hFormula =>
-          relation_plane_theory_subset_function_application_theory
-            (right_projection_operator_theory_subset_relation_plane_theory
-              hFormula))
+        (show Theory.Extends function_application_theory right_projection_operator_theory from by theory_inclusion)
         (is_ordered_pair_eq_ordered_pair_projections
           (Γ := Γ) member)
       have hImp' := FirstOrder.Derives.context_weaken_cons

@@ -74,8 +74,6 @@ theorem separation_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP
 /-- 固定右参数后，从给定集合中分离出不属于右参数的元素。 -/
 def differenceSchema : Definitional.Project.Delta0UnarySchema 1 where
   body := .neg (.mem (.bound 0) (.bound 1))
-  freeClosed := by
-    simp [Definitional.Formula.FreeClosed]
   delta0 := .neg (.mem _ _)
 /-- KP 中任意两个集合都有差集。 -/
 theorem difference_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) (left right : ℳ.Domain) :
@@ -95,8 +93,6 @@ theorem difference_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP
 /-- 固定右参数后，从给定集合中分离出同时属于右参数的元素。 -/
 def intersectionSchema : Definitional.Project.Delta0UnarySchema 1 where
   body := .mem (.bound 0) (.bound 1)
-  freeClosed := by
-    simp [Definitional.Formula.FreeClosed]
   delta0 := .mem _ _
 /-- KP 中任意两个集合都有交集。 -/
 theorem intersection_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) (left right : ℳ.Domain) :

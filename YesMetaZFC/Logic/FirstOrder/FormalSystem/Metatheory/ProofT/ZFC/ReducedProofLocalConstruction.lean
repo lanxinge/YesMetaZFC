@@ -13,15 +13,10 @@ set_option autoImplicit false
 universe x
 variable {𝒩 : Structure.{0,0,0,x} signature}
 
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory
-      (power_set_operator_theory_subset_relation_plane_theory h))
-
 def queryTest : ObjectProofNode.Kind → ObjectCheckedTrace.LocalTest intrinsic_zfc_theory :=
   ObjectProofNode.queryTest intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest
 
 def Holds (condition : FormulaTemplate.Unary) (value : 𝒩.Carrier .set) : Prop :=
@@ -43,7 +38,7 @@ theorem node_local_satisfies (row : 𝒩.Carrier .set) :
         ∀ query ∈ shape.queries, Holds (queryTest query.1).condition (exprValue 𝒩 values query.2) :=
   ObjectProofNode.localTest_satisfies intrinsic_zfc_certificate_core
     intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest row
 
 def quoteValue (𝒩 : Structure.{0,0,0,x} signature) (formula : SetSentence) : 𝒩.Carrier .set :=

@@ -243,35 +243,17 @@ def minimum_natural_order_theory : SetTheory :=
 def order_operator_theory : SetTheory :=
   Theory.insert maximum_natural_order_definition_axiom minimum_natural_order_theory
 
-theorem finite_ordinal_theory_subset_relation_image_separation_theory
-    {sentence : SetSentence}
-    (hSentence : finite_ordinal_theory sentence) :
-    relation_image_separation_theory sentence := Or.inr hSentence
+derive_theory_subset finite_ordinal_theory ⊆ relation_image_separation_theory
 
-theorem relation_image_separation_theory_subset_image_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_image_separation_theory sentence) :
-    image_operator_theory sentence := Or.inr hSentence
+derive_theory_subset relation_image_separation_theory ⊆ image_operator_theory
 
-theorem image_operator_theory_subset_restriction_operator_theory
-    {sentence : SetSentence}
-    (hSentence : image_operator_theory sentence) :
-    restriction_operator_theory sentence := Or.inr hSentence
+derive_theory_subset image_operator_theory ⊆ restriction_operator_theory
 
-theorem restriction_operator_theory_subset_minimum_linear_order_theory
-    {sentence : SetSentence}
-    (hSentence : restriction_operator_theory sentence) :
-    minimum_linear_order_theory sentence := Or.inr hSentence
+derive_theory_subset restriction_operator_theory ⊆ minimum_linear_order_theory
 
-theorem minimum_linear_order_theory_subset_minimum_natural_order_theory
-    {sentence : SetSentence}
-    (hSentence : minimum_linear_order_theory sentence) :
-    minimum_natural_order_theory sentence := Or.inr hSentence
+derive_theory_subset minimum_linear_order_theory ⊆ minimum_natural_order_theory
 
-theorem minimum_natural_order_theory_subset_order_operator_theory
-    {sentence : SetSentence}
-    (hSentence : minimum_natural_order_theory sentence) :
-    order_operator_theory sentence := Or.inr hSentence
+derive_theory_subset minimum_natural_order_theory ⊆ order_operator_theory
 
 end BasicSetTheory
 end Nonlogical

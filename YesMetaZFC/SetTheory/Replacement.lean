@@ -23,9 +23,6 @@ def imageMembership {parameterCount : Nat} (schema : BinarySchema parameterCount
   body :=
     Definitional.Project.Formula.existsMem (.bound 1) <|
       schema.body.rename BinaryImageEmbedding.body
-  freeClosed := by
-    simp [Definitional.Project.Formula.existsMem,
-      Definitional.Formula.FreeClosed, schema.freeClosed]
 end BinarySchema
 end Project
 end Definitional

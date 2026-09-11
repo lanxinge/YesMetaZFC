@@ -45,7 +45,7 @@ end Formula
 /-- 一元项目公式模式；index `0` 是元素，后续 index 是参数。 -/
 structure UnarySchema (parameterCount : Nat) where
   body : Formula 1 (parameterCount + 1)
-  freeClosed : body.FreeClosed
+  freeClosed : body.FreeClosed := by simp -implicitDefEqProofs [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
 
 /-- 带 `Delta0` 证据的一元项目公式模式。 -/
 structure Delta0UnarySchema (parameterCount : Nat)
@@ -55,12 +55,14 @@ structure Delta0UnarySchema (parameterCount : Nat)
 /-- 二元项目公式模式；index `0` 是输出，index `1` 是输入，后续 index 是参数。 -/
 structure BinarySchema (parameterCount : Nat) where
   body : Formula 1 (parameterCount + 2)
-  freeClosed : body.FreeClosed
+  freeClosed : body.FreeClosed := by simp -implicitDefEqProofs [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
 
 /-- 带 `Delta0` 证据的二元项目公式模式。 -/
 structure Delta0BinarySchema (parameterCount : Nat)
     extends BinarySchema parameterCount where
   delta0 : body.IsDelta0
+
+attribute [simp] UnarySchema.freeClosed BinarySchema.freeClosed
 
 end Project
 end Definitional

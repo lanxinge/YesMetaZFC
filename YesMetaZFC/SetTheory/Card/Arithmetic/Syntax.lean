@@ -25,6 +25,7 @@ def isCardinalMultiplication (𝒞 : OrderedPairConvention)
     .conj (isCardinalOf 𝒞 left.weaken.weaken.weaken (.bound 2)) <|
     .conj (isCardinalOf 𝒞 right.weaken.weaken.weaken (.bound 1)) <|
     .conj (isCartesianProduct 𝒞 (.bound 0) (.bound 2) (.bound 1)) (isCardinalOf 𝒞 product.weaken.weaken.weaken (.bound 0))
+derive_free_closed isCardinalMultiplication
 /-- `power` 是 `base ^ exponent`：从指数代表元到基数代表元的函数集基数。 -/
 def isCardinalExponentiation (𝒞 : OrderedPairConvention)
     {depth : Nat} (power base exponent : Term depth) : Formula 1 depth :=

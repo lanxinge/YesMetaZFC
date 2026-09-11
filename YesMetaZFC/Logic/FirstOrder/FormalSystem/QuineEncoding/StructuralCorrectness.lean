@@ -22,20 +22,7 @@ open scoped FormalSystem.Symbols
 
 set_option autoImplicit false
 
-private theorem infinity_theory_subset_formal_language_encoding_theory
-    {sentence : SetSentence}
-    (hSentence : infinity_theory sentence) :
-    formal_language_encoding_theory sentence := by
-  have h₁ := infinity_theory_subset_unbounded_subset_theory hSentence
-  have h₂ := unbounded_subset_theory_subset_bounded_subset_theory h₁
-  have h₃ := bounded_subset_theory_subset_natural_order_type_theory h₂
-  have h₄ := natural_order_type_theory_subset_natural_subset_type_theory h₃
-  have h₅ := natural_set_theory_subset_natural_addition_theory h₄
-  have h₆ := natural_addition_theory_subset_natural_multiplication_theory h₅
-  have h₇ := natural_multiplication_theory_subset_natural_exponentiation_theory h₆
-  have h₈ := natural_exponentiation_theory_subset_bound_theory h₇
-  exact natural_addition_bound_theory_subset_formal_language_encoding_theory
-    (natural_exponentiation_bound_theory_subset_addition_bound_theory h₈)
+private derive_theory_subset infinity_theory ⊆ formal_language_encoding_theory
 
 private theorem godel_pairing_core_subset_formal_language_encoding_theory
     {sentence : SetSentence}
@@ -304,54 +291,6 @@ theorem term_list_code_at_code_mem_of_derives
     hCode
   exact FirstOrder.Derives.conj_elim_right
     (FirstOrder.Derives.conj_elim_left hCondition)
-
-theorem three_free_substitution_beta
-    {body : SetOpenFormula
-      [SetSort.set, SetSort.set, SetSort.set]}
-    (first second third : SetOpenTerm []) :
-    Formula.instantiateFreeTop first
-      (Formula.substituteFree
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.instantiateFreeTop second))
-        (Formula.substituteFree
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.liftFree SetSort.set
-              (VariableSubstitution.instantiateFreeTop third)))
-          body)) =
-      Formula.substituteFree
-        (VariableSubstitution.cons first
-          (VariableSubstitution.cons second
-            (VariableSubstitution.cons third
-              VariableSubstitution.empty))) body := by
-  change ((body.substituteFree _).substituteFree _).substituteFree _ = _
-  rw [Formula.substituteFree_comp, Formula.substituteFree_comp]
-  congr 1
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there entry =>
-    cases entry with
-    | here =>
-      exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
-    | there entry =>
-      cases entry with
-      | here =>
-        simp only [VariableSubstitution.postcompose, VariableSubstitution.liftFree,
-          VariableSubstitution.instantiateFreeTop,
-          Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree,
-          VariableSubstitution.cons]
-      | there entry => exact nomatch entry
-
-theorem gq_closed_three_weaken_substitute
-    (τ : VariableSubstitution signature
-      [SetSort.set, SetSort.set, SetSort.set] [] [])
-    {resultSort : signature.SortSymbol}
-    (term : Term signature [] [] resultSort) :
-    Term.substituteMapped VariableSubstitution.boundId τ
-        (((term.weakenFree SetSort.set).weakenFree SetSort.set).weakenFree
-          SetSort.set) =
-      term := by
-  simp only [Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree]
 
 private theorem term_list_code_cons_condition_intro
     (depth length code previousLength head tail : SetOpenTerm [])

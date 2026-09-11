@@ -69,11 +69,8 @@ theorem symmetric_semantics (𝒩 : Structure.{0,0,0,x} S) (a b output : 𝒩.Ca
 
 theorem converse (hℳ : Theory.Models ℳ theory) :
     relation_converse_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro hRelation
   apply ((PureCompletedStage.realizes hℳ).function .relationConverse (.cons a .nil) output).symm.trans
   apply (PureRoundOneSpecifications.converse_spec hℳ output a _ _ _ ((relation_predicate hℳ a).mp hRelation)
@@ -86,12 +83,8 @@ theorem converse (hℳ : Theory.Models ℳ theory) :
 
 theorem composition (hℳ : Theory.Models ℳ theory) :
     relation_composition_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output b a
   intro _
   apply ((PureCompletedStage.realizes hℳ).function .relationComposition (.cons b (.cons a .nil)) output).symm.trans
   apply (PureRoundOneSpecifications.composition_spec hℳ output a b _ _ _ (domain_value hℳ a) (range_value hℳ b)
@@ -114,11 +107,8 @@ theorem composition (hℳ : Theory.Models ℳ theory) :
 
 theorem membership_relation (hℳ : Theory.Models ℳ theory) :
     membership_relation_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro _
   apply ((PureCompletedStage.realizes hℳ).function .membershipRelation (.cons a .nil) output).symm.trans
   apply (PureRoundOneSpecifications.membership_spec hℳ output a _ (cartesian_value hℳ a a)).trans
@@ -129,14 +119,8 @@ theorem membership_relation (hℳ : Theory.Models ℳ theory) :
 
 theorem image (hℳ : Theory.Models ℳ theory) :
     image_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons subset tail =>
-  cases tail with | cons target tail =>
-  cases tail with | cons source tail =>
-  cases tail with | cons function tail =>
-  cases tail
+  apply close_of_curried
+  intro output subset target source function
   intro hMapping hSubset
   apply ((PureCompletedStage.realizes hℳ).function .image (.cons function (.cons subset .nil)) output).symm.trans
   apply (PureRoundOneSpecifications.image_spec hℳ output function source target subset
@@ -147,12 +131,8 @@ theorem image (hℳ : Theory.Models ℳ theory) :
 
 theorem symmetric_difference (hℳ : Theory.Models ℳ theory) :
     symmetric_difference_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons b tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output b a
   exact ((PureCompletedStage.realizes hℳ).function .symmetricDifference (.cons a (.cons b .nil)) output).symm.trans
     ((PureRoundOneSpecifications.symmetric_difference_spec hℳ output a b _ (binary_union_value hℳ a b)).trans
       (symmetric_semantics (E hℳ).model a b output).symm)

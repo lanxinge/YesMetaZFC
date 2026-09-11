@@ -28,11 +28,6 @@ private def leastUnusedDiagonalValue (𝒞 : OrderedPairConvention) : BinarySche
         .existsE <|
           .conj (.mem (.bound 0) (.bound 2)) <|
             .existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 7)) (Formula.orderedPairMem 𝒞 (.bound 5) (.bound 2) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.forallMem,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 最小未用对角值模式的纸面解释。 -/

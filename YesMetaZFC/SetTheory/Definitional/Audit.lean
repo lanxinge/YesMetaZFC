@@ -74,23 +74,8 @@ termination_by availableStage _depth formula =>
 @[simp] theorem expand_embed {σ : AtomSignature.{u}} (definitions : Definitions σ) {availableStage depth : Nat} (formula : Pure.Formula depth) :
     expand definitions (embed (availableStage := availableStage) formula) =
       formula := by
-  induction formula with
-  | falsum =>
-      simp [embed, expand]
-  | truth =>
-      simp [embed, expand]
-  | mem =>
-      simp [embed, expand]
-  | neg formula ih =>
-      simp [embed, expand, ih]
-  | conj left right ihLeft ihRight
-  | disj left right ihLeft ihRight
-  | imp left right ihLeft ihRight
-  | iff left right ihLeft ihRight =>
-      simp [embed, expand, ihLeft, ihRight]
-  | forallE body ih
-  | existsE body ih =>
-      simp [embed, expand, ih]
+  induction formula <;>
+    simp_all [embed, expand]
 /-- 旧核自由闭合公式嵌入后在新核中仍自由闭合。 -/
 theorem freeClosed_embed {σ : AtomSignature.{u}}
     {availableStage depth : Nat} (formula : Pure.Formula depth) (hClosed : formula.FreeClosed) :

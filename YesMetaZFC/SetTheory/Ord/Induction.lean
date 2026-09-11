@@ -217,8 +217,6 @@ namespace UnarySchema
 def neg {parameterCount : Nat} (schema : UnarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .neg schema.body
-  freeClosed := by
-    simpa [Formula.FreeClosed] using schema.freeClosed
 /-- 该性质对序数递进。 -/
 @[prove_auto_norm definition]
 def progressiveCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
@@ -253,38 +251,15 @@ def casesCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : For
   .conj (zeroCaseCore schema) <|
     .conj (successorCaseCore schema) (limitCaseCore schema)
 private theorem progressiveCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (progressiveCore schema).FreeClosed := by
-  simp [progressiveCore, Formula.isOrdinal, Formula.isTransitive,
-    Formula.isWellOrderOn, Formula.isLinearOrderOn,
-    Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-    Formula.isTransitiveOn, Formula.isLeastOf, Formula.lessOrEqual,
-    Formula.forallMem, Formula.existsMem, Formula.subset,
-    Formula.extensionalEq, Formula.FreeClosed, schema.freeClosed]
+  simp -implicitDefEqProofs [progressiveCore, Formula.FreeClosed]
 private theorem inductionCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (inductionCore schema).FreeClosed := by
-  simp [inductionCore, Formula.isOrdinal, Formula.isTransitive,
-    Formula.isWellOrderOn, Formula.isLinearOrderOn,
-    Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-    Formula.isTransitiveOn, Formula.isLeastOf, Formula.lessOrEqual,
-    Formula.forallMem, Formula.existsMem, Formula.subset,
-    Formula.extensionalEq, Formula.FreeClosed, schema.freeClosed]
+  simp -implicitDefEqProofs [inductionCore, Formula.FreeClosed]
 private theorem zeroCaseCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (zeroCaseCore schema).FreeClosed := by
-  simp [zeroCaseCore, Formula.isEmpty, Formula.FreeClosed,
-    schema.freeClosed]
+  simp -implicitDefEqProofs [zeroCaseCore, Formula.FreeClosed]
 private theorem successorCaseCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (successorCaseCore schema).FreeClosed := by
-  simp [successorCaseCore, Formula.isOrdinal, Formula.isTransitive,
-    Formula.isWellOrderOn, Formula.isLinearOrderOn,
-    Formula.isStrictPartialOrderOn, Formula.isIrreflexiveOn,
-    Formula.isTransitiveOn, Formula.isLeastOf, Formula.lessOrEqual,
-    Formula.isSuccessor, Formula.forallMem, Formula.existsMem,
-    Formula.subset, Formula.extensionalEq, Formula.FreeClosed,
-    schema.freeClosed]
+  simp -implicitDefEqProofs [successorCaseCore, Formula.FreeClosed]
 private theorem limitCaseCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (limitCaseCore schema).FreeClosed := by
-  simp [limitCaseCore, Formula.isLimitOrdinal, Formula.isOrdinal,
-    Formula.isTransitive, Formula.isWellOrderOn,
-    Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-    Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-    Formula.isLeastOf, Formula.lessOrEqual, Formula.forallMem,
-    Formula.existsMem, Formula.subset, Formula.extensionalEq,
-    Formula.FreeClosed, schema.freeClosed]
+  simp -implicitDefEqProofs [limitCaseCore, Formula.FreeClosed]
 private theorem casesCore_freeClosed {parameterCount : Nat} (schema : UnarySchema parameterCount) : (casesCore schema).FreeClosed := by
   simpa [casesCore, Formula.FreeClosed] using
     And.intro (zeroCaseCore_freeClosed schema) (And.intro (successorCaseCore_freeClosed schema) (limitCaseCore_freeClosed schema))

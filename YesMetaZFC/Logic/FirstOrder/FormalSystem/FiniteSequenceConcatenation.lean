@@ -171,28 +171,13 @@ def finite_sequence_formal_system_theory : SetTheory :=
 
 /-! ## 理论嵌入 -/
 
-theorem hereditarily_finite_theory_subset_finite_sequence_concatenation_theory
-    {sentence : SetSentence} (hSentence : hereditarily_finite_theory sentence) :
-    finite_sequence_concatenation_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset hereditarily_finite_theory ⊆ finite_sequence_concatenation_theory
 
-theorem finite_sequence_concatenation_theory_subset_nonempty_sequence_separation_theory
-    {sentence : SetSentence}
-    (hSentence : finite_sequence_concatenation_theory sentence) :
-    nonempty_finite_sequence_space_separation_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset finite_sequence_concatenation_theory ⊆ nonempty_finite_sequence_space_separation_theory => finite_sequence_concatenation_theory_subset_nonempty_sequence_separation_theory
 
-theorem nonempty_sequence_separation_theory_subset_nonempty_sequence_space_theory
-    {sentence : SetSentence}
-    (hSentence : nonempty_finite_sequence_space_separation_theory sentence) :
-    nonempty_finite_sequence_space_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset nonempty_finite_sequence_space_separation_theory ⊆ nonempty_finite_sequence_space_theory => nonempty_sequence_separation_theory_subset_nonempty_sequence_space_theory
 
-theorem nonempty_sequence_space_theory_subset_finite_sequence_flatten_theory
-    {sentence : SetSentence}
-    (hSentence : nonempty_finite_sequence_space_theory sentence) :
-    finite_sequence_flatten_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset nonempty_finite_sequence_space_theory ⊆ finite_sequence_flatten_theory => nonempty_sequence_space_theory_subset_finite_sequence_flatten_theory
 
 end FormalSystem
 end FirstOrder

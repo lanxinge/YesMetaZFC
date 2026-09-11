@@ -95,9 +95,8 @@ theorem pairing_mem_omega
     (hRight : Γ ⊢ₘ[T] right ∈ₘ ωₘ) :
     Γ ⊢ₘ[T] godel_pairₘ(left, right) ∈ₘ ωₘ := by
   exact godel_pairing_mem_omega_of_extends
-    (fun hSentence => S.contains_natural_addition_bound
-      (natural_exponentiation_bound_theory_subset_addition_bound_theory
-        (godel_pairing_core_theory_subset_bound_theory hSentence)))
+    (show Theory.Extends T godel_pairing_core_theory from by
+      intro sentence hSentence; apply S.contains_natural_addition_bound; theory_inclusion)
     left right hLeft hRight
 
 theorem pairing_coordinates_lt

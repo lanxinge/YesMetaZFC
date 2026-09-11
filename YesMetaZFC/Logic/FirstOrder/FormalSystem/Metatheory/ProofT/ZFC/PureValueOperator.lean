@@ -31,10 +31,7 @@ noncomputable def E (hℳ : Theory.Models ℳ theory) : Expansion PureRelatedSta
   relation := (PureRelatedStage.expansion hℳ).relation
 
 theorem round_two_map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues PureRelatedStage.interpretation args = mapValues PureRoundTwoStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
+    mapValues PureRelatedStage.interpretation args = mapValues PureRoundTwoStage.interpretation args := rfl
 
 theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (E hℳ) where
   function symbol args output := by

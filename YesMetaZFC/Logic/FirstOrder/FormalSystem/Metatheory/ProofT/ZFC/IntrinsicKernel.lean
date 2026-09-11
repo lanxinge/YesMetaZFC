@@ -33,52 +33,21 @@ def intrinsic_zfc_axiom_theory : SetTheory :=
 def intrinsic_zfc_theory : SetTheory :=
   Theory.union intrinsic_zfc_axiom_theory intrinsic_proof_theory
 
-theorem intrinsic_zfc_axiom_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : intrinsic_zfc_axiom_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset intrinsic_zfc_axiom_theory ⊆ intrinsic_zfc_theory
 
-theorem intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : intrinsic_proof_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset intrinsic_proof_theory ⊆ intrinsic_zfc_theory
 
-theorem intrinsic_syntax_carrier_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : intrinsic_syntax_carrier_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    (intrinsic_syntax_carrier_theory_subset_intrinsic_proof_theory hSentence)
+derive_theory_subset intrinsic_syntax_carrier_theory ⊆ intrinsic_zfc_theory
 
-theorem expression_encoding_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : expression_encoding_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    (expression_encoding_theory_subset_intrinsic_proof_theory hSentence)
+derive_theory_subset expression_encoding_theory ⊆ intrinsic_zfc_theory
 
-theorem formal_language_encoding_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : formal_language_encoding_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    (formal_language_encoding_theory_subset_intrinsic_proof_theory hSentence)
+derive_theory_subset formal_language_encoding_theory ⊆ intrinsic_zfc_theory
 
-theorem natural_addition_bound_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : natural_addition_bound_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    (natural_addition_bound_theory_subset_intrinsic_proof_theory hSentence)
+derive_theory_subset natural_addition_bound_theory ⊆ intrinsic_zfc_theory
 
-theorem godel_pairing_core_theory_subset_intrinsic_zfc_theory
-    {sentence : SetSentence}
-    (hSentence : godel_pairing_core_theory sentence) :
-    intrinsic_zfc_theory sentence :=
-  intrinsic_proof_theory_subset_intrinsic_zfc_theory
-    (godel_pairing_core_theory_subset_intrinsic_proof_theory hSentence)
+derive_theory_subset godel_pairing_core_theory ⊆ intrinsic_zfc_theory
+
+derive_theory_subset power_set_operator_theory ⊆ intrinsic_zfc_theory => intrinsic_zfc_contains_power
 
 /-- 任意 Project ZFC 公理的内在像都是新目标理论公理。 -/
 theorem intrinsic_zfc_axiom_mem

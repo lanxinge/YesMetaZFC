@@ -43,6 +43,7 @@ def isHartogsWellOrderCode (𝒞 : OrderedPairConvention)
     {depth : Nat} (code source : Term depth) : Formula 1 depth :=
   .existsE <| .existsE <| .conj (𝒞.code code.weaken.weaken (.bound 1) (.bound 0)) <| .conj (subset (.bound 1) source.weaken.weaken)
     (isSetCodedWellOrder 𝒞 (.bound 0) (.bound 1))
+derive_free_closed isHartogsWellOrderCode
 /-- Hartogs 良序编码公式与纸面语义一致。 -/
 theorem satisfies_isHartogsWellOrderCode_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)
@@ -63,24 +64,6 @@ namespace UnarySchema
 def hartogsWellOrderCodeMembership (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := Formula.isHartogsWellOrderCode 𝒞
     Term.newest (.bound 1)
-  freeClosed := by
-    simp [Formula.isHartogsWellOrderCode,
-      Formula.isSetCodedWellOrder,
-      Formula.isWellOrderRelation, Formula.isWellOrderOn,
-      Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isRelation, Formula.related,
-      Formula.forallMem,
-      Formula.subset, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals
-      first
-      | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
-      | exact Formula.related_freeClosed_of_closed (relation := _) (parameters := _) (left := _) (right := _) (by intro entry; simp [TermVector.singleton])
-          (by simp) (by simp)
-      | simp [Formula.existsMem, Formula.FreeClosed, Term.newest]
 end UnarySchema
 namespace BinarySchema
 /-- 把 Hartogs 良序编码映到其规范序型的后继。 -/
@@ -88,27 +71,6 @@ def hartogsSuccessorValue (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := .existsE <| .existsE <| .existsE <| .conj (𝒞.code (.bound 4) (.bound 2) (.bound 1)) <| .conj (Formula.subset (.bound 2) (.bound 5)) <| .conj
     (Formula.isSetCodedWellOrder 𝒞 (.bound 1) (.bound 2)) <| .conj (Formula.isWellOrderType 𝒞 (.bound 1) (.bound 2) (.bound 0))
     (Formula.isSuccessor (.bound 3) (.bound 0))
-  freeClosed := by
-    simp [Formula.isSetCodedWellOrder,
-      Formula.isWellOrderRelation, Formula.isWellOrderOn,
-      Formula.isLinearOrderOn, Formula.isStrictPartialOrderOn,
-      Formula.isIrreflexiveOn, Formula.isTransitiveOn,
-      Formula.isLeastOf, Formula.lessOrEqual,
-      Formula.isWellOrderType,
-      Formula.isWellOrderCollapseFunction,
-      Formula.isRelationInitialSegment,
-      Formula.isFunction, Formula.isRelation,
-      Formula.isDomain, Formula.isRange,
-      Formula.orderedPairMem, Formula.related,
-      Formula.forallMem, Formula.existsMem,
-      Formula.subset, Formula.isSuccessor,
-      Formula.extensionalEq, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals first | exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl | skip
-    all_goals
-      exact Formula.related_freeClosed_of_closed (relation := _) (parameters := _) (left := _) (right := _) (by intro entry; simp [TermVector.singleton])
-        (by simp) (by simp)
 end BinarySchema
 namespace Formula
 /-- Hartogs 序型后继模式与纸面语义一致。 -/

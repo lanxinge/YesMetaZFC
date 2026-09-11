@@ -30,10 +30,8 @@ theorem finite_semantics (𝒩 : Structure.{0,0,0,x} S) (source : 𝒩.Carrier s
 theorem finite_subset_collection (hℳ : Theory.Models ℳ theory) :
     finite_subset_collection_separation_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons source tail =>
-  cases tail
+  apply close_of_curried
+  intro source
   apply (finite_semantics (PureRoundTwoStage.expansion hℳ).model source).mpr
   refine ⟨(PureRoundTwoStage.expansion hℳ).function .finiteSubsetCollection (.cons source .nil), ?_⟩
   exact (PureRoundTwoSpecifications.bounded_specification hℳ .finiteSubsetCollection (.cons source .nil) _).mp rfl
@@ -49,10 +47,8 @@ theorem nonempty_semantics (𝒩 : Structure.{0,0,0,x} S) (source : 𝒩.Carrier
 theorem nonempty_sequence_space (hℳ : Theory.Models ℳ theory) :
     nonempty_finite_sequence_space_separation_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
   apply (fromRoundTwoSentence hℳ _ rfl).mp
-  apply close_of_values
-  intro args
-  cases args with | cons source tail =>
-  cases tail
+  apply close_of_curried
+  intro source
   apply (nonempty_semantics (PureRoundTwoStage.expansion hℳ).model source).mpr
   refine ⟨(PureRoundTwoStage.expansion hℳ).function .nonemptyFiniteSequenceSpace (.cons source .nil), ?_⟩
   exact (PureRoundTwoSpecifications.filter_specification hℳ .nonemptyFiniteSequenceSpace (.cons source .nil) _).mp rfl
@@ -72,12 +68,8 @@ theorem image_semantics (𝒩 : Structure.{0,0,0,x} S) (relation source target :
 
 theorem relation_image (hℳ : Theory.Models ℳ theory) :
     relation_image_separation_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons target tail =>
-  cases tail with | cons source tail =>
-  cases tail with | cons relation tail =>
-  cases tail
+  apply close_of_curried
+  intro target source relation
   apply (image_semantics (E hℳ).model relation source target).mpr
   obtain ⟨output, hOutput⟩ := PureSeparation.exists_subset hℳ
     (openFormula PureCompletedStage.interpretation imageBody)

@@ -20,59 +20,6 @@ open scoped FormalSystem.Symbols
 
 set_option autoImplicit false
 
-/-- 连续实例化两个自由槽等于一次双槽替换。 -/
-theorem two_free_substitution_beta
-    {body : SetOpenFormula [SetSort.set, SetSort.set]}
-    (first second : SetOpenTerm []) :
-    Formula.instantiateFreeTop first
-      (Formula.substituteFree
-        (VariableSubstitution.liftFree SetSort.set
-          (VariableSubstitution.instantiateFreeTop second)) body) =
-      Formula.substituteFree
-        (VariableSubstitution.cons first
-          (VariableSubstitution.cons second VariableSubstitution.empty)) body := by
-  change
-    Formula.substitute (Substitution.instantiateFreeTop first)
-      (Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.liftFree SetSort.set
-            (VariableSubstitution.instantiateFreeTop second))) body) =
-      Formula.substitute
-        (Substitution.free_map
-          (VariableSubstitution.cons first
-            (VariableSubstitution.cons second VariableSubstitution.empty))) body
-  rw [Formula.substitute_comp]
-  simp only [Substitution.comp, Substitution.instantiateFreeTop,
-    Substitution.free_map]
-  congr 1
-  change Substitution.map _ _ = Substitution.map _ _
-  congr
-  funext resultSort entry
-  cases entry with
-  | here =>
-      simp [ VariableSubstitution.cons, VariableSubstitution.liftFree,
-        VariableSubstitution.instantiateFreeTop,
-        Term.substituteMapped]
-  | there previous =>
-      cases resultSort
-      cases previous with
-      | here =>
-          simpa [Term.weakenFree, Term.rename, Renaming.weakenFree,
-            Renaming.free, Term.renameMapped] using!
-            (Term.substituteMapped_weakenFree_instantiateFreeTop
-              (σ := signature) SetSort.set first second)
-      | there impossible =>
-          cases impossible
-
-theorem gq_closed_two_weaken_substitute
-    (τ : VariableSubstitution signature [SetSort.set, SetSort.set] [] [])
-    {resultSort : signature.SortSymbol}
-    (term : Term signature [] [] resultSort) :
-    Term.substituteMapped VariableSubstitution.boundId τ
-        ((term.weakenFree SetSort.set).weakenFree SetSort.set) =
-      term := by
-  simp only [Term.substituteMapped_weakenFree_tail, Term.substituteMapped_emptyFree]
-
 private theorem formula_code_binary_atomic_condition_intro
     (tag : StructuralCodeTag)
     (depth code left right : SetOpenTerm [])

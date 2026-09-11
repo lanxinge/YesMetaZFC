@@ -120,14 +120,6 @@ namespace ZF
 private def omegaSchema : Definitional.Project.UnarySchema 0 where
   body := .forallE <| .imp (Definitional.Project.Formula.isInductive
       Definitional.Project.Term.newest) (.mem (.bound 1) Definitional.Project.Term.newest)
-  freeClosed := by
-    simp [Definitional.Project.Formula.isInductive,
-      Definitional.Project.Formula.isEmpty,
-      Definitional.Project.Formula.isSuccessor,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
 /-- ZF 中存在最小归纳集。 -/
 theorem exists_omega {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF) :
     ∃ ω, ℳ.IsOmega ω := by
@@ -185,78 +177,28 @@ theorem exists_omega {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF) :
 /-- “当前对象是序数”的无参数分离模式。 -/
 private def ordinalSchema : Definitional.Project.UnarySchema 0 where
   body := Definitional.Project.Formula.isOrdinal (.bound 0)
-  freeClosed := by
-    simp [Definitional.Project.Formula.isOrdinal,
-      Definitional.Project.Formula.isTransitive,
-      Definitional.Project.Formula.isWellOrderOn,
-      Definitional.Project.Formula.isLinearOrderOn,
-      Definitional.Project.Formula.isStrictPartialOrderOn,
-      Definitional.Project.Formula.isIrreflexiveOn,
-      Definitional.Project.Formula.isTransitiveOn,
-      Definitional.Project.Formula.isLeastOf,
-      Definitional.Project.Formula.lessOrEqual,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Formula.subset,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
 /-- “当前对象包含于给定参数”的一参数分离模式。 -/
 private def subsetParameterSchema : Definitional.Project.UnarySchema 1 where
   body := Definitional.Project.Formula.subset (.bound 0) (.bound 1)
-  freeClosed := by
-    simp [Definitional.Project.Formula.subset,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.freeSupport_bound]
 /-- “当前自然数为空或为 `ω` 中某个自然数的后继”的分离模式。 -/
 private def emptyOrSuccessorInOmegaSchema : Definitional.Project.UnarySchema 1 where
   body := .disj (Definitional.Project.Formula.isEmpty (.bound 0)) <|
     .existsE <| .conj (.mem Definitional.Project.Term.newest (.bound 2)) (Definitional.Project.Formula.isSuccessor (.bound 1) Definitional.Project.Term.newest)
-  freeClosed := by
-    simp [Definitional.Project.Formula.isEmpty,
-      Definitional.Project.Formula.isSuccessor,
-      Definitional.Project.Formula.extensionalEq,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
 /-- 固定左自然数后，序数加法在 `ω` 中封闭。 -/
 private def ordinalAdditionClosedInOmegaSchema (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.UnarySchema 2 where
   body := .forallE <| .imp (Definitional.Project.Formula.isOrdinalAddition 𝒞
       Definitional.Project.Term.newest (.bound 2) (.bound 1)) (.mem Definitional.Project.Term.newest (.bound 3))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isOrdinalAddition,
-      Definitional.Project.Formula.related,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    apply Definitional.Project.Formula.related_freeClosed_of_closed <;>
-      simp [Definitional.TermVector.FreeClosed,
-        Definitional.TermVector.singleton]
 /-- 固定左自然数后，序数乘法在 `ω` 中封闭。 -/
 private def ordinalMultiplicationClosedInOmegaSchema (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.UnarySchema 2 where
   body := .forallE <| .imp (Definitional.Project.Formula.isOrdinalMultiplication 𝒞
       Definitional.Project.Term.newest (.bound 2) (.bound 1)) (.mem Definitional.Project.Term.newest (.bound 3))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isOrdinalMultiplication,
-      Definitional.Project.Formula.related,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    apply Definitional.Project.Formula.related_freeClosed_of_closed <;>
-      simp [Definitional.TermVector.FreeClosed,
-        Definitional.TermVector.singleton]
 /-! 固定自然数底数后，序数幂在 `ω` 中封闭。 -/
 private def ordinalExponentiationClosedInOmegaSchema (𝒞 : Definitional.Project.OrderedPairConvention) :
     Definitional.Project.UnarySchema 2 where
   body := .forallE <| .imp (Definitional.Project.Formula.isOrdinalExponentiation 𝒞
       Definitional.Project.Term.newest (.bound 2) (.bound 1)) (.mem Definitional.Project.Term.newest (.bound 3))
-  freeClosed := by
-    simp [Definitional.Project.Formula.isOrdinalExponentiation,
-      Definitional.Project.Formula.related,
-      Definitional.Formula.FreeClosed,
-      Definitional.Term.newest]
-    apply Definitional.Project.Formula.related_freeClosed_of_closed <;>
-      simp [Definitional.TermVector.FreeClosed,
-        Definitional.TermVector.singleton]
 /-- 自然数加法封闭模式的模型语义。 -/
 private theorem satisfies_ordinalAdditionClosedInOmegaSchema_iff
     {ℳ : Structure.{u}}

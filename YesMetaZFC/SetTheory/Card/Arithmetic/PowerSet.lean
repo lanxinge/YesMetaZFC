@@ -25,8 +25,6 @@ namespace BinarySchema
 def characteristicValue : BinarySchema 3 where
   body := .disj (.conj (.mem (.bound 1) (.bound 2)) (Formula.extensionalEq (.bound 0) (.bound 4))) (.conj (.neg <| .mem (.bound 1) (.bound 2))
       (Formula.extensionalEq (.bound 0) (.bound 3)))
-  freeClosed := by
-    simp [Formula.extensionalEq, Formula.FreeClosed]
 /-- 把幂集成员映到其特征函数图。 -/
 def characteristicFunction (𝒞 : OrderedPairConvention) : BinarySchema 4 where
   body := .conj (Formula.isFunctionFromTo 𝒞 (.bound 0) (.bound 2) (.bound 3)) <|
@@ -35,23 +33,11 @@ def characteristicFunction (𝒞 : OrderedPairConvention) : BinarySchema 4 where
         .conj (.mem (.bound 1) (.bound 4)) <|
           .disj (.conj (.mem (.bound 1) (.bound 3)) (Formula.extensionalEq (.bound 0) (.bound 7))) (.conj (.neg <| .mem (.bound 1) (.bound 3))
               (Formula.extensionalEq (.bound 0) (.bound 6)))
-  freeClosed := by
-    simp [Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.extensionalEq,
-      Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace UnarySchema
 /-- 从函数图中分离取值为 `one` 的输入。 -/
 def oneFiber (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 1)
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace Formula
 /-- 单点特征值关系的纸面解释。 -/

@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalTransfer
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRelatedSyntaxFixedPoint
 
 /-! # 三个相关语法谓词的模型扩张
@@ -34,18 +35,8 @@ def relationCovered : RelationSymbol → Bool
   | .isRelatedTermCodeAt | .isRelatedTermListCodeAt | .isRelatedFormulaCodeAt => true
   | symbol => PureStructureStage.relationCovered symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureStructureStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
-  intro symbol args
-  change ∃ output, (PureStructureStage.interpretation.function symbol).satisfies (templateEnv (.cons output (mapValues interpretation args))) ∧
-    ∀ other, (PureStructureStage.interpretation.function symbol).satisfies (templateEnv (.cons other (mapValues interpretation args))) → other = output
-  rw [map_values]
-  exact PureStructureStage.functional hℳ symbol args
+  exact PureStructureStage.functional hℳ
 
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ where
   function symbol args := match symbol,args with
@@ -64,7 +55,6 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
       cases args
       exact (PureRoundTwoStage.realizes hℳ).function .omega .nil output
     all_goals
-      rw [map_values,PureStructureStage.map_values,PureSyntaxStage.map_values]
       exact (PureRoundTwoStage.realizes hℳ).function _ args output
   relation symbol args := by
     cases symbol
@@ -88,7 +78,6 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
       cases tail
       exact graph2_correct hℳ .formula symbols depth code
     all_goals
-      rw [map_values]
       exact (PureStructureStage.realizes hℳ).relation _ args
 
 /-- 原递归正文中所有递归调用均携带当前符号集，故逐参数不动点可装配为整个关系解释。 -/
@@ -132,8 +121,6 @@ theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} 
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureStructureStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureStructureStage.expansion hℳ) (PureStructureStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureStructureStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureRelatedSyntaxStage

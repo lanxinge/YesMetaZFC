@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalTransfer
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureOrdinalArithmetic
 
 /-! # 加乘幂的实际模型扩张与有限迭代语义 -/
@@ -31,16 +32,9 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureDifferenceStage.interpretation.relation
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureDifferenceStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case naturalAddition | naturalMultiplication | naturalExponentiation =>
     cases args with | cons left tail =>
     cases tail with | cons right tail =>
@@ -57,9 +51,7 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory)
     (hGraph : interpretation.function symbol = PureDifferenceStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureDifferenceStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureDifferenceStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureDifferenceStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 
 theorem omega_eq (hℳ : Theory.Models ℳ theory) : (expansion hℳ).function .omega .nil = omega hℳ := function_preserved hℳ _ rfl _
 theorem zero_eq (hℳ : Theory.Models ℳ theory) : (expansion hℳ).function .emptySet .nil = zero hℳ := function_preserved hℳ _ rfl _

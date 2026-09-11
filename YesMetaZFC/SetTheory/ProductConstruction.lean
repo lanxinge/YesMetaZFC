@@ -14,8 +14,6 @@ namespace BinarySchema
 /-- 固定左坐标后，把右坐标映到相应有序对编码。 -/
 def orderedPairWithLeft (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := 𝒞.code (.bound 0) (.bound 2) (.bound 1)
-  freeClosed :=
-    𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- `row` 恰好由固定左坐标与右集合各元素组成的有序对编码构成。 -/
@@ -24,6 +22,7 @@ def isCartesianRow (𝒞 : OrderedPairConvention)
   .forallE <| .iff (.mem Term.newest row.weaken) <|
     Formula.existsMem right.weaken <|
       𝒞.code (.bound 1) left.weaken.weaken Term.newest
+derive_free_closed isCartesianRow
 /-- 固定左坐标的有序对模式按合同解释。 -/
 theorem denote_orderedPairWithLeft_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (env : Env ℳ 1) (right pair : ℳ.Domain) :
@@ -52,11 +51,6 @@ namespace BinarySchema
 /-- 固定右集合后，把每个左坐标映到其笛卡尔积行。 -/
 def cartesianRow (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body := Definitional.Project.Formula.isCartesianRow 𝒞 (.bound 0) (.bound 1) (.bound 2)
-  freeClosed := by
-    simp [Definitional.Project.Formula.isCartesianRow,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Formula.FreeClosed, Definitional.Term.newest]
-    exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 笛卡尔积行模式的 schema 解释。 -/

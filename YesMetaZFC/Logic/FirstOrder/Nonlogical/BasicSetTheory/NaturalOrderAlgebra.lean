@@ -160,25 +160,13 @@ def order_product_theory : SetTheory :=
   Theory.insert order_product_definition_axiom
     order_product_separation_theory
 
-theorem foundation_theory_subset_natural_order_algebra_base_theory
-    {sentence : SetSentence}
-    (hSentence : foundation_theory sentence) :
-    natural_order_algebra_base_theory sentence := hSentence
+derive_theory_subset foundation_theory ⊆ natural_order_algebra_base_theory
 
-theorem natural_order_algebra_base_theory_subset_order_sum_theory
-    {sentence : SetSentence}
-    (hSentence : natural_order_algebra_base_theory sentence) :
-    order_sum_theory sentence := Or.inr hSentence
+derive_theory_subset natural_order_algebra_base_theory ⊆ order_sum_theory
 
-theorem order_sum_theory_subset_order_product_separation_theory
-    {sentence : SetSentence}
-    (hSentence : order_sum_theory sentence) :
-    order_product_separation_theory sentence := Or.inr hSentence
+derive_theory_subset order_sum_theory ⊆ order_product_separation_theory
 
-theorem order_product_separation_theory_subset_order_product_theory
-    {sentence : SetSentence}
-    (hSentence : order_product_separation_theory sentence) :
-    order_product_theory sentence := Or.inr hSentence
+derive_theory_subset order_product_separation_theory ⊆ order_product_theory
 
 end BasicSetTheory
 end Nonlogical

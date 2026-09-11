@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSequenceFilters
 
 /-! # 递归序列族与其并集的统一扩张
@@ -32,18 +33,10 @@ def filterInterpretation : Interpretation S ℒ where
   function := filterFunction
   relation := PureNaturalRelations.interpretation.relation
 
-theorem filter_map_values {ℳ : Structure.{0,0,0,x} ℒ} {sorts : SortContext S}
-    (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues filterInterpretation args = mapValues PureCollectionStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem filter_functional {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory) :
     Functional filterInterpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [filter_map_values]
   case nonemptyFiniteSequenceSpace => exact PureSequenceFilters.functional hℳ .nonemptyFiniteSequenceSpace args
   case recursiveSequenceSpace => exact PureSequenceFilters.functional hℳ .recursiveSequenceSpace args
   all_goals exact PureCollectionStage.functional hℳ _ args
@@ -92,18 +85,10 @@ def interpretation : Interpretation S ℒ where
   function := functionGraph
   relation := PureNaturalRelations.interpretation.relation
 
-theorem map_values {ℳ : Structure.{0,0,0,x} ℒ} {sorts : SortContext S}
-    (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues filterInterpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
-
 theorem functional {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory) :
     Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case omegaRecursiveSequence =>
     cases args with | cons source tail =>
     cases tail with | cons seed tail =>
@@ -124,9 +109,7 @@ theorem transfer_from_collection {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.
     (args : Values (expansion hℳ).model.Carrier parameters) :
     spec.satisfies (templateEnv args : Env (PureCollectionStage.expansion hℳ).model [] parameters) ↔
       spec.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) spec args
-  rw [hTranslate, map_values, filter_map_values] at hNew
-  exact (openFormula_correct (PureCollectionStage.expansion hℳ) (PureCollectionStage.realizes hℳ) spec args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureCollectionStage.realizes hℳ) _ (realizes hℳ) spec hTranslate args
 
 theorem filter_graph_equation {symbol : Nonlogical.BasicSetTheory.FunctionSymbol}
     (primitive : PureSequenceFilters.Primitive symbol) :
@@ -142,20 +125,16 @@ theorem filter_translation {symbol : Nonlogical.BasicSetTheory.FunctionSymbol}
 theorem filter_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureSequenceFilters.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureSequenceFilters.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
+    FunctionSpecification (expansion hℳ) symbol ((PureSequenceFilters.specification primitive)) args output := by
   apply ((realizes hℳ).function symbol args output).symm.trans
-  rw [filter_graph_equation primitive, map_values, filter_map_values]
+  rw [filter_graph_equation primitive]
   exact (PureSequenceFilters.graph_correct hℳ primitive args output).trans
     (transfer_from_collection hℳ _ (filter_translation primitive) (.cons output args))
 
 /-- 最后加入的 ω 算子逐参数满足原并集规格。 -/
 theorem omega_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (source seed recursion output : Carrier ℳ) :
-    output = (expansion hℳ).function .omegaRecursiveSequence (.cons source (.cons seed (.cons recursion .nil))) ↔
-      omegaSpec.satisfies
-        (templateEnv (.cons output (.cons source (.cons seed (.cons recursion .nil)))) : Env (expansion hℳ).model [] [s,s,s,s]) := by
+    FunctionSpecification (expansion hℳ) .omegaRecursiveSequence (omegaSpec) (.cons source (.cons seed (.cons recursion .nil))) output := by
   apply ((realizes hℳ).function .omegaRecursiveSequence (.cons source (.cons seed (.cons recursion .nil))) output).symm.trans
   have hTranslation : openFormula interpretation omegaSpec = omegaGraph := rfl
   have h := openFormula_correct (expansion hℳ) (realizes hℳ) omegaSpec
@@ -188,11 +167,9 @@ theorem bounded_translation {symbol : Nonlogical.BasicSetTheory.FunctionSymbol}
 theorem bounded_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     {symbol : Nonlogical.BasicSetTheory.FunctionSymbol} (primitive : PureBoundedDefinitions.Primitive symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) (output : Carrier ℳ) :
-    output = (expansion hℳ).function symbol args ↔
-      (PureBoundedDefinitions.specification primitive).satisfies
-        (templateEnv (.cons output args) : Env (expansion hℳ).model [] (s :: S.funcDomain symbol)) := by
+    FunctionSpecification (expansion hℳ) symbol ((PureBoundedDefinitions.specification primitive)) args output := by
   apply ((realizes hℳ).function symbol args output).symm.trans
-  rw [bounded_graph_equation primitive, map_values, filter_map_values]
+  rw [bounded_graph_equation primitive]
   have hOld := ((PureCollectionStage.realizes hℳ).function symbol args output).trans
     (PureCollectionStage.bounded_specification hℳ primitive args output)
   rw [PureCollectionStage.bounded_graph_equation primitive] at hOld
@@ -200,9 +177,8 @@ theorem bounded_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Mod
 
 theorem finite_sequence_specification {ℳ : Structure.{0,0,0,x} ℒ} (hℳ : Theory.Models ℳ theory)
     (source output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteSequenceSpace (.cons source .nil) ↔
-      (Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here)).satisfies
-        (templateEnv (.cons output (.cons source .nil)) : Env (expansion hℳ).model [] [s,s]) := by
+    FunctionSpecification (expansion hℳ) .finiteSequenceSpace
+      ((Nonlogical.BasicSetTheory.finite_sequence_space_spec (.fvar (.there .here)) (.fvar .here))) (.cons source .nil) output := by
   apply ((realizes hℳ).function .finiteSequenceSpace (.cons source .nil) output).symm.trans
   have hOld := ((PureCollectionStage.realizes hℳ).function .finiteSequenceSpace (.cons source .nil) output).trans
     (PureCollectionStage.finite_sequence_specification hℳ source output)

@@ -18,6 +18,53 @@
 最终结论及其前提集中在 [TROPHIES.md](TROPHIES.md)，可信依赖和验证范围集中在
 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
 
+## 公式和模板的闭合性
+
+集合论公式缩写定义后使用 `derive_free_closed f`，生成普通定理 `f_freeClosed` 并注册为
+`simp` 规则。实现见 [DeriveFreeClosed](YesMetaZFC/Automation/DeriveFreeClosed.lean)：
+它保留原构造的全部参数，只为项、参数向量和公式输入添加闭合性前提，展开该缩写一层，
+再组合已有合同。生成证明必须通过 Lean 内核；无法完成时构建失败。
+`OrderedPairConvention.code_freeClosed` 和 `BinarySchema.instantiate_freeClosed` 是
+编码及模板代入的边界合同，任意有序对约定及任意参数数量均保留。
+
+[Hierarchy/Syntax](YesMetaZFC/SetTheory/Definitional/Project/Hierarchy/Syntax.lean) 的
+`UnarySchema`、`BinarySchema` 在构造时自动填充 `freeClosed`，`Delta0` 模板继承同一检查。
+常规模板只写 `body`；专用公式先派生自身合同。证书仍在结构中，调用者复用 `.freeClosed`，
+不重复展开函数、序数或基数定义。原 `Formula` 仍允许自由变量，只有模板要求闭合。
+闭合性自动化使用 `simp -implicitDefEqProofs`，保留侧条件的显式证明，避免 Lean 4.33.1
+在较低透明度下无法赋值简化后的证明；此选项不设为全局设置。
+
+全称闭包的语义复用 [ModelClosure](YesMetaZFC/Automation/ModelClosure.lean) 的
+`close_of_curried`，直接逐变量 `intro`，由 `Curried.apply` 统一接回任意排序的 `Values`。
+参数代入后的环境等式复用 [RelationalEnvironment](YesMetaZFC/Automation/RelationalEnvironment.lean)
+的 `pullback_arguments` 和 `pullback_free_arguments`。
+
+## 理论包含与最小支撑
+
+[TheoryInclusion](YesMetaZFC/Automation/TheoryInclusion.lean) 的
+`derive_theory_subset weak ⊆ strong` 在理论组合边界生成普通包含定理，默认名称为
+`weak_subset_strong`，可用 `=> name` 指定名称。`private`、文档注释、`sentence` 和
+`hSentence` 命名参数均保留。调用方仍可直接使用这些已检查的定理。
+
+`theory_inclusion` 沿理论的 `union`、`insert` 和别名寻找包含路径；源理论为并时，
+两个分支都必须包含在目标中。搜索缓存已访问节点，只展开理论谓词，不展开公理正文。
+它生成假设、析取引入／消去或空理论消去的普通证明，不负责数学推导或模型满足性。
+若 `have` 尚未确定结果理论，用 `show Theory.Extends strong weak from by theory_inclusion`
+显式固定边界；任意支撑 `S` 仍须先给出相应的 `S.contains_*` 合同。
+
+有限序列的最小支撑由 `finite_sequence_support_instance` 统一组装；算术联合理论直接
+弱化这一实例，再补其无穷和配数合同。ZFC 幂集包含统一使用
+`intrinsic_zfc_contains_power`，不在每个证明消费者重新复制包含链。
+
+## 有限公理基的模型满足
+
+[FiniteBasisModels](YesMetaZFC/Automation/FiniteBasisModels.lean) 的
+`finite_basis_models [h₁, …, hₙ]` 装配显式的 `Theory.Models ℳ basis.theory` 目标。
+证据必须是同一模型中的闭句语义或已验证子基；合取证据可拆分，子基沿 `singleton`、
+`insert`、`union`、`congr` 和别名组合。命名子基缓存为普通内核定理，不展开公理列表，
+也不搜索或补造缺失的数学证据。实际调用见 `ZFC/PureSupportModels.support_models`。
+参数分离族仍由闭模板的模型证明及 `FiniteAxiomBasis.models_iff` 接回原理论。
+
 ## 语法、替换与 Quine
 
 | 调用方需要 | 公共接口与源码 | 使用边界 |
@@ -31,6 +78,14 @@
 | Quine 的 scope、深度与总码域 | [QuineEncoding/StructuralCorrectness](YesMetaZFC/Logic/FirstOrder/FormalSystem/QuineEncoding/StructuralCorrectness.lean)、[FormulaStructuralCorrectness](YesMetaZFC/Logic/FirstOrder/FormalSystem/QuineEncoding/FormulaStructuralCorrectness.lean)、[FormulaTransformStructuralCorrectness](YesMetaZFC/Logic/FirstOrder/FormalSystem/QuineEncoding/FormulaTransformStructuralCorrectness.lean) | shape 接口不替代这些义务；先固定操作码、深度、变量位置及替换项 |
 | 共同 guard 下的命题等价 | [FirstOrder/Metatheory/Propositional](YesMetaZFC/Logic/FirstOrder/Metatheory/Propositional.lean) 的 `guarded_conj_congr_m` | 保留原 guard，不通过增强调用方前提缩短证明 |
 | 当前完整公式的单射 quotation | [IntrinsicQuotation](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/IntrinsicQuotation.lean) 的 `unquote_quote`、`quote_injective`、`quote_ne` | 保留全部十一种构造子；紧凑结构项不展开为巨大一元 numeral |
+
+[Substitution/Basic](YesMetaZFC/Logic/FirstOrder/Derivation/Substitution/Basic.lean) 的
+`Term`、`Arguments`、`Formula.renameMapped_eq_substituteMapped` 同时覆盖任意 bound/free
+重命名。复合操作先用 `substituteMapped_comp` 合并，再按变量像作函数外延；
+不为两层、三层弱化或闭包往返重新遍历项和公式。
+`Formula.substituteMapped_abstractFreeTop_lift` 保留任意替换与上下文，统一自由槽抽象的
+交换律；全称、存在量词只接各自构造子。公式弱化后的尾映射合同位于 `Substitution/Algebra`。
+这些是普通内核定理，不改变 AST 执行器、闭上下文嵌入算法或原定理的适用范围。
 
 含量词公式的参数化码与类型化代入交换，复用
 [ObjectCodeSubstitution](YesMetaZFC/Automation/ObjectCodeSubstitution.lean) 的
@@ -176,6 +231,18 @@ Löb 推导复用 [Loeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/Pro
 | 调度、预处理与 residual | [Automation/Scheduler](YesMetaZFC/Automation/Scheduler.lean)、[SourcePreprocessing](YesMetaZFC/Automation/SourcePreprocessing.lean)、[Automation/Resolution](YesMetaZFC/Automation/Resolution.lean)、[PropCdcl](YesMetaZFC/Automation/PropCdcl.lean) | 领域模块只提供合同；搜索实现和公共前端位于 Automation |
 | Henkin 调度所需的可数语法 | [SyntaxNatCoding](YesMetaZFC/Automation/SyntaxNatCoding.lean) | 单射编码服务于完备性，不替换对象理论 quotation |
 
+[GuardSemantics](YesMetaZFC/Automation/GuardSemantics.lean) 统一 FO/HO 公用的命题语义：
+`Clause.satisfies_canonical_iff`、`satisfies_append_iff` 与 `Clause.Satisfies.transfer`
+负责子句外壳；`Guards.learnedClause_satisfies_iff` 把学习子句接到守卫合取的否定，
+`Guards.activation_satisfies` 接到守卫蕴含正文。激活接口要求两种赋值在每个原守卫上
+真值一致；对象文字的编译、类型和 atom map 外部检查由各自回放层提供。
+
+[IntrinsicReplay/Core](YesMetaZFC/Automation/DAGCertificate/IntrinsicReplay/Core.lean) 的
+`parent_compiled_raw_of_snapshot` 只消费实际父索引及已检查快照，供父拷贝、局部规则、
+初始子句与冲突回放共用。`IntrinsicReplay/Semantics.literalLinks_satisfies` 只处理
+已编译真文字的链接映射；父边、guard 和整体拓扑条件仍由调用者证明。
+已知索引存在时先使用 `node?_eq_some_nodeAt`，无需再次划分查找失败分支。
+
 ## 核验入口与维护边界
 
 ```bash
@@ -188,11 +255,10 @@ bash scripts/check-all.sh
 `ProveAutoBranchProbe` 不得仅因默认导入图不可达而删除。工具依赖改变时，
 检查 `--help` 和一次实际目标扫描，命令使用 `lake env .lake/build/bin/prove_auto_sweep ...`。
 
-当前纯自身编码 Tarski 节点有 950 个 Lean 文件、237,149 行；含 Python/Shell 共
-237,986 行，严格低于 200,000 还需净减 37,987 行。计数包含规范源码中的空行与注释，
-排除构建缓存和临时文件；文档删除不计入代码减量。
-当前严格构建 947 个任务、全源 952 个任务及扫描工具 320 个任务通过，零错误、零警告；
-声明与可信依赖的核验摘要见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+当前规模、本轮基点、净减量与同条件耗时对照见
+[PROOF_REDUCTION.md](PROOF_REDUCTION.md)。计数包含注释和空行，排除缓存、探针和文档；
+新增公共接口必须计入净减量。构建结果只对应该记录标明的源码指纹。
+数学成果与原节点可信依赖审计见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
 此前 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)
 的 806 个 Lean 文件、225,346 行总代码是重构历史基点，不是当前规模。
 
@@ -207,7 +273,7 @@ Lean 4.33.1 适配约定：必要的类型别名使用 `@[implicit_reducible]`�
 | --- | --- | --- |
 | 扩大公共证明接口的消费范围 | 本页序列、环境、状态不变量和 shape 接口 | 找到仍重复的实际消费者；完成迁移后扣除新增抽象再计净减量 |
 | DAG 已检查父节点视图与材料化 | [DAGCertificate/IntrinsicReplay/Semantics](YesMetaZFC/Automation/DAGCertificate/IntrinsicReplay/Semantics.lean)、[HOAvatarSoundness](YesMetaZFC/Automation/HOAvatarSoundness.lean)、[SearchMaterialization](YesMetaZFC/Automation/SearchMaterialization.lean)、[HOSearchMaterialization](YesMetaZFC/Automation/HOSearchMaterialization.lean)、[ResourceTrace](YesMetaZFC/Automation/ResourceTrace.lean) | 先核对剩余重复；统一父索引、快照和 payload 提取，保留 FO/HO 特有证据及失败分支 |
-| 可组合的纯定义扩张 | [PureCollectionStage](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureCollectionStage.lean)、[PureSequenceStage](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSequenceStage.lean)、[RelationalTransfer](YesMetaZFC/Automation/RelationalTransfer.lean) | 在连续小阶段上验证新旧图保持和规格传输；不从最终巨大解释项展开 |
+| 可组合的纯定义扩张 | [RelationalEnvironment](YesMetaZFC/Automation/RelationalEnvironment.lean) 的 `mapSortValues`、[RelationalTransfer](YesMetaZFC/Automation/RelationalTransfer.lean)、[RelationalInheritance](YesMetaZFC/Automation/RelationalInheritance.lean) | 参数列只沿排序递归；`CoveredExtension.trans` 组合覆盖增长与旧图保持；任意翻译相等仍可直接传输，函数规格用 `specification_regraph`，闭句用 `ModelClosure.templateEnv_nil` |
 | 集合图与双射的数学复用 | [FunctionSpaceAlgebra](YesMetaZFC/SetTheory/FunctionSpaceAlgebra.lean)、[Card/Arithmetic/Equinumerosity](YesMetaZFC/SetTheory/Card/Arithmetic/Equinumerosity.lean) | 用模型内部可定义映射及复合消除重复，宿主 `Equiv` 不能替代集合图 |
 | 大公式核验性能 | [PureLogicalSchemaSets](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLogicalSchemaSets.lean) 的 `condition_bounded`、[PureFinalSyntax](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFinalSyntax.lean) 及 [PureSyntaxTransform](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureSyntaxTransform.lean) | 先作声明级测量，将语义形状与具体解释分开，保留原公式及证明前提 |
 | 扫描器前端覆盖 | `GoalRequest` 到领域目标的接入 | `Ordinal.transitive` 的现有扫描结果为 `not_closed` / `unknown`；前端接入和搜索成功分别核验 |

@@ -987,19 +987,8 @@ theorem HilbertLineCertificateCode.decode_value
     (certificate : HilbertLineCertificateCode) :
     HilbertLineCertificateCode.decode certificate.value =
       some certificate := by
-  cases certificate with
-  | logical certificateCode =>
-      simp [HilbertLineCertificateCode.value,
-        HilbertLineCertificateCode.decode,
-        godel_unpair_value_pair]
-  | theory certificateCode =>
-      simp [HilbertLineCertificateCode.value,
-        HilbertLineCertificateCode.decode,
-        godel_unpair_value_pair]
-  | modusPonens implicationIndex premiseIndex =>
-      simp [HilbertLineCertificateCode.value,
-        HilbertLineCertificateCode.decode,
-        godel_unpair_value_pair]
+  cases certificate <;>
+    simp_all [HilbertLineCertificateCode.value, HilbertLineCertificateCode.decode, godel_unpair_value_pair]
 
 /-! ## 证明序列编码的递归图 -/
 /--

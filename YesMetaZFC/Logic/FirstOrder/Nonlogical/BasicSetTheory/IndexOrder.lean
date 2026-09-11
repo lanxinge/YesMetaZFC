@@ -190,20 +190,11 @@ def index_order_separation_theory : SetTheory :=
 def index_order_theory : SetTheory :=
   Theory.insert index_order_definition_axiom index_order_separation_theory
 
-theorem order_operator_theory_subset_minimum_difference_theory
-    {sentence : SetSentence}
-    (hSentence : order_operator_theory sentence) :
-    minimum_difference_theory sentence := Or.inr hSentence
+derive_theory_subset order_operator_theory ⊆ minimum_difference_theory
 
-theorem minimum_difference_theory_subset_index_order_separation_theory
-    {sentence : SetSentence}
-    (hSentence : minimum_difference_theory sentence) :
-    index_order_separation_theory sentence := Or.inr hSentence
+derive_theory_subset minimum_difference_theory ⊆ index_order_separation_theory
 
-theorem index_order_separation_theory_subset_index_order_theory
-    {sentence : SetSentence}
-    (hSentence : index_order_separation_theory sentence) :
-    index_order_theory sentence := Or.inr hSentence
+derive_theory_subset index_order_separation_theory ⊆ index_order_theory
 
 end BasicSetTheory
 end Nonlogical

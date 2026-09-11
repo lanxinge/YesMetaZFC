@@ -20,10 +20,6 @@ register_option prove_auto.replay.strictAudit : Bool := {
   defValue := false
   descr := "rebuild replay completeness with pure Lean proofs instead of erasable native tickets"
 }
-private def traceRemainingHeartbeats (label : String) : MetaM Unit := do
-  let remaining ← getRemainingHeartbeats
-  trace[YesMetaZFC.proveAuto.kernelReplay]
-    "{label}; remainingHb={remaining / 1000}"
 def failureAttemptExpr (goal : Expr) (summary : String) : Expr :=
   mkApp2 (mkConst ``ProveAutoRequest.GoalAttempt.failure) goal (toExpr summary)
 structure PreprocessingPayloadExprs where

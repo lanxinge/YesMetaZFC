@@ -49,11 +49,6 @@ def transportedFunctionValue (𝒞 : OrderedPairConvention) : BinarySchema 3 whe
   body := .existsE <| .existsE <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 3) (.bound 5)) <|
     .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 4)) (Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 6))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed,
-      Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 把一个函数图整体输送到目标定义域和值域。 -/
 def functionTransportValue (𝒞 : OrderedPairConvention) : BinarySchema 4 where
   body := .conj (Formula.isFunctionFromTo 𝒞 (.bound 0) (.bound 4) (.bound 5)) <|
@@ -63,14 +58,6 @@ def functionTransportValue (𝒞 : OrderedPairConvention) : BinarySchema 4 where
           .existsE <| .existsE <|
             .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 3) (.bound 6)) <|
             .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 5)) (Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 7))
-  freeClosed := by
-    simp [Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 定义域单射扩张后的单点值关系。 -/
 def extendedFunctionValue (𝒞 : OrderedPairConvention) : BinarySchema 4 where
   body := .disj (.existsE <| .existsE <|
@@ -78,11 +65,6 @@ def extendedFunctionValue (𝒞 : OrderedPairConvention) : BinarySchema 4 where
       .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 4)) (Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 6))) <|
     .conj (.neg <| .existsE <|
         Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 4)) (Formula.extensionalEq (.bound 0) (.bound 5))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 把一个函数整体扩张到更大的定义域。 -/
 def functionExtensionValue (𝒞 : OrderedPairConvention) : BinarySchema 5 where
   body := .conj (Formula.isFunctionFromTo 𝒞 (.bound 0) (.bound 5) (.bound 6)) <|
@@ -93,14 +75,6 @@ def functionExtensionValue (𝒞 : OrderedPairConvention) : BinarySchema 5 where
             .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 5)) (Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 7))) <|
           .conj (.neg <| .existsE <|
               Formula.orderedPairMem 𝒞 (.bound 0) (.bound 2) (.bound 5)) (Formula.extensionalEq (.bound 0) (.bound 6))
-  freeClosed := by
-    simp [Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 单点输送值关系的纸面解释。 -/
@@ -177,14 +151,6 @@ namespace UnarySchema
 /-- 固定源集和目标集后筛选集合编码函数图。 -/
 def functionFromTo (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := Formula.isFunctionFromTo 𝒞 (.bound 0) (.bound 1) (.bound 2)
-  freeClosed := by
-    simp [Formula.isFunctionFromTo, Formula.isFunction,
-      Formula.isRelation, Formula.isDomain,
-      Formula.orderedPairMem, Formula.forallMem,
-      Formula.existsMem, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace Formula
 /-- 函数图筛选模式的纸面解释。 -/

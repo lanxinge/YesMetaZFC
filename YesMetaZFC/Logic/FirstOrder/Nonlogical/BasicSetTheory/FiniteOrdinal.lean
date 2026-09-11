@@ -116,15 +116,9 @@ scoped notation:max "numₘ(" number ")" =>
 def finite_ordinal_theory : SetTheory :=
   well_order_theory
 
-theorem natural_discrete_linear_order_theory_subset_well_order_theory
-    {sentence : SetSentence}
-    (hSentence : natural_discrete_linear_order_theory sentence) :
-    well_order_theory sentence := Or.inr hSentence
+derive_theory_subset natural_discrete_linear_order_theory ⊆ well_order_theory
 
-theorem well_order_theory_subset_finite_ordinal_theory
-    {sentence : SetSentence}
-    (hSentence : well_order_theory sentence) :
-    finite_ordinal_theory sentence := hSentence
+derive_theory_subset well_order_theory ⊆ finite_ordinal_theory
 
 end BasicSetTheory
 end Nonlogical

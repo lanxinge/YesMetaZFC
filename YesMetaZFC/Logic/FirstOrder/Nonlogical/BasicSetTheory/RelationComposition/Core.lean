@@ -341,44 +341,17 @@ def relation_composition_operator_theory : SetTheory :=
     Term.renameMapped_weakenFree_lift]
   rfl
 
-theorem relation_plane_theory_subset_relation_converse_theory
-    {sentence : SetSentence}
-    (hSentence : relation_plane_theory sentence) :
-    relation_converse_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_plane_theory ⊆ relation_converse_theory
 
-theorem relation_converse_theory_subset_relation_converse_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_converse_theory sentence) :
-    relation_converse_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_converse_theory ⊆ relation_converse_operator_theory
 
-theorem relation_converse_operator_theory_subset_relation_composition_theory
-    {sentence : SetSentence}
-    (hSentence : relation_converse_operator_theory sentence) :
-    relation_composition_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_converse_operator_theory ⊆ relation_composition_theory
 
-theorem relation_plane_theory_subset_relation_composition_theory
-    {sentence : SetSentence}
-    (hSentence : relation_plane_theory sentence) :
-    relation_composition_theory sentence :=
-  relation_converse_operator_theory_subset_relation_composition_theory
-    (relation_converse_theory_subset_relation_converse_operator_theory
-      (relation_plane_theory_subset_relation_converse_theory hSentence))
+derive_theory_subset relation_plane_theory ⊆ relation_composition_theory
 
-theorem relation_composition_theory_subset_relation_composition_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_composition_theory sentence) :
-    relation_composition_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_composition_theory ⊆ relation_composition_operator_theory
 
-theorem relation_plane_theory_subset_relation_composition_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_plane_theory sentence) :
-    relation_composition_operator_theory sentence :=
-  relation_composition_theory_subset_relation_composition_operator_theory
-    (relation_plane_theory_subset_relation_composition_theory hSentence)
+derive_theory_subset relation_plane_theory ⊆ relation_composition_operator_theory
 
 end BasicSetTheory
 end Nonlogical

@@ -11,6 +11,17 @@ set_option autoImplicit false
 universe x
 variable {σ : Signature.{0,0,0}} {ℳ : Structure.{0,0,0,x} σ}
 
+/-- 按排序列表逐个接收参数，避免每个闭句重新拆解异质值列。 -/
+def Curried : (free : SortContext σ) → (Values ℳ.Carrier free → Prop) → Prop
+  | .nil, body => body .nil
+  | .cons _ rest, body => ∀ value, Curried rest (fun args => body (.cons value args))
+
+theorem Curried.apply {free : SortContext σ} {body : Values ℳ.Carrier free → Prop}
+    (h : Curried free body) (args : Values ℳ.Carrier free) : body args := by
+  induction args with
+  | nil => exact h
+  | cons value args ih => exact ih (h value)
+
 theorem templateEnv_nil : templateEnv (Values.nil : Values ℳ.Carrier []) = Env.empty := by
   apply Env.ext <;> intro sort entry <;> cases entry
 
@@ -79,5 +90,10 @@ theorem close_of_values {free : SortContext σ} (body : Formula σ [] free)
     (hBody : ∀ args, body.satisfies (templateEnv args : Env ℳ [] free)) :
     (Metatheory.Formula.forall_close body).satisfies (Env.empty : Env ℳ [] []) :=
   (forall_close_iff body).mpr ((all_environments body).mp hBody)
+
+theorem close_of_curried {free : SortContext σ} (body : Formula σ [] free)
+    (hBody : Curried free (fun args => body.satisfies (templateEnv args : Env ℳ [] free))) :
+    (Metatheory.Formula.forall_close body).satisfies (Env.empty : Env ℳ [] []) :=
+  close_of_values body hBody.apply
 
 end YesMetaZFC.Automation.ModelClosure

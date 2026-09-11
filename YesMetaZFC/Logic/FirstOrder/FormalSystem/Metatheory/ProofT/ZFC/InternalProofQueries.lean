@@ -72,22 +72,16 @@ theorem row (test : ObjectCheckedTrace.LocalTest T) (hTest : Positive 𝒩 test.
   · intro query hq
     cases hq
 
-omit h𝒩 in
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory
-      (power_set_operator_theory_subset_relation_plane_theory h))
-
 /-- 当前节点条件的反射，公理参数已由实际 schema／有限表查询消去。 -/
 theorem currentNode : Positive 𝒩 ReducedProofPresentation.nodeTest.condition.body :=
   node h𝒩 intrinsic_zfc_certificate_core intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedAxiomNumber.localTest (InternalSchemaReflection.axiomTest h𝒩)
 
 /-- 当前 verifier 实际消费的局部行条件。 -/
 theorem currentRow : Positive 𝒩 ReducedProofPresentation.rowTest.condition.body :=
   row h𝒩 intrinsic_zfc_certificate_core intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport
-    intrinsic_zfc_arithmetic_support.contains_successor containsPower
+    intrinsic_zfc_arithmetic_support.contains_successor intrinsic_zfc_contains_power
     intrinsic_zfc_arithmetic_support.contains_infinity ReducedProofPresentation.nodeTest (currentNode h𝒩)
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.InternalProofQueryReflection

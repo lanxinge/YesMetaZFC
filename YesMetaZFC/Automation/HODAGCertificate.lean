@@ -1,4 +1,5 @@
 import YesMetaZFC.Automation.HODAGCertificate.Core
+import YesMetaZFC.Automation.GuardSemantics
 namespace YesMetaZFC
 namespace Automation
 namespace HODAGCertificate
@@ -108,31 +109,11 @@ theorem encodedClause_satisfies_of_object
     (hObject : link.objectClause.Satisfies env) :
     PropResolution.Clause.Satisfies (PropLiteralLink.valuation base atomMap env) link.encodedClause := by
   rcases hObject with ⟨objectLiteral, hObjectMem, hObjectSat⟩
-  have hMapped :
-      objectLiteral ∈ (link.literalLinks.map fun literal => literal.object).toList := by
-    simpa [objectClause] using Array.mem_def.mp hObjectMem
-  have hMappedList :
-      objectLiteral ∈
-        List.map (fun literal => literal.object) link.literalLinks.toList := by
-    simpa [Array.toList_map] using hMapped
-  rcases List.mem_map.mp hMappedList with
-    ⟨literalLink, hLinkMem, hObjectEq⟩
-  have hCheck : literalLink.check atomMap = true := by
-    have hArrayMem : literalLink ∈ link.literalLinks :=
-      Array.mem_def.mpr hLinkMem
-    rcases Array.mem_iff_getElem.mp hArrayMem with ⟨i, hLt, hGet⟩
-    simpa [hGet] using (Array.all_eq_true.mp hLiteralChecks) i hLt
-  have hPropMem : literalLink.prop ∈ link.encodedClause.toList := by
-    apply PropResolution.mem_canonicalClause_of_mem
-    have hRaw :
-        literalLink.prop ∈
-          List.map (fun literal => literal.prop) link.literalLinks.toList :=
-      List.mem_map_of_mem hLinkMem
-    simpa [Array.toList_map] using hRaw
-  have hPropHolds :
-      literalLink.prop.Holds (PropLiteralLink.valuation base atomMap env) :=
-    PropLiteralLink.sound hCheck (by simpa [hObjectEq] using hObjectSat)
-  exact PropResolution.Clause.satisfies_of_mem hPropMem hPropHolds
+  rcases Array.mem_map.mp hObjectMem with ⟨item, hItem, rfl⟩
+  apply PropResolution.Clause.satisfies_canonical_iff.mpr
+  exact ⟨item.prop, Array.mem_def.mp (Array.mem_map_of_mem hItem),
+    PropLiteralLink.sound (Array.all_eq_true'.mp hLiteralChecks item hItem) hObjectSat⟩
+
 end PropParentClauseLink
 structure PropGuardActivationLink (σ : Signature.{u, v, w}) where
   parent : ParentClause σ
@@ -160,56 +141,16 @@ theorem encodedClause_satisfies
     (hObjectOfGuards : (∀ lit, lit ∈ (Guards.canonical link.guards).toList → lit.Holds base) →
         link.objectClause.Satisfies env) :
     PropResolution.Clause.Satisfies (PropLiteralLink.valuation base atomMap env) link.encodedClause := by
-  classical
-  by_cases hGuards :
-      ∀ lit, lit ∈ (Guards.canonical link.guards).toList → lit.Holds base
-  · rcases hObjectOfGuards hGuards with
-      ⟨objectLiteral, hObjectMem, hObjectSat⟩
-    have hMapped :
-        objectLiteral ∈ (link.literalLinks.map fun literal => literal.object).toList := by
-      simpa [objectClause] using Array.mem_def.mp hObjectMem
-    have hMappedList :
-        objectLiteral ∈
-          List.map (fun literal => literal.object) link.literalLinks.toList := by
-      simpa [Array.toList_map] using hMapped
-    rcases List.mem_map.mp hMappedList with
-      ⟨literalLink, hLinkMem, hObjectEq⟩
-    have hCheck : literalLink.check atomMap = true := by
-      have hArrayMem : literalLink ∈ link.literalLinks :=
-        Array.mem_def.mpr hLinkMem
-      rcases Array.mem_iff_getElem.mp hArrayMem with ⟨i, hLt, hGet⟩
-      simpa [hGet] using (Array.all_eq_true.mp hLiteralChecks) i hLt
-    have hPropMem : literalLink.prop ∈ link.encodedClause.toList := by
-      apply PropResolution.mem_canonicalClause_of_mem
-      simp
-      exact Or.inr ⟨literalLink, Array.mem_def.mpr hLinkMem, rfl⟩
-    exact PropResolution.Clause.satisfies_of_mem hPropMem (PropLiteralLink.sound hCheck (by simpa [hObjectEq] using hObjectSat))
-  · rcases Classical.not_forall.mp hGuards with ⟨guardLit, hNotGuard⟩
-    have hGuardMem : guardLit ∈ (Guards.canonical link.guards).toList := by
-      by_cases hMem : guardLit ∈ (Guards.canonical link.guards).toList
-      · exact hMem
-      · exact False.elim (hNotGuard (by intro h; exact False.elim (hMem h)))
-    have hGuardFalse : ¬ guardLit.Holds base := by
-      intro hHold
-      exact hNotGuard (by intro _hMem; exact hHold)
-    have hRawGuardMem : guardLit ∈ link.guards.toList :=
-      Guards.mem_of_mem_canonical hGuardMem
-    have hOutside : PropLiteralLink.outsideAtomMap atomMap guardLit = true := by
-      have hArrayMem : guardLit ∈ link.guards :=
-        Array.mem_def.mpr hRawGuardMem
-      rcases Array.mem_iff_getElem.mp hArrayMem with ⟨i, hLt, hGet⟩
-      simpa [hGet] using (Array.all_eq_true.mp hGuardChecks) i hLt
-    have hNegBase : guardLit.neg.Holds base := by
-      cases guardLit with
-      | mk var positive =>
-          cases positive <;>
-            simpa [PropResolution.Lit.Holds, PropResolution.Lit.neg] using hGuardFalse
-    have hNegMem : guardLit.neg ∈ link.encodedClause.toList := by
-      apply PropResolution.mem_canonicalClause_of_mem
-      simp
-      exact Or.inl ⟨guardLit, Array.mem_def.mpr hRawGuardMem, rfl⟩
-    exact PropResolution.Clause.satisfies_of_mem hNegMem ((PropLiteralLink.holds_valuation_iff_of_outsideAtomMap (base := base) (env := env)
-        (PropLiteralLink.outsideAtomMap_neg hOutside)).2 hNegBase)
+  apply Guards.activation_satisfies
+  · intro lit hMem
+    exact PropLiteralLink.holds_valuation_iff_of_outsideAtomMap
+      (Array.all_eq_true'.mp hGuardChecks lit (Array.mem_def.mpr hMem))
+  · intro hGuards
+    exact PropResolution.Clause.satisfies_canonical_iff.mp
+      (PropParentClauseLink.encodedClause_satisfies_of_object
+        (link := ⟨link.parent, link.literalLinks⟩) hLiteralChecks
+        (hObjectOfGuards hGuards))
+
 end PropGuardActivationLink
 structure PropLearnedClauseLink where
   parent : Nat
@@ -230,39 +171,13 @@ theorem satisfies_of_not_guards
         PropLiteralLink.outsideAtomMap atomMap literal) = true) (hNotGuards :
       ¬ ∀ lit, lit ∈ (Guards.canonical guards).toList → lit.Holds base) :
     PropResolution.Clause.Satisfies (PropLiteralLink.valuation base atomMap env) link.clause := by
-  classical
-  rcases Classical.not_forall.mp hNotGuards with ⟨guardLit, hNotGuard⟩
-  have hGuardMem : guardLit ∈ (Guards.canonical guards).toList := by
-    by_cases hMem : guardLit ∈ (Guards.canonical guards).toList
-    · exact hMem
-    · exact False.elim (hNotGuard (by intro h; exact False.elim (hMem h)))
-  have hGuardFalse : ¬ guardLit.Holds base := by
-    intro hHold
-    exact hNotGuard (by intro _hMem; exact hHold)
-  have hRawGuardMem : guardLit ∈ guards.toList :=
-    Guards.mem_of_mem_canonical hGuardMem
-  have hNegMemLearned :
-      guardLit.neg ∈ (Guards.learnedClause guards).toList := by
-    have hMapMem :
-        guardLit.neg ∈ (guards.map PropResolution.Lit.neg).toList := by
-      simpa [Array.toList_map] using (List.mem_map_of_mem (f := PropResolution.Lit.neg) hRawGuardMem)
-    simpa [Guards.learnedClause] using!
-      PropResolution.mem_canonicalClause_of_mem hMapMem
-  have hNegMemClause : guardLit.neg ∈ link.clause.toList := by
-    simpa [hClause] using hNegMemLearned
-  have hNegOutside :
-      PropLiteralLink.outsideAtomMap atomMap guardLit.neg = true := by
-    have hArrayMem : guardLit.neg ∈ link.clause :=
-      Array.mem_def.mpr hNegMemClause
-    rcases Array.mem_iff_getElem.mp hArrayMem with ⟨i, hLt, hGet⟩
-    simpa [hGet] using (Array.all_eq_true.mp hOutside) i hLt
-  have hNegBase : guardLit.neg.Holds base := by
-    cases guardLit with
-    | mk var positive =>
-        cases positive <;>
-          simpa [PropResolution.Lit.Holds, PropResolution.Lit.neg] using hGuardFalse
-  exact PropResolution.Clause.satisfies_of_mem hNegMemClause ((PropLiteralLink.holds_valuation_iff_of_outsideAtomMap
-      (base := base) (env := env) hNegOutside).2 hNegBase)
+  have hSat : PropResolution.Clause.Satisfies base link.clause := by
+    rw [hClause]
+    exact Guards.learnedClause_satisfies_iff.mpr hNotGuards
+  exact hSat.transfer fun lit hMem hHolds =>
+    (PropLiteralLink.holds_valuation_iff_of_outsideAtomMap
+      (Array.all_eq_true'.mp hOutside lit (Array.mem_def.mpr hMem))).mpr hHolds
+
 end PropLearnedClauseLink
 structure PropAvatarSkeletonLink where
   parent : Nat
@@ -494,13 +409,10 @@ theorem parentIdsIn_of_check
     {problem : Problem σ} {parents : Array Nat} {payload : Payload σ} (hCheck : payload.check problem parents = true) :
     ∀ parent, parent ∈ payload.parentClauses.toList → parent.id ∈ parents.toList := by
   intro parent hParent
-  have hAll :=
-    Array.all_eq_true.mp (Bool.and_eq_true_iff.mp hCheck).1
-  have hArray : parent ∈ payload.parentClauses :=
-    Array.mem_def.mpr hParent
-  rcases Array.mem_iff_getElem.mp hArray with ⟨index, hIndex, hGet⟩
-  apply ParentClause.mem_toList_of_idIn
-  simpa [parentIdsCheck, hGet] using hAll index hIndex
+  exact ParentClause.mem_toList_of_idIn
+    (Array.all_eq_true'.mp (Bool.and_eq_true_iff.mp hCheck).1 parent
+      (Array.mem_def.mpr hParent))
+
 theorem conclusion_exists_of_check
     {problem : Problem σ} {parents : Array Nat} {payload : Payload σ} (hCheck : payload.check problem parents = true) :
     ∃ conclusion, payload.conclusion? problem = some conclusion := by

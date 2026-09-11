@@ -79,32 +79,24 @@ theorem coordinate_specification (hℳ : Theory.Models ℳ theory) (coordinate :
 
 theorem domain (hℳ : Theory.Models ℳ theory) :
     domain_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro hRelation
   exact ((PureCompletedStage.realizes hℳ).function .domain (.cons a .nil) output).symm.trans
     (coordinate_specification hℳ .domain a output ((relation_predicate hℳ a).mp hRelation))
 
 theorem range (hℳ : Theory.Models ℳ theory) :
     range_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro output a
   intro hRelation
   exact ((PureCompletedStage.realizes hℳ).function .range (.cons a .nil) output).symm.trans
     (coordinate_specification hℳ .range a output ((relation_predicate hℳ a).mp hRelation))
 
 theorem is_function (hℳ : Theory.Models ℳ theory) :
     is_function_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons a tail =>
-  cases tail
+  apply close_of_curried
+  intro a
   apply (function_predicate hℳ a).trans
   apply Iff.trans ?_ (function_semantics (E hℳ).model a).symm
   constructor
@@ -117,12 +109,8 @@ theorem is_function (hℳ : Theory.Models ℳ theory) :
 
 theorem is_mapping (hℳ : Theory.Models ℳ theory) :
     is_mapping_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons target tail =>
-  cases tail with | cons source tail =>
-  cases tail with | cons function tail =>
-  cases tail
+  apply close_of_curried
+  intro target source function
   apply (mapping_predicate hℳ function source target).trans
   exact (PureMappingDefinitions.mapping_spec hℳ function source target _ _
     (domain_value hℳ function) (range_value hℳ function)).trans
@@ -131,12 +119,8 @@ theorem is_mapping (hℳ : Theory.Models ℳ theory) :
 
 theorem application (hℳ : Theory.Models ℳ theory) :
     function_application_definition_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons output tail =>
-  cases tail with | cons input tail =>
-  cases tail with | cons function tail =>
-  cases tail
+  apply close_of_curried
+  intro output input function
   rintro ⟨hFunction, hInput⟩
   exact ((PureCompletedStage.realizes hℳ).function .application (.cons function (.cons input .nil)) output).symm.trans
     ((PureRelationFunctions.application_spec ((function_predicate hℳ function).mp hFunction)

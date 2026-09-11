@@ -1,3 +1,4 @@
+import YesMetaZFC.Automation.RelationalInheritance
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSetStage
 
 /-! # 有限宇宙与遗传有限关系
@@ -52,15 +53,9 @@ def interpretation : Interpretation S ℒ where
     | .isHereditarilyFinite => hereditaryGraph
     | symbol => PureSetStage.interpretation.relation symbol
 
-theorem map_values {sorts : SortContext S} (args : Values (fun _ => Carrier ℳ) sorts) :
-    mapValues interpretation args = mapValues PureSetStage.interpretation args := by
-  induction args with
-  | nil => rfl
-  | cons head tail ih => simp only [mapValues]; rw [ih]; rfl
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
   intro symbol args
   cases symbol
-  all_goals simp only [map_values]
   case finiteUniverse => cases args; exact universe_functional hℳ
   all_goals exact PureSetStage.functional hℳ _ args
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ :=
@@ -71,21 +66,16 @@ theorem function_preserved (hℳ : Theory.Models ℳ theory) (symbol : Nonlogica
     (hGraph : interpretation.function symbol = PureSetStage.interpretation.function symbol)
     (args : Values (expansion hℳ).model.Carrier (S.funcDomain symbol)) :
     (expansion hℳ).function symbol args = (PureSetStage.expansion hℳ).function symbol args := by
-  have hNew := ((realizes hℳ).function symbol args _).mpr rfl
-  rw [hGraph,map_values] at hNew
-  exact ((PureSetStage.realizes hℳ).function symbol args _).mp hNew
+  exact function_regraph _ _ _ _ (PureSetStage.realizes hℳ) _ (realizes hℳ) symbol hGraph args
 theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} (body : Formula S [] parameters)
     (hTranslate : openFormula interpretation body = openFormula PureSetStage.interpretation body)
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureSetStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  have hNew := openFormula_correct (expansion hℳ) (realizes hℳ) body args
-  rw [hTranslate,map_values] at hNew
-  exact (openFormula_correct (PureSetStage.expansion hℳ) (PureSetStage.realizes hℳ) body args).symm.trans hNew
+  exact transfer_regraph _ _ _ _ (PureSetStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
 
 theorem universe_specification (hℳ : Theory.Models ℳ theory) (output : Carrier ℳ) :
-    output = (expansion hℳ).function .finiteUniverse .nil ↔
-      universeSpec.satisfies (templateEnv (.cons output .nil) : Env (expansion hℳ).model [] [s]) :=
+    FunctionSpecification (expansion hℳ) .finiteUniverse (universeSpec) .nil output :=
   ((realizes hℳ).function .finiteUniverse .nil output).symm.trans
     ((openFormula_correct (PureSetStage.expansion hℳ) (PureSetStage.realizes hℳ) universeSpec (.cons output .nil)).trans
       (transfer hℳ universeSpec rfl (.cons output .nil)))

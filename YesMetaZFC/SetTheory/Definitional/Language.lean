@@ -135,6 +135,12 @@ def weaken {count depth : Nat} (terms : TermVector count depth) :
 /-- 参数向量没有自由变量。 -/
 def FreeClosed {count depth : Nat} (terms : TermVector count depth) : Prop :=
   ∀ entry, (terms entry).freeSupport = []
+@[simp] theorem ofFn_freeClosed {count depth : Nat} (terms : Fin count → Term depth) :
+    (ofFn terms).FreeClosed ↔ ∀ entry, (terms entry).freeSupport = [] := by
+  simp [FreeClosed]
+@[simp] theorem singleton_freeClosed {depth : Nat} (term : Term depth) :
+    (singleton term).FreeClosed ↔ term.freeSupport = [] := by
+  simp [singleton]
 /-- 空参数向量自由闭合。 -/
 @[simp] theorem empty_freeClosed {depth : Nat} : (empty : TermVector 0 depth).FreeClosed := by
   intro entry

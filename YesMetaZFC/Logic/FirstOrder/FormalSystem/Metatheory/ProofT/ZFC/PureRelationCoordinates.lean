@@ -45,11 +45,7 @@ def coordinateSchema (coordinate : RelationCoordinate) : Project.UnarySchema 1 w
     | .domain => Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 1) (.bound 0) (.bound 2)
     | .range => Project.Formula.orderedPairMem PureKuratowskiProject.convention (.bound 0) (.bound 1) (.bound 2)
   freeClosed := by
-    cases coordinate <;>
-      simp [Project.Formula.orderedPairMem, _root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed,
-        _root_.YesMetaZFC.SetTheory.Definitional.Term.newest]
-    all_goals exact PureKuratowskiProject.convention.code_freeClosed _ _ _ rfl rfl rfl
-
+    cases coordinate <;> simp -implicitDefEqProofs [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed]
 theorem schema_correct (hℳ : Theory.Models ℳ theory) (coordinate : RelationCoordinate)
     (env : _root_.YesMetaZFC.SetTheory.Env (Project.FirstOrderSemantics.reduct ℳ) 1) (element : Carrier ℳ) :
     Project.Formula.satisfies (env.push element) (coordinateSchema coordinate).body ↔

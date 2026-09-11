@@ -84,12 +84,8 @@ theorem addition_upper_instance (hℳ : Theory.Models ℳ theory) (a b c : Carri
 
 theorem addition_upper_axiom (hℳ : Theory.Models ℳ theory) :
     natural_addition_upper_bound_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact addition_upper_instance hℳ a b c
 
 theorem positive_addition_instance (hℳ : Theory.Models ℳ theory) (a b c : Carrier ℳ) :
@@ -102,12 +98,8 @@ theorem positive_addition_instance (hℳ : Theory.Models ℳ theory) (a b c : Ca
 
 theorem positive_addition_axiom (hℳ : Theory.Models ℳ theory) :
     natural_positive_left_addition_strict_bound_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact positive_addition_instance hℳ a b c
 
 theorem transitivity_instance (hℳ : Theory.Models ℳ theory) (a b c : Carrier ℳ) :
@@ -120,12 +112,8 @@ theorem transitivity_instance (hℳ : Theory.Models ℳ theory) (a b c : Carrier
 
 theorem transitivity_axiom (hℳ : Theory.Models ℳ theory) :
     natural_le_lt_transitivity_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons c tail1 =>
-  cases tail1 with | cons b tail2 =>
-  cases tail2 with | cons a tail3 =>
-  cases tail3
+  apply close_of_curried
+  intro c b a
   exact transitivity_instance hℳ a b c
 
 theorem pairing_instance (hℳ : Theory.Models ℳ theory) (a b : Carrier ℳ) :
@@ -139,11 +127,8 @@ theorem pairing_instance (hℳ : Theory.Models ℳ theory) (a b : Carrier ℳ) :
 
 theorem pairing_axiom (hℳ : Theory.Models ℳ theory) :
     natural_godel_pairing_coordinate_bound_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact pairing_instance hℳ a b
 
 theorem exponent_instance (hℳ : Theory.Models ℳ theory) (a b : Carrier ℳ) :
@@ -156,11 +141,8 @@ theorem exponent_instance (hℳ : Theory.Models ℳ theory) (a b : Carrier ℳ) 
 
 theorem exponent_axiom (hℳ : Theory.Models ℳ theory) :
     natural_exponentiation_index_bound_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons b tail1 =>
-  cases tail1 with | cons a tail2 =>
-  cases tail2
+  apply close_of_curried
+  intro b a
   exact exponent_instance hℳ a b
 
 theorem exponent_product_instance (hℳ : Theory.Models ℳ theory) (a b c d : Carrier ℳ) :
@@ -173,13 +155,8 @@ theorem exponent_product_instance (hℳ : Theory.Models ℳ theory) (a b c d : C
 
 theorem exponent_product_axiom (hℳ : Theory.Models ℳ theory) :
     natural_exponent_product_index_bound_axiom.satisfies (Env.empty : Env (E hℳ).model [] []) := by
-  apply close_of_values
-  intro args
-  cases args with | cons d tail1 =>
-  cases tail1 with | cons c tail2 =>
-  cases tail2 with | cons b tail3 =>
-  cases tail3 with | cons a tail4 =>
-  cases tail4
+  apply close_of_curried
+  intro d c b a
   exact exponent_product_instance hℳ a b c d
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureFinalArithmetic

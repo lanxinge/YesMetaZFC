@@ -393,91 +393,31 @@ def relation_range_operator_theory : SetTheory :=
 
 /-! ## 理论嵌入 -/
 
-theorem right_projection_operator_theory_subset_relation_base_theory
-    {sentence : SetSentence}
-    (hSentence : right_projection_operator_theory sentence) :
-    relation_base_theory sentence :=
-  Or.inl hSentence
+derive_theory_subset right_projection_operator_theory ⊆ relation_base_theory
 
-theorem union_operator_theory_subset_relation_base_theory
-    {sentence : SetSentence}
-    (hSentence : union_operator_theory sentence) :
-    relation_base_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset union_operator_theory ⊆ relation_base_theory
 
-theorem relation_function_theory_subset_relation_base_theory
-    {sentence : SetSentence}
-    (hSentence : relation_function_theory sentence) :
-    relation_base_theory sentence :=
-  right_projection_operator_theory_subset_relation_base_theory
-    (relation_function_theory_subset_right_projection_operator_theory
-      hSentence)
+derive_theory_subset relation_function_theory ⊆ relation_base_theory
 
-theorem extensionality_theory_subset_relation_base_theory
-    {sentence : SetSentence}
-    (hSentence : extensionality_theory sentence) :
-    relation_base_theory sentence :=
-  right_projection_operator_theory_subset_relation_base_theory
-    (ordered_pair_operator_theory_subset_right_projection_operator_theory
-      (extensionality_theory_subset_ordered_pair_operator_theory hSentence))
+derive_theory_subset extensionality_theory ⊆ relation_base_theory
 
-theorem relation_base_theory_subset_relation_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : relation_base_theory sentence) :
-    relation_predicate_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_base_theory ⊆ relation_predicate_theory
 
-theorem relation_predicate_theory_subset_relation_domain_theory
-    {sentence : SetSentence}
-    (hSentence : relation_predicate_theory sentence) :
-    relation_domain_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_predicate_theory ⊆ relation_domain_theory
 
-theorem relation_domain_theory_subset_relation_domain_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_domain_theory sentence) :
-    relation_domain_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_domain_theory ⊆ relation_domain_operator_theory
 
-theorem relation_domain_operator_theory_subset_relation_range_theory
-    {sentence : SetSentence}
-    (hSentence : relation_domain_operator_theory sentence) :
-    relation_range_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_domain_operator_theory ⊆ relation_range_theory
 
-theorem relation_range_theory_subset_relation_range_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_range_theory sentence) :
-    relation_range_operator_theory sentence :=
-  Or.inr hSentence
+derive_theory_subset relation_range_theory ⊆ relation_range_operator_theory
 
-theorem relation_base_theory_subset_relation_domain_theory
-    {sentence : SetSentence}
-    (hSentence : relation_base_theory sentence) :
-    relation_domain_theory sentence :=
-  relation_predicate_theory_subset_relation_domain_theory
-    (relation_base_theory_subset_relation_predicate_theory hSentence)
+derive_theory_subset relation_base_theory ⊆ relation_domain_theory
 
-theorem relation_base_theory_subset_relation_domain_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_base_theory sentence) :
-    relation_domain_operator_theory sentence :=
-  relation_domain_theory_subset_relation_domain_operator_theory
-    (relation_base_theory_subset_relation_domain_theory hSentence)
+derive_theory_subset relation_base_theory ⊆ relation_domain_operator_theory
 
-theorem relation_base_theory_subset_relation_range_theory
-    {sentence : SetSentence}
-    (hSentence : relation_base_theory sentence) :
-    relation_range_theory sentence :=
-  relation_domain_operator_theory_subset_relation_range_theory
-    (relation_base_theory_subset_relation_domain_operator_theory hSentence)
+derive_theory_subset relation_base_theory ⊆ relation_range_theory
 
-theorem relation_base_theory_subset_relation_range_operator_theory
-    {sentence : SetSentence}
-    (hSentence : relation_base_theory sentence) :
-    relation_range_operator_theory sentence :=
-  relation_range_theory_subset_relation_range_operator_theory
-    (relation_base_theory_subset_relation_range_theory hSentence)
+derive_theory_subset relation_base_theory ⊆ relation_range_operator_theory
 
 end BasicSetTheory
 end Nonlogical

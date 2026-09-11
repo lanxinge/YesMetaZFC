@@ -87,15 +87,9 @@ def power_set_bijection_theory : SetTheory :=
   Theory.insert power_set_bijection_definition_axiom
     power_set_bijection_separation_theory
 
-theorem index_order_theory_subset_power_set_bijection_separation_theory
-    {sentence : SetSentence}
-    (hSentence : index_order_theory sentence) :
-    power_set_bijection_separation_theory sentence := Or.inr hSentence
+derive_theory_subset index_order_theory ⊆ power_set_bijection_separation_theory
 
-theorem power_set_bijection_separation_theory_subset_power_set_bijection_theory
-    {sentence : SetSentence}
-    (hSentence : power_set_bijection_separation_theory sentence) :
-    power_set_bijection_theory sentence := Or.inr hSentence
+derive_theory_subset power_set_bijection_separation_theory ⊆ power_set_bijection_theory
 
 end BasicSetTheory
 end Nonlogical

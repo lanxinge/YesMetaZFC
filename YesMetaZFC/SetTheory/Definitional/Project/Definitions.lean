@@ -12,56 +12,66 @@ namespace Formula
 /-- `set` 没有元素。 -/
 def isEmpty {depth : Nat} (set : Term depth) : Formula 1 depth :=
   .forallE <| .neg (.mem Term.newest set.weaken)
+derive_free_closed isEmpty
 /-- `pair` 恰好包含 `left` 与 `right`。 -/
 def isUnorderedPair {depth : Nat} (pair left right : Term depth) :
     Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest pair.weaken) <|
       .disj (extensionalEq Term.newest left.weaken) (extensionalEq Term.newest right.weaken)
+derive_free_closed isUnorderedPair
 /-- `singleton` 是 `element` 的单元素集。 -/
 def isSingleton {depth : Nat} (singleton element : Term depth) :
     Formula 1 depth :=
   isUnorderedPair singleton element element
+derive_free_closed isSingleton
 /-- `union` 是 `family` 的并集。 -/
 def isUnion {depth : Nat} (union family : Term depth) : Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest union.weaken) <|
       .existsE <|
         .conj (.mem Term.newest family.weaken.weaken) (.mem (.bound 1) Term.newest)
+derive_free_closed isUnion
 /-- `power` 是 `set` 的幂集。 -/
 def isPowerSet {depth : Nat} (power set : Term depth) : Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest power.weaken) (subset Term.newest set.weaken)
+derive_free_closed isPowerSet
 /-- `successor` 是 `set ∪ {set}`。 -/
 def isSuccessor {depth : Nat} (successor set : Term depth) :
     Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest successor.weaken) <|
       .disj (.mem Term.newest set.weaken) (extensionalEq Term.newest set.weaken)
+derive_free_closed isSuccessor
 /-- `inter` 是两个集合的交。 -/
 def isIntersection {depth : Nat} (inter left right : Term depth) :
     Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest inter.weaken) <|
       .conj (.mem Term.newest left.weaken) (.mem Term.newest right.weaken)
+derive_free_closed isIntersection
 /-- `diff` 是集合差 `left \ right`。 -/
 def isDifference {depth : Nat} (diff left right : Term depth) :
     Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest diff.weaken) <|
       .conj (.mem Term.newest left.weaken) (.neg (.mem Term.newest right.weaken))
+derive_free_closed isDifference
 /-- `symmDiff` 是两个集合的对称差。 -/
 def isSymmetricDifference {depth : Nat} (symmDiff left right : Term depth) : Formula 1 depth :=
   .forallE <|
     .iff (.mem Term.newest symmDiff.weaken) <|
       .disj (.conj (.mem Term.newest left.weaken) (.neg (.mem Term.newest right.weaken))) (.conj (.mem Term.newest right.weaken)
           (.neg (.mem Term.newest left.weaken)))
+derive_free_closed isSymmetricDifference
 /-- `choice` 与 `member` 的交恰好是单元素集。 -/
 def meetsExactlyOnce {depth : Nat} (choice member : Term depth) : Formula 1 depth :=
   .existsE <|
     .conj (.conj (.mem Term.newest choice.weaken) (.mem Term.newest member.weaken)) <|
       .forallE <|
         .imp (.conj (.mem Term.newest choice.weaken.weaken) (.mem Term.newest member.weaken.weaken)) (extensionalEq Term.newest (.bound 1))
+derive_free_closed meetsExactlyOnce
 end Formula
 /-- 项目原子核中的有序对编码约定。 -/
 structure OrderedPairConvention where
@@ -83,12 +93,14 @@ def orderedPairMem (𝒞 : OrderedPairConvention)
     {depth : Nat} (left right relation : Term depth) : Formula 1 depth :=
   .existsE <|
     .conj (𝒞.code Term.newest left.weaken right.weaken) (.mem Term.newest relation.weaken)
+derive_free_closed orderedPairMem
 /-- `relation` 的每个元素都是约定编码下的有序对。 -/
 def isRelation (𝒞 : OrderedPairConvention)
     {depth : Nat} (relation : Term depth) : Formula 1 depth :=
   .forallMem relation <|
     .existsE <| .existsE <|
       𝒞.code (.bound 2) (.bound 1) (.bound 0)
+derive_free_closed isRelation
 /-- `function` 是单值关系。 -/
 def isFunction (𝒞 : OrderedPairConvention)
     {depth : Nat} (function : Term depth) : Formula 1 depth :=
@@ -97,6 +109,7 @@ def isFunction (𝒞 : OrderedPairConvention)
       .imp (.conj (orderedPairMem 𝒞 (.bound 2) (.bound 1)
             function.weaken.weaken.weaken) (orderedPairMem 𝒞 (.bound 2) (.bound 0)
             function.weaken.weaken.weaken)) (extensionalEq (.bound 1) (.bound 0))
+derive_free_closed isFunction
 /-- `domain` 是关系 `relation` 的定义域。 -/
 def isDomain (𝒞 : OrderedPairConvention)
     {depth : Nat} (domain relation : Term depth) : Formula 1 depth :=
@@ -105,6 +118,7 @@ def isDomain (𝒞 : OrderedPairConvention)
       .existsE <|
         orderedPairMem 𝒞 (.bound 1) (.bound 0)
           relation.weaken.weaken
+derive_free_closed isDomain
 /-- `range` 是关系 `relation` 的值域。 -/
 def isRange (𝒞 : OrderedPairConvention)
     {depth : Nat} (range relation : Term depth) : Formula 1 depth :=
@@ -113,6 +127,7 @@ def isRange (𝒞 : OrderedPairConvention)
       .existsE <|
         orderedPairMem 𝒞 (.bound 0) (.bound 1)
           relation.weaken.weaken
+derive_free_closed isRange
 /-- `field` 是关系定义域和值域的并。 -/
 def isField (𝒞 : OrderedPairConvention)
     {depth : Nat} (field relation : Term depth) : Formula 1 depth :=
@@ -120,6 +135,7 @@ def isField (𝒞 : OrderedPairConvention)
     .conj (isDomain 𝒞 (.bound 2) relation.weaken.weaken.weaken) <|
       .conj (isRange 𝒞 (.bound 1) relation.weaken.weaken.weaken) <|
         .conj (isUnorderedPair (.bound 0) (.bound 2) (.bound 1)) (isUnion field.weaken.weaken.weaken (.bound 0))
+derive_free_closed isField
 /-- `function : source → target`。 -/
 def isFunctionFromTo (𝒞 : OrderedPairConvention)
     {depth : Nat} (function source target : Term depth) : Formula 1 depth :=
@@ -129,6 +145,7 @@ def isFunctionFromTo (𝒞 : OrderedPairConvention)
         Formula.existsMem target.weaken <|
           orderedPairMem 𝒞 (.bound 1) (.bound 0)
             function.weaken.weaken
+derive_free_closed isFunctionFromTo
 /-- 函数在其定义域上是单射。 -/
 def isInjective (𝒞 : OrderedPairConvention)
     {depth : Nat} (function : Term depth) : Formula 1 depth :=
@@ -136,6 +153,7 @@ def isInjective (𝒞 : OrderedPairConvention)
     .imp (.conj (orderedPairMem 𝒞 (.bound 2) (.bound 0)
           function.weaken.weaken.weaken) (orderedPairMem 𝒞 (.bound 1) (.bound 0)
           function.weaken.weaken.weaken)) (extensionalEq (.bound 2) (.bound 1))
+derive_free_closed isInjective
 /-- `function` 把 `source` 覆盖到 `target`。 -/
 def isSurjectiveOnto (𝒞 : OrderedPairConvention)
     {depth : Nat} (function source target : Term depth) : Formula 1 depth :=
@@ -143,6 +161,7 @@ def isSurjectiveOnto (𝒞 : OrderedPairConvention)
     Formula.existsMem source.weaken <|
       orderedPairMem 𝒞 Term.newest (.bound 1)
         function.weaken.weaken
+derive_free_closed isSurjectiveOnto
 /-- `restriction` 是 `function` 在 `source` 上的限制。 -/
 def isRestriction (𝒞 : OrderedPairConvention)
     {depth : Nat} (restriction function source : Term depth) :
@@ -152,6 +171,7 @@ def isRestriction (𝒞 : OrderedPairConvention)
       .iff (orderedPairMem 𝒞 (.bound 1) (.bound 0)
           restriction.weaken.weaken) (.conj (.mem (.bound 1) source.weaken.weaken) (orderedPairMem 𝒞 (.bound 1) (.bound 0)
             function.weaken.weaken))
+derive_free_closed isRestriction
 /-- `composition` 是 `left ∘ right`。 -/
 def isComposition (𝒞 : OrderedPairConvention)
     {depth : Nat} (composition left right : Term depth) :
@@ -162,6 +182,7 @@ def isComposition (𝒞 : OrderedPairConvention)
         .conj (orderedPairMem 𝒞 (.bound 2) (.bound 0)
             right.weaken.weaken.weaken) (orderedPairMem 𝒞 (.bound 0) (.bound 1)
             left.weaken.weaken.weaken))
+derive_free_closed isComposition
 /-- `image` 是 `function` 在 `source` 上的像。 -/
 def isImage (𝒞 : OrderedPairConvention)
     {depth : Nat} (image function source : Term depth) : Formula 1 depth :=
@@ -170,6 +191,7 @@ def isImage (𝒞 : OrderedPairConvention)
       Formula.existsMem source.weaken <|
         orderedPairMem 𝒞 (.bound 0) (.bound 1)
           function.weaken.weaken
+derive_free_closed isImage
 /-- `preimage` 是 `target` 在 `function` 下的逆像。 -/
 def isPreimage (𝒞 : OrderedPairConvention)
     {depth : Nat} (preimage function target : Term depth) :
@@ -179,12 +201,14 @@ def isPreimage (𝒞 : OrderedPairConvention)
       Formula.existsMem target.weaken <|
         orderedPairMem 𝒞 (.bound 1) (.bound 0)
           function.weaken.weaken
+derive_free_closed isPreimage
 /-- `identity` 是 `set` 上的恒等函数。 -/
 def isIdentityOn (𝒞 : OrderedPairConvention)
     {depth : Nat} (identity set : Term depth) : Formula 1 depth :=
   .forallE <| .forallE <|
     .iff (orderedPairMem 𝒞 (.bound 1) (.bound 0)
         identity.weaken.weaken) (.conj (.mem (.bound 1) set.weaken.weaken) (extensionalEq (.bound 1) (.bound 0)))
+derive_free_closed isIdentityOn
 end Formula
 end Project
 end Definitional

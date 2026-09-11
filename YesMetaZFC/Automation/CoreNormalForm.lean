@@ -2213,12 +2213,6 @@ def freshSkolem (ctx : Context) : ProjectM CoreSyntax.Search.Term := do
     skolemTrace := state.skolemTrace.push intro
   }
   pure term
-def freshLambdaBinder : ProjectM CoreSyntax.Search.Term := do
-  let state ← get
-  let symbol : CoreSyntax.Search.FunctionSymbol :=
-    { id := state.nextSkolem, arity := 0, kind := CoreSyntax.Search.SymbolKind.parameter }
-  set { state with nextSkolem := state.nextSkolem + 1 }
-  pure (CoreSyntax.Search.Term.app symbol [])
 mutual
   partial def projectTerm (ctx : Context) : Term → ProjectM CoreSyntax.Search.Term
     | Term.bvar _ index =>

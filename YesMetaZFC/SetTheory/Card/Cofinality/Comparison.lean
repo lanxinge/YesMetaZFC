@@ -14,17 +14,9 @@ namespace UnarySchema
 def functionPreimageMember (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := Formula.orderedPairMem 𝒞
     Term.newest (.bound 1) (.bound 2)
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 从序列长度中筛出其值严格超过固定序数的全部索引。 -/
 def sequenceIndexAboveMember (𝒞 : OrderedPairConvention) : UnarySchema 2 where
   body := .existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 3)) (.mem (.bound 2) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end UnarySchema
 namespace BinarySchema
 /-- 以序数良序选择固定函数值的最小原像。 -/
@@ -33,21 +25,11 @@ def leastPreimageValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
     Formula.forallMem (.bound 0) <| .neg <|
       Formula.orderedPairMem 𝒞
         Term.newest (.bound 2) (.bound 4)
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.forallMem,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 /-- 选择共尾序列中首个严格超过输入序数的索引。 -/
 def firstIndexAboveValue (𝒞 : OrderedPairConvention) : BinarySchema 2 where
   body := .conj (.mem (.bound 0) (.bound 2)) <| .conj (.existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 4))
       (.mem (.bound 2) (.bound 0))) <|
     Formula.forallMem (.bound 0) <| .neg <| .existsE <| .conj (Formula.orderedPairMem 𝒞 (.bound 1) (.bound 0) (.bound 5)) (.mem (.bound 3) (.bound 0))
-  freeClosed := by
-    simp [Formula.orderedPairMem, Formula.forallMem,
-      Formula.FreeClosed, Term.newest]
-    repeat' apply And.intro
-    all_goals exact 𝒞.code_freeClosed _ _ _ rfl rfl rfl
 end BinarySchema
 namespace Formula
 /-- 函数原像成员模式的纸面语义。 -/

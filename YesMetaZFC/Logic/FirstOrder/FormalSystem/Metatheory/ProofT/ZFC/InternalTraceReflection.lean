@@ -54,11 +54,6 @@ theorem natural_term_proof (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     exact ObjectCodeInstantiation.formula_weakenFree (node 𝒩) values named (input ∈ₘ ωₘ)
   rwa [hc] at h
 
-private theorem containsPower {φ : SetSentence} (h : power_set_operator_theory φ) : intrinsic_zfc_theory φ :=
-  intrinsic_zfc_arithmetic_support.contains_function_predicate
-    (relation_plane_theory_subset_function_predicate_theory
-      (power_set_operator_theory_subset_relation_plane_theory h))
-
 theorem finite_trace_derives (step : FormulaTemplate.Binary) (root : SetOpenTerm free)
     (rows : List (SetOpenTerm free)) (hRoot : root ∈ rows) :
     Derives intrinsic_zfc_theory []
@@ -67,7 +62,7 @@ theorem finite_trace_derives (step : FormulaTemplate.Binary) (root : SetOpenTerm
           (ObjectTrace.condition step ωₘ root))) := by
   apply Derives.imp_intro
   apply Derives.imp_intro
-  apply ObjectTrace.positive intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport containsPower step ωₘ root rows hRoot
+  apply ObjectTrace.positive intrinsic_zfc_arithmetic_support.toFiniteSequenceGraphSupport intrinsic_zfc_contains_power step ωₘ root rows hRoot
   · intro row hr
     exact ObjectHorn.allOf_elim (formulas := rows.map (fun row => row ∈ₘ ωₘ)) (Derives.assumption (by simp)) (List.mem_map.mpr ⟨row, hr, rfl⟩)
   · intro row hr

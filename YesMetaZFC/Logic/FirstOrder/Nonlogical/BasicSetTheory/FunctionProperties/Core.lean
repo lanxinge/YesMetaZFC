@@ -304,76 +304,31 @@ def membership_relation_operator_theory : SetTheory :=
   Theory.insert membership_relation_definition_axiom
     membership_relation_theory
 
-theorem function_application_theory_subset_injective_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : function_application_theory sentence) :
-    injective_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset function_application_theory ⊆ injective_predicate_theory
 
-theorem injective_predicate_theory_subset_surjective_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : injective_predicate_theory sentence) :
-    surjective_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset injective_predicate_theory ⊆ surjective_predicate_theory
 
-theorem surjective_predicate_theory_subset_bijection_predicate_theory
-    {sentence : SetSentence}
-    (hSentence : surjective_predicate_theory sentence) :
-    bijection_predicate_theory sentence := Or.inr hSentence
+derive_theory_subset surjective_predicate_theory ⊆ bijection_predicate_theory
 
-theorem bijection_predicate_theory_subset_identity_theory
-    {sentence : SetSentence}
-    (hSentence : bijection_predicate_theory sentence) :
-    identity_theory sentence := Or.inr hSentence
+derive_theory_subset bijection_predicate_theory ⊆ identity_theory
 
-theorem identity_theory_subset_identity_operator_theory
-    {sentence : SetSentence}
-    (hSentence : identity_theory sentence) :
-    identity_operator_theory sentence := Or.inr hSentence
+derive_theory_subset identity_theory ⊆ identity_operator_theory
 
-theorem bijection_predicate_theory_subset_identity_operator_theory
-    {sentence : SetSentence}
-    (hSentence : bijection_predicate_theory sentence) :
-    identity_operator_theory sentence :=
-  identity_theory_subset_identity_operator_theory
-    (bijection_predicate_theory_subset_identity_theory hSentence)
+derive_theory_subset bijection_predicate_theory ⊆ identity_operator_theory
 
-theorem identity_operator_theory_subset_mapping_collection_theory
-    {sentence : SetSentence}
-    (hSentence : identity_operator_theory sentence) :
-    mapping_collection_theory sentence := Or.inr hSentence
+derive_theory_subset identity_operator_theory ⊆ mapping_collection_theory
 
-theorem mapping_collection_theory_subset_mapping_collection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : mapping_collection_theory sentence) :
-    mapping_collection_operator_theory sentence := Or.inr hSentence
+derive_theory_subset mapping_collection_theory ⊆ mapping_collection_operator_theory
 
-theorem identity_operator_theory_subset_mapping_collection_operator_theory
-    {sentence : SetSentence}
-    (hSentence : identity_operator_theory sentence) :
-    mapping_collection_operator_theory sentence :=
-  mapping_collection_theory_subset_mapping_collection_operator_theory
-    (identity_operator_theory_subset_mapping_collection_theory hSentence)
+derive_theory_subset identity_operator_theory ⊆ mapping_collection_operator_theory
 
-theorem mapping_collection_operator_theory_subset_transitive_set_theory
-    {sentence : SetSentence}
-    (hSentence : mapping_collection_operator_theory sentence) :
-    transitive_set_theory sentence := Or.inr hSentence
+derive_theory_subset mapping_collection_operator_theory ⊆ transitive_set_theory
 
-theorem transitive_set_theory_subset_membership_relation_theory
-    {sentence : SetSentence}
-    (hSentence : transitive_set_theory sentence) :
-    membership_relation_theory sentence := Or.inr hSentence
+derive_theory_subset transitive_set_theory ⊆ membership_relation_theory
 
-theorem membership_relation_theory_subset_membership_relation_operator_theory
-    {sentence : SetSentence}
-    (hSentence : membership_relation_theory sentence) :
-    membership_relation_operator_theory sentence := Or.inr hSentence
+derive_theory_subset membership_relation_theory ⊆ membership_relation_operator_theory
 
-theorem transitive_set_theory_subset_membership_relation_operator_theory
-    {sentence : SetSentence}
-    (hSentence : transitive_set_theory sentence) :
-    membership_relation_operator_theory sentence :=
-  membership_relation_theory_subset_membership_relation_operator_theory
-    (transitive_set_theory_subset_membership_relation_theory hSentence)
+derive_theory_subset transitive_set_theory ⊆ membership_relation_operator_theory
 
 end BasicSetTheory
 end Nonlogical

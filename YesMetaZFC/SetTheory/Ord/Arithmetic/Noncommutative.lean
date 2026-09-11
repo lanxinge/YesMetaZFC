@@ -48,12 +48,6 @@ namespace UnarySchema
 private def ordinalAdditionOneSuccessor (𝒞 : OrderedPairConvention) : UnarySchema 1 where
   body := .forallE <| .imp (Formula.isOrdinalAddition 𝒞
       Term.newest (.bound 2) (.bound 1)) (Formula.isSuccessor Term.newest (.bound 1))
-  freeClosed := by
-    simp [Formula.isOrdinalAddition, Formula.isSuccessor,
-      Formula.related, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 /--
 在当前自然数处，`two * n` 的值仍属于 `ω`，并且不小于 `n`。
 -/
@@ -62,12 +56,6 @@ private def ordinalMultiplicationTwoBounded (𝒞 : OrderedPairConvention) : Una
       Term.newest (.bound 2) (.bound 1)) <|
     .conj (.mem Term.newest (.bound 3)) <|
       .disj (Formula.extensionalEq (.bound 1) Term.newest) (.mem (.bound 1) Term.newest)
-  freeClosed := by
-    simp [Formula.isOrdinalMultiplication,
-      Formula.related, Formula.extensionalEq,
-      Formula.FreeClosed, Term.newest]
-    apply Formula.related_freeClosed_of_closed <;>
-      simp [TermVector.FreeClosed, TermVector.singleton]
 end UnarySchema
 namespace Formula
 private theorem satisfies_ordinalAdditionOneSuccessor_iff
