@@ -155,21 +155,29 @@ class CacheTests(unittest.TestCase):
         (self.root / "YesMetaZFC.lean").write_text("import Init\n")
         for name in ("LICENSE", "NOTICE"):
             (self.root / name).write_text("test notice\n")
+        toolchain = self.root / "toolchain"
+        toolchain.mkdir()
+        for name in ("LICENSE", "LICENSES"):
+            (toolchain / name).write_text("upstream notice\n")
         artifacts = self.build / "lib/lean"
         artifacts.mkdir(parents=True)
         (artifacts / "YesMetaZFC.olean").write_bytes(b"current")
         (artifacts / "DeletedModule.olean").write_bytes(b"stale")
         return self.root / "output"
 
+    def pack_command(self, _root, *args, **_kwargs):
+        return str(self.root / "toolchain") if args[:2] == ("lean", "--print-prefix") else ""
+
     def test_pack_omits_deleted_modules(self):
         output = self.prepare_pack()
-        with patch.object(cache, "identity", return_value=self.info), patch.object(cache, "run", return_value=""), patch.object(cache, "build_all"):
+        with patch.object(cache, "identity", return_value=self.info), patch.object(cache, "run", side_effect=self.pack_command), patch.object(cache, "build_all"):
             archive = cache.pack_cache(self.root, output, "lean")
         with tarfile.open(archive) as bundle:
             names = bundle.getnames()
         self.assertIn("lib/lean/YesMetaZFC.olean", names)
         self.assertNotIn("lib/lean/DeletedModule.olean", names)
         self.assertIn("share/YesMetaZFC/LICENSE", names)
+        self.assertIn("share/YesMetaZFC/third-party/lean4/LICENSES", names)
 
     def test_source_change_during_pack_preserves_previous_archive(self):
         output = self.prepare_pack()
@@ -177,7 +185,7 @@ class CacheTests(unittest.TestCase):
         archive = output / cache.archive_name(self.info, "lean")
         archive.write_bytes(b"previous archive")
         changed = {**self.info, "source_sha256": "c" * 64}
-        with patch.object(cache, "identity", side_effect=[self.info, changed]), patch.object(cache, "run", return_value=""), patch.object(cache, "build_all"):
+        with patch.object(cache, "identity", side_effect=[self.info, changed]), patch.object(cache, "run", side_effect=self.pack_command), patch.object(cache, "build_all"):
             with self.assertRaisesRegex(ValueError, "发生变化"):
                 cache.pack_cache(self.root, output, "lean")
         self.assertEqual(archive.read_bytes(), b"previous archive")

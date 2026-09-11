@@ -116,6 +116,14 @@ def pack_cache(root: Path, output: Path, kind: str, *, allow_dirty: bool = False
     notices.mkdir(parents=True, exist_ok=True)
     for name in ("LICENSE", "NOTICE"):
         shutil.copyfile(root / name, notices / name)
+    # 原生工具链接 Lean 的运行库，随包保留发行工具链附带的第三方许可。
+    toolchain = Path(run(root, "lean", "--print-prefix", capture=True))
+    third_party = notices / "third-party/lean4"
+    third_party.mkdir(parents=True, exist_ok=True)
+    for name in ("LICENSE", "LICENSES"):
+        if not (toolchain / name).is_file():
+            raise ValueError(f"工具链缺少随附许可文件：{toolchain / name}")
+        shutil.copyfile(toolchain / name, third_party / name)
     output = output.resolve()
     if output.is_relative_to(build):
         raise ValueError("压缩包不能输出到被打包的构建目录内")

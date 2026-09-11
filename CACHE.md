@@ -10,7 +10,9 @@
 | `lean`（默认） | 全部独立模块的 `.olean`、`.ilean`、Lake 跟踪文件，以及默认 `leanArts` 要求的生成 C/LLVM 文件和元数据 | 编辑器、阅读证明、继续形式化开发 |
 | `full` | `lean` 的内容，加原生对象文件、静态库、共享库及 `prove_auto_sweep` 可执行程序 | 运行扫描工具、原生链接及完整开发环境 |
 
-两个类型都包含 `LICENSE` 和 `NOTICE`。不包含 Lean 工具链、Git 历史或研究资料。
+两个类型都包含本项目的 `LICENSE` 和 `NOTICE`，以及 `share/YesMetaZFC/third-party/lean4/`
+下的工具链 `LICENSE`、`LICENSES`，保留相应第三方组件的许可说明。
+不包含 Lean 工具链本体、Git 历史或研究资料。
 完整包使用 Lake 默认的 `YesMetaZFC-<target>.tar.gz` 名称；轻量包增加 `-lean` 后缀。
 
 | 平台 | CI 构建环境 | Lean 目标 |
