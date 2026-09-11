@@ -71,6 +71,10 @@ jobs:
           lint: 'false'
           use-mathlib-cache: 'false'
           use-github-cache: 'false'
+      # 将 Git Bash 路径转换为 Windows 原生进程能识别的路径。
+      - name: Export native Windows Elan path
+        if: runner.os == 'Windows'
+        run: cygpath -w "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build all modules and native targets
         run: python scripts/lean_cache.py build --native
       - name: Check scanner
