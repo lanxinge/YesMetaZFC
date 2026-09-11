@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Axioms.ZF
-import YesMetaZFC.SetTheory.Theory
+import YesMetaZFC.Model.SetTheory.Theory
 /-!
 # 收集模式的语义接口
 本层把 ZF 与 KP 的收集公理整理为模型内可直接消费的纸面语义。输入集合中的每个元素

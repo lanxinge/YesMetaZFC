@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Extension
-import YesMetaZFC.SetTheory.FunctionSemantics
+import YesMetaZFC.Model.SetTheory.FunctionSemantics
 import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 基础集合构造的模型语义接口

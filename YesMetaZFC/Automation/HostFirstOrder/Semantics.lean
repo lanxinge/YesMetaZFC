@@ -1,5 +1,5 @@
 import YesMetaZFC.Automation.HostFirstOrder.Syntax
-import YesMetaZFC.Logic.Theory
+import YesMetaZFC.Model.FirstOrder.Theory
 
 /-!
 # 索引化宿主一阶语义

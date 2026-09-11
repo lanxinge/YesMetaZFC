@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Definitional.DeepRflAttr
-import YesMetaZFC.SetTheory.Definitional.Theory
+import YesMetaZFC.Model.SetTheory.DefinitionalTheory
 /-!
 # 新核受控定义约化
 `deep_rfl` 只使用专用 simp 集约化新核语义。原子定义体、保守性桥和审计展开不会进入

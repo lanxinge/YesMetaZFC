@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserDelta0
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureCompletedStage
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureStageTwoSemantics
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRoundOneSpecifications
+import YesMetaZFC.Model.ZFC.Pure.PureCompletedStage
+import YesMetaZFC.Model.ZFC.Pure.PureStageTwoSemantics
+import YesMetaZFC.Model.ZFC.Pure.PureRoundOneSpecifications
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.DefinitionContracts
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.FormalSystem
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.Project
@@ -85,10 +85,10 @@ import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SupportRealiza
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedAxiomPacket
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofPresentation
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedRosser
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRelationFunctions
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureMappingSpecifications
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureCoordinateSpecifications
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureMappingOperations
+import YesMetaZFC.Model.ZFC.Pure.PureRelationFunctions
+import YesMetaZFC.Model.ZFC.Pure.PureMappingSpecifications
+import YesMetaZFC.Model.ZFC.Pure.PureCoordinateSpecifications
+import YesMetaZFC.Model.ZFC.Pure.PureMappingOperations
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserTransfer
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedDerivability
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofReflection

@@ -1,7 +1,7 @@
-import YesMetaZFC.Automation.RelationalDefinitions
-import YesMetaZFC.Automation.SemanticTransfer
-import YesMetaZFC.Automation.TotalizedGraph
-import YesMetaZFC.Automation.RelationalExpansion
+import YesMetaZFC.Model.Interpretation.RelationalDefinitions
+import YesMetaZFC.Model.Interpretation.SemanticTransfer
+import YesMetaZFC.Model.Interpretation.TotalizedGraph
+import YesMetaZFC.Model.Interpretation.RelationalExpansion
 import YesMetaZFC.Automation.CoreSyntax
 import YesMetaZFC.Automation.CoreNormalForm
 import YesMetaZFC.Automation.CoreNormalForm.FoolLambdaSoundness

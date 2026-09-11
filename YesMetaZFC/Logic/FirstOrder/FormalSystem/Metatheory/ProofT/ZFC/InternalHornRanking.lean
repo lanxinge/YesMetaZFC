@@ -1,7 +1,7 @@
 import YesMetaZFC.Automation.ObjectHornRanking
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornReflection
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceStrongInduction
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceSyntaxRank
+import YesMetaZFC.Model.ZFC.Pure.PureSourceStrongInduction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceSyntaxRank
 
 /-! # 原 Horn 图的分层内部强归纳
 

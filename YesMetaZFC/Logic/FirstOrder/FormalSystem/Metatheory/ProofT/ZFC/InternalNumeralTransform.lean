@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralQuotation
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceTransformConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceTransformConstruction
 
 /-! # 非标准数码在语法变换下保持不变
 

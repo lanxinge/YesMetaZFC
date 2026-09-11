@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.Fragment
-import YesMetaZFC.Logic.Theory
+import YesMetaZFC.Model.FirstOrder.Theory
 
 /-!
 # 内在类型语法的浅嵌入桥接

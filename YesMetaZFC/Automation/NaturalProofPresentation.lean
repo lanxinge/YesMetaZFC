@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.Delta1ProofPresentation
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.Infinity
 import YesMetaZFC.Logic.FirstOrder.Metatheory.Propositional
-import YesMetaZFC.Logic.FirstOrder.Derivation.Soundness
+import YesMetaZFC.Model.FirstOrder.Soundness
 
 /-! # 将对象证明图的证明码限制在模型内部 ω
 

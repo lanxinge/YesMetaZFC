@@ -1,5 +1,5 @@
 import YesMetaZFC.Automation.DAGCertificate.CompileDAG
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Semantics
+import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics
 
 /-!
 # raw substitution 到内在 typed substitution 的编译

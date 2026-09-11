@@ -1,6 +1,6 @@
-import YesMetaZFC.Automation.SyntaxNatCoding
+import YesMetaZFC.Model.Henkin.SyntaxNatCoding
 import YesMetaZFC.Automation.SearchMaterialization
-import YesMetaZFC.Logic.FirstOrder.Completeness
+import YesMetaZFC.Model.Henkin
 
 /-!
 # 自动化后端的完备性接口

@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Semantics
+import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics
 
 /-! # 公式穿过绑定变量后的通用语义
 

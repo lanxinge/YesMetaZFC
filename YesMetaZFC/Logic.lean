@@ -1,11 +1,11 @@
 import YesMetaZFC.Logic.Signature
 import YesMetaZFC.Logic.Syntax
-import YesMetaZFC.Logic.Semantics
-import YesMetaZFC.Logic.FreeVariableSupport
-import YesMetaZFC.Logic.Theory
+import YesMetaZFC.Model.FirstOrder.Semantics
+import YesMetaZFC.Model.FirstOrder.FreeVariableSupport
+import YesMetaZFC.Model.FirstOrder.Theory
 import YesMetaZFC.Logic.HigherOrder
-import YesMetaZFC.Logic.Infinitary
-import YesMetaZFC.Logic.SecondOrder
+import YesMetaZFC.Model.Infinitary
+import YesMetaZFC.Model.SecondOrder
 import YesMetaZFC.Logic.Fragment
 import YesMetaZFC.Logic.Shallow
 import YesMetaZFC.Logic.FirstOrder

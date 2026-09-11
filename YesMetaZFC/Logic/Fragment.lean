@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.Semantics
+import YesMetaZFC.Model.FirstOrder.Semantics
 /-!
 # 逻辑片段描述
 这里不实现搜索器，只记录语义核允许哪些表达力。Automation 后续应按 fragment

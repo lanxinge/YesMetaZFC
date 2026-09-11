@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceLocalTests
+import YesMetaZFC.Model.ZFC.Pure.PureSourceLocalTests
 
 /-! # 当前纯 Rosser 句子的裸 ZFC 独立性
 

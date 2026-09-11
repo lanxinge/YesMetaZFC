@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralTransform
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourcePointInstantiation
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceInstantiationSyntax
+import YesMetaZFC.Model.ZFC.Pure.PureSourcePointInstantiation
+import YesMetaZFC.Model.ZFC.Pure.PureSourceInstantiationSyntax
 
 /-! # 多参数数码环境与连续点实例化
 

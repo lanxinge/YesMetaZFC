@@ -1,6 +1,6 @@
 import YesMetaZFC.SetTheory.Definitional.Language
-import YesMetaZFC.SetTheory.Definitional.Semantics
-import YesMetaZFC.SetTheory.Definitional.Theory
+import YesMetaZFC.Model.SetTheory.DefinitionalSemantics
+import YesMetaZFC.Model.SetTheory.DefinitionalTheory
 import YesMetaZFC.SetTheory.Definitional.DeepRfl
 import YesMetaZFC.SetTheory.Definitional.Project
 import YesMetaZFC.SetTheory.Definitional.Project.Derivation

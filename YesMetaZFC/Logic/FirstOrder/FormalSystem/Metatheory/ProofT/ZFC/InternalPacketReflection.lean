@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourcePacketBounds
+import YesMetaZFC.Model.ZFC.Pure.PureSourcePacketBounds
 
 /-! # 原传输包图的内部正反射
 

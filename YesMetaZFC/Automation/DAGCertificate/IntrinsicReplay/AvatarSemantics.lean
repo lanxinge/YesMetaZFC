@@ -1,6 +1,6 @@
 import YesMetaZFC.Automation.DAGCertificate.CompileRenaming
 import YesMetaZFC.Automation.DAGCertificate.IntrinsicReplay.Avatar
-import YesMetaZFC.Logic.FreeVariableSupport
+import YesMetaZFC.Model.FirstOrder.FreeVariableSupport
 
 namespace YesMetaZFC
 namespace Automation

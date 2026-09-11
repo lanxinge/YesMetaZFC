@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornReflection
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceSyntaxRank
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceStrongInduction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceSyntaxRank
+import YesMetaZFC.Model.ZFC.Pure.PureSourceStrongInduction
 
 /-! # 原一般语法图的内部正反射
 

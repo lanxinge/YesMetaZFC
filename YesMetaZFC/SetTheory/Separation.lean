@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Axioms.ZF
-import YesMetaZFC.SetTheory.Theory
+import YesMetaZFC.Model.SetTheory.Theory
 /-!
 # 分离模式的语义接口与常用集合构造
 本层先把任意一元公式模式的分离公理整理为稳定的语义接口；ZF 消费任意模式，KP

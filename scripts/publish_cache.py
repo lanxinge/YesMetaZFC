@@ -70,7 +70,7 @@ def publish(directory: Path) -> None:
             "From a checkout of this commit, run:\n\n"
             "```sh\npython scripts/lean_cache.py get\n"
             "python scripts/lean_cache.py get --kind full\n```\n\n"
-            f"[Cache documentation](https://github.com/{repository}/blob/{revision}/CACHE.md)\n",
+            f"[Cache documentation](https://github.com/{repository}/blob/{revision}/markdown/CACHE.md)\n",
             encoding="utf-8",
         )
         subprocess.run([*gh, "create", tag, "--repo", repository, "--target", revision, "--draft", "--prerelease",

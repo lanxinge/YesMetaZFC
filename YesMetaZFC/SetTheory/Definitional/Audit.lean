@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.Definitional.Theory
+import YesMetaZFC.Model.SetTheory.DefinitionalTheory
 import YesMetaZFC.SetTheory.Definitional.Audit.Pure
 import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!

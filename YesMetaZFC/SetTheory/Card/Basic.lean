@@ -1,6 +1,6 @@
 import YesMetaZFC.SetTheory.Card.Syntax
 import YesMetaZFC.SetTheory.FunctionConstruction
-import YesMetaZFC.SetTheory.FunctionSemantics
+import YesMetaZFC.Model.SetTheory.FunctionSemantics
 import YesMetaZFC.SetTheory.Ord.Basic
 /-!
 # 基数论的基础语义

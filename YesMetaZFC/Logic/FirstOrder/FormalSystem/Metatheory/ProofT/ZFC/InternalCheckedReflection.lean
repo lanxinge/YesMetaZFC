@@ -1,6 +1,6 @@
 import YesMetaZFC.Automation.ObjectCheckedReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPositiveQueries
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceCheckedConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceCheckedConstruction
 
 /-! # 已检查规则的内部证明装配
 

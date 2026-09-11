@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.Model
+import YesMetaZFC.Model.SetTheory.Structure
 /-!
 # 定义原子核的纯隶属审计语言
 本模块保存旧纯 `∈` 核的最小独立副本，只供 `Definitional.Audit` 的展开与保守性证明

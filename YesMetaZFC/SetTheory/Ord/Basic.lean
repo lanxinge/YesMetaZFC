@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Ord.Notation
-import YesMetaZFC.SetTheory.OrderSemantics
+import YesMetaZFC.Model.SetTheory.OrderSemantics
 import YesMetaZFC.SetTheory.Separation
 import YesMetaZFC.SetTheory.SetConstruction
 import YesMetaZFC.SetTheory.Automation.Context

@@ -1,7 +1,7 @@
 import YesMetaZFC.Automation.ObjectLocalDecision
 import YesMetaZFC.Automation.ObjectBinaryTest
 import YesMetaZFC.Automation.NaturalRosserSemantics
-import YesMetaZFC.Logic.FirstOrder.LevyAbsoluteness
+import YesMetaZFC.Model.FirstOrder.LevyAbsoluteness
 
 /-! # 有界规则的任意模型语义
 

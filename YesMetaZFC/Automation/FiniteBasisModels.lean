@@ -1,5 +1,5 @@
 import Lean
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.FiniteAxiomModels
+import YesMetaZFC.Model.ZFC.FiniteAxiomModels
 
 /-! # 有限公理基的模型装配
 

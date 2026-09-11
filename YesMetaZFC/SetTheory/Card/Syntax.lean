@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.FunctionSemantics
+import YesMetaZFC.Model.SetTheory.FunctionSemantics
 /-!
 # 基数论基础公式
 本文件定义集合编码单射、双射、等势、基数比较，以及初始序数意义下的基数。所有定义

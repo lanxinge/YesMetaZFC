@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.SyntaxNatCoding
+import YesMetaZFC.Model.Henkin.SyntaxNatCoding
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.SyntaxCoding
 import YesMetaZFC.SetTheory.Language
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.Automation.NaturalProofPresentation
-import YesMetaZFC.Automation.RelationalEnvironment
+import YesMetaZFC.Model.Interpretation.RelationalEnvironment
 
 /-! # 自然数证明图的 Rosser 比较语义
 

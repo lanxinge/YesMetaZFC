@@ -1,0 +1,18 @@
+import YesMetaZFC.Model.Interpretation.ModelClosure
+import YesMetaZFC.Model.Interpretation.PredicateCongruence
+import YesMetaZFC.Model.Interpretation.PredicateExpansion
+import YesMetaZFC.Model.Interpretation.RelationalCongruence
+import YesMetaZFC.Model.Interpretation.RelationalDefinitions
+import YesMetaZFC.Model.Interpretation.RelationalEnvironment
+import YesMetaZFC.Model.Interpretation.RelationalExpansion
+import YesMetaZFC.Model.Interpretation.RelationalInheritance
+import YesMetaZFC.Model.Interpretation.RelationalSemantics
+import YesMetaZFC.Model.Interpretation.RelationalTransfer
+import YesMetaZFC.Model.Interpretation.RelationalTranslation
+import YesMetaZFC.Model.Interpretation.SemanticTransfer
+import YesMetaZFC.Model.Interpretation.TotalizedGraph
+
+/-! # 关系解释、扩张与语义传输
+
+本入口直接汇集本目录的实际定义和证明，数学声明沿用原命名空间。
+-/

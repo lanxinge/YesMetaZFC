@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.Derivation.Core
 import YesMetaZFC.Logic.FirstOrder.Derivation.Quantifier
-import YesMetaZFC.Logic.FirstOrder.Derivation.Soundness
+import YesMetaZFC.Model.FirstOrder.Soundness
 import YesMetaZFC.Logic.FirstOrder.Derivation.Structural
 import YesMetaZFC.Logic.FirstOrder.Derivation.Classical
 import YesMetaZFC.Logic.FirstOrder.Derivation.Propositional

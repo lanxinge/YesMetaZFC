@@ -1,5 +1,5 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceNumeralTotality
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceTermConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceNumeralTotality
+import YesMetaZFC.Model.ZFC.Pure.PureSourceTermConstruction
 
 /-! # 任意内部自然数的唯一合法闭项数码
 

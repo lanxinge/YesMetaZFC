@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.NaturalArithmetic
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Semantics
+import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics
 
 /-! # 自然减法与递归序列的逐步语义
 

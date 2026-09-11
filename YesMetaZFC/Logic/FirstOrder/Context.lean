@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.Context.Basic
-import YesMetaZFC.Logic.Theory
+import YesMetaZFC.Model.FirstOrder.Theory
 
 /-!
 # 一阶局部上下文语义

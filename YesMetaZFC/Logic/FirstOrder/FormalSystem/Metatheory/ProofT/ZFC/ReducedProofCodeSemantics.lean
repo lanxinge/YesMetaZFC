@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceTraceComposition
+import YesMetaZFC.Model.ZFC.Pure.PureSourceTraceComposition
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureNaturalRosserAgreement
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ProvabilitySemantics
 

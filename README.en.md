@@ -18,6 +18,7 @@ and provability uses the project's ordinary `Derives` relation.
 
 | Result | Source entry point | Assumptions and scope |
 | --- | --- | --- |
+| Native small-graph model and consistency | [SmallGraph/ZFC](YesMetaZFC/Model/SmallGraph/ZFC.lean): `sg_models_zfc`, `zfc_consistent` | Constructs a model of the original ZFC axioms from well-founded pointed graphs modulo bisimulation and proves consistency in Lean's metatheory, without a model-existence or consistency assumption. |
 | Rosser independence | [PureRosserComplete](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean): `PureRosser.independent` | Assuming ZFC is consistent, a specific pure sentence and its negation are both unprovable. |
 | Derivability conditions D1–D3 | [PureProvability](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean): `necessitation_m`, `distribution_m`, `introspection_m` | For arbitrary pure sentences; no consistency or standard-model assumption. |
 | Löb's theorem | [PureLoeb](YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean): `PureProvability.loeb_axiom_m`, `loeb_m` | Includes the internal formula and the rule, using an established fixed-point construction. |
@@ -28,9 +29,11 @@ and provability uses the project's ordinary `Derives` relation.
 The provability predicate retains the source quotation and proof checker through the
 pure-language translation. The fixed-point and Tarski results also provide a separate
 encoding of the final pure formulas themselves. Precise statements and encoding conventions
-are recorded in [TROPHIES.md](TROPHIES.md) and [NAT_DECODING.md](NAT_DECODING.md).
+are recorded in [TROPHIES.md](markdown/TROPHIES.md) and [NAT_DECODING.md](markdown/NAT_DECODING.md).
 
 ## Explore the infrastructure
+
+Repository guides other than README files are collected in [markdown/](markdown/).
 
 The existing development connects typed syntax and substitution, formal proof systems,
 set-theoretic definitions, model interpretations, internal proof coding, and automation.
@@ -38,13 +41,13 @@ These interfaces support the current results and the broader research-platform g
 
 | Interest | Start here |
 | --- | --- |
-| Mathematical results and exact hypotheses | [TROPHIES.md](TROPHIES.md) |
-| Reusable proof interfaces and `prove_auto` automation | [ENGINEERING.md](ENGINEERING.md) |
-| Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](NAT_DECODING.md) |
-| Definitions, internal recursion, and staged extensions | [ELIMINATION.md](ELIMINATION.md) |
-| Axiom coverage, model correspondence, and recorded dependency audits | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
-| Source recovery and toolchain setup | [RESTORE.md](RESTORE.md) |
-| Development conventions | [AGENTS.md](AGENTS.md), [ProofNaming.md](ProofNaming.md) |
+| Mathematical results and exact hypotheses | [TROPHIES.md](markdown/TROPHIES.md) |
+| Reusable proof interfaces and `prove_auto` automation | [ENGINEERING.md](markdown/ENGINEERING.md) |
+| Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
+| Definitions, internal recursion, and staged extensions | [ELIMINATION.md](markdown/ELIMINATION.md) |
+| Axiom coverage, model correspondence, and recorded dependency audits | [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) |
+| Source recovery and toolchain setup | [RESTORE.md](markdown/RESTORE.md) |
+| Development conventions | [AGENTS.md](markdown/AGENTS.md), [ProofNaming.md](markdown/ProofNaming.md) |
 
 The detailed guides are currently mainly in Chinese; the source links above identify
 the relevant declarations directly. The platform remains under active development.
@@ -68,8 +71,8 @@ python scripts/lean_cache.py build
 ```
 
 Warnings cause these checks to fail. Recorded validation runs and their scope are documented
-in [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) and
-[PROOF_REDUCTION.md](PROOF_REDUCTION.md).
+in [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) and
+[PROOF_REDUCTION.md](markdown/PROOF_REDUCTION.md).
 
 ## Prebuilt caches
 
@@ -82,7 +85,7 @@ Successful main-branch builds publish a complete set in a release named `cache-<
 The downloader checks the source fingerprint, exact Lean version, platform, and SHA-256,
 then verifies that all corresponding targets are ready without rebuilding.
 Python 3.11+ is required; no third-party Python packages are needed.
-See [CACHE.md](CACHE.md) for supported environments and offline restoration.
+See [CACHE.md](markdown/CACHE.md) for supported environments and offline restoration.
 
 ## Get involved
 

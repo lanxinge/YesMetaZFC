@@ -1,5 +1,5 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSentenceTransfer
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceLocalTests
+import YesMetaZFC.Model.ZFC.Pure.PureSentenceTransfer
+import YesMetaZFC.Model.ZFC.Pure.PureSourceLocalTests
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedLoeb
 
 /-! # 裸 ZFC 中由原编码表示的普通可证明性

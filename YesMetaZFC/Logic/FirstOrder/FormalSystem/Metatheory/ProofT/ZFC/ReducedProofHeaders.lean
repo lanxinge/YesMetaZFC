@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureNaturalRosserAgreement
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceCodingInversion
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceHornConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceCodingInversion
+import YesMetaZFC.Model.ZFC.Pure.PureSourceHornConstruction
 
 /-! # 完整证明图的内部根行反演
 

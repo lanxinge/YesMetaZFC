@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofComposition
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceTransformConstruction
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceFormulaConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceTransformConstruction
+import YesMetaZFC.Model.ZFC.Pure.PureSourceFormulaConstruction
 
 /-! # 内部公式码上的逻辑公理与存在引入
 

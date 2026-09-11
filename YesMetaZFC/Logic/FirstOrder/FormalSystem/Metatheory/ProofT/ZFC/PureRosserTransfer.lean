@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedRosser
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureModel
-import YesMetaZFC.Automation.SemanticTransfer
-import YesMetaZFC.Automation.RelationalExpansion
+import YesMetaZFC.Model.ZFC.Pure.PureModel
+import YesMetaZFC.Model.Interpretation.SemanticTransfer
+import YesMetaZFC.Model.Interpretation.RelationalExpansion
 
 /-! # 裸 ZFC Rosser 回传的精确合同
 

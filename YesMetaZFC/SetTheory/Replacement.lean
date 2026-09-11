@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Collection
-import YesMetaZFC.SetTheory.FunctionSemantics
+import YesMetaZFC.Model.SetTheory.FunctionSemantics
 import YesMetaZFC.SetTheory.Separation
 /-!
 # 函数式替换的语义接口

@@ -1,7 +1,7 @@
 import YesMetaZFC.Automation.ObjectHornReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPredicateTransport
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalTraceReflection
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceHornElimination
+import YesMetaZFC.Model.ZFC.Pure.PureSourceHornElimination
 
 /-! # 原 Horn 规则的内部证明装配
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.Derivation.Consistency
-import YesMetaZFC.Logic.FirstOrder.Derivation.Soundness
+import YesMetaZFC.Model.FirstOrder.Soundness
 
 /-! # 普通 Hilbert 推导中的真不可定义性
 

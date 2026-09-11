@@ -1,6 +1,6 @@
 import YesMetaZFC.Automation.ObjectNumeralReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralSpecialization
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceLocalTests
+import YesMetaZFC.Model.ZFC.Pure.PureSourceLocalTests
 
 /-! # 数码实例的可分离反射归纳
 

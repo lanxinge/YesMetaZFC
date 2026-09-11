@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralQuotation
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceSubstitution
+import YesMetaZFC.Model.ZFC.Pure.PureSourceSubstitution
 
 /-! # 内部数码命名与固定公式代入的实际连接
 

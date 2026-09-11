@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceInfinity
+import YesMetaZFC.Model.ZFC.Pure.PureSourceInfinity
 
 /-! # 后继链码域的边界及内部自然数覆盖
 

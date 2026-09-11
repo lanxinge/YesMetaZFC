@@ -1,5 +1,5 @@
 import YesMetaZFC.Automation.DAGCertificate.CompileDAG
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Semantics
+import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics
 
 /-!
 # raw offset 改名到内在 typed free-renaming 的编译

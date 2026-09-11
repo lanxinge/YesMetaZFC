@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Language
-import YesMetaZFC.SetTheory.Theory
+import YesMetaZFC.Model.SetTheory.Theory
 import YesMetaZFC.Logic.FirstOrder.Derivation.Consistency
 
 /-!

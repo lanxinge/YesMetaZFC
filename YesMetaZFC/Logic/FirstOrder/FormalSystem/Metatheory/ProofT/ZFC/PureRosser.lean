@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureZFCModels
+import YesMetaZFC.Model.ZFC.Pure.PureZFCModels
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserSchedule
 
 /-! # 当前完整证明树 Rosser 句子的纯隶属配置

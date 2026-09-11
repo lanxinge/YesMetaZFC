@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Axioms.ZFC
-import YesMetaZFC.SetTheory.Theory
+import YesMetaZFC.Model.SetTheory.Theory
 import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 公理系统扩张与定理继承

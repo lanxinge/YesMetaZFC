@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureOpenTransfer
+import YesMetaZFC.Model.ZFC.Pure.PureOpenTransfer
 import YesMetaZFC.Automation.ObjectExpressionIteration
 
 /-! # 纯隶属公式自身的完整 AST 编码

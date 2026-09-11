@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofHeaders
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceProjection
+import YesMetaZFC.Model.ZFC.Pure.PureSourceProjection
 import YesMetaZFC.Automation.ObjectProofNodeSemantics
 
 /-! # 当前证明节点的内部局部检查构造 -/

@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.HigherOrder.Signature
 import YesMetaZFC.Logic.HigherOrder.Syntax
-import YesMetaZFC.Logic.HigherOrder.Semantics
+import YesMetaZFC.Model.HigherOrder
 /-!
 # 原生简单类型高阶语义核
 本入口为后续 HO DAG、Miller pattern 合一证书和外延叠加规则提供稳定语法与语义。

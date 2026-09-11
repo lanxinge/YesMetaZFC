@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralSubstitution
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourcePointInstantiation
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSourceInstantiationSyntax
+import YesMetaZFC.Model.ZFC.Pure.PureSourcePointInstantiation
+import YesMetaZFC.Model.ZFC.Pure.PureSourceInstantiationSyntax
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofLogicalConstruction
 
 /-! # 数码实例的内部证明到存在句子证明

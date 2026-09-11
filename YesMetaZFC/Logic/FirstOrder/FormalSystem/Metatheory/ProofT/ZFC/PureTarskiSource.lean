@@ -1,4 +1,4 @@
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureOpenTransfer
+import YesMetaZFC.Model.ZFC.Pure.PureOpenTransfer
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedTarskiParameters
 
 /-! # 裸 ZFC 中保留原语法编码的带参数真不可定义性

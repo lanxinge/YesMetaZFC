@@ -1,5 +1,5 @@
 import YesMetaZFC.Automation.DAGCertificate.Compile
-import YesMetaZFC.Logic.FirstOrder.Derivation.Substitution.Semantics
+import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics
 
 /-!
 # 检查编译的内在语义接口

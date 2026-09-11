@@ -1,6 +1,6 @@
 import YesMetaZFC.Automation.FunctionFreeDelta0
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserComplete
-import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureSeparation
+import YesMetaZFC.Model.ZFC.Pure.PureSeparation
 
 /-! # 纯隶属 Rosser 的 Δ₀ 参数矩阵与闭句边界
 
