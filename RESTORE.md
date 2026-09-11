@@ -2,6 +2,8 @@
 
 工具链固定为 `leanprover/lean4:v4.33.1`，无外部 Lake 包依赖。
 普通 Linux 将工具链 `bin` 加入 `PATH`，确认 `lean --version`、`lake --version` 后构建。
+跨平台构建缓存的下载、离线恢复和版本检查见 [CACHE.md](CACHE.md)。
+全源检查脚本与缓存脚本需要 Python 3.11 或以上，不需要额外 Python 包。
 
 ## 规范源码
 

@@ -2,13 +2,123 @@ name: Lean CI
 
 on:
   push:
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+concurrency:
+  group: lean-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  PYTHONUTF8: '1'
+
+jobs:
+  cache-tests:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s scripts/tests -v
+
+  build:
+    needs: cache-tests
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            threads: 4
+          - os: ubuntu-22.04-arm
+            threads: 4
+          - os: windows-2022
+            threads: 4
+          - os: macos-15-intel
+            threads: 4
+          - os: macos-14
+            threads: 2
+    env:
+      LEAN_NUM_THREADS: ${{ matrix.threads }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore incremental build
+        id: cache
+        uses: actions/cache/restore@v5
+        with:
+          path: .lake/build
+          key: lean-v1-${{ matrix.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain', 'lakefile.toml', 'lake-manifest.json') }}-${{ github.sha }}
+          restore-keys: |
+            lean-v1-${{ matrix.os }}-${{ runner.arch }}-${{ hashFiles('lean-toolchain', 'lakefile.toml', 'lake-manifest.json') }}-
       - uses: leanprover/lean-action@v1
+        with:
+          auto-config: 'false'
+          build: 'false'
+          test: 'false'
+          lint: 'false'
+          use-mathlib-cache: 'false'
+          use-github-cache: 'false'
+      - name: Build all modules and native targets
+        run: python scripts/lean_cache.py build --native
+      - name: Check scanner
+        run: lake --no-build exe prove_auto_sweep --help
+      - name: Pack Lean and full caches
+        run: |
+          python scripts/lean_cache.py pack --kind lean
+          python scripts/lean_cache.py pack --kind full
+      - name: Verify restoration in a fresh build directory
+        run: |
+          python scripts/lean_cache.py restore --kind lean tmp/lean-cache/*-lean.tar.gz
+          python scripts/lean_cache.py restore --kind full "$(find tmp/lean-cache -name '*.tar.gz' ! -name '*-lean.tar.gz')"
+      - name: Save incremental build
+        if: github.event_name != 'pull_request' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .lake/build
+          key: ${{ steps.cache.outputs.cache-primary-key }}
+      - name: Upload downloadable caches
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-cache-${{ matrix.os }}
+          path: tmp/lean-cache/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: >-
+      github.repository == 'lanxinge/YesMetaZFC' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lean-cache-*
+          path: tmp/release-cache
+          merge-multiple: true
+      # 所有平台完成真实恢复验证后，才将同一提交的完整集合公开。
+      - name: Publish immutable commit snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/publish_cache.py tmp/release-cache

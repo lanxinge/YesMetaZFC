@@ -1,5 +1,12 @@
 name = "YesMetaZFC"
 version = "0.1.0"
+description = "Toward a general-purpose platform for set theory research in Lean 4"
+homepage = "https://github.com/lanxinge/YesMetaZFC"
+license = "Apache-2.0"
+licenseFiles = ["LICENSE", "NOTICE"]
+keywords = ["set-theory", "mathematical-logic", "metamathematics", "theorem-proving"]
+releaseRepo = "https://github.com/lanxinge/YesMetaZFC"
+preferReleaseBuild = true
 defaultTargets = ["YesMetaZFC"]
 
 [leanOptions]
