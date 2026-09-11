@@ -20,11 +20,14 @@
 | Linux x86-64 | Ubuntu 22.04 | `x86_64-unknown-linux-gnu` |
 | Linux ARM64 | Ubuntu 22.04 ARM | `aarch64-unknown-linux-gnu` |
 | Windows x86-64 | Windows Server 2022 | `x86_64-w64-windows-gnu` |
-| macOS Intel | macOS 15 Intel | `x86_64-apple-darwin` |
-| macOS Apple Silicon | macOS 14 ARM | `aarch64-apple-darwin` |
+| macOS Intel | macOS 15 Intel | `x86_64-apple-darwin`，可能带 Darwin 版本后缀 |
+| macOS Apple Silicon | macOS 14 ARM | `arm64-apple-darwin24.6.0` 等，也接受 `aarch64` 架构名 |
 
 平台从实际 `lean --version` 输出识别，不能跨平台混用。原生工具还要求兼容的系统运行库；
 CI 的构建环境不等于对所有更早系统版本的兼容保证。
+缓存文件名与身份校验保留完整目标串，包括 Darwin 版本后缀，与 Lake 默认归档命名一致。
+发布集合仅按平台族识别 macOS 架构别名与版本后缀；同一平台的两类缓存必须使用相同的
+完整目标串，下载和恢复仍严格匹配原目标串及完整 Lean 版本。
 
 ## 一条命令获取
 
@@ -110,4 +113,4 @@ python scripts/lean_cache.py pack --kind full
 可以在相同源码副本中离线恢复，但公开下载和 CI 发布均拒绝它。打包期间若源码变化，同样失败。
 
 脚本测试：`python -m unittest discover -s scripts/tests -v`。测试覆盖版本错配、归档损坏、
-路径越界、特殊文件、恢复失败回滚以及发布集合完整性；不会引入 Lean 测试模块。
+路径越界、特殊文件、恢复失败回滚、Darwin 版本目标串以及发布集合完整性；不会引入 Lean 测试模块。

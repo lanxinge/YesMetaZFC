@@ -7,14 +7,24 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 
 
-TARGETS = {
+PLATFORMS = {
     "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu",
     "x86_64-w64-windows-gnu", "x86_64-apple-darwin", "aarch64-apple-darwin",
 }
+
+
+def platform_family(target: str) -> str:
+    """发布按平台族计数，归档和清单仍保留完整的 Lean 目标串。"""
+    match = re.fullmatch(r"(x86_64|aarch64|arm64)-apple-darwin(?:\d+(?:\.\d+)*)?", target)
+    if match:
+        arch = "aarch64" if match[1] == "arm64" else match[1]
+        return f"{arch}-apple-darwin"
+    return target
 
 
 def publish(directory: Path) -> None:
@@ -22,13 +32,17 @@ def publish(directory: Path) -> None:
     if os.environ.get("GITHUB_REPOSITORY") != repository or os.environ.get("GITHUB_REF") != "refs/heads/main":
         raise ValueError("只允许在原仓库主分支发布缓存")
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    expected = {(target, kind) for target in TARGETS for kind in ("lean", "full")}
+    expected = {(platform, kind) for platform in PLATFORMS for kind in ("lean", "full")}
     found, fingerprints, sums, assets = set(), set(), [], []
+    platform_targets = {}
     for path in sorted(directory.glob("*.tar.gz.json")):
         metadata = json.loads(path.read_text(encoding="utf-8"))
-        pair = (metadata["target"], metadata["kind"])
+        platform = platform_family(metadata["target"])
+        pair = (platform, metadata["kind"])
         if pair in found or pair not in expected:
             raise ValueError(f"缓存平台重复或未知：{pair}")
+        if platform_targets.setdefault(platform, metadata["target"]) != metadata["target"]:
+            raise ValueError(f"同一平台的两类缓存目标不一致：{platform}")
         suffix = "-lean" if metadata["kind"] == "lean" else ""
         name = f"YesMetaZFC-{metadata['target']}{suffix}.tar.gz"
         if (metadata["revision"] != revision or metadata["dirty"]

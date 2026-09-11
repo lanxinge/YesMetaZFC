@@ -57,7 +57,8 @@ def build_all(root: Path, kind: str, *, no_build: bool = False) -> None:
 
 def identity(root: Path) -> dict:
     version = run(root, "lean", "--version", capture=True)
-    match = re.search(r"\(version [^,]+, ([\w-]+), commit ", version)
+    # Darwin 的目标串可能包含系统版本，例如 arm64-apple-darwin24.6.0。
+    match = re.search(r"\(version [^,]+, ([\w.-]+), commit ", version)
     if not match:
         raise ValueError(f"无法识别 Lean 平台：{version}")
     revision = run(root, "git", "rev-parse", "HEAD", capture=True)

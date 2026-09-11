@@ -151,6 +151,24 @@ class CacheTests(unittest.TestCase):
             source.write_bytes(b"import Lean\n")
             self.assertNotEqual(first["source_sha256"], cache.identity(self.root)["source_sha256"])
 
+    def test_identity_preserves_versioned_darwin_targets_and_archive_names(self):
+        for name in cache.SOURCE_CONFIG:
+            (self.root / name).write_bytes(b"configuration\n")
+        (self.root / "YesMetaZFC.lean").write_bytes(b"import Init\n")
+        targets = (
+            "arm64-apple-darwin24.6.0", "aarch64-apple-darwin25.0.0",
+            "x86_64-apple-darwin24.6.0", "x86_64-apple-darwin", "aarch64-apple-darwin",
+            "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu", "x86_64-w64-windows-gnu",
+        )
+        for target in targets:
+            version = (f"Lean (version 4.33.1, {target}, "
+                       "commit 819816b2e0a3bf405af45ae5c7af2491d8f5bee6, Release)")
+            with self.subTest(target=target), patch.object(cache, "run", side_effect=[version, "a" * 40]):
+                info = cache.identity(self.root)
+                self.assertEqual(info["target"], target)
+                self.assertEqual(info["lean_version"], version)
+                self.assertEqual(cache.archive_name(info, "full"), f"YesMetaZFC-{target}.tar.gz")
+
     def prepare_pack(self):
         (self.root / "YesMetaZFC.lean").write_text("import Init\n")
         for name in ("LICENSE", "NOTICE"):
@@ -199,8 +217,8 @@ class PublishTests(unittest.TestCase):
         self.directory = Path(temporary.name)
         self.environment = {"GITHUB_REPOSITORY": "lanxinge/YesMetaZFC", "GITHUB_REF": "refs/heads/main"}
 
-    def collection(self):
-        for target in publish_cache.TARGETS:
+    def collection(self, targets=None):
+        for target in publish_cache.PLATFORMS if targets is None else targets:
             for kind in ("lean", "full"):
                 info = {"target": target}
                 name = cache.archive_name(info, kind)
@@ -233,6 +251,39 @@ class PublishTests(unittest.TestCase):
         with patch.dict(os.environ, {**self.environment, "GITHUB_REF": "refs/heads/feature"}):
             with self.assertRaisesRegex(ValueError, "主分支"):
                 publish_cache.publish(self.directory)
+
+    def test_versioned_darwin_targets_are_published_without_renaming(self):
+        targets = publish_cache.PLATFORMS - {"x86_64-apple-darwin", "aarch64-apple-darwin"}
+        targets |= {"x86_64-apple-darwin24.6.0", "arm64-apple-darwin24.6.0"}
+        self.collection(targets)
+        responses = [subprocess.CompletedProcess([], code, "") for code in (1, 0, 0, 0)]
+        with patch.dict(os.environ, self.environment), patch.object(subprocess, "check_output", return_value="a" * 40), patch.object(subprocess, "run", side_effect=responses) as gh:
+            publish_cache.publish(self.directory)
+            upload = gh.call_args_list[2].args[0]
+            self.assertEqual(upload[2], "upload")
+            self.assertIn(str(self.directory / "YesMetaZFC-arm64-apple-darwin24.6.0.tar.gz"), upload)
+            self.assertIn(str(self.directory / "YesMetaZFC-x86_64-apple-darwin24.6.0-lean.tar.gz"), upload)
+
+    def test_aliases_cannot_supply_duplicate_platform_caches(self):
+        self.collection(publish_cache.PLATFORMS | {"arm64-apple-darwin24.6.0"})
+        with patch.dict(os.environ, self.environment), patch.object(subprocess, "check_output", return_value="a" * 40), patch.object(subprocess, "run") as gh:
+            with self.assertRaisesRegex(ValueError, "重复或未知"):
+                publish_cache.publish(self.directory)
+            gh.assert_not_called()
+
+    def test_two_profiles_must_use_the_same_exact_darwin_target(self):
+        self.collection()
+        old = self.directory / "YesMetaZFC-aarch64-apple-darwin.tar.gz.json"
+        metadata = json.loads(old.read_text())
+        metadata["target"] = "arm64-apple-darwin24.6.0"
+        metadata["archive"] = cache.archive_name(metadata, "full")
+        (self.directory / "YesMetaZFC-aarch64-apple-darwin.tar.gz").rename(self.directory / metadata["archive"])
+        old.unlink()
+        (self.directory / (metadata["archive"] + ".json")).write_text(json.dumps(metadata))
+        with patch.dict(os.environ, self.environment), patch.object(subprocess, "check_output", return_value="a" * 40), patch.object(subprocess, "run") as gh:
+            with self.assertRaisesRegex(ValueError, "目标不一致"):
+                publish_cache.publish(self.directory)
+            gh.assert_not_called()
 
 
 if __name__ == "__main__":
