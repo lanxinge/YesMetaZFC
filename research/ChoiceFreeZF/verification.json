@@ -1,0 +1,158 @@
+{
+  "research_start_utc": "2026-09-12 05:47:24 UTC",
+  "research_deadline_utc": "2026-09-12 06:47:24 UTC",
+  "verified_at_utc": "2026-09-12T06:45:13.040723+00:00",
+  "full_zf_model_completed": false,
+  "actual_files": [
+    {
+      "file": "collection-church.lean",
+      "lines": 418,
+      "seconds": 3.359,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 17,
+      "sha256": "3e9a11bacaecfa7a5c14e901f2cc34b5a9fe39a2967061865a03851bb3401841",
+      "log": "collection-church.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/collection-church.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "collection-cover.lean",
+      "lines": 97,
+      "seconds": 3.178,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 4,
+      "sha256": "3878034e8bb17bfaf152be762c0946cc36a81aee3a9e652138154d43a9bf7e2a",
+      "log": "collection-cover.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/collection-cover.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "foundations-graph-rank.lean",
+      "lines": 185,
+      "seconds": 3.254,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 14,
+      "sha256": "a4d66d6868b742951a4116c3ac7f072c142f298293f5b950e4613be3a40e040b",
+      "log": "foundations-graph-rank.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/foundations-graph-rank.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "foundations-rank.lean",
+      "lines": 136,
+      "seconds": 3.048,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 7,
+      "sha256": "a16ee59a395c3f2260fc438ef62ec54d6a5aaeaf2a68cd1ab5bd3cf6f620f1a6",
+      "log": "foundations-rank.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/foundations-rank.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "root-universe.lean",
+      "lines": 65,
+      "seconds": 2.951,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 6,
+      "sha256": "af8a6796082e78a47e0dfc1c732890e409953fa329456948f01f96278a95d48e",
+      "log": "root-universe.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/root-universe.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "semantics-church-stable.lean",
+      "lines": 347,
+      "seconds": 1.055,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 7,
+      "sha256": "cac4b66998ee38f45fa7f592cc58ed4426a945d301c698280448b84e50a43e03",
+      "log": "semantics-church-stable.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/semantics-church-stable.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "semantics-description.lean",
+      "lines": 259,
+      "seconds": 1.071,
+      "exit_code": 0,
+      "axioms": [
+        "Quot.sound",
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 12,
+      "sha256": "c135f9dbf5d48458eeab8be6a7d8115dff334e8c4f9dbc0c4c72b05fe4c86303",
+      "log": "semantics-description.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/semantics-description.lean",
+      "unchanged_after_relocation": true
+    },
+    {
+      "file": "semantics-stable.lean",
+      "lines": 58,
+      "seconds": 0.803,
+      "exit_code": 0,
+      "axioms": [
+        "propext"
+      ],
+      "unexpected_axioms": [],
+      "declarations_audited": 4,
+      "sha256": "92c8b5c8affaaa0877261967936db142989343c0248ae06d96da97352e8cc10d",
+      "log": "semantics-stable.log",
+      "command": "lake env lean -DwarningAsError=true -DrelaxedAutoImplicit=false research/ChoiceFreeZF/semantics-stable.lean",
+      "unchanged_after_relocation": true
+    }
+  ],
+  "formal_code_net_before_research": 2390,
+  "formal_code_added_before_research": 2396,
+  "research_lean_lines": 1565,
+  "combined_net_lean_increment": 3955,
+  "combined_added_lean_lines": 3961,
+  "research_in_default_build": false,
+  "all_passed": true,
+  "new_git_commit": false,
+  "scanner_run": false,
+  "final_library_build": {
+    "command": "lake --wfail build",
+    "exit_code": 0,
+    "jobs": 998,
+    "note": "本轮正式Lean源码未变；使用既有依赖缓存，研究文件已另行逐份显式编译。"
+  },
+  "report": "markdown/CHOICE_FREE_ZF_RESEARCH.md",
+  "research_hashes_unchanged_after_verification": true,
+  "report_relative_links_valid": true,
+  "source_root": "research/ChoiceFreeZF",
+  "logs_root": ".lake/zf-research",
+  "research_finished_at_utc": "2026-09-12T06:46:29.302486+00:00",
+  "subagents_completed": 3,
+  "ongoing_background_work": false
+}

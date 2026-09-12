@@ -39,7 +39,7 @@
 
 通用底座的 44 个关键接口已做依赖审计，没有 `sorryAx`，仅涉及已有的 `propext`、
 `Quot.sound`、`Classical.choice`；后者用于原生经典逻辑可靠性证明。
-`Model` 入口的 41 个源码依赖不包含 Henkin 或具体 ZFC 模块；具体小图入口单独列在下表。
+`Model` 入口的 49 个源码依赖不包含 Henkin 或具体 ZFC 模块；具体集合论模型单独列在下表。
 
 | 内容 | 导入入口 | 目录 |
 | --- | --- | --- |
@@ -49,6 +49,8 @@
 | 关系解释、扩张、模型闭包与传输 | `YesMetaZFC.Model.Interpretation` | [Interpretation](Interpretation.lean) |
 | 隶属结构及 Project 语义连接 | `YesMetaZFC.Model.SetTheory` | [SetTheory](SetTheory.lean) |
 | 原生小图 ZFC 模型与一致性 | `YesMetaZFC.Model.SmallGraph` | [SmallGraph](SmallGraph.lean) |
+| 通用布尔值语义及原生对应 | `YesMetaZFC.Model.Boolean.Native` | [Boolean/Native](Boolean/Native.lean) |
+| 任意完备布尔代数的标准 ZFC 名称模型 | `YesMetaZFC.Model.Boolean` | [Boolean/ZFC](Boolean/ZFC.lean) |
 | ZFC 的 136 个纯模型构造、规格与对应模块 | `YesMetaZFC.Model.ZFC.Pure` | [ZFC/Pure](ZFC/Pure.lean) |
 
 `import YesMetaZFC.Model` 只汇集通用语义入口；Henkin、解释消去和具体集合论层按需导入。
@@ -65,8 +67,8 @@ Windows 的命令行长度限制。
 
 ## 后续路线
 
-以下区分已经落地的小图模型与后续构造。布尔值可靠性、真类超幂和力迫的模型性
-仍需各自的实际证明，不能从通用底座或载体层级直接推得。
+小图 ZFC 模型、布尔值可靠性及标准布尔名称 ZFC 模型已经落地。真类超幂、泛型扩张
+和不使用元层选择的 ZF 构造仍需各自的实际证明。
 
 ## 基础边界
 
@@ -104,7 +106,7 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 | 裸 ZFC 目标 | [PureModel](ZFC/Pure/PureModel.lean) | `theory` 是现有原 ZFC 的纯语言像；公理正文和无限参数模式继续复用 |
 | 二阶语义 | [Logic/SecondOrder](SecondOrder.lean) | 已有 Henkin 与 Full 语义，现由可选谓词域接口及规范 Full 实例连接；不自动满足任意理解模式 |
 | 有界绝对性 | [LevyAbsoluteness](FirstOrder/LevyAbsoluteness.lean) | 一般二元界关系的绝对性已消费普通 `Str_emb` 层；有界见证回拉仅在有界公式证明中消费 |
-| 布尔值语义 | [上下文底座](Semantics/Algebra.lean) 已预留解释运算 | 仍需实际布尔代数、布尔值等号与量词实例，并核验其规则证书；通用代数本身不算布尔值可靠性已完成 |
+| 布尔值语义 | [Boolean/Soundness](Boolean/Soundness.lean)、[Boolean/Native](Boolean/Native.lean) | 任意签名、布尔等号与关系、完整代入及等词同余、原 27 类逻辑公理与六规则可靠性；原生语义及模型性逐式对应 |
 
 现有 Henkin / Full 满足关系的存在不代表已有二阶证明演算的可靠性或完备性；
 `SemanticsMode.automationSupported` 也不能充当这些定理。
@@ -201,38 +203,67 @@ Full 语义的保真只在已证明范围内使用，不能把一阶可靠性或
 
 ## 布尔值模型入口
 
-任意签名的通用层放在 `YesMetaZFC/Model/`，ZFC 专门构造只消费该层。保留当前 AST；
-布尔值等号和关系解释取值于布尔代数 `B`：
+`import YesMetaZFC.Model.Boolean` 提供通用语义及实际标准名称模型；只需任意签名上的
+语义与原生对应时导入 `Boolean.Native`。逻辑验证使用仓库原 AST、Hilbert 公理和六条推导规则。
 
-```text
-eqValue s : A s → A s → B
-relValue r : Values A (σ.relDomain r) → B
-⟦φ⟧ρ : B
+| 层 | 已实现的接口 |
+| --- | --- |
+| [序与布尔代数](Boolean/Algebra.lean) | `PO_bot`、`CS_order`、`Sup_order`、`BA_alg`、`CB_alg` 按所需强度分开；`prop_algebra` 是实际实例。任意索引确界通过 `B → Prop` 中的值域谓词形成。 |
+| [求值与代入](Boolean/Semantics.lean) | `BV_str` 给出载体、函数、布尔等号和关系；`value` 复用公共公式求值器，`value_substitute` 复用原项及环境代入。 |
+| [等词与可靠性](Boolean/Soundness.lean) | `BV_laws`、`value_congr`、`axiom_valid`、`rules` 已证明；证书接入公共 `Sem_rules`。任意结构不默认具备名称的混合或最大值性质。 |
+| [原生对应](Boolean/Native.lean) | `native_str`、`native_laws` 是实际装配；`native_value` 和 `native_models` 精确恢复原满足关系及 `Theory.Models`。 |
+| [名称与等号](Boolean/Equality.lean) | `BV_graph` 是有布尔边标签的良基小图；`bv_eq`、`bv_mem` 按成员匹配解释，已证明自反、对称、传递、隶属同余及外延性。 |
+| [混合与最大值](Boolean/Maximum.lean) | `root_sum`、`mix` 保持小节点层级；链不动点给出不交细化，`maximum` 给出存在量词的实际名称见证。 |
+| [集合运算](Boolean/Closure.lean) | 分离重加权根成员，幂集遍历全部小权函数；并集、配对和任意二元关系的收集均有实际名称。 |
+| [基础与无穷](Boolean/Foundation.lean) | 基础公理沿呈现图归纳；[Infinity](Boolean/Infinity.lean) 复用原单位元列表 ω 图并赋顶值，证明后继封闭。 |
+| [选择集](Boolean/Choice.lean) | `selection` 构造模布尔等同的不交系数，`choice` 在原非空、不交条件下给出选择集，处理重复名称呈现。 |
+| [原公理核验](Boolean/ZFC.lean) | `formula_correct` 对应原 `fo_formula`；`separation_core`、`collection_core` 保留全部有限参数；`bv_models_zfc` 核验原 `PureModel.theory`。 |
+
+最终定理的数学参数只有实际完备布尔代数：
+
+```lean
+bv_models_zfc {B : Type u} (𝔹 : CB_alg B) : (name_model 𝔹).models PureModel.theory
 ```
 
-布尔值等号不能定义成 Lean 等号的真假判定。它需要自反、对称、传递及函数／关系
-同余；这些合同支持当前内核的对象等词替换规则。一般布尔值结构不默认要求
-`eqValue a b = ⊤ → a = b`，也不默认要求存在量词的上确界能被某个见证取得。
-分离性、混合性和最大值原理属于后续各自的接口和定理。
+`BV_name B = BV_graph.{u,u} B : Type (u+1)` 固定模型载体；每个图的节点及布尔值域
+均在 `Type u`。图并合、不交细化、混合与幂集没有扩大节点 universe。布尔值等号
+保留所有真值，不将顶值等同替换为名称的 Lean 相等。该模型没有现成 ZFC 模型、
+一致性、大基数或最大值原理作为未实现的前提。
 
-命题部分只消费布尔代数运算及其定律；对象量词另外消费相应值族的上确界与下确界。
-完整布尔代数可提供通用的具体装配，但不要把它传播到只需有限布尔运算的引理。
-载体、索引族和真值代数的 universe 由同层条件统一检查。
+`Boolean.zfc_consistent` 在实际 `prop_algebra` 上调用原六规则可靠性，得到 Lean 元层
+裸 ZFC 一致性。没有提取超滤子、泛型滤子或借用 Henkin 完备性。
 
-最先攻克的证明是等词同余、代入正确性和完整推导可靠性。若所有背景理论公理的
-值都是 `⊤`，则对原内核推导 `T; Γ ⊢ φ` 证明
+50 个布尔关键接口及 8 个小图交叉入口已做依赖审计：名称、图并合、混合、ω 和
+`name_structure` 的数据构造不依赖公理；一般布尔值可靠性、名称等词、分离、幂集、无穷、
+基础的通用证明只涉及 `propext`、`Quot.sound`。不交细化、最大值和收集使用
+`Classical.choice`。原 ZFC 终点沿用原八条固定公理已有的句法闭合性 `native_decide`
+依赖；无新增公理、`sorry`、不可计算数据实例或原生计算可信依赖。
 
-```text
-(Γ 中公式在 ρ 下的值之有限交) ≤ ⟦φ⟧ρ。
-```
+在 `a911617` 的未提交工作区，`lake --wfail build` 的 998 个任务和
+`check-all.sh --library-only` 的全部 1,004 个独立 Lean 模块均通过，零错误、零警告。
+布尔层共 25 个模块、2,388 行，最长模块 191 行；整个代码工作区新增 2,396 行、删除
+6 行，净增 2,390 行。新模块单次检查均低于 6 秒；全库本次最慢模块为 55 秒。
+源码与工具链配置指纹为 `17b05ad24fb8561093da8905373d0474caa8f23a80a8a42a9525db7130f4766e`。
+没有运行扫描器或提交 Git。旧 `DefinitionalSemantics` 中的 binder 环境等式已直接公开为
+`Semantics.substitute_lift`，原消费者同步改用该名字，布尔适配复用同一证明。
 
-随后才用非平凡性 `⊥ ≠ ⊤` 排除矛盾推导。这里既不需要选取超滤子获得二值模型，
-也不需要 Henkin 强完备性。普通 `Prop` 语义应有实际的特例装配和逐公式对应，
-以接入当前结构库；不得只留下没有实例的真值代数合同。
+## 不使用元层选择的 ZF 目标
 
-ZFC 专门层随后按指定构造给出载体、布尔值等号与隶属，并验证原公理及无限模式。
-命名递归、混合、商模型或 forcing 等具体技术只在相应任务中确定；不预设源结构
-外部良基，不用一种受限模型构造替代任意结构上的通用语义。
+这一目标尚未实现。小图的 `small_collect`、`collection` 仍选择商代表或关系见证；
+其经典基础公理证明也使用元层排中律。当前全小图载体支持任意元层谓词分离：对命题 `P`
+形成 `{1} ∪ {0 | P}`，原基础公理给出的极小元可判定 `P ∨ ¬P`。这一推导已经在临时
+Lean 依赖核验中证明，只涉及 `propext`、`Quot.sound`；Lean 现有 `Classical.em` 的依赖
+则包含 `Classical.choice`。该结论针对当前全小图载体与元层解释。
+
+布尔名称的收集证明通过 `maximum` 选取见证。一般力迫的最大值原理与选择公理的关系见
+[Miller 的原论文](https://people.math.wisc.edu/~awmille1/res/max.pdf)，特别是定理 2。
+无元层选择的 ZF 构造须另证明不依赖最大值原理的见证界及收集；现有 ZFC 端点的
+ZF 理论限制仍带元层选择依赖，不能作为该目标的交付。
+
+用户已允许重选架构并开展一小时并行研究。实际候选、无选择的条件秩与对角界、
+描述树、普通及稳定观察语义的核验结果见
+[研究记录](../../markdown/CHOICE_FREE_ZF_RESEARCH.md)。完整 ZF 仍未完成；研究证明没有
+进入默认编译层，也不将各候选分别满足的性质合并声称为一个已完成模型。
 
 ## 一致性与交付顺序
 
@@ -247,9 +278,8 @@ ZFC 专门层随后按指定构造给出载体、布尔值等号与隶属，并�
 新公理或未经验证的语义断言替代证明。现有可信基的边界继续遵守；新增不可计算
 构造不因接口规划而自动获得许可。
 
-普通结构接口及其消费者迁移、二阶可选接口、原生小图 ZFC 模型与一致性现已完成。
-后续布尔值后端仍需完成等词、量词和规则证书，再核验其具体 ZFC 模型；
-本文件中的后续规划不计作已实现成果。
+普通结构接口及其消费者迁移、二阶可选接口、小图 ZFC、布尔值可靠性和标准名称 ZFC
+模型均已完成。无元层选择的 ZF、真类超幂及泛型扩张仍是独立构造任务。
 
 每次交付都须满足：实际实例与消费者存在、没有加强数学前提、原接口迁移完整、
 无占位公理或隐藏缺口。沿用单模块低于 2,000 行、未提交增量不超过 3,000 行、
@@ -261,5 +291,5 @@ ZFC 专门层随后按指定构造给出载体、布尔值等号与隶属，并�
 结构映射与初等性可对照 [Mathlib 的 ElementaryMaps](https://leanprover-community.github.io/mathlib4_docs/Mathlib/ModelTheory/ElementaryMaps.html)，
 只参考数学接口，不引入其依赖或替换仓库的显式结构约定。
 [Han 与 van Doorn 的布尔值模型形式化论文](https://arxiv.org/abs/1904.10570)
-包含一阶布尔值可靠性及其集合论应用；本仓库仍须对自己的 AST、推导核、ZFC 公理和
-同层约束完成独立实现与验证。
+包含一阶布尔值可靠性及其集合论应用；本仓库使用自己的 AST、推导核与原 ZFC 公理，
+实现采用上述固定层级的小图名称。

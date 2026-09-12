@@ -10,6 +10,7 @@
 | 成果 | 最终入口 | 前提与范围 |
 | --- | --- | --- |
 | 原生小图 ZFC 模型与一致性 | [SmallGraph/ZFC](../YesMetaZFC/Model/SmallGraph/ZFC.lean)：`sg_models_zfc`、`zfc_consistent` | Lean 元层直接构造良基小图双模拟商；验证原 ZFC 全部公理与模式，无模型存在或一致性前提 |
+| 标准布尔值 ZFC 模型与一致性 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`bv_models_zfc`、`zfc_consistent` | 对任意完备布尔代数构造全部小名称，核验原 ZFC 及所有有限参数模式；从实际命题布尔代数与原六规则可靠性得到一致性 |
 | Rosser 双侧独立性 | [PureRosserComplete](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean)：`PureRosser.independent` | 裸 ZFC 一致；具体纯闭句及其否定均不可证 |
 | 可证明性 D1–D3 | [PureProvability](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean)：`necessitation_m`、`distribution_m`、`introspection_m` | 无一致性或标准模型前提；任意纯闭句 |
 | Löb 内部公式与规则 | [PureLoeb](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureLoeb.lean)：`PureProvability.loeb_axiom_m`、`loeb_m` | 固定点实际构造；不另假定反射原则 |
@@ -18,8 +19,9 @@
 | Tarski 真不可定义性 | [PureTarski](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureTarski.lean)：`undefinable_syntax_m`、`undefinable_parameters_m` | 句法版假定一致；语义版覆盖任意裸模型和参数赋值，量化同一参数上下文的全部纯开放公式 |
 
 源理论、保留源编码的纯翻译和纯公式自身编码的具体合同分列如下。
-原元数学核验覆盖 530 个依赖审计入口；小图层另核验 38 个关键接口，当前全源构建
-覆盖 979 个 Lean 模块，未新增可信依赖。原公理的 8 处句法闭合性原生依赖仍保留；详见
+原元数学核验覆盖 530 个依赖审计入口；小图层另核验 38 个关键接口。布尔层新增
+50 个关键接口审计，并复核 8 个小图入口。全库 998 个构建任务及 1,004 个独立模块通过。
+原公理的 8 处句法闭合性原生依赖仍保留；详见
 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
 
 ## 裸 ZFC Rosser 实例

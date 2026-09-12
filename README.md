@@ -9,6 +9,7 @@ YesMetaZFC 在 Lean 4 中发展一阶逻辑、集合论与元数学的形式化�
 当前已完成裸 ZFC 的具体 Rosser 独立句、D1–D3、Löb 与哥德尔第二不完备定理，
 以及使用最终纯公式自身完整 AST 编码的带参数固定点和 Tarski 真不可定义定理。
 原生小图双模拟商已实际构造出 ZFC 模型，并在 Lean 元层证明裸 ZFC 一致。
+标准布尔名称模型也已对任意完备布尔代数构造并核验原 ZFC，包含全部有限参数模式。
 Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义版覆盖任意裸 ZFC
 模型和每组有限参数赋值。准确的公式范围、编码约定与声明见 [TROPHIES.md](markdown/TROPHIES.md)。
 
@@ -24,7 +25,7 @@ bash scripts/check-all.sh
 全源脚本需要 Python 3.11 或以上，覆盖默认入口未导入的独立模块与 `prove_auto_sweep`，
 warning 会使检查失败。工具链恢复见 [RESTORE.md](markdown/RESTORE.md)。
 仅检查全部库模块时，运行 `bash scripts/check-all.sh --library-only`。
-原生小图模型及后续布尔值模型路线见 [model](YesMetaZFC/Model/README.md)；通用入口为 `import YesMetaZFC.Model`，小图入口为 `import YesMetaZFC.Model.SmallGraph`。
+模型接口及可信依赖见 [model](YesMetaZFC/Model/README.md)；通用入口为 `import YesMetaZFC.Model`，具体入口为 `import YesMetaZFC.Model.SmallGraph` 和 `import YesMetaZFC.Model.Boolean`。
 
 ## 获取构建缓存
 

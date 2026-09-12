@@ -153,7 +153,7 @@ def atomEnv {σ : AtomSignature.{u}} {ℳ : SetTheory.Structure.{v}}
   bound := arguments.eval env
   free := env.free
 /-- substitution 穿过 binder 时，新旧环境构造交换。 -/
-private theorem substitute_liftSubstitution {ℳ : SetTheory.Structure.{v}}
+theorem substitute_lift {ℳ : SetTheory.Structure.{v}}
     {sourceDepth targetDepth : Nat} (env : SetTheory.Env ℳ targetDepth) (value : ℳ.Domain) (substitution : Fin sourceDepth → Term targetDepth) :
     Env.substitute (env.push value) (Term.liftSubstitution substitution) = (Env.substitute env substitution).push value := by
   rw [SetTheory.Env.mk.injEq]
@@ -241,21 +241,21 @@ def satisfies {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} �
       constructor
       · intro h value
         have hBody := (satisfies_bind interpretation (env.push value) (Term.liftSubstitution substitution) body).mp (h value)
-        simpa only [substitute_liftSubstitution] using hBody
+        simpa only [substitute_lift] using hBody
       · intro h value
         apply (satisfies_bind interpretation (env.push value) (Term.liftSubstitution substitution) body).mpr
-        simpa only [substitute_liftSubstitution] using h value
+        simpa only [substitute_lift] using h value
   | .existsE body => by
       simp only [Formula.bind, satisfies]
       constructor
       · rintro ⟨value, hBody⟩
         refine ⟨value, ?_⟩
         have hBody' := (satisfies_bind interpretation (env.push value) (Term.liftSubstitution substitution) body).mp hBody
-        simpa only [substitute_liftSubstitution] using hBody'
+        simpa only [substitute_lift] using hBody'
       · rintro ⟨value, hBody⟩
         refine ⟨value, ?_⟩
         apply (satisfies_bind interpretation (env.push value) (Term.liftSubstitution substitution) body).mpr
-        simpa only [substitute_liftSubstitution] using hBody
+        simpa only [substitute_lift] using hBody
 /-!
 `rename` 只是把 bound 变量替换为目标环境中的对应位置，因此直接复用
 `satisfies_bind`，不再按公式构造子复制一遍机械递归。

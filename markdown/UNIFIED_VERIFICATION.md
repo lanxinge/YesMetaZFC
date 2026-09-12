@@ -6,6 +6,8 @@
 [原生小图模型](../YesMetaZFC/Model/SmallGraph/ZFC.lean) 的 `SmallGraph.zfc_consistent`
 另在 Lean 元层通过实际模型给出该一致性证明。纯定义构造见 [ELIMINATION.md](ELIMINATION.md)，
 证书与检查器见 [NAT_DECODING.md](NAT_DECODING.md)。
+[布尔名称模型](../YesMetaZFC/Model/Boolean/ZFC.lean) 的 `bv_models_zfc` 已覆盖任意完备布尔
+代数；`Boolean.zfc_consistent` 另由实际命题布尔代数和原推导核可靠性给出一致性。
 原支撑理论的无参数及任意有限参数 Tarski 真不可定义性也已完成；语义终点覆盖
 任意原模型及每一组参数赋值。`PureTarskiSource` 另已给出保留源编码的裸 ZFC 版本；
 其合同按源公式索引。`PureTarski` 现已完成只量化纯公式、使用最终纯公式自身编码的版本。
@@ -15,6 +17,7 @@
 | 要使用的结果 | 接口与源码 | 精确范围 |
 | --- | --- | --- |
 | 原生小图模型与裸 ZFC 一致性 | [SmallGraph/ZFC](../YesMetaZFC/Model/SmallGraph/ZFC.lean)：`sg_model`、`sg_project_zfc`、`sg_models_zfc`、`zfc_consistent` | 小图双模拟商直接构造；原公理及全部有限参数分离、收集模式已经核验，无模型存在或一致性前提；载体固定为 `Type (u+1)` |
+| 标准布尔值 ZFC 模型 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`project_zfc`、`bv_models_zfc`、`zfc_consistent` | 任意 `B : Type u` 及实际 `CB_alg B`；名称节点同层，载体固定在 `Type (u+1)`；原公理与所有有限参数模式逐句核验 |
 | 有限基覆盖原支撑理论 | [FiniteAxiomModels](../YesMetaZFC/Model/ZFC/FiniteAxiomModels.lean) 中 `FiniteAxiomBasis.models_iff`；[ReducedAxioms](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedAxioms.lean) 的 `derives_iff` | 108 个具体闭句与 11 个参数分离模板，共 119 条；与原无限参数理论推导等价，不是公理集合相等 |
 | 完整支撑模型 | [PureSupportModels](../YesMetaZFC/Model/ZFC/Pure/PureSupportModels.lean) 的 `support_models` | 同一规范扩张满足整个原支撑理论 |
 | 原 ZFC 像及实际纯翻译 | [PureZFCModels](../YesMetaZFC/Model/ZFC/Pure/PureZFCModels.lean) 的 `models`、`translated_models` | 不弱化原公理或 guard |
@@ -30,8 +33,15 @@
 一致性证明使用已有 `propext`、`Quot.sound`、`Classical.choice`。`zfc_consistent`
 还继承原八条固定公理的 `sentence!` 自由闭合性 `native_decide` 依赖：外延、空集、配对、
 并集、幂集、无穷、基础及选择各一处。没有新增公理常量、`sorryAx` 或原生验证依赖。
-全库严格构建与全部 979 个独立模块通过；代码范围及载体边界见
+全库严格构建的 998 个任务与全部 1,004 个独立模块通过；代码范围及载体边界见
 [模型论指南](../YesMetaZFC/Model/README.md)。
+
+布尔层新增 50 个关键依赖入口并交叉复核 8 个小图入口。`name_structure`、名称等号的
+递归定义、图并合、混合和 ω 数据均无公理依赖；一般布尔值六规则可靠性以及名称的
+等词、分离、幂集、无穷、基础证明仅涉及 `propext`、`Quot.sound`。最大值、收集、选择及
+ZFC 终点仍依赖 `Classical.choice`；原八处句法闭合性原生依赖与小图终点相同。
+未新增 `sorryAx`、自定义公理或原生计算可信依赖。严格不使用元层选择的两类 ZF 模型
+尚未实现，具体依赖与全小图基础公理的排中律边界见模型论指南。
 
 ## 任意原模型的内部证明码对应
 
