@@ -31,7 +31,7 @@
 核验原 ZFC，`Boolean.zfc_consistent` 在实际命题布尔代数上得到一致性。通用语义单独
 导入 `Boolean.Native`：`BV_str.rules` 连接原六规则，`native_models` 恢复原生模型性。
 名称节点与 `B` 同在 `Type u`，名称载体固定在 `Type (u+1)`。现有收集仍使用元层选择；
-不把 ZFC 端点的 ZF 理论限制标成不使用元层选择的 ZF 构造。
+对象理论的限制不改变模型构造与一致性端点的元层可信依赖。
 
 ## 元数学内核
 
