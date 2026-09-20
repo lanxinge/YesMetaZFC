@@ -7,6 +7,11 @@
 一般加法规律由 `PA.Addition` 提供；乘法零律、单位律、后继律、交换律、双侧分配律与结合律由 `PA.Multiplication` 提供。
 这些接口保留任意 PA 扩张、自由参数、局部假设与输入项，不仅适用于外部数码。
 任意 PA 模型中的对应结果见 `YesMetaZFC.Model.Arithmetic.PA.Operations`，只消费推导可靠性。
+`PA.Cancellation` 提供加法消去和零和定理；`PA.Order`、`PA.StrictOrder` 提供
+可定义序的自反、传递、反对称、后继保持及严格序不可自返性的对象推导。
+`Model.Arithmetic.PA.LinearOrder` 与 `PA.Minimum` 另证明任意 PA 模型中的全序性和
+带任意参数的可定义最小元：归纳使用实际公式，不假定内部数域外部良基。
+这两个模型结论尚无独立对象推导版本；不把语义结果与 `Derives` 混同。
 
 Z₂ 的数目公理与 Q 共用 `Robinson` 模板，理解允许任意数／集合量词和有限混合参数。
 全公式归纳是理解与集合归纳的对象推论，不是另加的公理。

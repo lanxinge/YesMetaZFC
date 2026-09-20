@@ -1,6 +1,7 @@
 import YesMetaZFC.Logic.Arithmetic.PA.Multiplication
 import YesMetaZFC.Model.Arithmetic.Structure
 import YesMetaZFC.Model.FirstOrder.Soundness
+import YesMetaZFC.Model.Arithmetic.Q.Operations
 
 /-! # 任意 PA 模型中的运算规律
 
@@ -15,6 +16,9 @@ universe u
 variable {ℳ : Structure.{0, 0, 0, u} signature_m}
 variable (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
 include hPA
+
+theorem q_models_m : Theory.Models ℳ Logic.Arithmetic.Q.theory_m :=
+  fun φ h => hPA φ (Logic.Arithmetic.PA.extends_q_m h)
 
 private def v₀ {Δ : SortContext signature_m} : Term signature_m [] (.num :: Δ) .num :=
   .fvar .here

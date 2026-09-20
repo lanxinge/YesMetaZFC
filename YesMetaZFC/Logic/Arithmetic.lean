@@ -1,6 +1,8 @@
 import YesMetaZFC.Logic.Arithmetic.Q.Numeral
 import YesMetaZFC.Logic.Arithmetic.PA.Multiplication
 import YesMetaZFC.Logic.Arithmetic.PA.Order
+import YesMetaZFC.Logic.Arithmetic.PA.Cancellation
+import YesMetaZFC.Logic.Arithmetic.PA.StrictOrder
 import YesMetaZFC.Logic.Arithmetic.Z2.Induction
 import YesMetaZFC.Logic.Arithmetic.PA.Interpretation
 
