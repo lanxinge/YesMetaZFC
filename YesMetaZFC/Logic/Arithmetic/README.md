@@ -9,9 +9,11 @@
 任意 PA 模型中的对应结果见 `YesMetaZFC.Model.Arithmetic.PA.Operations`，只消费推导可靠性。
 `PA.Cancellation` 提供加法消去和零和定理；`PA.Order`、`PA.StrictOrder` 提供
 可定义序的自反、传递、反对称、后继保持及严格序不可自返性的对象推导。
-`Model.Arithmetic.PA.LinearOrder` 与 `PA.Minimum` 另证明任意 PA 模型中的全序性和
+`Model.Arithmetic.PA.LinearOrder` 与 `Model.Arithmetic.PA.Minimum` 另证明任意 PA 模型中的全序性和
 带任意参数的可定义最小元：归纳使用实际公式，不假定内部数域外部良基。
 这两个模型结论尚无独立对象推导版本；不把语义结果与 `Derives` 混同。
+`Model.Arithmetic.Z2.Minimum` 将最小化推广到任意混合数／集参数公式，并提供非空内部数集的最小元。
+PA 与 Z₂ 共用最小化推理，但分别构造所需的实际公式归纳实例，不对任意宿主谓词假设归纳。
 
 Z₂ 的数目公理与 Q 共用 `Robinson` 模板，理解允许任意数／集合量词和有限混合参数。
 全公式归纳是理解与集合归纳的对象推论，不是另加的公理。
