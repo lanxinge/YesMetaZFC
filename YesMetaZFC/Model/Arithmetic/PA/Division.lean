@@ -23,6 +23,14 @@ theorem graph_sat_m {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ)
     add_m, mul_m, Term.eval, Arguments.eval]
   rfl
 
+theorem domain_sat_m {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ)
+    (n d : Term signature_m Γ Δ .num) :
+    (Logic.Arithmetic.Division.domain_m n d).satisfies η ↔
+      ∃ q r, graph_l (n.eval η) (d.eval η) q r := by
+  simp only [Logic.Arithmetic.Division.domain_m, Formula.satisfies, graph_sat_m,
+    Term.eval_weakenBound]
+  rfl
+
 theorem exists_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
     (n d : num_l ℳ) (hd : d ≠ zero_l ℳ) : ∃ q r, graph_l n d q r := by
   have hQ := q_models_m hPA

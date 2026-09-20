@@ -9,4 +9,10 @@ set_option autoImplicit false
 def graph_m {Γ Δ : SortContext signature_m} (n d q r : Term signature_m Γ Δ .num) :
     Formula signature_m Γ Δ := .conj (.equal (add_m (mul_m q d) r) n) (lt_m r d)
 
+/-- 存在内部商和余数；原项在两个新绑定槽下弱化。 -/
+def domain_m {Γ Δ : SortContext signature_m} (n d : Term signature_m Γ Δ .num) :
+    Formula signature_m Γ Δ := .existsE .num (.existsE .num
+  (graph_m ((n.weakenBound sort_m.num).weakenBound sort_m.num)
+    ((d.weakenBound sort_m.num).weakenBound sort_m.num) (.bvar (.there .here)) (.bvar .here)))
+
 end YesMetaZFC.Logic.Arithmetic.Division

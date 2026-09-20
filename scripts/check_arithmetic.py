@@ -1,4 +1,4 @@
-"""检查算术切片的公开声明公理依赖；先构建两个算术入口。
+"""检查算术切片的公开声明公理依赖；先构建全部算术模块（含可选模块）。
 
 这不是数学语义审查。自动生成的 recursor 和私有声明不单独枚举，
 但它们作为公开声明的传递依赖仍由 Lean 的公理检查覆盖。
@@ -39,21 +39,23 @@ def main():
     for path in files:
         source = path.read_text(encoding="utf-8-sig")
         namespaces = re.findall(r"^namespace\s+(\S+)", source, re.M)
-        names = re.findall(r"^(?:@\[[^\]]+\]\s*)?(?:theorem|def|abbrev|inductive)\s+(\S+)",
+        names = re.findall(r"^(?:@\[[^\]]+\]\s*)?(?:noncomputable\s+)?(?:theorem|def|abbrev|inductive)\s+(\S+)",
                            source, re.M)
         if names and len(namespaces) != 1:
             raise ValueError(f"需要更新声明枚举器的命名空间处理: {path}")
         declarations.extend(namespaces[0] + "." + name for name in names)
     if not declarations or len(declarations) != len(set(declarations)):
         raise ValueError("公开声明列表为空或重复")
-    dependencies = closure(ENTRY)
+    modules = [p.relative_to(ROOT).with_suffix("").as_posix().replace("/", ".") for p in files]
+    dependencies = closure(modules)
     forbidden = [m for m in dependencies if m.startswith((
         "Mathlib", "BMSConstructibleBridge", "YesMetaZFC.BMS", "ConstructibleUniverse",
         "YesMetaZFC.SetTheory", "YesMetaZFC.Model.ZFC", "YesMetaZFC.Model.SmallGraph"))]
-    forbidden += [m for m in closure(ENTRY[:1]) if m.startswith("YesMetaZFC.Model.")]
+    logic = [m for m in modules if m.startswith("YesMetaZFC.Logic.")]
+    forbidden += [m for m in closure(logic) if m.startswith("YesMetaZFC.Model.")]
     if forbidden:
         raise ValueError(f"算术分层依赖越界: {sorted(set(forbidden))}")
-    commands = "\n".join(["import " + m for m in ENTRY] +
+    commands = "\n".join(["import " + m for m in modules] +
                          ["#print axioms " + name for name in declarations]) + "\n"
     result = subprocess.run(["lake", "env", "lean", "--stdin"], input=commands,
                             cwd=ROOT, capture_output=True, encoding="utf-8", errors="replace")
