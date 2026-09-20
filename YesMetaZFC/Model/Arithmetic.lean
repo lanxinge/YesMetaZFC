@@ -1,0 +1,7 @@
+import YesMetaZFC.Model.Arithmetic.Standard
+import YesMetaZFC.Model.Arithmetic.PA.Operations
+import YesMetaZFC.Model.Arithmetic.Order
+import YesMetaZFC.Model.Arithmetic.Z2.Standard
+import YesMetaZFC.Model.Arithmetic.Z2.Reduct
+
+/-! # 算术模型入口：任意结构上的可定义归纳与标准模型 -/

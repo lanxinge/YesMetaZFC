@@ -1,0 +1,77 @@
+"""检查算术切片的公开声明公理依赖；先构建两个算术入口。
+
+这不是数学语义审查。自动生成的 recursor 和私有声明不单独枚举，
+但它们作为公开声明的传递依赖仍由 Lean 的公理检查覆盖。
+"""
+from pathlib import Path
+import hashlib
+import re
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+ENTRY = ["YesMetaZFC.Logic.Arithmetic", "YesMetaZFC.Model.Arithmetic"]
+ALLOWED = {"propext", "Classical.choice", "Quot.sound"}
+
+
+def imports(path):
+    return re.findall(r"^import\s+(\S+)", path.read_text(encoding="utf-8-sig"), re.M)
+
+
+def closure(entry):
+    seen, pending = set(), list(entry)
+    while pending:
+        module = pending.pop()
+        if module in seen:
+            continue
+        seen.add(module)
+        path = ROOT / (module.replace(".", "/") + ".lean")
+        if path.exists():
+            pending.extend(imports(path))
+    return seen
+
+
+def main():
+    files = sorted([ROOT / (m.replace(".", "/") + ".lean") for m in ENTRY] +
+                   [p for m in ENTRY for p in (ROOT / m.replace(".", "/")).rglob("*.lean")])
+    before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+    declarations = []
+    for path in files:
+        source = path.read_text(encoding="utf-8-sig")
+        namespaces = re.findall(r"^namespace\s+(\S+)", source, re.M)
+        names = re.findall(r"^(?:@\[[^\]]+\]\s*)?(?:theorem|def|abbrev|inductive)\s+(\S+)",
+                           source, re.M)
+        if names and len(namespaces) != 1:
+            raise ValueError(f"需要更新声明枚举器的命名空间处理: {path}")
+        declarations.extend(namespaces[0] + "." + name for name in names)
+    if not declarations or len(declarations) != len(set(declarations)):
+        raise ValueError("公开声明列表为空或重复")
+    dependencies = closure(ENTRY)
+    forbidden = [m for m in dependencies if m.startswith((
+        "Mathlib", "BMSConstructibleBridge", "YesMetaZFC.BMS", "ConstructibleUniverse",
+        "YesMetaZFC.SetTheory", "YesMetaZFC.Model.ZFC", "YesMetaZFC.Model.SmallGraph"))]
+    forbidden += [m for m in closure(ENTRY[:1]) if m.startswith("YesMetaZFC.Model.")]
+    if forbidden:
+        raise ValueError(f"算术分层依赖越界: {sorted(set(forbidden))}")
+    commands = "\n".join(["import " + m for m in ENTRY] +
+                         ["#print axioms " + name for name in declarations]) + "\n"
+    result = subprocess.run(["lake", "env", "lean", "--stdin"], input=commands,
+                            cwd=ROOT, capture_output=True, encoding="utf-8", errors="replace")
+    log = result.stdout + result.stderr
+    print(log, end="")
+    reported = re.findall(r"'([^']+)' (?:depends on axioms:|does not depend on any axioms)", log)
+    used = {a.strip() for group in re.findall(r"depends on axioms:\s*\[([^\]]*)\]", log, re.S)
+            for a in group.split(",") if a.strip()}
+    missing = set(declarations) - set(reported)
+    changed = [str(p.relative_to(ROOT)) for p in files
+               if hashlib.sha256(p.read_bytes()).hexdigest() != before[p]]
+    if result.returncode or missing or used - ALLOWED or changed:
+        print(f"FAIL: exit={result.returncode}, missing={sorted(missing)}, "
+              f"unexpected={sorted(used - ALLOWED)}, changed={changed}", file=sys.stderr)
+        return 1
+    print(f"PASS: {len(files)} files, {len(declarations)} declarations; axioms={sorted(used)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
