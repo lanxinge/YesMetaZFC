@@ -1,4 +1,5 @@
 import YesMetaZFC.Logic.Arithmetic.Q.Numeral
+import YesMetaZFC.Logic.Arithmetic.Division
 import YesMetaZFC.Logic.Arithmetic.PA.Multiplication
 import YesMetaZFC.Logic.Arithmetic.PA.Order
 import YesMetaZFC.Logic.Arithmetic.PA.Cancellation
