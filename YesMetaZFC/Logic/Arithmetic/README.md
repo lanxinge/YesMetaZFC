@@ -21,6 +21,10 @@ PA 与 Z₂ 共用最小化推理，但分别构造所需的实际公式归纳�
 `Division.graph_m` 是原算术语言中的商余关系；`Model.Arithmetic.PA.Division` 对非零内部除数
 证明商余数存在且唯一，并证明规范商余关系排除零除数。`Division.domain_m` 是存在商余数的公式；
 对象存在性接口仍显式保留除数非零条件。没有调用宿主自然数除法。
+`Pairing.graph_m` 固定平方分层配对；正向总性／函数性在任意理论中可证。
+`Model.Arithmetic.PA.PairingBounds` 与 `PA.Unpairing` 证明任意 PA 模型全数域上的
+双射及左右投影图，不假定外部有限性。可选的 `PA.PairingProvability` 提供满射性、
+单射性、左右投影总性与函数性的对象推导；可经既有 PA→Z₂ 翻译直接使用。
 
 Z₂ 的数目公理与 Q 共用 `Robinson` 模板，理解允许任意数／集合量词和有限混合参数。
 全公式归纳是理解与集合归纳的对象推论，不是另加的公理。

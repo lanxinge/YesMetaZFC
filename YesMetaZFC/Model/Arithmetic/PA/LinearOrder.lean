@@ -69,4 +69,21 @@ theorem le_total_m (m n : num_l ℳ) : le_l m n ∨ le_l n m := by
       exact (hm p).elim (fun h => Or.inl ((succ_le_succ_m hPA).mpr h))
         (fun h => Or.inr ((succ_le_succ_m hPA).mpr h))
 
+theorem le_of_not_lt_m {m n : num_l ℳ} (h : ¬lt_l m n) : le_l n m := by
+  rcases le_total_m hPA m n with h₁ | h₁
+  · rcases le_cases_m hPA h₁ with h₁ | h₁
+    · rw [h₁]; exact le_refl_m hPA n
+    · exact False.elim (h h₁)
+  · exact h₁
+
+theorem lt_ne_m {m n : num_l ℳ} (h : lt_l m n) : m ≠ n := by
+  intro h₁
+  exact lt_irrefl_m hPA n (h₁ ▸ h)
+
+theorem le_lt_trans_m {m n p : num_l ℳ} (h₁ : le_l m n) (h₂ : lt_l n p) : lt_l m p :=
+  le_trans_m hPA ((succ_le_succ_m hPA).mpr h₁) h₂
+
+theorem lt_le_trans_m {m n p : num_l ℳ} (h₁ : lt_l m n) (h₂ : le_l n p) : lt_l m p :=
+  le_trans_m hPA h₁ h₂
+
 end YesMetaZFC.Model.Arithmetic.PA

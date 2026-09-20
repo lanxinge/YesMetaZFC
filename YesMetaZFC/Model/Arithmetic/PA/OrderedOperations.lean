@@ -35,4 +35,17 @@ theorem zero_lt_m {n : num_l ℳ} (h : n ≠ zero_l ℳ) : lt_l (zero_l ℳ) n :
   · rw [hn]
     exact (lt_succ_m hPA).mpr (zero_le_m hPA m)
 
+theorem mul_le_mul_left_m (p : num_l ℳ) {m n : num_l ℳ} (h : le_l m n) :
+    le_l (mul_l p m) (mul_l p n) := by
+  rw [mul_comm_m hPA p m, mul_comm_m hPA p n]
+  exact mul_le_mul_right_m hPA p h
+
+theorem square_le_square_m {m n : num_l ℳ} (h : le_l m n) :
+    le_l (mul_l m m) (mul_l n n) :=
+  le_trans_m hPA (mul_le_mul_right_m hPA m h) (mul_le_mul_left_m hPA n h)
+
+theorem square_succ_m (n : num_l ℳ) :
+    mul_l (succ_l n) (succ_l n) = succ_l (add_l (add_l (mul_l n n) n) n) := by
+  rw [Q.mul_succ_m (q_models_m hPA), succ_mul_m hPA, Q.add_succ_m (q_models_m hPA)]
+
 end YesMetaZFC.Model.Arithmetic.PA
