@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.Arithmetic.Completeness
-import YesMetaZFC.Model.Arithmetic.PA.Beta
+import YesMetaZFC.Model.Arithmetic.PA.BetaSequence
+import YesMetaZFC.Model.Arithmetic.Sequence
 
 /-! # β 读取总性与唯一性的对象推导 -/
 namespace YesMetaZFC.Model.Arithmetic.PA.Beta.Provability
@@ -25,5 +26,16 @@ theorem unique_m (b c i a d : Term signature_m [] Δ .num) :
   intro ℳ hℳ η
   simp only [Formula.satisfies, graph_sat_m]
   exact fun ha hd => Beta.unique_m hℳ ha hd
+
+theorem sequence_m (φ : OpenFormula signature_m (.num :: .num :: Δ)) (n : Term signature_m [] Δ .num) :
+    Derives T Γ ((Formula.imp (Logic.Arithmetic.FiniteRange.segment_m φ lt_m)
+      (Logic.Arithmetic.Sequence.code_m φ lt_m Logic.Arithmetic.Beta.graph_m)).instantiateFreeTop n) := by
+  apply Derives.theory_weaken hPA
+  apply Completeness.derives_m
+  intro ℳ hℳ η
+  rw [Formula.satisfies_instantiateFreeTop]
+  simp only [Formula.satisfies, FiniteRange.segment_sat_m _ _ _ lt_m lt_l lt_sat_m,
+    Sequence.code_sat_m _ _ _ lt_m Logic.Arithmetic.Beta.graph_m lt_l graph_l lt_sat_m graph_sat_m]
+  exact Beta.sequence_m hℳ φ η (n.eval η)
 
 end YesMetaZFC.Model.Arithmetic.PA.Beta.Provability
