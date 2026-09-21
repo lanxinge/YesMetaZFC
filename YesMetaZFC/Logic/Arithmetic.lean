@@ -1,5 +1,7 @@
 import YesMetaZFC.Logic.Arithmetic.Q.Numeral
 import YesMetaZFC.Logic.Arithmetic.Division
+import YesMetaZFC.Logic.Arithmetic.Divisibility
+import YesMetaZFC.Logic.Arithmetic.Beta
 import YesMetaZFC.Logic.Arithmetic.Pairing
 import YesMetaZFC.Logic.Arithmetic.FiniteRange
 import YesMetaZFC.Logic.Arithmetic.PA.Multiplication

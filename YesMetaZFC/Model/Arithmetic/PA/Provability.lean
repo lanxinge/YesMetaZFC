@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.Arithmetic.Completeness
 import YesMetaZFC.Model.Arithmetic.PA.Division
+import YesMetaZFC.Model.Arithmetic.PA.Divisibility
 import YesMetaZFC.Model.Arithmetic.PA.Minimum
 import YesMetaZFC.Model.Arithmetic.Minimum
 import YesMetaZFC.Model.Arithmetic.PA.FiniteRange
@@ -70,5 +71,13 @@ theorem bound_m (φ : OpenFormula signature_m (.num :: .num :: Δ)) (n : Term si
   simp only [Formula.satisfies, FiniteRange.segment_sat_m _ _ _ lt_m lt_l lt_sat_m,
     FiniteRange.bound_sat_m _ _ _ lt_m lt_l lt_sat_m]
   exact PA.bound_m hℳ φ η (n.eval η)
+
+theorem common_multiple_m (n b : Term signature_m [] Δ .num) :
+    Derives T Γ (Logic.Arithmetic.Divisibility.bounded_m n b) := by
+  apply Derives.theory_weaken hPA
+  apply Completeness.derives_m
+  intro ℳ hℳ η
+  rw [Arithmetic.Divisibility.bounded_sat_m]
+  exact Divisibility.bounded_m hℳ (n.eval η) (b.eval η)
 
 end YesMetaZFC.Model.Arithmetic.PA.Provability

@@ -28,6 +28,12 @@ PA 与 Z₂ 共用最小化推理，但分别构造所需的实际公式归纳�
 `FiniteRange` 的通用模板保留输入、输出和原参数。`Model.Arithmetic.PA.bound_m` 与
 `Z2.bound_m` 分别对算术／混合公式证明内部有限函数的统一值域界，只要求所需截段上
 存在唯一输出。两个可选 `Provability.bound_m` 提供任意长度项处的相应对象推导。
+`Divisibility` 提供整除和共同倍数模板；`Model.Arithmetic.PA.Divisibility` 以实际公式归纳
+证明任意内部截段的正共同倍数存在，并可超过任意内部下界。
+`PA.Provability.common_multiple_m` 提供相应对象推导。
+`Beta` 固定模数 `succ ((succ i)*c)`；`Model.Arithmetic.PA.Beta` 证明读取总性、唯一性和界，
+包括 `c=0` 时的模 1 情形。可选 `PA.BetaProvability` 提供总性和唯一性的对象推导。
+这些读取结论不等于任意内部有限函数已经可编码；后者仍需特殊模数族的拼接证明。
 
 Z₂ 的数目公理与 Q 共用 `Robinson` 模板，理解允许任意数／集合量词和有限混合参数。
 全公式归纳是理解与集合归纳的对象推论，不是另加的公理。

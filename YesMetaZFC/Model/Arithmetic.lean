@@ -5,6 +5,8 @@ import YesMetaZFC.Model.Arithmetic.PA.Order
 import YesMetaZFC.Model.Arithmetic.PA.LinearOrder
 import YesMetaZFC.Model.Arithmetic.PA.Minimum
 import YesMetaZFC.Model.Arithmetic.PA.Division
+import YesMetaZFC.Model.Arithmetic.PA.Divisibility
+import YesMetaZFC.Model.Arithmetic.PA.Beta
 import YesMetaZFC.Model.Arithmetic.PA.Unpairing
 import YesMetaZFC.Model.Arithmetic.PA.FiniteRange
 import YesMetaZFC.Model.Arithmetic.Order
