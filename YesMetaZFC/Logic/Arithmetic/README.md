@@ -25,6 +25,9 @@ PA 与 Z₂ 共用最小化推理，但分别构造所需的实际公式归纳�
 `Model.Arithmetic.PA.PairingBounds` 与 `PA.Unpairing` 证明任意 PA 模型全数域上的
 双射及左右投影图，不假定外部有限性。可选的 `PA.PairingProvability` 提供满射性、
 单射性、左右投影总性与函数性的对象推导；可经既有 PA→Z₂ 翻译直接使用。
+`FiniteRange` 的通用模板保留输入、输出和原参数。`Model.Arithmetic.PA.bound_m` 与
+`Z2.bound_m` 分别对算术／混合公式证明内部有限函数的统一值域界，只要求所需截段上
+存在唯一输出。两个可选 `Provability.bound_m` 提供任意长度项处的相应对象推导。
 
 Z₂ 的数目公理与 Q 共用 `Robinson` 模板，理解允许任意数／集合量词和有限混合参数。
 全公式归纳是理解与集合归纳的对象推论，不是另加的公理。
