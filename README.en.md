@@ -38,6 +38,8 @@ The independent arithmetic library provides Q, PA, and Z₂ axiom schemas and de
 internal finite coding, and representation and provable totality for each externally given
 primitive-recursive program. Import `YesMetaZFC.Logic.Arithmetic` or
 `YesMetaZFC.Model.Arithmetic`; see the [arithmetic interfaces and scope](markdown/ARITHMETIC_STATUS.md).
+Model pairing and projections use relations: classical proofs in `Prop` are allowed,
+but choice is not used to construct model data in `Type`.
 
 Repository guides other than README files are collected in [markdown/](markdown/).
 

@@ -77,8 +77,10 @@ jobs:
         run: cygpath -w "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build all modules and native targets
         run: python scripts/lean_cache.py build --native
-      - name: Audit arithmetic axiom dependencies
-        run: python scripts/check_arithmetic.py
+      - name: Audit arithmetic axioms and data boundary
+        run: |
+          python scripts/test_arithmetic_guard.py
+          python scripts/check_arithmetic.py
       - name: Check scanner
         run: lake --no-build exe prove_auto_sweep --help
       - name: Pack Lean and full caches

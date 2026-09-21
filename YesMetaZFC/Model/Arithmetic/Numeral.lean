@@ -61,9 +61,12 @@ theorem lt_m (m n : Nat) : lt_l (value_l (ℳ := ℳ) m) (value_l n) ↔ m < n :
   · intro h
     exact le_of_le_m hPA h
 
-theorem pair_m (m n : Nat) : Pairing.value_l (value_l (ℳ := ℳ) m) (value_l n) = value_l (NatPairing.pair_l m n) := by
-  classical
-  simp only [Pairing.value_l, lt_m hPA, NatPairing.pair_l]
-  split <;> simp only [mul_m hPA, add_m hPA]
+theorem pair_m (m n : Nat) : Pairing.graph_l (value_l (ℳ := ℳ) m) (value_l n)
+    (value_l (NatPairing.pair_l m n)) := by
+  by_cases h : m < n
+  · apply (Pairing.of_lt_m ((lt_m hPA m n).mpr h)).mpr
+    simp only [NatPairing.pair_l, if_pos h, mul_m hPA, add_m hPA]
+  · apply (Pairing.of_not_lt_m (fun h₁ => h ((lt_m hPA m n).mp h₁))).mpr
+    simp only [NatPairing.pair_l, if_neg h, mul_m hPA, add_m hPA]
 
 end YesMetaZFC.Model.Arithmetic.Numeral

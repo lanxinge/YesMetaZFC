@@ -21,17 +21,20 @@ theorem lt_standard_m (m n : Nat) : lt_l (ℳ := standard_m) m n ↔ m < n := by
   rw [le_standard_m]
   omega
 
-theorem pair_standard_m (m n : Nat) : Pairing.value_l (ℳ := standard_m) m n = NatPairing.pair_l m n := by
-  classical
-  simp only [Pairing.value_l, lt_standard_m, NatPairing.pair_l]
-  rfl
+theorem pair_standard_m (m n : Nat) : Pairing.graph_l (ℳ := standard_m) m n (NatPairing.pair_l m n) := by
+  by_cases h : m < n
+  · apply (Pairing.of_lt_m ((lt_standard_m m n).mpr h)).mpr
+    simp only [NatPairing.pair_l, if_pos h]
+    rfl
+  · apply (Pairing.of_not_lt_m (fun h₁ => h ((lt_standard_m m n).mp h₁))).mpr
+    simp only [NatPairing.pair_l, if_neg h]
+    rfl
 
 theorem unpair_pair_l (m n : Nat) : NatPairing.unpair_l (NatPairing.pair_l m n) = (m, n) := by
-  have h : Pairing.value_l (ℳ := standard_m)
-      (NatPairing.unpair_l (NatPairing.pair_l m n)).1 (NatPairing.unpair_l (NatPairing.pair_l m n)).2 =
-      Pairing.value_l (ℳ := standard_m) m n := by
-    rw [pair_standard_m, pair_standard_m, NatPairing.pair_unpair_l]
-  have h' := PA.Pairing.injective_m pa_models_m _ _ m n h
+  have h := pair_standard_m (NatPairing.unpair_l (NatPairing.pair_l m n)).1
+    (NatPairing.unpair_l (NatPairing.pair_l m n)).2
+  rw [NatPairing.pair_unpair_l] at h
+  have h' := PA.Pairing.injective_m pa_models_m _ _ m n h (pair_standard_m m n)
   exact Prod.ext h'.1 h'.2
 
 end YesMetaZFC.Model.Arithmetic.PrimitiveRecursive

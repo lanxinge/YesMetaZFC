@@ -1,9 +1,8 @@
 import YesMetaZFC.Model.Arithmetic.PA.PairingBounds
 
-/-! # PA 全数域的反配对与投影
+/-! # PA 全数域反配对的关系接口
 
-选择只提供模型解释的宿主函数接口；对象层仍使用原语言的图，
-其存在与唯一性已经由实际公式归纳及平方区间论证证明。
+反配对保留存在唯一性，不从 Prop 存在证明选择 Type 层的坐标函数。
 -/
 namespace YesMetaZFC.Model.Arithmetic.PA.Unpairing
 open Logic FirstOrder Logic.Arithmetic
@@ -11,41 +10,38 @@ set_option autoImplicit false
 universe u
 variable {ℳ : Structure.{0, 0, 0, u} signature_m}
 
-noncomputable def value_l (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m) (z : num_l ℳ) :
-    num_l ℳ × num_l ℳ :=
-  ⟨(Pairing.surjective_m hPA z).choose, (Pairing.surjective_m hPA z).choose_spec.choose⟩
+def left_l (z m : num_l ℳ) : Prop := ∃ n, Arithmetic.Pairing.graph_l m n z
+def right_l (z n : num_l ℳ) : Prop := ∃ m, Arithmetic.Pairing.graph_l m n z
 
-theorem pair_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m) (z : num_l ℳ) :
-    Arithmetic.Pairing.value_l (value_l hPA z).1 (value_l hPA z).2 = z :=
-  (Pairing.surjective_m hPA z).choose_spec.choose_spec
-
-theorem unpair_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m) (m n : num_l ℳ) :
-    value_l hPA (Arithmetic.Pairing.value_l m n) = (m, n) := by
-  have h := Pairing.injective_m hPA _ _ m n (pair_m hPA (Arithmetic.Pairing.value_l m n))
-  exact Prod.ext h.1 h.2
-
-theorem left_sat_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
-    {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ) (s t : Term signature_m Γ Δ .num) :
-    (Logic.Arithmetic.Pairing.left_m s t).satisfies η ↔ (value_l hPA (s.eval η)).1 = t.eval η := by
+theorem left_sat_m {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ)
+    (s t : Term signature_m Γ Δ .num) :
+    (Logic.Arithmetic.Pairing.left_m s t).satisfies η ↔ left_l (s.eval η) (t.eval η) := by
   simp only [Logic.Arithmetic.Pairing.left_m, Formula.satisfies, Arithmetic.Pairing.graph_sat_m,
     Term.eval_weakenBound, Term.eval]
-  change (∃ n, Arithmetic.Pairing.value_l (t.eval η) n = s.eval η) ↔ _
-  constructor
-  · rintro ⟨n, h⟩
-    rw [← h, unpair_m]
-  · intro h
-    exact ⟨(value_l hPA (s.eval η)).2, by rw [← h, pair_m]⟩
+  rfl
 
-theorem right_sat_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
-    {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ) (s t : Term signature_m Γ Δ .num) :
-    (Logic.Arithmetic.Pairing.right_m s t).satisfies η ↔ (value_l hPA (s.eval η)).2 = t.eval η := by
+theorem right_sat_m {Γ Δ : SortContext signature_m} (η : Env ℳ Γ Δ)
+    (s t : Term signature_m Γ Δ .num) :
+    (Logic.Arithmetic.Pairing.right_m s t).satisfies η ↔ right_l (s.eval η) (t.eval η) := by
   simp only [Logic.Arithmetic.Pairing.right_m, Formula.satisfies, Arithmetic.Pairing.graph_sat_m,
     Term.eval_weakenBound, Term.eval]
-  change (∃ m, Arithmetic.Pairing.value_l m (t.eval η) = s.eval η) ↔ _
-  constructor
-  · rintro ⟨m, h⟩
-    rw [← h, unpair_m]
-  · intro h
-    exact ⟨(value_l hPA (s.eval η)).1, by rw [← h, pair_m]⟩
+  rfl
+
+theorem total_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m) (z : num_l ℳ) :
+    ∃ m n, Arithmetic.Pairing.graph_l m n z ∧ left_l z m ∧ right_l z n := by
+  obtain ⟨m, n, h⟩ := Pairing.surjective_m hPA z
+  exact ⟨m, n, h, ⟨n, h⟩, ⟨m, h⟩⟩
+
+theorem left_unique_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
+    {z m n : num_l ℳ} (hm : left_l z m) (hn : left_l z n) : m = n := by
+  obtain ⟨a, ha⟩ := hm
+  obtain ⟨b, hb⟩ := hn
+  exact (Pairing.injective_m hPA m a n b ha hb).1
+
+theorem right_unique_m (hPA : Theory.Models ℳ Logic.Arithmetic.PA.theory_m)
+    {z m n : num_l ℳ} (hm : right_l z m) (hn : right_l z n) : m = n := by
+  obtain ⟨a, ha⟩ := hm
+  obtain ⟨b, hb⟩ := hn
+  exact (Pairing.injective_m hPA a m b n ha hb).2
 
 end YesMetaZFC.Model.Arithmetic.PA.Unpairing

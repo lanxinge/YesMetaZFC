@@ -20,32 +20,27 @@ theorem numeral_m (c : code_m) (n : Nat) :
   | succ => rfl
   | left =>
       refine ⟨Numeral.value_l (NatPairing.unpair_l n).2, ?_⟩
-      change Pairing.value_l (Numeral.value_l (ℳ := ℳ) (NatPairing.unpair_l n).1)
-        (Numeral.value_l (NatPairing.unpair_l n).2) = Numeral.value_l n
-      rw [Numeral.pair_m hPA, NatPairing.pair_unpair_l]
+      simpa only [eval_l, NatPairing.pair_unpair_l] using
+        Numeral.pair_m hPA (NatPairing.unpair_l n).1 (NatPairing.unpair_l n).2
   | right =>
       refine ⟨Numeral.value_l (NatPairing.unpair_l n).1, ?_⟩
-      change Pairing.value_l (Numeral.value_l (ℳ := ℳ) (NatPairing.unpair_l n).1)
-        (Numeral.value_l (NatPairing.unpair_l n).2) = Numeral.value_l n
-      rw [Numeral.pair_m hPA, NatPairing.pair_unpair_l]
+      simpa only [eval_l, NatPairing.pair_unpair_l] using
+        Numeral.pair_m hPA (NatPairing.unpair_l n).1 (NatPairing.unpair_l n).2
   | pair c d hc hd => exact ⟨_, _, hc n, hd n, Numeral.pair_m hPA _ _⟩
   | comp c d hc hd => exact ⟨_, hd n, hc (eval_l d n)⟩
   | prec c d hc hd =>
       let R := relation_l (ℳ := ℳ) c
-      let S := fun a i v w => relation_l (ℳ := ℳ) d (Pairing.value_l a (Pairing.value_l i v)) w
+      let S := iteration_l (relation_l (ℳ := ℳ) d)
       have hrun (a k : Nat) : PA.History.graph_l R S (Numeral.value_l a) (Numeral.value_l k)
           (Numeral.value_l (run_l (eval_l c) (eval_l d) a k)) := by
         induction k with
         | zero => exact PA.History.zero_m R S hPA (hc a)
         | succ k ih =>
             apply PA.History.step_m R S hPA ih
-            change relation_l (ℳ := ℳ) d
-              (Pairing.value_l (Numeral.value_l a)
-                (Pairing.value_l (Numeral.value_l k) (Numeral.value_l (run_l (eval_l c) (eval_l d) a k)))) _
-            rw [Numeral.pair_m hPA, Numeral.pair_m hPA]
-            exact hd _
+            exact ⟨_, _, Numeral.pair_m hPA _ _, Numeral.pair_m hPA _ _, hd _⟩
       refine ⟨Numeral.value_l (NatPairing.unpair_l n).1, Numeral.value_l (NatPairing.unpair_l n).2, ?_, ?_⟩
-      · rw [Numeral.pair_m hPA, NatPairing.pair_unpair_l]
+      · simpa only [NatPairing.pair_unpair_l] using
+          Numeral.pair_m hPA (NatPairing.unpair_l n).1 (NatPairing.unpair_l n).2
       · exact hrun _ _
 
 theorem numeral_iff_m (c : code_m) (n : Nat) (y : num_l ℳ) :

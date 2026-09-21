@@ -17,6 +17,7 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 
 独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
 表示和可证总性。入口为 `YesMetaZFC.Logic.Arithmetic`、`YesMetaZFC.Model.Arithmetic`；
+模型配对与反配对采用关系接口，允许命题内经典证明，但不以选择公理构造模型数据。
 精确接口、理论边界和来源见 [算术子库](markdown/ARITHMETIC_STATUS.md)。
 
 ## 环境与构建

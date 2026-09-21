@@ -113,6 +113,10 @@
   或仅重复调用定理的 `example` 模块；保留有独立数学内容的规格和正负表示证明。
 - 不恢复常开的 `simp.rewrite` 追踪；性能问题先作声明级测量。
   构建和审计证据只标记实际核验过的源码基点，文档减量不计入代码净减量。
+- 算术切片允许 `Prop` 内经典证明，但不得借选择产生 `Type` 层模型数或函数。
+  使用图关系及存在唯一性接口，不添加 `noncomputable`；验证运行
+  `python scripts/test_arithmetic_guard.py` 和 `python scripts/check_arithmetic.py`。
+  不把证明公理列表中的 `Classical.choice` 一概误判为数据选择，也不据此宣称 ZF 内解释已完成。
 
 ## 集合论接口符号约定
 

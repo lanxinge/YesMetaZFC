@@ -40,7 +40,7 @@ Z₂ 采用多排序一阶演算呈现二阶算术。Henkin 完备性不是 Full
 | `Model.Arithmetic.PA.LinearOrder` | `le_total_m`、`lt_succ_m`、`le_cases_m` | 任意 PA 模型全数域 |
 | `Model.Arithmetic.PA.Minimum`、`Z2.Minimum` | `minimum_m` | 实际算术／混合公式定义的非空数类 |
 | `Model.Arithmetic.PA.Division` | `exists_m/unique_m/exists_unique_m` | 显式非零内部除数；图为 `q*d+r=n ∧ r<d` |
-| `Model.Arithmetic.PA.Pairing`、`Unpairing` | `surjective_m/injective_m`、`pair_m/unpair_m` | 固定平方分层配对及全内部数域的双向复合 |
+| `Model.Arithmetic.Pairing`、`PA.Pairing`、`PA.Unpairing` | `graph_l`、`total_m/unique_m`、`surjective_m/injective_m`、`left_l/right_l` | 固定平方分层配对；全内部数域的存在唯一性与投影 |
 | `Model.Arithmetic.PA`、`Z2` | `bound_m` | 每个内部 i<N 的输出唯一；不要求截段外总性 |
 | `Model.Arithmetic.PA.Divisibility` | `exists_m/bounded_m` | 内部截段的正共同倍数；无需宿主阶乘 |
 | `Model.Arithmetic.PA.Beta` | `total_m/unique_m` | 模数为 `succ ((succ i)*c)`，包括 c=0 的模 1 情况 |
@@ -50,6 +50,26 @@ Z₂ 采用多排序一阶演算呈现二阶算术。Henkin 完备性不是 Full
 配对约定为 m<n 时 n*n+m，否则 m*m+m+n。它与一阶调度中的二进制配对不同，不能混用。
 `Logic.Arithmetic.NatPairing` 给出同约定的可执行宿主配对／解码；
 `Model.Arithmetic.PrimitiveRecursive.NatPairing` 证明它与标准结构解释一致及两向复合。
+
+### 经典证明与数据构造的边界
+
+允许在 `Prop` 中使用经典推理；不从存在性证明借助选择公理产生 `Type` 中的模型数、
+坐标函数或结构。配对、最大坐标和反配对因此采用关系接口，而不是非可计算的宿主函数。
+这不要求模型内部序可判定，也不把任意 PA 模型限制为标准模型。
+
+| 原接口 | 当前接口 |
+| --- | --- |
+| `Pairing.value_l m n = p` | `Pairing.graph_l m n p`；用 `total_m` 在命题内取见证，`unique_m` 比较输出 |
+| `PA.Pairing.max_l m n` 返回模型数 | `PA.Pairing.max_l m n k : Prop`，平方区间定理显式接收关系证据 |
+| `PA.Unpairing.value_l hPA z` 返回坐标对 | `left_l z m`、`right_l z n`，以及 `total_m/left_unique_m/right_unique_m` |
+
+原始递归关系和 Z₂ 函数图已同步迁移：配对码显式存在量化，集合成员合同显式接收
+配对关系证据。总性、唯一性、数码表示及对象推导结论仍保留；没有留下旧选择函数别名。
+标准 `Nat` 上的 `NatPairing.pair_l/unpair_l` 仍是可执行算法。
+
+算术模块不使用 `noncomputable`；正常编译与模块级审计共同检查这一数据边界。
+命题证明的公理依赖仍可能含 `Classical.choice`，尤其是调用上游完备性的可选证明。
+这项重构不是已经形式化了整套 Lean 元理论在 ZF 内的解释，也不是全仓 Choice 消除。
 
 `FiniteRange`、`BetaPrefix` 和 `Sequence` 的公式／语义模板已推广到任意签名 universe 与排序。
 PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规则的条件没有留给最终调用者补证。
@@ -116,20 +136,29 @@ PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规�
 
 ## 验证
 
-当前算术切片：96 个 Lean 文件，5,433 行（含空行及注释），432 个显式公开声明。
-Stage 4a 联合构建 152 jobs，退出码 0、无警告；外部调用测试与两套公理审计通过。
+当前算术切片：96 个 Lean 文件，5,457 行（含空行及注释），439 个显式公开声明。
+关系接口重构后的联合构建 152 jobs，退出码 0、无警告；公开声明公理审计通过。
 公理依赖并集仅 `propext`、`Classical.choice`、`Quot.sound`，禁止标记／依赖为空，审计前后源码哈希一致。
-自动生成的 recursor、构造器和私有声明不单列，但其传递依赖仍由公开声明审计覆盖。
+数据边界审计另按实际所属模块检查 1,165 个声明，包含私有及编译器生成声明，
+不按公开名称猜测归属；未发现 `noncomputable` 声明或新增公理。
+生成声明的公理传递依赖仍由公开声明审计覆盖。
 
 仓库内可复跑命令：
 
 ```bash
 python scripts/lean_cache.py build --native
+python scripts/test_arithmetic_guard.py
 python scripts/check_arithmetic.py
 lake --no-build exe prove_auto_sweep --help
 ```
 
-CI 枚举全部独立模块（包括可选 Provability），随后执行算术公理审计。
+CI 枚举全部独立模块（包括可选 Provability），随后测试并执行算术公理／数据边界审计。
+`check_arithmetic.py` 自身也先构建全部算术模块，不能只凭旧缓存通过。
+边界测试覆盖命题内经典推理、直接数据选择、私有数据选择、其他命名空间及新增公理。
+本轮证据位于工作区 `outputs/yesmetazfc-arithmetic/choice-relational-audit.log`、
+`choice-guard-tests.log`；后述 Stage 4a 文件是迁移前的历史证据。
+重构后全仓 1,100 个模块及原生目标亦已通过增量构建，证据为 `choice-native-build.log`；
+5 项数据边界正反例和 19 项缓存脚本测试通过。未作全仓冷构建。
 外部开发证据位于工作区 `outputs/yesmetazfc-arithmetic/`：
 `stage4a-final-build.log`、`stage4a-consumer.log`、`stage4a-audit.json`、`stage4a-portable-audit.log`。
 一次性消费者与失败日志不进入正式库；历史分批证据仍保留在该目录。

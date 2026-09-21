@@ -15,7 +15,7 @@ theorem total_m (m n : Term signature_m [] Δ .num) :
     Derives T Γ (Logic.Arithmetic.Pairing.domain_m m n) := by
   apply Completeness.derives_m
   intro ℳ _ η
-  exact (domain_sat_m η m n).mpr ⟨_, rfl⟩
+  exact (domain_sat_m η m n).mpr (Pairing.total_m _ _)
 
 theorem functional_m (m n p q : Term signature_m [] Δ .num) :
     Derives T Γ (.imp (Logic.Arithmetic.Pairing.graph_m m n p)
@@ -23,6 +23,6 @@ theorem functional_m (m n p q : Term signature_m [] Δ .num) :
   apply Completeness.derives_m
   intro ℳ _ η
   simp only [Formula.satisfies, graph_sat_m]
-  exact fun h₁ h₂ => h₁.symm.trans h₂
+  exact fun h₁ h₂ => Pairing.unique_m h₁ h₂
 
 end YesMetaZFC.Model.Arithmetic.Pairing.Provability

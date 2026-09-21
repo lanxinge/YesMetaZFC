@@ -26,23 +26,25 @@ theorem injective_m (m n a b p : Term signature_m [] Δ .num) :
   apply Completeness.derives_m
   intro ℳ hℳ η
   simp only [Formula.satisfies, Arithmetic.Pairing.graph_sat_m]
-  exact fun h₁ h₂ => Pairing.injective_m hℳ _ _ _ _ (h₁.trans h₂.symm)
+  exact fun h₁ h₂ => Pairing.injective_m hℳ _ _ _ _ h₁ h₂
 
 theorem left_total_m (s : Term signature_m [] Δ .num) :
     Derives T Γ (.existsE .num (Logic.Arithmetic.Pairing.left_m (s.weakenBound sort_m.num) (.bvar .here))) := by
   apply Derives.theory_weaken hPA
   apply Completeness.derives_m
   intro ℳ hℳ η
-  simp only [Formula.satisfies, Unpairing.left_sat_m hℳ, Term.eval_weakenBound, Term.eval]
-  exact ⟨_, rfl⟩
+  simp only [Formula.satisfies, Unpairing.left_sat_m, Term.eval_weakenBound, Term.eval]
+  obtain ⟨m, n, h⟩ := Pairing.surjective_m hℳ (s.eval η)
+  exact ⟨m, n, h⟩
 
 theorem right_total_m (s : Term signature_m [] Δ .num) :
     Derives T Γ (.existsE .num (Logic.Arithmetic.Pairing.right_m (s.weakenBound sort_m.num) (.bvar .here))) := by
   apply Derives.theory_weaken hPA
   apply Completeness.derives_m
   intro ℳ hℳ η
-  simp only [Formula.satisfies, Unpairing.right_sat_m hℳ, Term.eval_weakenBound, Term.eval]
-  exact ⟨_, rfl⟩
+  simp only [Formula.satisfies, Unpairing.right_sat_m, Term.eval_weakenBound, Term.eval]
+  obtain ⟨m, n, h⟩ := Pairing.surjective_m hℳ (s.eval η)
+  exact ⟨n, m, h⟩
 
 theorem left_functional_m (s t u : Term signature_m [] Δ .num) :
     Derives T Γ (.imp (Logic.Arithmetic.Pairing.left_m s t)
@@ -50,8 +52,8 @@ theorem left_functional_m (s t u : Term signature_m [] Δ .num) :
   apply Derives.theory_weaken hPA
   apply Completeness.derives_m
   intro ℳ hℳ η
-  simp only [Formula.satisfies, Unpairing.left_sat_m hℳ]
-  exact fun h₁ h₂ => h₁.symm.trans h₂
+  simp only [Formula.satisfies, Unpairing.left_sat_m]
+  exact fun h₁ h₂ => Unpairing.left_unique_m hℳ h₁ h₂
 
 theorem right_functional_m (s t u : Term signature_m [] Δ .num) :
     Derives T Γ (.imp (Logic.Arithmetic.Pairing.right_m s t)
@@ -59,7 +61,7 @@ theorem right_functional_m (s t u : Term signature_m [] Δ .num) :
   apply Derives.theory_weaken hPA
   apply Completeness.derives_m
   intro ℳ hℳ η
-  simp only [Formula.satisfies, Unpairing.right_sat_m hℳ]
-  exact fun h₁ h₂ => h₁.symm.trans h₂
+  simp only [Formula.satisfies, Unpairing.right_sat_m]
+  exact fun h₁ h₂ => Unpairing.right_unique_m hℳ h₁ h₂
 
 end YesMetaZFC.Model.Arithmetic.PA.Pairing.Provability
