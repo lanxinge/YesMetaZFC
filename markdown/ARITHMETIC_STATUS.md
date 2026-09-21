@@ -1,380 +1,138 @@
 # 算术子库接口与来源
 
-本文件记录 Q/PA、Z₂ 核心、已验证的 PA→Z₂ 桥及首批一般算术；其余算术／编码按 [工作规划](ARITHMETIC_PLAN.md) 推进。
-验证状态在本文件末尾单列；文件存在本身不是构建通过的证据。
+Q、PA、Z₂ 核心、内部有限编码和逐程序原始递归表示已经实现。
+本页是接口导航；历史分批记录保留在 Git 历史，扩展边界见 [工作规划](ARITHMETIC_PLAN.md)。
 
-## 入口与理论边界
+## 导入与分层
 
-- `import YesMetaZFC.Logic.Arithmetic`：Q/PA、数码计算、Z₂ 理解与全公式归纳、PA→Z₂ 推导翻译。
-- `import YesMetaZFC.Model.Arithmetic`：任意结构、PA/Z₂ 可定义归纳、标准模型、元层一致性及 PA 数域约化。
-- 共享语言放 `Logic/Arithmetic/Signature` 与 `Syntax`，不归属于 PA 公理层。
-  Q 独立放 `Q/`，实现时据实际复用关系调整了规划中的 `PA/Robinson` 路径。
-- 全部模块属于现有 Lake 库，当前全源枚举脚本会覆盖它们；没有嵌套桥工程或独立工具链。
+- `YesMetaZFC.Logic.Arithmetic`：最小签名、公理模式、对象推导、PA→Z₂ 翻译和程序图编译。
+- `YesMetaZFC.Model.Arithmetic`：任意模型语义、标准模型、内部编码、程序总性及 Z₂ 内部函数图。
+- 完备性及下列 `Provability` 模块按需独立导入，不进入上述核心入口。
+- 所有文件属于同一个 Lake 库、同一 Lean 4.33.1 工具链，没有嵌套桥工程或外部包依赖。
+- Logic 不依赖 Model；算术闭包不导入 BMS、Mathlib、构造宇宙或具体集合论模型。
+  程序求值的平方根来自工具链自带的 `Init.Data.Nat.Sqrt.Lemmas`。
 
-主要公开接口的命名空间及精确作用：
+以下命名空间省略前缀 `YesMetaZFC`。结构和模型性均显式传入，不设全局模型类型类。
 
-| 命名空间 | 接口 | 范围 |
+## Q、PA、Z₂
+
+| 命名空间 | 主要接口 | 数学范围 |
 | --- | --- | --- |
-| `Logic.Arithmetic` | `signature_m`、`zero_m/succ_m/add_m/mul_m`、`numeral_m` | 单排序、仅四种函数；没有非逻辑关系 |
-| 同上 | `numeral_subst_m`、`numeral_rename_m` | 任意合法 bound/free 上下文和替换／重命名 |
-| 同上 | `succ_congr_m`、`add_left_congr_m`、`add_right_congr_m`、`mul_left_congr_m`、`mul_right_congr_m` | 任意理论、任意局部上下文的纯逻辑同余 |
-| `Logic.Arithmetic.Q` | `template_m`、`sentence_m`、`theory_m` | 七条实际 Q 公理；模板参数完整闭合 |
-| 同上 | `derives_m` 及七个公理实例 | 目标理论显式包含 Q；任意项、自由参数和局部假设 |
-| 同上 | `numeral_add_m`、`numeral_mul_m`、`numeral_ne_m` | 对每组外部给定数码产生对象推导；不消费 PA 归纳 |
-| `Logic.Arithmetic.PA` | `induction_m`、`theory_m`、`extends_q_m` | Q 加任意带有限数目参数的算术公式归纳模式 |
-| 同上 | `induction_derives_m`、`induction_rule_m`、`induction_term_m` | 真正的 `Derives` 结论；规则显式弱化局部上下文，可在任意项处实例化 |
-| 同上 | `next_weaken_m` | 后继替换不改变原自由参数 |
-| 同上 | `zero_add_m`、`succ_add_m`、`add_comm_m`、`add_assoc_m`、`add_right_comm_m` | 任意 PA 扩张中任意项的一般加法规律 |
-| 同上 | `zero_mul_m`、`mul_one_m`、`one_mul_m` | 同范围的乘法左零律与左右单位律 |
-| 同上 | `succ_mul_m`、`mul_comm_m`、`mul_add_m`、`add_mul_m`、`mul_assoc_m` | 同范围的一般乘法后继、交换、双侧分配与结合律 |
-| `Model.Arithmetic.PA` | 十二条运算定理 | 由对象推导的可靠性得到任意 PA 模型全数域上的等式 |
-| `Model.Arithmetic` | `num_l`、`zero_l/succ_l/add_l/mul_l` | 任意预定 universe 的结构，不默认满足 Q/PA |
-| 同上 | `next_sat_m`、`induction_sat_m` | 后继替换与归纳模式的逐公式语义对应 |
-| 同上 | `induction_m`、`induct_m` | 任意 PA 模型全数域上的可定义归纳；需真实公式及环境 |
-| 同上 | `standard_m`、`numeral_eval_m`、`q_models_m`、`pa_models_m` | 实际标准自然数结构和公理模式满足性 |
-| 同上 | `q_consistent_m`、`pa_consistent_m` | Lean 元层由标准模型和可靠性得出的无矛盾性，不是对象自证一致性 |
-| `Logic.Arithmetic.Robinson` | `base_m`、`parameters_m`、`template_m` | 对任意签名 universe、给定数排序及项构造建立七条数目公理；Q 和 Z₂ 共用 |
-| `Logic.Arithmetic.Z2` | `signature_m`、`insert_m`、`next_m` | 最小双排序语言及保留全部原参数的新集合槽／后继替换 |
-| 同上 | `number_m`、`extensionality_m`、`set_induction_m`、`comprehension_m`、`theory_m` | 实际闭公理和完整理解模式；没有 BMS 语言检查前提 |
-| 同上 | `comprehension_derives_m`、`induction_derives_m`、`induction_rule_m` | 任意 Z₂ 扩张、混合自由参数和局部上下文中的对象推导 |
-| 同上 | `induction_congr_m` | 任意理论中，逐点可证等价传输归纳实例；不要求 Z₂ 公理 |
-| `Model.Arithmetic.Z2` | `ext_m`、`insert_sat_m`、`comprehension_sat_m`、`comprehension_m` | 任意集域的外延性、见证槽独立性、理解的精确语义与内部集合见证 |
-| 同上 | `induction_sat_m`、`induction_m`、`induct_m` | 模型全数域上的公式归纳；宿主谓词版本仍要求实际公式定义 |
-| 同上 | `standard_m`、`models_m`、`consistent_m` | Nat 与全部 Nat→Prop 的标准模型；Lean 元层一致性 |
-| `Logic.Arithmetic.PA.Translation` | `context_m`、`variable_m`、`term_m`、`arguments_m`、`formula_m` | 保持变量位置及逻辑联结词，数量词只译为数量词 |
-| 同上 | `term_rename_m`、`formula_rename_m`、`term_subst_m`、`formula_subst_m` | 任意合法 bound/free 上下文之间的重命名与同时替换保持 |
-| 同上 | `formula_instantiate_m`、`formula_abstract_m`、`formula_forall_m`、`formula_close_m` | 实例化、抽象、量化、全称闭包保持；自由顶部实例化和存在量化也有对应接口 |
-| 同上 | `logical_m`、`provable_of_axioms_m`、`derives_of_axioms_m` | 原逻辑公理的实际目标证书；给定各公理像可证，可传输任意源数目理论推导 |
-| 同上 | `number_image_m`、`induction_image_m`、`axiom_derives_m`、`derives_m` | 已构造 PA 公理像证明，最终定理直接输入 PA 推导，输出 Z₂ 推导；不是未填条件接口 |
-| `Model.Arithmetic.Z2` | `reduct_m`、`environment_m`、`term_eval_m`、`formula_sat_m` | 任意双排序结构的整个数域约化，以及逐项／逐公式语义保持 |
-| 同上 | `reduct_models_m` | 显式给定 Z₂ 模型性后，得到 PA 全部公理及归纳模式的模型性 |
+| `Logic.Arithmetic` | `signature_m`、`zero_m/succ_m/add_m/mul_m`、`numeral_m` | 单排序四函数语言；数码为外部有限后继链 |
+| `Logic.Arithmetic.Q` | `theory_m`、`derives_m`、`numeral_add_m/numeral_mul_m/numeral_ne_m` | 七条实际公理；任意 Q 扩张和局部上下文 |
+| `Logic.Arithmetic.PA` | `theory_m`、`induction_derives_m/induction_rule_m/induction_term_m` | Q 加所有带有限数参数的算术公式归纳 |
+| `Logic.Arithmetic.PA` | 加乘交换／结合／分配、消去、序的对象推导 | 真实 `Derives`，保留任意项和局部假设 |
+| `Model.Arithmetic` | `standard_m`、`q_models_m/pa_models_m`、`q_consistent_m/pa_consistent_m` | 实际标准模型；一致性结论位于 Lean 元层 |
+| `Logic.Arithmetic.Robinson` | `template_m` | Q 与 Z₂ 共用的七条数目公理模板 |
+| `Logic.Arithmetic.Z2` | `theory_m`、`comprehension_derives_m`、`induction_derives_m` | 数／集双排序、外延性、集合归纳、完整理解；由此导出全公式归纳 |
+| `Model.Arithmetic.Z2` | `comprehension_m`、`induct_m`、`models_m` | 任意混合公式与参数；另有标准 `Nat, Nat → Prop` 模型 |
+| `Logic.Arithmetic.PA.Translation` | `formula_m`、`derives_m` | 全部项、公式、替换、绑定与推导向 Z₂ 的实际翻译 |
+| `Model.Arithmetic.Z2` | `reduct_m`、`formula_sat_m`、`reduct_models_m` | 保留整个内部数域的 PA 约化及逐公式语义对应 |
 
-所有命名空间均带前缀 `YesMetaZFC`。任意模型接口没有标准性或外部幂集假设。
-核心不导入 BMS、Mathlib 或集合论模型。PA→Z₂ 桥已经实现；尚无原始递归总性断言。
+Z₂ 采用多排序一阶演算呈现二阶算术。Henkin 完备性不是 Full 二阶完备性；
+任意 Z₂ 模型的集域不默认是外部幂集。PA→Z₂ 翻译不宣称对 PA 保守。
+标准模型导出的元层一致性不是对象理论自证一致性。
 
-## 迁移来源与修改
+## 内部算术与有限编码
 
-来源仓库：[BMS-Well-Ordering-Lean](https://github.com/EgoFakeFantasy/BMS-Well-Ordering-Lean)。
-采用本地 `bm4v` 工作树，Git 基点 `013b0edbb7808bbefa2f2aaa5fc6d700196b3016`；
-不假定整个工作树与该提交相同。下列为实际读取文件的原始字节 SHA-256。
-来源目录均为 `ConstructibleBridge/BMSConstructibleBridge/`。
+| 模块／命名空间 | 主要接口 | 保留的条件 |
+| --- | --- | --- |
+| `Model.Arithmetic.PA.LinearOrder` | `le_total_m`、`lt_succ_m`、`le_cases_m` | 任意 PA 模型全数域 |
+| `Model.Arithmetic.PA.Minimum`、`Z2.Minimum` | `minimum_m` | 实际算术／混合公式定义的非空数类 |
+| `Model.Arithmetic.PA.Division` | `exists_m/unique_m/exists_unique_m` | 显式非零内部除数；图为 `q*d+r=n ∧ r<d` |
+| `Model.Arithmetic.PA.Pairing`、`Unpairing` | `surjective_m/injective_m`、`pair_m/unpair_m` | 固定平方分层配对及全内部数域的双向复合 |
+| `Model.Arithmetic.PA`、`Z2` | `bound_m` | 每个内部 i<N 的输出唯一；不要求截段外总性 |
+| `Model.Arithmetic.PA.Divisibility` | `exists_m/bounded_m` | 内部截段的正共同倍数；无需宿主阶乘 |
+| `Model.Arithmetic.PA.Beta` | `total_m/unique_m` | 模数为 `succ ((succ i)*c)`，包括 c=0 的模 1 情况 |
+| `Model.Arithmetic.PA.Beta`、`Z2.Beta` | `sequence_m` | 任意内部长度下可定义有限函数的编码；Z₂ 保留集合参数 |
+| `Model.Arithmetic.PA.Beta` | `extend_m/singleton_m` | 重新编码旧前缀和新末值，保留全部旧读值 |
 
-| 文件 | SHA-256 |
+配对约定为 m<n 时 n*n+m，否则 m*m+m+n。它与一阶调度中的二进制配对不同，不能混用。
+`Logic.Arithmetic.NatPairing` 给出同约定的可执行宿主配对／解码；
+`Model.Arithmetic.PrimitiveRecursive.NatPairing` 证明它与标准结构解释一致及两向复合。
+
+`FiniteRange`、`BetaPrefix` 和 `Sequence` 的公式／语义模板已推广到任意签名 universe 与排序。
+PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规则的条件没有留给最终调用者补证。
+所有长度、模数、界和见证都是模型数，不换成宿主 Nat 或列表。
+
+可选对象推导模块：
+`Model.Arithmetic.PA.Provability`、`Z2.Provability`、`PA.PairingProvability`、
+`PA.BetaProvability`、`Z2.BetaProvability`。
+这些由全部原一阶模型中的结论调用已证完备性，不从标准模型真值反射为可证性。
+
+## 原始递归与表示
+
+| 命名空间 | 主要接口 | 结论 |
+| --- | --- | --- |
+| `Logic.Arithmetic.PrimitiveRecursive` | `code_m`、`run_l/eval_l` | 零、后继、左右投影、配对、复合、原始递归的有限程序与实际计算 |
+| 同上 | `primitive_l`、`primitive_m/complete_m` | 显式七构造闭包与程序的双向对应 |
+| 同上 | `graph_m` | 结构递归产生原 PA 签名的图公式，任意 bound/free 上下文 |
+| `Model.Arithmetic.PA.History` | `graph_sat_m`、`total_m/unique_m` | β 有限历史、真实公式归纳支持的存在性、确定转移的唯一性 |
+| `Model.Arithmetic.PrimitiveRecursive` | `graph_sat_m` | 编译图与内部关系逐构造精确对应 |
+| 同上 | `exists_unique_m/total_m/unique_m` | 任意 PA 模型中，每个给定程序对每个内部输入有唯一内部输出 |
+| 同上 | `numeral_m/numeral_iff_m` | 任意 PA 模型中标准输入的正确数码输出，排除非标准伪输出 |
+| 同上 | `relation_standard_m/standard_m` | 标准模型中编译图恰好表示可执行求值；复用一般数码表示 |
+| `Model.Arithmetic.PrimitiveRecursive.Provability` | `total_m/unique_m` | PA 中逐程序可推导总性和函数性；允许理论扩张与局部上下文 |
+| 同上 | `numeral_m/evaluates_m/rejects_m` | 任意输出项的数码表示等价式、正确结果可证、错误数码结果可反驳 |
+| `Model.Arithmetic.Z2.PrimitiveRecursive` | `graph_m/function_m/unique_m` | 原模型内部集域中的全函数图及其外延唯一性 |
+
+递归步使用输入配对 x,(i,y)。外层按宿主有限程序语法归纳，内部步数则由实际历史公式归纳。
+此处 `∀ c : code_m` 不是模型内部所有程序码的统一总性／真值断言。
+七构造闭包是明确的配对式原始递归呈现，未接 Mathlib `Nat.Primrec` 的跨库桥；
+不引入无界最小化，不宣称已经形式化算术层级、RCA₀/ACA₀ 或 BMS 良序性。
+
+## 来源与重构
+
+来源为 [BMS-Well-Ordering-Lean](https://github.com/EgoFakeFantasy/BMS-Well-Ordering-Lean)，
+本地 bm4v 工作树基点 `013b0edbb7808bbefa2f2aaa5fc6d700196b3016`。
+该树含本地修改，故以下登记实际读取文件的原始字节 SHA-256，而非只引用提交。
+文件均位于 `ConstructibleBridge/BMSConstructibleBridge/`。Apache-2.0 通知保留在根目录 NOTICE。
+
+| 来源文件 | SHA-256 |
 | --- | --- |
-| `SecondOrderSyntax.lean` | `6204ccd8bf29e924a70c679d55170bc281f663ae8c007bc0933bc76c1af63429` |
-| `SecondOrderArithmetic.lean` | `e2afb09cc8318a6c15bbfdf8650dff2f878834da53f6b5a1f70311a8ddc6497e` |
-| `SecondOrderModel.lean` | `7e9fb58b74ffc73d4ed40ca04a6cc4570fa602a063b43140cdfc380e822f16b1` |
+| SecondOrderSyntax.lean | 6204ccd8bf29e924a70c679d55170bc281f663ae8c007bc0933bc76c1af63429 |
+| SecondOrderArithmetic.lean | e2afb09cc8318a6c15bbfdf8650dff2f878834da53f6b5a1f70311a8ddc6497e |
+| SecondOrderModel.lean | 7e9fb58b74ffc73d4ed40ca04a6cc4570fa602a063b43140cdfc380e822f16b1 |
+| SecondOrderNumbers.lean | c70af63162d9da17353c35fd5599d53ea4d9e3b4c71edd10f92b376fd5c6278f |
+| SecondOrderMultiplication.lean | d95f8e28ecbb5b94795d1803f78a027e18f37a137048d4adfeff75a661fbf6e0 |
+| SecondOrderOrder.lean | 2246e4bbe577a9ac4c4d115806d39ba01cb1c03c640f0b0d7873d84bc3a4a817 |
+| SecondOrderMinimum.lean | 2131648443f2965c3e542f13b9368a896b263002fd41aec6e26efa461aa81e44 |
+| SecondOrderDivision.lean | 3ff85c3c439e7cc07cb190f17f35bf15bbd5515dcb61aaf331f495113bf7822c |
+| SecondOrderPairing.lean | b097b993919532838766d14c4b9191b69e44bcaa5608c642203c5e7381364e1d |
+| SecondOrderPairingBounds.lean | 3a4b774eaae005d7a6956fdf173588f939ea18c3db8b57b620c8c8638ebabcc3 |
+| SecondOrderUnpairing.lean | 01833e6004d40497955f95aafcb34a9f26126ba9758be5569a27bf963271054d |
+| SecondOrderFiniteRange.lean | ff42f6ad108a80f649e367f4bfa6067c7bd24bf5442a6b106d158d97e99e073e |
+| SecondOrderBetaSequence.lean | 1ff262a3ccc9fa007cf56d8d6c6dc6fc19218ca7422fa9febdd280b3dd251eec |
+| PrimitiveProgram.lean | 62daaca531f13756d0b72a65e7e693bdc774afa20f8050cc103e0679ab881fc3 |
+| PrimitiveHistory.lean | 3e1e9a59e44da145cf8351103b5e03be462ba22bedd9e3345ab24fa82ab6c782 |
+| PrimitiveFormulas.lean | 6c619059612cacd63f1fe9ce9e8542e46e5178df99ce5831ea100b894cc8611c |
 
-本批不是原文件直接复制：重建独立单排序语言，删除 BMS 扩张符号；用开放模板统一 Q 公理实例化；
-将数码结论从固定 Z₂ 背景降低至任意 Q 扩张；将一般归纳独立呈现为 PA 模式；
-分离纯逻辑同余与算术公理，模型对应移入 Model；按公开判断重新判定层后缀。
-保留原库 Apache-2.0 贡献者通知，见根目录 NOTICE。旧仓库及其公开接口未修改。
+这是按数学职责重建的迁移，不是整目录复制：删除 BMS 专用符号及纯语言布尔 guard，
+数码运算降至 Q，数目归纳与编码降至 PA，含集合参数的接口保留 Z₂。
+配对、模逆和 β 证明去除 Mathlib 代数实例；标准序列的宿主列表论证改为内部公式归纳。
+图公式、可执行求值、标准正确性、任意模型总性和对象可推导性分别提供。
+沿用上游 AST、替换、推导核、可靠性和完备性，不维护第二套逻辑系统。
+旧 BMS 仓库及其公开接口未修改。
 
-Stage 2a 继续改写同一 `SecondOrderArithmetic.lean` 的理解与归纳证明，其来源 SHA 已重新核对。
-以 `existsFreeTop/forallFreeTop` 直接构造理解，省去旧版本的独立 bound 替换及等式转换层；
-删除原先排除 BMS 符号的 `language_m φ = true` 条件，因为新签名从类型上不含这些符号。
-把公式归纳推广到任意理论扩张与局部上下文；标准模型用原生谓词代替 Mathlib Set。
-数目公理模板对任意签名及排序 universe 抽取，Q 的原实例证明重新编译；不是维护两份公理列表。
-模板接口只生成语法，不给任意传入项构造附加未经证明的替换自然性。
+## 验证
 
-Stage 2b 是针对当前类型化 AST 新写的翻译及语义证明；复用上游替换、Hilbert 核、
-局部上下文 discharge 和可靠性，不复制旧桥的扩张语言或另造推导核。
-上游 Henkin 嵌入用作结构递归和规则传输的接口参考，但其固定排序扩张不能直接复用于此桥。
+当前算术切片：96 个 Lean 文件，5,433 行（含空行及注释），432 个显式公开声明。
+Stage 4a 联合构建 152 jobs，退出码 0、无警告；外部调用测试与两套公理审计通过。
+公理依赖并集仅 `propext`、`Classical.choice`、`Quot.sound`，禁止标记／依赖为空，审计前后源码哈希一致。
+自动生成的 recursor、构造器和私有声明不单列，但其传递依赖仍由公开声明审计覆盖。
 
-## 验收合同
+仓库内可复跑命令：
 
-最终结果以真实命令退出码、源码指纹及公理日志为准。开发中的失败日志保留在仓库外，
-不得引用某个旧 `.olean` 或失败构建中的局部成功条目宣布整体通过。
-本批联合目标为 `YesMetaZFC.Logic.Arithmetic` 与 `YesMetaZFC.Model.Arithmetic`。
-公理审计覆盖本批显式公开定义／归纳类型／定理；语义复核另检查模板槽、模式量词、
-局部假设新鲜性、内外部自然数和结论层级。尚未运行全仓 CI。
+```bash
+python scripts/lean_cache.py build --native
+python scripts/check_arithmetic.py
+lake --no-build exe prove_auto_sweep --help
+```
 
-### Stage 1 历史验收（2026-09-20）
+CI 枚举全部独立模块（包括可选 Provability），随后执行算术公理审计。
+外部开发证据位于工作区 `outputs/yesmetazfc-arithmetic/`：
+`stage4a-final-build.log`、`stage4a-consumer.log`、`stage4a-audit.json`、`stage4a-portable-audit.log`。
+一次性消费者与失败日志不进入正式库；历史分批证据仍保留在该目录。
 
-以下仅对应第一批源码指纹；当前共享模板已经重构，应以随后 Stage 2a 验收为准。
-
-- 联合 `lake --wfail build YesMetaZFC.Logic.Arithmetic YesMetaZFC.Model.Arithmetic`：46 jobs，退出码 0。
-- 13 个新增 Lean 文件，共 499 行（含注释与空行，不含文档和审计脚本）。
-- 对 52 个显式公开定义／归纳类型／定理逐项 `#print axioms`，52 项均取得结果；未计入自动生成的实例／recursor。
-- 公理依赖的并集仅为 `propext`、`Classical.choice`、`Quot.sound`；无 `sorryAx` 或新自定义公理。
-- 新源码静态扫描无占位证明、unsafe、native_decide 或关闭 linter；完整导入闭包不含 BMS、Mathlib、
-  ConstructibleUniverse、SetTheory 或具体 ZFC 模型。源码审计前后 SHA-256 相同。
-- 语义验收的机器证据包括：七条公理的任意项实例、`induction_sat_m` 的任意结构对应、
-  `induction_rule_m` 的上下文合同，以及全公理模式的 `pa_models_m`，不是只验证若干数值样例。
-
-本地证据位于工作区 `outputs/yesmetazfc-arithmetic/`：`stage1-final-build.log`、
-`stage1-axioms.log`、`stage1-audit.json` 与可重跑脚本 `audit_stage1.py`。
-这些一次性审计材料不放进正式 Lean 源码目录。以上是算术依赖切片的验证，不代表上游全仓 CI。
-### Stage 2a 历史验收（2026-09-20）
-
-- 两个聚合入口联合 `lake --wfail build`：53 jobs，退出码 0，没有 linter 警告。
-- 当前算术子库 20 个 Lean 文件、952 行，比第一批净增 453 行；最长文件 136 行。
-- 92 个显式公开声明逐项 `#print axioms` 全通过；审计并集仅为 `propext/Classical.choice/Quot.sound`。
-- 无占位证明、新自定义公理、unsafe、native_decide 或关闭 linter；53 个导入闭包模块无 BMS、
-  Mathlib、ConstructibleUniverse、SetTheory、具体 ZFC 模型。未解析为本仓源码的入口仅 `Lean`。
-- 源码在审计前后 SHA-256 一致。没有运行全仓 CI，也没有重新认证旧 BMS 仓库。
-- 独立复查 Logic 聚合入口的 36 模块导入闭包，没有任何 Model 模块；对象证明层未反向依赖模型语义。
-- 当前证据为 `stage2-verified-build.log`、`stage2-axioms.log`、`stage2-audit.json`；
-  用 `python outputs/yesmetazfc-arithmetic/audit_stage1.py stage2` 从父工作区重跑审计。
-  脚本保留默认 stage1 输出名，但当前验收必须传 stage2，避免覆盖历史证据。
-
-语义复核的具体边界：
-
-1. 理解正文 `φ : Formula signature_m [] (.num :: Δ)` 的 Δ 是任意混合排序列表，
-   AST 的数／集量词不受限制。`insert_sat_m` 对每个候选 X 证明原 φ 的真值不依赖新集合槽。
-2. `axiom_m` 仅有七条数目公理、外延、集合归纳与完整理解；全公式归纳确由理解和集合归纳导出。
-3. `induction_congr_m` 与最终归纳规则都是 `Derives`；没有借标准模型真值、完备性或反射替代对象证明。
-4. 任意模型语义遍历整个内部数域及集域。`induct_m` 仍保留逐点公式定义前提，不可用于任意额外宿主谓词。
-5. 标准模型检查涵盖整个理解模式，不是有限样例。元层一致性不等于对象自证一致性，
-   双排序一阶语义不自动成为 Full 二阶语义的完备性。
-
-### Stage 2b 当前验收（2026-09-20）
-
-本批完成 PA→Z₂ 的语法／推导翻译及模型约化。Stage 2 的全部五项合同现已满足。
-
-- 联合构建 `lake --wfail build YesMetaZFC.Logic.Arithmetic YesMetaZFC.Model.Arithmetic`：57 jobs，退出码 0，无 linter 警告。
-- 当前算术子库 24 个 Lean 文件、1,545 行；本批净增 593 行，最长模块 242 行。
-- 142 个显式公开声明公理审计全通过；依赖并集仅 `propext/Classical.choice/Quot.sound`，无占位证明或新自定义公理。
-- 57 个模块的完整导入闭包不含 BMS、Mathlib、构造宇宙、SetTheory 或具体 ZFC 模型；外部入口仅 `Lean`。
-- 审计前后源码 SHA-256 一致。当前证据为 `stage2b-final-build.log`、`stage2b-axioms.log`、`stage2b-audit.json`。
-  在父工作区运行 `python outputs/yesmetazfc-arithmetic/audit_stage1.py stage2b` 重跑当前审计，不覆盖历史批次。
-- 没有运行全仓 CI，没有提交或推送，没有改动旧 BMS 源码。
-
-本批语义审查：
-
-1. `context_m` 逐槽保留参数位置，`formula_m` 保留全部逻辑联结词；源数量词不会被译为集合量词。
-2. 重命名、bound/free 同时替换、提升、实例化、量词抽象及闭包均有一般定理，不以样例验证代替。
-3. `logical_m` 构造每一种原逻辑公理的目标证书；`provable_of_axioms_m` 遍历全部六种 Hilbert 构造。
-   `axiom_derives_m` 实际填满 PA 公理像，`derives_m` 保留任意局部上下文。未使用完备性、模型真值反射或新公理。
-4. `reduct_m` 对任意 carrier universe 的结构直接保留整个内部数域，`formula_sat_m` 不要求 Z₂ 公理；
-   最终 `reduct_models_m` 才使用 Z₂ 模型性和已证明的 PA 公理像。没有偷换成标准自然数。
-5. 这是 PA 在 Z₂ 中的正向解释；没有反向保守性、Full 二阶完备性或对象自证一致性声明。
-
-### Stage 3a 验收（2026-09-20）
-
-本批完成一般算术的首个切片，不把整个 Stage 3 标为完成。
-
-| 接口 | 已完成合同 |
-| --- | --- |
-| `PA.next_weaken_m` | 归纳变量替为后继时保留原项的所有自由参数 |
-| `PA.induction_term_m` | 真实公式归纳后在任意项处实例化，局部上下文按新变量弱化 |
-| `PA.Addition` | 任意 PA 扩张中的 `succ_add_m`、`add_comm_m`、`add_assoc_m` |
-| `PA.Multiplication` | 同范围的 `zero_mul_m`、`mul_one_m`、`one_mul_m` |
-| `Model.Arithmetic.PA.Operations` | 上述六条及已有左零加法律在任意 carrier universe 的 PA 模型中成立 |
-
-复用来源：旧 `BMSConstructibleBridge/SecondOrderNumbers.lean` 与
-`SecondOrderMultiplication.lean` 的数学归纳路线。没有搬入旧模型假设、纯语言布尔 guard、Mathlib 或 BMS 符号。
-前者 SHA-256 为 `c70af63162d9da17353c35fd5599d53ea4d9e3b4c71edd10f92b376fd5c6278f`；
-后者为 `d95f8e28ecbb5b94795d1803f78a027e18f37a137048d4adfeff75a661fbf6e0`。
-不同于旧库主要提供的语义规律，本批先构造 `Derives`，再通过可靠性获得任意模型结果。
-乘法单位律中的左单位律直接公式归纳，不借用尚未实现的一般乘法交换律。
-
-验收证据仍位于父工作区 `outputs/yesmetazfc-arithmetic/`：
-
-- `stage3a-combined-first.log`：两个聚合入口联合构建，61 jobs，退出码 0，零警告。
-- `stage3a-axioms.log`／`stage3a-audit.json`：159 个公开声明全通过；依赖并集仅
-  `propext/Classical.choice/Quot.sound`，无占位证明、新自定义公理或关闭 linter。
-- `stage3a-consumers.lean`／`stage3a-consumers-checked.log`：实际调用 PA→Z₂ 翻译传输新的交换律，
-  并在任意 Z₂ 模型数域约化上使用结合律；退出码 0、无诊断输出。测试不进入正式库源文件。
-- 当前 27 个 Lean 文件、1,791 行，比 Stage 2b 净增 246 行；最长模块仍为 242 行。
-- 61 个模块导入闭包无 BMS、Mathlib、构造宇宙、SetTheory 或具体 ZFC 模型；外部入口仅 Lean。
-  审计前后源码指纹一致。复跑审计使用 `audit_stage1.py stage3a`，不要覆盖旧批次记录。
-  单独检查 Logic 入口的 42 模块依赖闭包，没有任何 Model 导入。
-- 语义复核：归纳对象是具体公式；原参数通过 `weakenFree` 和 `next_weaken_m` 保持；
-  输入是任意项，不限定为数码。纯逻辑同余无需 Q，Q 递归方程继续只要求 Q，新增一般规律显式要求 PA。
-  任意模型结果只用已证明推导的可靠性，不重做宿主任意谓词归纳。
-- 未运行全仓 CI／native 验证，未提交或推送；旧 BMS 源码未修改。
-
-### Stage 3b 验收（2026-09-20）
-
-本批完成一般乘法规律；序关系、最小化与内部编码仍未实现，不将整个 Stage 3 标为完成。
-
-- `PA.Multiplication` 新增 `succ_mul_m`、`mul_comm_m`、`mul_add_m`、`add_mul_m`、`mul_assoc_m`。
-  全部结论为任意 PA 扩张、自由参数、局部上下文和输入项下的 `Derives`。
-- 四条规律通过真实公式归纳建立；`add_mul_m` 由交换律及已证分配律组合。
-  `PA.add_right_comm_m` 组合已有加法规律并实际用于乘法后继步，不再单独归纳。
-  新 `mul_right_congr_m` 与已有同余接口一样，不要求 Q 或 PA。
-- `Model.Arithmetic.PA.Operations` 新增五条同名任意模型结论，仅消费对象推导的可靠性。
-  不对内部数域作宿主 Nat 归纳，不增加标准性、模型存在性或 Z₂ 前提。
-- 来源继续采用 Stage 3a 所列 `SecondOrderMultiplication.lean` 的数学路线；其原始 SHA-256 已复查未变。
-  迁入后改为句法证明优先，不搬入 donor 的模型背景或 BMS 依赖。
-- 两个算术入口的联合构建通过：61 jobs，退出码 0，零警告。首轮证据为 `stage3b-first-build.log`；
-  注释修订后的最终证据保存为 `stage3b-final-build.log`，以最终源码指纹为验收对象。
-- 当前 27 个 Lean 文件、1,965 行，比 Stage 3a 增加 174 行；最长模块仍为 242 行。
-  171 个公开声明的公理审计通过；依赖并集仅 `propext/Classical.choice/Quot.sound`。
-  `stage3b-axioms.log`／`stage3b-audit.json` 记录当前指纹，复跑使用 `audit_stage1.py stage3b`。
-- `stage3b-consumers.lean`／`stage3b-consumers-checked.log` 实测三项调用：分配律和结合律的 PA→Z₂ 推导传输，
-  以及任意 Z₂ 模型数域约化中的乘法结合律。退出码 0，无诊断；这些测试不进入正式库。
-- 仍仅验收算术依赖切片，未运行全仓 CI／native，未提交或推送，未修改旧 BMS 仓库。
-
-### Stage 3c 首批验收（2026-09-20）
-
-- `Logic.Arithmetic.Order` 用内部差值存在量词定义 `le_m`，以 `le_m (succ_m s) t` 定义 `lt_m`；
-  提供重命名、弱化和存在见证的引入／消去接口。没有扩张语言的非逻辑关系符号。
-- `Q.le_refl_m` 只要求 Q；`PA.zero_le_m` 和 `PA.le_trans_m` 要求 PA。
-  传递性先后引入两个新鲜内部见证，并用加法结合律合成它们；不限制见证为外部数码。
-- `Model.Arithmetic.le_sat_m`／`lt_sat_m` 对任意结构和 bound/free 环境给出精确语义，
-  不预设模型的序性质。消去、反对称性、全序性和最小化仍未完成。
-- 两个聚合入口联合构建通过：65 jobs、退出码 0、无警告。31 个 Lean 文件共 2,115 行；
-  186 个显式公开声明公理审计通过，依赖并集仅 `propext/Classical.choice/Quot.sound`。
-  无禁止依赖／占位证明，审计前后源码指纹相同。证据为 `stage3c-final-build.log` 和 `stage3c-audit.json`。
-- 可复跑检查已进入 `scripts/check_arithmetic.py`，现有 CI 在全源构建后执行它。
-  本地脚本运行通过；另验证遗漏报告、额外公理和 Lean 非零退出码都会拒绝验收。
-  脚本检查公开声明的传递公理依赖和分层依赖，不替代数学语义审查。
-- 本地全源枚举确认包含新增模块，但完整构建提前中断；不宣称全仓／native CI 已通过。
-
-### Stage 3d 验收（2026-09-20）
-
-- 对象层新增：`PA.Cancellation` 的左右消去和零和定理、`PA.le_antisymm_m`；
-  `PA.StrictOrder` 的后继保持／反映、严格序蕴含非严格序、严格传递与不可自返性。
-  Q 单独提供 `le_succ_m` 和 `lt_succ_m`，不为这些弱结论要求 PA。
-- 模型层新增七条任意 Q 模型运算接口、PA→Q 模型限制、PA 消去与偏序规律。
-  `PA.LinearOrder.le_total_m` 用含数量词的实际公式归纳证明全序性。
-- `Model.Arithmetic.PA.minimum_m` 对任意有限参数上下文 Δ、公式 φ 和环境 η，
-  从 φ 定义的数类非空推出内部最小元。新界变量通过提升重命名插入，证明原参数值不变。
-  不消费集合参数、外部良基性或任意宿主谓词归纳；全序性和最小元尚无独立 `Derives` 版本。
-- 复用旧库 `SecondOrderOrder.lean` 和 `SecondOrderMinimum.lean` 的数学路线，
-  SHA-256 分别为 `2246e4bbe577a9ac4c4d115806d39ba01cb1c03c640f0b0d7873d84bc3a4a817`、
-  `2131648443f2965c3e542f13b9368a896b263002fd41aec6e26efa461aa81e44`。
-  最小元从固定 Z₂ 集合成员关系推广成任意 PA 公式；没有复制旧类型类、Mathlib 或语言布尔 guard。
-- 两个入口联合 `--wfail` 构建通过：72 jobs、退出码 0、无警告；38 个 Lean 文件共 2,587 行。
-  224 个显式公开声明公理审计全通过，依赖并集仍仅三项标准公理；源码指纹前后一致。
-  证据为 `stage3d-final-build.log`、`stage3d-axioms.log`、`stage3d-audit.json`。
-- 验证范围仍为算术切片，尚无全仓 CI 通过结论。首批本地提交为 `acaa16c`；
-  上传采用个人 fork 的 `feat/arithmetic-theories` 分支及上游 PR，未直接修改上游主分支。
-
-### Stage 3e 验收（2026-09-20）
-
-- `Z2.Order` 提供任意混合上下文中的数序公式；模型层的数序直接复用 PA 数域约化。
-  `le_sat_m`／`lt_sat_m` 在不要求 Z₂ 模型性的任意结构上证明逐公式语义。
-- PA 与 Z₂ 的最小化共用 `PA.minimum_rule_m`。其宿主谓词参数 P 不享有自动归纳；
-  所需有界无见证归纳 `hI` 是显式前提，由两个最终 `minimum_m` 分别以实际公式填满。
-  `PA.minimum_le_m` 与 `minimum_unique_m` 则只讨论已给定候选的最小性，不假定任意 P 有最小元。
-- `Z2.minimum_m` 允许任意数／集量词和有限混合参数；`minimum_set_m` 给出非空内部数集最小元。
-  没有默认集域是外部幂集，没有将 PA 约化的公式限制套到 Z₂ 公式上。
-- `stage3e-mixed-consumer.log` 核验了同时带数参数 c 和集合参数 X 的
-  `n ∈ X ∧ c ≤ n` 最小化调用；退出码 0，无诊断。一次性消费者不进入正式库。
-- 两入口联合构建：75 jobs、退出码 0、无警告；41 个 Lean 文件共 2,712 行。
-  235 个公开声明公理审计全通过；标准三项依赖、禁止标记／依赖为空、前后指纹一致。
-  证据为 `stage3e-final-build.log`、`stage3e-audit.json`；仓库内审计脚本也已再次实际运行通过。
-- 来源继续采用 Stage 3d 所列最小元数学论证，改写为两种公式语言共用的证明规则。
-  全序性／最小化的独立对象推导及内部除法／配对／序列编码仍未完成；不标记 Stage 3 完成。
-
-### Stage 3f 验收（2026-09-20）
-
-- `Logic.Arithmetic.Division.graph_m` 用 `q*d+r=n ∧ r<d` 定义商余关系，不增加函数符号。
-  `Model.Arithmetic.PA.Division.graph_sat_m` 对任意结构、项和环境给出精确语义。
-- `exists_m` 对任意 PA 模型的内部 n、非零内部 d 证明商余数存在；归纳正文为实际双存在数公式。
-  `unique_m` 以商区间分离和加法消去证明唯一性；`exists_unique_m` 合并两者。
-  `divisor_ne_zero_m` 证明规范图关系本身排除零除数，因此非零条件不是可删除的装饰。
-- `PA.OrderedOperations` 只加入实际被除法证明消费的加法／乘法单调性和正性接口；
-  不复制旧库的全局半环／线序类型类，不使用 Mathlib 的 `ring` 或宿主 `Nat.div`。
-- 来源：旧 `SecondOrderDivision.lean`，SHA-256
-  `3ff85c3c439e7cc07cb190f17f35bf15bbd5515dcb61aaf331f495113bf7822c`。
-  新图接口可用于任意 bound/free 上下文；模型假设从旧 Z₂ 降至 PA，除数条件改成等价的显式非零条件。
-- 联合构建：78 jobs、退出码 0、无警告；44 个 Lean 文件共 2,857 行。
-  246 个公开声明公理审计全通过，只有标准三项依赖；源码指纹一致，禁止标记／依赖为空。
-  `stage3f-final-build.log`／`stage3f-audit.json` 和仓库内可复跑审计均通过。
-- `stage3f-z2-consumer.log` 验证在任意 Z₂ 模型的整个 PA 数域约化上调用商余唯一性，退出码 0。
-  这些仍是图的任意模型证明，独立对象推导及内部配对／序列编码尚未完成。
-
-### Stage 3g 验收（2026-09-21）
-
-- `Model.Arithmetic.Completeness` 和 `Z2.Completeness` 实际构造有限符号单射编码，
-  通过上游 `SyntaxNatCoding.schedule` 取得公平调度，再调用 `SemanticTransfer.derives_open_m`。
-  只消费全部零层一阶模型中的真值，不要求标准性／外部幂集，不添加反射公理。
-- `PA.Provability` 提供全序性、商余数存在／唯一／非零除数及最小化的原 `Derives` 结论；
-  `Z2.Provability.minimum_m` 保留任意混合上下文。接口均允许理论扩张及任意局部假设。
-  最小元模板与语义对应推广到任意签名 universe 和排序，不预设关系为序。
-- 两个 `Provability` 模块按需独立导入，不进入核心算术入口；Logic 仍不依赖 Model。
-  审计器改为导入并遍历全部算术模块，包含默认入口不可达模块，且识别公开 noncomputable 定义。
-- 两个核心入口及两个可选推导入口联合构建：106 jobs、退出码 0、无警告。
-  50 个 Lean 文件共 3,069 行；261 个公开声明公理审计通过，依赖并集仅标准三项。
-  107 个依赖模块，外部入口仅 Lean 与 Lean.Elab.Tactic.Omega；禁止标记／依赖为空，源码指纹一致。
-- `stage3g-final-build.log`、`stage3g-audit.json`、`stage3g-portable-audit.log` 为实际证据。
-  `stage3g-consumer.log` 检查了从局部除数非零推导商余存在，以及带数／集合参数的最小化调用。
-  更新后的审计脚本还通过正例及缺报告、异常公理、Lean 失败三个模拟负例；可选模块导入已断言覆盖。
-- 这些接口使用的是上游已证完备性，不是逐行构造的短 Hilbert 证书；完整仓库／native CI 仍未核验。
-  内部配对、序列编码及原始递归表示未完成，不据此宣布整个项目完成。
-
-### Stage 3h 验收（2026-09-21）
-
-- 固定平方分层配对：m<n 时为 n*n+m，否则为 m*m+m+n；实际图、正向存在、
-  反解存在及左右投影公式均只使用原四个函数和可定义序，没有增加新符号。
-- 任意 PA 模型中以实际反解存在公式归纳证明满射性；后继步沿平方层前进。
-  单射性通过平方区间界、相同编码的最大坐标相同、两个分支不碰撞证明。
-  `PA.Unpairing` 的选择函数仅是模型解释接口，图的存在／唯一性和双向复合已经证明。
-- `Model.Arithmetic.Pairing.Provability.total_m/functional_m` 对任意理论成立，不多加 PA 假设。
-  可选 `PA.PairingProvability` 提供反向满射／单射及左右投影总性／函数性的原 `Derives`。
-  `stage3h-consumer.log` 核验了 PA 推导翻译到 Z₂，以及任意 Z₂ 数域约化上的反配对复合。
-- 旧库来源文件及 SHA-256：
-  `SecondOrderPairing.lean`：`b097b993919532838766d14c4b9191b69e44bcaa5608c642203c5e7381364e1d`；
-  `SecondOrderPairingBounds.lean`：`3a4b774eaae005d7a6956fdf173588f939ea18c3db8b57b620c8c8638ebabcc3`；
-  `SecondOrderUnpairing.lean`：`01833e6004d40497955f95aafcb34a9f26126ba9758be5569a27bf963271054d`。
-  从 Z₂ 降至 PA，删除 Mathlib/typeclass/ring 依赖，所有模型参数保持显式。
-- 最终联合构建 113 jobs、退出码 0、无警告；57 个 Lean 文件共 3,453 行。
-  297 个公开声明公理审计通过，含非可计算模型函数；依赖仅标准三项，源码指纹一致。
-  `stage3h-final-build.log`、`stage3h-audit.json` 为实际证据；禁止标记／分层依赖为空。
-  全仓／native CI 尚未核验，内部有限序列及原始递归表示仍未完成。
-
-### Stage 3i 验收（2026-09-21）
-
-- `FiniteRange` 提供任意签名／排序的参数插入、唯一见证、截段函数性和值域界模板及语义对应。
-  φ 首槽是输出、次槽是输入；多层量词下保持全部原参数。比较关系在模板层不预设为序。
-- `Model.Arithmetic.PA.bound_m` 和 `Z2.bound_m` 分别对实际算术／混合参数公式证明：
-  若每个 i<N 有唯一输出，则所有这些输出有共同内部上界。N、i、输出与界均在模型数域。
-  共用 `PA.bound_rule_m` 的归纳前提由两个最终公式接口填满，不向任意宿主关系赠送归纳。
-- 改写旧 `SecondOrderFiniteRange.lean` 的数学路线，SHA-256
-  `ff42f6ad108a80f649e367f4bfa6067c7bd24bf5442a6b106d158d97e99e073e`。
-  原库先以理解补成全函数；新证明对 `n≤N → 界存在` 归纳，免去全函数补全及内部集合假设。
-- PA/Z₂ 的可选 `Provability.bound_m` 均有实际对象推导，允许任意局部上下文与长度项。
-  `stage3i-consumer.log` 验证了局部函数性推导界，以及带内部集合参数的模型调用。
-- 最终联合构建 117 jobs、退出码 0、无警告；61 个 Lean 文件共 3,676 行。
-  310 个显式公开声明审计通过，只含标准三项公理，禁止标记／依赖为空，源码指纹一致。
-  证据为 `stage3i-final-build.log` 和 `stage3i-audit.json`。全仓／native CI 仍未核验。
-- 尚未构造 β 序列编码或完成原始递归表示；不能把值域界解释为已经得到序列编码。
-
-### Stage 3j 验收（2026-09-21）
-
-- `Divisibility` 定义内部整除、正共同倍数和任意下界以上的共同倍数公式。
-  `Model.Arithmetic.PA.Divisibility` 对实际存在公式归纳，证明每个内部截段有这样的倍数；
-  长度及整除见证均为模型数，不使用宿主阶乘。`PA.Provability.common_multiple_m` 给出对象推导。
-- `Beta` 固定后继模数 `succ ((succ i)*c)`，直接复用商余图。
-  任意 PA 模型中的读取总性、唯一性、余数界以及 c=0 时模 1 的零余数均已证明；
-  可选 `PA.BetaProvability` 提供总性和唯一性的 `Derives`。这不是有限函数的编码存在性。
-- 数学路线来源为旧 `SecondOrderBetaSequence.lean`，原始 SHA-256
-  `1ff262a3ccc9fa007cf56d8d6c6dc6fc19218ca7422fa9febdd280b3dd251eec`。
-  共同倍数假设从 Z₂ 降到 PA；读取改为既有除法图，未复制旧 Mathlib 类型类或重复项构造。
-- `stage3j-final-build.log`：六个核心／可选入口联合构建，123 jobs，退出码 0、无警告。
-  67 个 Lean 文件、3,917 行；336 个显式公开声明的审计通过，公理依赖并集仅标准三项，
-  源码指纹前后一致，禁止标记／依赖为空。证据为 `stage3j-audit.json` 与可复跑审计日志。
-- `stage3j-consumer.log` 验证共同倍数推导向 Z₂ 翻译、局部上下文中 β 读取唯一性的实际消去，
-  以及任意 Z₂ 数域约化上的零参数读取。19 项缓存／发布脚本单元测试也通过，不能替代完整 Lean CI。
-- Stage 3i 已上传到上游 PR #1；远端工作流等待维护者批准。用户要求剩余工作完成后一次性上传，
-  因此本批及后续只在本地分批验收和提交，不逐批推送。
-
-### Stage 3k 验收（2026-09-21）
-
-- `PA.Modular` 构造模逆及保持旧余数的可逆增量；`PA.BetaModuli` 对特殊模数族证明所需逆元。
-  共同倍数、内部模数和见证均来自原 PA 数域；没有外部中国剩余定理或有限列表假设。
-- `PA.Beta.sequence_m` 对任意算术公式定义的内部有限函数构造 β 码；`Z2.Beta.sequence_m`
-  保留任意混合公式及集合参数。两个最终入口都用实际公式归纳填满抽象前缀规则的归纳义务。
-  两种语言共用前缀与编码公式的通用语义模板，不把 Z₂ 的理解域当成外部幂集。
-- PA／Z₂ 的可选 `BetaProvability.sequence_m` 给出截段函数性蕴含编码存在性的原 `Derives`；
-  长度为任意内部项，理论扩张及局部上下文均保留。外部消费者验证了局部前提消去和真实集合参数。
-- 来源仍为 Stage 3j 登记的 `SecondOrderBetaSequence.lean`；重建特殊模数论证及公式归纳，
-  去除 Mathlib、全局代数实例和 BMS 符号。该批没有改变远端分支。
-- `stage3k-final-build.log`：136 jobs，退出码 0、无警告；80 个 Lean 文件、4,582 行。
-  `stage3k-audit.json`：374 个显式公开声明全部覆盖，公理依赖并集仅标准三项，
-  137 个依赖模块，禁止标记／依赖为空，源码指纹一致；可复跑审计和消费者也通过。
-- Stage 3 的内部有限编码合同至此完成；有限计算历史和七构造原始递归表示仍属 Stage 4，尚未完成。
-  全仓／远端 CI 尚未通过核验，不能将本批局部证据当成整个项目完成。
-
-### 后续：有限历史与递归表示
-
-核心可作为第一批贡献通过个人 fork 的独立分支提交上游 PR；用户已授权此流程，内部编码不阻塞核心交付。
-
-1. 内部共同倍数、特殊模数增量及 PA／Z₂ 的 β 序列编码已完成。
-2. 接入有限历史编码；除数非零等前提显式保留，内部长度与见证不得换成外部数码。
-3. 原始递归表示以这些图的对象推导为基础；模型内部长度不换成宿主 Nat 或有限列表。
-   超过未提交 3,000 行门槛前完成当前批次验收并提交；不直接推送上游主分支或自行合并 PR。
+全仓／原生构建正在核验，当前不能据算术切片通过宣称全仓 CI 通过。
+上游 PR #1 保持审查流程，不直接推送上游 main、不自行合并；剩余成果完成验收后统一更新。

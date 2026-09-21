@@ -14,6 +14,8 @@ import YesMetaZFC.Logic.Arithmetic.Z2.Induction
 import YesMetaZFC.Logic.Arithmetic.Z2.Order
 import YesMetaZFC.Logic.Arithmetic.Z2.Beta
 import YesMetaZFC.Logic.Arithmetic.PA.Interpretation
+import YesMetaZFC.Logic.Arithmetic.PrimitiveRecursive.Formula
+import YesMetaZFC.Logic.Arithmetic.PrimitiveRecursive.Closure
 
 /-! # 算术理论入口：Q、PA、Z₂ 及其对象推导
 

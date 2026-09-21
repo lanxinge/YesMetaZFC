@@ -34,6 +34,11 @@ are recorded in [TROPHIES.md](markdown/TROPHIES.md) and [NAT_DECODING.md](markdo
 
 ## Explore the infrastructure
 
+The independent arithmetic library provides Q, PA, and Z₂ axiom schemas and derivations,
+internal finite coding, and representation and provable totality for each externally given
+primitive-recursive program. Import `YesMetaZFC.Logic.Arithmetic` or
+`YesMetaZFC.Model.Arithmetic`; see the [arithmetic interfaces and scope](markdown/ARITHMETIC_STATUS.md).
+
 Repository guides other than README files are collected in [markdown/](markdown/).
 
 The existing development connects typed syntax and substitution, formal proof systems,

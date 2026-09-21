@@ -16,5 +16,7 @@ import YesMetaZFC.Model.Arithmetic.Z2.Reduct
 import YesMetaZFC.Model.Arithmetic.Z2.Minimum
 import YesMetaZFC.Model.Arithmetic.Z2.FiniteRange
 import YesMetaZFC.Model.Arithmetic.Z2.Beta
+import YesMetaZFC.Model.Arithmetic.PrimitiveRecursive.Standard
+import YesMetaZFC.Model.Arithmetic.Z2.PrimitiveRecursive
 
 /-! # 算术模型入口：任意结构上的可定义归纳与标准模型 -/

@@ -15,6 +15,10 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 
 ## 环境与构建
 
+独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
+表示和可证总性。入口为 `YesMetaZFC.Logic.Arithmetic`、`YesMetaZFC.Model.Arithmetic`；
+精确接口、理论边界和来源见 [算术子库](markdown/ARITHMETIC_STATUS.md)。
+
 工具链固定为 **Lean 4.33.1**，见 [lean-toolchain](lean-toolchain)。在项目根目录运行：
 
 ```bash

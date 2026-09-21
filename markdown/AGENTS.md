@@ -11,6 +11,7 @@
 | 纯定义、阶段扩张与原规格 | [ELIMINATION.md](ELIMINATION.md) |
 | 原公理覆盖、模型对应、Rosser／Löb／哥二／Tarski 与可信依赖 | [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
 | 成果入口、命名规范 | [TROPHIES.md](TROPHIES.md)、[ProofNaming.md](ProofNaming.md) |
+| Q／PA／Z₂、内部编码、原始递归表示 | [ARITHMETIC_STATUS.md](ARITHMETIC_STATUS.md)、[ARITHMETIC_PLAN.md](ARITHMETIC_PLAN.md) |
 
 裸 ZFC Rosser 实例已经完成：`PureRosser.agreement` 有实际证明，
 `PureRosser.independent` 仅假定裸 ZFC 一致。相关重构必须保留这一终点、
