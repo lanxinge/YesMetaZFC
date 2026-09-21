@@ -1,7 +1,8 @@
 # 算术子库：完成合同与后续路线
 
 本轮 Stage 0–4 的数学实现已完成，接口、来源哈希和验证证据集中于
-[ARITHMETIC_STATUS.md](ARITHMETIC_STATUS.md)。全仓／原生验证及最终 PR 更新仍在收尾。
+[ARITHMETIC_STATUS.md](ARITHMETIC_STATUS.md)。本地算术审计和全仓／原生构建已通过；
+GitHub 多平台 CI 与维护者审查独立进行，不以本地通过代替。
 上游基点为 `039c8e132cc19671d73a3933c66b4799d2599dd6`；
 贡献通过个人 fork 的独立分支和上游 PR #1，不修改旧 BMS 发布资源。
 

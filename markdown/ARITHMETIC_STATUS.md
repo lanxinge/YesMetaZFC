@@ -134,5 +134,13 @@ CI 枚举全部独立模块（包括可选 Provability），随后执行算术�
 `stage4a-final-build.log`、`stage4a-consumer.log`、`stage4a-audit.json`、`stage4a-portable-audit.log`。
 一次性消费者与失败日志不进入正式库；历史分批证据仍保留在该目录。
 
-全仓／原生构建正在核验，当前不能据算术切片通过宣称全仓 CI 通过。
-上游 PR #1 保持审查流程，不直接推送上游 main、不自行合并；剩余成果完成验收后统一更新。
+全仓／原生构建已在 Windows 上通过：枚举 1,100 个 Lean 模块及其原生对象，
+并校验静态库、共享库与扫描器。原有模块复用上游基点的官方 full 缓存，
+先在独立基线核对提交、平台、工具链、源码指纹、归档 SHA-256 及全部 no-build 目标；
+确认本次未修改上游原有 Lean 源码或构建配置后，只补入缺失产物，不覆盖本地产物。
+新增算术证明在本机编译；这不是一次完整冷构建。证据为 `complete-native-cached-build.log`。
+
+扫描器帮助与单目标扫描均正常退出；实际目标 `SetTheory.Ordinal.transitive` 的结果仍是
+`not_closed`，不把工具运行成功解释为新增自动证明能力。19 项缓存／发布脚本测试通过。
+本地验证不替代 GitHub 多平台 CI；远端工作流仍受维护者的 fork 运行批准控制。
+贡献通过现有上游 PR #1，不直接推送上游 main、不自行合并。

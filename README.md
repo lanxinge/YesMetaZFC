@@ -13,11 +13,13 @@ YesMetaZFC 在 Lean 4 中发展一阶逻辑、集合论与元数学的形式化�
 Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义版覆盖任意裸 ZFC
 模型和每组有限参数赋值。准确的公式范围、编码约定与声明见 [TROPHIES.md](markdown/TROPHIES.md)。
 
-## 环境与构建
+## 算术理论
 
 独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
 表示和可证总性。入口为 `YesMetaZFC.Logic.Arithmetic`、`YesMetaZFC.Model.Arithmetic`；
 精确接口、理论边界和来源见 [算术子库](markdown/ARITHMETIC_STATUS.md)。
+
+## 环境与构建
 
 工具链固定为 **Lean 4.33.1**，见 [lean-toolchain](lean-toolchain)。在项目根目录运行：
 
