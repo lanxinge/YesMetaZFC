@@ -5,3 +5,12 @@ Licensed under the Apache License, Version 2.0.
 See LICENSE for the full license text.
 
 Project: https://github.com/lanxinge/YesMetaZFC
+
+The arithmetic library includes modified material from BMS-Well-Ordering-Lean.
+Copyright 2026 EgoFakeFantasy and the BMS-Well-Ordering-Lean contributors.
+Licensed under the Apache License, Version 2.0.
+Project: https://github.com/EgoFakeFantasy/BMS-Well-Ordering-Lean
+
+The material has been separated from the BMS-specific language and refactored
+into independent arithmetic syntax, Q/PA/Z2 derivations, and model semantics.
+Source provenance and modification details: markdown/ARITHMETIC_STATUS.md.
