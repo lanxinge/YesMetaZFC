@@ -249,11 +249,6 @@ theorem generated_proper_of_fip_l {α : Type u} {base : Filter.SetFamily α}
   rcases hbase xs hxs with ⟨x, hx⟩
   exact hsub hx
 
-/-- An ultrafilter is a proper filter deciding every subset or its complement. -/
-structure IsUltrafilter {α : Type u} (F : Filter α) : Prop where
-  proper : Proper F
-  decides : ∀ s : α → Prop, F.sets s ∨ F.sets (Complement s)
-
 /-- 真滤子不能同时包含一个集合及其补集。 -/
 theorem not_complement_mem_of_proper_l {α : Type u} {F : Filter α}
     (hF : Proper F) {s : α → Prop} (hs : F.sets s) :
@@ -264,12 +259,6 @@ theorem not_complement_mem_of_proper_l {α : Type u} {F : Filter α}
   intro x hx
   exact hx.2 hx.1
 
-/-- 超滤对子集与补集的判定是互斥的。 -/
-theorem IsUltrafilter.not_both_l {α : Type u} {F : Filter α}
-    (hF : IsUltrafilter F) {s : α → Prop} (hs : F.sets s) :
-    ¬ F.sets (Complement s) :=
-  not_complement_mem_of_proper_l hF.proper hs
-
 /-- Containment of the underlying families of two filters. -/
 def Extends {α : Type u} (F G : Filter α) : Prop :=
   ∀ s, F.sets s → G.sets s
@@ -278,20 +267,8 @@ def Extends {α : Type u} (F G : Filter α) : Prop :=
 def IsMaximalProper {α : Type u} (F : Filter α) : Prop :=
   Proper F ∧ ∀ G, Extends F G → Proper G → ∀ s, G.sets s → F.sets s
 
-/-- The decision property implies maximality among proper filters; the proof constructs
-no new data and uses no choice principle. -/
-theorem IsUltrafilter.isMaximalProper_l {α : Type u} {F : Filter α}
-    (hF : IsUltrafilter F) : IsMaximalProper F := by
-  refine ⟨hF.proper, ?_⟩
-  intro G hFG hG s hs
-  rcases hF.decides s with h | h
-  · exact h
-  · have hComp : G.sets (Complement s) := hFG _ h
-    apply False.elim
-    apply hG
-    apply G.upward (G.inter_mem hs hComp)
-    intro x hx
-    exact hx.2 hx.1
+/-- 超滤定义为极大真滤子；补集判定留给单独的经典命题定理。 -/
+abbrev IsUltrafilter {α : Type u} (F : Filter α) : Prop := IsMaximalProper F
 
 end Filter
 end SetTheory
