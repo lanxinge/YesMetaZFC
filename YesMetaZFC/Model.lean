@@ -4,6 +4,7 @@ import YesMetaZFC.Model.Infinitary
 import YesMetaZFC.Model.SecondOrder.Full
 import YesMetaZFC.Model.Semantics
 import YesMetaZFC.Model.Boolean.Native
+import YesMetaZFC.Model.Ultrapower
 
 /-! # 通用模型论入口
 

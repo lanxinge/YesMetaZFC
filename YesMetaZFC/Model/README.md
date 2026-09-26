@@ -24,6 +24,8 @@
 | [子结构](FirstOrder/Substructure.lean) | `Substructure_m` 给出各排序非空且函数封闭的子集；`structure_m`、`incl_m` 实际构造限制结构和包含映射。其 `tarski_vaught_m` 使用原模型环境及参数归属，直接供 hull 的见证封闭证明调用。 |
 | [任意指标闭包](Closure.lean) | `RuleFamily_l` 不依赖逻辑语言，支持任意排序、载体、规则及输入指标 universe；`Closure_l` 是实际归纳闭包。给出最小性、单调性、幂等性、重编号、任意规则族合并及任意生成族的闭包公式。 |
 | [Skolem 壳](FirstOrder/Skolem.lean) | `Skolem_m` 显式携带存在成立时的见证函数；`hull_m` 对任意多排序签名、原结构及生成子集构造同层初等子结构。`hull_with_m` 还可同时封闭任意额外规则族，不要求其运算属于原语言。 |
+| [约化积与 Łoś](ReducedProduct/Los.lean) | 任意签名及同层结构族的截面商，有限参数无选择地下降。`los_m` 明确消费见证拼接条件，`los_iff_witness_m` 证明此条件恰好必要充分。 |
+| [同层超幂](Ultrapower.lean) | 恒定结构族的实际超幂，输入与输出 `Structure` 层级相同；对角嵌入、条件初等性、理论保持及主超幂的显式同构，不限于隶属语言。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
@@ -165,6 +167,40 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 `python scripts/check_elementary.py` 检查整个闭包、初等子结构与 Skolem 切片的实际声明，
 并对闭包及壳的数据定义严格排除 `Classical.choice`；初等性继承 Tarski–Vaught 的 Prop
 经典推理。没有新增公理、`noncomputable` 或原生计算可信依赖。
+
+### 超幂与 Łoś 的调用边界
+
+最小导入为 `YesMetaZFC.Model.Ultrapower`；公开接口位于
+`YesMetaZFC.Logic.FirstOrder.Ultrapower` 和 `ReducedProduct`。任意签名的排序、函数
+和关系均使用原生类型化 AST，模型不要求满足 ZF、可数、传递或外部良基。
+
+- 固定 `I : Type x` 与 `ℳ : Structure.{u,v,w,max x y} σ` 后，
+  `Ultrapower.structure_m ℳ U` 的结果仍是同一个 `Structure.{u,v,w,max x y} σ`。
+  输入已处于该层，并非输出时才升层；同层指标和较小指标都可直接调用。
+  无 `ULift`、`Shrink` 或提高模型载体的隐式包装。任意更高 universe 的指标不在
+  此固定域内：其全函数空间通常更大，不能同时无条件承诺“任意更大指标”和“不升层”。
+- 只给滤子即可构造约化积，真滤子给出 `diagonal_m`。超滤加 `Witness_m` 给出
+  `diagonal_elementary_m` 与 `models_iff_m`。理论可以是任意闭句集合。
+- 一般结构族 `ℳ : I → Structure ...` 使用 `ReducedProduct.structure_m`，并显式
+  提供 `Nonempty_m ℳ`（逐排序的截面空间非空）。逐点非空在无选择背景下不足以
+  自动取得该条件；恒定结构族的超幂已无选择地证明该条件。
+- `Germ_l` 以滤子意义下相等为等价关系。有限参数列通过 `map₂_l` 递归装配，函数
+  和关系直接商消去；`env_surjective_m` 仅在 Prop 中逐项回拉有限环境，不定义
+  全商的代表元函数。因此 `los_m` 的截面环境形式覆盖所有有限商参数。
+- `Witness_m` 只要求原公式在大集上逐点存在时，有一个截面在大集上见证。
+  `los_iff_witness_m` 证明它与完整 Łoś 等价，不自动从超滤性推出。
+  可以传入 `WitnessData_m` 的显式全域见证运算，经 `witness_of_data_m` 获得条件；
+  或显式假定本指标及载体上的 `Choice_m`，经 `witness_of_choice_m` 使用。
+  未用宿主 `Classical.choose` 或全局选择公理自动填充这些前提。
+- 指定点的主超滤 `Filter.point_l i` 无需额外选择条件：`principal_witness_m`
+  已证明见证拼接；`principal_iso_m` 实际构造原模型与主超幂的同构，其逆由指定点
+  的商求值 `evaluation_m` 给出，不从满射选逆。
+- 当前是原 AST 与宿主 Tarski 语义的同层超幂，不宣称完成任意非标准 ZF 模型内部
+  编码的超幂，也没有声称任意非主超幂外部良基或自动存在 Mostowski 坍缩。
+
+`python scripts/check_ultrapower.py` 审计全部五个新模块的实际声明与构造性端点，已接入
+CI。商数据使用 `propext` / `Quot.sound`，不使用选择；Łoś 和对角嵌入的 Prop 证书
+使用经典逻辑，单看整个含证明结构的公理列表不能误判为选择了 Type 数据。
 
 ## 可选的二阶接口
 
