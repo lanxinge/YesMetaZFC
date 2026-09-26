@@ -9,6 +9,9 @@ import Std
 
 有限基生成只保存一个显式有限列表作证。有限交性质因此给出生成滤子为真的
 构造性充分条件，不需要 Zorn 引理或选择公理。
+
+本文件仅作宿主层辅助；任意 ZF 模型内部的集合滤子使用 `Filter.Internal`
+与 `Filter.Extension`。外部谓词族不能充当非标准模型的内部幂集。
 -/
 
 namespace YesMetaZFC
@@ -325,6 +328,11 @@ theorem ultrafilter_double_neg_mem_or_complement_l {α : Type u} {F : Filter α}
     intro x hx
     exact hx.2
   exact hNo (Or.inl (hF.2 G hFG hGProper s hsG))
+
+/-- 经典逻辑中的完整二择性质；经典性仅用于命题证明，不生成选择数据。 -/
+theorem ultrafilter_decides_l {α : Type u} {F : Filter α} (hF : IsUltrafilter F)
+    (s : α → Prop) : F.sets s ∨ F.sets (Complement s) :=
+  Classical.not_not.mp (ultrafilter_double_neg_mem_or_complement_l hF s)
 
 end Filter
 end SetTheory

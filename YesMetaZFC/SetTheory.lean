@@ -7,6 +7,8 @@ import YesMetaZFC.SetTheory.Ord
 import YesMetaZFC.SetTheory.Card
 import YesMetaZFC.SetTheory.Collection
 import YesMetaZFC.SetTheory.Filter.Tarski
+import YesMetaZFC.SetTheory.Filter.Extension
+import YesMetaZFC.SetTheory.Boolean.Filter
 import YesMetaZFC.Model.SetTheory.Infinitary
 import YesMetaZFC.SetTheory.Notation
 import YesMetaZFC.SetTheory.Axioms.Common

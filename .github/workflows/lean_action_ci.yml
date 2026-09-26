@@ -83,6 +83,8 @@ jobs:
           python scripts/check_arithmetic.py
       - name: Check scanner
         run: lake --no-build exe prove_auto_sweep --help
+      - name: Audit filters and Boolean completion
+        run: python scripts/check_filters.py
       - name: Pack Lean and full caches
         run: |
           python scripts/lean_cache.py pack --kind lean

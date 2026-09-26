@@ -277,16 +277,15 @@ namespace KP
 /-- KP 模型中存在空集。 -/
 theorem exists_empty {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) :
     ∃ empty, ∀ value, ¬ ℳ.mem value empty := by
-  let free : FreeVarId → ℳ.Domain := fun _ =>
-    Classical.choice ℳ.nonempty
+  obtain ⟨a⟩ := ℳ.nonempty
+  let free : FreeVarId → ℳ.Domain := fun _ => a
   exact (Axioms.satisfies_emptySet_iff free).mp <|
     hKP.2 Axioms.emptySet Axiom.emptySet free
 /-- KP 模型中任意两个对象都有无序对。 -/
 theorem exists_pair {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) (left right : ℳ.Domain) :
     ∃ pair, ∀ value,
       ℳ.mem value pair ↔ value = left ∨ value = right := by
-  let free : FreeVarId → ℳ.Domain := fun _ =>
-    Classical.choice ℳ.nonempty
+  let free : FreeVarId → ℳ.Domain := fun _ => left
   have hPairing := (Axioms.satisfies_pairing_iff free).mp <|
       hKP.2 Axioms.pairing Axiom.pairing free
   rcases hPairing left right with ⟨pair, hPair⟩
@@ -315,8 +314,7 @@ theorem exists_union {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) (fami
     ∃ union, ∀ value,
       ℳ.mem value union ↔
         ∃ member, ℳ.mem member family ∧ ℳ.mem value member := by
-  let free : FreeVarId → ℳ.Domain := fun _ =>
-    Classical.choice ℳ.nonempty
+  let free : FreeVarId → ℳ.Domain := fun _ => family
   exact (Axioms.satisfies_union_iff free).mp (hKP.2 Axioms.union Axiom.union free) family
 /-- KP 模型中可以向一个集合插入单个对象。 -/
 theorem exists_insert {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP) (set value : ℳ.Domain) :
@@ -361,8 +359,7 @@ namespace ZF
 /-- ZF 模型中任意集合都有幂集。 -/
 theorem exists_powerSet {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF) (set : ℳ.Domain) :
     ∃ power, ℳ.IsPowerSetOf power set := by
-  let free : FreeVarId → ℳ.Domain := fun _ =>
-    Classical.choice ℳ.nonempty
+  let free : FreeVarId → ℳ.Domain := fun _ => set
   have hPowerSet := (Axioms.satisfies_powerSet_iff free).mp <|
       hZF.2 Axioms.powerSet Axiom.powerSet free
   rcases hPowerSet set with ⟨power, hPower⟩
