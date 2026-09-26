@@ -20,6 +20,8 @@
 | [可选谓词域](Semantics/Predicates.lean) | `Predicate_domain` 分离关系对象与背景谓词。`Full` 相对于该谓词域，`Formula_closed` 只要求覆盖标准公式像；两者都不属于基础模型的必填条件。Native 实例直接消费原 Henkin 关系域。 |
 | [完整二阶默认实例](SecondOrder/Full.lean) | `Full.structure_of` 使用原载体上的全部谓词，关系域保持 `Type (max u x)`；`predicate_full` 证明其满性，`satisfies_iff` 对所有对象量词、关系量词及联结词连接原 Full 语义。 |
 | [普通结构映射](FirstOrder/Morphism.lean) | `Env.map` 只要载体映射，`Fn_map` 只要函数保持，`Str_emb` 另要求单射与关系双向保持；`formula_iff`、`models_iff` 只另消费满射。`Str_iso` 携带显式逆映射，不通过不可计算选择构造逆。 |
+| [初等嵌入](FirstOrder/Elementary.lean) | `Str_emb.Elementary_m` 保持任意有限参数下的全部公式；`tarski_vaught_m` 等价于目标见证可取在像中。无需满射、可数性、模型论完备性或选择函数。 |
+| [子结构](FirstOrder/Substructure.lean) | `Substructure_m` 给出各排序非空且函数封闭的子集；`structure_m`、`incl_m` 实际构造限制结构和包含映射。其 `tarski_vaught_m` 使用原模型环境及参数归属，直接供 hull 的见证封闭证明调用。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
@@ -126,8 +128,13 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 已落地 `Fn_map`、`Str_emb`、`Str_iso`，并整层迁移 `LevyEmbedding` 的对应消费者。
 正向关系同态、专门的无量词片段接口仍可按实际使用需求添加；不把这些未来接口计为已实现。
 
-初等嵌入、子结构与 Tarski–Vaught 等通用工具可在该层上发展，但不作为图模型或
-布尔值一致性证明的强制前置。尤其不把一般模型存在问题改道到可数 Henkin 枚举。
+初等嵌入及子结构的 Tarski–Vaught 判据已落地。后续 Skolem hull 只需先给出实际
+非空、函数封闭子结构，再证明 `Substructure_m.WitnessClosed_m`：对该子集内的任意有限
+参数，原模型满足的存在公式在子集中有见证。`tarski_vaught_m` 即给出初等性；
+`term_mem_m` 提供项闭包，`elementary_inclusion_m` 处理同一模型中嵌套的初等子结构。
+判据证明中的经典反证只留在 Prop；限制结构、环境和包含映射均不选择数据。
+本接口针对原 AST 与默认 Tarski 语义，不声称非标准内部公式码的初等性，也尚未构造
+Skolem 函数或 hull。它不作为图模型、布尔值一致性或一般模型存在问题的强制前置。
 
 ## 可选的二阶接口
 

@@ -1,6 +1,8 @@
 import YesMetaZFC.Model.FirstOrder.FreeVariableSupport
 import YesMetaZFC.Model.FirstOrder.LevyAbsoluteness
 import YesMetaZFC.Model.FirstOrder.Morphism
+import YesMetaZFC.Model.FirstOrder.Elementary
+import YesMetaZFC.Model.FirstOrder.Substructure
 import YesMetaZFC.Model.FirstOrder.Semantics
 import YesMetaZFC.Model.FirstOrder.Soundness
 import YesMetaZFC.Model.FirstOrder.SubstitutionSemantics

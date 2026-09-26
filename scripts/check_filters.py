@@ -46,18 +46,20 @@ def names(values):
     return "#[" + ", ".join("`" + value for value in values) + "]"
 
 
-def main():
-    files = [ROOT / (m.replace(".", "/") + ".lean") for m in MODULES]
+def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
+         label="FILTER_GUARD_PASS"):
+    """复用声明级审计；各数学切片显式传入模块及其可信边界。"""
+    files = [ROOT / (m.replace(".", "/") + ".lean") for m in modules]
     hashes = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     env = {**os.environ, "LEAN_NUM_THREADS": "1"}
-    result = subprocess.run(["lake", "--wfail", "build", *MODULES], cwd=ROOT, env=env)
+    result = subprocess.run(["lake", "--wfail", "build", *modules], cwd=ROOT, env=env)
     if result.returncode:
         return result.returncode
     guard = f'''
 run_cmd do
   let env ← Lean.getEnv
-  let selected : Array Lean.Name := {names(MODULES)}
-  let allowed : Array Lean.Name := {names(BASELINE + ["propext", "Quot.sound", "Classical.choice"])}
+  let selected : Array Lean.Name := {names(modules)}
+  let allowed : Array Lean.Name := {names(baseline + ["propext", "Quot.sound", "Classical.choice"])}
   let mut count : Nat := 0
   let mut modules : Nat := 0
   for i in [0 : env.header.moduleNames.size] do
@@ -73,20 +75,20 @@ run_cmd do
       for a in ← Lean.collectAxioms c.name do
         unless allowed.contains a do throwError "未知公理: {{c.name}} → {{a}}"
   unless modules == selected.size do throwError "审计模块遗漏: {{modules}}"
-  let strict : Array Lean.Name := {names(CHOICE_FREE)}
+  let strict : Array Lean.Name := {names(choice_free)}
   for n in strict do
     let axioms ← Lean.collectAxioms n
     if axioms.contains `Classical.choice then throwError "构造性端点退化: {{n}}"
     Lean.logInfo m!"CHOICE_FREE: {{n}}; {{axioms}}"
-  Lean.logInfo m!"FILTER_GUARD_PASS: {{modules}} modules, {{count}} declarations"
+  Lean.logInfo m!"{label}: {{modules}} modules, {{count}} declarations"
 '''
-    source = "import Lean\n" + "\n".join("import " + m for m in MODULES) + "\n" + guard
+    source = "import Lean\n" + "\n".join("import " + m for m in modules) + "\n" + guard
     result = subprocess.run(["lake", "env", "lean", "--stdin"], input=source,
                             cwd=ROOT, env=env, capture_output=True, encoding="utf-8", errors="replace")
     print(result.stdout + result.stderr, end="")
     changed = [str(p.relative_to(ROOT)) for p in files
                if hashlib.sha256(p.read_bytes()).hexdigest() != hashes[p]]
-    if result.returncode or "FILTER_GUARD_PASS:" not in result.stdout or changed:
+    if result.returncode or label + ":" not in result.stdout or changed:
         print(f"FAIL: exit={result.returncode}, changed={changed}", file=sys.stderr)
         return 1
     print("PASS: no new axioms or noncomputable data; all strict endpoints remain choice-free")
