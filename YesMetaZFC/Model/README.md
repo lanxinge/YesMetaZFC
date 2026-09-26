@@ -22,6 +22,8 @@
 | [普通结构映射](FirstOrder/Morphism.lean) | `Env.map` 只要载体映射，`Fn_map` 只要函数保持，`Str_emb` 另要求单射与关系双向保持；`formula_iff`、`models_iff` 只另消费满射。`Str_iso` 携带显式逆映射，不通过不可计算选择构造逆。 |
 | [初等嵌入](FirstOrder/Elementary.lean) | `Str_emb.Elementary_m` 保持任意有限参数下的全部公式；`tarski_vaught_m` 等价于目标见证可取在像中。无需满射、可数性、模型论完备性或选择函数。 |
 | [子结构](FirstOrder/Substructure.lean) | `Substructure_m` 给出各排序非空且函数封闭的子集；`structure_m`、`incl_m` 实际构造限制结构和包含映射。其 `tarski_vaught_m` 使用原模型环境及参数归属，直接供 hull 的见证封闭证明调用。 |
+| [任意指标闭包](Closure.lean) | `RuleFamily_l` 不依赖逻辑语言，支持任意排序、载体、规则及输入指标 universe；`Closure_l` 是实际归纳闭包。给出最小性、单调性、幂等性、重编号、任意规则族合并及任意生成族的闭包公式。 |
+| [Skolem 壳](FirstOrder/Skolem.lean) | `Skolem_m` 显式携带存在成立时的见证函数；`hull_m` 对任意多排序签名、原结构及生成子集构造同层初等子结构。`hull_with_m` 还可同时封闭任意额外规则族，不要求其运算属于原语言。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
@@ -128,13 +130,41 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 已落地 `Fn_map`、`Str_emb`、`Str_iso`，并整层迁移 `LevyEmbedding` 的对应消费者。
 正向关系同态、专门的无量词片段接口仍可按实际使用需求添加；不把这些未来接口计为已实现。
 
-初等嵌入及子结构的 Tarski–Vaught 判据已落地。后续 Skolem hull 只需先给出实际
+初等嵌入及子结构的 Tarski–Vaught 判据已落地。Skolem hull 先通过规则闭包给出实际
 非空、函数封闭子结构，再证明 `Substructure_m.WitnessClosed_m`：对该子集内的任意有限
-参数，原模型满足的存在公式在子集中有见证。`tarski_vaught_m` 即给出初等性；
+参数，原模型满足的存在公式在子集中有指定见证。`tarski_vaught_m` 即给出初等性；
 `term_mem_m` 提供项闭包，`elementary_inclusion_m` 处理同一模型中嵌套的初等子结构。
 判据证明中的经典反证只留在 Prop；限制结构、环境和包含映射均不选择数据。
-本接口针对原 AST 与默认 Tarski 语义，不声称非标准内部公式码的初等性，也尚未构造
-Skolem 函数或 hull。它不作为图模型、布尔值一致性或一般模型存在问题的强制前置。
+本接口针对原 AST 与默认 Tarski 语义，不声称非标准内部公式码的初等性。
+它不作为图模型、布尔值一致性或一般模型存在问题的强制前置。
+
+### Skolem 壳的调用与选择边界
+
+最小导入为 `YesMetaZFC.Model.FirstOrder.Skolem`，数学接口位于
+`YesMetaZFC.Logic.FirstOrder.Skolem_m`；底层闭包只需导入 `YesMetaZFC.Model.Closure`，
+不依赖 Mathlib、集合论或一阶语法。
+
+- 调用方给出 `F : Skolem_m ℳ`，以及任意生成谓词 `A : ∀ s, ℳ.Carrier s → Prop`。
+  `F.hull_m A` 是实际 `Substructure_m ℳ`，`F.hull_elementary_m A` 证明初等性；
+  `hull_models_iff_m` 对任意理论传输模型性，不限于 ZF 或 ZFC。
+- `F.witness φ ρ h` 只在 `h : ∃ a, ...` 时返回数据；正确性由 `F.satisfies` 认证。
+  不从原结构非空性选择默认对象。即使 `A` 为空，各排序仍有真公式的指定见证。
+- `seed_mem_m`、`hull_le_m`、`hull_mono_m`、`hull_idem_m` 给出闭包公理；最小性
+  针对同一套指定 Skolem 规则，不是说原结构有一个与见证选择无关的最小初等子模型。
+- 任意索引生成族可取 `fun s a => ∃ i, A i s a`，`hull_union_iff_m` 连接逐项闭包。
+  任意额外运算族先用 `RuleFamily_l.of_operations_l` 装配，再交给 `hull_with_m`；
+  `hull_with_closed_m`、`hull_with_le_m`、`hull_with_elementary_m` 分别证明双重封闭、
+  最小性和初等性。规则族也可用 `union_l` 任意合并或用 `reindex_l` 重编号。
+- 签名的三个 universe、结构载体 universe、额外指标及输入指标 universe 独立多态。
+  载体始终是原载体的子类型；合并不同大小的输入族只提升输入指标，不提升模型域。
+  底层允许无限元规则，因此没有无条件声称 ω 步闭包或 Löwenheim–Skolem 基数界。
+- 没有无条件证明每个结构都有 `Skolem_m`，也没有把该见证数据从 Prop 选择出来。
+  调用方需提供显式/可定义的见证系统，或另行证明所需选择原则及存在性。
+  此处尚不是任意非标准 ZF 模型内部集合编码的壳构造；内部化须另有内部语法和满足关系。
+
+`python scripts/check_elementary.py` 检查整个闭包、初等子结构与 Skolem 切片的实际声明，
+并对闭包及壳的数据定义严格排除 `Classical.choice`；初等性继承 Tarski–Vaught 的 Prop
+经典推理。没有新增公理、`noncomputable` 或原生计算可信依赖。
 
 ## 可选的二阶接口
 

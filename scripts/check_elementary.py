@@ -7,7 +7,9 @@ import sys
 
 from check_filters import main
 
-MODULES = ["YesMetaZFC.Model.FirstOrder." + m for m in ("Elementary", "Substructure")]
+MODULES = ["YesMetaZFC.Model.Closure"] + [
+    "YesMetaZFC.Model.FirstOrder." + m for m in ("Elementary", "Substructure", "Skolem")
+]
 PREFIX = "YesMetaZFC.Logic.FirstOrder."
 CHOICE_FREE = [PREFIX + "Str_emb." + n for n in (
     "Elementary_m", "WitnessClosed_m", "witness_of_elementary_m",
@@ -17,6 +19,15 @@ CHOICE_FREE = [PREFIX + "Str_emb." + n for n in (
     "structure_m", "incl_m", "Params_m", "restrict_m", "map_restrict_m", "params_map_m",
     "term_mem_m", "Elementary_m", "WitnessClosed_m", "models_iff_m",
     "inclusion_m", "elementary_inclusion_m",
+)] + ["YesMetaZFC.Model.RuleFamily_l." + n for n in (
+    "of_operations_l", "Closed_l", "Closure_l", "closed_l", "least_l", "mono_l",
+    "closure_iff_l", "idempotent_l", "reindex_l", "reindex_le_l", "reindex_iff_l",
+    "sum_l", "sum_closed_iff_l", "union_l", "union_closed_iff_l", "closure_union_iff_l",
+)] + [PREFIX + n for n in ("Skolem_m", "SkolemIndex_m")] + [PREFIX + "Skolem_m." + n for n in (
+    "rules_m", "Closed_m", "witness_mem_m", "nonempty_m", "substructure_m",
+    "witness_closed_m", "hull_m", "seed_mem_m", "hull_closed_m", "hull_le_m",
+    "hull_mono_m", "hull_idem_m", "hull_union_iff_m", "hull_with_m",
+    "hull_with_closed_m", "hull_with_le_m",
 )]
 
 if __name__ == "__main__":
