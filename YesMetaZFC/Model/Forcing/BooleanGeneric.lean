@@ -103,6 +103,20 @@ theorem imp_mem_iff_l {𝔹 : BA_alg B} (U : Filter_l 𝔹) (h : U.Maximal_l) (a
   · exact U.upward ha ((𝔹.le_imp_iff _ _ _).mpr
       (𝔹.le_trans (𝔹.imp_elim _ _) (𝔹.bot_le _)))
 
+theorem neg_mem_iff_l {𝔹 : BA_alg B} (U : Filter_l 𝔹) (h : U.Maximal_l) (a : B) :
+    U.mem (𝔹.neg a) ↔ ¬ U.mem a :=
+  (imp_mem_iff_l U h a 𝔹.bot).trans ⟨fun k ha => h.1 (k ha), fun k ha => (k ha).elim⟩
+
+theorem join_mem_iff_l {𝔹 : BA_alg B} (U : Filter_l 𝔹) (h : U.Maximal_l) (a b : B) :
+    U.mem (𝔹.join a b) ↔ U.mem a ∨ U.mem b := by
+  rw [BA_alg.join, neg_mem_iff_l U h, meet_mem_iff_l, neg_mem_iff_l U h, neg_mem_iff_l U h]
+  exact Classical.not_and_iff_not_or_not.trans (or_congr Classical.not_not Classical.not_not)
+
+theorem iff_mem_iff_l {𝔹 : BA_alg B} (U : Filter_l 𝔹) (h : U.Maximal_l) (a b : B) :
+    U.mem (𝔹.iff a b) ↔ (U.mem a ↔ U.mem b) := by
+  rw [BA_alg.iff, meet_mem_iff_l, imp_mem_iff_l U h, imp_mem_iff_l U h]
+  exact ⟨fun k => ⟨k.1, k.2⟩, fun k => ⟨k.mp, k.mpr⟩⟩
+
 /-- 每阶段满足有限方阵，避免另选二维下标的编码或枚举。 -/
 theorem generic_ultrafilter_grid_l (𝔹 : BA_alg B) (D : Nat → Nat → Pos_l 𝔹 → Prop)
     (h : ∀ i j, (positive_order_l 𝔹).toPO_pre.Dense_l (D i j))

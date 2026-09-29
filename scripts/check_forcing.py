@@ -9,7 +9,23 @@ from check_filters import main
 MODULES = ["YesMetaZFC.Model.Forcing." + n for n in
            ("Order", "Density", "Separative", "Boolean", "Tree",
             "RegularOpen", "Completion", "Cohen", "Generic", "Valuation",
-            "BooleanGeneric", "Truth", "NameGeneric", "Extension", "RealName", "CohenReal")]
+            "BooleanGeneric", "Truth", "NameGeneric", "Extension", "RealName", "CohenReal",
+            "Domain", "Formula", "FormulaGeneric", "FormulaEnumeration",
+            "InternalPair", "InternalNames", "InternalGraph", "InternalRealization",
+            "InternalBoolean", "InternalCohen", "InternalCheckSyntax", "InternalCheck",
+            "InternalGround", "InternalCheckVal", "InternalCheckRealization")]
+# 原公理公式已有的自由闭合证书，只允许出现在直接消费原公理的切片中。
+ZFC_MODULES = ["YesMetaZFC.Model.Forcing." + n for n in ("ZFCBase", "CohenTheory")]
+ZFC_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
+                for n in ("extensionality", "emptySet", "foundation", "infinity")]
+# 从完整原 ZF 模型抽取内部名称所需的窄模式片段，单独固定原七条公理的既有依赖。
+INTERNAL_MODULES = ["YesMetaZFC.Model.Forcing.InternalClosure",
+                    "YesMetaZFC.Model.Forcing.InternalCheckModel",
+                    "YesMetaZFC.SetTheory.MembershipInduction",
+                    "YesMetaZFC.SetTheory.Ord.Recursion"]
+INTERNAL_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
+                     for n in ("emptySet", "extensionality", "foundation", "infinity",
+                               "pairing", "powerSet", "union")]
 PREFIX = "YesMetaZFC.Model.Forcing."
 CHOICE_FREE = [PREFIX + n for n in (
     "PO_pre", "PO_ord", "PO_hom", "PO_compat", "PO_dense",
@@ -30,6 +46,9 @@ CHOICE_FREE = [PREFIX + n for n in (
     "cohen_bit_l", "cohen_real_name_l", "cohen_avoid_l", "cohen_family_l",
     "cohen_node_enum_l", "cohen_node_surjective_l", "cohen_names_l",
     "cohen_ext_old_l", "cohen_ext_new_l",
+    "cohen_ext_omega_l", "domain_str_l", "ext_model_l", "val_map_l", "val_map_surjective_l",
+    "Fm_generic_l", "fm_dense_l", "fm_dense_lower_l", "Fm_query_l", "span_enum_l",
+    "span_enum_surjective_l",
 )] + [PREFIX + "PO_pre." + n for n in (
     "Cmp_l", "Inc_l", "Lower_l", "down_l", "Antichain_l", "Atomless_l",
     "Separative_l", "below_l", "Dense_below_l", "Dense_l", "Predense_below_l",
@@ -41,5 +60,37 @@ CHOICE_FREE = [PREFIX + n for n in (
     "ro_principal_ne_bot_l", "ro_meet_eq_bot_l", "ro_condition_l", "ro_map_l",
 )] + [PREFIX + "PO_dense." + n for n in ("id_l", "comp_l")]
 
+CHOICE_FREE += [PREFIX + "Internal." + n for n in (
+    "Pair_d", "KPair_d", "kpair_m", "kpair_convention_l", "kpair_interpretation_l",
+    "Entry_d", "Supp_d", "Name_d", "supp_m", "name_m", "name_entry_l", "name_empty_l",
+    "Setlike_d", "node_l", "decode_graph_l", "Rep_d", "decode_rep_l", "decode_exists_l",
+    "rep_child_l", "rep_val_eq_l", "Val_d", "val_exists_unique_l", "val_mem_l", "name_domain_l",
+    "sg_kpair_l", "pair_graph_l", "kpair_graph_l", "encode_graph_l", "encode_set_l",
+    "condition_set_l", "coded_graph_l", "encode_name_l", "encode_rep_l", "encode_val_l",
+    "code_pred_l", "encode_pred_val_l", "sg_setlike_l", "sg_name_domain_l",
+    "order_set_l", "order_mem_l", "meet_spec_l", "imp_spec_l", "boolean_model_l", "sup_exists_l",
+    "binary_code_l", "cohen_code_graph_l", "cohen_condition_set_l",
+    "cohen_order_set_l", "cohen_internal_name_l", "cohen_internal_name_spec_l",
+    "Check_step_d", "Check_graph_d", "Check_d", "entry_m", "check_step_m", "check_graph_m",
+    "check_m", "check_sat_l", "Check_ops_d", "check_unique_l", "check_mem_l", "check_union_l",
+    "check_adjoin_l", "check_exists_l", "check_name_l", "check_entry_l", "check_injective_l",
+    "check_mem_iff_l", "Ground_rep_d", "ground_node_l", "ground_graph_l", "ground_decode_l",
+    "ground_rep_eq_l", "Ground_d", "check_val_l", "check_val_exists_l", "sg_mem_ind_l",
+    "sg_check_range_l", "sg_ground_l", "sg_check_val_l",
+)]
+INTERNAL_CHOICE_FREE = [PREFIX + "Internal." + n for n in (
+    "Entry_supp_d", "entry_supp_m", "Name_ops_d", "set_insert_l", "name_adjoin_l", "name_subset_l",
+    "name_pair_l", "name_unfold_l",
+)]
+INTERNAL_CHOICE_FREE += ["YesMetaZFC.SetTheory.Mem_ind_d",
+                        "YesMetaZFC.SetTheory.Structure.IsSequenceOfLength.restriction",
+                        "YesMetaZFC.SetTheory.Structure.IsRecursiveSequence.restriction"]
+
 if __name__ == "__main__":
-    sys.exit(main(MODULES, CHOICE_FREE, [], "FORCING_GUARD_PASS"))
+    sys.stdout.reconfigure(encoding="utf-8")
+    result = main(MODULES, CHOICE_FREE, [], "FORCING_GUARD_PASS")
+    if result == 0:
+        result = main(ZFC_MODULES, [], ZFC_BASELINE, "FORCING_ZFC_GUARD_PASS")
+    if result == 0:
+        result = main(INTERNAL_MODULES, INTERNAL_CHOICE_FREE, INTERNAL_BASELINE, "FORCING_INTERNAL_GUARD_PASS")
+    sys.exit(result)

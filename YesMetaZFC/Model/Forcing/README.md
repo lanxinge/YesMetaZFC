@@ -3,8 +3,10 @@
 导入 `YesMetaZFC.Model.Forcing`，声明位于 `YesMetaZFC.Model.Forcing`。
 `YesMetaZFC.Model` 已导出此层。任意宿主预序已有实际正则开完备布尔代数和规范
 稠密映射。名称求值直接消费现有 `Model.Boolean.BV_graph`，输出实际 `SG_set`。
-已有相对名称域的解释扩张、原子真值及 Cohen 新实数实例；内部地模型的
-名称域刻画、全公式力迫定理及 `M[G] ⊨ ZFC` 保持证明尚未实现。
+已有相对名称域的解释扩张、完整一阶真值对应及 Cohen 新实数实例。一次调用
+可得到对全部原公式、任意有限参数同时有效的滤子。原 ZFC 的外延性、空集、
+基础及无穷公理已核验。内部名称已有实际一阶定义、递归刻画、小图解码与求值；
+内部力迫关系、一般地模型中的规范名称递归及其余公理保持仍待完成。
 
 ## 文献选择
 
@@ -48,6 +50,19 @@
 | `Extension` | `name_span_l` 生成子名称封闭域；`ext_structure_l` 是该域的实际求值像，已有传递性、外延性、良基性、规范名称包含及原子语义接口。 |
 | `RealName` | 任意权重序列给出可数的自然数子集名称；求值逐位读取权重。复用原 ω 图，并提供显式节点枚举。 |
 | `CohenReal` | `cohen_extension_l` 构造同一滤子：遇到给定稠密族、避开给定可数旧实数族，并满足整个 `cohen_names_l` 名称域的原子真值要求。 |
+| `Domain` | 相对名称布尔结构 `domain_str_l` 与原纯语言扩张 `ext_model_l`；求值映射直接满射到解释像，项和环境使用原 `Fn_map` 接口。 |
+| `Formula` | `val_formula_iff_l` 对原十一种公式构造证明真值对应；量词只遍历指定名称域，保留原 bound/free 上下文。 |
+| `FormulaGeneric` | `fm_dense_l` 由公式及赋值计算量词稠密族，并证明稠密性和向下封闭性；没有让调用者假设量词真值引理。 |
+| `FormulaEnumeration` | 复用 `SyntaxNatCoding` 的单射编码及原异质赋值列，证明全部有限参数公式实例可枚举；枚举选择只存在于 Prop 证明中。 |
+| `ZFCBase` | 直接核验原外延性、空集、基础公理；当 ω 在实际解释像中时，核验原无穷公理。 |
+| `CohenTheory` | `cohen_full_extension_l` 一次生成满足全部公式真值、额外稠密族和新实数要求的同一滤子；`cohen_zfc_base_l` 自动给出四条原公理。 |
+| `InternalPair` | 名称的 Kuratowski 有序对编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
+| `InternalNames` | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
+| `InternalClosure` | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
+| `InternalGraph` | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |
+| `InternalRealization` | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
+| `InternalBoolean` | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
+| `InternalCohen` | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
 
 分离比较定义为
 
@@ -121,23 +136,127 @@ D_f=\{p>0\mid p\leq\neg\bigvee_i f_i\ \lor\ \exists i\;p\leq f_i\}.
 定理塞入结构字段。`name_family_generic_l` 通过四重有限初段与
 Rasiowa–Sikorski 证明这些前提可同时实现；`cohen_node_enum_l` 给出实际实例的枚举。
 
+完整真值通过原公式结构归纳证明：联结词消费超滤子的有限运算性质，全称和存在
+分别消费反例与见证稠密集；目标量词见证由求值满射回拉。`fm_dense_l` 在二元
+联结词处取稠密开集的交，在量词处用已有 `NatPairing` 遍历名称与正文要求。
+全部公式及有限赋值的可数性复用现有 `SyntaxNatCoding` 和 `Model.FirstOrder.Valuation`。
+这里使用语法编码的单射性，没有调用 Henkin 完备性或构造另一套公式语言。
+
 常用调用顺序如下，其中 `r` 枚举旧实数的成员谓词，`D` 为额外稠密族，
 `hD` 是其逐项稠密性证明，`p` 是任意非零 Cohen 条件：
 
 ```lean
-obtain ⟨U, hU, hp, hd, hn, hg⟩ := cohen_extension_l r D hD p
-let ℳ := ext_structure_l (cohen_names_l r) U.mem
+obtain ⟨U, hU, hp, hd, hn, ht⟩ := cohen_full_extension_l r D hD p
+let ℳ := ext_model_l (cohen_names_l r) U.mem
 -- cohen_ext_old_l r U n：第 n 个旧实数属于 ℳ。
 -- cohen_ext_new_l r U：Cohen 名称的实际求值属于 ℳ。
 -- hn n：该求值不同于第 n 个旧实数。
--- ext_atomic_l 消费 hg G H hG hH，得到 ℳ 内的等号及隶属真值对应。
+-- ht φ ρ：原公式 φ 在赋值 ρ 下的布尔真值被 U 接受，当且仅当 ℳ 中相应公式成立。
+have hbase := cohen_zfc_base_l r U
+-- hbase 给出原外延性、空集、基础及无穷公理，不是全部 ZFC。
 ```
 
-`cohen_names_l r` 是旧实数规范名称与 Cohen 名称的子名称封闭域，**不是 ZFC
-地模型的全部内部名称域**。当前定理并未证明这个相对扩张满足配对、幂集、替换等
-全部公理，也没有把可数旧实数族称为 ZFC 地模型。下一层仍需实现内部地模型与名称
-之间的对应，以及量词真值和公理保持。`val_surjective_l` 已证明全部宿主名称的
+`cohen_names_l r` 由空名称、Cohen 名称、ω 的规范名称及旧实数规范名称生成，
+**不是 ZFC 地模型的全部内部名称域**。四条基础公理已实现；配对、并集、幂集、
+分离、收集及选择的保持尚未证明，也没有把可数旧实数族称为 ZFC 地模型。
+完整真值对应的左侧是这个相对名称域的布尔解释，不能直接替换成全名称宇宙的
+`Boolean.bv_models_zfc`。正式内部名称接口见下一节；将内部布尔量词、力迫关系
+及其余公理保持接入该接口仍是下一层工作。`val_surjective_l` 已证明全部宿主名称的
 求值像就是全部宿主 `SG_set`，因此不能用全宿主名称域替代地模型相对化。
+
+## 内部名称
+
+声明位于 `YesMetaZFC.Model.Forcing.Internal`。对于地模型隶属结构 `M`、
+模型内条件集 `B` 和模型对象 `τ`，定义为
+
+\[
+\operatorname{Name}_M(B,\tau)\iff
+\exists S\in M\;\bigl[\tau\in^M S\ \land\
+\forall\sigma\in^M S\;\forall p\in^M\sigma\;
+\exists\rho,b\in M\;(p=\langle\rho,b\rangle\land\rho\in^M S\land b\in^M B)\bigr].
+\]
+
+这里 `S` 是模型对象，不是宿主提供的名称谓词。`name_sat_l` 证明其与 `name_m`
+完全对应。`name_unfold_l` 证明它等价于通常的递归定义：每个成员都是标签在 `B`
+中的子名称对。反向证明先在模型内收集支撑，再用 `supp_m` 的分离实例去掉无效
+支撑，最后取并并添加新根。`Name_ops_d` 只保留所用的配对、并集和两条明确模式；
+`name_ops_l M hZF` 从已给定的 ZF 模型证明自动生成这些能力。
+
+名称编码选用 Kuratowski 对，以得到 `ρ ∈ {ρ} ∈ ⟨ρ,b⟩ ∈ σ` 的实际下降路径。
+这是本层明确指定的 `OrderedPairConvention`，不改变项目其余层的平坦对约定。
+一阶名称定义本身不要求模型外部良基；解码到外部良基图时才消费 `WellFounded M.mem`。
+不会从 `M ⊨ Foundation` 推出外部良基性。
+
+`Setlike_d.{m,n} M` 要求模型内每个集合存在 `Type n` 中的小呈现。解码的节点是
+支撑与条件呈现的乘积加一个根，始终留在 `Type n`，输出属于 `SG_set.{n}`。
+`decode_exists_l` 不导出呈现选择函数；`val_exists_unique_l` 证明实际解释存在唯一，
+`Internal.val_mem_l` 给出直接使用模型内带权成员的求值递归式。
+`name_domain_l` 把这些呈现接入已有 `Name_domain_l`，无需另填子名称封闭性证书。
+
+已有实际实例，不要求调用者虚设模型构造能力：
+
+- `sg_setlike_l`、`sg_name_ops_l` 和 `sg_name_domain_l` 来自原小图模型的实际集合操作。
+- `encode_name_l` 把任意已有布尔名称编码成真正的内部集合；无限节点域也由小图并合
+  形成同层的内部支撑。`sg_check_exists_l` 通过下述通用内部递归给出每个旧集合的规范名称。
+- `cohen_code_injective_l` 证明正则开条件的集合编码单射；`cohen_boolean_l` 核验编码
+  载体和序关系的内部布尔代数律。`sup_exists_l` 构造模型内集合族的上确界，不要求
+  使用者把内部代数声明成宿主完备代数。
+
+```lean
+have ht := Internal.cohen_internal_name_spec_l
+obtain ⟨G, hG⟩ := Internal.sg_decode_l ht
+-- G 使用原 Type 0 小节点；hG 证明它精确呈现模型内的 Cohen 名称。
+have hv := Internal.cohen_internal_val_l U.mem
+-- U 是原 Cohen 布尔滤子；其成员谓词沿单射编码自动送到模型对象。
+```
+
+上面的 `sg_*` 是实际完整小图地模型的实例，不声称它可数，也不声称由前面的
+可数稠密族构造所得滤子对整个小图地模型泛型。内部真值定义及全部 ZFC 保持，
+仍需在这些名称对象上继续证明。
+
+## 内部规范名称递归
+
+`Check_d M b x τ` 用模型内的部分递归图定义规范名称，其纸面方程为
+
+\[
+\check{x}_b=\{\langle\check{y}_b,b\rangle:y\in^M x\}.
+\]
+
+取 `b` 为布尔顶值即可得到通常的规范名称。构造本身不消费布尔代数律。
+`check_sat_l` 核验实际公式 `check_m`；`check_mem_l` 给出上式，
+`check_unique_l`、`check_injective_l` 和 `check_mem_iff_l` 分别证明唯一性、
+单射性和隶属保持。递归图的值域直接构成内部名称支撑。
+
+存在性先证明任意两个部分递归图相容，再在模型内收集前驱图、取并、替换出新值，
+最后添加输入输出对。`Check_ops_d` 的收集与替换字段由明确的一阶公式实现，
+`check_ops_l M hZF` 和 `sg_check_ops_l` 均是已构造的实际实例。
+
+归纳使用 `SetTheory.Mem_ind_d`，它只对实际一阶公式成立。
+`MembershipInduction` 复用内部序数递归，沿模型自己的 ω 形成传递包络，
+再以分离和基础公理证明成员归纳。因此规范名称存在性不要求外部良基性，
+也不要求模型内部的 ω 是标准自然数。
+
+```lean
+obtain ⟨τ, hτ, hname, hunique⟩ := Internal.zf_check_l M hZF hb x
+-- hb : M.mem b B；hτ : Internal.Check_d M b x τ。
+-- hname : Internal.Name_d M B τ；hunique 给出同一 x 的名称唯一性。
+```
+
+外部解释时，`Ground_rep_d` 独立呈现地模型的无权成员图。
+`ground_decode_l` 从内部传递包络和小呈现构造该图，节点层级保持不变；
+`ground_rep_eq_l` 保证呈现无关性。`check_val_l` 以规范名称关系作双模拟，
+证明接受 `b` 的任何谓词都把规范名称还原为该地模型对象。
+
+`zf_check_val_l M hZF hM hL hb x` 一次取得规范名称、地模型对象的小图解释，
+以及对所有 `U b` 成立的求值还原。这里只在小图解释阶段要求 `hM` 外部良基、
+`hL` 为相应节点层级的 set-like 证书，不从内部基础公理推断这些条件。
+
+原 `sg_check_exists_l` 已迁移为同一内部递归的实例：参数为 `hb : b ∈ B` 和 `x`，
+结果同时包含规范性、内部名称性、唯一性及对所有接受 `b` 的谓词的求值还原。
+`sg_check_ext_l hb U hU x` 直接证明旧对象属于内部名称的解释扩张。
+本层只返回存在与唯一性定理，没有定义全局不可计算的规范名称选择函数。
+
+## 审计
 
 `python scripts/check_forcing.py` 先以 `lake --wfail build` 构建，再审计实际生产
 声明。正则开载体与运算、规范映射、图求值、相对扩张载体、自然数子集名称、
@@ -145,4 +264,17 @@ Cohen 名称和节点枚举均严格排除 `Classical.choice`。
 像稠密、正向稠密量词对应及部分相容性反射证书允许 Prop 内经典反证；
 `ro_dense_l` 的映射函数固定为已审计的 `ro_condition_l`，没有选取见证函数。
 Rasiowa–Sikorski 和 Tarski 扩张只在 Prop 存在证明内部使用选择；输出仍是存在
-定理，没有定义全局不可计算滤子。无 `sorry`、新增公理、`noncomputable` 或常驻 smoke 模块。
+定理，没有定义全局不可计算滤子。完整公式枚举同样只在 Prop 内取得。
+核心切片继续仅允许 `propext`、`Quot.sound` 与 Prop 证明中的 `Classical.choice`。
+直接引用原公理的 `ZFCBase`／`CohenTheory` 单独审计，只额外继承四条原公理定义
+中已经存在的 `native_decide` 自由闭合证书。`InternalClosure`、`InternalCheckModel`
+及 `MembershipInduction` 消费原 ZF 公理时，单独允许原七条固定公理的既有证书；
+这些依赖不开放给核心切片。
+复用的 `Ord.Recursion` 一并审计；序列限制的两个证明直接调用成员序数性与函数限制，
+排除了原自动化生成的原生计算公理依赖。
+内部名称定义、解码图、编码图、条件集、序关系和 Cohen 编码数据也都严格排除
+`Classical.choice`。旧列表编码的单射性证书使用经典证明，保留在 Prop 内，
+没有封装进本层实际编码函数。
+小图规范名称递归的收集只在 Prop 存在证明中使用选择；递归核心、实际公式、
+地模型图构造及求值还原证书继续严格排除 `Classical.choice`。
+无 `sorry`、新增公理、`noncomputable` 或常驻 smoke 模块。

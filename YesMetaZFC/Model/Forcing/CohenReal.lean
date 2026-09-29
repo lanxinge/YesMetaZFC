@@ -82,12 +82,14 @@ theorem cohen_fresh_l (U : Filter_l cohen_algebra_l.toBA_alg) (hU : U.Proper_l)
 def cohen_family_l (r : Nat → Nat → Prop) : Nat → BV_graph.{0, 0} Cohen_l
   | 0 => BV_graph.empty cohen_algebra_l.toPO_bot
   | 1 => cohen_real_name_l
-  | n+2 => check_graph_l cohen_algebra_l.toBA_alg (real_graph_l (r n))
+  | 2 => check_graph_l cohen_algebra_l.toBA_alg omega_graph
+  | n+3 => check_graph_l cohen_algebra_l.toBA_alg (real_graph_l (r n))
 
 def cohen_node_enum_l (r : Nat → Nat → Prop) : ∀ i, Nat → (cohen_family_l r i).Domain
   | 0, _ => PUnit.unit
   | 1, n => omega_enum_l n
-  | _+2, n => omega_enum_l n
+  | 2, n => omega_enum_l n
+  | _+3, n => omega_enum_l n
 
 theorem cohen_node_surjective_l (r : Nat → Nat → Prop)
     (i : Nat) (a : (cohen_family_l r i).Domain) : ∃ n, cohen_node_enum_l r i n = a := by
@@ -99,16 +101,20 @@ theorem cohen_node_surjective_l (r : Nat → Nat → Prop)
   | succ i =>
     cases i with
     | zero => exact omega_enum_surjective_l a
-    | succ i => exact omega_enum_surjective_l a
+    | succ i => cases i <;> exact omega_enum_surjective_l a
 
-/-- 旧实数的规范名称与 Cohen 名称共同生成一个实际子名称封闭域。 -/
+/-- ω、旧实数的规范名称与 Cohen 名称共同生成一个实际子名称封闭域。 -/
 def cohen_names_l (r : Nat → Nat → Prop) : Name_domain_l.{0, 0} Cohen_l :=
   name_span_l cohen_algebra_l.toBA_alg (fun G => ∃ i, cohen_family_l r i = G)
 
 theorem cohen_ext_old_l (r : Nat → Nat → Prop) (U : Filter_l cohen_algebra_l.toBA_alg)
     (n : Nat) : Ext_l (cohen_names_l r) U.mem (real_set_l (r n)) :=
   ext_check_l cohen_algebra_l.toBA_alg _ U (real_graph_l (r n))
-    (name_span_mem_l _ ⟨n+2, rfl⟩)
+    (name_span_mem_l _ ⟨n+3, rfl⟩)
+
+theorem cohen_ext_omega_l (r : Nat → Nat → Prop) (U : Filter_l cohen_algebra_l.toBA_alg) :
+    Ext_l (cohen_names_l r) U.mem SG_set.omega :=
+  ext_check_l cohen_algebra_l.toBA_alg _ U omega_graph (name_span_mem_l _ ⟨2, rfl⟩)
 
 theorem cohen_ext_new_l (r : Nat → Nat → Prop) (U : Filter_l cohen_algebra_l.toBA_alg) :
     Ext_l (cohen_names_l r) U.mem (val_l U.mem cohen_real_name_l) :=
