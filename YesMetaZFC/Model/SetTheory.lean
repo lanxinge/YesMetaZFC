@@ -7,6 +7,7 @@ import YesMetaZFC.Model.SetTheory.OrderSemantics
 import YesMetaZFC.Model.SetTheory.ProjectSemantics
 import YesMetaZFC.Model.SetTheory.Structure
 import YesMetaZFC.Model.SetTheory.Theory
+import YesMetaZFC.Model.SetTheory.Countable
 
 /-! # 集合论结构及现有语义接口
 

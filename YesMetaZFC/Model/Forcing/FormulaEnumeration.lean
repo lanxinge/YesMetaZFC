@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.FormulaGeneric
 import YesMetaZFC.Model.FirstOrder.Valuation
-import YesMetaZFC.Model.Henkin.SyntaxNatCoding
+import YesMetaZFC.Model.SetTheory.CountableSyntax
 
 /-! # 原公式及有限赋值的可数性
 
@@ -13,45 +13,6 @@ open Boolean Logic Logic.FirstOrder SetTheory
 open Automation.SyntaxNatCoding Automation.RelationalTranslation Automation.ModelClosure
 open FirstOrder.Completeness.Henkin
 universe u v w
-
-private def pure_symbols_l : SymbolCoding ℒ where
-  sort := ⟨fun _ => 0, fun a b _ => by cases a; cases b; rfl⟩
-  function := ⟨(fun a => nomatch a), (fun a => nomatch a)⟩
-  relation := ⟨fun _ => 0, fun a b _ => by cases a; cases b; rfl⟩
-
-private structure Query_code_l where
-  bound : SortContext ℒ
-  free : SortContext ℒ
-  formula : Formula ℒ bound free
-  parameter : Nat
-
-private def query_coding_l : NatCoding Query_code_l where
-  encode q := NatPairing.pair ((NatCoding.list pure_symbols_l.sort).encode q.bound)
-    (NatPairing.pair ((NatCoding.list pure_symbols_l.sort).encode q.free)
-      (NatPairing.pair (formula_encode pure_symbols_l q.formula) q.parameter))
-  injective := by
-    rintro ⟨b, f, φ, n⟩ ⟨c, g, ψ, m⟩ h
-    obtain ⟨hb, h⟩ := NatPairing.pair_eq_pair_iff.mp h
-    obtain ⟨hf, h⟩ := NatPairing.pair_eq_pair_iff.mp h
-    obtain ⟨hφ, hn⟩ := NatPairing.pair_eq_pair_iff.mp h
-    have hb := (NatCoding.list pure_symbols_l.sort).injective hb
-    have hf := (NatCoding.list pure_symbols_l.sort).injective hf
-    dsimp only at hb hf hφ hn
-    subst c; subst g; subst m
-    have hφ := formula_encode_injective pure_symbols_l hφ
-    subst ψ
-    rfl
-
-private theorem enum_exists_l {A : Type w} (c : NatCoding A) (a : A) :
-    ∃ e : Nat → A, Function.Surjective e := by
-  classical
-  have h n : ∃ x, ∀ y, c.encode y = n → x = y := by
-    by_cases h : ∃ x, c.encode x = n
-    · obtain ⟨x, hx⟩ := h
-      exact ⟨x, fun y hy => c.injective (hx.trans hy.symm)⟩
-    · exact ⟨a, fun y hy => (h ⟨y, hy⟩).elim⟩
-  obtain ⟨e, he⟩ := Classical.axiomOfChoice h
-  exact ⟨e, fun x => ⟨c.encode x, he _ x rfl⟩⟩
 
 variable {B : Type v} (𝔹 : CB_alg B) (N : Name_domain_l.{u, v} B)
   (e : Nat → {G : BV_graph.{u, v} B // N.mem G})

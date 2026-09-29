@@ -316,7 +316,7 @@ theorem omega_selfMultiplication
   apply cartesianSquare_bounded_in_omega
     hZF 𝕀 hω
   · simpa [hSelectedEq] using hSelectedOmega
-  · prove_auto
+  · exact hSquare
 /--
 定理 3.5 的最小反例递推步。
 若 `κ` 以下每个坐标最大值的后继都有一个严格小于 `κ`、且已对自乘闭合的基数代表，

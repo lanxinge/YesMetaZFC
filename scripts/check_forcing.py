@@ -14,7 +14,8 @@ MODULES = ["YesMetaZFC.Model.Forcing." + n for n in
             "InternalPair", "InternalNames", "InternalGraph", "InternalRealization",
             "InternalBoolean", "InternalCohen", "InternalCheckSyntax", "InternalCheck",
             "InternalGround", "InternalCheckVal", "InternalCheckRealization",
-            "InternalAtomicSyntax", "InternalFormula", "InternalGenericInstance")]
+            "InternalAtomicSyntax", "InternalFormula", "InternalGenericInstance", "InternalGeneric")]
+MODULES += ["YesMetaZFC.Model.SetTheory.CountableSyntax"]
 # 原公理公式已有的自由闭合证书，只允许出现在直接消费原公理的切片中。
 ZFC_MODULES = ["YesMetaZFC.Model.Forcing." + n for n in ("ZFCBase", "CohenTheory")]
 ZFC_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
@@ -35,6 +36,11 @@ INTERNAL_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_
                                "pairing", "powerSet", "union")]
 CHOICE_MODULES = ["YesMetaZFC.SetTheory.Choice", "YesMetaZFC.Model.Forcing.InternalChoice"]
 CHOICE_BASELINE = INTERNAL_BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
+CH_MODULES = ["YesMetaZFC.Model.Forcing." + n for n in
+              ("InternalClosed", "Collapse", "NoNewReals", "GroundTransfer", "CollapseGeneric", "CH")]
+CH_MODULES += ["YesMetaZFC.SetTheory." + n for n in
+               ("DependentChoice", "Card.Omega", "Card.CountableUnion", "Continuum")]
+CH_MODULES += ["YesMetaZFC.Model.SetTheory.Countable"]
 PREFIX = "YesMetaZFC.Model.Forcing."
 CHOICE_FREE = [PREFIX + n for n in (
     "PO_pre", "PO_ord", "PO_hom", "PO_compat", "PO_dense",
@@ -105,6 +111,12 @@ INTERNAL_CHOICE_FREE = [PREFIX + "Internal." + n for n in (
 INTERNAL_CHOICE_FREE += ["YesMetaZFC.SetTheory.Mem_ind_d",
                         "YesMetaZFC.SetTheory.Structure.IsSequenceOfLength.restriction",
                         "YesMetaZFC.SetTheory.Structure.IsRecursiveSequence.restriction"]
+CH_CHOICE_FREE = [PREFIX + "Internal." + n for n in
+                  ("binary_pred_m", "Chain_d", "Closed_d", "Coll_d", "coll_m", "Dec_check_d", "dec_check_m")]
+CH_CHOICE_FREE += ["YesMetaZFC.SetTheory." + n for n in
+                   ("CH_d", "hartogs_m", "ch_m", "ch_sentence_l", "ZFC_CH",
+                    "values_enum_l", "env_enum_l", "query_holds_l",
+                    "ZFC.Next_d", "ZFC.next_m", "ZFC.iter_m")]
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
@@ -116,4 +128,6 @@ if __name__ == "__main__":
     if result == 0:
         result = main(CHOICE_MODULES, ["YesMetaZFC.SetTheory.ZFC." + n for n in
             ("Rem_d", "rem_m", "Enum_step_d", "enum_step_m")], CHOICE_BASELINE, "FORCING_CHOICE_GUARD_PASS")
+    if result == 0:
+        result = main(CH_MODULES, CH_CHOICE_FREE, CHOICE_BASELINE, "FORCING_CH_GUARD_PASS")
     sys.exit(result)

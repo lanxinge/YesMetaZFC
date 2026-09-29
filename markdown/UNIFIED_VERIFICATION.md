@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 原生小图模型与裸 ZFC 一致性 | [SmallGraph/ZFC](../YesMetaZFC/Model/SmallGraph/ZFC.lean)：`sg_model`、`sg_project_zfc`、`sg_models_zfc`、`zfc_consistent` | 小图双模拟商直接构造；原公理及全部有限参数分离、收集模式已经核验，无模型存在或一致性前提；载体固定为 `Type (u+1)` |
 | 标准布尔值 ZFC 模型 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`project_zfc`、`bv_models_zfc`、`zfc_consistent` | 任意 `B : Type u` 及实际 `CB_alg B`；名称节点同层，载体固定在 `Type (u+1)`；原公理与所有有限参数模式逐句核验 |
+| ZFC＋CH 的实际力迫模型 | [Forcing/CH](../YesMetaZFC/Model/Forcing/CH.lean)：`ch_forcing_l`、`ch_extension_l`、`ch_model_l` | 可数部分函数塌缩、不增实数、实际泛型满射及原 CH 句子；地模型由小图模型的可数初等子结构提供，最终模型载体在 `Type 1` |
 | 有限基覆盖原支撑理论 | [FiniteAxiomModels](../YesMetaZFC/Model/ZFC/FiniteAxiomModels.lean) 中 `FiniteAxiomBasis.models_iff`；[ReducedAxioms](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedAxioms.lean) 的 `derives_iff` | 108 个具体闭句与 11 个参数分离模板，共 119 条；与原无限参数理论推导等价，不是公理集合相等 |
 | 完整支撑模型 | [PureSupportModels](../YesMetaZFC/Model/ZFC/Pure/PureSupportModels.lean) 的 `support_models` | 同一规范扩张满足整个原支撑理论 |
 | 原 ZFC 像及实际纯翻译 | [PureZFCModels](../YesMetaZFC/Model/ZFC/Pure/PureZFCModels.lean) 的 `models`、`translated_models` | 不弱化原公理或 guard |
@@ -33,7 +34,7 @@
 一致性证明使用已有 `propext`、`Quot.sound`、`Classical.choice`。`zfc_consistent`
 还继承原八条固定公理的 `sentence!` 自由闭合性 `native_decide` 依赖：外延、空集、配对、
 并集、幂集、无穷、基础及选择各一处。没有新增公理常量、`sorryAx` 或原生验证依赖。
-全库严格构建的 998 个任务与全部 1,004 个独立模块通过；代码范围及载体边界见
+当前全部 1,189 个独立模块及扫描工具严格构建通过；代码范围及载体边界见
 [模型论指南](../YesMetaZFC/Model/README.md)。
 
 布尔层新增 50 个关键依赖入口并交叉复核 8 个小图入口。`name_structure`、名称等号的
@@ -42,6 +43,10 @@
 ZFC 终点仍依赖 `Classical.choice`；原八处句法闭合性原生依赖与小图终点相同。
 未新增 `sorryAx`、自定义公理或原生计算可信依赖。严格不使用元层选择的两类 ZF 模型
 尚未实现，具体依赖与全小图基础公理的排中律边界见模型论指南。
+
+力迫层的 `scripts/check_forcing.py` 审计 70 个生产模块、1691 条声明，包括内部真值、
+完整 ZFC 保持与 CH 构造。CH 模型只继承 `propext`、`Quot.sound`、Prop 内选择及原八条
+固定公理的句法闭合证书；实际 CH 句子的闭合性直接证明，没有新增原生计算公理。
 
 ## 任意原模型的内部证明码对应
 

@@ -8,6 +8,8 @@
 完整内部力迫真值定理及原 ZFC 全部公理保持，包括全分离、全收集模式。
 `Internal.preserves_zfc_l` 一次返回模型性；内部名称、规范名称递归、原子力迫、
 公式翻译和各公理见证均由实际内部集合构造。
+可数闭塌缩已接入这一名称域；`Internal.ch_model_l` 给出实际 ZFC＋CH 模型存在，
+`Internal.ch_extension_l` 从可数外部良基地模型自动构造相应泛型扩张。
 
 ## 文献选择
 
@@ -71,6 +73,10 @@
 | `InternalZFOperations`／`InternalZF` | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
 | `SetTheory.Choice`／`InternalSelection`／`InternalChoice` | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
 | `InternalGenericInstance` | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
+| `InternalGeneric` | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
+| `InternalClosed`／`Collapse` | 原模型内的可数递降链、可数稠密交、可数部分函数条件集及其实际可数闭性。 |
+| `NoNewReals`／`GroundTransfer` | 可数闭力迫不增加实数；规范嵌入保持成员、函数图、单射、序数和 ω。 |
+| `CollapseGeneric`／`CH` | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
 
 分离比较定义为
 
@@ -293,8 +299,45 @@ have hConcrete := Internal.two_extension_zfc_l
 ```
 
 `preserves_zf_l O hZF hU hM hL` 只消费地模型 ZF；选择公理仅在 `preserves_zfc_l`
-中使用。外部良基性与小呈现是实际小图解释的前提。尚未提供可数地模型上的
-无原子内部泛型存在端点，也未将 Cohen 相对名称域升级为完整内部 Cohen 扩张。
+中使用。外部良基性与小呈现是实际小图解释的前提。可数地模型的完整内部泛型
+存在现由 `internal_generic_l` 提供；Cohen 相对名称域尚未接成完整内部 Cohen 扩张。
+
+## ZFC＋CH 的实际力迫模型
+
+`SetTheory.ZFC_CH 𝒞` 是原 ZFC 加上实际 Project 句子 `ch_sentence_l 𝒞`。
+该句子取模型自己的 ω、其幂集及 Hartogs 序数 κ，要求 `|P(ω)| ≤ κ`；
+`ch_sat_l` 核验语义。`ZFC.continuum_bound_l` 用 Cantor 定理证明：若一个序数的
+所有真初段可数且足以覆盖实数，它就是所需的第一不可数基数。
+
+构造的条件是 κ 到地模型实数集的可数部分函数，按反向包含增强。
+`coll_set_l` 用内部幂集与分离得到条件集，`collapse_closed_l` 构造序关系并证明
+模型内可数闭性。`SetTheory.ZFC.dependent_choice_l` 和 `countable_union_l`
+分别提供真正内部的递降链及可数并；`ZF.omega_cardinal_l` 自动证明 ω 的基数性。
+
+`no_new_reals_l` 对每个自然数同时判定规范名称隶属，再通过内部可数稠密交与泛型性
+取得一个全判定条件。地模型按这个条件分离出旧实数，证明其规范名称与给定实数
+解释相同。`collapse_surjection_l` 则把被泛型滤子接受的条件中的有序对收集成
+实际关系名称：指定坐标稠密集保证全定义，指定值稠密集保证满射。
+这条路线与 [Isabelle/ZF 的 CH 塌缩构造](https://isa-afp.org/browser_info/current/AFP/Independence_CH/CH.html)
+使用的可数部分函数塌缩一致。
+
+模型存在的地模型由 `SetTheory.countable_ground_l` 实际提供：对原小图 ZFC 模型
+逐层加入原公式的有限参数见证，复用 `Substructure_m.tarski_vaught_m` 得到可数
+初等子模型；其隶属关系继承小图模型的外部良基性。公式查询编码与原力迫调度
+已统一迁到 `Model.SetTheory.CountableSyntax`，不重复建立语法。
+
+```lean
+obtain ⟨N, hN⟩ := Internal.ch_model_l
+-- hN : N.Models (SetTheory.ZFC_CH Internal.kpair_convention_l)
+
+obtain ⟨B, R, U, hO, hU, hCH⟩ := Internal.ch_extension_l M hZFC hM e he
+-- e : Nat → M.Domain，he : Function.Surjective e；小呈现自动构造。
+-- B、R 是模型内条件集与序关系，U 是实际地模型泛型滤子。
+```
+
+`Closed_d` 只对地模型内部的 ω 序列断言存在下界。地模型在外部可数，并不把其
+所有外部可数序列变成模型内集合。模型、枚举、见证选择和泛型滤子只通过 Prop
+存在定理返回，没有全局不可计算的模型实例。
 
 ## 审计
 
@@ -319,3 +362,5 @@ Rasiowa–Sikorski 和 Tarski 扩张只在 Prop 存在证明内部使用选择�
 小图规范名称递归的收集只在 Prop 存在证明中使用选择；递归核心、实际公式、
 地模型图构造及求值还原证书继续严格排除 `Classical.choice`。
 无 `sorry`、新增公理、`noncomputable` 或常驻 smoke 模块。
+CH 切片另检查内部依赖选择、ω 基数性、可数并、可数初等子模型及完整塌缩扩张；
+只继承原八条 ZFC 句法闭合证书。复用序数引理中的若干原生计算步骤已换成直接证明。

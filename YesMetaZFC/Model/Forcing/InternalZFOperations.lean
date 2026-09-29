@@ -73,7 +73,7 @@ theorem internal_union_l (A : (E).Domain) : ∃ Q : (E).Domain, ∀ x : (E).Doma
       ⟨hsS, (hU.proper p hp).1, (hφ s p).mpr ⟨a, ⟨c, ha, hpc⟩, ⟨d, hs, hpd⟩⟩⟩, hp, hsv⟩
 
 omit hU in
-private theorem check_val_mem_l {b a t} {x y : SmallGraph.SG_set.{v}}
+theorem check_val_mem_l {b a t} {x y : SmallGraph.SG_set.{v}}
     (hc : Check_d M b a t) (hv : Val_d M B U t x) (hb : U b) :
     y ∈ x ↔ ∃ c s, M.mem c a ∧ Check_d M b c s ∧ Val_d M B U s y := by
   constructor

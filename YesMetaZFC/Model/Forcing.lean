@@ -7,6 +7,7 @@ import YesMetaZFC.Model.Forcing.InternalCheckModel
 import YesMetaZFC.Model.Forcing.InternalCheckRealization
 import YesMetaZFC.Model.Forcing.InternalChoice
 import YesMetaZFC.Model.Forcing.InternalGenericInstance
+import YesMetaZFC.Model.Forcing.CH
 
 /-! # 力迫偏序、名称求值与相对扩张入口
 
@@ -15,6 +16,7 @@ import YesMetaZFC.Model.Forcing.InternalGenericInstance
 Cohen 实例同时满足全部公式真值、指定稠密要求和旧实数规避要求。
 内部名称扩张的完整原公式真值和原 ZFC 全部公理及模式由实际内部构造证明。
 preserves_zfc_l 一次取得全部保持性，two_extension_zfc_l 给出可直接调用的实际实例。
+ch_extension_l 自动构造可数地模型的 CH 塌缩扩张；ch_model_l 给出实际 ZFC＋CH 模型存在。
 内部名称的一阶定义、支撑收集、小图解码、编码往返及 Cohen 内部实例见 Internal 各模块。
 内部规范名称递归由 zf_check_l 一次取得；解释还原由 zf_check_val_l 给出。
 文献选择、顺序方向、调用方式和尚未实现的语义范围见 `Forcing/README.md`。

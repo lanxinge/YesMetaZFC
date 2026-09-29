@@ -137,8 +137,9 @@ theorem classify {ℳ : SetTheory.Structure.{u}} {α : ℳ.Domain} (hExt : Exten
   by_cases hEmpty : ∀ value, ¬ ℳ.mem value α
   · exact Or.inl hEmpty
   · have hNonempty : ∃ value, ℳ.mem value α := by
-      set_option prove_auto.context.maxFacts 0 in
-        prove_auto USE hEmpty
+      apply Classical.byContradiction
+      intro h
+      exact hEmpty (fun value hValue => h ⟨value, hValue⟩)
     by_cases hGreatest : ∃ candidate,
         ℳ.mem candidate α ∧
           ∀ value, ℳ.mem value α →

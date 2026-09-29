@@ -26,7 +26,7 @@
 | [Skolem 壳](FirstOrder/Skolem.lean) | `Skolem_m` 显式携带存在成立时的见证函数；`hull_m` 对任意多排序签名、原结构及生成子集构造同层初等子结构。`hull_with_m` 还可同时封闭任意额外规则族，不要求其运算属于原语言。 |
 | [约化积与 Łoś](ReducedProduct/Los.lean) | 任意签名及同层结构族的截面商，有限参数无选择地下降。`los_m` 明确消费见证拼接条件，`los_iff_witness_m` 证明此条件恰好必要充分。 |
 | [同层超幂](Ultrapower.lean) | 恒定结构族的实际超幂，输入与输出 `Structure` 层级相同；对角嵌入、条件初等性、理论保持及主超幂的显式同构，不限于隶属语言。 |
-| [力迫与名称解释](Forcing/README.md) | 预序、布尔完备化、图求值及 Cohen 相对名称域真值。全部内部名称已有规范递归、内部原子力迫和原 Project 全公式真值；`preserves_zfc_l` 一次核验原 ZFC 全部公理及模式，另有二元布尔主泛型的实际完整实例。 |
+| [力迫与名称解释](Forcing/README.md) | 全部内部名称的原公式真值与 ZFC 保持；可数闭塌缩、不增实数及实际泛型满射。`ch_extension_l` 自动产生可数地模型的 CH 扩张，`ch_model_l` 从小图模型的可数初等子模型构造实际 ZFC＋CH 模型。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
