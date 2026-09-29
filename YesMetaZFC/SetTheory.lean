@@ -6,6 +6,7 @@ import YesMetaZFC.SetTheory.WellFounded
 import YesMetaZFC.SetTheory.Ord
 import YesMetaZFC.SetTheory.Card
 import YesMetaZFC.SetTheory.Collection
+import YesMetaZFC.SetTheory.Choice
 import YesMetaZFC.SetTheory.Filter.Tarski
 import YesMetaZFC.SetTheory.Filter.Extension
 import YesMetaZFC.SetTheory.Boolean.Filter

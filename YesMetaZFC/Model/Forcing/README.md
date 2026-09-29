@@ -4,9 +4,10 @@
 `YesMetaZFC.Model` 已导出此层。任意宿主预序已有实际正则开完备布尔代数和规范
 稠密映射。名称求值直接消费现有 `Model.Boolean.BV_graph`，输出实际 `SG_set`。
 已有相对名称域的解释扩张、完整一阶真值对应及 Cohen 新实数实例。一次调用
-可得到对全部原公式、任意有限参数同时有效的滤子。原 ZFC 的外延性、空集、
-基础及无穷公理已核验。内部名称已有实际一阶定义、递归刻画、小图解码与求值；
-内部力迫关系、一般地模型中的规范名称递归及其余公理保持仍待完成。
+可得到对全部原公式、任意有限参数同时有效的滤子。全部地模型内部名称的扩张另有
+完整内部力迫真值定理及原 ZFC 全部公理保持，包括全分离、全收集模式。
+`Internal.preserves_zfc_l` 一次返回模型性；内部名称、规范名称递归、原子力迫、
+公式翻译和各公理见证均由实际内部集合构造。
 
 ## 文献选择
 
@@ -63,6 +64,13 @@
 | `InternalRealization` | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
 | `InternalBoolean` | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
 | `InternalCohen` | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
+| `InternalAtomicSyntax`／`InternalAtomicClosure`／`InternalAtomic` | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
+| `InternalConditions`／`InternalDefinability`／`InternalAtomicTruth` | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集；证明原子真值对应。 |
+| `InternalFormula`／`InternalLogic`／`InternalTruth` | 原 Project 公式的内部力迫翻译、正则性和完整真值定理；量词遍历全部内部名称。 |
+| `InternalNameConstruction`／`InternalSeparation`／`InternalCollection`／`InternalPower` | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
+| `InternalZFOperations`／`InternalZF` | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
+| `SetTheory.Choice`／`InternalSelection`／`InternalChoice` | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
+| `InternalGenericInstance` | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
 
 分离比较定义为
 
@@ -157,11 +165,10 @@ have hbase := cohen_zfc_base_l r U
 ```
 
 `cohen_names_l r` 由空名称、Cohen 名称、ω 的规范名称及旧实数规范名称生成，
-**不是 ZFC 地模型的全部内部名称域**。四条基础公理已实现；配对、并集、幂集、
-分离、收集及选择的保持尚未证明，也没有把可数旧实数族称为 ZFC 地模型。
+**不是 ZFC 地模型的全部内部名称域**。此有限生成相对域只核验了四条基础公理；
+完整公理保持使用下述地模型全部内部名称域。
 完整真值对应的左侧是这个相对名称域的布尔解释，不能直接替换成全名称宇宙的
-`Boolean.bv_models_zfc`。正式内部名称接口见下一节；将内部布尔量词、力迫关系
-及其余公理保持接入该接口仍是下一层工作。`val_surjective_l` 已证明全部宿主名称的
+`Boolean.bv_models_zfc`。正式内部名称接口见下一节。`val_surjective_l` 已证明全部宿主名称的
 求值像就是全部宿主 `SG_set`，因此不能用全宿主名称域替代地模型相对化。
 
 ## 内部名称
@@ -211,8 +218,8 @@ have hv := Internal.cohen_internal_val_l U.mem
 ```
 
 上面的 `sg_*` 是实际完整小图地模型的实例，不声称它可数，也不声称由前面的
-可数稠密族构造所得滤子对整个小图地模型泛型。内部真值定义及全部 ZFC 保持，
-仍需在这些名称对象上继续证明。
+可数稠密族构造所得滤子对整个小图地模型泛型。下面的内部真值及保持定理要求
+`Generic_d`：滤子遇到地模型中每个在其接受条件下稠密的集合。
 
 ## 内部规范名称递归
 
@@ -256,6 +263,39 @@ obtain ⟨τ, hτ, hname, hunique⟩ := Internal.zf_check_l M hZF hb x
 `sg_check_ext_l hb U hU x` 直接证明旧对象属于内部名称的解释扩张。
 本层只返回存在与唯一性定理，没有定义全局不可计算的规范名称选择函数。
 
+## 内部真值与完整 ZFC 保持
+
+`Eq_force_d` 以模型内带条件双模拟为证书。在闭支撑 `S` 上，利用模型内
+`B × S × S` 的幂集收集所有双模拟，再取并得到最大关系；限制到另一个闭支撑
+保持该关系，因此力迫定义不依赖支撑。`Mem_force_d` 是匹配隶属见证的稠密闭包。
+两个谓词都有实际 Project 公式，原子真值沿名称图的良基关系证明。
+
+`force_code_m` 递归翻译原公式，否定为非零加强下不可实现，全称量词只遍历内部名称。
+`forcing_truth_l` 证明
+`(∃ p, U p ∧ Forces_d M B R z φ ρ p) ↔ Formula.satisfies η φ`，
+适用于任意自由变量闭合的原 Project 公式及相应有限参数赋值；
+`Env_val_d` 表示名称赋值 `ρ` 解释为扩张赋值 `η`，`lift_env_l` 给出任意 `η` 的提升。
+`Cond_order_d` 只要求预序和零元以下无非零条件，布尔代数由 `cond_order_l` 自动接入。
+
+分离在源名称支撑与条件集的积上按力迫正文分离；收集在模型内统一收集可能见证。
+幂集先把每个扩张子集正规化成模型内 `S × B` 的子集名称，再用模型自己的幂集收集。
+选择公理使用 `ZFC.ordinal_enum_l`：从原选择集公理和 Hartogs 定理取得支撑的内部
+序数枚举，最早可能隶属的指标产生可定义稠密集，保证选值存在且与名称呈现无关。
+
+```lean
+have hExt := Internal.preserves_zfc_l O hZFC hU hM hL
+-- O : Internal.Cond_order_d M B R z
+-- hU : Internal.Generic_d M B R z U
+-- hM : WellFounded M.mem；hL : Internal.Setlike_d M
+-- 结论是实际 extension_l 的原 SetTheory.ZFC 模型性，包括全部模式。
+have hConcrete := Internal.two_extension_zfc_l
+-- 小图地模型与二元布尔主泛型的完整实际实例，无额外模型存在前提。
+```
+
+`preserves_zf_l O hZF hU hM hL` 只消费地模型 ZF；选择公理仅在 `preserves_zfc_l`
+中使用。外部良基性与小呈现是实际小图解释的前提。尚未提供可数地模型上的
+无原子内部泛型存在端点，也未将 Cohen 相对名称域升级为完整内部 Cohen 扩张。
+
 ## 审计
 
 `python scripts/check_forcing.py` 先以 `lake --wfail build` 构建，再审计实际生产
@@ -268,10 +308,11 @@ Rasiowa–Sikorski 和 Tarski 扩张只在 Prop 存在证明内部使用选择�
 核心切片继续仅允许 `propext`、`Quot.sound` 与 Prop 证明中的 `Classical.choice`。
 直接引用原公理的 `ZFCBase`／`CohenTheory` 单独审计，只额外继承四条原公理定义
 中已经存在的 `native_decide` 自由闭合证书。`InternalClosure`、`InternalCheckModel`
-及 `MembershipInduction` 消费原 ZF 公理时，单独允许原七条固定公理的既有证书；
-这些依赖不开放给核心切片。
-复用的 `Ord.Recursion` 一并审计；序列限制的两个证明直接调用成员序数性与函数限制，
-排除了原自动化生成的原生计算公理依赖。
+及内部原子真值、全公式真值和 ZF 保持消费原 ZF 时，单独允许原七条固定公理的
+既有证书；`SetTheory.Choice` 与 `InternalChoice` 另成切片，只多允许原选择公理
+已有的句法闭合证书。这些依赖不开放给核心切片。
+复用的 `Ord.Recursion` 与 `Card.Aleph.Hartogs` 一并审计；序列限制及后继唯一性
+直接调用相应数学定理，排除了这些步骤原自动化生成的原生计算公理依赖。
 内部名称定义、解码图、编码图、条件集、序关系和 Cohen 编码数据也都严格排除
 `Classical.choice`。旧列表编码的单射性证书使用经典证明，保留在 Prop 内，
 没有封装进本层实际编码函数。

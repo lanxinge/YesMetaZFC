@@ -99,11 +99,11 @@ theorem name_subset_l (hP : ∀ a b, ∃ p, Pair_d M p a b)
   obtain ⟨S, ht, hS⟩ := ht
   exact name_adjoin_l M hP hU hS (fun p hp => hS t ht p (h p hp))
 
-/-- 两个带权子名称直接组成模型内名称；有限构造不消费分离或收集。 -/
-theorem name_pair_l (hE : Extensional M) (hP : ∀ a b, ∃ p, Pair_d M p a b)
-    (hU : ∀ F, ∃ S, M.IsUnionOf S F) {B s t b c}
-    (hs : Name_d M B s) (ht : Name_d M B t) (hb : M.mem b B) (hc : M.mem c B) :
-    ∃ q, Name_d M B q ∧ ∀ p, M.mem p q ↔ KPair_d M p s b ∨ KPair_d M p t c := by
+/-- 两个内部名称具有同一个模型内闭支撑；不要求条件集非空。 -/
+theorem name_support_l (hP : ∀ a b, ∃ p, Pair_d M p a b)
+    (hU : ∀ F, ∃ S, M.IsUnionOf S F) {B s t}
+    (hs : Name_d M B s) (ht : Name_d M B t) :
+    ∃ W, M.mem s W ∧ M.mem t W ∧ Supp_d M B W := by
   obtain ⟨S, hsS, hS⟩ := hs
   obtain ⟨T, htT, hT⟩ := ht
   obtain ⟨F, hF⟩ := hP S T
@@ -118,13 +118,21 @@ theorem name_pair_l (hE : Extensional M) (hP : ∀ a b, ∃ p, Pair_d M p a b)
       exact ⟨a, d, h, hw V (Or.inl rfl) ha, hd⟩
     · obtain ⟨a, d, h, ha, hd⟩ := hT z hz p hp
       exact ⟨a, d, h, hw V (Or.inr rfl) ha, hd⟩
+  exact ⟨W, hw S (Or.inl rfl) hsS, hw T (Or.inr rfl) htT, hC⟩
+
+/-- 两个带权子名称直接组成模型内名称；有限构造不消费分离或收集。 -/
+theorem name_pair_l (hE : Extensional M) (hP : ∀ a b, ∃ p, Pair_d M p a b)
+    (hU : ∀ F, ∃ S, M.IsUnionOf S F) {B s t b c}
+    (hs : Name_d M B s) (ht : Name_d M B t) (hb : M.mem b B) (hc : M.mem c B) :
+    ∃ q, Name_d M B q ∧ ∀ p, M.mem p q ↔ KPair_d M p s b ∨ KPair_d M p t c := by
+  obtain ⟨W, hsW, htW, hC⟩ := name_support_l M hP hU hs ht
   obtain ⟨v, hv⟩ := (kpair_interpretation_l M hE hP).total s b
   obtain ⟨w, hw'⟩ := (kpair_interpretation_l M hE hP).total t c
   obtain ⟨q, hq⟩ := hP v w
   refine ⟨q, name_adjoin_l M hP hU hC (fun p hp => ?_), fun p => (hq p).trans ?_⟩
   · rcases (hq p).mp hp with rfl | rfl
-    · exact ⟨s, b, hv, hw S (Or.inl rfl) hsS, hb⟩
-    · exact ⟨t, c, hw', hw T (Or.inr rfl) htT, hc⟩
+    · exact ⟨s, b, hv, hsW, hb⟩
+    · exact ⟨t, c, hw', htW, hc⟩
   · exact or_congr ⟨fun h => h ▸ hv, fun h => kpair_unique_l M hE h hv⟩
       ⟨fun h => h ▸ hw', fun h => kpair_unique_l M hE h hw'⟩
 

@@ -13,7 +13,8 @@ MODULES = ["YesMetaZFC.Model.Forcing." + n for n in
             "Domain", "Formula", "FormulaGeneric", "FormulaEnumeration",
             "InternalPair", "InternalNames", "InternalGraph", "InternalRealization",
             "InternalBoolean", "InternalCohen", "InternalCheckSyntax", "InternalCheck",
-            "InternalGround", "InternalCheckVal", "InternalCheckRealization")]
+            "InternalGround", "InternalCheckVal", "InternalCheckRealization",
+            "InternalAtomicSyntax", "InternalFormula", "InternalGenericInstance")]
 # 原公理公式已有的自由闭合证书，只允许出现在直接消费原公理的切片中。
 ZFC_MODULES = ["YesMetaZFC.Model.Forcing." + n for n in ("ZFCBase", "CohenTheory")]
 ZFC_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
@@ -22,10 +23,18 @@ ZFC_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
 INTERNAL_MODULES = ["YesMetaZFC.Model.Forcing.InternalClosure",
                     "YesMetaZFC.Model.Forcing.InternalCheckModel",
                     "YesMetaZFC.SetTheory.MembershipInduction",
-                    "YesMetaZFC.SetTheory.Ord.Recursion"]
+                    "YesMetaZFC.SetTheory.Ord.Recursion",
+                    "YesMetaZFC.SetTheory.Card.Aleph.Hartogs"]
+INTERNAL_MODULES += ["YesMetaZFC.Model.Forcing." + n for n in (
+    "InternalAtomicClosure", "InternalAtomic", "InternalConditions", "InternalDefinability",
+    "InternalAtomicTruth", "InternalLogic", "InternalTruth", "InternalNameConstruction",
+    "InternalSeparation", "InternalCollection", "InternalPower", "InternalZFOperations", "InternalZF",
+    "InternalSelection")]
 INTERNAL_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
                      for n in ("emptySet", "extensionality", "foundation", "infinity",
                                "pairing", "powerSet", "union")]
+CHOICE_MODULES = ["YesMetaZFC.SetTheory.Choice", "YesMetaZFC.Model.Forcing.InternalChoice"]
+CHOICE_BASELINE = INTERNAL_BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
 PREFIX = "YesMetaZFC.Model.Forcing."
 CHOICE_FREE = [PREFIX + n for n in (
     "PO_pre", "PO_ord", "PO_hom", "PO_compat", "PO_dense",
@@ -77,10 +86,21 @@ CHOICE_FREE += [PREFIX + "Internal." + n for n in (
     "check_mem_iff_l", "Ground_rep_d", "ground_node_l", "ground_graph_l", "ground_decode_l",
     "ground_rep_eq_l", "Ground_d", "check_val_l", "check_val_exists_l", "sg_mem_ind_l",
     "sg_check_range_l", "sg_ground_l", "sg_check_val_l",
+    "Triple_d", "Rel_d", "Below_d", "Match_wit_d", "Match_d", "Bisim_d", "Eq_force_d",
+    "triple_m", "rel_m", "below_m", "match_wit_m", "match_m", "bisim_m", "eq_force_m",
+    "fenv_l", "param_shift_l", "name_shift_l", "neg_code_m", "imp_code_m", "all_code_m",
+    "some_code_m", "mem_code_m", "eq_code_m", "force_code_m", "force_code_closed_l", "Code_d", "Forces_d",
+    "two_code_l", "two_code_injective_l", "two_order_l", "two_conditions_l", "two_relation_l",
+    "two_zero_l", "two_one_l", "two_filter_l", "two_generic_l",
 )]
 INTERNAL_CHOICE_FREE = [PREFIX + "Internal." + n for n in (
     "Entry_supp_d", "entry_supp_m", "Name_ops_d", "set_insert_l", "name_adjoin_l", "name_subset_l",
-    "name_pair_l", "name_unfold_l",
+    "name_pair_l", "name_unfold_l", "name_support_l", "Triple_carrier_d", "Max_bisim_d",
+    "Eq_match_d", "Mem_force_d", "mem_force_m", "Cond_order_d", "Dense_d", "Neg_d", "Lower_d", "Generic_d",
+    "Defined_d", "pred_m", "neg_pred_m", "Wit_d", "Bad_d", "wit_m", "bad_m", "Regular_d", "Eval_d",
+    "force_at_m", "force_at_closed_l", "Source_d", "source_m", "Sub_name_d", "sub_name_m",
+    "witness_m", "witness_closed_l",
+    "Poss_mem_d", "Min_mem_d", "poss_mem_m", "min_mem_m",
 )]
 INTERNAL_CHOICE_FREE += ["YesMetaZFC.SetTheory.Mem_ind_d",
                         "YesMetaZFC.SetTheory.Structure.IsSequenceOfLength.restriction",
@@ -93,4 +113,7 @@ if __name__ == "__main__":
         result = main(ZFC_MODULES, [], ZFC_BASELINE, "FORCING_ZFC_GUARD_PASS")
     if result == 0:
         result = main(INTERNAL_MODULES, INTERNAL_CHOICE_FREE, INTERNAL_BASELINE, "FORCING_INTERNAL_GUARD_PASS")
+    if result == 0:
+        result = main(CHOICE_MODULES, ["YesMetaZFC.SetTheory.ZFC." + n for n in
+            ("Rem_d", "rem_m", "Enum_step_d", "enum_step_m")], CHOICE_BASELINE, "FORCING_CHOICE_GUARD_PASS")
     sys.exit(result)
