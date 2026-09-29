@@ -28,6 +28,7 @@ INTERNAL_MODULES = ["YesMetaZFC.Model.Forcing.InternalClosure",
                     "YesMetaZFC.SetTheory.Card.Aleph.Hartogs"]
 INTERNAL_MODULES += ["YesMetaZFC.Model.Forcing." + n for n in (
     "InternalAtomicClosure", "InternalAtomic", "InternalConditions", "InternalDefinability",
+    "InternalAtomicWitness", "InternalEquivalence", "InternalQuotient", "InternalFoundation", "InternalCheckForcing",
     "InternalAtomicTruth", "InternalLogic", "InternalTruth", "InternalNameConstruction",
     "InternalSeparation", "InternalCollection", "InternalPower", "InternalZFOperations", "InternalZF",
     "InternalSelection")]
@@ -107,6 +108,8 @@ INTERNAL_CHOICE_FREE = [PREFIX + "Internal." + n for n in (
     "force_at_m", "force_at_closed_l", "Source_d", "source_m", "Sub_name_d", "sub_name_m",
     "witness_m", "witness_closed_l",
     "Poss_mem_d", "Min_mem_d", "poss_mem_m", "min_mem_m",
+    "Name_eq_d", "Name_quot_l", "Qval_d", "qmem_l", "name_quot_membership_l",
+    "qval_unique_l", "qval_name_l", "name_value_l", "value_name_l", "Min_name_d", "min_name_m",
 )]
 INTERNAL_CHOICE_FREE += ["YesMetaZFC.SetTheory.Mem_ind_d",
                         "YesMetaZFC.SetTheory.Structure.IsSequenceOfLength.restriction",

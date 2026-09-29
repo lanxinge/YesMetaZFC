@@ -8,7 +8,7 @@ import YesMetaZFC.Model.Forcing.InternalNameConstruction
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project
-universe u v
+universe u
 
 theorem args_cons_l {M : SetTheory.Structure.{u}} {n m} (ρ : Env M m) (t : Term m) (e : Fin n → Term m) :
     (⟨fun i : Fin (n + 1) => (Fin.cases t e i : Term m).eval ρ, ρ.free⟩ : Env M (n + 1)) =
@@ -57,18 +57,18 @@ theorem witness_sat_l {M : SetTheory.Structure.{u}} (hE : Extensional M) {n m}
 
 variable {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
 variable (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
-  (hM : _root_.WellFounded M.mem) (hL : Setlike_d.{u, v} M) (hN : ∃ t, Name_d M B t)
-local notation "E" => ext_structure_l (name_domain_l M hM hL B hN) U
+
+local notation "E" => extension_l M hZF B R z U
 include O hZF hU
 
 theorem internal_collection_l {n} (φ : BinarySchema n) (η : Env E n) (A : (E).Domain)
-    (h : ∀ x : (E).Domain, x.1 ∈ A.1 → ∃ y : (E).Domain,
+    (h : ∀ x : (E).Domain, x ∈ A → ∃ y : (E).Domain,
       Formula.satisfies ((η.push x).push y) φ.body) :
-    ∃ C : (E).Domain, ∀ x : (E).Domain, x.1 ∈ A.1 → ∃ y : (E).Domain,
-      y.1 ∈ C.1 ∧ Formula.satisfies ((η.push x).push y) φ.body := by
+    ∃ C : (E).Domain, ∀ x : (E).Domain, x ∈ A → ∃ y : (E).Domain,
+      y ∈ C ∧ Formula.satisfies ((η.push x).push y) φ.body := by
   classical
-  obtain ⟨ρ, hρ⟩ := lift_env_l hM hL hN η
-  obtain ⟨t, ht, hA⟩ := value_name_l hM hL hN A
+  obtain ⟨ρ, hρ⟩ := lift_env_l hZF η
+  obtain ⟨t, ht, hA⟩ := value_name_l A
   obtain ⟨S, htS, hS⟩ := ht
   let I := kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))
   obtain ⟨K, hK⟩ := ZF.exists_cartesianProduct hZF I S B
@@ -103,13 +103,13 @@ theorem internal_collection_l {n} (φ : BinarySchema n) (η : Env E n) (A : (E).
   let ρb : Env M 1 := ⟨fun _ => b, fun _ => b⟩
   obtain ⟨q, hq, _, hqE⟩ := name_comp_l M hZF BinarySchema.constantValue ρb B F
     (fun v hv => ((hf v).mp hv).2)
-  obtain ⟨C, hC⟩ := name_value_l hM hL hN hq
+  obtain ⟨C, hC⟩ := name_value_l (R := R) (z := z) (U := U) hq
   refine ⟨C, fun x hx => ?_⟩
-  obtain ⟨a, c, ha, hc, hax⟩ := (val_mem_l M hA).mp hx
+  obtain ⟨a, c, ha, hc, hax⟩ := (qval_mem_l O hZF hU hA).mp hx
   obtain ⟨y, hxy⟩ := h x hx
-  obtain ⟨v, hv, hvy⟩ := value_name_l hM hL hN y
-  have hρ' := env_val_push_l hM hL hN (env_val_push_l hM hL hN hρ hax) hvy
-  have hEval := formula_eval_l O hZF hU hM hL hN φ.body φ.freeClosed ((ρ.push a).push v)
+  obtain ⟨v, hv, hvy⟩ := value_name_l y
+  have hρ' := env_val_push_l hZF (env_val_push_l hZF hρ hax) hvy
+  have hEval := formula_eval_l O hZF hU φ.body φ.freeClosed ((ρ.push a).push v)
     ((η.push x).push y) hρ'
   obtain ⟨p, hp, hpφ⟩ := hEval.2.mpr hxy
   obtain ⟨r, hr, _, hrp⟩ := hU.directed c p hc hp
@@ -119,11 +119,11 @@ theorem internal_collection_l {n} (φ : BinarySchema n) (η : Env E n) (A : (E).
   obtain ⟨w, hwT, hw⟩ := hT k ((hK k).mpr ⟨a, (supp_entry_l M hS htS ha).1, r, hr'.1, hk⟩)
   obtain ⟨a', r', hk', hwN, hwφ⟩ := (hψ k w).mp hw
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hk hk'
-  obtain ⟨y', hwy⟩ := name_value_l hM hL hN hwN
-  refine ⟨y', (val_mem_l M hC).mpr ⟨w, b, (hqE w b).mpr ⟨(hf w).mpr ⟨hwT, hwN⟩,
+  obtain ⟨y', hwy⟩ := name_value_l (R := R) (z := z) (U := U) hwN
+  refine ⟨y', (qval_mem_l O hZF hU hC).mpr ⟨w, b, (hqE w b).mpr ⟨(hf w).mpr ⟨hwT, hwN⟩,
     (hU.proper b hb).1, (Formula.denote_constantValue_iff hZF.1 ρb w b).mpr rfl⟩, hb, hwy⟩, ?_⟩
-  exact (forcing_truth_l O hZF hU hM hL hN φ.body φ.freeClosed ((ρ.push a).push w)
-    ((η.push x).push y') (env_val_push_l hM hL hN (env_val_push_l hM hL hN hρ hax) hwy)).mp
+  exact (forcing_truth_l O hZF hU φ.body φ.freeClosed ((ρ.push a).push w)
+    ((η.push x).push y') (env_val_push_l hZF (env_val_push_l hZF hρ hax) hwy)).mp
       ⟨r, hr, hwφ v hv hrφ⟩
 
 end YesMetaZFC.Model.Forcing.Internal

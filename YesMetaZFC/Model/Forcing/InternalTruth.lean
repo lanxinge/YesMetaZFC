@@ -1,26 +1,21 @@
 import YesMetaZFC.Model.Forcing.InternalLogic
+import YesMetaZFC.Model.Forcing.InternalQuotient
 
 /-! # 全部原公式的内部力迫真值定理
 
-原公式、内部力迫翻译与实际解释扩张逐构造对应。量词见证由内部名称的解码取得；
+原公式、内部力迫翻译与名称泛型商逐构造对应。量词见证由商类的名称代表取得；
 全称量词的反向方向使用实际反例公式形成的稠密集。
 -/
 
 namespace YesMetaZFC.Model.Forcing.Internal
-open SetTheory SetTheory.Definitional.Project SmallGraph
-universe u v
+open SetTheory SetTheory.Definitional.Project
+universe u
 variable {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
 
 theorem defined_congr_l {P Q : M.Domain → Prop} (h : Defined_d M P) (e : ∀ p, P p ↔ Q p) :
     Defined_d M Q := by
   obtain ⟨n, φ, ρ, hφ⟩ := h
   exact ⟨n, φ, ρ, fun p => (hφ p).trans (e p)⟩
-
-theorem val_unique_l {t : M.Domain} {x y : SG_set.{v}}
-    (h : Val_d M B U t x) (k : Val_d M B U t y) : x = y := by
-  obtain ⟨G, hG, rfl⟩ := h
-  obtain ⟨H, hH, rfl⟩ := k
-  exact rep_val_eq_l M U hG hH
 
 variable (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
 include O hZF hU
@@ -55,40 +50,29 @@ private theorem code_eval_imp_l {n} {C D : Formula 1 (n + 4)} {ρ : Env M n} {P 
   classical
   simp only [not_and, Classical.not_not]
 
-variable (hM : _root_.WellFounded M.mem) (hL : Setlike_d.{u, v} M) (hN : ∃ t, Name_d M B t)
-local notation "E" => ext_structure_l (name_domain_l M hM hL B hN) U
+local notation "E" => extension_l M hZF B R z U
 
 def Env_val_d {n} (ρ : Env M n) (η : Env E n) : Prop :=
-  ∀ t : Term n, Val_d M B U (t.eval ρ) (t.eval η).1
+  ∀ t : Term n, Qval_d M B R z U (t.eval ρ) (t.eval η)
 
-omit O hZF hU in
-theorem env_val_push_l {n} {ρ : Env M n} {η : Env E n} (h : Env_val_d hM hL hN ρ η)
-    {t : M.Domain} {x : (E).Domain} (hx : Val_d M B U t x.1) :
-    Env_val_d hM hL hN (ρ.push t) (η.push x) := by
+omit O hU in
+theorem env_val_push_l {n} {ρ : Env M n} {η : Env E n} (h : Env_val_d hZF ρ η)
+    {t : M.Domain} {x : (E).Domain} (hx : Qval_d M B R z U t x) :
+    Env_val_d hZF (ρ.push t) (η.push x) := by
   intro s
   cases s with
   | free i => exact h (.free i)
   | bound i => exact Fin.cases hx (fun i => h (.bound i)) i
 
-omit O hZF hU in
-theorem env_val_name_l {n} {ρ : Env M n} {η : Env E n} (h : Env_val_d hM hL hN ρ η) (t : Term n) :
-    Name_d M B (t.eval ρ) := (h t).elim fun _ h => h.1.1
+omit O hU in
+theorem env_val_name_l {n} {ρ : Env M n} {η : Env E n} (h : Env_val_d hZF ρ η) (t : Term n) :
+    Name_d M B (t.eval ρ) := qval_name_l (h t)
 
-omit O hZF hU in
-theorem name_value_l {t} (ht : Name_d M B t) : ∃ x : (E).Domain, Val_d M B U t x.1 := by
-  obtain ⟨x, hx, _⟩ := val_exists_unique_l M hM hL B U ht
-  exact ⟨⟨x, (ext_iff_l M hM hL B hN U x).mpr ⟨t, hx⟩⟩, hx⟩
-
-omit O hZF hU in
-theorem value_name_l (x : (E).Domain) : ∃ t, Name_d M B t ∧ Val_d M B U t x.1 := by
-  obtain ⟨G, ⟨t, ht⟩, he⟩ := x.2
-  exact ⟨t, ht.1, G, ht, he⟩
-
-omit O hZF hU in
+omit O hU in
 /-- 任意扩张赋值都可在 Prop 中提升为内部名称赋值，不导出全局选择函数。 -/
-theorem lift_env_l {n} (η : Env E n) : ∃ ρ : Env M n, Env_val_d hM hL hN ρ η := by
-  obtain ⟨b, hb⟩ := Classical.axiomOfChoice (fun i => value_name_l hM hL hN (η.bound i))
-  obtain ⟨f, hf⟩ := Classical.axiomOfChoice (fun i => value_name_l hM hL hN (η.free i))
+theorem lift_env_l {n} (η : Env E n) : ∃ ρ : Env M n, Env_val_d hZF ρ η := by
+  obtain ⟨b, hb⟩ := Classical.axiomOfChoice (fun i => value_name_l (η.bound i))
+  obtain ⟨f, hf⟩ := Classical.axiomOfChoice (fun i => value_name_l (η.free i))
   refine ⟨⟨b, f⟩, fun t => ?_⟩
   cases t with
   | bound i => exact (hb i).2
@@ -96,7 +80,7 @@ theorem lift_env_l {n} (η : Env E n) : ∃ ρ : Env M n, Env_val_d hM hL hN ρ 
 
 private theorem code_eval_all_l {n} {C : Formula 1 (n + 5)} {ρ : Env M n} {Q : (E).Domain → Prop}
     (hC : C.FreeClosed)
-    (h : ∀ t, Name_d M B t → ∀ x : (E).Domain, Val_d M B U t x.1 →
+    (h : ∀ t, Name_d M B t → ∀ x : (E).Domain, Qval_d M B R z U t x →
       Eval_d M B R z U (Code_d M B R z C (ρ.push t)) (Q x)) :
     Eval_d M B R z U (Code_d M B R z (all_code_m C) ρ) (∀ x, Q x) := by
   have he := funext fun p => propext (code_all_l M hZF.1 B R z C ρ p)
@@ -109,46 +93,39 @@ private theorem code_eval_all_l {n} {C : Formula 1 (n + 5)} {ρ : Env M n} {Q : 
         rw [code_some_l M hZF.1]
         exact exists_congr fun t => and_congr_right fun _ => code_neg_l M hZF.1 B R z C (ρ.push t) p)
   have hall : Eval_d M B R z U (fun p => ∀ t, Name_d M B t → Code_d M B R z C (ρ.push t) p)
-      (∀ t, Name_d M B t → ∃ x : (E).Domain, Val_d M B U t x.1 ∧ Q x) := by
+      (∀ t, Name_d M B t → ∃ x : (E).Domain, Qval_d M B R z U t x ∧ Q x) := by
     apply eval_all_l O hZF hU hd hc
     intro t ht
-    obtain ⟨x, hx⟩ := name_value_l hM hL hN ht
+    obtain ⟨x, hx⟩ := name_value_l (R := R) (z := z) (U := U) ht
     apply eval_congr_l (h t ht x hx)
     exact ⟨fun hQ => ⟨x, hx, hQ⟩, fun ⟨y, hy, hQ⟩ =>
-      (show y = x from Subtype.ext (val_unique_l hy hx)) ▸ hQ⟩
+      (show y = x from qval_unique_l hy hx) ▸ hQ⟩
   apply eval_congr_l hall
   constructor
   · intro h x
-    obtain ⟨t, ht, hx⟩ := value_name_l hM hL hN x
+    obtain ⟨t, ht, hx⟩ := value_name_l x
     obtain ⟨y, hy, hQ⟩ := h t ht
-    exact (show y = x from Subtype.ext (val_unique_l hy hx)) ▸ hQ
+    exact (show y = x from qval_unique_l hy hx) ▸ hQ
   · intro h t ht
-    obtain ⟨x, hx⟩ := name_value_l hM hL hN ht
+    obtain ⟨x, hx⟩ := name_value_l (R := R) (z := z) (U := U) ht
     exact ⟨x, hx, h x⟩
 
 private theorem code_eval_mem_l {n} (s t : Term n) {ρ : Env M n} {η : Env E n}
-    (hρ : Env_val_d hM hL hN ρ η) :
+    (hρ : Env_val_d hZF ρ η) :
     Eval_d M B R z U (Code_d M B R z (mem_code_m s t) ρ) ((E).mem (s.eval η) (t.eval η)) := by
-  obtain ⟨G, hG, he⟩ := hρ s
-  obtain ⟨H, hH, hf⟩ := hρ t
   rw [funext fun p => propext (code_mem_l M hZF.1 B R z s t ρ p)]
-  refine ⟨regular_mem_l O _ _, ?_⟩
-  simpa only [he, hf, ext_structure_l] using mem_force_truth_l O hZF hU G H hG hH
+  exact ⟨regular_mem_l O _ _, qval_mem_forcing_l O hZF hU (hρ s) (hρ t)⟩
 
 private theorem code_eval_eq_l {n} (s t : Term n) {ρ : Env M n} {η : Env E n}
-    (hρ : Env_val_d hM hL hN ρ η) :
+    (hρ : Env_val_d hZF ρ η) :
     Eval_d M B R z U (Code_d M B R z (eq_code_m s t) ρ) (s.eval η = t.eval η) := by
-  obtain ⟨G, hG, he⟩ := hρ s
-  obtain ⟨H, hH, hf⟩ := hρ t
   rw [funext fun p => propext (code_eq_l M hZF.1 B R z s t ρ p)]
-  refine ⟨regular_eq_l O hZF hG.1 hH.1, ?_⟩
-  have h := eq_force_truth_l O hZF hU G H hG hH
-  rw [he, hf] at h
-  exact h.trans ⟨Subtype.ext, congrArg Subtype.val⟩
+  exact ⟨regular_eq_l O hZF (qval_name_l (hρ s)) (qval_name_l (hρ t)),
+    qval_eq_l O hZF hU (hρ s) (hρ t)⟩
 
 /-- 同时核验正则性及全部连接词、量词的求值真值。 -/
 theorem formula_eval_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed)
-    (ρ : Env M n) (η : Env E n) (hρ : Env_val_d hM hL hN ρ η) :
+    (ρ : Env M n) (η : Env E n) (hρ : Env_val_d hZF ρ η) :
     Eval_d M B R z U (Forces_d M B R z φ ρ) (Formula.satisfies η φ) := by
   unfold Forces_d
   induction φ <;> simp only [Definitional.Formula.FreeClosed] at hφ
@@ -164,18 +141,18 @@ theorem formula_eval_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed)
       ⟨fun _ => trivial, fun _ => hU.inhabited.elim fun p hp => ⟨p, hp, trivial⟩⟩⟩
   case mem s t =>
     simp only [force_code_m, Formula.satisfies_mem_iff]
-    exact code_eval_mem_l O hZF hU hM hL hN s t hρ
+    exact code_eval_mem_l O hZF hU s t hρ
   case atom r _ ts =>
     cases r
-    · apply eval_congr_l (code_eval_eq_l O hZF hU hM hL hN (ts 0) (ts 1) hρ)
+    · apply eval_congr_l (code_eval_eq_l O hZF hU (ts 0) (ts 1) hρ)
       simp only [Formula.satisfies_atom_extensionalEq_iff]
       change ((ts 0).eval η = (ts 1).eval η) ↔ _
       exact ⟨fun h x => congrArg (fun y => (E).mem x y) h |>.to_iff,
-        fun h => (ext_extensional_l _ U).eq_of_same_members _ _ h⟩
+        fun h => (extension_ext_l O hZF hU).eq_of_same_members _ _ h⟩
     · simp only [force_code_m, Formula.satisfies_atom_subset_iff]
       change Eval_d M B R z U (Code_d M B R z (all_code_m _) ρ)
         (∀ x : (E).Domain, (E).mem x ((ts 0).eval η) → (E).mem x ((ts 1).eval η))
-      apply code_eval_all_l O hZF hU hM hL hN
+      apply code_eval_all_l O hZF hU
         (imp_code_m_freeClosed _ _ (mem_code_m_freeClosed _ _ rfl (by simpa using hφ 0))
           (mem_code_m_freeClosed _ _ rfl (by simpa using hφ 1)))
       intro t ht x hx
@@ -183,9 +160,9 @@ theorem formula_eval_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed)
         (mem_code_m_freeClosed _ _ rfl (by simpa using hφ 0))
         (mem_code_m_freeClosed _ _ rfl (by simpa using hφ 1))
         (by simpa only [Definitional.Term.eval_newest, Definitional.Term.eval_weaken] using
-          code_eval_mem_l O hZF hU hM hL hN .newest (ts 0).weaken (env_val_push_l hM hL hN hρ hx))
+          code_eval_mem_l O hZF hU .newest (ts 0).weaken (env_val_push_l hZF hρ hx))
         (by simpa only [Definitional.Term.eval_newest, Definitional.Term.eval_weaken] using
-          code_eval_mem_l O hZF hU hM hL hN .newest (ts 1).weaken (env_val_push_l hM hL hN hρ hx))
+          code_eval_mem_l O hZF hU .newest (ts 1).weaken (env_val_push_l hZF hρ hx))
   case neg φ ih =>
     simp only [force_code_m, Formula.satisfies_neg_iff]
     exact code_eval_neg_l O hZF hU (force_code_closed_l φ hφ) (ih hφ ρ η hρ)
@@ -216,20 +193,20 @@ theorem formula_eval_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed)
     exact eval_congr_l (code_eval_conj_l hU h k) ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.mp, h.mpr⟩⟩
   case forallE φ ih =>
     simp only [force_code_m, Formula.satisfies_forall_iff]
-    exact code_eval_all_l O hZF hU hM hL hN (force_code_closed_l φ hφ)
-      (fun t _ x hx => ih hφ (ρ.push t) (η.push x) (env_val_push_l hM hL hN hρ hx))
+    exact code_eval_all_l O hZF hU (force_code_closed_l φ hφ)
+      (fun t _ x hx => ih hφ (ρ.push t) (η.push x) (env_val_push_l hZF hρ hx))
   case existsE φ ih =>
     have hc := force_code_closed_l φ hφ
-    have h := code_eval_all_l O hZF hU hM hL hN (neg_code_m_freeClosed _ hc)
+    have h := code_eval_all_l O hZF hU (neg_code_m_freeClosed _ hc)
       (fun t _ x hx => code_eval_neg_l O hZF hU hc
-        (ih hφ (ρ.push t) (η.push x) (env_val_push_l hM hL hN hρ hx)))
+        (ih hφ (ρ.push t) (η.push x) (env_val_push_l hZF hρ hx)))
     apply eval_congr_l (code_eval_neg_l O hZF hU (all_code_m_freeClosed _ (neg_code_m_freeClosed _ hc)) h)
     classical
     simp only [Formula.satisfies_exists_iff, Classical.not_forall, Classical.not_not]
 
 theorem forcing_truth_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed)
-    (ρ : Env M n) (η : Env E n) (hρ : Env_val_d hM hL hN ρ η) :
+    (ρ : Env M n) (η : Env E n) (hρ : Env_val_d hZF ρ η) :
     (∃ p, U p ∧ Forces_d M B R z φ ρ p) ↔ Formula.satisfies η φ :=
-  (formula_eval_l O hZF hU hM hL hN φ hφ ρ η hρ).2
+  (formula_eval_l O hZF hU φ hφ ρ η hρ).2
 
 end YesMetaZFC.Model.Forcing.Internal

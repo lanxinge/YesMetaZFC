@@ -9,7 +9,7 @@ import YesMetaZFC.Model.Forcing.GroundTransfer
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project SmallGraph
-universe u v
+universe u
 variable {M : SetTheory.Structure.{u}} {B R ω : M.Domain} {U : M.Domain → Prop}
 
 theorem check_image_l (hZF : M.Models ZF) {b} (hb : M.mem b B) (A : M.Domain) :
@@ -30,10 +30,9 @@ theorem check_image_l (hZF : M.Models ZF) {b} (hb : M.mem b B) (A : M.Domain) :
   exact check_unique_l M hZF.1 (check_ind_l M hZF) b a s t has hat ▸ hsn
 
 variable (O : Cond_order_d M B R B) (hZFC : M.Models ZFC) (hU : Generic_d M B R B U)
-  (hM : _root_.WellFounded M.mem) (hL : Setlike_d.{u,v} M) (hN : ∃ t, Name_d M B t)
-local notation "E" => ext_structure_l (name_domain_l M hM hL B hN) U
-variable {hEN : Extensional (ext_structure_l (name_domain_l M hM hL B hN) U)}
-  {hPN : ∀ a b, ∃ p, Pair_d (ext_structure_l (name_domain_l M hM hL B hN) U) p a b}
+local notation "E" => extension_l M (ZFC.models_zf_l hZFC) B R B U
+variable {hEN : Extensional (extension_l M (ZFC.models_zf_l hZFC) B R B U)}
+  {hPN : ∀ a b, ∃ p, Pair_d (extension_l M (ZFC.models_zf_l hZFC) B R B U) p a b}
 include O hZFC hU hEN hPN
 
 theorem collapse_surjection_l {X Y b} (hω : M.IsOmega ω) (hb : U b)
@@ -44,7 +43,7 @@ theorem collapse_surjection_l {X Y b} (hω : M.IsOmega ω) (hb : U b)
       (KP.exists_pair (ZF.modelsKP (ZFC.models_zf_l hZFC)))) X ω) (hY : ∃ y, M.mem y Y)
     (e : M.Domain → (E).Domain) (hi : Function.Injective e)
     (he : ∀ a y, (E).mem y (e a) ↔ ∃ c, M.mem c a ∧ e c = y)
-    (hv : ∀ a t, Check_d M b a t → Val_d M B U t (e a).1) :
+    (hv : ∀ a t, Check_d M b a t → Qval_d M B R B U t (e a)) :
     ∃ F : (E).Domain, (E).IsSetFunctionFromTo (kpair_interpretation_l E hEN hPN) F (e X) (e Y) ∧
       (E).IsSetSurjectiveOnto (kpair_interpretation_l E hEN hPN) F (e X) (e Y) := by
   classical
@@ -90,18 +89,18 @@ theorem collapse_surjection_l {X Y b} (hω : M.IsOmega ω) (hb : U b)
       check_sat_l M hZF.1, Formula.satisfies_mem_iff]
     rfl
   obtain ⟨t, ht, _, hte⟩ := name_comp_l M hZF φ ρ B S hs
-  obtain ⟨F, hF⟩ := name_value_l hM hL hN ht
+  obtain ⟨F, hF⟩ := name_value_l (R := R) (z := B) (U := U) ht
   have hm (x : (E).Domain) : (E).mem x F ↔ ∃ p, U p ∧ ∃ a, M.mem a p ∧ e a = x := by
     constructor
     · intro hx
-      obtain ⟨s, p, hsp, hp, hsx⟩ := (val_mem_l M hF).mp hx
+      obtain ⟨s, p, hsp, hp, hsx⟩ := (qval_mem_l O hZF hU hF).mp hx
       obtain ⟨a, has, hap⟩ := (hφ s p).mp ((hte s p).mp hsp).2.2
-      exact ⟨p, hp, a, hap, Subtype.ext (val_unique_l (hv a s has) hsx)⟩
+      exact ⟨p, hp, a, hap, qval_unique_l (hv a s has) hsx⟩
     · rintro ⟨p, hp', a, hap, rfl⟩
       obtain ⟨i, c, hac⟩ := (hp hp').1.1 a hap
       have hic := (hp hp').2.1 i c ⟨a, hac, hap⟩
       obtain ⟨s, has, _, _⟩ := zf_check_l M hZF (hU.proper b hb).1 a
-      exact (val_mem_l M hF).mpr ⟨s, p, (hte s p).mpr
+      exact (qval_mem_l O hZF hU hF).mpr ⟨s, p, (hte s p).mpr
         ⟨(hS s).mpr ⟨a, (hP a).mpr ⟨i, hic.1, c, hic.2, hac⟩, has⟩,
           (hU.proper p hp').1, (hφ s p).mpr ⟨a, has, hap⟩⟩, hp', hv a s has⟩
   have hf (x y : (E).Domain) : Entry_d E x y F ↔

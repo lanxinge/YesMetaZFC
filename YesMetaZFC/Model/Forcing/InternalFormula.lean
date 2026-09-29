@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.InternalAtomicTruth
+import YesMetaZFC.Model.Forcing.InternalAtomicWitness
 
 /-! # 原 Project 公式的内部力迫翻译
 

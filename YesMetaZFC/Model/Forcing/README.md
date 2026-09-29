@@ -7,9 +7,10 @@
 可得到对全部原公式、任意有限参数同时有效的滤子。全部地模型内部名称的扩张另有
 完整内部力迫真值定理及原 ZFC 全部公理保持，包括全分离、全收集模式。
 `Internal.preserves_zfc_l` 一次返回模型性；内部名称、规范名称递归、原子力迫、
-公式翻译和各公理见证均由实际内部集合构造。
+公式翻译和各公理见证均由实际内部集合构造。主扩张载体是内部名称的泛型商，
+允许任意外部非良基地模型，载体 universe 与地模型相同。
 可数闭塌缩已接入这一名称域；`Internal.ch_model_l` 给出实际 ZFC＋CH 模型存在，
-`Internal.ch_extension_l` 从可数外部良基地模型自动构造相应泛型扩张。
+`Internal.ch_extension_l` 从任意可数地模型自动构造相应泛型扩张。
 
 ## 文献选择
 
@@ -67,8 +68,11 @@
 | `InternalBoolean` | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
 | `InternalCohen` | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
 | `InternalAtomicSyntax`／`InternalAtomicClosure`／`InternalAtomic` | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
-| `InternalConditions`／`InternalDefinability`／`InternalAtomicTruth` | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集；证明原子真值对应。 |
-| `InternalFormula`／`InternalLogic`／`InternalTruth` | 原 Project 公式的内部力迫翻译、正则性和完整真值定理；量词遍历全部内部名称。 |
+| `InternalConditions`／`InternalDefinability`／`InternalAtomicWitness` | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集。 |
+| `InternalEquivalence`／`InternalQuotient` | 模型内部双模拟的等价及替换；同 universe 的名称泛型商、原子真值、求值成员方程及外延性。 |
+| `InternalFoundation`／`InternalCheckForcing` | 由内部公式归纳证明条目极小元、商模型的基础公理及规范名称嵌入单射性；允许外部非良基地模型。 |
+| `InternalAtomicTruth` | 外部良基名称图的原子真值及求值对应；图表示层的独立接口。 |
+| `InternalFormula`／`InternalLogic`／`InternalTruth` | 原 Project 公式的内部力迫翻译、正则性和泛型商的完整真值定理；量词遍历全部内部名称。 |
 | `InternalNameConstruction`／`InternalSeparation`／`InternalCollection`／`InternalPower` | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
 | `InternalZFOperations`／`InternalZF` | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
 | `SetTheory.Choice`／`InternalSelection`／`InternalChoice` | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
@@ -274,7 +278,15 @@ obtain ⟨τ, hτ, hname, hunique⟩ := Internal.zf_check_l M hZF hb x
 `Eq_force_d` 以模型内带条件双模拟为证书。在闭支撑 `S` 上，利用模型内
 `B × S × S` 的幂集收集所有双模拟，再取并得到最大关系；限制到另一个闭支撑
 保持该关系，因此力迫定义不依赖支撑。`Mem_force_d` 是匹配隶属见证的稠密闭包。
-两个谓词都有实际 Project 公式，原子真值沿名称图的良基关系证明。
+两个谓词都有实际 Project 公式。`InternalEquivalence` 在模型内三元组集合上构造
+对角、逆关系和复合双模拟，证明等号力迫的等价性及隶属替换；不使用外部良基归纳。
+
+`InternalQuotient` 定义 `Name_quot_l M B R z U`：内部名称按
+`∃ p, U p ∧ Eq_force_d M B R z p s t` 取商。`Qval_d` 是名称到商类的解释关系，
+`qmem_l` 是被接受的隶属力迫在商上的像；替换定理保证它与任意代表元一致。
+`extension_l M hZF B R z U` 是这个商上的实际集合论结构。若地模型载体为 `Type u`，
+扩张载体同样为 `Type u`。小图解码及 `InternalAtomicTruth` 保留为外部良基情形的
+图表示设施，内部真值与公理保持直接在商上证明。
 
 `force_code_m` 递归翻译原公式，否定为非零加强下不可实现，全称量词只遍历内部名称。
 `forcing_truth_l` 证明
@@ -287,20 +299,23 @@ obtain ⟨τ, hτ, hname, hunique⟩ := Internal.zf_check_l M hZF hb x
 幂集先把每个扩张子集正规化成模型内 `S × B` 的子集名称，再用模型自己的幂集收集。
 选择公理使用 `ZFC.ordinal_enum_l`：从原选择集公理和 Hartogs 定理取得支撑的内部
 序数枚举，最早可能隶属的指标产生可定义稠密集，保证选值存在且与名称呈现无关。
+基础公理使用 `entry_ind_l`，它把实际公式加强到两层成员，从原内部成员归纳得到
+名称条目归纳。`entry_min_l` 在模型内集合中找到条目极小元；泛型性遇到极小可能
+成员的稠密集，从而证明 `internal_foundation_l`。这不把内部基础公理当成外部良基性。
 
 ```lean
-have hExt := Internal.preserves_zfc_l O hZFC hU hM hL
+have hExt := Internal.preserves_zfc_l O hZFC hU
 -- O : Internal.Cond_order_d M B R z
 -- hU : Internal.Generic_d M B R z U
--- hM : WellFounded M.mem；hL : Internal.Setlike_d M
--- 结论是实际 extension_l 的原 SetTheory.ZFC 模型性，包括全部模式。
+-- 结论是 extension_l M (ZFC.models_zf_l hZFC) B R z U 满足原 ZFC，包括全部模式。
 have hConcrete := Internal.two_extension_zfc_l
 -- 小图地模型与二元布尔主泛型的完整实际实例，无额外模型存在前提。
 ```
 
-`preserves_zf_l O hZF hU hM hL` 只消费地模型 ZF；选择公理仅在 `preserves_zfc_l`
-中使用。外部良基性与小呈现是实际小图解释的前提。可数地模型的完整内部泛型
-存在现由 `internal_generic_l` 提供；Cohen 相对名称域尚未接成完整内部 Cohen 扩张。
+`preserves_zf_l O hZF hU` 只消费地模型 ZF；选择公理仅在 `preserves_zfc_l` 中使用。
+这两个保持接口均不要求可数性、外部良基性或小图呈现。任意可数地模型的完整
+泛型存在由 `internal_generic_l` 提供；对未给枚举的模型，保持定理消费给定的
+`Generic_d` 证书。Cohen 相对名称域尚未接成完整内部 Cohen 扩张。
 
 ## ZFC＋CH 的实际力迫模型
 
@@ -318,6 +333,11 @@ have hConcrete := Internal.two_extension_zfc_l
 取得一个全判定条件。地模型按这个条件分离出旧实数，证明其规范名称与给定实数
 解释相同。`collapse_surjection_l` 则把被泛型滤子接受的条件中的有序对收集成
 实际关系名称：指定坐标稠密集保证全定义，指定值稠密集保证满射。
+`check_force_reflect_l` 对原对象作内部公式归纳，证明规范名称在泛型商中的单射性。
+`check_map_l` 因而给出任意地模型的成员满覆盖嵌入。`image_omega_l` 在扩张中对
+旧 ω 与任意归纳集的差集取基础公理极小元，证明旧内部 ω 仍是扩张的 ω；
+这里没有排除非标准自然数。`ch_forcing_l M hZFC` 对任意地模型给出实际塌缩偏序，
+并证明其每个地模型泛型商满足 ZFC＋CH。
 这条路线与 [Isabelle/ZF 的 CH 塌缩构造](https://isa-afp.org/browser_info/current/AFP/Independence_CH/CH.html)
 使用的可数部分函数塌缩一致。
 
@@ -330,8 +350,8 @@ have hConcrete := Internal.two_extension_zfc_l
 obtain ⟨N, hN⟩ := Internal.ch_model_l
 -- hN : N.Models (SetTheory.ZFC_CH Internal.kpair_convention_l)
 
-obtain ⟨B, R, U, hO, hU, hCH⟩ := Internal.ch_extension_l M hZFC hM e he
--- e : Nat → M.Domain，he : Function.Surjective e；小呈现自动构造。
+obtain ⟨B, R, U, hO, hU, hCH⟩ := Internal.ch_extension_l M hZFC e he
+-- e : Nat → M.Domain，he : Function.Surjective e；允许外部非良基与非标准 ω。
 -- B、R 是模型内条件集与序关系，U 是实际地模型泛型滤子。
 ```
 

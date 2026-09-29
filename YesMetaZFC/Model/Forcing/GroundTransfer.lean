@@ -1,4 +1,5 @@
 import YesMetaZFC.Model.Forcing.InternalZFOperations
+import YesMetaZFC.Model.Forcing.InternalCheckForcing
 
 /-! # 规范名称的地模型嵌入与有界结构保持
 
@@ -8,45 +9,42 @@ import YesMetaZFC.Model.Forcing.InternalZFOperations
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project SmallGraph
-universe u v w
-variable {M : SetTheory.Structure.{u}} {B : M.Domain} {U : M.Domain → Prop}
+universe u w
+variable {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
 
-theorem check_map_l (hZF : M.Models ZF) (hM : _root_.WellFounded M.mem)
-    (hL : Setlike_d.{u,v} M) (hN : ∃ t, Name_d M B t) {b} (hbB : M.mem b B) (hb : U b) :
-    ∃ e : M.Domain → (ext_structure_l (name_domain_l M hM hL B hN) U).Domain,
-      (∀ a t, Check_d M b a t → Val_d M B U t (e a).1) ∧
-      (∀ a y, y.1 ∈ (e a).1 ↔ ∃ c, M.mem c a ∧ e c = y) ∧ Function.Injective e := by
-  let E := ext_structure_l (name_domain_l M hM hL B hN) U
-  have hall (a : M.Domain) : ∃ y : E.Domain, ∃ t, Check_d M b a t ∧ Val_d M B U t y.1 := by
+theorem check_map_l (O : Cond_order_d M B R z) (hZF : M.Models ZF)
+    (hU : Generic_d M B R z U) {b} (hb : U b) :
+    ∃ e : M.Domain → (extension_l M hZF B R z U).Domain,
+      (∀ a t, Check_d M b a t → Qval_d M B R z U t (e a)) ∧
+      (∀ a y, y ∈ e a ↔ ∃ c, M.mem c a ∧ e c = y) ∧ Function.Injective e := by
+  let E := extension_l M hZF B R z U
+  have hbB := (hU.proper b hb).1
+  have hall (a : M.Domain) : ∃ y : E.Domain, ∃ t, Check_d M b a t ∧ Qval_d M B R z U t y := by
     obtain ⟨t, ht, hn, _⟩ := zf_check_l M hZF hbB a
-    obtain ⟨y, hy⟩ := name_value_l (U := U) hM hL hN hn
+    obtain ⟨y, hy⟩ := name_value_l (R := R) (z := z) (U := U) hn
     exact ⟨y, t, ht, hy⟩
   obtain ⟨e, he⟩ := Classical.axiomOfChoice hall
-  have hv a t (ht : Check_d M b a t) : Val_d M B U t (e a).1 := by
+  have hv a t (ht : Check_d M b a t) : Qval_d M B R z U t (e a) := by
     obtain ⟨s, hs, hv⟩ := he a
     exact check_unique_l M hZF.1 (check_ind_l M hZF) b a s t hs ht ▸ hv
-  have hm a (y : E.Domain) : y.1 ∈ (e a).1 ↔ ∃ c, M.mem c a ∧ e c = y := by
+  have hm a (y : E.Domain) : y ∈ e a ↔ ∃ c, M.mem c a ∧ e c = y := by
     obtain ⟨t, ht, hta⟩ := he a
     constructor
     · intro hy
-      obtain ⟨c, s, hca, hcs, hsy⟩ := (check_val_mem_l hZF ht hta hb).mp hy
-      exact ⟨c, hca, Subtype.ext (val_unique_l (hv c s hcs) hsy)⟩
+      obtain ⟨c, s, hca, hcs, hsy⟩ := (check_val_mem_l O hZF hU ht hta hb).mp hy
+      exact ⟨c, hca, qval_unique_l (hv c s hcs) hsy⟩
     · rintro ⟨c, hca, rfl⟩
       obtain ⟨s, hcs, hsc⟩ := he c
-      exact (check_val_mem_l hZF ht hta hb).mpr ⟨c, s, hca, hcs, hsc⟩
-  refine ⟨e, hv, hm, ?_⟩
-  intro a
-  apply hM.induction a
-  intro a ih c heq
-  apply hZF.1.eq_of_same_members a c
-  intro d
-  constructor
-  · intro hda
-    obtain ⟨f, hfc, hef⟩ := (hm c (e d)).mp (heq ▸ (hm a (e d)).mpr ⟨d, hda, rfl⟩)
-    exact (ih d hda hef.symm).symm ▸ hfc
-  · intro hdc
-    obtain ⟨f, hfa, hef⟩ := (hm a (e d)).mp (heq.symm ▸ (hm c (e d)).mpr ⟨d, hdc, rfl⟩)
-    exact ih f hfa hef ▸ hfa
+      exact (check_val_mem_l O hZF hU ht hta hb).mpr ⟨c, s, hca, hcs, hsc⟩
+  refine ⟨e, hv, hm, fun a c heq => ?_⟩
+  obtain ⟨s, hs, hsa⟩ := he a
+  obtain ⟨t, ht, htc⟩ := he c
+  obtain ⟨p, hp, hst⟩ := (qval_eq_l O hZF hU hsa htc).mpr heq
+  obtain ⟨r, hr, hrp, hrb⟩ := hU.directed p b hp hb
+  have hr' := hU.proper r hr
+  exact check_force_reflect_l O hZF hbB hs ht ⟨hr'.1, hr'.2, hrb⟩
+    (eq_force_lower_l O hZF (qval_name_l hsa) (qval_name_l htc) p r hst.1
+      ⟨hr'.1, hr'.2, hrp⟩ hst)
 
 variable {N : SetTheory.Structure.{w}} (e : M.Domain → N.Domain)
   (hi : Function.Injective e) (he : ∀ a y, N.mem y (e a) ↔ ∃ c, M.mem c a ∧ e c = y)
@@ -185,9 +183,11 @@ theorem image_ordinal_l (hEM : Extensional M)
     · exact False.elim (hm y hy hyx)
 
 include hi hEN in
-/-- 规范嵌入保留内部 ω；外部良基归纳只用于排除非标准自然数的解释。 -/
-theorem image_omega_l (hZF : M.Models ZF) (hM : _root_.WellFounded M.mem)
-    {ω} (hω : M.IsOmega ω) : N.IsOmega (e ω) := by
+/-- 规范嵌入保留内部 ω；目标中的差集与基础公理排除新的归纳真子集。 -/
+theorem image_omega_l (hZF : M.Models ZF)
+    (hF : ∀ X, (∃ x, N.mem x X) → ∃ x, N.mem x X ∧ ∀ y, N.mem y X → ¬ N.mem y x)
+    {ω} (hω : M.IsOmega ω)
+    (hD : ∀ T, ∃ D, ∀ y, N.mem y D ↔ N.mem y (e ω) ∧ ¬ N.mem y T) : N.IsOmega (e ω) := by
   have hz a (ha : ∀ x, ¬ M.mem x a) : ∀ y, ¬ N.mem y (e a) := by
     intro y hy
     obtain ⟨x, hx, _⟩ := (he a y).mp hy
@@ -201,20 +201,25 @@ theorem image_omega_l (hZF : M.Models ZF) (hM : _root_.WellFounded M.mem)
       obtain ⟨s, hs, hsω⟩ := hω.1.2 a ha
       exact ⟨e s, image_successor_l (hEN := hEN) e hi he hZF.1 hs, (image_member_l e hi he).mpr hsω⟩
   · intro T hT y hy
-    obtain ⟨a, ha, rfl⟩ := (he ω y).mp hy
-    have hp : ∀ a, M.mem a ω → N.mem (e a) T := by
-      intro a
-      apply hM.induction a
-      intro a ih ha
-      by_cases hn : ∃ c, M.mem c a
-      · obtain ⟨c, hcω, hac⟩ := hω.exists_predecessor_of_mem_of_nonempty hZF ha hn
-        obtain ⟨s, hs, hsT⟩ := hT.2 (e c) (ih c hac.predecessor_mem hcω)
-        have heq := Structure.SuccessorOf.eq hEN (image_successor_l (hEN := hEN) e hi he hZF.1 hac) hs
-        exact heq.symm ▸ hsT
-      · obtain ⟨s, hs, hsT⟩ := hT.1
-        have ha0 := hz a (fun c hc => hn ⟨c, hc⟩)
-        have heq := hEN.eq_of_same_members (e a) s (fun y => iff_of_false (ha0 y) (hs y))
-        exact heq.symm ▸ hsT
-    exact hp a ha
+    classical
+    apply Classical.byContradiction
+    intro hn
+    obtain ⟨D, hD⟩ := hD T
+    obtain ⟨x, hx, hm⟩ := hF D ⟨y, (hD y).mpr ⟨hy, hn⟩⟩
+    obtain ⟨hxω, hxT⟩ := (hD x).mp hx
+    obtain ⟨a, ha, rfl⟩ := (he ω x).mp hxω
+    apply hxT
+    by_cases hn : ∃ c, M.mem c a
+    · obtain ⟨c, hcω, hac⟩ := hω.exists_predecessor_of_mem_of_nonempty hZF ha hn
+      have hcT : N.mem (e c) T := by
+        apply Classical.byContradiction
+        intro hnc
+        exact hm (e c) ((hD (e c)).mpr ⟨(image_member_l e hi he).mpr hcω, hnc⟩)
+          ((image_member_l e hi he).mpr hac.predecessor_mem)
+      obtain ⟨s, hs, hsT⟩ := hT.2 (e c) hcT
+      exact (Structure.SuccessorOf.eq hEN (image_successor_l (hEN := hEN) e hi he hZF.1 hac) hs).symm ▸ hsT
+    · obtain ⟨s, hs, hsT⟩ := hT.1
+      have ha0 := hz a (fun c hc => hn ⟨c, hc⟩)
+      exact (hEN.eq_of_same_members (e a) s (fun y => iff_of_false (ha0 y) (hs y))).symm ▸ hsT
 
 end YesMetaZFC.Model.Forcing.Internal

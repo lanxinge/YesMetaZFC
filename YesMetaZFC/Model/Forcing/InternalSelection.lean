@@ -9,7 +9,7 @@ import YesMetaZFC.SetTheory.Choice
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project
-universe u v
+universe u
 variable (M : SetTheory.Structure.{u})
 
 def Poss_mem_d (B R z F p i t : M.Domain) : Prop :=
@@ -102,21 +102,21 @@ theorem min_mem_dense_l (hZF : M.Models ZF) {F κ p i s t}
 
 /-- 相同解释的两个目标名称给出同一个被选元素，即使枚举或名称有重复呈现。 -/
 theorem min_mem_unique_l (hZF : M.Models ZF) {U : M.Domain → Prop}
-    (hU : Generic_d M B R z U) {F κ S p q s t a b} {x y w : SmallGraph.SG_set.{v}}
+    (hU : Generic_d M B R z U) {F κ S p q s t a b} {x y w : Name_quot_l M B R z U}
     (hκ : M.IsOrdinal κ)
     (hf : M.IsSetFunctionFromTo (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) F κ S)
-    (hp : U p) (hq : U q) (hs : Val_d M B U s x) (ha : Val_d M B U a y)
-    (ht : Val_d M B U t w) (hb : Val_d M B U b w)
+    (hp : U p) (hq : U q) (hs : Qval_d M B R z U s x) (ha : Qval_d M B R z U a y)
+    (ht : Qval_d M B R z U t w) (hb : Qval_d M B R z U b w)
     (hm : Min_mem_d M B R z F κ p s t) (hn : Min_mem_d M B R z F κ q a b) : x = y := by
   obtain ⟨i, hi, his, hmt, hmi⟩ := hm
   obtain ⟨j, hj, hja, hnb, hnj⟩ := hn
-  have hm := (val_mem_forcing_l O hZF hU hs ht).mp ⟨p, hp, hmt⟩
-  have hn := (val_mem_forcing_l O hZF hU ha hb).mp ⟨q, hq, hnb⟩
-  have impossible {i j s t p} {x : SmallGraph.SG_set.{v}}
+  have hm := (qval_mem_forcing_l O hZF hU hs ht).mp ⟨p, hp, hmt⟩
+  have hn := (qval_mem_forcing_l O hZF hU ha hb).mp ⟨q, hq, hnb⟩
+  have impossible {i j s t p} {x : Name_quot_l M B R z U}
       (hi : Entry_d M i s F) (hij : M.mem i j) (hp : U p)
-      (hs : Val_d M B U s x) (ht : Val_d M B U t w) (hx : x ∈ w)
+      (hs : Qval_d M B R z U s x) (ht : Qval_d M B R z U t w) (hx : x ∈ w)
       (hn : ∀ k, M.mem k j → ¬ Poss_mem_d M B R z F p k t) : False := by
-    obtain ⟨q, hq, hm⟩ := (val_mem_forcing_l O hZF hU hs ht).mpr hx
+    obtain ⟨q, hq, hm⟩ := (qval_mem_forcing_l O hZF hU hs ht).mpr hx
     obtain ⟨r, hr, hrp, hrq⟩ := hU.directed p q hp hq
     have hr' := hU.proper r hr
     exact hn i hij ⟨s, hi, r, ⟨hr'.1, hr'.2, hrp⟩,
@@ -126,7 +126,7 @@ theorem min_mem_unique_l (hZF : M.Models ZF) {U : M.Domain → Prop}
     subst j
     have he := hf.1.2 i s a his hja
     subst a
-    exact val_unique_l hs ha
+    exact qval_unique_l hs ha
   · exact False.elim (impossible his hij hq hs hb hm hnj)
   · exact False.elim (impossible hja hji hp ha ht hn hmi)
 

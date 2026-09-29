@@ -8,7 +8,7 @@ import YesMetaZFC.Model.Forcing.InternalTruth
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project
-universe u v
+universe u
 
 def force_at_m {n m} (φ : Formula 1 n) (e : Fin n → Term m) (B R z p : Term m) : Formula 1 m :=
   (force_code_m φ).bind (Fin.cases p (Fin.cases z (Fin.cases R (Fin.cases B e))))
@@ -49,13 +49,13 @@ theorem source_sat_l (hE : Extensional M) {n} (ρ : Env M n) (R t s p : Term n) 
   simp only [source_m, Source_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     entry_sat_l M hE, Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 
-theorem source_val_l {B R : M.Domain} {U : M.Domain → Prop}
-    (hu : ∀ p q, U p → M.mem q B → Entry_d M p q R → U q)
-    {s t p} {x y : SmallGraph.SG_set.{v}} (ht : Val_d M B U t x) (hs : Val_d M B U s y)
+theorem source_val_l {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
+    (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
+    {s t p} {x y : Name_quot_l M B R z U} (ht : Qval_d M B R z U t x) (hs : Qval_d M B R z U s y)
     (h : Source_d M R t s p) (hp : U p) : y ∈ x := by
   obtain ⟨b, hb, hpb⟩ := h
-  have hn : Name_d M B t := ht.elim fun _ h => h.1.1
-  exact (val_mem_l M ht).mpr ⟨s, b, hb, hu p b hp (name_entry_l M hn hb).2 hpb, hs⟩
+  have hn : Name_d M B t := qval_name_l ht
+  exact (qval_mem_l O hZF hU ht).mpr ⟨s, b, hb, hU.upward p b hp (name_entry_l M hn hb).2 hpb, hs⟩
 
 /-- 精确加权分离；源集只须逐个包含内部名称，不要求它本身是闭支撑。 -/
 theorem name_comp_l (hZF : M.Models ZF) {n} (φ : BinarySchema n) (ρ : Env M n)

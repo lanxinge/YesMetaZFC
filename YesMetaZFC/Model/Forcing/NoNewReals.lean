@@ -9,7 +9,7 @@ import YesMetaZFC.Model.Forcing.InternalZFOperations
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project SmallGraph
-universe u v
+universe u
 variable (M : SetTheory.Structure.{u})
 
 def Dec_check_d (B R z b t n p : M.Domain) : Prop := ∃ s, Check_d M b n s ∧
@@ -39,11 +39,10 @@ include O hZFC hU
 theorem no_new_reals_l (hω : M.IsOmega ω)
     (hc : Closed_d (kpair_interpretation_l M hZFC.1
       (KP.exists_pair (ZF.modelsKP (ZFC.models_zf_l hZFC)))) B R z ω)
-    (hM : _root_.WellFounded M.mem) (hL : Setlike_d.{u,v} M)
-    {b w t : M.Domain} {W x : SG_set.{v}} (hb : U b)
-    (hw : Check_d M b ω w) (hv : Val_d M B U w W) (ht : Val_d M B U t x)
+    {b w t : M.Domain} {W x : Name_quot_l M B R z U} (hb : U b)
+    (hw : Check_d M b ω w) (hv : Qval_d M B R z U w W) (ht : Qval_d M B R z U t x)
     (hx : ∀ y, y ∈ x → y ∈ W) :
-    ∃ a s, M.MemberSubset a ω ∧ Check_d M b a s ∧ Val_d M B U s x := by
+    ∃ a s, M.MemberSubset a ω ∧ Check_d M b a s ∧ Qval_d M B R z U s x := by
   classical
   let hZF := ZFC.models_zf_l hZFC
   have hbB := (hU.proper b hb).1
@@ -88,28 +87,28 @@ theorem no_new_reals_l (hω : M.IsOmega ω)
       check_sat_l M hZF.1, mem_force_sat_l M hZF.1]
     rfl
   obtain ⟨s, hsa, hsn, _⟩ := zf_check_l M hZF hbB a
-  obtain ⟨y, hsy, _⟩ := val_exists_unique_l M hM hL B U hsn
+  obtain ⟨y, hsy⟩ := name_value_l (R := R) (z := z) (U := U) hsn
   have heq : y = x := by
-    apply SG_set.ext
+    apply (extension_ext_l O hZF hU).eq_of_same_members
     intro v
     constructor
     · intro hvy
-      obtain ⟨n, r, hna, hnr, hrv⟩ := (check_val_mem_l hZF hsa hsy hb).mp hvy
+      obtain ⟨n, r, hna, hnr, hrv⟩ := (check_val_mem_l O hZF hU hsa hsy hb).mp hvy
       obtain ⟨_, r', hnr', hm⟩ := (ha n).mp hna
       have hr := check_unique_l M hZF.1 (check_ind_l M hZF) b n r' r hnr' hnr
       subst r'
-      exact (val_mem_forcing_l O hZF hU hrv ht).mp ⟨p, hp, hm⟩
+      exact (qval_mem_forcing_l O hZF hU hrv ht).mp ⟨p, hp, hm⟩
     · intro hvx
-      obtain ⟨n, r, hnω, hnr, hrv⟩ := (check_val_mem_l hZF hw hv hb).mp (hx v hvx)
+      obtain ⟨n, r, hnω, hnr, hrv⟩ := (check_val_mem_l O hZF hU hw hv hb).mp (hx v hvx)
       obtain ⟨r', hnr', hm⟩ := hdec n hnω
       have hr := check_unique_l M hZF.1 (check_ind_l M hZF) b n r' r hnr' hnr
       subst r'
       rcases hm with hm | hm
-      · exact (check_val_mem_l hZF hsa hsy hb).mpr
+      · exact (check_val_mem_l O hZF hU hsa hsy hb).mpr
           ⟨n, r, (ha n).mpr ⟨hnω, r, hnr, hm⟩, hnr, hrv⟩
       · have hn := (generic_neg_l O hZF hU (mem_force_defined_l M hZF.1 B R z r t)
           (regular_mem_l O r t).1).mp ⟨p, hp, hm⟩
-        exact False.elim (hn ((val_mem_forcing_l O hZF hU hrv ht).mpr hvx))
+        exact False.elim (hn ((qval_mem_forcing_l O hZF hU hrv ht).mpr hvx))
   exact ⟨a, s, fun n hn => ((ha n).mp hn).1, hsa, heq ▸ hsy⟩
 
 end YesMetaZFC.Model.Forcing.Internal

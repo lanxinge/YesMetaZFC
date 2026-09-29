@@ -8,18 +8,18 @@ import YesMetaZFC.Model.Forcing.InternalNameConstruction
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project
-universe u v
+universe u
 variable {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
 variable (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
-  (hM : _root_.WellFounded M.mem) (hL : Setlike_d.{u, v} M) (hN : ∃ t, Name_d M B t)
-local notation "E" => ext_structure_l (name_domain_l M hM hL B hN) U
+
+local notation "E" => extension_l M hZF B R z U
 include O hZF hU
 
 theorem internal_separation_l {n} (φ : UnarySchema n) (η : Env E n) (A : (E).Domain) :
     ∃ C : (E).Domain, ∀ x : (E).Domain,
-      x.1 ∈ C.1 ↔ x.1 ∈ A.1 ∧ Formula.satisfies (η.push x) φ.body := by
-  obtain ⟨ρ, hρ⟩ := lift_env_l hM hL hN η
-  obtain ⟨t, ht, hA⟩ := value_name_l hM hL hN A
+      x ∈ C ↔ x ∈ A ∧ Formula.satisfies (η.push x) φ.body := by
+  obtain ⟨ρ, hρ⟩ := lift_env_l hZF η
+  obtain ⟨t, ht, hA⟩ := value_name_l A
   obtain ⟨S, htS, hS⟩ := ht
   let δ := (((ρ.push t).push B).push R).push z
   let e : Fin (n + 1) → Term (n + 6) := Fin.cases (.bound 1) (fun i => .bound ⟨i.val + 6, by omega⟩)
@@ -39,25 +39,25 @@ theorem internal_separation_l {n} (φ : UnarySchema n) (η : Env E n) (A : (E).D
       force_at_sat_l, he]
     rfl
   obtain ⟨q, hq, _, he⟩ := name_comp_l M hZF ψ δ B S (fun s hs => ⟨S, hs, hS⟩)
-  obtain ⟨C, hC⟩ := name_value_l hM hL hN hq
+  obtain ⟨C, hC⟩ := name_value_l (R := R) (z := z) (U := U) hq
   refine ⟨C, fun x => ?_⟩
   constructor
   · intro hx
-    obtain ⟨a, p, ha, hp, hax⟩ := (val_mem_l M hC).mp hx
+    obtain ⟨a, p, ha, hp, hax⟩ := (qval_mem_l O hZF hU hC).mp hx
     obtain ⟨_, _, ha⟩ := (he a p).mp ha
     obtain ⟨ha, hφ⟩ := (hψ a p).mp ha
-    exact ⟨source_val_l M hU.upward hA hax ha hp,
-      (forcing_truth_l O hZF hU hM hL hN φ.body φ.freeClosed (ρ.push a) (η.push x)
-        (env_val_push_l hM hL hN hρ hax)).mp ⟨p, hp, hφ⟩⟩
+    exact ⟨source_val_l O hZF hU hA hax ha hp,
+      (forcing_truth_l O hZF hU φ.body φ.freeClosed (ρ.push a) (η.push x)
+        (env_val_push_l hZF hρ hax)).mp ⟨p, hp, hφ⟩⟩
   · rintro ⟨hx, hφ⟩
-    obtain ⟨a, c, ha, hc, hax⟩ := (val_mem_l M hA).mp hx
-    have ht := formula_eval_l O hZF hU hM hL hN φ.body φ.freeClosed (ρ.push a) (η.push x)
-      (env_val_push_l hM hL hN hρ hax)
+    obtain ⟨a, c, ha, hc, hax⟩ := (qval_mem_l O hZF hU hA).mp hx
+    have ht := formula_eval_l O hZF hU φ.body φ.freeClosed (ρ.push a) (η.push x)
+      (env_val_push_l hZF hρ hax)
     obtain ⟨p, hp, hφ⟩ := ht.2.mpr hφ
     obtain ⟨b, hb, hbc, hbp⟩ := hU.directed c p hc hp
     have hb' := hU.proper b hb
     have hφb := ht.1.1 p b (hU.proper p hp).1 ⟨hb'.1, hb'.2, hbp⟩ hφ
-    exact (val_mem_l M hC).mpr ⟨a, b, (he a b).mpr
+    exact (qval_mem_l O hZF hU hC).mpr ⟨a, b, (he a b).mpr
       ⟨(supp_entry_l M hS htS ha).1, hb'.1, (hψ a b).mpr ⟨⟨c, ha, hbc⟩, hφb⟩⟩, hb, hax⟩
 
 end YesMetaZFC.Model.Forcing.Internal
