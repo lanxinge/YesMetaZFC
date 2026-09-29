@@ -20,6 +20,8 @@
 | 标准布尔值 ZFC 模型 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`project_zfc`、`bv_models_zfc`、`zfc_consistent` | 任意 `B : Type u` 及实际 `CB_alg B`；名称节点同层，载体固定在 `Type (u+1)`；原公理与所有有限参数模式逐句核验 |
 | 任意地模型的内部泛型商 | [Forcing/InternalQuotient](../YesMetaZFC/Model/Forcing/InternalQuotient.lean)、[InternalChoice](../YesMetaZFC/Model/Forcing/InternalChoice.lean) | 外部非良基、内部 ω 非标准的地模型也满足完整真值及原 ZFC 保持；商载体与地模型同 universe，基础公理通过内部公式归纳证明 |
 | ZFC＋CH 的实际力迫模型 | [Forcing/CH](../YesMetaZFC/Model/Forcing/CH.lean)：`ch_forcing_l`、`ch_extension_l`、`ch_model_l` | 对任意地模型构造可数部分函数塌缩，证明每个泛型商满足原 ZFC＋CH；可数地模型自动取得泛型，实际无模型存在前提的实例载体在 `Type 1` |
+| 参数化 Cohen 添加与 ZFC＋¬CH | [Forcing/CohenAdd](../YesMetaZFC/Model/Forcing/CohenAdd.lean)、[NotCH](../YesMetaZFC/Model/Forcing/NotCH.lean) | 对任意模型内指标集 κ 构造 κ 条互异新实数，保持旧无限基数；添加量超过旧 ω₁ 即否定 CH，自动入口默认取 ω₂ |
+| 原 ZFC 的 CH 独立性 | [Forcing/CHIndependence](../YesMetaZFC/Model/Forcing/CHIndependence.lean)：`ch_independent_l`、`ch_consistency_l` | 原 Project Derives 即原纯隶属推导核中的 CH 双侧不可证；两侧一致性由实际模型与既有六规则可靠性给出，不添加新理论或替代 CH 句子 |
 | 有限基覆盖原支撑理论 | [FiniteAxiomModels](../YesMetaZFC/Model/ZFC/FiniteAxiomModels.lean) 中 `FiniteAxiomBasis.models_iff`；[ReducedAxioms](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedAxioms.lean) 的 `derives_iff` | 108 个具体闭句与 11 个参数分离模板，共 119 条；与原无限参数理论推导等价，不是公理集合相等 |
 | 完整支撑模型 | [PureSupportModels](../YesMetaZFC/Model/ZFC/Pure/PureSupportModels.lean) 的 `support_models` | 同一规范扩张满足整个原支撑理论 |
 | 原 ZFC 像及实际纯翻译 | [PureZFCModels](../YesMetaZFC/Model/ZFC/Pure/PureZFCModels.lean) 的 `models`、`translated_models` | 不弱化原公理或 guard |
@@ -35,7 +37,7 @@
 一致性证明使用已有 `propext`、`Quot.sound`、`Classical.choice`。`zfc_consistent`
 还继承原八条固定公理的 `sentence!` 自由闭合性 `native_decide` 依赖：外延、空集、配对、
 并集、幂集、无穷、基础及选择各一处。没有新增公理常量、`sorryAx` 或原生验证依赖。
-当前全部 1,194 个独立模块及扫描工具严格构建通过；代码范围及载体边界见
+当前全部 1,206 个独立模块及扫描工具严格构建通过；代码范围及载体边界见
 [模型论指南](../YesMetaZFC/Model/README.md)。
 
 布尔层新增 50 个关键依赖入口并交叉复核 8 个小图入口。`name_structure`、名称等号的
@@ -45,10 +47,11 @@ ZFC 终点仍依赖 `Classical.choice`；原八处句法闭合性原生依赖与
 未新增 `sorryAx`、自定义公理或原生计算可信依赖。严格不使用元层选择的两类 ZF 模型
 尚未实现，具体依赖与全小图基础公理的排中律边界见模型论指南。
 
-力迫层的 `scripts/check_forcing.py` 审计 75 个生产模块、1745 条声明，包括名称泛型商、
-内部基础公理、完整真值、任意地模型的 ZFC 保持与 CH 构造。商载体、解释关系与隶属
-定义无经典选择依赖。CH 模型只继承 `propext`、`Quot.sound`、Prop 内选择及原八条
-固定公理的句法闭合证书；实际 CH 句子的闭合性直接证明，没有新增原生计算公理。
+力迫层的 `scripts/check_forcing.py` 审计 87 个生产模块、1998 条声明，包括名称泛型商、
+内部基础公理、完整真值、任意地模型的 ZFC 保持、CH 塌缩、参数化 Cohen 添加、
+CCC 基数保持、¬CH 模型及原推导核中的 CH 独立性。商载体、解释关系与隶属定义无
+经典选择依赖。两侧模型只继承 `propext`、`Quot.sound`、Prop 内选择及原八条固定
+公理的句法闭合证书；CH 与 ¬CH 句子的闭合性直接证明，没有新增原生计算公理。
 
 ## 任意原模型的内部证明码对应
 

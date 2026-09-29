@@ -42,6 +42,12 @@ CH_MODULES = ["YesMetaZFC.Model.Forcing." + n for n in
 CH_MODULES += ["YesMetaZFC.SetTheory." + n for n in
                ("DependentChoice", "Card.Omega", "Card.CountableUnion", "Continuum")]
 CH_MODULES += ["YesMetaZFC.Model.SetTheory.Countable"]
+COHEN_MODULES = ["YesMetaZFC.SetTheory." + n for n in
+                 ("Card.Finite", "PartialFunction", "PartialFunctionCCC", "Fiber")]
+COHEN_MODULES += ["YesMetaZFC.Model.Forcing." + n for n in
+                  ("InternalCCC", "InternalCCCBounds", "GenericFunction", "CohenCoordinates",
+                   "CohenAdd", "NotCH", "CHIndependence")]
+COHEN_MODULES += ["YesMetaZFC.Model.SetTheory.ProjectSoundness"]
 PREFIX = "YesMetaZFC.Model.Forcing."
 CHOICE_FREE = [PREFIX + n for n in (
     "PO_pre", "PO_ord", "PO_hom", "PO_compat", "PO_dense",
@@ -120,6 +126,13 @@ CH_CHOICE_FREE += ["YesMetaZFC.SetTheory." + n for n in
                    ("CH_d", "hartogs_m", "ch_m", "ch_sentence_l", "ZFC_CH",
                     "values_enum_l", "env_enum_l", "query_holds_l",
                     "ZFC.Next_d", "ZFC.next_m", "ZFC.iter_m")]
+COHEN_CHOICE_FREE = ["YesMetaZFC.SetTheory." + n for n in
+                     ("Finite_d", "finite_m", "ZF.erase_m", "Pfn_d", "Fn_d", "Agree_d", "pfn_m", "fn_m", "agree_m",
+                      "Fn_antichain_d", "fn_antichain_m", "Fn_bounded_d", "fn_bounded_m", "fiber_m",
+                      "not_ch_sentence_l", "ZFC_not_CH", "Definitional.Project.FirstOrderSemantics.model_l")]
+COHEN_CHOICE_FREE += [PREFIX + "Internal." + n for n in
+                      ("Cmp_d", "Antichain_d", "Ccc_d", "Value_d", "value_m", "Collision_d", "collision_m",
+                       "Split_d", "split_m", "Diagonal_d", "diagonal_m")]
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
@@ -133,4 +146,6 @@ if __name__ == "__main__":
             ("Rem_d", "rem_m", "Enum_step_d", "enum_step_m")], CHOICE_BASELINE, "FORCING_CHOICE_GUARD_PASS")
     if result == 0:
         result = main(CH_MODULES, CH_CHOICE_FREE, CHOICE_BASELINE, "FORCING_CH_GUARD_PASS")
+    if result == 0:
+        result = main(COHEN_MODULES, COHEN_CHOICE_FREE, CHOICE_BASELINE, "FORCING_COHEN_GUARD_PASS")
     sys.exit(result)

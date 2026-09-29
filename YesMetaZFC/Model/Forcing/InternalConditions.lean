@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.Forcing.InternalAtomic
 import YesMetaZFC.Model.Forcing.InternalBoolean
+import YesMetaZFC.SetTheory.Foundation
 
 /-! # 模型内条件序与外部泛型滤子
 
@@ -79,6 +80,30 @@ theorem generic_atom_l {a} (ha : M.mem a B) (hn : a ≠ z)
   meets p hp D hd := by
     obtain ⟨q, hq, hD⟩ := hd a ⟨ha, hn, hp.2⟩
     exact ⟨q, ⟨hq.1, hA q hq⟩, hD⟩
+
+omit O in
+/-- 任意内部集合族按反向包含排序；族自身作为排除值。 -/
+theorem subset_order_l (M : SetTheory.Structure.{u}) (hZF : M.Models ZF) (B : M.Domain) : ∃ R,
+    (∀ p q, Entry_d M p q R ↔ M.mem p B ∧ M.mem q B ∧ M.MemberSubset q p) ∧ Cond_order_d M B R B := by
+  let I := kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))
+  let φ : BinarySchema 0 := { body := .subset .newest (.bound 1) }
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => B⟩
+  obtain ⟨R, _, hR⟩ := ZF.exists_setRelationOn_of_denote hZF I φ ρ B
+  have hr p q : Entry_d M p q R ↔ M.mem p B ∧ M.mem q B ∧ M.MemberSubset q p :=
+    (hR p q).trans (and_congr_right fun _ => and_congr_right fun _ =>
+      Formula.satisfies_subset_iff ((ρ.push p).push q) .newest (.bound 1))
+  refine ⟨R, hr, ?_⟩
+  exact {
+    refl := fun p hp => (hr p p).mpr ⟨hp, hp, fun _ h => h⟩
+    trans := fun p q r hp _ hr' hpq hqr => (hr p r).mpr
+      ⟨hp, hr', fun x hx => ((hr p q).mp hpq).2.2 x (((hr q r).mp hqr).2.2 x hx)⟩
+    zero := fun p _ hp => False.elim (KP.mem_irrefl_d (ZF.modelsKP hZF) B ((hr p B).mp hp).2.1) }
+
+omit O in
+theorem subset_below_l (hZF : M.Models ZF) {B R p q : M.Domain}
+    (hR : ∀ p q, Entry_d M p q R ↔ M.mem p B ∧ M.mem q B ∧ M.MemberSubset q p)
+    (hp : M.mem p B) (hq : M.mem q B) (h : M.MemberSubset p q) : Below_d M B R B q p :=
+  ⟨hq, fun he => KP.mem_irrefl_d (ZF.modelsKP hZF) B (he ▸ hq), (hR q p).mpr ⟨hq, hp, h⟩⟩
 
 /-- 等号力迫在加强条件下保持；证明消费已构造的递归方程。 -/
 theorem eq_force_lower_l (hZF : M.Models ZF) {s t}

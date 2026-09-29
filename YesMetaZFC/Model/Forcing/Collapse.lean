@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.Forcing.InternalClosed
 import YesMetaZFC.SetTheory.Card.CountableUnion
+import YesMetaZFC.SetTheory.PartialFunction
 
 /-! # 地模型内部的可数部分函数塌缩
 
@@ -68,13 +69,14 @@ theorem coll_union_l (hZFC : M.Models ZFC) {ω X Y B f} (hω : M.IsOmega ω)
     exact (hB p).mp (hf.output_mem_of_pairMember hi)
   have hs {i p} (hp : M.PairMember I i p f) : M.MemberSubset p q :=
     fun x hx => (hq x).mpr ⟨p, (hA p).mpr ⟨i, hp⟩, hx⟩
-  have hc : M.CardinalLessOrEqual I q ω := ZFC.countable_union_l I hZFC hω
+  have hcA : M.CardinalLessOrEqual I A ω := ZFC.surjection_bound_l I hZFC
     ⟨hf.1, hf.2.1, fun i hi => by
       obtain ⟨p, _, hp⟩ := hf.2.2 i hi
       exact ⟨p, (hA p).mpr ⟨i, hp⟩, hp⟩⟩
     (fun p hp => by
       obtain ⟨i, hi⟩ := (hA p).mp hp
-      exact ⟨i, hf.input_mem_of_pairMember hi, hi⟩) hq (fun _ hp => (ha hp).2.2)
+      exact ⟨i, hf.input_mem_of_pairMember hi, hi⟩)
+  have hc := ZFC.countable_union_l I hZFC hω hcA hq (fun _ hp => (ha hp).2.2)
   refine ⟨q, (hB q).mpr ⟨⟨?_, ?_⟩, ?_, hc⟩, fun _ _ hp => hs hp⟩
   · intro x hx
     obtain ⟨p, hp, hxp⟩ := (hq x).mp hx
@@ -102,33 +104,9 @@ theorem coll_extend_l (hZF : M.Models ZF) {ω X Y p x y} (hω : M.IsOmega ω)
     (hp : Coll_d I ω X Y p) (hx : M.mem x X) (hy : M.mem y Y)
     (hn : ¬ ∃ z, M.PairMember I x z p) :
     ∃ q, Coll_d I ω X Y q ∧ M.MemberSubset p q ∧ M.PairMember I x y q := by
-  obtain ⟨v, hv⟩ := I.total x y
-  obtain ⟨q, hq⟩ := KP.exists_insert (ZF.modelsKP hZF) p v
-  have he a b : M.PairMember I a b q ↔ M.PairMember I a b p ∨ (a = x ∧ b = y) := by
-    constructor
-    · rintro ⟨w, hw, hwq⟩
-      rcases (hq w).mp hwq with hwp | rfl
-      · exact Or.inl ⟨w, hw, hwp⟩
-      · exact Or.inr (I.injective hw hv)
-    · rintro (⟨w, hw, hwp⟩ | ⟨rfl, rfl⟩)
-      · exact ⟨w, hw, (hq w).mpr (Or.inl hwp)⟩
-      · exact ⟨v, hv, (hq v).mpr (Or.inr rfl)⟩
-  refine ⟨q, ⟨⟨?_, ?_⟩, ?_, ZF.countable_insert_l I hZF hω hp.2.2 hq⟩,
-    fun w hw => (hq w).mpr (Or.inl hw), (he x y).mpr (Or.inr ⟨rfl, rfl⟩)⟩
-  · intro w hw
-    rcases (hq w).mp hw with hw | rfl
-    · exact hp.1.1 w hw
-    · exact ⟨x, y, hv⟩
-  · intro a b c hab hac
-    rcases (he a b).mp hab with hab | ⟨hax, hby⟩ <;> rcases (he a c).mp hac with hac | ⟨hax', hcy⟩
-    · exact hp.1.2 a b c hab hac
-    · exact False.elim (hn ⟨b, hax' ▸ hab⟩)
-    · exact False.elim (hn ⟨c, hax ▸ hac⟩)
-    · exact hby.trans hcy.symm
-  · intro a b hab
-    rcases (he a b).mp hab with hab | ⟨rfl, rfl⟩
-    · exact hp.2.1 a b hab
-    · exact ⟨hx, hy⟩
+  obtain ⟨q, v, _, hq, hqf, hxy⟩ := ZF.pfn_insert_l I hZF ⟨hp.1, hp.2.1⟩ hx hy hn
+  exact ⟨q, ⟨hqf.1, hqf.2, ZF.countable_insert_l I hZF hω hp.2.2 hq⟩,
+    fun w hw => (hq w).mpr (Or.inl hw), hxy⟩
 
 /-- 不可数源集中总有一个尚未使用的坐标。 -/
 theorem coll_fresh_l (hZF : M.Models ZF) {ω X Y p} (hp : Coll_d I ω X Y p)
@@ -172,18 +150,8 @@ theorem collapse_order_l (hZF : M.Models ZF) (ω X Y : M.Domain) : ∃ B R,
     Cond_order_d M B R B := by
   let I := kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))
   obtain ⟨B, hB⟩ := coll_set_l I hZF ω X Y
-  let φ : BinarySchema 0 := { body := .subset .newest (.bound 1) }
-  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => B⟩
-  obtain ⟨R, _, hR⟩ := ZF.exists_setRelationOn_of_denote hZF I φ ρ B
-  have hr p q : Entry_d M p q R ↔ M.mem p B ∧ M.mem q B ∧ M.MemberSubset q p :=
-    (hR p q).trans (and_congr_right fun _ => and_congr_right fun _ =>
-      Formula.satisfies_subset_iff ((ρ.push p).push q) .newest (.bound 1))
-  refine ⟨B, R, hB, hr, ?_⟩
-  exact {
-    refl := fun p hp => (hr p p).mpr ⟨hp, hp, fun _ h => h⟩
-    trans := fun p q r hp _ hr' hpq hqr => (hr p r).mpr
-      ⟨hp, hr', fun x hx => ((hr p q).mp hpq).2.2 x (((hr q r).mp hqr).2.2 x hx)⟩
-    zero := fun p _ hp => False.elim (KP.mem_irrefl_d (ZF.modelsKP hZF) B ((hr p B).mp hp).2.1) }
+  obtain ⟨R, hR, hO⟩ := subset_order_l M hZF B
+  exact ⟨B, R, hB, hR, hO⟩
 
 /-- 可数部分函数塌缩具有已实现的模型内部可数闭性。 -/
 theorem collapse_closed_l (hZFC : M.Models ZFC) {ω} (hω : M.IsOmega ω) (X Y : M.Domain) : ∃ B R,

@@ -12,6 +12,8 @@
 | 原生小图 ZFC 模型与一致性 | [SmallGraph/ZFC](../YesMetaZFC/Model/SmallGraph/ZFC.lean)：`sg_models_zfc`、`zfc_consistent` | Lean 元层直接构造良基小图双模拟商；验证原 ZFC 全部公理与模式，无模型存在或一致性前提 |
 | 任意地模型的内部泛型商 | [Forcing/InternalChoice](../YesMetaZFC/Model/Forcing/InternalChoice.lean)：`preserves_zfc_l`；[InternalTruth](../YesMetaZFC/Model/Forcing/InternalTruth.lean)：`forcing_truth_l` | 允许外部非良基与非标准 ω；内部双模拟、商上的隶属、基础公理及原 ZFC 全部模式均已证明；不要求外部小图呈现 |
 | ZFC＋CH 力迫模型 | [Forcing/CH](../YesMetaZFC/Model/Forcing/CH.lean)：`ch_forcing_l`、`ch_extension_l`、`ch_model_l` | 任意地模型的可数闭塌缩保持 CH；对可数地模型自动取得泛型，允许外部非良基。小图模型的可数初等子模型给出无额外模型存在前提的实际实例 |
+| 参数化 Cohen 添加与 ¬CH 模型 | [Forcing/CohenAdd](../YesMetaZFC/Model/Forcing/CohenAdd.lean)：`cohen_extension_l`；[NotCH](../YesMetaZFC/Model/Forcing/NotCH.lean)：`not_ch_extension_l`、`not_ch_model_l` | 任意模型内添加量 κ，自动产生互异新实数族并保持旧无限基数；默认 ω₂ 实例满足原 ZFC＋¬CH，允许外部非良基地模型 |
+| 原 ZFC 的 CH 独立性 | [Forcing/CHIndependence](../YesMetaZFC/Model/Forcing/CHIndependence.lean)：`ch_independent_l`、`ch_consistency_l`、`ch_extensions_l` | 原 Project／纯隶属 Derives 核中的双侧不可证及两侧理论一致性；实际两侧模型已构造，独立性端点无额外模型存在或一致性前提 |
 | 标准布尔值 ZFC 模型与一致性 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`bv_models_zfc`、`zfc_consistent` | 对任意完备布尔代数构造全部小名称，核验原 ZFC 及所有有限参数模式；从实际命题布尔代数与原六规则可靠性得到一致性 |
 | Rosser 双侧独立性 | [PureRosserComplete](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean)：`PureRosser.independent` | 裸 ZFC 一致；具体纯闭句及其否定均不可证 |
 | 可证明性 D1–D3 | [PureProvability](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureProvability.lean)：`necessitation_m`、`distribution_m`、`introspection_m` | 无一致性或标准模型前提；任意纯闭句 |
@@ -22,7 +24,7 @@
 
 源理论、保留源编码的纯翻译和纯公式自身编码的具体合同分列如下。
 原元数学核验覆盖 530 个依赖审计入口；小图层另核验 38 个关键接口。布尔层新增
-50 个关键接口审计，并复核 8 个小图入口。当前全部 1,194 个独立模块及扫描工具严格构建通过。
+50 个关键接口审计，并复核 8 个小图入口。当前全部 1,206 个独立模块及扫描工具严格构建通过。
 原公理的 8 处句法闭合性原生依赖仍保留；详见
 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
 

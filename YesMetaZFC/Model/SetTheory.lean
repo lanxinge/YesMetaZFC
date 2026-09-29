@@ -5,6 +5,7 @@ import YesMetaZFC.Model.SetTheory.FunctionSemantics
 import YesMetaZFC.Model.SetTheory.Infinitary
 import YesMetaZFC.Model.SetTheory.OrderSemantics
 import YesMetaZFC.Model.SetTheory.ProjectSemantics
+import YesMetaZFC.Model.SetTheory.ProjectSoundness
 import YesMetaZFC.Model.SetTheory.Structure
 import YesMetaZFC.Model.SetTheory.Theory
 import YesMetaZFC.Model.SetTheory.Countable

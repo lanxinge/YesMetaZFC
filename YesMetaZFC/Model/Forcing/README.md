@@ -11,6 +11,9 @@
 允许任意外部非良基地模型，载体 universe 与地模型相同。
 可数闭塌缩已接入这一名称域；`Internal.ch_model_l` 给出实际 ZFC＋CH 模型存在，
 `Internal.ch_extension_l` 从任意可数地模型自动构造相应泛型扩张。
+`Internal.cohen_extension_l` 将 Cohen 添加量参数化为模型内指标集 κ，自动产生互异新实数族
+并保持旧无限基数；`not_ch_extension_l` 默认添加 ω₂ 条实数。`ch_independent_l` 与
+`ch_consistency_l` 已把两侧模型接入原推导核，给出 CH 双侧不可证及两侧扩充的一致性。
 
 ## 文献选择
 
@@ -81,6 +84,11 @@
 | `InternalClosed`／`Collapse` | 原模型内的可数递降链、可数稠密交、可数部分函数条件集及其实际可数闭性。 |
 | `NoNewReals`／`GroundTransfer` | 可数闭力迫不增加实数；规范嵌入保持成员、函数图、单射、序数和 ω。 |
 | `CollapseGeneric`／`CH` | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
+| `SetTheory.Card.Finite`／`PartialFunction`／`PartialFunctionCCC` | 内部有限集合的删除归纳、有限部分函数添值与合并，以及任意坐标集和可数值集上的内部可数链条件。 |
+| `SetTheory.Fiber`／`Card.CountableUnion` | 可定义纤维自动组成集合函数；小集合族的并单射到 κ×κ，供可数覆盖与基数保持共同使用。 |
+| `InternalCCC`／`InternalCCCBounds` | 有限部分函数偏序自动装配 CCC；可定义碰撞的否定条件控制可能原像，反射基数上界并保持每个旧无限基数。 |
+| `GenericFunction`／`CohenCoordinates` | 塌缩与 Cohen 共用泛型函数名称；新鲜自然数列、两行分离及旧集合对角稠密集。 |
+| `CohenAdd`／`NotCH`／`CHIndependence` | 按 κ 添加互异新实数、ZFC＋¬CH 模型及原 ZFC 的 CH 独立性；均允许外部非良基地模型。 |
 
 分离比较定义为
 
@@ -359,6 +367,54 @@ obtain ⟨B, R, U, hO, hU, hCH⟩ := Internal.ch_extension_l M hZFC e he
 所有外部可数序列变成模型内集合。模型、枚举、见证选择和泛型滤子只通过 Prop
 存在定理返回，没有全局不可计算的模型实例。
 
+## 任意添加量与 CH 独立性
+
+`cohen_forcing_l M hZFC κ` 自动构造 `Add(ω,κ)`：条件是模型内 κ×ω 到二元集的
+有限部分函数，增强方向为反向包含。κ 可为任意模型内指标集；取旧无限基数时，
+它在扩张中仍是同一个基数。有限性由向某个内部 n∈ω 的集合编码单射见证，
+允许内部有限集合在外部看来无限。
+
+可数链条件通过对内部有限大小界归纳证明。固定一个非空条件，每个反链成员
+必在它的某个坐标上取值，这些坐标和值形成可数覆盖；每个覆盖片删去共同条目，
+大小界降低。可数链条件只断言模型内反链可数。一般 Cohen 偏序的该性质亦见
+[AFP 的 Cohen／Δ-system 形式化](https://isa-afp.org/entries/Delta_System_Lemma.html)。
+
+`Cohen_result_d` 是已经构造出的装配结果，包含原 ZFC 模型性、规范地模型嵌入、
+内部 ω 保持、每个旧无限基数保持，以及扩张内到 P(ω) 的集合编码单射实数族。
+族中每一行都与每个地模型旧集合不同。κ 计数的是添加的 Cohen 坐标，接口保证
+至少 κ 个互异新实数；它不将连续统自动声明为恰好 κ，后者还需要基数算术上界
+与名称计数证明。
+
+精确值的一项标准充分条件是地模型内 κ 为无限基数且 `κ^ω = κ`，参见
+[Kubiś 讲义 Lemma 14.2](https://users.math.cas.cz/~kubis/pdfs/forcing_notes1999.pdf)。
+当前装配不要求该条件，也尚未实现对应的名称计数上界；已实现的参数化结论为上述
+单射新实数族，足以自动装配 ¬CH 与 CH 独立性。
+
+```lean
+obtain ⟨ω, B, R, U, hω, O, hU, hccc, hAdd⟩ :=
+  Internal.cohen_extension_l M hZFC κ c hc
+-- κ : M.Domain；c : Nat → M.Domain，hc : Function.Surjective c。
+-- hAdd : Internal.Cohen_result_d O hZFC hU ω κ。
+
+obtain ⟨B, R, U, O, hU, hnCH⟩ := Internal.not_ch_extension_l M hZFC c hc
+-- hnCH : (Internal.extension_l M ... B R B U).Models
+--   (SetTheory.ZFC_not_CH Internal.kpair_convention_l)。
+
+have hIndependent := Internal.ch_independent_l
+have hConsistent := Internal.ch_consistency_l
+```
+
+`cohen_not_ch_l` 只要求添加量在地模型中不能单射到其 ω₁，不要求 GCH 或先调整
+地模型的连续统。`not_ch_forcing_l` 自动取两次 Hartogs 得到 ω₂，并装配所有所需
+证书。`ch_extensions_l M hZFC c hc` 从同一个可数地模型返回 CH 的两侧模型；
+`not_ch_model_l` 使用已有实际地模型实例，无额外模型存在前提。
+
+`ch_independent_l` 的结论是原 Project `Derives ZFC` 对 `ch_sentence_l` 与
+`not_ch_sentence_l` 的双侧不可证。这里的 `Derives` 定义为原纯隶属一阶核的推导，
+`Model.SetTheory.ProjectSoundness` 保留对象域与成员关系接入原可靠性定理。
+`ch_consistency_l` 同时给出两个扩充理论的一致性。对任意大小的地模型，力迫保持
+接口消费给定泛型；可数性只在自动构造泛型的 `*_extension_l` 入口使用。
+
 ## 审计
 
 `python scripts/check_forcing.py` 先以 `lake --wfail build` 构建，再审计实际生产
@@ -384,3 +440,5 @@ Rasiowa–Sikorski 和 Tarski 扩张只在 Prop 存在证明内部使用选择�
 无 `sorry`、新增公理、`noncomputable` 或常驻 smoke 模块。
 CH 切片另检查内部依赖选择、ω 基数性、可数并、可数初等子模型及完整塌缩扩张；
 只继承原八条 ZFC 句法闭合证书。复用序数引理中的若干原生计算步骤已换成直接证明。
+Cohen／独立性切片覆盖内部有限归纳、CCC、无限基数保持、参数化新实数族、¬CH 模型
+和原推导核的独立性端点，使用相同的八条既有证书边界；条件与公式数据严格排除经典选择。

@@ -29,6 +29,11 @@ def ch_sentence_l (𝒞 : OrderedPairConvention) : Sentence := ⟨ch_m 𝒞, ch_
 
 def ZFC_CH (𝒞 : OrderedPairConvention) : Theory := fun s => ZFC s ∨ s = ch_sentence_l 𝒞
 
+def not_ch_sentence_l (𝒞 : OrderedPairConvention) : Sentence :=
+  ⟨.neg (ch_m 𝒞), by simp only [Definitional.Formula.FreeClosed]; exact ch_m_freeClosed 𝒞⟩
+
+def ZFC_not_CH (𝒞 : OrderedPairConvention) : Theory := fun s => ZFC s ∨ s = not_ch_sentence_l 𝒞
+
 theorem ch_sat_l {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
     (hE : Extensional M) (ρ : Env M 0) : Formula.satisfies ρ (ch_m 𝒞) ↔ CH_d I := by
   simp only [ch_m, CH_d, hartogs_m, Structure.IsHartogsNumber, Formula.satisfies_exists_iff,
@@ -38,21 +43,44 @@ theorem ch_sat_l {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.In
     Formula.satisfies_cardinalLessOrEqual_iff I hE]
   rfl
 
-namespace ZFC
+namespace ZF
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-/-- 内部满射的纤维选择给出反向基数不等式。 -/
-theorem surjection_bound_l (hZFC : M.Models ZFC) {F X Y}
-    (hf : M.IsSetFunctionFromTo I F X Y) (hs : M.IsSetSurjectiveOnto I F X Y) : M.CardinalLessOrEqual I Y X := by
-  let φ : BinarySchema 1 := { body := Formula.orderedPairMem 𝒞 .newest (.bound 1) (.bound 2) }
-  let ρ : Env M 1 := ⟨fun _ => F, fun _ => F⟩
-  have hφ y x : φ.denote ρ y x ↔ M.PairMember I x y F :=
-    Formula.satisfies_orderedPairMem_iff I ((ρ.push y).push x) .newest (.bound 1) (.bound 2)
-  obtain ⟨G, hG, hg⟩ := uniformize_formula_l I hZFC φ ρ (X := Y) (Y := X) (by
-    intro y hy
-    obtain ⟨x, hx, hxy⟩ := hs y hy
-    exact ⟨x, hx, (hφ y x).mpr hxy⟩)
-  exact ⟨G, hG, fun y z x hy hz => hf.1.2 x y z ((hφ y x).mp (hg y x hy)) ((hφ z x).mp (hg z x hz))⟩
+/-- 序数的所有真初段可嵌入 X，而本身不能时，它恰为 X 的 Hartogs 序数。 -/
+theorem hartogs_bound_l (hZF : M.Models ZF) {κ X} (hκ : M.IsOrdinal κ)
+    (hs : ∀ α, M.mem α κ → M.CardinalLessOrEqual I α X)
+    (hn : ¬ M.CardinalLessOrEqual I κ X) : M.IsHartogsNumber I κ X := by
+  refine ⟨hκ, fun α hα => ⟨hs α, fun hαX => ?_⟩⟩
+  rcases hα.trichotomy hZF.1 hκ (KP.difference_exists_d (ZF.modelsKP hZF))
+      (KP.intersection_exists_d (ZF.modelsKP hZF) α κ) with he | hακ | hκα
+  · exact False.elim (hn (hZF.1.eq_of_same_members α κ he ▸ hαX))
+  · exact hακ
+  · obtain ⟨F, hF⟩ := ZF.exists_inclusionInjection hZF I (hα.transitive κ hκα)
+    obtain ⟨G, hG⟩ := hαX
+    exact False.elim (hn (ZF.exists_compositionInjection hZF I hF hG))
+
+/-- 超过 ω₁ 的可区分实数族直接否定原 CH 句子的语义。 -/
+theorem not_ch_l (hZF : M.Models ZF) {ω P κ μ} (hω : M.IsOmega ω) (hP : M.IsPowerSetOf P ω)
+    (hκ : M.IsHartogsNumber I κ ω) (hμP : M.CardinalLessOrEqual I μ P)
+    (hn : ¬ M.CardinalLessOrEqual I μ κ) : ¬ CH_d I := by
+  rintro ⟨ω', P', κ', hω', hP', hκ', hCH⟩
+  have hωeq : ω' = ω := hZF.1.eq_of_same_members ω' ω (fun x =>
+    ⟨hω'.2 ω hω.1 x, hω.2 ω' hω'.1 x⟩)
+  subst ω'
+  have hPeq := hP'.eq hZF.1 hP
+  subst P'
+  have hκeq : κ' = κ := hZF.1.eq_of_same_members κ' κ (fun α =>
+    ⟨fun h => (hκ.2 α (hκ'.1.mem h)).mpr ((hκ'.2 α (hκ'.1.mem h)).mp h),
+      fun h => (hκ'.2 α (hκ.1.mem h)).mpr ((hκ.2 α (hκ.1.mem h)).mp h)⟩)
+  subst κ'
+  obtain ⟨F, hF⟩ := hμP
+  obtain ⟨G, hG⟩ := hCH
+  exact hn (ZF.exists_compositionInjection hZF I hF hG)
+
+end ZF
+
+namespace ZFC
+variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
 /-- 一个序数界的所有真初段可数且足以覆盖实数时，该界自动就是 ω₁。 -/
 theorem continuum_bound_l (hZFC : M.Models ZFC) {ω P κ} (hω : M.IsOmega ω)
@@ -65,14 +93,7 @@ theorem continuum_bound_l (hZFC : M.Models ZFC) {ω P κ} (hω : M.IsOmega ω)
     have hPω := ZF.exists_compositionInjection hZF I hF hG
     have hc := ZF.cardinalLess_powerSet hZF I hP
     exact hc.2 (ZF.equinumerous_of_cardinalLessOrEqual hZF I hc.1 hPω)
-  refine ⟨ω, P, κ, hω, hP, ⟨hκ, fun α hα => ⟨hs α, fun hαω => ?_⟩⟩, hb⟩
-  rcases hα.trichotomy hZF.1 hκ (KP.difference_exists_d (ZF.modelsKP hZF))
-      (KP.intersection_exists_d (ZF.modelsKP hZF) α κ) with he | hακ | hκα
-  · exact False.elim (hn (hZF.1.eq_of_same_members α κ he ▸ hαω))
-  · exact hακ
-  · obtain ⟨F, hF⟩ := ZF.exists_inclusionInjection hZF I (hα.transitive κ hκα)
-    obtain ⟨G, hG⟩ := hαω
-    exact False.elim (hn (ZF.exists_compositionInjection hZF I hF hG))
+  exact ⟨ω, P, κ, hω, hP, ZF.hartogs_bound_l I hZF hκ hs hn, hb⟩
 
 end ZFC
 end YesMetaZFC.SetTheory

@@ -185,4 +185,17 @@ theorem dependent_choice_l (hZFC : M.Models ZFC) {ω X R a : M.Domain}
   obtain ⟨g, hg, hz, hs⟩ := iterate_l I (models_zf_l hZFC) hω hF ha
   exact ⟨g, hg, hz, fun i j x y hij hx hy => hFR x y (hs i j x y hij hx hy)⟩
 
+/-- 内部满射的纤维选择给出反向基数不等式。 -/
+theorem surjection_bound_l (hZFC : M.Models ZFC) {F X Y}
+    (hf : M.IsSetFunctionFromTo I F X Y) (hs : M.IsSetSurjectiveOnto I F X Y) : M.CardinalLessOrEqual I Y X := by
+  let φ : BinarySchema 1 := { body := Formula.orderedPairMem 𝒞 .newest (.bound 1) (.bound 2) }
+  let ρ : Env M 1 := ⟨fun _ => F, fun _ => F⟩
+  have hφ y x : φ.denote ρ y x ↔ M.PairMember I x y F :=
+    Formula.satisfies_orderedPairMem_iff I ((ρ.push y).push x) .newest (.bound 1) (.bound 2)
+  obtain ⟨G, hG, hg⟩ := uniformize_formula_l I hZFC φ ρ (X := Y) (Y := X) (by
+    intro y hy
+    obtain ⟨x, hx, hxy⟩ := hs y hy
+    exact ⟨x, hx, (hφ y x).mpr hxy⟩)
+  exact ⟨G, hG, fun y z x hy hz => hf.1.2 x y z ((hφ y x).mp (hg y x hy)) ((hφ z x).mp (hg z x hz))⟩
+
 end YesMetaZFC.SetTheory.ZFC
