@@ -89,6 +89,8 @@ jobs:
         run: python scripts/check_elementary.py
       - name: Audit ultrapowers and Los witness boundary
         run: python scripts/check_ultrapower.py
+      - name: Audit forcing orders and constructive data
+        run: python scripts/check_forcing.py
       - name: Pack Lean and full caches
         run: |
           python scripts/lean_cache.py pack --kind lean
