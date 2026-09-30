@@ -20,6 +20,12 @@
 | [可选谓词域](Semantics/Predicates.lean) | `Predicate_domain` 分离关系对象与背景谓词。`Full` 相对于该谓词域，`Formula_closed` 只要求覆盖标准公式像；两者都不属于基础模型的必填条件。Native 实例直接消费原 Henkin 关系域。 |
 | [完整二阶默认实例](SecondOrder/Full.lean) | `Full.structure_of` 使用原载体上的全部谓词，关系域保持 `Type (max u x)`；`predicate_full` 证明其满性，`satisfies_iff` 对所有对象量词、关系量词及联结词连接原 Full 语义。 |
 | [普通结构映射](FirstOrder/Morphism.lean) | `Env.map` 只要载体映射，`Fn_map` 只要函数保持，`Str_emb` 另要求单射与关系双向保持；`formula_iff`、`models_iff` 只另消费满射。`Str_iso` 携带显式逆映射，不通过不可计算选择构造逆。 |
+| [初等嵌入](FirstOrder/Elementary.lean) | `Str_emb.Elementary_m` 保持任意有限参数下的全部公式；`tarski_vaught_m` 等价于目标见证可取在像中。无需满射、可数性、模型论完备性或选择函数。 |
+| [子结构](FirstOrder/Substructure.lean) | `Substructure_m` 给出各排序非空且函数封闭的子集；`structure_m`、`incl_m` 实际构造限制结构和包含映射。其 `tarski_vaught_m` 使用原模型环境及参数归属，直接供 hull 的见证封闭证明调用。 |
+| [任意指标闭包](Closure.lean) | `RuleFamily_l` 不依赖逻辑语言，支持任意排序、载体、规则及输入指标 universe；`Closure_l` 是实际归纳闭包。给出最小性、单调性、幂等性、重编号、任意规则族合并及任意生成族的闭包公式。 |
+| [Skolem 壳](FirstOrder/Skolem.lean) | `Skolem_m` 显式携带存在成立时的见证函数；`hull_m` 对任意多排序签名、原结构及生成子集构造同层初等子结构。`hull_with_m` 还可同时封闭任意额外规则族，不要求其运算属于原语言。 |
+| [约化积与 Łoś](ReducedProduct/Los.lean) | 任意签名及同层结构族的截面商，有限参数无选择地下降。`los_m` 明确消费见证拼接条件，`los_iff_witness_m` 证明此条件恰好必要充分。 |
+| [同层超幂](Ultrapower.lean) | 恒定结构族的实际超幂，输入与输出 `Structure` 层级相同；对角嵌入、条件初等性、理论保持及主超幂的显式同构，不限于隶属语言。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
@@ -126,8 +132,75 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 已落地 `Fn_map`、`Str_emb`、`Str_iso`，并整层迁移 `LevyEmbedding` 的对应消费者。
 正向关系同态、专门的无量词片段接口仍可按实际使用需求添加；不把这些未来接口计为已实现。
 
-初等嵌入、子结构与 Tarski–Vaught 等通用工具可在该层上发展，但不作为图模型或
-布尔值一致性证明的强制前置。尤其不把一般模型存在问题改道到可数 Henkin 枚举。
+初等嵌入及子结构的 Tarski–Vaught 判据已落地。Skolem hull 先通过规则闭包给出实际
+非空、函数封闭子结构，再证明 `Substructure_m.WitnessClosed_m`：对该子集内的任意有限
+参数，原模型满足的存在公式在子集中有指定见证。`tarski_vaught_m` 即给出初等性；
+`term_mem_m` 提供项闭包，`elementary_inclusion_m` 处理同一模型中嵌套的初等子结构。
+判据证明中的经典反证只留在 Prop；限制结构、环境和包含映射均不选择数据。
+本接口针对原 AST 与默认 Tarski 语义，不声称非标准内部公式码的初等性。
+它不作为图模型、布尔值一致性或一般模型存在问题的强制前置。
+
+### Skolem 壳的调用与选择边界
+
+最小导入为 `YesMetaZFC.Model.FirstOrder.Skolem`，数学接口位于
+`YesMetaZFC.Logic.FirstOrder.Skolem_m`；底层闭包只需导入 `YesMetaZFC.Model.Closure`，
+不依赖 Mathlib、集合论或一阶语法。
+
+- 调用方给出 `F : Skolem_m ℳ`，以及任意生成谓词 `A : ∀ s, ℳ.Carrier s → Prop`。
+  `F.hull_m A` 是实际 `Substructure_m ℳ`，`F.hull_elementary_m A` 证明初等性；
+  `hull_models_iff_m` 对任意理论传输模型性，不限于 ZF 或 ZFC。
+- `F.witness φ ρ h` 只在 `h : ∃ a, ...` 时返回数据；正确性由 `F.satisfies` 认证。
+  不从原结构非空性选择默认对象。即使 `A` 为空，各排序仍有真公式的指定见证。
+- `seed_mem_m`、`hull_le_m`、`hull_mono_m`、`hull_idem_m` 给出闭包公理；最小性
+  针对同一套指定 Skolem 规则，不是说原结构有一个与见证选择无关的最小初等子模型。
+- 任意索引生成族可取 `fun s a => ∃ i, A i s a`，`hull_union_iff_m` 连接逐项闭包。
+  任意额外运算族先用 `RuleFamily_l.of_operations_l` 装配，再交给 `hull_with_m`；
+  `hull_with_closed_m`、`hull_with_le_m`、`hull_with_elementary_m` 分别证明双重封闭、
+  最小性和初等性。规则族也可用 `union_l` 任意合并或用 `reindex_l` 重编号。
+- 签名的三个 universe、结构载体 universe、额外指标及输入指标 universe 独立多态。
+  载体始终是原载体的子类型；合并不同大小的输入族只提升输入指标，不提升模型域。
+  底层允许无限元规则，因此没有无条件声称 ω 步闭包或 Löwenheim–Skolem 基数界。
+- 没有无条件证明每个结构都有 `Skolem_m`，也没有把该见证数据从 Prop 选择出来。
+  调用方需提供显式/可定义的见证系统，或另行证明所需选择原则及存在性。
+  此处尚不是任意非标准 ZF 模型内部集合编码的壳构造；内部化须另有内部语法和满足关系。
+
+`python scripts/check_elementary.py` 检查整个闭包、初等子结构与 Skolem 切片的实际声明，
+并对闭包及壳的数据定义严格排除 `Classical.choice`；初等性继承 Tarski–Vaught 的 Prop
+经典推理。没有新增公理、`noncomputable` 或原生计算可信依赖。
+
+### 超幂与 Łoś 的调用边界
+
+最小导入为 `YesMetaZFC.Model.Ultrapower`；公开接口位于
+`YesMetaZFC.Logic.FirstOrder.Ultrapower` 和 `ReducedProduct`。任意签名的排序、函数
+和关系均使用原生类型化 AST，模型不要求满足 ZF、可数、传递或外部良基。
+
+- 固定 `I : Type x` 与 `ℳ : Structure.{u,v,w,max x y} σ` 后，
+  `Ultrapower.structure_m ℳ U` 的结果仍是同一个 `Structure.{u,v,w,max x y} σ`。
+  输入已处于该层，并非输出时才升层；同层指标和较小指标都可直接调用。
+  无 `ULift`、`Shrink` 或提高模型载体的隐式包装。任意更高 universe 的指标不在
+  此固定域内：其全函数空间通常更大，不能同时无条件承诺“任意更大指标”和“不升层”。
+- 只给滤子即可构造约化积，真滤子给出 `diagonal_m`。超滤加 `Witness_m` 给出
+  `diagonal_elementary_m` 与 `models_iff_m`。理论可以是任意闭句集合。
+- 一般结构族 `ℳ : I → Structure ...` 使用 `ReducedProduct.structure_m`，并显式
+  提供 `Nonempty_m ℳ`（逐排序的截面空间非空）。逐点非空在无选择背景下不足以
+  自动取得该条件；恒定结构族的超幂已无选择地证明该条件。
+- `Germ_l` 以滤子意义下相等为等价关系。有限参数列通过 `map₂_l` 递归装配，函数
+  和关系直接商消去；`env_surjective_m` 仅在 Prop 中逐项回拉有限环境，不定义
+  全商的代表元函数。因此 `los_m` 的截面环境形式覆盖所有有限商参数。
+- `Witness_m` 只要求原公式在大集上逐点存在时，有一个截面在大集上见证。
+  `los_iff_witness_m` 证明它与完整 Łoś 等价，不自动从超滤性推出。
+  可以传入 `WitnessData_m` 的显式全域见证运算，经 `witness_of_data_m` 获得条件；
+  或显式假定本指标及载体上的 `Choice_m`，经 `witness_of_choice_m` 使用。
+  未用宿主 `Classical.choose` 或全局选择公理自动填充这些前提。
+- 指定点的主超滤 `Filter.point_l i` 无需额外选择条件：`principal_witness_m`
+  已证明见证拼接；`principal_iso_m` 实际构造原模型与主超幂的同构，其逆由指定点
+  的商求值 `evaluation_m` 给出，不从满射选逆。
+- 当前是原 AST 与宿主 Tarski 语义的同层超幂，不宣称完成任意非标准 ZF 模型内部
+  编码的超幂，也没有声称任意非主超幂外部良基或自动存在 Mostowski 坍缩。
+
+`python scripts/check_ultrapower.py` 审计全部五个新模块的实际声明与构造性端点，已接入
+CI。商数据使用 `propext` / `Quot.sound`，不使用选择；Łoś 和对角嵌入的 Prop 证书
+使用经典逻辑，单看整个含证明结构的公理列表不能误判为选择了 Type 数据。
 
 ## 可选的二阶接口
 

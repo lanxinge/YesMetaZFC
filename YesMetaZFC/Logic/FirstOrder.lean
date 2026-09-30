@@ -7,6 +7,7 @@ import YesMetaZFC.Logic.FirstOrder.Derivation
 import YesMetaZFC.Logic.FirstOrder.Hilbert.Equivalence
 import YesMetaZFC.Logic.FirstOrder.FormulaComplexity
 import YesMetaZFC.Logic.FirstOrder.LevyHierarchy
+import YesMetaZFC.Logic.FirstOrder.Lindenbaum
 import YesMetaZFC.Model.FirstOrder.LevyAbsoluteness
 /-!
 # 一阶语义与 Derives 核聚合入口

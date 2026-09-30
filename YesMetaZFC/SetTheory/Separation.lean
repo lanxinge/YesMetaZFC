@@ -82,7 +82,7 @@ theorem difference_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP
         ℳ.mem value right ∧ ¬ ℳ.mem value left := by
   let env : Env ℳ 1 := {
     bound := fun _ => left
-    free := fun _ => Classical.choice ℳ.nonempty
+    free := fun _ => left
   }
   rcases KP.separation_exists_d hKP differenceSchema env right with
     ⟨difference, hDifference⟩
@@ -101,7 +101,7 @@ theorem intersection_exists_d {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.
         ℳ.mem value left ∧ ℳ.mem value right := by
   let env : Env ℳ 1 := {
     bound := fun _ => right
-    free := fun _ => Classical.choice ℳ.nonempty
+    free := fun _ => left
   }
   rcases KP.separation_exists_d hKP intersectionSchema env left with
     ⟨intersection, hIntersection⟩
