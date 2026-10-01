@@ -12,7 +12,7 @@ YesMetaZFC 在 Lean 4 中发展一阶逻辑、集合论与元数学的形式化�
 标准布尔名称模型也已对任意完备布尔代数构造并核验原 ZFC，包含全部有限参数模式。
 地模型全部内部名称的泛型商已证明原公式真值定理及完整 ZFC 保持，允许外部非良基地模型，
 参数化 Cohen 添加与可数闭塌缩分别构造了 ZFC＋¬CH、ZFC＋CH 模型，
-并在原推导核中证明 CH 双侧不可证，见 [力迫模块](YesMetaZFC/Model/Forcing/README.md)。
+并在原推导核中证明 CH 双侧不可证，见 [力迫模块](YesMetaZFC/Model/Forcing/README.md)及其[功能目录与构造历史](YesMetaZFC/Model/Forcing/INDEX.md)。
 Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义版覆盖任意裸 ZFC
 模型和每组有限参数赋值。准确的公式范围、编码约定与声明见 [TROPHIES.md](markdown/TROPHIES.md)。
 

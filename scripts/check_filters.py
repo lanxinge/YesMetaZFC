@@ -47,7 +47,7 @@ def names(values):
 
 
 def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
-         label="FILTER_GUARD_PASS"):
+         label="FILTER_GUARD_PASS", axiom_bounds=None):
     """复用声明级审计；各数学切片显式传入模块及其可信边界。"""
     files = [ROOT / (m.replace(".", "/") + ".lean") for m in modules]
     hashes = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
@@ -55,6 +55,10 @@ def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
     result = subprocess.run(["lake", "--wfail", "build", *modules], cwd=ROOT, env=env)
     if result.returncode:
         return result.returncode
+    # 同一模块可包含不同理论强度的端点，逐声明另给更窄的可信边界。
+    bounds = "#[" + ", ".join(
+        f"(`{name}, {names(bound + ['propext', 'Quot.sound', 'Classical.choice'])})"
+        for name, bound in (axiom_bounds or {}).items()) + "]"
     guard = f'''
 run_cmd do
   let env ← Lean.getEnv
@@ -77,9 +81,17 @@ run_cmd do
   unless modules == selected.size do throwError "审计模块遗漏: {{modules}}"
   let strict : Array Lean.Name := {names(choice_free)}
   for n in strict do
+    unless env.contains n do throwError "审计端点不存在: {{n}}"
     let axioms ← Lean.collectAxioms n
     if axioms.contains `Classical.choice then throwError "构造性端点退化: {{n}}"
     Lean.logInfo m!"CHOICE_FREE: {{n}}; {{axioms}}"
+  let bounds : Array (Lean.Name × Array Lean.Name) := {bounds}
+  for (n, bound) in bounds do
+    unless env.contains n do throwError "审计端点不存在: {{n}}"
+    let axioms ← Lean.collectAxioms n
+    for a in axioms do
+      unless bound.contains a do throwError "端点超出公理边界: {{n}} → {{a}}"
+    Lean.logInfo m!"AXIOM_BOUND: {{n}}; {{axioms}}"
   Lean.logInfo m!"{label}: {{modules}} modules, {{count}} declarations"
 '''
     source = "import Lean\n" + "\n".join("import " + m for m in modules) + "\n" + guard

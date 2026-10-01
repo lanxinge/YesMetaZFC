@@ -1,5 +1,7 @@
 # 力迫偏序、布尔完备化与名称解释
 
+[功能目录与构造历史索引](INDEX.md)
+
 导入 `YesMetaZFC.Model.Forcing`，声明位于 `YesMetaZFC.Model.Forcing`。
 `YesMetaZFC.Model` 已导出此层。任意宿主预序已有实际正则开完备布尔代数和规范
 稠密映射。名称求值直接消费现有 `Model.Boolean.BV_graph`，输出实际 `SG_set`。
@@ -40,55 +42,55 @@
 
 | 模块 | 接口与已经证明的内容 |
 | --- | --- |
-| `Order` | `Cmp_l` 是存在共同加强，`Inc_l` 是不相容；`Lower_l`、`down_l`、反链、无原子性、分离性及条件以下的限制。 |
-| `Density` | 稠密、局部稠密及预稠密；预稠密等价于向下闭包稠密；两个稠密集在其中一个向下封闭时交仍稠密。 |
-| `Density` 的映射 | `PO_hom` 只保序，`PO_compat` 另保持不相容，`PO_dense` 再要求像稠密；证明稠密开集回拉及稠密映射复合。相容性反射只要求 `PO_compat`。 |
-| `Separative` | 通过相容性定义分离预序与实际商 `Sep_l`，构造 `sep_order_l` 和规范稠密映射 `sep_map_l`；证明商序分离、规范映射保持并反射相容性。 |
-| `Boolean` | 任意 `BA_alg B` 的非零部分给出 `positive_order_l`；相容等价于交非零，差 `p ∧ ¬q` 给出分离见证。条件域非空恰要求代数非平凡。 |
-| `Tree` | `List A` 按延长排序；相容恰为前缀可比，任意有限长度的条件稠密；二元树的两个孩子形成反链，整棵树无原子。 |
-| `RegularOpen` | `RO_l` 是向下且双重伪补稳定的谓词；`ro_algebra_l` 实际装配交、剩余、双重否定及任意上确界，直接返回原 `CB_alg`。 |
-| `Completion` | `ro_principal_l p` 正则化主向下集；`ro_map_l` 保序且保持不相容，`ro_dense_l` 的像稠密。布尔比较恢复 `Sep_le_l`，非零交恢复 `Cmp_l`；分离时反射原顺序，反对称时进一步单射。 |
-| `Cohen` | `cohen_algebra_l` 是二元序列树的实际完备布尔代数；`cohen_nontrivial_l` 和 `cohen_atomless_l` 分别给出非平凡性与无原子性。 |
-| `Generic` | 条件滤子、主滤子、递降序列滤子；`generic_countable_l` 从任意起始条件构造遇到指定可数稠密族的滤子。 |
-| `BooleanGeneric` | 条件滤子转布尔真滤子；显式上确界见证稠密集 `sup_dense_l` 及其稠密性；只有遇到相应稠密集才导出无限析取／合取的真值对应。 |
-| `Valuation` | `val_graph_l` 删除未接受的边，`val_l` 取双模拟商；成员递归式、规范名称 `check_graph_l` 及还原定理。数据无需滤子、完备性或代表元选择。 |
-| `Truth` | `Name_generic_l` 列出四类具体稠密集；`val_eq_iff_l`、`val_mem_iff_l` 沿图良基归纳证明原子真值对应。可数节点已有泛型滤子存在端点。 |
-| `NameGeneric` | `name_family_generic_l` 同时处理可数名称族所有节点对，并允许额外可数稠密要求；有限初段调度直接产生同一个滤子。 |
-| `Extension` | `name_span_l` 生成子名称封闭域；`ext_structure_l` 是该域的实际求值像，已有传递性、外延性、良基性、规范名称包含及原子语义接口。 |
-| `RealName` | 任意权重序列给出可数的自然数子集名称；求值逐位读取权重。复用原 ω 图，并提供显式节点枚举。 |
-| `CohenReal` | `cohen_extension_l` 构造同一滤子：遇到给定稠密族、避开给定可数旧实数族，并满足整个 `cohen_names_l` 名称域的原子真值要求。 |
-| `Domain` | 相对名称布尔结构 `domain_str_l` 与原纯语言扩张 `ext_model_l`；求值映射直接满射到解释像，项和环境使用原 `Fn_map` 接口。 |
-| `Formula` | `val_formula_iff_l` 对原十一种公式构造证明真值对应；量词只遍历指定名称域，保留原 bound/free 上下文。 |
-| `FormulaGeneric` | `fm_dense_l` 由公式及赋值计算量词稠密族，并证明稠密性和向下封闭性；没有让调用者假设量词真值引理。 |
-| `FormulaEnumeration` | 复用 `SyntaxNatCoding` 的单射编码及原异质赋值列，证明全部有限参数公式实例可枚举；枚举选择只存在于 Prop 证明中。 |
-| `ZFCBase` | 直接核验原外延性、空集、基础公理；当 ω 在实际解释像中时，核验原无穷公理。 |
-| `CohenTheory` | `cohen_full_extension_l` 一次生成满足全部公式真值、额外稠密族和新实数要求的同一滤子；`cohen_zfc_base_l` 自动给出四条原公理。 |
-| `InternalPair` | 名称的 Kuratowski 有序对编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
-| `InternalNames` | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
-| `InternalClosure` | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
-| `InternalGraph` | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |
-| `InternalRealization` | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
-| `InternalBoolean` | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
-| `InternalCohen` | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
-| `InternalAtomicSyntax`／`InternalAtomicClosure`／`InternalAtomic` | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
-| `InternalConditions`／`InternalDefinability`／`InternalAtomicWitness` | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集。 |
-| `InternalEquivalence`／`InternalQuotient` | 模型内部双模拟的等价及替换；同 universe 的名称泛型商、原子真值、求值成员方程及外延性。 |
-| `InternalFoundation`／`InternalCheckForcing` | 由内部公式归纳证明条目极小元、商模型的基础公理及规范名称嵌入单射性；允许外部非良基地模型。 |
-| `InternalAtomicTruth` | 外部良基名称图的原子真值及求值对应；图表示层的独立接口。 |
-| `InternalFormula`／`InternalLogic`／`InternalTruth` | 原 Project 公式的内部力迫翻译、正则性和泛型商的完整真值定理；量词遍历全部内部名称。 |
-| `InternalNameConstruction`／`InternalSeparation`／`InternalCollection`／`InternalPower` | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
-| `InternalZFOperations`／`InternalZF` | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
-| `SetTheory.Choice`／`InternalSelection`／`InternalChoice` | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
-| `InternalGenericInstance` | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
-| `InternalGeneric` | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
-| `InternalClosed`／`Collapse` | 原模型内的可数递降链、可数稠密交、可数部分函数条件集及其实际可数闭性。 |
-| `NoNewReals`／`GroundTransfer` | 可数闭力迫不增加实数；规范嵌入保持成员、函数图、单射、序数和 ω。 |
-| `CollapseGeneric`／`CH` | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
+| [Order/Basic](Order/Basic.lean) | `Cmp_l` 是存在共同加强，`Inc_l` 是不相容；`Lower_l`、`down_l`、反链、无原子性、分离性及条件以下的限制。 |
+| [Order/Density](Order/Density.lean) | 稠密、局部稠密及预稠密；预稠密等价于向下闭包稠密；两个稠密集在其中一个向下封闭时交仍稠密。 |
+| [Order/Density](Order/Density.lean) 的映射 | `PO_hom` 只保序，`PO_compat` 另保持不相容，`PO_dense` 再要求像稠密；证明稠密开集回拉及稠密映射复合。相容性反射只要求 `PO_compat`。 |
+| [Order/Separative](Order/Separative.lean) | 通过相容性定义分离预序与实际商 `Sep_l`，构造 `sep_order_l` 和规范稠密映射 `sep_map_l`；证明商序分离、规范映射保持并反射相容性。 |
+| [Boolean/Conditions](Boolean/Conditions.lean) | 任意 `BA_alg B` 的非零部分给出 `positive_order_l`；相容等价于交非零，差 `p ∧ ¬q` 给出分离见证。条件域非空恰要求代数非平凡。 |
+| [Order/Tree](Order/Tree.lean) | `List A` 按延长排序；相容恰为前缀可比，任意有限长度的条件稠密；二元树的两个孩子形成反链，整棵树无原子。 |
+| [Boolean/RegularOpen](Boolean/RegularOpen.lean) | `RO_l` 是向下且双重伪补稳定的谓词；`ro_algebra_l` 实际装配交、剩余、双重否定及任意上确界，直接返回原 `CB_alg`。 |
+| [Boolean/Completion](Boolean/Completion.lean) | `ro_principal_l p` 正则化主向下集；`ro_map_l` 保序且保持不相容，`ro_dense_l` 的像稠密。布尔比较恢复 `Sep_le_l`，非零交恢复 `Cmp_l`；分离时反射原顺序，反对称时进一步单射。 |
+| [Applications/Cohen/Algebra](Applications/Cohen/Algebra.lean) | `cohen_algebra_l` 是二元序列树的实际完备布尔代数；`cohen_nontrivial_l` 和 `cohen_atomless_l` 分别给出非平凡性与无原子性。 |
+| [External/Generic](External/Generic.lean) | 条件滤子、主滤子、递降序列滤子；`generic_countable_l` 从任意起始条件构造遇到指定可数稠密族的滤子。 |
+| [Boolean/Generic](Boolean/Generic.lean) | 条件滤子转布尔真滤子；显式上确界见证稠密集 `sup_dense_l` 及其稠密性；只有遇到相应稠密集才导出无限析取／合取的真值对应。 |
+| [External/Valuation](External/Valuation.lean) | `val_graph_l` 删除未接受的边，`val_l` 取双模拟商；成员递归式、规范名称 `check_graph_l` 及还原定理。数据无需滤子、完备性或代表元选择。 |
+| [External/Truth](External/Truth.lean) | `Name_generic_l` 列出四类具体稠密集；`val_eq_iff_l`、`val_mem_iff_l` 沿图良基归纳证明原子真值对应。可数节点已有泛型滤子存在端点。 |
+| [External/NameGeneric](External/NameGeneric.lean) | `name_family_generic_l` 同时处理可数名称族所有节点对，并允许额外可数稠密要求；有限初段调度直接产生同一个滤子。 |
+| [External/Extension](External/Extension.lean) | `name_span_l` 生成子名称封闭域；`ext_structure_l` 是该域的实际求值像，已有传递性、外延性、良基性、规范名称包含及原子语义接口。 |
+| [External/RealName](External/RealName.lean) | 任意权重序列给出可数的自然数子集名称；求值逐位读取权重。复用原 ω 图，并提供显式节点枚举。 |
+| [Applications/Cohen/Real](Applications/Cohen/Real.lean) | `cohen_extension_l` 构造同一滤子：遇到给定稠密族、避开给定可数旧实数族，并满足整个 `cohen_names_l` 名称域的原子真值要求。 |
+| [External/Domain](External/Domain.lean) | 相对名称布尔结构 `domain_str_l` 与原纯语言扩张 `ext_model_l`；求值映射直接满射到解释像，项和环境使用原 `Fn_map` 接口。 |
+| [External/Formula](External/Formula.lean) | `val_formula_iff_l` 对原十一种公式构造证明真值对应；量词只遍历指定名称域，保留原 bound/free 上下文。 |
+| [External/FormulaGeneric](External/FormulaGeneric.lean) | `fm_dense_l` 由公式及赋值计算量词稠密族，并证明稠密性和向下封闭性；没有让调用者假设量词真值引理。 |
+| [External/FormulaEnumeration](External/FormulaEnumeration.lean) | 复用 `SyntaxNatCoding` 的单射编码及原异质赋值列，证明全部有限参数公式实例可枚举；枚举选择只存在于 Prop 证明中。 |
+| [External/ZFCBase](External/ZFCBase.lean) | 直接核验原外延性、空集、基础公理；当 ω 在实际解释像中时，核验原无穷公理。 |
+| [Applications/Cohen/Theory](Applications/Cohen/Theory.lean) | `cohen_full_extension_l` 一次生成满足全部公式真值、额外稠密族和新实数要求的同一滤子；`cohen_zfc_base_l` 自动给出四条原公理。 |
+| [Internal/Names/Pair](Internal/Names/Pair.lean) | 名称的 Kuratowski 有序对编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
+| [Internal/Names/Basic](Internal/Names/Basic.lean) | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
+| [Internal/Names/Closure](Internal/Names/Closure.lean) | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
+| [Internal/Names/Graph](Internal/Names/Graph.lean) | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |
+| [Internal/Names/Realization](Internal/Names/Realization.lean) | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
+| [Boolean/Internal](Boolean/Internal.lean) | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
+| [Applications/Cohen/Internal](Applications/Cohen/Internal.lean) | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
+| [Internal/Atomic/Syntax](Internal/Atomic/Syntax.lean)／[Internal/Atomic/Closure](Internal/Atomic/Closure.lean)／[Internal/Atomic/Recursion](Internal/Atomic/Recursion.lean) | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
+| [Internal/Forcing/Conditions](Internal/Forcing/Conditions.lean)／[Internal/Forcing/Definability](Internal/Forcing/Definability.lean)／[Internal/Atomic/Witness](Internal/Atomic/Witness.lean) | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集。 |
+| [Internal/Atomic/Equivalence](Internal/Atomic/Equivalence.lean)／[Internal/Extension/Quotient](Internal/Extension/Quotient.lean) | 模型内部双模拟的等价及替换；同 universe 的名称泛型商、原子真值、求值成员方程及外延性。 |
+| [Internal/Extension/Foundation](Internal/Extension/Foundation.lean)／[Internal/Check/Forcing](Internal/Check/Forcing.lean) | 由内部公式归纳证明条目极小元、商模型的基础公理及规范名称嵌入单射性；允许外部非良基地模型。 |
+| [Internal/Atomic/Truth](Internal/Atomic/Truth.lean) | 外部良基名称图的原子真值及求值对应；图表示层的独立接口。 |
+| [Internal/Forcing/Formula](Internal/Forcing/Formula.lean)／[Internal/Forcing/Logic](Internal/Forcing/Logic.lean)／[Internal/Forcing/Truth](Internal/Forcing/Truth.lean) | 原 Project 公式的内部力迫翻译、正则性和泛型商的完整真值定理；量词遍历全部内部名称。 |
+| [Internal/Names/Construction](Internal/Names/Construction.lean)／[Internal/Extension/Separation](Internal/Extension/Separation.lean)／[Internal/Extension/Collection](Internal/Extension/Collection.lean)／[Internal/Extension/Power](Internal/Extension/Power.lean) | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
+| [Internal/Extension/Operations](Internal/Extension/Operations.lean)／[Internal/Extension/ZF](Internal/Extension/ZF.lean) | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
+| `SetTheory.Choice`／[Internal/Maximum/Selection](Internal/Maximum/Selection.lean)／[Internal/Extension/Choice](Internal/Extension/Choice.lean) | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
+| [Internal/Extension/Instance](Internal/Extension/Instance.lean) | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
+| [Internal/Extension/Generic](Internal/Extension/Generic.lean) | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
+| [Closed/Basic](Closed/Basic.lean)／[Applications/Collapse/Basic](Applications/Collapse/Basic.lean) | 原模型内的可数递降链、可数稠密交、可数部分函数条件集及其实际可数闭性。 |
+| [Closed/NoNewReals](Closed/NoNewReals.lean)／[Closed/NoNewFunctions](Closed/NoNewFunctions.lean)／[Closed/NoNewCountable](Closed/NoNewCountable.lean)／[Internal/Ground/Transfer](Internal/Ground/Transfer.lean) | 可数闭力迫不增加实数、取值于任意旧集合的内部 ω 函数或旧集合的内部可数子集；返回实际旧原像及旧可数性。规范嵌入保持成员、函数图、单射、序数和 ω。 |
+| [Applications/Collapse/Generic](Applications/Collapse/Generic.lean)／[Applications/Continuum/CH](Applications/Continuum/CH.lean) | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
 | `SetTheory.Card.Finite`／`PartialFunction`／`PartialFunctionCCC` | 内部有限集合的删除归纳、有限部分函数添值与合并，以及任意坐标集和可数值集上的内部可数链条件。 |
 | `SetTheory.Fiber`／`Card.CountableUnion` | 可定义纤维自动组成集合函数；小集合族的并单射到 κ×κ，供可数覆盖与基数保持共同使用。 |
-| `InternalCCC`／`InternalCCCBounds` | 有限部分函数偏序自动装配 CCC；可定义碰撞的否定条件控制可能原像，反射基数上界并保持每个旧无限基数。 |
-| `GenericFunction`／`CohenCoordinates` | 塌缩与 Cohen 共用泛型函数名称；新鲜自然数列、两行分离及旧集合对角稠密集。 |
-| `CohenAdd`／`NotCH`／`CHIndependence` | 按 κ 添加互异新实数、ZFC＋¬CH 模型及原 ZFC 的 CH 独立性；均允许外部非良基地模型。 |
+| [CCC/Basic](CCC/Basic.lean)／[CCC/Bounds](CCC/Bounds.lean) | 有限部分函数偏序自动装配 CCC；可定义碰撞的否定条件控制可能原像，反射基数上界并保持每个旧无限基数。 |
+| [Internal/Functions/Generic](Internal/Functions/Generic.lean)／[Applications/Cohen/Coordinates](Applications/Cohen/Coordinates.lean) | 塌缩与 Cohen 共用泛型函数名称；新鲜自然数列、两行分离及旧集合对角稠密集。 |
+| [Applications/Cohen/Add](Applications/Cohen/Add.lean)／[Applications/Continuum/NotCH](Applications/Continuum/NotCH.lean)／[Applications/Continuum/Independence](Applications/Continuum/Independence.lean) | 按 κ 添加互异新实数、ZFC＋¬CH 模型及原 ZFC 的 CH 独立性；均允许外部非良基地模型。 |
 
 分离比较定义为
 
@@ -415,6 +417,122 @@ have hConsistent := Internal.ch_consistency_l
 `ch_consistency_l` 同时给出两个扩充理论的一致性。对任意大小的地模型，力迫保持
 接口消费给定泛型；可数性只在自动构造泛型的 `*_extension_l` 入口使用。
 
+## 支撑迭代
+
+共同后继步见 [迭代设施清单](ITERATION.md)：`two_step_l` 从任意名称预序构造实际
+内部二步条件集，`two_step_factors_l`、`two_step_compose_l` 与 `two_step_recover_l`
+完成两阶段泛型的双向分解和精确恢复。内部混合与 `maximum_l` 给出全局见证名称，
+`forces_zf_l` 与 `forces_zfc_l` 分别在相应地模型的全部正条件上核验原理论公理。
+`forces_of_generics_l` 在 ZF 强度下消费实际原模型公式和对全部泛型成立的构造，
+已用于规范名称配对及二步名称性。`cohen_step_l` 从任意
+添加量名称统一装配 Cohen 后继、顶名称和实际阶段完全嵌入，对全部泛型保留 CCC、
+基数保持与新实数族。`reg_embed_max_l`、`reg_embed_comp_l` 给出极大反链保持与
+模型内嵌入复合。有限支撑、可数支撑的极限构造及给定原公式规则的完整内部
+超限递归存在性均已完成；有限支撑 CCC 保持也已接入整个递归，可数支撑
+properness 保持也已通过实际交集 club 完成。本层继续保留
+任意外部非良基地模型的适用范围。
+
+`stage_nmap_l` 从实际阶段图自动构造唯一的目标名称。`stage_nmap_comp_l` 核验两次
+搬运与复合图的一致，`stage_nmap_id_l` 证明删除零标签后的恒等搬运仍与原名称
+被迫相等。等号、隶属及其否定现已在阶段像上精确对应；`reg_generic_l` 自动回拉
+目标泛型，`stage_extension_l` 给出解释交换且成员满覆盖的实际单射。
+`two_step_name_l` 已构造二步名称的唯一转换，并验证其在第一扩张中的第二阶段
+名称性及精确条目解释；`two_step_valuation_l` 进一步装配原二步名称的双重求值，
+核验总性、唯一性和组合滤子下的成员递归。`curry_forces_eq_l` 以内部条目归纳
+证明二步等号向嵌套等号传输，`curry_forces_eq_iff_l` 通过原模型内的实际双模拟
+补齐反射方向。任意第二阶段名称现可在原模型内摊平，且双重值精确还原。
+`two_step_iso_l` 自动返回单次二步扩张与双重扩张间的成员结构双射，并保留逐名称
+求值证书；原部分映射接口已迁移到此入口。
+`row_zero_l`、`row_successor_l` 已构造共同的部分函数坐标条件；省略顶名称坐标后，
+旧条件按原对象完全嵌入下一阶段，顶不变且前缀精确恢复。有限／可数支撑均在
+限制、单坐标追加和前缀替换下保持。后继同时返回 `Row_link_d`：限制投影保序，
+旧前缀的加强能保留原尾部，产生同时低于原条件和新前缀的条件；阶段链接已有
+恒等和复合定理。`row_cohen_successor_l` 给出添加量名称参数化的真实实例。
+`Row_system_d` 进一步以实际模型内序列编码全部阶段；`row_system_successor_l` 和
+`row_system_cohen_l` 自动延长所有旧投影。`row_limit_l` 从阶段序列实际构造有限／
+可数支撑极限及各阶段的完全嵌入，`row_system_limit_l` 把极限写回序列以继续后继。
+零系统直接调用统一极限处理空序列。`row_iteration_l` 进一步从实际原公式规则
+构造任意指定内部长度的完整迭代；`row_iteration_unique_l`、`row_iteration_step_l`
+给出字面唯一性与精确前缀方程，`cohen_iteration_l` 提供一键实际实例。
+规则允许读取全部历史，递归轨迹的合法性由实际原公式作内部超限归纳证明。
+构造与有限支撑直接并刻画只用 ZF。`row_limit_union_l` 精确刻画非空阶段系统中
+条件与序关系的直接并。`two_step_ccc_l` 证明任意被迫 CCC 名称的二步保持；
+`row_limit_ccc_l` 以内部有限尾支撑归纳证明非零极限保持，两者使用 ZFC。
+`row_iteration_ccc_exists_l` 一次返回整个有限支撑迭代及全部阶段 CCC，
+`cohen_iteration_ccc_l` 只需内部长度与添加量，自动验证现有 Cohen 原公式规则。
+`ccc_proper_l` 已从内部可数闭包实际构造主条件 club；`proper_mstr_l` 自动装配
+含指定可数种子的主加强，`cohen_names_proper_l` 给出任意添加量名称的全局 properness
+力迫证书。`row_fusion_l` 取实际可数共尾前缀族的并，得到唯一极限条件并精确保留
+全部前缀；`row_fusion_reconstruct_l` 自动生成实例并还原原条件。
+`ng_elementary_hull_l` 已自动构造同一个 N 在所有接受主条件的泛型中的完整内部
+`N[G]≺X[G]`。`ng_hchi_hull_l` 已将环境精确识别为扩张的 `H(eχ)`；
+`ng_next_master_l` 从被迫 proper 的后继自动构造 club 名称及同一 N[G] 中的主加强。
+`two_step_master_l` 已完成二步主条件合成，`two_step_master_first_l` 给出首坐标投影；
+`two_step_master_second_l` 证明第二坐标的 N[G] 主性力迫，`two_step_master_decompose_l`
+自动构造规范 N[G] 名称并给出完整双向分解。
+`two_step_master_extension_l` 在任意地模型中自动取得含指定种子的实际二步主加强。
+`ng_family_hull_l` 一次选择同一个 N，统一支持其所有成员阶段的 H(χ) 泛型初等提升。
+`ng_family_forcing_l` 已把共同提升构造成内部原公式的力迫证书；
+`ng_family_ground_l` 同时构造 N 内统一规范名称图，支持旧阶段条件的精确回拉。
+`row_step_proper_name_l` 对随泛型变化的商条件名称构造保持指定主前缀的 proper
+后继主加强，`row_step_proper_l` 是其实际旧条件特例。`row_dense_name_l` 在任意
+阶段间于原主前缀上选择进入 N 内指定稠密集的商加强名称。`row_step_pil_l` 已
+构造相邻后继的内部 `Row_pil_d`，`row_pil_value_l` 自动给出真正的
+`τ∈G∩check(N)` 力迫；`row_pil_comp_l` 复合已证明区间，`row_pil_dense_l` 同时
+满足指定 N 稠密集并保留原名称的实际尾部比较。滤子名称、名称的原样搬运、
+有界公式和旧关系力迫的跨阶段保持均已实现。商名称的前缀投影、进入新商偏序及
+实际尾部加强复合也已按 ZF 强度证明。`row_model_sequence_l` 构造共尾于
+`sup(N∩β)` 的内部阶段列和 N 内全部稠密集的枚举，并给出原 N 条件的支撑界。
+`row_iteration_pr_prepare_l` 进一步从实际 proper 后继规则及可数种子，一次构造
+统一辅助名称图、共同 N、全阶段提升与该 N 全部成员后继的迭代引理；
+`cohen_rule_pr_l` 已接入任意添加量的现有 Cohen 规则。
+该入口还由内部 ω 归纳自动给出全部内部有限区间的迭代引理，包含外部非标准阶段。
+`row_cut_step_l` 已证明变动前缀对原名称的限制比较保持；共尾融合保留此比较，
+结合已验证支撑界可以恢复完整尾部加强。
+`row_pr_thread_l` 已从实际转移生成内部 ω 主前缀序列；`row_pr_coherent_l` 证明全部
+前缀一致性。`row_pr_omega_thread_l` 从共同 N 与真实 proper 后继图自动完成首个
+内部极限的序列装配，包含初值、共尾列与全部稠密集枚举。类上选择的秩界由实际
+反射闭包构造，不要求外部良基性或标准 ω。
+`row_pr_bound_l` 现已证明全部早期名称的后期比较；`row_pr_master_fusion_l` 从实际
+递归图及支撑界自动构造主融合，比较和给定融合的主性只需 ZF。
+`row_iteration_pr_omega_l` 已从 proper 规则、实际可数支撑迭代及种子自动取得内部 ω
+终点的完整区间迭代引理。`row_iteration_pr_l` 进一步以实际原公式超限归纳完成
+任意内部终点的区间装配；`row_iteration_pr_exists_l` 同时构造迭代，
+`cohen_iteration_pil_l` 直接接受添加量与内部长度，提供参数化 Cohen 实例。
+`ng_trace_forcing_l` 固定三张实际闭包图构造交集 club，每个成员的同一见证带有
+完整内部提升证书。`row_iteration_proper_l` 据此证明所有阶段的 `Proper_d`；
+`row_iteration_proper_exists_l` 一次构造整个 proper 迭代，`cohen_iteration_proper_l`
+给出任意添加量与内部长度的直接实例，详见 [迭代设施清单](ITERATION.md)。
+`proper_countable_l` 自动给出全部旧集合的可数性双向对应，`proper_omega_one_l`
+精确保留第一不可数序数。`row_iteration_preserves_l` 将 ZFC、内部 ω、ω₁ 与
+旧可数性保持装配到全部阶段；`cohen_iteration_preserves_l` 一次构造参数化实例。
+同一规范嵌入还返回 `proper_set_cover_l`：旧集合在扩张中的每个新可数子集，
+均有地模型内部可数的旧子集覆盖。覆盖见证通过实际原公式的稠密性由原泛型选出。
+`proper_cf_omega_l` 进一步证明 `cf(eα)=eω ↔ cf(α)=ω`；
+`proper_countable_bounded_l` 对旧共尾度大于 ω 的任意旧序数 α 返回新可数子集的
+严格旧界。这两项也由上述全部阶段的装配入口返回。严格 ω 共尾列在 ZF 内由
+可数共尾集实际构造，详见 [可数共尾性保持](ITERATION.md#proper-扩张的可数覆盖ω₁-与可数共尾性保持)。
+后继已统一使用最小支撑乘积的幂集作为混合闭名称库；`Row_next_d`、`Row_limit_d` 及各自
+原公式给出确定的构造规格。存在性由装配入口返回，唯一性由 `row_next_unique_l`、
+`row_limit_unique_l` 在外延性下证明；二步关系显式保存有序对图性质。
+`name_pool_represent_l` 在 ZF 下给出同条件的库内等值代表；一般有界见证由
+`name_pool_maximum_l` 在 ZFC 下选择。`row_next_witness_l` 返回前缀精确不变的
+实际后继条件，`row_next_lower_name_l` 保持指定前缀并提升第二坐标加强。
+此处不把给定名称后的构造唯一性扩张为全局名称选择。
+内部累积层级及其覆盖定理进一步给出最早层的唯一候选集合。`norm_name_exists_l`
+从全局力迫等号类构造唯一规范名称，同时返回规范固定点及全部正条件上的等号
+证书；全局等价的输入得到相同规范名称。此层只需 ZF，最大值及所有 Cohen 名称
+入口已直接返回这些规范固定点；一般最大值原理仍使用 ZFC。
+`unique_maximum_l` 则从实际存在与唯一性公式的力迫证书，在 ZF 内混合全部局部
+见证并返回唯一规范名称。Cohen 关系规格现已包含完整图性质，条件、关系及顶
+唯一性只需外延性；名称和两个坐标装配入口均已改用 ZF 的唯一见证构造。
+`Cohen_names_d`、`cohen_names_m` 给出完整规范三元组的原公式规格，并已证明字面
+唯一性。`Row_cohen_d` 与 `row_cohen_m` 把名称装配和坐标后继合为一个确定构造，
+`row_cohen_unique_l` 在 ZF 下唯一确定后继条件集及序关系；两个坐标系统入口
+直接返回该证书，未要求调用者另行选择名称代表。
+第二阶段关系的规范化由 `preord_order_l` 自动完成；
+`forces_order_l` 与 `generic_order_l` 核验全部公式力迫和泛型性在规范化前后相同。
+
 ## 审计
 
 `python scripts/check_forcing.py` 先以 `lake --wfail build` 构建，再审计实际生产
@@ -442,3 +560,45 @@ CH 切片另检查内部依赖选择、ω 基数性、可数并、可数初等�
 只继承原八条 ZFC 句法闭合证书。复用序数引理中的若干原生计算步骤已换成直接证明。
 Cohen／独立性切片覆盖内部有限归纳、CCC、无限基数保持、参数化新实数族、¬CH 模型
 和原推导核的独立性端点，使用相同的八条既有证书边界；条件与公式数据严格排除经典选择。
+迭代切片另审计内部力迫规则、混合、最大值、初等反射、名称预序的二步装配、
+泛型双向分解与全局 Cohen 后继实际实例；
+继续使用固定既有证书边界，所有条件、公式与投影定义严格排除经典选择。
+ZF 反模型、全局泛型判据、规范名称配对、二步名称及等号力迫、关系规范化、名称摊平及扩张同构
+另按端点检查原七条 ZF 证书上界，不允许继承原选择公理的句法证书。
+坐标追加、限制、前缀拼接、支撑保持、偏序重编码、通用坐标后继和投影复合
+也按该 ZF 边界审计；二元可数并与可数积另纳入原 ZF 切片。
+模型内阶段序列、支撑极限集合界、极限投影和完全嵌入也已纳入逐端点 ZF 审计。
+最小闭支撑与混合闭名称库在原 ZF 边界内审计；固定条件的库内代表、二步与
+后继加强均另查 ZF 端点。后继、极限构造式及唯一性端点严格排除经典选择。
+累积层级、覆盖、最早层候选集合及名称规范化在同一原七条 ZF 证书边界内审计；
+迁入 Project 公共层的谓词实例化在无原公理的核心切片审计。
+Cohen 名称、坐标后继和系统后继已按原七条 ZF 证书上界逐端点审计；含 CCC 的
+完整 Cohen 结果仍保留原 ZFC，未扩大既有证书集合。
+有限支撑直接并、尾部合并、索引名称构造与可数性反射新增 ZF 端点检查。
+二步、极限及完整有限支撑 CCC 保持与参数化 Cohen 实例已进入迭代切片；
+可数覆盖、名称和规则的原公式数据均通过无经典选择检查。
+`N[G]` 的名称、求值图、内部可数性及主条件下的指定公式见证提升按原七条 ZF
+证书审计；自动构造承载这些实际见证池的内部初等 N 另允许原选择公理证书。
+名称和见证数据严格排除经典选择。有限名称列提升、内部公式码绝对性及
+`ng_elementary_l` 的全内部初等提升仍按原七条 ZF 证书审计；实际选择图和
+`ng_elementary_hull_l` 的自动装配使用 ZFC，边界见 [ITERATION](ITERATION.md)。
+全部 N 参数下的池闭性调用独立的 [Lévy 反射层](../SetTheory/LevyReflection.lean)；
+其通用证明与原子解码均在模型论目录，力迫层只保留实际池公式及其消费者。
+H(χ) 对应的内部秩、传递闭包和集合存在性只用 ZF；小名称降阶、正则性保持及
+自动装配使用 ZFC。内部可数模型捕获 club 的证明保留实际 ω 序列，所有新数据定义
+继续排除经典选择；完整 proper 迭代引理及保持接口的准确范围见 [ITERATION](ITERATION.md)。
+带指标的确定递归、严格 ω 共尾列与可数共尾集刻画按原七条 ZF 证书审计；
+旧序数反射与共尾集传输另检查无原公理依赖，proper 可数共尾性装配使用 ZFC。
+
+可数闭二步与坐标后继的入口为 [TwoStepClosed](TwoStep/Closed.lean) 和
+[IterationClosedSuccessor](Iteration/Closed/Successor.lean)：下界精确保留给定共同前缀。
+[CollapseClosed](Applications/Collapse/Closed.lean) 实际构造任意名称参数的可数闭塌缩后继、
+两组集合参数的可数闭二步塌缩，以及保留原阶段链接和支撑的坐标后继。
+`row_cl_induction_l` 已通过实际极限下界和原公式内部超限归纳完成全部闭区间，
+`row_iteration_closed_l` 证明任意内部长度的全部阶段可数闭。
+[CollapseIteration](Applications/Collapse/Iteration.lean) 从两个集合参数和内部长度自动构造
+确定的塌缩迭代，返回各阶段 ZFC、内部 ω，以及实数、任意旧目标上的内部 ω 函数和可数子集的实际旧原像。
+`closed_proper_l` 已从内部可数闭预序构造实际 proper club；闭扩张装配也自动返回
+ω₁、旧可数性和 ω 共尾性保持。`collapse_iteration_pil_l` 进一步为任意可数种子
+构造同一塌缩迭代的共同 N 及完整 proper 区间引理。
+证明结构与调用入口见 [迭代设施清单](ITERATION.md#任意内部长度的可数支撑闭迭代)。

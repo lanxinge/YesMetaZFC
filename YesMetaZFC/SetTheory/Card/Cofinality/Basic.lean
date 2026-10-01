@@ -98,7 +98,8 @@ theorem range_isCofinalSubset {ℳ : Structure.{u}} (hExt : Extensional ℳ)
   rcases hCofinal.isLimit.2.2 with
     ⟨canonicalRange, hCanonicalRange, hUnion⟩
   have hRangeEq : range = canonicalRange := by
-    prove_auto
+    exact hExt.eq_of_same_members range canonicalRange
+      (fun x => (hRange x).trans (hCanonicalRange x).symm)
   subst canonicalRange
   refine ⟨hCofinal.isLimitOrdinal, ?_, hUnion⟩
   intro value hValue
@@ -176,7 +177,8 @@ theorem range_isCofinalSubset
   rcases hCofinal.isLimit.2.2 with
     ⟨canonicalRange, hCanonicalRange, hUnion⟩
   have hRangeEq : range = canonicalRange := by
-    prove_auto
+    exact hExt.eq_of_same_members range canonicalRange
+      (fun x => (hRange x).trans (hCanonicalRange x).symm)
   subst canonicalRange
   refine ⟨hCofinal.isLimitOrdinal, ?_, hUnion⟩
   intro value hValue

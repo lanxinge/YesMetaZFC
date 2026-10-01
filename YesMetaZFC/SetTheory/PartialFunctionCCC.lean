@@ -89,7 +89,7 @@ theorem fn_bounded_countable_l (hY : M.CardinalLessOrEqual I Y ω) :
         have hsω : M.mem s ω := (Structure.SuccessorOf.eq hZF.1 hs hs').symm ▸ hsω
         have hpω := ZF.finite_countable_l I hZF hω ⟨s, hsω, (hA p hp).2⟩
         obtain ⟨J, hJ⟩ := ZF.exists_cartesianProduct hZF I p Y
-        have hj := countable_product_l I hZFC hω hpω hY hJ
+        have hj := ZF.countable_product_l I hZF hω hpω hY hJ
         let ψ : BinarySchema 0 := {
           body := .existsE (.existsE (.existsE (.existsE (.conj
             (𝒞.code (.bound 5) (.bound 3) (.bound 2)) (.conj (𝒞.code (.bound 3) (.bound 1) .newest)

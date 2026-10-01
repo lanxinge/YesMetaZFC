@@ -290,6 +290,13 @@ theorem trans {ℳ : Structure.{u}}
       exact
         (hInner.2 input output).mpr
           ⟨hPair.1, (hOuter.2 input output).mp hPair.2 |>.2⟩
+/-- 对已限制函数再作较小限制，复合为原函数上的直接限制。 -/
+theorem comp_l {ℳ : Structure.{u}} {𝒞 : Definitional.Project.OrderedPairConvention}
+    {𝕀 : 𝒞.Interpretation ℳ} {a b c S T : ℳ.Domain}
+    (h : ℳ.IsRestrictionOf 𝕀 a b S) (k : ℳ.IsRestrictionOf 𝕀 b c T) (hST : ℳ.MemberSubset S T) :
+    ℳ.IsRestrictionOf 𝕀 a c S :=
+  ⟨h.1, fun i x => (h.2 i x).trans ⟨fun ⟨hi, hx⟩ => ⟨hi, ((k.2 i x).mp hx).2⟩,
+    fun ⟨hi, hx⟩ => ⟨hi, (k.2 i x).mpr ⟨hST i hi, hx⟩⟩⟩⟩
 end IsRestrictionOf
 register_prove_auto_hr_rule
   IsRestrictionOf.isSetFunction PRIORITY 200

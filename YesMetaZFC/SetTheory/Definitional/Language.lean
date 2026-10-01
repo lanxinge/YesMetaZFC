@@ -83,13 +83,14 @@ namespace TermVector
 /-- 从逐项构造函数建立规范的固定长度参数数组。 -/
 def ofFn {count depth : Nat} (terms : Fin count → Term depth) :
     TermVector count depth where
-  terms := Array.ofFn terms
-  size_eq := by simp
+  -- 先按有限下标构造列表；其读取定理不依赖元层选择，再无损转为参数数组。
+  terms := (List.ofFn terms).toArray
+  size_eq := by simp only [List.size_toArray, List.length_ofFn]
 /-- 按有界下标读取一个参数。 -/
 def get {count depth : Nat} (terms : TermVector count depth) (entry : Fin count) : Term depth :=
   terms.terms[entry.val]' (by simp [terms.size_eq, entry.isLt])
 @[simp] theorem get_ofFn {count depth : Nat} (terms : Fin count → Term depth) (entry : Fin count) : (ofFn terms).get entry = terms entry := by
-  simp [get, ofFn]
+  simp only [get, ofFn, List.getElem_toArray, List.getElem_ofFn]
 instance {count depth : Nat} : CoeFun (TermVector count depth) (fun _ => Fin count → Term depth) :=
   ⟨get⟩
 instance {count depth : Nat} : BEq (TermVector count depth) where

@@ -1,7 +1,6 @@
 import YesMetaZFC.SetTheory.DependentChoice
 import YesMetaZFC.SetTheory.Fiber
-import YesMetaZFC.SetTheory.Card.Omega
-import YesMetaZFC.SetTheory.Card.Aleph.Multiplication
+import YesMetaZFC.SetTheory.Card.CountablePair
 
 /-! # 模型内部的可数并
 
@@ -68,20 +67,6 @@ theorem union_bound_l (hZFC : M.Models ZFC) {κ A U W : M.Domain}
     exact (hg hTj).2 x y k hxj hye
   exact ⟨H, hinj⟩
 
-/-- 两个可数集的积仍可数，所用配对和单射均在模型内部。 -/
-theorem countable_product_l (hZFC : M.Models ZFC) {ω X Y W} (hω : M.IsOmega ω)
-    (hX : M.CardinalLessOrEqual I X ω) (hY : M.CardinalLessOrEqual I Y ω)
-    (hW : M.IsCartesianProduct I W X Y) : M.CardinalLessOrEqual I W ω := by
-  let hZF := models_zf_l hZFC
-  obtain ⟨S, hS⟩ := ZF.exists_cartesianProduct hZF I ω ω
-  obtain ⟨f, hf⟩ := hX
-  obtain ⟨g, hg⟩ := hY
-  obtain ⟨F, hF⟩ := ZF.exists_cartesianProductInjection hZF I hW hS hf hg
-  have hωc := ZF.omega_cardinal_l I hZF hω
-  obtain ⟨G, hG⟩ := ZF.cartesianSquare_cardinalLessOrEqual_of_selfMultiplication hZF I
-    ⟨hωc, Structure.Equinumerous.refl hZF I ω⟩ hS (ZF.omega_selfMultiplication hZF I hω hωc)
-  exact ZF.exists_compositionInjection hZF I hF hG
-
 /-- 可数集合族的可数并；族只须可数，不要求预先给出满枚举。 -/
 theorem countable_union_l (hZFC : M.Models ZFC) {ω A U : M.Domain} (hω : M.IsOmega ω)
     (hA : M.CardinalLessOrEqual I A ω) (hU : M.IsUnionOf U A)
@@ -135,7 +120,7 @@ theorem countable_cover_l (hZFC : M.Models ZFC) {ω} (hω : M.IsOmega ω)
   obtain ⟨W, hW⟩ := ZF.exists_cartesianProduct hZF I ω ω
   obtain ⟨F, hF⟩ := cover_bound_l I hZFC φ ρ hJ hW hc ht
   obtain ⟨G, hG⟩ := ZF.exists_identityBijection hZF I ω
-  obtain ⟨H, hH⟩ := countable_product_l I hZFC hω ⟨G, hG.1⟩ ⟨G, hG.1⟩ hW
+  obtain ⟨H, hH⟩ := ZF.countable_product_l I hZF hω ⟨G, hG.1⟩ ⟨G, hG.1⟩ hW
   exact ZF.exists_compositionInjection hZF I hF hH
 
 end YesMetaZFC.SetTheory.ZFC

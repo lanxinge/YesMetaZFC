@@ -1,12 +1,11 @@
 import YesMetaZFC.Model.SetTheory.CountableSyntax
 import YesMetaZFC.Model.FirstOrder.Substructure
 import YesMetaZFC.Model.FirstOrder.Valuation
-import YesMetaZFC.Model.SmallGraph.ZFC
 
 /-! # 纯集合论结构的实际可数初等子模型
 
 逐层枚举有限参数公式并加入存在见证。每层仍由自然数枚举，有限参数总落在同一层；
-共同使用原 Tarski–Vaught 判据得到初等性。最后实例化原小图 ZFC 模型，并继承外部良基性。
+共同使用原 Tarski–Vaught 判据得到初等性，并保留任意给定的可数参数族。
 -/
 
 namespace YesMetaZFC.SetTheory
@@ -39,11 +38,12 @@ def query_holds_l (q : Query_code_l) (e : Nat → M.Carrier .set) (a : M.Carrier
   | ⟨[], _, _, _⟩ => True
   | ⟨.set :: b, f, φ, n⟩ => Formula.satisfies ((env_enum_l M e b f n).pushBound a) φ
 
-/-- 任意纯隶属结构都有实际可枚举的初等子结构。 -/
-theorem countable_elementary_l : ∃ A : Substructure_m M, A.Elementary_m ∧
+/-- 任意纯隶属结构都有包含指定可数参数族的可枚举初等子结构。 -/
+theorem countable_elementary_l (f : Nat → M.Carrier .set) : ∃ A : Substructure_m M, A.Elementary_m ∧
+    (∀ n, A.carrier .set (f n)) ∧
     ∃ e : Nat → A.structure_m.Carrier .set, Function.Surjective e := by
   classical
-  obtain ⟨a₀⟩ := M.nonempty .set
+  let a₀ := f 0
   obtain ⟨q, hq⟩ := enum_exists_l query_coding_l ⟨[], [], .truth, 0⟩
   have hw (q : Query_code_l) (g : Nat → M.Carrier .set) :
       ∃ a, (∃ x, query_holds_l M q g x) → query_holds_l M q g a := by
@@ -52,7 +52,7 @@ theorem countable_elementary_l : ∃ A : Substructure_m M, A.Elementary_m ∧
       exact ⟨a, fun _ => ha⟩
     · exact ⟨a₀, fun h' => False.elim (h h')⟩
   obtain ⟨w, hw⟩ := Classical.axiomOfChoice (fun q => Classical.axiomOfChoice (hw q))
-  let T : Nat → Nat → M.Carrier .set := Nat.rec (fun _ => a₀) (fun _ g n =>
+  let T : Nat → Nat → M.Carrier .set := Nat.rec f (fun _ g n =>
     if NatPairing.first n = 0 then g (NatPairing.second n) else w (q (NatPairing.second n)) g)
   have old k n : T (k+1) (NatPairing.pair 0 n) = T k n := by
     simp only [T, NatPairing.first_pair, NatPairing.second_pair, ↓reduceIte]
@@ -102,18 +102,9 @@ theorem countable_elementary_l : ∃ A : Substructure_m M, A.Elementary_m ∧
     simpa only [query_holds_l, c, henv] using hw c (T m) h
   let e (n : Nat) : A.structure_m.Carrier .set :=
     ⟨T (NatPairing.first n) (NatPairing.second n), NatPairing.first n, NatPairing.second n, rfl⟩
-  refine ⟨A, A.tarski_vaught_m.mpr hA, e, fun a => ?_⟩
+  refine ⟨A, A.tarski_vaught_m.mpr hA, fun n => ⟨0, n, rfl⟩, e, fun a => ?_⟩
   obtain ⟨k, n, hn⟩ := a.2
   exact ⟨NatPairing.pair k n, Subtype.ext (by simpa only [e, NatPairing.first_pair, NatPairing.second_pair] using hn)⟩
 
-/-- 原小图 ZFC 模型的可数初等子模型，保留其外部良基性。 -/
-theorem countable_ground_l : ∃ M : SetTheory.Structure.{1}, M.Models ZFC ∧
-    _root_.WellFounded M.mem ∧ ∃ e : Nat → M.Domain, Function.Surjective e := by
-  obtain ⟨A, hA, e, he⟩ := countable_elementary_l Model.SmallGraph.sg_model.{0}
-  let M := Definitional.Project.FirstOrderSemantics.reduct A.structure_m
-  have hM := Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureModel.project_models
-    ((A.models_iff_m hA _).mpr Model.SmallGraph.sg_models_zfc)
-  refine ⟨M, hM, ?_, e, he⟩
-  exact InvImage.wf (fun x : A.structure_m.Carrier .set => x.1) Model.SmallGraph.SG_set.mem_wf
 
 end YesMetaZFC.SetTheory
