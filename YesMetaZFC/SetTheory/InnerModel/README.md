@@ -40,6 +40,11 @@ OD、HOD 留待 J 层级与内部解释完成后发展。
 | [Computation/SearchTotal](Computation/SearchTotal.lean) | `cs_scan_exists_l` 对实际原公式使用内部成员归纳：一旦某层命中，即有最早停机层，允许外部非标准、非良基模型。 |
 | [Computation/Delta1](Computation/Delta1.lean) | `cd_compile_l` 把互补的两条 Σ₁ 正规形编译为同时搜索正反见证的程序；`cd_eval_total_l`、`cd_eval_iff_l` 在 KPi + V=L 中证明总性及完整布尔规格，`cd_basic_in_j_l` 接入实际 Jensen 模型。 |
 | [Computation/Readback](Computation/Readback.lean) | `cs_pair_l` 把总搜索程序反向编译为互补 Σ₁ 定义；`cd_roundtrip_l` 证明语义往返，`cd_equiv_l` 给出 `D1_defined_d R ↔ Cs_computable_d R`。 |
+| [ProofCode/Syntax](ProofCode/Syntax.lean)、[Rules](ProofCode/Rules.lean) | 叶码 `(0,α)` 与运算码 `(k+1,(a,(b,c)))`；固定标签使用实际有限序数码，局部规则及有界自然数标签都有 Δ₀ 公式。 |
+| [ProofCode/Certificate](ProofCode/Certificate.lean)、[Uniqueness](ProofCode/Uniqueness.lean) | 历史每行记录内部自然数高度、码和值；`pc_eval_s` 是求值的实际 Σ₁ 正规形，`pc_eval_unique_l` 用模型内部归纳证明一致性。 |
+| [ProofCode/WellFormed](ProofCode/WellFormed.lean)、[Erasure](ProofCode/Erasure.lean) | 语法历史只记录高度与码，检查时不查询 J 层值；`ps_eval_total_l` 证明合法码都有值，`ps_valid_iff_l` 识别精确求值域。 |
+| [ProofCode/Coverage](ProofCode/Coverage.lean) | `pc_coded_iff_l` 证明 `Pc_coded_d x ↔ L_d x`；覆盖性通过 rudimentary 迭代与内部 J 层级归纳获得。 |
+| [ProofCode/Table](ProofCode/Table.lean)、[SetCover](ProofCode/SetCover.lean) | `pc_table_s` 编译完整求值表，`pc_set_cover_l` 为任何成员均属 L 的模型内集合构造合法码集合及满射求值图。 |
 
 `S1_binary` 使用单个存在见证的 Δ₀ 矩阵正规形，矩阵和自由闭合性均携带真实证书。
 已完成见证验证，以及两条互补正规形所表达的 Δ₁ 关系与总 J 搜索程序的双向编译。
@@ -116,9 +121,39 @@ def cp_product_l : Cp_code 2 := setfn! (x, y) {
 序数和隶属关系无需外部标准性或良基性。统一解释模型内部的非标准程序码属于后续层。
 求值接口是模型中的关系规格；不把任意抽象模型的成员关系当作宿主可执行的判定器。
 
+## J 构造推导码
+
+独立入口为 `YesMetaZFC.SetTheory.InnerModel.ProofCode`。码本身是模型中的集合：
+叶码引用一个内部序数处的 J 层，运算码引用三个子码。求值证书的高度属于
+模型自身的自然数；子推导高度必须属于父高度，因此包含外部非标准的有限推导。
+规则只使用已有 J 递归证书和十三个已验证集合运算。
+
+语法证书与求值证书分开：前者只有 `(高度,码)` 行，后者有 `(高度,码,值)` 行。
+`pc_eval_valid_l` 在 KP 中擦除值列；反向的 `ps_eval_total_l` 在 KPi 中构造值。
+函数性、叶/运算证书的拼接、J 覆盖性以及集合大小求值表均已证明，不是前提字段。
+
+规范码名取模型内三元组 `(α,n,c)`，要求 `α` 为序数、`n` 为内部自然数，
+`c ∈ rud(α)` 且语法高度不超过 `n`。先比较 `α`，再比较 `n`，最后按叶参数、
+运算标签和三个子码的字典次序比较 `c`。这里允许同一树有多个码名，尚未挑选最小代表。
+
+`po_height_min_l` 用内部高度归纳证明固定高度的字典良序；
+`pn_min_l` 证明每个模型内非空合法码名集合有最小元。
+序律不依赖 V=L，也不假定模型外部良基。序数界放在高度之前，确保前驱能统一界在
+`(α+1) × ω × rud(α)` 的三元组集合中；这是 `pn_initial_bound_l` 的结论。
+
+`pn_lt_s`、`pn_not_lt_s` 是实际正反 Σ₁ 正规形；`pn_delta1_l` 证明它们在合法码名域互补。
+合法性由 `pn_decode_s` 给出 Σ₁ 定义；`pn_eval_s` 将解码复合到原 J 求值。
+`pn_cover_l` 证明所有 J 内对象都有这样的码名。
+`pn_order_table_l` 自动构造指定合法码族上的比较表，并返回仓库已有的
+`IsSetCodedWellOrder` 实例；`pn_initial_in_l` 构造该码族内的精确前段。
+
+尚需构造包含全部合法前驱的精确全局初段，并据此证明 L 对象的最小代表存在及其
+Σ₁ 定义。统一前驱界目前允许包含非法码名，不能直接作为完整求值表的定义域。
+不受界的否定求值会提高复杂度，因此现有规范码序与求值表不被直接当作最小代表定理。
+
 ## 尚未完成
 
-规范全局良序、一般 Levy Σ₁ 归一化及模型内部非标准程序码的统一解释器尚未实现。
+L 对象的规范全局良序、一般 Levy Σ₁ 归一化及通用 DSL 内部非标准程序码的统一解释器尚未实现；上节码名良序和 J 构造推导码的内部求值已实现。
 当前总搜索等价仍使用 KPi + V=L；向原 KP + V=L 降低归纳前提需要另证。本层用 J 层级表达
 可构造公理；与另行以 `Def` 递归定义的 Gödel L 层级之间的等价性尚未形式化。后续相对化
 保留加入 `x ↦ x ∩ A` 的运算位置，但本入口目前没有宣称已构造 `L[A]`。
