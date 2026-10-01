@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.Language
 import YesMetaZFC.Model.SetTheory.Theory
 import YesMetaZFC.SetTheory.Definitional
 import YesMetaZFC.Model.SetTheory.FunctionSemantics
+import YesMetaZFC.SetTheory.InnerModel
 import YesMetaZFC.SetTheory.WellFounded
 import YesMetaZFC.SetTheory.Ord
 import YesMetaZFC.SetTheory.Card
