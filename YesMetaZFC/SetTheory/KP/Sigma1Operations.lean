@@ -77,4 +77,55 @@ theorem S1_binary.image_sat_l (hKP : M.Models KP) {n} (φ : S1_binary n) (ρ : E
       subst z
       exact ⟨x, hx, w, hwT, hw⟩
 
+/-- 互补 Σ₁ 条件的精确分离图；单个证书同时界住所有成员的正反见证。 -/
+def S1_binary.separate {n} (φ ψ : Delta0BinarySchema n) : S1_binary n where
+  matrix := {
+    body := .conj (Formula.subset (.bound 1) (.bound 2)) (Formula.forallMem (.bound 2)
+      (.disj (.conj (.mem .newest (.bound 2)) (Formula.existsMem (.bound 1)
+        (binary_pred_m φ.toBinarySchema (fun i => .bound ⟨i.val + 5, by omega⟩) (.bound 1) .newest)))
+        (.conj (.neg (.mem .newest (.bound 2))) (Formula.existsMem (.bound 1)
+          (binary_pred_m ψ.toBinarySchema (fun i => .bound ⟨i.val + 5, by omega⟩) (.bound 1) .newest)))))
+    freeClosed := by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]
+    delta0 := .conj (.atom _ _ _) (.forallMem _ (.disj
+      (.conj (.mem _ _) (.existsMem _ (φ.delta0.bind_l _)))
+      (.conj (.neg (.mem _ _)) (.existsMem _ (ψ.delta0.bind_l _))))) }
+
+theorem S1_binary.separate_sat_l (hKP : M.Models KP) {n} (φ ψ : Delta0BinarySchema n) (ρ : Env M n) (X Y : M.Domain)
+    (hc : ∀ x, M.mem x X → ((∃ w, φ.toBinarySchema.denote ρ x w) ↔ ¬ ∃ w, ψ.toBinarySchema.denote ρ x w)) :
+    (S1_binary.separate φ ψ).schema.denote ρ X Y ↔
+      ∀ x, M.mem x Y ↔ M.mem x X ∧ ∃ w, φ.toBinarySchema.denote ρ x w := by
+  rw [S1_binary.sat_l]
+  simp only [S1_binary.separate, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
+    Formula.satisfies_forallMem_iff, Formula.satisfies_disj_iff, Formula.satisfies_mem_iff,
+    Formula.satisfies_neg_iff, Formula.satisfies_existsMem_iff, binary_pred_sat_l]
+  change (∃ T, M.MemberSubset Y X ∧ ∀ x, M.mem x X →
+    (M.mem x Y ∧ ∃ w, M.mem w T ∧ φ.toBinarySchema.denote ρ x w) ∨
+      (¬ M.mem x Y ∧ ∃ w, M.mem w T ∧ ψ.toBinarySchema.denote ρ x w)) ↔ _
+  constructor
+  · rintro ⟨T, hs, h⟩ x
+    constructor
+    · intro hx
+      exact ⟨hs x hx, ((h x (hs x hx)).elim (fun h => h.2.imp (fun _ h => h.2)) (fun h => (h.1 hx).elim))⟩
+    · rintro ⟨hx, w, hw⟩
+      exact ((h x hx).elim And.left (fun h => ((hc x hx).mp ⟨w, hw⟩ (h.2.imp (fun _ h => h.2))).elim))
+  · intro hy
+    let θ : Delta0BinarySchema n := {
+      body := .disj φ.body ψ.body
+      freeClosed := by simpa only [Definitional.Formula.FreeClosed] using And.intro φ.freeClosed ψ.freeClosed
+      delta0 := .disj φ.delta0 ψ.delta0 }
+    have hθ x w : θ.toBinarySchema.denote ρ x w ↔ φ.toBinarySchema.denote ρ x w ∨ ψ.toBinarySchema.denote ρ x w :=
+      Formula.satisfies_disj_iff _ _ _
+    obtain ⟨T, ht⟩ := KP.collection_exists_d hKP θ ρ X (by
+      intro x hx
+      classical
+      by_cases hp : ∃ w, φ.toBinarySchema.denote ρ x w
+      · exact hp.imp (fun w hw => (hθ x w).mpr (Or.inl hw))
+      · have hn : ∃ w, ψ.toBinarySchema.denote ρ x w := Classical.not_not.mp (fun hn => hp ((hc x hx).mpr hn))
+        exact hn.imp (fun w hw => (hθ x w).mpr (Or.inr hw)))
+    refine ⟨T, fun x hx => ((hy x).mp hx).1, fun x hx => ?_⟩
+    obtain ⟨w, hw, h⟩ := ht x hx
+    rcases (hθ x w).mp h with h | h
+    · exact Or.inl ⟨(hy x).mpr ⟨hx, w, h⟩, w, hw, h⟩
+    · exact Or.inr ⟨fun hxy => (hc x hx).mp ((hy x).mp hxy).2 ⟨w, h⟩, w, hw, h⟩
+
 end YesMetaZFC.SetTheory.Definitional.Project

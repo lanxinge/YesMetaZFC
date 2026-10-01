@@ -35,7 +35,7 @@ theorem cp_negative_sat_l (hKP : M.Models KP) {n} (p : Cp_code (n + 1)) (ρ : En
     exact hn (cp_eval_unique_l hKP.1 p _ (cp_cert_sound_l hKP.1 p _ hz) hy)
   · intro hn
     obtain ⟨z, A, hz⟩ := cp_cert_total_l hKP p (ρ.push x)
-    obtain ⟨T, ht⟩ := cp_cover_l hKP [A, z]
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [A, z]
     exact ⟨T, z, (ht z (by simp)).2, cp_cert_mono_l p _ (ht A (by simp)).1 hz,
       fun he => hn (he ▸ cp_cert_sound_l hKP.1 p _ hz)⟩
 
@@ -83,7 +83,7 @@ theorem cp_witness_sat_l (hKP : M.Models KP) {n} (p : Cp_code (n + 3)) (ρ : Env
     exact ⟨w, v, cp_cert_sound_l hKP.1 p _ hv, ht⟩
   · rintro ⟨w, v, hv, hn⟩
     obtain ⟨A, ha⟩ := cp_cert_complete_l hKP hv
-    obtain ⟨T, ht⟩ := cp_cover_l hKP [A, w, v]
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [A, w, v]
     exact ⟨T, w, (ht w (by simp)).2, v, (ht v (by simp)).2,
       cp_cert_mono_l p _ (ht A (by simp)).1 ha, hn⟩
 

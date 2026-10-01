@@ -102,20 +102,6 @@ theorem po_compare_l (hM : M.Models KPi) {c d : M.Domain} (hc : Ps_valid_d c) (h
       · exact Or.inr (Or.inr ((po_node_iff_l hM hd hc).mpr (Or.inr ⟨rfl, Or.inl h⟩)))
     · exact Or.inr (Or.inr ((po_node_iff_l hM hd hc).mpr (Or.inl h)))
 
-theorem po_lex_trans_l {D : Type u} {R : D → D → Prop} {a b c x y z p q r : D}
-    (ha : R a x → R x p → R a p) (hb : R b y → R y q → R b q) (hc : R c z → R z r → R c r)
-    (h : Po_lex_d R a b c x y z) (g : Po_lex_d R x y z p q r) : Po_lex_d R a b c p q r := by
-  rcases h with h | ⟨h, g' | ⟨g', f⟩⟩ <;> rcases g with i | ⟨i, j | ⟨j, k⟩⟩
-  · exact Or.inl (ha h i)
-  · exact Or.inl (i ▸ h)
-  · exact Or.inl (i ▸ h)
-  · exact Or.inl (h.symm ▸ i)
-  · exact Or.inr ⟨h.trans i, Or.inl (hb g' j)⟩
-  · exact Or.inr ⟨h.trans i, Or.inl (j ▸ g')⟩
-  · exact Or.inl (h.symm ▸ i)
-  · exact Or.inr ⟨h.trans i, Or.inl (g'.symm ▸ j)⟩
-  · exact Or.inr ⟨h.trans i, Or.inr ⟨g'.trans j, hc f k⟩⟩
-
 theorem po_trans_l (hM : M.Models KPi) {c d e : M.Domain}
     (hc : Ps_valid_d c) (hd : Ps_valid_d d) (he : Ps_valid_d e) (hcd : Po_lt_d c d) (hde : Po_lt_d d e) : Po_lt_d c e := by
   obtain ⟨hKP, hi⟩ := KPi.models_iff_l.mp hM

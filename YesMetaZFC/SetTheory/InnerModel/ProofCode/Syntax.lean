@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Class
 import YesMetaZFC.Model.SetTheory.Internal.Numeral
+import YesMetaZFC.SetTheory.InnerModel.Order.Coordinates
 
 /-! # 携带序数参数的 J 构造推导码
 
@@ -44,13 +45,6 @@ theorem pc_num_sat_l (hE : Extensional M) (k : Nat) {n} (ρ : Env M n) (x : Term
     simp only [pc_num_m, Num_d, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
       ih, KP.succ0_sat_l hE, Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
     exact ⟨fun ⟨a, _, ha, hs⟩ => ⟨a, ha, hs⟩, fun ⟨a, ha, hs⟩ => ⟨a, hs.predecessor_mem, ha, hs⟩⟩
-
-theorem pc_triple_inj_l {p a b c x y z : M.Domain} (h : Rd_triple_d p a b c) (g : Rd_triple_d p x y z) :
-    a = x ∧ b = y ∧ c = z := by
-  obtain ⟨q, hq, hp⟩ := h
-  obtain ⟨r, hr, hg⟩ := g
-  obtain ⟨ha, he⟩ := kpair_injective_l M hp hg; subst r
-  exact ⟨ha, kpair_injective_l M hq hr⟩
 
 def Pc_leaf_d (T c a : M.Domain) : Prop := ∃ e, M.mem e T ∧ Num_d 0 e ∧ KPair_d M c e a
 

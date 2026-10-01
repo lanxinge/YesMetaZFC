@@ -24,7 +24,7 @@ theorem pc_step_mono_l {T U F G h c x : M.Domain} (ht : M.MemberSubset T U) (hf 
 
 theorem pc_cover_l (hM : M.Models KPi) (L : List M.Domain) :
     ∃ T, M.TransitiveSet T ∧ ∀ x ∈ L, M.mem x T := by
-  obtain ⟨U, hu⟩ := cp_cover_l (KPi.models_iff_l.mp hM).1 L
+  obtain ⟨U, hu⟩ := kp_finite_cover_l (KPi.models_iff_l.mp hM).1 L
   obtain ⟨T, ht, hU⟩ := KPi.transitive_cover_l hM U
   exact ⟨T, ht, fun x hx => ht U hU x (hu x hx).2⟩
 

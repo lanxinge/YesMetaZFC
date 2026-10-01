@@ -40,7 +40,7 @@ theorem pn_decode_sat_l (hKP : M.Models KP) (ρ : Env M 0) (v c : M.Domain) :
   · rintro ⟨a, h, hv, ha, hh, ⟨n, hn, hs⟩, C, hC, hc⟩
     obtain ⟨V, hs⟩ := (ps_rank_s.sat_l ρ n c).mp ((ps_rank_sat_l hKP ρ n c).mpr hs)
     obtain ⟨W, hC⟩ := (rd_closure_s.sat_l ρ a C).mp ((rd_closure_sat_l hKP.1 ρ a C).mpr hC)
-    obtain ⟨T, ht⟩ := cp_cover_l hKP [a, h, n, C, W, V]
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [a, h, n, C, W, V]
     exact ⟨T, a, (ht a (by simp)).2, h, (ht h (by simp)).2, n, (ht n (by simp)).2,
       C, (ht C (by simp)).2, W, (ht W (by simp)).2, V, (ht V (by simp)).2, hv, ha, hh, hn, hs, hC, hc⟩
 

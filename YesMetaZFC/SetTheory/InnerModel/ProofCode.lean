@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.InnerModel.ProofCode.Order.Table
+import YesMetaZFC.SetTheory.InnerModel.ProofCode.Global.Statement
 
 /-! # J 构造推导码
 
@@ -6,4 +6,6 @@ import YesMetaZFC.SetTheory.InnerModel.ProofCode.Order.Table
 求值域恰为合法码，值域恰为 J 内对象；集合大小的合法码族具有完整求值表。
 规范码名依次比较序数界、内部高度和构造树；比较有正反 Σ₁ 证书，合法码族
 上可构造实际集合良序表。模型内部非标准有限推导同样纳入序律与最小元证明。
+总语法检查器实现精确初段集合化；完整求值表给出唯一最小代表的 Σ₁ 图。
+所得 L 全局良序及初段函数均为无参数 Σ₁ 定义，良序在 L 上为 Δ₁，且与 J 内部解释一致。
 -/

@@ -34,7 +34,7 @@ theorem cs_classify_sat_l (hKP : M.Models KP) {n} (b : Bool) (p : Cs_code (n + 2
     exact ⟨v, (cs_graph_sat_l hKP p (ρ.push x) y v).mp (((cs_graph_s p).sat_l (ρ.push x) y v).mpr ⟨w, hw⟩), ht⟩
   · rintro ⟨v, hv, ht⟩
     obtain ⟨w, hw⟩ := ((cs_graph_s p).sat_l (ρ.push x) y v).mp ((cs_graph_sat_l hKP p (ρ.push x) y v).mpr hv)
-    obtain ⟨T, hT⟩ := cp_cover_l hKP [v, w]
+    obtain ⟨T, hT⟩ := kp_finite_cover_l hKP [v, w]
     exact ⟨T, v, (hT v (by simp)).2, w, (hT w (by simp)).2, hw, ht⟩
 
 def cs_pair_l {n} (p : Cs_code (n + 2)) : D1_pair n := ⟨cs_classify_s true p, cs_classify_s false p⟩

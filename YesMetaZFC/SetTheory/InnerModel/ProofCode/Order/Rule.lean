@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.ProofCode.SetCover
+import YesMetaZFC.SetTheory.InnerModel.Order.Selection
 
 /-! # 构造树的字典序规则
 
@@ -10,9 +11,6 @@ namespace YesMetaZFC.SetTheory.InnerModel
 open Definitional.Project Internal
 universe u
 variable {M : Structure.{u}}
-
-def Po_lex_d {D : Type u} (R : D → D → Prop) (a b c x y z : D) : Prop :=
-  R a x ∨ (a = x ∧ (R b y ∨ (b = y ∧ R c z)))
 
 def Po_step_d (T : M.Domain) (R : M.Domain → M.Domain → Prop) (c d : M.Domain) : Prop :=
   (∃ a, M.mem a T ∧ ∃ b, M.mem b T ∧ Pc_leaf_d T c a ∧ Pc_leaf_d T d b ∧ M.mem a b) ∨

@@ -45,7 +45,7 @@ theorem cs_stage_sat_l (hKP : M.Models KP) {n} (p : Cp_code (n + 1)) (ρ : Env M
   · rintro ⟨A, ha, hy⟩
     obtain ⟨W, hw⟩ := (φ.sat_l η a A).mp ((hj A).mpr ha)
     obtain ⟨B, hb⟩ := cp_cert_complete_l hKP hy
-    obtain ⟨T, ht⟩ := cp_cover_l hKP [A, W, B]
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [A, W, B]
     exact ⟨T, A, (ht A (by simp)).2, W, (ht W (by simp)).2, hw, cp_cert_mono_l p _ (ht B (by simp)).1 hb⟩
 
 theorem cs_stage_total_l (hM : M.Models KPi) {n} (p : Cp_code (n + 1)) (ρ : Env M n) (a : M.Domain) :

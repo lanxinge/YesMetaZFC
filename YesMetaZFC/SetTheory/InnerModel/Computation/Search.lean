@@ -62,7 +62,7 @@ theorem cs_scan_sat_l (hKP : M.Models KP) {n} (p : Cp_code (n + 2)) (ρ : Env M 
       rw [BinarySchema.denote, S1_binary.matrix_sat_l]; rfl
     obtain ⟨B, hB⟩ := KP.collection_exists_d hKP δ (η.push e) a (fun b h =>
       ((φ.sat_l η b e).mp ((cs_stage_sat_l hKP ..).mpr (hb b h))).imp (fun v hv => (hδ b v).mpr hv))
-    obtain ⟨T, ht⟩ := cp_cover_l hKP [a, e, w, B]
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [a, e, w, B]
     refine ⟨T, a, (ht a (by simp)).2, e, (ht e (by simp)).2, w, (ht w (by simp)).2,
       ha, he, hw, hn, fun b h => ?_⟩
     obtain ⟨v, hv, hδv⟩ := hB b h

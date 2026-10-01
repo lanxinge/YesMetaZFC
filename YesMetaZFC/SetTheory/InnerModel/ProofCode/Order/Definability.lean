@@ -57,7 +57,7 @@ theorem pn_lt_sat_l (hKP : M.Models KP) (ρ : Env M 0) (v w : M.Domain) :
       · obtain ⟨W, hg⟩ := (po_lt_s.sat_l ρ c d).mp ((po_lt_sat_l hKP ρ c d).mpr hg)
         exact ⟨W, Or.inr ⟨he, Or.inr ⟨hf, hg⟩⟩⟩
     obtain ⟨W, he⟩ := witness
-    obtain ⟨T, hT⟩ := cp_cover_l hKP [a, h, c, b, m, d, W]
+    obtain ⟨T, hT⟩ := kp_finite_cover_l hKP [a, h, c, b, m, d, W]
     exact ⟨T, a, (hT a (by simp)).2, h, (hT h (by simp)).2, c, (hT c (by simp)).2,
       b, (hT b (by simp)).2, m, (hT m (by simp)).2, d, (hT d (by simp)).2, W, (hT W (by simp)).2, hv, hw, he⟩
 
