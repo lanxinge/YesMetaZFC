@@ -38,7 +38,7 @@ theorem length_isLimitOrdinal
       ⟨predecessor, _, hLengthSuccessor⟩
     have hPredecessor :
         ℳ.mem predecessor length :=
-      by prove_auto
+      hLengthSuccessor.predecessor_mem
     rcases (hCofinal.isIncreasing.1.1.2.2 predecessor).mp
           hPredecessor with
       ⟨last, hLastValue⟩

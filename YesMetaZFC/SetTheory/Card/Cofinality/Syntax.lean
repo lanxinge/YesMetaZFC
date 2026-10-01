@@ -19,6 +19,7 @@ def isCofinalOrdinalSequence (𝒞 : OrderedPairConvention)
         Formula.forallMem length <| .forallE <|
           .imp (orderedPairMem 𝒞 (.bound 1) Term.newest
               sequence.weaken.weaken) (.mem Term.newest α.weaken.weaken)
+derive_free_closed isCofinalOrdinalSequence
 /-- `sequence` 是长度为 `length`、在极限序数 `α` 中共尾的非递减序列。 -/
 def isCofinalNondecreasingOrdinalSequence (𝒞 : OrderedPairConvention)
     {depth : Nat} (sequence length α : Term depth) :
@@ -35,6 +36,7 @@ def hasCofinalOrdinalSequence (𝒞 : OrderedPairConvention)
   .existsE <|
     isCofinalOrdinalSequence 𝒞
       Term.newest length.weaken α.weaken
+derive_free_closed hasCofinalOrdinalSequence
 /-- 存在一个长度为 `length`、在 `α` 中共尾的非递减序列。 -/
 def hasCofinalNondecreasingOrdinalSequence (𝒞 : OrderedPairConvention)
     {depth : Nat} (length α : Term depth) : Formula 1 depth :=
@@ -62,6 +64,7 @@ def isCofinality (𝒞 : OrderedPairConvention)
   .conj (isCardinal 𝒞 κ) <|
     .conj (hasCofinalOrdinalSequence 𝒞 κ α) <|
       .forallE <| .imp (hasCofinalOrdinalSequence 𝒞 Term.newest α.weaken) (.disj (extensionalEq κ.weaken Term.newest) (.mem κ.weaken Term.newest))
+derive_free_closed isCofinality
 end Formula
 end Project
 end Definitional

@@ -164,8 +164,8 @@ theorem mem
     ℳ.mem maximum α := by
   rcases hMaximum with
     ⟨rfl, _⟩ | ⟨rfl, _⟩
-  · prove_auto
-  · prove_auto
+  · exact hLeft
+  · exact hRight
 /-- 第一坐标严格小于最大值，或就是最大值。 -/
 theorem left_mem_or_eq
     {ℳ : Structure.{u}} {left right maximum : ℳ.Domain} (hMaximum : ℳ.IsOrdinalMaximum left right maximum) :

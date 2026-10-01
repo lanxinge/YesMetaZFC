@@ -206,9 +206,9 @@ theorem restriction {ℳ : Structure.{u}}
       ℳ.IsRestrictionOf 𝕀 restricted sequence index) :
     ℳ.IsSequenceOfLength 𝕀 restricted index := by
   have hIndexOrdinal : ℳ.IsOrdinal index :=
-    by prove_auto
+    hSequence.1.mem hIndex
   have hRestrictedFunction : ℳ.IsSetFunction 𝕀 restricted :=
-    by prove_auto
+    hRestriction.isSetFunction hSequence.2.1
   have hRestrictedDomain : ℳ.IsDomainOf 𝕀 index restricted :=
     hRestriction.isDomainOf hSequence.2.2
       (hSequence.1.transitive index hIndex)
@@ -288,9 +288,9 @@ theorem restriction {ℳ : Structure.{u}}
       ℳ.IsRestrictionOf 𝕀 restricted sequence index) :
     ℳ.IsRecursiveSequence 𝕀 operator restricted index := by
   have hIndexOrdinal : ℳ.IsOrdinal index :=
-    by prove_auto
+    hSequence.1.1.mem hIndex
   have hRestrictedFunction : ℳ.IsSetFunction 𝕀 restricted :=
-    by prove_auto
+    hRestriction.isSetFunction hSequence.1.2.1
   have hRestrictedDomain : ℳ.IsDomainOf 𝕀 index restricted :=
     hRestriction.isDomainOf hSequence.1.2.2 (hSequence.1.1.transitive index hIndex)
   have hRestrictedRecursion :

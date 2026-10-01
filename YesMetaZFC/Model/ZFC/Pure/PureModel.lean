@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.FirstOrder.Theory
-import YesMetaZFC.Model.SetTheory.ProjectSemantics
+import YesMetaZFC.Model.SetTheory.ProjectExtensional
 import YesMetaZFC.SetTheory.Axioms.ZFC
 
 /-! # 裸 ZFC 纯隶属模型中的基础集合构造
@@ -24,22 +24,9 @@ def membership (M : Structure.{0, 0, 0, x} ℒ) (left right : Carrier M) : Prop 
 variable {M : Structure.{0, 0, 0, x} ℒ}
 
 theorem extensionality (hM : Theory.Models M theory) (left right : Carrier M)
-    (h : ∀ element, membership M element left ↔ membership M element right) : left = right := by
-  have hAx := hM _ ⟨_, _root_.YesMetaZFC.SetTheory.ZFC.Axiom.zf .extensionality, rfl⟩
-  simp only [Formula.TrueIn, fo_sentence, _root_.YesMetaZFC.SetTheory.Axioms.extensionality,
-    _root_.YesMetaZFC.SetTheory.Definitional.Project.Sentence.ofFormula,
-    fo_formula, fo_mem, fo_term, fo_bound_variable, Formula.satisfies, Arguments.eval, Term.eval,
-    _root_.YesMetaZFC.SetTheory.Definitional.Project.Term.newest,
-    _root_.YesMetaZFC.SetTheory.Definitional.Project.Term.weaken,
-    _root_.YesMetaZFC.SetTheory.Definitional.Term.newest,
-    _root_.YesMetaZFC.SetTheory.Definitional.Term.weaken,
-    _root_.YesMetaZFC.SetTheory.Definitional.Term.rename,
-    _root_.YesMetaZFC.SetTheory.Definitional.Term.bind,
-    _root_.YesMetaZFC.SetTheory.Definitional.Project.Formula.extensionalEq,
-    _root_.YesMetaZFC.SetTheory.Definitional.Project.Formula.pairArguments] at hAx
-  change (∀ left right : Carrier M,
-    (∀ element, membership M element left ↔ membership M element right) → left = right) at hAx
-  exact hAx left right h
+    (h : ∀ element, membership M element left ↔ membership M element right) : left = right :=
+  (FirstOrderSemantics.extensional_iff_l.mp
+    (hM _ ⟨_, _root_.YesMetaZFC.SetTheory.ZFC.Axiom.zf .extensionality, rfl⟩)).eq_of_same_members left right h
 
 /-- 当前纯语言模型直接接入既有 Project 集合论模型库。 -/
 theorem project_models (hM : Theory.Models M theory) :

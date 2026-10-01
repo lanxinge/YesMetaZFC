@@ -102,8 +102,7 @@ theorem not_successorLength {ℳ : Structure.{u}}
     IsSequenceOfLength.length_eq hExt hZeroSequence
       hSuccessorSequence
   subst length
-  have hPredecessor : ℳ.mem predecessor zero := by
-    prove_auto
+  have hPredecessor : ℳ.mem predecessor zero := hLength.predecessor_mem
   exact hEmpty predecessor hPredecessor
 /-- 零长度序列不可能同时具有非零极限长度。 -/
 theorem not_limitLength {ℳ : Structure.{u}}
@@ -169,8 +168,7 @@ theorem not_limitLength {ℳ : Structure.{u}}
     IsSequenceOfLength.length_eq hExt hSuccessorSequence
       hLimitSequence
   subst limitLength
-  have hPredecessorMember : ℳ.mem predecessor length := by
-    prove_auto
+  have hPredecessorMember : ℳ.mem predecessor length := hLength.predecessor_mem
   rcases hLimitOrdinal.2.2 predecessor hPredecessorMember with
     ⟨larger, hLargerMember, hPredecessorLarger⟩
   rcases (hLength larger).mp hLargerMember with
