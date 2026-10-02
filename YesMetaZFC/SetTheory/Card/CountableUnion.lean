@@ -2,10 +2,10 @@ import YesMetaZFC.SetTheory.DependentChoice
 import YesMetaZFC.SetTheory.Fiber
 import YesMetaZFC.SetTheory.Card.CountablePair
 
-/-! # 模型内部的可数并
+/-! # 模型内部的小集合族之并
 
-先在模型内统一选择各成员到 ω 的单射，再把并集单射到 ω×ω，最后用已有 Cantor
-配对定理压回 ω。成员的枚举与单射见证均为内部集合编码函数。
+先在模型内统一选择各成员到 κ 的单射，再把并集单射到 κ×κ，最后用无限基数
+自乘定理压回 κ。可数并是 κ=ω 的实例，所有见证均为内部集合编码函数。
 -/
 
 namespace YesMetaZFC.SetTheory.ZFC
@@ -67,17 +67,26 @@ theorem union_bound_l (hZFC : M.Models ZFC) {κ A U W : M.Domain}
     exact (hg hTj).2 x y k hxj hye
   exact ⟨H, hinj⟩
 
-/-- 可数集合族的可数并；族只须可数，不要求预先给出满枚举。 -/
+/-- κ 小集合族的成员均为 κ 小时，其并仍为 κ 小。 -/
+theorem infinite_union_l (hZFC : M.Models ZFC) {ω κ A U : M.Domain} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
+    (hA : M.CardinalLessOrEqual I A κ) (hU : M.IsUnionOf U A)
+    (hc : ∀ T, M.mem T A → M.CardinalLessOrEqual I T κ) : M.CardinalLessOrEqual I U κ := by
+  let hZF := models_zf_l hZFC
+  obtain ⟨W, hW⟩ := ZF.exists_cartesianProduct hZF I κ κ
+  obtain ⟨F, hF⟩ := union_bound_l I hZFC hA hU hc hW
+  have hωc := ZF.omega_cardinal_l I hZF hω
+  obtain ⟨J, hJ⟩ := ZF.cartesianSquare_cardinalLessOrEqual_of_selfMultiplication hZF I
+    ⟨hκ.1, Structure.Equinumerous.refl hZF I κ⟩ hW (ZF.infiniteCardinal_selfMultiplication hZF I hω hωc hκ)
+  exact ZF.exists_compositionInjection hZF I hF hJ
+
+/-- 可数集合族的可数并是 κ=ω 的实例。 -/
 theorem countable_union_l (hZFC : M.Models ZFC) {ω A U : M.Domain} (hω : M.IsOmega ω)
     (hA : M.CardinalLessOrEqual I A ω) (hU : M.IsUnionOf U A)
     (hc : ∀ T, M.mem T A → M.CardinalLessOrEqual I T ω) : M.CardinalLessOrEqual I U ω := by
   let hZF := models_zf_l hZFC
-  obtain ⟨W, hW⟩ := ZF.exists_cartesianProduct hZF I ω ω
-  obtain ⟨F, hF⟩ := union_bound_l I hZFC hA hU hc hW
-  have hωc := ZF.omega_cardinal_l I hZF hω
-  obtain ⟨J, hJ⟩ := ZF.cartesianSquare_cardinalLessOrEqual_of_selfMultiplication hZF I
-    ⟨hωc, Structure.Equinumerous.refl hZF I ω⟩ hW (ZF.omega_selfMultiplication hZF I hω hωc)
-  exact ZF.exists_compositionInjection hZF I hF hJ
+  obtain ⟨F, hF⟩ := ZF.exists_identityBijection hZF I ω
+  exact infinite_union_l I hZFC hω ⟨ZF.omega_cardinal_l I hZF hω, F, hF.1⟩ hA hU hc
 
 /-- 可定义小纤维覆盖的基数界：纤维集合及其编号函数自动由分离与替换构造。 -/
 theorem cover_bound_l (hZFC : M.Models ZFC) {n} (φ : BinarySchema n) (ρ : Env M n)

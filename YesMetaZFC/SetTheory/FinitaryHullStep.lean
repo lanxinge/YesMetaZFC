@@ -1,10 +1,10 @@
 import YesMetaZFC.SetTheory.FinitaryHullSyntax
 import YesMetaZFC.SetTheory.Card.OrdinalImage
 
-/-! # 有限元闭包的一步构造及可数性
+/-! # 有限元闭包的一步构造及无限基数界
 
-一步取旧集合与全部运算值的并。参数列空间的可数性由实际内部编号给出，
-运算图限制到规则与参数的积后，其值域仍可数。
+一步取旧集合与全部运算值的并。参数列空间的 κ 小性由实际内部编号给出，
+运算图限制到规则与参数的积后，其值域仍为 κ 小。
 -/
 
 namespace YesMetaZFC.SetTheory
@@ -27,14 +27,16 @@ theorem ZF.fc_step_exists_l (hZF : M.Models ZF) {ω X T D K A}
   exact ⟨And.right, fun h => ⟨h.elim (hA x)
     (fun ⟨_, _, _, _, _, _, _, _, hx⟩ => hK.output_mem_of_pairMember hx), h⟩⟩
 
-theorem ZF.fc_step_countable_l (hZF : M.Models ZF) {ω X S T D K A B} (hω : M.IsOmega ω)
+theorem ZF.fc_step_bound_l (hZF : M.Models ZF) {ω κ X S T D K A B} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
     (hS : Fseq_space_d I ω X S) (hD : M.IsCartesianProduct I D T S)
-    (hK : M.IsSetFunctionFromTo I K D X) (hT : M.CardinalLessOrEqual I T ω)
-    (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A ω) (hB : Fc_step_d I ω T K A B) :
-    M.CardinalLessOrEqual I B ω := by
-  obtain ⟨L, hL, hl⟩ := ZF.fseq_countable_space_l I hZF hω ha
+    (hK : M.IsSetFunctionFromTo I K D X) (hT : M.CardinalLessOrEqual I T κ)
+    (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A κ) (hB : Fc_step_d I ω T K A B) :
+    M.CardinalLessOrEqual I B κ := by
+  obtain ⟨L, hL⟩ := ZF.fseq_space_exists_l I hZF hω A
+  have hl := ZF.fseq_bound_l I hZF hω hκ ha hL
   obtain ⟨W, hW⟩ := ZF.exists_cartesianProduct hZF I T L
-  have hw := ZF.countable_product_l I hZF hω hT hl hW
+  have hw := ZF.infinite_product_l I hZF hω hκ hT hl hW
   have hWD : M.MemberSubset W D := by
     intro p hp
     obtain ⟨t, ht, s, hs, hc⟩ := (hW p).mp hp
@@ -46,7 +48,7 @@ theorem ZF.fc_step_countable_l (hZF : M.Models ZF) {ω X S T D K A B} (hω : M.I
   have hgY : M.IsSetFunctionFromTo I G W Y := ⟨hg.1, hg.2.1, fun p hp => by
     obtain ⟨x, _, hx⟩ := hg.2.2 p hp
     exact ⟨x, (hY x).mpr ⟨p, hx⟩, hx⟩⟩
-  have hy := ZF.ordinal_image_bound_l I hZF (hω.isOrdinal hZF) hw hgY (fun x hx => by
+  have hy := ZF.ordinal_image_bound_l I hZF hκ.1.1 hw hgY (fun x hx => by
     obtain ⟨p, hp⟩ := (hY x).mp hx
     exact ⟨p, hg.input_mem_of_pairMember hp, hp⟩)
   have values x : Fc_value_d I ω T K A x ↔ M.mem x Y := by
@@ -59,6 +61,15 @@ theorem ZF.fc_step_countable_l (hZF : M.Models ZF) {ω X S T D K A B} (hω : M.I
       obtain ⟨t, ht, s, hs, hc⟩ := (hW p).mp hpW
       obtain ⟨n, hn, hs⟩ := (hL s).mp hs
       exact ⟨n, s, t, p, hn, hs, ht, hc, hx⟩
-  exact ZF.countable_union_two_l I hZF hω ha hy (fun x => (hB x).trans (or_congr Iff.rfl (values x)))
+  exact ZF.infinite_union_two_l I hZF hω hκ ha hy (fun x => (hB x).trans (or_congr Iff.rfl (values x)))
+
+/-- 可数规则与可数参数的单步闭包，是一般无限基数界的实例。 -/
+theorem ZF.fc_step_countable_l (hZF : M.Models ZF) {ω X S T D K A B} (hω : M.IsOmega ω)
+    (hS : Fseq_space_d I ω X S) (hD : M.IsCartesianProduct I D T S)
+    (hK : M.IsSetFunctionFromTo I K D X) (hT : M.CardinalLessOrEqual I T ω)
+    (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A ω) (hB : Fc_step_d I ω T K A B) :
+    M.CardinalLessOrEqual I B ω := by
+  obtain ⟨F, hF⟩ := ZF.exists_identityBijection hZF I ω
+  exact ZF.fc_step_bound_l I hZF hω ⟨ZF.omega_cardinal_l I hZF hω, F, hF.1⟩ hS hD hK hT hA ha hB
 
 end YesMetaZFC.SetTheory

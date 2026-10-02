@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.ProofCode.Global.Jensen
+import YesMetaZFC.SetTheory.Definitional.Project.GlobalOrder
 
 /-! # 原对象语言中的目标全局良序句子
 
@@ -11,29 +12,16 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}}
 
-def lo_universe_s : Sentence := Sentence.ofFormula
-  (.conj (.forallE (.neg (lo_lt_m .newest .newest))) <|
-    .conj (.forallE (.forallE (.forallE (.imp
-      (.conj (lo_lt_m (.bound 2) (.bound 1)) (lo_lt_m (.bound 1) .newest)) (lo_lt_m (.bound 2) .newest))))) <|
-      .conj (.forallE (.forallE (.disj (Formula.extensionalEq (.bound 1) .newest)
-        (.disj (lo_lt_m (.bound 1) .newest) (lo_lt_m .newest (.bound 1)))))) <|
-        .conj (.forallE (.imp (Formula.existsMem .newest .truth)
-          (Formula.existsMem .newest (Formula.forallMem (.bound 1)
-            (.disj (Formula.extensionalEq (.bound 1) .newest) (lo_lt_m (.bound 1) .newest))))))
-          (.forallE (.existsE (.forallE (.iff (.mem .newest (.bound 1)) (lo_lt_m .newest (.bound 2)))))))
-  (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed])
+def lo_universe_s : Sentence := gw_sentence_s lo_lt_s.schema
 
 theorem lo_universe_l (hM : M.Models KPi) (hVL : M.SatisfiesSentence Axioms.vl_axiom) : M.SatisfiesSentence lo_universe_s := by
   rw [Structure.satisfiesSentence_iff]
   intro f
   have all : ∀ x : M.Domain, L_d x := (vl_sat_l (KPi.models_iff_l.mp hM).1 f).mp
     ((Structure.satisfiesSentence_iff M Axioms.vl_axiom).mp hVL f)
-  simp only [lo_universe_s, Sentence.ofFormula, Formula.satisfies_conj_iff, Formula.satisfies_forall_iff,
-    Formula.satisfies_neg_iff, lo_lt_formula_l hM, Formula.satisfies_imp_iff, Formula.satisfies_disj_iff,
-    Formula.satisfies_extensionalEq_iff_eq (KPi.models_iff_l.mp hM).1.1, Formula.satisfies_existsMem_iff,
-    Formula.satisfies_forallMem_iff, Formula.satisfies_truth_iff, and_true, Formula.satisfies_exists_iff,
-    Formula.satisfies_iff_iff, Formula.satisfies_mem_iff]
-  exact ⟨lo_irrefl_l hM, (fun _ _ _ h => lo_trans_l hM h.1 h.2),
+  apply (gw_sentence_sat_l (KPi.models_iff_l.mp hM).1.1 lo_lt_s.schema ⟨Fin.elim0, f⟩).mpr
+  simp only [Gw_order_d, lo_lt_sat_l hM]
+  exact ⟨lo_irrefl_l hM, (fun _ _ _ h g => lo_trans_l hM h g),
     (fun x y => lo_compare_l hM (all x) (all y)), (fun X hn => lo_min_l hM (fun x _ => all x) hn),
     fun x => (lo_initial_exists_l hM (all x)).imp (fun _ h => h.2)⟩
 

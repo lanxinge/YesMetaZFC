@@ -178,6 +178,13 @@ obtain ⟨N, d, S, hSubstructure, hSeed, hCountable, hElementary⟩ :=
 -- hElementary 比较全部内部公式与赋值，包含非标准公式码。
 ```
 
+一般无限基数版本为 `ssk_hull_bound_l`、`selem_hull_bound_l`：额外输入 κ 的
+`IsInfiniteCardinal` 证书及种子到 κ 的实际单射，输出的内部初等壳仍可单射到 κ。
+原可数入口已经成为 κ=ω 的实例。有限参数列的 `ZF.fseq_bound_l` 与单步闭包的
+`ZF.fc_step_bound_l` 仍只需 ZF；完整 Skolem 选择及小并装配使用 ZFC。
+[SmallHull](SetTheory/Internal/SmallHull.lean) 的 `s1_hull_l` 将这套实际构造接到
+Σ₁ 隶属子结构接口，供 Mostowski 坍塌和 Jensen 凝聚直接调用。
+
 [SourceElementary](SetTheory/Internal/SourceElementary.lean) 的 `selem_source_l` 与
 `selem_witness_l` 把完整内部初等性用于原公式保持及实际见证回拉。力迫层已构造
 实际可数 `N[G]`，并由主条件和内部初等性提升指定原公式在所有 N 名称参数下的存在见证；

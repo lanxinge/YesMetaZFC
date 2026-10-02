@@ -192,6 +192,12 @@ def cp_product_l : Cp_code 2 := setfn! (x, y) {
 | [Order/Macro](Order/Macro.lean) 的 `jh_order_rep_l` | 原宏观 Jₐ 是同一有序微层级中的实际一层，不增设索引对应假设 |
 | [Order/Uniform](Order/Uniform.lean) 的 `jh_local_sigma1_l` | 固定无参数 Σ₁ 公式 `js_less_s` 在每个非空 Jₐ 内定义 `Js_lt_d` 的限制 |
 | `jh_local_wellorder_l`、`jh_order_initial_l` | 合并实际集合编码良序与层内定义，并证明各 Jₐ 都是全局序的初段 |
+| [Order/InternalState](Order/InternalState.lean) 的 `js_l_value_iff_l`、`js_value_constructible_l` | 内外有序微层及关系表一致，微层本身和关系表均属于 L |
+| [Order/Initial](Order/Initial.lean) 的 `jh_initial_in_l` | 每个 x∈Jₐ 的完整全局前驱集合本身属于同一个 Jₐ |
+| [Order/InitialSigma1](Order/InitialSigma1.lean) 的 `js_initial_s`、`jh_initial_local_l`、`jh_initial_function_l` | 初段函数的实际 Σ₁ 图在每层内都可靠、完备且有唯一输出 |
+| [Order/Global](Order/Global.lean) 的 `js_min_l`、`js_delta1_l`、`jh_local_delta1_l` | 全局最小元与正反 Σ₁ 证书；同一对公式在每个非空 J 层内互补 |
+| [Order/Internal](Order/Internal.lean) 的 `js_l_absolute_l`、`js_initial_l_absolute_l` | 比较和初段在实际 Jensen 模型内外一致；`js_rel_sat_l`、`js_initial_rel_sat_l` 给出原公式相对化接口 |
+| [Order/Statement](Order/Statement.lean) 的 `js_universe_l`、`js_l_model_l`、`jh_order_model_l` | KPi + V=L、实际 Jensen 模型以及每个非空 J 层满足同一全局良序句子，包含严格初段集合性 |
 
 公共真值表现在支持坐标映射；原 Δ₀ 分离直接复用完整定义集构造。
 上述接口允许背景模型外部非标准、非良基，所有存在性均以集合关系证明。
@@ -200,10 +206,67 @@ def cp_product_l : Cp_code 2 := setfn! (x, y) {
 `Jₐ ⊨ js_less_s(x,y) ↔ Js_lt_d(x,y)`。因此不同层在共同对象上的比较自动一致。
 J₀ 的空良序也已包括在 `jh_local_wellorder_l` 中；非空条件仅用于建立仓库的非空结构载体。
 
+完整前驱集合 `Iₓ={y : Js_lt_d(y,x)}` 留在包含 x 的每一个 Jₐ 中，
+`js_initial_s` 在该层内部准确计算 Iₓ。证明从更早微层的状态证书读取关系表，
+只用 Δ₀ 分离构造完整初段；端延拓排除了层外遗漏的前驱。
+`jh_order_model_l` 表达的是单层满足这条特定良序句子，并不据此赋予该层 KP 模型性。
+
+[通用句子模板](../Definitional/Project/GlobalOrder.lean) 的 `gw_sentence_s` 只接受原二元公式；
+`gw_sentence_sat_l` 在外延结构中展开其严格线序、集合最小元及初段集合性语义。
+原 `lo_universe_s` 与新 `js_universe_s` 都已直接使用此模板，未加入新理论公理。
+
 极限阶段使用 Δ₀ 查询精确收集可见的短历史，重用较早层作为所有旧见证的共同界。
 宏观层的识别通过最小 rud 闭包和序数截口证明，没有假设微层与原层级的等价性。
 `Js_lt_d` 是逐层端延拓得到的 Jensen 序；上节 `lo_*` 是最小构造码名序。
 两者各有已证接口，当前没有声称这两个关系逐点相同。
+
+## 坍塌凝聚及 GCH 前件
+
+入口为 [Condensation](Condensation.lean)，通用隶属坍塌入口为
+[SetTheory/Collapse](../Collapse.lean)。对模型内部的任意大小集合 X，
+`S1_sub_d X U` 以实际“∃见证＋Δ₀ 矩阵”及任意有限参数表达 Σ₁ 初等性。
+在背景 KPi 中，X≺Σ₁Jₐ 的传递坍塌是唯一的原 Jᵦ，且有实际单射 β→X。
+
+| 接口 | 结论与前提 |
+| --- | --- |
+| [Collapse/Recursion](../Collapse/Recursion.lean) 的 `mc_value_exists_l`、`mc_value_equation_l` | π(a)={π(b):b∈a∩X} 的实际内部递归；背景 KPi |
+| [Collapse/Mostowski](../Collapse/Mostowski.lean) 的 `mc_collapse_l` | 外延隶属子结构的传递值域、集合图及隶属同构；`Mc_iso_d.bijection_l` 接入原集合双射接口 |
+| [Collapse/Uniqueness](../Collapse/Uniqueness.lean) 的 `mc_iso_unique_l` | 任意传递坍塌均等于规范递归，值域和图均唯一 |
+| [Collapse/Transport](../Collapse/Transport.lean) 的 `Mc_iso_d.formula_l` | 通过集合编码同构传输原公式，有限参数逐项回拉 |
+| [Condensation/Recognition](Condensation/Recognition.lean) 的 `jc_rud_macro_l` | rud 封闭微层必是原宏观 J 层；通过原公式内部归纳证明 |
+| [Condensation/Collapse](Condensation/Collapse.lean) 的 `jc_condensation_l`、`jc_condensation_unique_l` | Σ₁ 子结构坍塌到唯一原 J 层；没有可数性或外部良基性前提 |
+| [Condensation/Size](Condensation/Size.lean) 的 `jc_bounded_condensation_l` | 同时返回实际高度单射 β→X；若 A 传递、A⊆X、x∈X 且 x⊆A，则 π(x)=x |
+| [Condensation/Internal](Condensation/Internal.lean) 的 `jc_internal_l` | 直接消费已有全内部 `Selem_d` 证书；解码原公式的现有接口要求背景 ZF |
+| `jc_countable_hull_l` | 从现有内部可数种子实际构造初等壳及其凝聚；壳构造使用 ZFC，凝聚主定理不限于可数壳 |
+
+证明先构造 Mostowski 集合图，再把 rud 运算及完整微层证书的存在式传入坍塌。
+传递值域于是 rud 封闭并由可见微层覆盖；规范截口和宏观层识别给出 Jᵦ。
+高度界通过 γ↦Jγ 的集合编码单射及坍塌逆图取得，只需 KPi。
+取 A=κ 后，X 中的 κ 子集均被坍塌固定并属于 Jᵦ，这是后续 GCH 论证需要的保持结论。
+
+## GCH 与 ZF 背景下的最终模型
+
+[GCH](GCH.lean) 的 `l_model_gch_l hZF` 证明：任意 ZF 模型中的同一实际 Jensen
+内模型满足 `ZFC_GCH kpair_convention_l`。无需外部选择公理，也无需外部良基性。
+这里的 κ、κ⁺、幂集与双射均在 L 内解释；没有把外部 κ⁺ 当作内部后继基数。
+
+| 接口 | 已证明的内容 |
+| --- | --- |
+| [Jensen/ZF/Choice](Jensen/ZF/Choice.lean) 的 `l_model_zfc_l` | 从逐层 Jensen 全局良序分离最小元，导出 L 内原选择集公理；背景只需 ZF |
+| [Card/FiniteSequenceCountable](../Card/FiniteSequenceCountable.lean) 的 `ZF.fseq_bound_l` | ZF 中 κ 小字母表的全部内部有限序列仍为 κ 小；固定递归编号覆盖非标准长度 |
+| [Internal/ElementaryHull](../../Model/SetTheory/Internal/ElementaryHull.lean) 的 `selem_hull_bound_l` | ZFC 中实际构造包含任意 κ 小种子的 κ 小内部初等子模型，量化全部内部公式码 |
+| [Collapse/Sigma1Bound](../Collapse/Sigma1Bound.lean) 的 `s1_value_bound_l` | ZFC 中传递 κ 小参数的唯一 Σ₁ 输出仍为 κ 小；完整 Skolem 壳和 Mostowski 图均自动构造 |
+| [GCH/Bounds](GCH/Bounds.lean) 的 `jh_cardinal_bound_l` | 当 κ 无限且 \|α\|≤κ 时，\|Jα\|≤κ；直接实例化真实的 Σ₁ 层递归图 |
+| `jh_subset_bound_l` | 构造性的 κ 子集经小壳凝聚，被固定在高度 β<κ⁺ 的 Jβ 中，因而属于 Jκ⁺ |
+| [GeneralizedContinuum](../GeneralizedContinuum.lean) 的 `gch_sentence_l`、`gch_sat_l` | 原 Project 句子及其语义：每个无限 κ 的幂集与 Hartogs(κ) 存在内部双射 |
+| `ZF.hartogs_power_eq_l` | 仅用 ZF，将幂集的 Hartogs 上界提升为等势；Cantor 排除较小序型 |
+| [GCH/Model](GCH/Model.lean) 的 `js_gch_l`、`js_gch_sentence_l`、`l_model_gch_l` | ZF+V=L 的 GCH、原句子满足性及任意 ZF 背景中的实际 L 模型实例 |
+| `ZF.gch_power_l` | 给定已证 GCH 实例与无限 κ，自动取得内部幂集、κ⁺ 和完整双射图 |
+
+证明先在 ZF+V=L 中导出选择，再于该模型内运行一般小壳构造。
+凝聚给出 `P(κ)⊆Jκ⁺`，唯一 Σ₁ 层值的计数给出 `|Jκ⁺|≤κ⁺`，二者合并为
+`|P(κ)|≤κ⁺`；实际序型构造及 Cantor 定理最终得到 `2^κ=κ⁺`。
+原可数积、并、有限序列和 Skolem 壳的入口均已改用同一套一般无限基数证明。
 
 ## 尚未完成
 
@@ -221,3 +284,5 @@ Jensen 的 [第一章 §1.1](https://www.math.uni-bonn.de/~raesch/jensen/jensen/
 采用宏观索引 `J₀=∅`、`Jₐ₊₁=Rud(Jₐ∪{Jₐ})`、`Jλ=⋃ₐ∈λ Jₐ`。
 递归算子统一写作所有前值的后继之并，再证明上述三条方程。尚未在 Lean 中
 证明有限基与一般 rudimentary 项定义的等价定理，或与其他 J 索引约定的等价性。
+Σ₁ 凝聚的数学目标见 Jensen 原论文
+[The Fine Structure of the Constructible Hierarchy，Lemma 2.6](https://www.math.cmu.edu/~laiken/papers/FineStructure.pdf#page=18)。
