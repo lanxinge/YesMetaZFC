@@ -1,4 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.Borel.Open
+import YesMetaZFC.SetTheory.Descriptive.Borel.Finite
+import YesMetaZFC.SetTheory.Descriptive.Borel.Relabel
 
 /-! # 内部 Borel 集及空间实例
 

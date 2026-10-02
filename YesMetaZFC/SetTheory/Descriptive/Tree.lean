@@ -81,18 +81,36 @@ theorem tree_body_closed_l (hKP : M.Models KP) {S B T K : M.Domain} (hK : Body_d
   obtain ⟨s, hs, hsf, hst⟩ := bad
   exact ⟨s, hs, hsf, fun g hg hsg => (hU g).mpr ⟨hg, fun hgK => hst (((hK g).mp hgK).2 s hs hsg)⟩⟩
 
-/-- 任意闭集由可延伸到该集合的全部有限前缀表示。 -/
-theorem tree_of_closed_l (hKP : M.Models KP) {S B K U : M.Domain} (hKB : M.MemberSubset K B)
-    (hU : ∀ f, M.mem f U ↔ M.mem f B ∧ ¬ M.mem f K) (ho : Open_d S B U) :
-    ∃ T, Tree_d S T ∧ Body_d S B T K := by
+def Ktree_d (S K T : M.Domain) : Prop := ∀ s,
+  M.mem s T ↔ M.mem s S ∧ ∃ f, M.mem f K ∧ M.MemberSubset s f
+def ktree_m {d} (S K T : Term d) : Formula 1 d := .forallE (.iff (.mem .newest T.weaken)
+  (.conj (.mem .newest S.weaken) (Formula.existsMem K.weaken (Formula.subset (.bound 1) .newest))))
+derive_free_closed ktree_m
+@[prove_auto_norm semantic]
+theorem ktree_sat_l {d} (ρ : Env M d) (S K T : Term d) :
+    Formula.satisfies ρ (ktree_m S K T) ↔ Ktree_d (M := M) (S.eval ρ) (K.eval ρ) (T.eval ρ) := by
+  simp only [ktree_m, Ktree_d, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff,
+    Formula.satisfies_mem_iff, Formula.satisfies_conj_iff, Formula.satisfies_existsMem_iff,
+    Formula.satisfies_subset_iff, Definitional.Term.eval_weaken]; rfl
+
+theorem ktree_exists_l (hKP : M.Models KP) (S K : M.Domain) : ∃ T, Ktree_d S K T := by
   let ρ : Env M 1 := ⟨fun _ => K, fun _ => K⟩
   let φ : Delta0UnarySchema 1 := {
     body := Formula.existsMem (.bound 1) (Formula.subset (.bound 1) .newest)
     delta0 := .existsMem _ (.atom _ _ _) }
   obtain ⟨T, hT'⟩ := KP.separation_exists_d hKP φ ρ S
-  have hT s : M.mem s T ↔ M.mem s S ∧ ∃ f, M.mem f K ∧ M.MemberSubset s f := by
-    simpa only [φ, Formula.satisfies_existsMem_iff, Formula.satisfies_subset_iff] using! hT' s
-  refine ⟨T, ⟨fun s hs => ((hT s).mp hs).1, fun s hs t ht hts => ?_⟩, fun f => ⟨?_, ?_⟩⟩
+  refine ⟨T, fun s => ?_⟩
+  simpa only [φ, Formula.satisfies_existsMem_iff, Formula.satisfies_subset_iff] using! hT' s
+
+theorem ktree_unique_l (hE : Extensional M) {S K T U : M.Domain} (h : Ktree_d S K T) (k : Ktree_d S K U) : T = U :=
+  hE.eq_of_same_members T U (fun s => (h s).trans (k s).symm)
+
+/-- 任意闭集由唯一的规范前缀树表示，同时返回其原公式刻画。 -/
+theorem tree_of_closed_l (hKP : M.Models KP) {S B K U : M.Domain} (hKB : M.MemberSubset K B)
+    (hU : ∀ f, M.mem f U ↔ M.mem f B ∧ ¬ M.mem f K) (ho : Open_d S B U) :
+    ∃ T, Ktree_d S K T ∧ Tree_d S T ∧ Body_d S B T K := by
+  obtain ⟨T, hT⟩ := ktree_exists_l hKP S K
+  refine ⟨T, hT, ⟨fun s hs => ((hT s).mp hs).1, fun s hs t ht hts => ?_⟩, fun f => ⟨?_, ?_⟩⟩
   · obtain ⟨_, f, hf, hsf⟩ := (hT s).mp hs
     exact (hT t).mpr ⟨ht, f, hf, fun p hp => hsf p (hts p hp)⟩
   · intro hf

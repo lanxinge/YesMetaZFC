@@ -60,13 +60,24 @@ with a bijection to the internal power set of ω. A prefix ultrametric with cano
 rational codes is constructed, and both spaces are internally complete. Cantor is
 compact; an explicit Baire open cover has no internal finite subcover. Internal prefix
 trees and their bodies are implemented: bodies are closed, and every closed set has a
-prefix tree representation, using only KP. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel.lean)
+unique canonical prefix tree representation, using only KP. In internal Baire space this
+canonical tree has no dead ends. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel.lean)
 are internally well-founded labelled prefix trees with unique evaluations and denotations.
 Basic cylinders, complements, internal countable unions, open sets, and closed tree bodies
 have actual codes. Grafting has a unique output and an object formula; codes also restrict
 to internal subspaces. The constructions use at most ZF, with no additional choice axiom;
-countable union takes an internal family of codes. Borel ranks and the projective hierarchy
-remain to be implemented.
+countable union takes an internal family of codes. The [analytic layer](YesMetaZFC/SetTheory/Descriptive/Analytic.lean)
+uses internal Baire projections of Borel relations, with unique denotations, coded countable
+unions, countable intersections of coanalytic complements, and closed tree projections.
+Closed-set and closed-tree projection normal forms are proved by closed evaluation
+certificates and witness pairing. The direct criterion quantifies over an internal real
+and all internal prefix lengths, and also has a relative subspace version.
+The [projective layer](YesMetaZFC/SetTheory/Descriptive/Projective.lean) constructs Σ¹ₙ, Π¹ₙ,
+and Δ¹ₙ along the model's own ω, including nonstandard levels. Base and first-level identities,
+successor projection equations, complement duality, monotonicity, and Borel ⊆ Δ¹₁ are proved.
+Individual projective codes and the entire hierarchy have unique internal interpretations;
+Cantor pointclasses are obtained by subspace traces. Borel ranks, separation and perfect-set
+theorems, Δ¹₁ ⊆ Borel, and strictness remain to be implemented.
 
 ## Explore the infrastructure
 
