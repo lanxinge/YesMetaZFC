@@ -58,9 +58,15 @@ prefixes, infinite extensions, actual countable clopen bases, Hausdorff separati
 and the absence of isolated points. Cantor is a closed nowhere dense subspace of Baire,
 with a bijection to the internal power set of ω. A prefix ultrametric with canonical
 rational codes is constructed, and both spaces are internally complete. Cantor is
-compact; an explicit Baire open cover has no internal finite subcover. These results
-use ZF, with object formulas and semantic correspondence proofs. The Borel/projective
-hierarchies remain to be implemented.
+compact; an explicit Baire open cover has no internal finite subcover. Internal prefix
+trees and their bodies are implemented: bodies are closed, and every closed set has a
+prefix tree representation, using only KP. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel.lean)
+are internally well-founded labelled prefix trees with unique evaluations and denotations.
+Basic cylinders, complements, internal countable unions, open sets, and closed tree bodies
+have actual codes. Grafting has a unique output and an object formula; codes also restrict
+to internal subspaces. The constructions use at most ZF, with no additional choice axiom;
+countable union takes an internal family of codes. Borel ranks and the projective hierarchy
+remain to be implemented.
 
 ## Explore the infrastructure
 
