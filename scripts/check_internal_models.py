@@ -1,4 +1,4 @@
-"""审计内部模型、公式编译、司寇伦闭包、内部初等性及 Lévy 有限公式反射。
+"""审计内部模型、公式编译、司寇伦闭包、有限反射及 OD/HOD。
 
 ZF 基础逐声明限制在原七条证书；司寇伦选择与闭包装配另允许原选择公理证书。
 编码和解码数据排除经典选择，司寇伦模块的 ZF 端点另逐项收紧。
@@ -11,11 +11,12 @@ from check_filters import BASELINE, main
 MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
            ("Numeral", "Structure", "Assignment", "Syntax", "TruthSyntax", "Truth",
             "TruthRules", "FormulaCode", "Satisfaction", "Theory", "Prefix", "Source",
-            "Builder", "CompileSemantics", "Compiler", "Countable", "FiniteAssignment", "SkolemSyntax",
+            "Builder", "CompileSemantics", "Compiler", "Countable", "FiniteAssignment", "FiniteSource", "SkolemSyntax",
+            "CanonicalRows", "CanonicalCode", "CanonicalSatisfaction",
             "SupportSyntax", "SupportBound", "Support", "Induction", "TarskiVaughtSyntax",
             "FullWitness", "ElementarySyntax", "TarskiVaught", "Elementary", "SourceElementary", "Membership", "MembershipSkolem", "Hereditary")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection." + name for name in
-            ("Parameters", "WitnessSyntax", "Collection", "Step", "Chain", "Closure", "Relativization", "Decode")]
+            ("Parameters", "WitnessSyntax", "Collection", "Step", "Chain", "Closure", "Relativization", "Decode", "Bounded")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection", "YesMetaZFC.SetTheory.CumulativeUnion"]
 MODULES += ["YesMetaZFC.SetTheory.RelationChain"]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
@@ -29,6 +30,19 @@ MODULES += ["YesMetaZFC.SetTheory." + name for name in
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("Rank", "TransitiveClosure", "RankImage", "Hereditary", "Card.SmallBound", "FunctionRetraction", "FinitarySlice")]
+MODULES += ["YesMetaZFC.SetTheory.Ord.Code." + name for name in
+            ("Transport", "Pair", "Natural", "Fold", "Prefix", "Sequence")]
+MODULES += ["YesMetaZFC.SetTheory.Ord.Code", "YesMetaZFC.SetTheory.InnerModel.OD"]
+MODULES += ["YesMetaZFC.SetTheory.InnerModel.OD." + name for name in
+            ("Syntax", "Source", "Code", "Definition", "Complexity", "Minimum", "Order", "Choice")]
+MODULES += ["YesMetaZFC.SetTheory." + name for name in
+            ("CumulativeCertificate", "Ord.DefinableMinimum", "Definitional.Project.Hierarchy.Levy",
+             "InnerModel.HOD.Definition", "InnerModel.HOD")]
+MODULES += ["YesMetaZFC.SetTheory.InnerModel.OD." + name for name in
+            ("Graph", "Brackets", "Parameters", "Relative", "RelativeClosure", "Separation")]
+MODULES += ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in
+            ("Relative", "Relativization", "Closure", "Schemas", "Models", "Parameters")]
+MODULES += ["YesMetaZFC.SetTheory.Card.FiniteSequenceJoin"]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Num_d", "num_m", "num_unique_l", "Smdl_d", "smdl_m", "smdl_structure_l",
@@ -57,6 +71,24 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
                  "Fseq_end_d", "fseq_end_m", "fseq_end_unique_l", "fseq_end_rebuild_l", "Fc_slice_d", "fc_slice_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
                 ("Fc_seed_d", "fc_seed_m", "Fc_trace_d", "fc_trace_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Sc_node_d", "sc_node_m", "Sc_rows_d", "sc_rows_m", "Sc_num_d", "sc_num_m", "Sc_sat_d", "sc_sat_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
+                ("Oc_at_d", "oc_at_m", "Oc_pair_d", "oc_pair_m", "Oc_fold_d", "oc_fold_m", "Oc_seq_d", "oc_seq_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
+                ("Od_local_d", "od_local_m", "Od_code_d", "od_code_m", "Od_in_d", "od_in_m",
+                 "Od_ext_d", "od_decoder_s", "Od_eval_d", "od_eval_m", "od_eval_s", "od_s", "Od_d", "od_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
+                ("Od_rank_d", "od_rank_m", "od_sigma_m", "Od_min_d", "od_min_m", "Od_pick_d", "od_pick_m",
+                 "Od_choices_d", "od_choices_m", "Od_lt_d", "od_lt_m", "Hod_d", "hod_m", "hod_sigma_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
+                ("lr_truth_s", "Lr_truth_d", "lr_truth_m", "Vc_step_d", "vc_step_m", "Vc_d", "vc_matrix_m", "v_sigma_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
+                ("od_unique_s", "Od_graph_d", "od_graph_m", "od_graph_s", "ob_s", "Ob_d", "ob_m",
+                 "Ob_eval_d", "ob_eval_m", "Ob_ext_d", "od_ex_m", "ob_subst_s", "Oa_seq_d", "oa_seq_m",
+                 "Oa_param_d", "oa_param_m", "Oa_d", "oa_m", "Op_d", "Ha_d", "Hb_d", "Hp_d",
+                 "ha_m", "ha_cut_s", "ha_rel_m", "oa_sep_s", "Hb_pick_d", "hb_pick_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Fs_tail_d", "YesMetaZFC.SetTheory.fs_tail_m"]
 
 SKOLEM_MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("Skolem", "ElementaryHull", "ElementaryClub")]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory.FinitaryClub"]
@@ -70,10 +102,18 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
 ZFC_BASELINE = BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
 ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.Ssk_d." + name: BASELINE for name in
              ("value_l", "closed_l", "point_mem_l")}
+# HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
+HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
+HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
+                 ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}
+HOD_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
+                      ("hb_pick_exists_l", "hb_pick_unique_l", "hb_choice_set_l")})
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     result = main(MODULES, CHOICE_FREE, BASELINE, "INTERNAL_MODEL_GUARD_PASS")
+    if not result:
+        result = main(HOD_CHOICE_MODULES, [], ZFC_BASELINE, "HOD_CHOICE_GUARD_PASS", HOD_ZF_BOUNDS)
     if not result:
         result = main(SKOLEM_MODULES, [], ZFC_BASELINE, "INTERNAL_SKOLEM_GUARD_PASS", ZF_BOUNDS)
     sys.exit(result)

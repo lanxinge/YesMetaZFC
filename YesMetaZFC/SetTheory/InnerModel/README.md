@@ -1,10 +1,86 @@
-# J 层级与可容许递归
+# J 层级、OD、HOD 与可容许递归
 
 入口为 `YesMetaZFC.SetTheory.InnerModel`。当前工作沿 Jensen 的 rudimentary
 有限基构造 J 层级，允许背景模型的自然数、序数和隶属关系在外部非标准、非良基。
-OD、HOD 的首批基础设施已给出规范序数配对、内部有限序数参数列编码及内部公式的
-自然数编码与统一满足关系，见 [规范编码接口](../../Model/README.md)。OD/HOD 的
-成员定义与模型性尚待建设。
+OD 已具有基于 V 层满足关系的内部定义、标准原公式对应及单序数解码。
+底层使用规范序数配对、内部有限序数列编码及内部公式的自然数编码与统一满足关系，
+见 [规范编码接口](../../Model/README.md)。OD/HOD 的 Σ₂ 成员定义、OD 最小代表
+及全局良序已完成，HOD 的实际隶属结构已验证原选择集公理。
+两种集合参数版本现已分别构造实际 ZFC 与 ZF 模型，见下节。
+
+## 内部 OD
+
+入口为 [OD](OD.lean)。`Od_d x` 是固定 Kuratowski 编码下的无参数原公式谓词，
+不量化宿主 AST。定义见证包含内部累积层 `Vθ`、内部公式自然数码和内部有限序数
+参数列码；空集补齐列外赋值，零号变量读取候选对象，要求该候选在层内唯一满足公式。
+
+| 接口 | 结论与前提 |
+| --- | --- |
+| [Syntax](OD/Syntax.lean) 的 `od_code_unique_l` | ZF 中相同定义码的输出唯一；层、公式、参数列的辅助表示均不影响结果 |
+| [Source](OD/Source.lean) 的 `od_source_l` | 从原公式及其序数参数的唯一性，经实际有限反射与统一编译生成内部定义码 |
+| `od_code_external_l`、`od_in_iff_external_l` | 内部 OD 恰为原公式序数参数唯一可定义的对象，即使公式码或参数长度非标准也成立 |
+| `od_convention_l` | 更换实际有序对编码约定不改变 OD 类 |
+| [Code](OD/Code.lean) 的 `od_eval_unique_l`、`od_one_parameter_l` | 单序数代码求值单值；每个 OD 对象由同一条固定原公式和一个序数参数唯一指定 |
+| [Definition](OD/Definition.lean) 的 `od_sat_l`、`od_iff_external_l` | 公开谓词的原公式解释及 ZF 中的通常 OD 语义 |
+| `od_ordinal_l`、`od_parameter_free_l`、`od_separation_l` | 全部序数与无参数唯一可定义对象属于 OD；任意集合与 OD 的交实际存在 |
+| `od_rel_sat_l` | 同一原公式在内部传递集合结构中的相对化解释；该结构的 OD 按自身满足关系计算 |
+| [Complexity](OD/Complexity.lean) 的 `od_sigma_complexity_l`、`od_sigma_sat_l` | 实际 `∃∃∃∃∃∀Δ₀` 公式及其与既有 OD 谓词的等价证明 |
+| [Minimum](OD/Minimum.lean) 的 `od_min_exists_l`、`od_min_unique_l`、`od_min_injective_l` | 每个 OD 对象的最小序数代码存在、唯一，不同对象的最小代码不同 |
+| [Order](OD/Order.lean) | 最小码诱导严格线序；每个非空 OD 元素集合有最小元，每个严格初段为实际集合 |
+| [Choice](OD/Choice.lean) 的 `od_unique_parameter_l`、`od_choices_exists_l` | 从 OD 参数唯一可定义的对象仍为 OD，规范选择集可直接由分离构造 |
+
+数学存在性与等价定理仅用背景 ZF，不要求背景选择公理、外部良基性或 ω 标准性。
+语法解释和相对化使用较弱的语义条件。反向对应通过标准解码公式读取内部代码，
+不把非标准程序转换为宿主 AST。相对化结论不声称内部 OD 与背景 OD 的限制相同。
+Σ₂ 证书先将固定解码公式限制在一个真实 V 层：层内唯一性是 Δ₀ 性质；
+正向由有限反射取得该层，反向用层高度与解码序数唯一指定对象。
+[CumulativeCertificate](../CumulativeCertificate.lean) 对层历史给出全称 Δ₀ 检查，
+并在 KP 下证明证书与原递归值等价。证明没有假定所有非标准公式一起反射。
+
+## HOD 与选择公理
+
+[HOD/Definition](HOD/Definition.lean) 用全部成员属于 OD 的内部传递容器定义 `Hod_d`，
+`hod_tc_l` 证明它恰为 `TC({x})⊆OD`；该类传递并包含全部内部序数。
+`hod_sigma_complexity_l` 与 `hod_sigma_sat_l` 给出实际 Σ₂ 公式及语义等价。
+
+[HOD/Choice](HOD/Choice.lean) 的 `hod_choice_set_l` 对 HOD 中任意互不相交非空族，
+构造属于 HOD 的选择集。每行选择最早出现的序数定义码，所得集合从原族唯一可定义，
+故仍是 OD；其元素又属于原族的遗传 OD 容器，因此整个集合属于 HOD。
+`hod_model_choice_l` 将此结果落实为实际 `hod_model_l` 满足原 `Axioms.choice`。
+背景仅假设 ZF，未假设背景 AC，也没有从存在命题选择外部数据。
+
+OD 良序在背景模型中计算，不宣称同一公式在 HOD 内重算得到原关系。
+当前尚未认证原序数解码图、最小代表图或良序图的 Δ₂ 复杂度；OD/HOD 的 Σ₂
+成员证书已经完成。原无参数 `hod_model_l` 的完整 ZF 接口尚未归并到下述参数模型定理。
+
+## 两种参数版本及实际模型
+
+参数约定采用 [Jech §13，195–196 页](https://daiwz.net/course/disc_math/2023/set_theory_jech.pdf#page=195)：
+`OD[A]` 允许整个 A 作固定参数；`OD(A)` 在此之外允许 A 中的有限参数列。
+相应的遗传类分别为 HOD[A] 和 HOD(A)。本库中的 A 总是背景模型内部的集合。
+
+| 原公式与语义接口 | 已证明的内容 |
+| --- | --- |
+| [OD/Brackets](OD/Brackets.lean) 的 `Ob_d`、`ob_m`、`ob_iff_external_l` | OD[A] 的内部谓词，等价于标准原公式从 A 和序数参数唯一可定义；允许背景非标准 |
+| `ob_code_l`、`ob_eval_unique_l` | A 固定后的单序数定义码及单值求值 |
+| [OD/Relative](OD/Relative.lean) 的 `Op_d`、`op_statement_l` | OD(A) 精确等于某条内部有限 A 序列 s 下的 OD[A,s]；二参数以 Kuratowski 对表示 |
+| [OD/RelativeClosure](OD/RelativeClosure.lean) 的 `oa_unique_l`、`op_member_l` | 两种参数类均对有限唯一原公式定义封闭，A 的每个成员属于 OD(A) |
+| [HOD/Parameters](HOD/Parameters.lean) 的 `hb_statement_l`、`hp_statement_l` | 遗传类恰由 TC({x}) 的全部元素属于相应 OD 类刻画 |
+| `hb_subset_hp_l`、`hp_transitive_parameter_l` | HOD[A]⊆HOD(A)；传递 A 连同其成员属于 HOD(A) |
+| [HOD/Models](HOD/Models.lean) 的 `ha_model_zf_l`、`hp_model_zf_l` | 两个实际隶属结构的全部原 ZF 公理，包括任意模式的全分离和全收集 |
+| [HOD/BracketChoice](HOD/BracketChoice.lean) 的 `hb_model_zfc_l` | 仅用背景 ZF，HOD[A] 满足原 ZFC；选择集自身属于 HOD[A] |
+
+固定参数通过 OD 偏函数图在 A 处的值解释。[OD/Graph](OD/Graph.lean) 将任意原公式的
+唯一值部分限制到真实 V 层，实际构造这样的 OD 图；反向由既有单序数解码恢复标准公式。
+因此参数版本继续使用原内部满足关系与规范编码，没有新增解释语言或可定义性公理。
+
+圆括号的有限性始终是模型内部有限性。[FiniteSequenceJoin](../Card/FiniteSequenceJoin.lean)
+用内部序数加法拼接参数列，并给出可定义的前段与尾段投影，从而合并任意有限多个参数包。
+`op_statement_l` 不声称非标准有限 A 序列可以展开为宿主标准有限个 A 元素。
+
+共同的模型证明先构造 `H∩Vα`，并证明它仍属于相应遗传类。全收集在背景取得见证界后，
+直接使用这样的秩切片；没有为每个对象挑选一个参数列。只有方括号的选择证明对固定 A
+后的序数定义码取最小值。圆括号模型定理不附加 AC，也不宣称它总是不满足 AC。
 
 ## 已实现的数学接口
 

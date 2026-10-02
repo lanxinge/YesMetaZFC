@@ -128,6 +128,9 @@ ZF，允许地模型外部非良基；这里的满足关系针对集合结构，
 接收任意有限参数上下文中的 `FreeClosed` 公式，返回实际程序码、规范变量编号及
 对全部编码结构的语义对应。定义原子先展开为原正文，因而解码结构不需外延性；
 量词在内部取得新编号并更新赋值。`source_satisfaction_l` 自动装配参数赋值与满足等价式。
+[FiniteSource](SetTheory/Internal/FiniteSource.lean) 的 `source_finite_compile_l` 进一步把
+有限参数装入模型内函数图；零号变量留给候选对象，列外取空集，同一份程序和参数列
+对全部包含参数的集合结构、全部候选对象有效。内部 OD 使用这一接口传递唯一性。
 
 ```lean
 obtain ⟨a, E, f, hFormula, hSpace, hf, hTruth⟩ :=
@@ -164,7 +167,11 @@ obtain ⟨C, N, hCodes, hNumbering⟩ :=
 上述结果均在背景 ZF 中证明，未使用背景选择公理。原 `scode_numbering_l` 与
 `scode_countable_l` 已直接调用规范编码。非标准公式的逆解码结果仍是模型内部的
 程序与根行号；标准 Project AST 通过已有编译接口进入这套编码。
-目前已提供全部原公式图及语义对应，编码图的 Lévy 复杂度证书留待 OD 定义层继续建设。
+目前已提供全部原公式图及语义对应。[内部 OD](../SetTheory/InnerModel/OD.lean) 已完成
+以 V 层满足关系为基础的无参数定义、标准原公式唯一可定义性对应及单序数解码；
+OD 的 Σ₂ 正规形已由 [Complexity](../SetTheory/InnerModel/OD/Complexity.lean) 证明：
+有界化固定解码公式，用真实累积层的全称递归证书核验幂集，直接连接既有 OD 定义。
+这一结论不自动给出原编码图或原解码图的 Δ₂ 证书。
 
 [Skolem](SetTheory/Internal/Skolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
 函数图 K 及任意内部可数种子 A 的最小闭包 N。规则域为全部内部公式码与变量编号

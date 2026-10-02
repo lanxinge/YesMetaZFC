@@ -6,6 +6,8 @@ import YesMetaZFC.SetTheory.InnerModel.Order.Statement
 import YesMetaZFC.SetTheory.InnerModel.Condensation
 import YesMetaZFC.SetTheory.InnerModel.GCH
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Definable
+import YesMetaZFC.SetTheory.InnerModel.OD
+import YesMetaZFC.SetTheory.InnerModel.HOD
 
 /-! # 内模型技术的共同基础
 
@@ -22,4 +24,10 @@ Jensen 逐层良序由同一无参数 Σ₁ 公式在每个非空 J 层内定义
 微层状态、比较及初段在 J 内外一致；每个非空 J 层满足同一原语言全局良序句子。
 内部 Σ₁ 初等子结构的实际坍塌是唯一 J 层，并有凝聚高度界和传递参数子集固定。
 任意无限基数的小壳和 J 层基数界已实现；外部仅需 ZF，同一 L 模型满足 ZFC+GCH。
+内部 OD 通过 V 层满足关系定义，允许非标准公式及有限参数列，等价于原公式的序数
+参数唯一可定义性。单序数解码单值且覆盖 OD，公开谓词支持分离与内部传递结构相对化。
+OD 与 HOD 均具有实际 Σ₂ 证书；OD 的唯一最小序数代表导出全局良序和集合初段。
+背景仅需 ZF，实际 HOD 隶属结构满足原选择集公理，选择集自身属于 HOD。
+两种集合参数版本已给出原公式陈述：HOD[A] 为实际 ZFC 模型，HOD(A) 为实际 ZF 模型；
+全收集使用秩切片作内部见证池，允许非标准有限参数列且不使用背景选择公理。
 -/
