@@ -45,6 +45,7 @@ import YesMetaZFC.Model.Forcing.Applications.Cohen.CountableSupport
 import YesMetaZFC.Model.Forcing.Iteration.Proper.Prefix.Limit
 import YesMetaZFC.Model.Forcing.Iteration.Names.DenseName
 import YesMetaZFC.Model.Forcing.Proper.Generic.Ground
+import YesMetaZFC.Model.Forcing.Applications.Cohen.OrdinalSubsets
 
 /-! # 力迫偏序、名称求值与相对扩张入口
 
@@ -62,6 +63,10 @@ maximum_l 为原公式构造规范的统一见证名称；forces_zf_l、forces_z
 cohen_step_l 从任意添加量名称全局装配实际 Cohen 后继，迭代的极限阶段见 `Forcing/ITERATION.md`。
 two_step_embed_l 构造带顶名称的阶段完全嵌入；reg_embed_max_l 与 reg_embed_comp_l 给出极大反链保持和内部复合。
 stage_nmap_l 自动构造目标名称；stage_nmap_comp_l 与 stage_nmap_id_l 核验复合及恒等阶段的一致性。
+aut_nmap_inverse_l 给出条件自同构的严格名称逆作用；aut_forces_l 保持全部原公式力迫，
+aut_check_forces_l 处理固定基条件上的有限地参数；cohen_flip_l 构造任意内部坐标集上的 Cohen 翻转实例。
+check_map_ordinals_l 用内部名称秩界证明泛型扩张不增加序数；whom_ground_truth_l 给出弱齐性下的地参数真值定义。
+whom_od_ordinal_subset_l 与 whom_ob_ordinal_subset_l 恢复 OD 和 OD[A] 序数子集；cohen_od_recovery_l 自动实例化到序数添加量的 Cohen 扩张。
 reg_generic_l 自动回拉阶段泛型；stage_extension_l 给出名称解释相容的成员满覆盖单射。
 two_step_name_l 统一转换二步名称，并核验其在每个第一泛型扩张中的第二阶段名称性。
 curry_forces_name_l 在原 ZF 下给出该第二阶段名称性的全局力迫证书。

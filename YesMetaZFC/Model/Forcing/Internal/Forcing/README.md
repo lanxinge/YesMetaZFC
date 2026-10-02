@@ -18,3 +18,4 @@
 | [Rules.lean](Rules.lean) | `InternalForcingRules.lean` | 不依赖泛型选择的内部力迫规则 |
 | [OrderCongruence.lean](OrderCongruence.lean) | `InternalOrderCongruence.lean` | 条件域上的序关系决定全部名称力迫 |
 | [Congruence.lean](Congruence.lean) | `InternalForcingCongruence.lean` | 局部等号替换与有界存在见证 |
+| [Finite.lean](Finite.lean) | — | 有限 check 赋值、自由闭合正文的正则性与替换、共同加强处的基点交换 |

@@ -23,7 +23,7 @@ MODULES = [MODULE_PREFIX + n for n in (
     "External.Truth", "External.Valuation", "Internal.Atomic.Syntax", "Internal.Check.Basic",
     "Internal.Check.Realization", "Internal.Check.Syntax", "Internal.Check.Valuation",
     "Internal.Extension.Generic", "Internal.Extension.Instance", "Internal.Forcing.Formula",
-    "Internal.Ground.Graph", "Internal.Names.Basic", "Internal.Names.Graph", "Internal.Names.Pair",
+    "Internal.Ground.Graph", "Internal.Names.Basic", "Internal.Names.Graph",
     "Internal.Names.Realization", "Order.Basic", "Order.Density", "Order.Separative", "Order.Tree",
 )] + [
     "YesMetaZFC.Model.SetTheory.CountableSyntax",
@@ -37,6 +37,12 @@ ZFC_MODULES = [MODULE_PREFIX + n for n in (
 )]
 
 INTERNAL_MODULES = [MODULE_PREFIX + n for n in (
+    "Internal.Automorphism.Basic", "Internal.Automorphism.Names", "Internal.Automorphism.Atomic",
+    "Internal.Automorphism.Forcing", "Applications.Cohen.FlipSyntax", "Applications.Cohen.Flip",
+    "Internal.Ground.NameRank", "Internal.Ground.Ordinals", "Internal.Forcing.Finite",
+    "Internal.Homogeneous.Basic", "Internal.Homogeneous.Definition", "Internal.Homogeneous.Truth",
+    "Internal.Homogeneous.Recovery", "Internal.Homogeneous.OrdinalSubsets",
+    "Applications.Cohen.Homogeneous", "Applications.Cohen.OrdinalSubsets",
     "Applications.Collapse.NameSyntax", "Applications.Collapse.NameUniqueness",
     "Applications.Collapse.RuleSyntax", "Closed.Sequence", "Closed.Syntax", "Internal.Atomic.Closure",
     "Internal.Atomic.Equivalence", "Internal.Atomic.Recursion", "Internal.Atomic.Truth",
@@ -254,6 +260,13 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Definitional.TermVector." + n for n in
                 ("ofFn", "get_ofFn", "ofFn_freeClosed", "boundParameters_freeClosed")]
 
 INTERNAL_CHOICE_FREE = [PREFIX + "Internal." + n for n in (
+    "Aut_d", "aut_m", "aut_m_freeClosed", "aut_sat_l", "aut_bij_l", "aut_of_bij_l", "aut_below_l",
+    "Cflip_val_d", "Cflip_pair_d", "Cflip_d", "cflip_val_m", "cflip_pair_m", "cflip_m",
+    "cflip_val_sat_l", "cflip_pair_sat_l", "cflip_sat_l", "cflip_val_symm_l", "cflip_val_unique_l",
+    "cflip_val_target_l", "cflip_pair_symm_l", "cflip_pair_unique_l", "cflip_unique_l", "cflip_entry_l",
+    "cflip_mono_l", "cflip_empty_l",
+    "Whom_d", "whom_m", "whom_m_freeClosed", "whom_sat_l", "Gforce_d",
+    "gforce_m", "gforce_closed_l", "gforce_sat_l", "od_member_s", "od_member_sat_l",
     "Entry_supp_d", "entry_supp_m", "Name_ops_d", "set_insert_l", "entry_union_l", "name_adjoin_l", "name_subset_l",
     "name_pair_l", "name_unfold_l", "name_support_l", "Triple_carrier_d", "Max_bisim_d",
     "Eq_match_d", "Mem_force_d", "mem_force_m", "Cond_order_d", "Dense_d", "Neg_d", "Lower_d", "Generic_d",
