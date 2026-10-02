@@ -2,7 +2,9 @@
 
 入口为 `YesMetaZFC.SetTheory.InnerModel`。当前工作沿 Jensen 的 rudimentary
 有限基构造 J 层级，允许背景模型的自然数、序数和隶属关系在外部非标准、非良基。
-OD、HOD 留待 J 层级与内部解释完成后发展。
+OD、HOD 的首批基础设施已给出规范序数配对、内部有限序数参数列编码及内部公式的
+自然数编码与统一满足关系，见 [规范编码接口](../../Model/README.md)。OD/HOD 的
+成员定义与模型性尚待建设。
 
 ## 已实现的数学接口
 

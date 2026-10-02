@@ -142,6 +142,30 @@ obtain ⟨C, N, hCodes, hNumbering⟩ :=
 编号层沿内部 ω 统一递归，最终把长度与层内编号配对，只需 ZF。
 [Countable](SetTheory/Internal/Countable.lean) 将它用于完整公式码集合。
 
+规范编码入口为 [CanonicalCode](SetTheory/Internal/CanonicalCode.lean) 与
+[Ord/Code](../SetTheory/Ord/Code.lean)。固定有序对约定后，序数配对 `Oc_pair_d a b c`
+取 `(a,b)` 在“最大坐标、第一坐标、第二坐标”典范良序中的位置；端延拓证明
+计算结果与方块界无关。它在全部序数上有唯一输出，单射，且将内部自然数对编码为自然数。
+
+有限序数列 `F:n→Ord` 按内部递归计算 `b₀=0`、`bᵢ₊₁=pair(bᵢ,F(i))`，
+最终编码为 `pair(n,bₙ)`。`oc_fold_injective_l` 用实际分离公式的 ω 归纳恢复
+整个前缀，所以支持模型内部的非标准有限长度。空参数列的代码是内部零。
+
+| 接口 | 已证明的内容 |
+| --- | --- |
+| `oc_pair_exists_l`、`oc_pair_unique_l`、`oc_pair_injective_l` | 规范序数配对的总性、唯一性及解码唯一性 |
+| `oc_seq_exists_l`、`oc_seq_injective_l`、`oc_seq_natural_l` | 全部内部有限序数列的编码与恢复；自然数列的代码仍在 ω 内 |
+| `oc_seq_tables_l` | 任意序数字母表的全部有限列与其合法序数码之间，实际存在双向集合编码表 |
+| `sc_num_exists_l`、`sc_num_unique_l`、`sc_num_injective_l` | 原内部公式码 `(程序,根)` 的固定自然数编号，无额外编号图参数 |
+| `sc_num_tables_l` | 自动构造全部原公式码、合法自然数码集及精确互逆图 |
+| [CanonicalSatisfaction](SetTheory/Internal/CanonicalSatisfaction.lean) 的 `sc_sat_decode_l` | 自然数码上的满足关系精确还原为原内部满足关系 |
+| `source_nat_satisfaction_l` | 从原 Project 公式与实际模型参数自动取得自然数码、内部赋值和真值等价 |
+
+上述结果均在背景 ZF 中证明，未使用背景选择公理。原 `scode_numbering_l` 与
+`scode_countable_l` 已直接调用规范编码。非标准公式的逆解码结果仍是模型内部的
+程序与根行号；标准 Project AST 通过已有编译接口进入这套编码。
+目前已提供全部原公式图及语义对应，编码图的 Lévy 复杂度证书留待 OD 定义层继续建设。
+
 [Skolem](SetTheory/Internal/Skolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
 函数图 K 及任意内部可数种子 A 的最小闭包 N。规则域为全部内部公式码与变量编号
 的积，输入是内部有限参数列；列外取基点 u，再在被量化变量处更新。存在见证时
