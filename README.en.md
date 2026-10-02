@@ -32,6 +32,24 @@ pure-language translation. The fixed-point and Tarski results also provide a sep
 encoding of the final pure formulas themselves. Precise statements and encoding conventions
 are recorded in [TROPHIES.md](markdown/TROPHIES.md) and [NAT_DECODING.md](markdown/NAT_DECODING.md).
 
+## Inner models and admissible recursion
+
+The [inner-model guide](YesMetaZFC/SetTheory/InnerModel/README.md) records the current
+interfaces, exact hypotheses, and remaining work.
+
+| Area | Implemented result |
+| --- | --- |
+| Jensen J and L | Rudimentary closure and the J hierarchy in KPi; the resulting L model satisfies ZFC + GCH over any ZF background. |
+| Set computation and local order | A C-style set DSL, Δ₀ decisions, and Σ₁ witness verification; Δ₁ definitions correspond to total J-search programs over KPi + V=L. The Jensen order has one local Σ₁ definition in every nonempty J level, with its full initial segments in that level. |
+| OD and HOD | Internal canonical codes, Σ₂ membership definitions, and least representatives. Over ZF, HOD[A] is a ZFC model and HOD(A) is a ZF model. |
+| Weakly homogeneous forcing | For an OD presentation, HOD of the extension is contained in the image of ground-model HOD. The fixed-parameter version and a Cohen instance are implemented. |
+
+These constructions allow externally ill-founded models and nonstandard internal ω.
+KPi is the repository's KP augmented with full formula membership induction; it is not
+silently identified with KP. Square brackets allow the whole set A as a fixed parameter;
+round brackets additionally allow internally finite sequences from A. Relativized L[A]
+and stronger complexity results for OD code and order graphs remain to be formalized.
+
 ## Explore the infrastructure
 
 The independent arithmetic library provides Q, PA, and Z₂ axiom schemas and derivations,
@@ -50,6 +68,7 @@ These interfaces support the current results and the broader research-platform g
 | Interest | Start here |
 | --- | --- |
 | Mathematical results and exact hypotheses | [TROPHIES.md](markdown/TROPHIES.md) |
+| J/L, OD/HOD, set computation, and forcing comparison | [Inner-model progress and interfaces](YesMetaZFC/SetTheory/InnerModel/README.md) |
 | Reusable proof interfaces and `prove_auto` automation | [ENGINEERING.md](markdown/ENGINEERING.md) |
 | Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
 | Definitions, internal recursion, and staged extensions | [ELIMINATION.md](markdown/ELIMINATION.md) |

@@ -1,6 +1,6 @@
 # Forcing 功能目录与构造脉络
 
-364 个 Lean 模块按数学职责归入 11 个一级目录。各子目录的 README 列出全部文件、原平铺文件名和用途，并按导入依赖排列。
+382 个 Lean 模块按数学职责归入 11 个一级目录。各子目录的 README 列出全部文件、原平铺文件名和用途，并按导入依赖排列。
 
 总入口仍为 `import YesMetaZFC.Model.Forcing`。细分导入使用下面的新路径；数学声明保持 `YesMetaZFC.Model.Forcing` 及其原有命名空间。
 
@@ -13,14 +13,14 @@
 | [Order](Order/README.md) | 4 | 预序、相容性、稠密映射、分离商和有限序列条件。 |
 | [Boolean](Boolean/README.md) | 5 | 非零布尔条件、正则开完备化、规范稠密映射及模型内编码。 |
 | [External](External/README.md) | 11 | 早期外部名称求值、相对名称域、公式真值与可数泛型设施；保留其实际语义边界。 |
-| [Internal](Internal/README.md) | 72 | 从内部名称与规范名称递归到原子力迫、泛型商、完整真值和 ZFC 保持。 |
+| [Internal](Internal/README.md) | 85 | 内部名称、泛型商、真值、ZFC 保持、自同构、不增加序数及弱齐性 OD/HOD 比较。 |
 | [Stage](Stage/README.md) | 17 | 完全嵌入、复合、名称搬运、原子对应、泛型回拉及扩张嵌入。 |
 | [TwoStep](TwoStep/README.md) | 51 | 实际二步偏序、名称转换、泛型分解、扩张同构及 CCC、proper、可数闭保持。 |
 | [CCC](CCC/README.md) | 5 | CCC 原公式、有限部分函数实例、基数界和可数预稠密子族。 |
 | [Proper](Proper/README.md) | 62 | 主条件、内部初等闭包、N[G] 提升、H(χ) 对应及 proper 扩张保持。 |
 | [Closed](Closed/README.md) | 12 | 内部可数稠密交、名称下降链、不新增旧目标序列与可数子集，以及实际 proper club。 |
 | [Iteration](Iteration/README.md) | 97 | 共同条件表示、内部超限递归、支撑极限，以及有限支撑 CCC、可数支撑 proper 和闭性保持。 |
-| [Applications](Applications/README.md) | 28 | Cohen 添加、可数部分函数塌缩和 CH 独立性；各实例接入对应的支撑迭代接口。 |
+| [Applications](Applications/README.md) | 33 | Cohen 添加、弱齐性与 OD/HOD 比较，可数部分函数塌缩和 CH 独立性；各实例接入对应的支撑迭代接口。 |
 
 ## 沿构造历史阅读
 
@@ -48,6 +48,9 @@
 | 完整 proper 区间与全阶段保持 | [Iteration/Proper/Induction.lean](Iteration/Proper/Induction.lean)：`row_iteration_pr_l`；[Extension.lean](Iteration/Proper/Extension.lean)：`row_iteration_preserves_l` |
 | 可数支撑闭迭代 | [Iteration/Closed/Induction.lean](Iteration/Closed/Induction.lean)：`row_iteration_closed_exists_l` |
 | Cohen／塌缩的可直接调用实例 | [Cohen/CountableSupport.lean](Applications/Cohen/CountableSupport.lean)、[Collapse/Iteration.lean](Applications/Collapse/Iteration.lean) |
+| 名称自同构与力迫不变性 | [Internal/Automorphism/Forcing.lean](Internal/Automorphism/Forcing.lean)：`aut_forces_closed_l`、`aut_check_forces_l`；[Cohen/Flip.lean](Applications/Cohen/Flip.lean)：`cohen_flip_l` |
+| 不增加序数与 OD 序数子集恢复 | [Ground/Ordinals.lean](Internal/Ground/Ordinals.lean)：`check_map_ordinals_l`；[Homogeneous/OrdinalSubsets.lean](Internal/Homogeneous/OrdinalSubsets.lean)：`whom_od_ordinal_subset_l`；[Cohen/OrdinalSubsets.lean](Applications/Cohen/OrdinalSubsets.lean)：`cohen_od_recovery_l` |
+| 弱齐性 HOD 比较 | [Homogeneous/HOD.lean](Internal/Homogeneous/HOD.lean)：`whom_hod_comparison_l`、`whom_hb_comparison_l`；[Cohen/HOD.lean](Applications/Cohen/HOD.lean)：`cohen_hod_comparison_l` |
 
 ## 维护约定
 

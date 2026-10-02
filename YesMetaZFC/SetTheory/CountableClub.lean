@@ -64,24 +64,35 @@ theorem cc_club_sat_l (hE : Extensional M) {n} (ρ : Env M n) (ω X C : Term n) 
     cc_increasing_sat_l I, cc_union_sat_l I, Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
   exact ⟨fun h => ⟨h.1, h.2.1, h.2.2⟩, fun h => ⟨h.members, h.unbounded, h.closed⟩⟩
 
-/-- 一张内部可数序列的值均可数时，其实际并可数。 -/
-theorem ZFC.cc_union_countable_l (hZFC : M.Models ZFC) {ω X f N} (hω : M.IsOmega ω)
+/-- 一条内部 ω 序列的值均为 κ 小时，其实际并为 κ 小。 -/
+theorem ZFC.cc_union_bound_l (hZFC : M.Models ZFC) {ω κ X f N} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
     (hf : M.IsSetFunctionFromTo I f ω X) (hu : Cc_union_d I f N)
-    (hc : ∀ A, M.mem A X → M.CardinalLessOrEqual I A ω) : M.CardinalLessOrEqual I N ω := by
+    (hc : ∀ A, M.mem A X → M.CardinalLessOrEqual I A κ) : M.CardinalLessOrEqual I N κ := by
   let hZF := ZFC.models_zf_l hZFC
   obtain ⟨Y, hY⟩ := ZF.exists_range_of_setFunction hZF I hf.1 hf.2.1
   have hfY : M.IsSetFunctionFromTo I f ω Y := ⟨hf.1, hf.2.1, fun i hi => by
     obtain ⟨A, _, hiA⟩ := hf.2.2 i hi
     exact ⟨A, (hY A).mpr ⟨i, hiA⟩, hiA⟩⟩
-  apply ZFC.countable_union_l I hZFC hω (ZFC.surjection_bound_l I hZFC hfY (fun A hA => by
+  obtain ⟨G, hG⟩ := ZFC.surjection_bound_l I hZFC hfY (fun A hA => by
     obtain ⟨i, hi⟩ := (hY A).mp hA
-    exact ⟨i, hf.input_mem_of_pairMember hi, hi⟩))
+    exact ⟨i, hf.input_mem_of_pairMember hi, hi⟩)
+  obtain ⟨H, hH⟩ := hκ.2
+  apply ZFC.infinite_union_l I hZFC hω hκ (ZF.exists_compositionInjection hZF I hG hH)
   · intro x
     exact (hu x).trans ⟨fun ⟨i, A, hi, hx⟩ => ⟨A, (hY A).mpr ⟨i, hi⟩, hx⟩,
       fun ⟨A, hA, hx⟩ => (hY A).mp hA |>.elim fun i hi => ⟨i, A, hi, hx⟩⟩
   · intro A hA
     obtain ⟨i, hi⟩ := (hY A).mp hA
     exact hc A (hf.output_mem_of_pairMember hi)
+
+/-- 一张内部可数序列的值均可数时，其实际并可数。 -/
+theorem ZFC.cc_union_countable_l (hZFC : M.Models ZFC) {ω X f N} (hω : M.IsOmega ω)
+    (hf : M.IsSetFunctionFromTo I f ω X) (hu : Cc_union_d I f N)
+    (hc : ∀ A, M.mem A X → M.CardinalLessOrEqual I A ω) : M.CardinalLessOrEqual I N ω := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨F, hF⟩ := ZF.exists_identityBijection hZF I ω
+  exact ZFC.cc_union_bound_l I hZFC hω ⟨ZF.omega_cardinal_l I hZF hω, F, hF.1⟩ hf hu hc
 
 /-- 全部内部可数子集组成实际 club，供闭包构造直接使用。 -/
 theorem ZFC.cc_all_l (hZFC : M.Models ZFC) {ω} (hω : M.IsOmega ω) (X : M.Domain) :

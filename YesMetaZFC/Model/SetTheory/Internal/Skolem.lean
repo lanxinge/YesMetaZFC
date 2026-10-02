@@ -4,8 +4,8 @@ import YesMetaZFC.SetTheory.FinitaryHull
 
 /-! # 实际内部司寇伦函数与最小闭包
 
-原选择公理把满足关系的见证纤维统一选成一张函数图。规则域内部可数，有限
-参数闭包因而内部可数。假公式的零元运算确保基点进入每个闭集，空种子同样有效。
+原选择公理把满足关系的见证纤维统一选成一张函数图。规则域内部可数，任意无限 κ 的 κ 小种子之有限
+参数闭包仍为 κ 小。假公式的零元运算确保基点进入每个闭集，空种子同样有效。
 -/
 
 namespace YesMetaZFC.SetTheory.Internal
@@ -81,41 +81,54 @@ theorem Ssk_d.point_mem_l (hZF : M.Models ZF) {ω c X R u C S T D K N}
     simp only [Definitional.Semantics.satisfies] at hh
   · exact heq ▸ hxN
 
-/-- 一次装配实际选择图与最小内部司寇伦闭包，允许任意内部可数种子，包括空集。 -/
-theorem ssk_hull_l (hZFC : M.Models ZFC) {ω c X R A} (hω : M.IsOmega ω)
-    (hM : Smdl_d I c X R) (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A ω) :
+/-- 一次装配实际选择图与最小内部司寇伦闭包，允许任意 κ 小种子，包括空集。 -/
+theorem ssk_hull_bound_l (hZFC : M.Models ZFC) {ω κ c X R A} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
+    (hM : Smdl_d I c X R) (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A κ) :
     ∃ u C S T D K N, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
-      M.CardinalLessOrEqual I N ω ∧ M.mem u N ∧ Ssk_closed_d I ω c X u C N := by
+      M.CardinalLessOrEqual I N κ ∧ M.mem u N ∧ Ssk_closed_d I ω c X u C N := by
   let hZF := ZFC.models_zf_l hZFC
   obtain ⟨u, C, S, T, D, K, hK⟩ := ssk_exists_l I hZFC hω c hM.2.1
   obtain ⟨J, hJ⟩ := ZF.exists_identityBijection hZF I ω
-  have ht := ZF.countable_product_l I hZF hω (scode_countable_l I hZF hω hK.codes) ⟨J, hJ.1⟩ hK.labels
+  have htω := ZF.countable_product_l I hZF hω (scode_countable_l I hZF hω hK.codes) ⟨J, hJ.1⟩ hK.labels
+  obtain ⟨t, ht⟩ := htω
+  obtain ⟨j, hj⟩ := hκ.2
+  have ht := ZF.exists_compositionInjection hZF I ht hj
   obtain ⟨P, Q, N, hP, hQ, hz, hs, hu, hN⟩ := ZF.fc_hull_chain_l I hZF hω hK.graph hA
-  -- 固定已构造的选择图后，各闭包阶段按实际原公式归纳保持内部可数。
-  let ρ : Env M 2 := (⟨fun _ => Q, fun _ => Q⟩ : Env M 1).push ω
+  -- 固定已构造的选择图后，各闭包阶段按实际原公式归纳保持大小不超过 κ。
+  let ρ : Env M 2 := (⟨fun _ => Q, fun _ => Q⟩ : Env M 1).push κ
   let φ : UnarySchema 2 := { body := .forallE (.imp (Formula.orderedPairMem 𝒞 (.bound 1) .newest (.bound 3))
     (Formula.cardinalLessOrEqual 𝒞 .newest (.bound 2))) }
-  have hφ i : φ.denote ρ i ↔ ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B ω := by
+  have hφ i : φ.denote ρ i ↔ ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ := by
     simp only [UnarySchema.denote, φ, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
       Formula.satisfies_orderedPairMem_iff I, Formula.satisfies_cardinalLessOrEqual_iff I hZF.1]
     rfl
-  have count : ∀ i, M.mem i ω → ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B ω := by
-    apply hω.induction (fun i => ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B ω)
+  have count : ∀ i, M.mem i ω → ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ := by
+    apply hω.induction (fun i => ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ)
     · obtain ⟨U, hU⟩ := ZF.separation_exists_d hZF φ ρ ω
       exact ⟨U, fun i => (hU i).trans (and_congr_right fun _ => hφ i)⟩
     · exact fun e he B hB => hQ.1.2 e A B (hz e he) hB ▸ ha
     · intro i hi ih j hji E hj
       obtain ⟨B, hB, hb⟩ := hQ.2.2 i hi
-      exact ZF.fc_step_countable_l I hZF hω hK.params hK.domain hK.graph ht
+      exact ZF.fc_step_bound_l I hZF hω hκ hK.params hK.domain hK.graph ht
         ((hP B).mp hB) (ih B hb) (hs i j B E hji hb hj)
   obtain ⟨Y, hY⟩ := ZF.exists_range_of_setFunction hZF I hQ.1 hQ.2.1
   have hQY : M.IsSetFunctionFromTo I Q ω Y := ⟨hQ.1, hQ.2.1, fun i hi => by
     obtain ⟨B, _, hb⟩ := hQ.2.2 i hi
     exact ⟨B, (hY B).mpr ⟨i, hb⟩, hb⟩⟩
-  have hn := ZFC.cc_union_countable_l I hZFC hω hQY hu (fun B hB => by
+  have hn := ZFC.cc_union_bound_l I hZFC hω hκ hQY hu (fun B hB => by
     obtain ⟨i, hi⟩ := (hY B).mp hB
     exact count i (hQ.input_mem_of_pairMember hi) B hi)
   exact ⟨u, C, S, T, D, K, N, hK, hN, hn, hK.point_mem_l I hZF hω hM hN.2.2.1,
     hK.closed_l I hN.2.1 hN.2.2.1⟩
+
+/-- 可数 Skolem 壳是一般 κ 小闭包的实例。 -/
+theorem ssk_hull_l (hZFC : M.Models ZFC) {ω c X R A} (hω : M.IsOmega ω)
+    (hM : Smdl_d I c X R) (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A ω) :
+    ∃ u C S T D K N, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
+      M.CardinalLessOrEqual I N ω ∧ M.mem u N ∧ Ssk_closed_d I ω c X u C N := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨F, hF⟩ := ZF.exists_identityBijection hZF I ω
+  exact ssk_hull_bound_l I hZFC hω ⟨ZF.omega_cardinal_l I hZF hω, F, hF.1⟩ hM hA ha
 
 end YesMetaZFC.SetTheory.Internal

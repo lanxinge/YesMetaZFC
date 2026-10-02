@@ -1,6 +1,7 @@
 # 内部名称构造
 
-有序对编码、支撑、名称图与递归构造，以及配对和序列名称。
+支撑、名称图与递归构造，以及配对和序列名称。通用有序对编码位于
+[SetTheory/Kuratowski](../../../../SetTheory/Kuratowski.lean)。
 
 [总索引](../../INDEX.md) · [上级目录](../README.md)
 
@@ -10,7 +11,6 @@
 
 | 当前文件 | 原平铺文件 | 内容 |
 | --- | --- | --- |
-| [Pair.lean](Pair.lean) | `InternalPair.lean` | 内部名称的有序对编码 |
 | [Basic.lean](Basic.lean) | `InternalNames.lean` | 地模型内部的名称谓词 |
 | [Closure.lean](Closure.lean) | `InternalClosure.lean` | 内部名称的递归刻画与集合闭包 |
 | [Graph.lean](Graph.lean) | `InternalGraph.lean` | 内部名称的小图呈现 |

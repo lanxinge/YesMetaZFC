@@ -4,6 +4,8 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceElementary
 import YesMetaZFC.Model.SetTheory.Internal.Membership
 import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
+import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -13,7 +15,10 @@ import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 `smodels_theory_l` 给出编码理论及实际模型性实例；`source_compile_l` 把原 Project
 AST 编译成内部码并证明对全部编码结构的语义对应，`source_satisfaction_l` 自动
 装配有限参数赋值。`scode_numbering_l` 返回全部内部公式码到内部 ω 的单射图，
-复用 ZF 中可数字母表的内部有限序列编号。`ssk_hull_l` 在 ZFC 中一次构造真实的
+使用固定的规范编码图；`sc_num_tables_l` 同时返回合法自然数码集与双向图，
+`source_nat_satisfaction_l` 将原公式直接接入自然数码上的统一满足关系。
+`source_finite_compile_l` 一次生成内部有限参数列，并对全部载体与候选值证明同一码的语义。
+`ssk_hull_l` 在 ZFC 中一次构造真实的
 内部司寇伦选择图与任意可数种子的最小可数闭包，并给出所有内部有限参数下的
 见证闭性。固定运算图的闭包存在、最小性与单步可数性分别保留 ZF 强度。
 `selem_hull_l` 进一步一次构造内部可数初等子模型，初等性量化全部内部公式码

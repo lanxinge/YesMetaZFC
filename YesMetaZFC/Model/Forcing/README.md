@@ -17,6 +17,14 @@
 并保持旧无限基数；`not_ch_extension_l` 默认添加 ω₂ 条实数。`ch_independent_l` 与
 `ch_consistency_l` 已把两侧模型接入原推导核，给出 CH 双侧不可证及两侧扩充的一致性。
 
+[弱齐性 OD/HOD 比较](Internal/Homogeneous/README.md) 已从内部自同构作用推进到
+完整 HOD 恢复：背景仅需 ZF，若条件呈现 B、R、z 均为 OD 且弱齐性，则
+`HOD^{M[U]} ⊆ e[HOD^M]`。`whom_hod_comparison_l` 自动构造地嵌入 e，并返回序数相同；
+`whom_hb_comparison_l` 给出 OD[A] 呈现下的固定参数版。
+证明使用有界序数关系编码、旧子集恢复和内部坍塌，允许模型外部非良基；
+[Cohen/HOD](Applications/Cohen/HOD.lean) 已提供实际实例。内模型侧进度见
+[J/L、OD/HOD 总览](../../SetTheory/InnerModel/README.md)。
+
 ## 文献选择
 
 检索与版本核对日期：2026-09-29。下表区分论文发表、预印本修订及工程判断，
@@ -65,7 +73,7 @@
 | [External/FormulaEnumeration](External/FormulaEnumeration.lean) | 复用 `SyntaxNatCoding` 的单射编码及原异质赋值列，证明全部有限参数公式实例可枚举；枚举选择只存在于 Prop 证明中。 |
 | [External/ZFCBase](External/ZFCBase.lean) | 直接核验原外延性、空集、基础公理；当 ω 在实际解释像中时，核验原无穷公理。 |
 | [Applications/Cohen/Theory](Applications/Cohen/Theory.lean) | `cohen_full_extension_l` 一次生成满足全部公式真值、额外稠密族和新实数要求的同一滤子；`cohen_zfc_base_l` 自动给出四条原公理。 |
-| [Internal/Names/Pair](Internal/Names/Pair.lean) | 名称的 Kuratowski 有序对编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
+| [SetTheory/Kuratowski](../../SetTheory/Kuratowski.lean) | 名称与内模型共同使用的 Kuratowski 编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
 | [Internal/Names/Basic](Internal/Names/Basic.lean) | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
 | [Internal/Names/Closure](Internal/Names/Closure.lean) | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
 | [Internal/Names/Graph](Internal/Names/Graph.lean) | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |

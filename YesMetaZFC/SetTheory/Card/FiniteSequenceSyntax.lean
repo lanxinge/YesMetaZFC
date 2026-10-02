@@ -4,7 +4,7 @@ import YesMetaZFC.SetTheory.Ord.FiniteSequenceParsing
 
 /-! # 内部有限序列的统一编号公式
 
-固定字母表单射 Q 和自然数对单射 J。第 n 层给 X^n 编号；后继层把前缀编号
+固定字母表单射 Q 和 κ 内部对单射 J。第 n 层给 X^n 编号；后继层把前缀编号
 与末项编号经 J 合并。各层同时在模型的 ω 上递归，故包含非标准有限长度。
 -/
 
@@ -89,33 +89,33 @@ theorem fseq_at_sat_l (hE : Extensional M) {d} (ρ : Env M d) (X Q J H F z : Ter
     fseq_snoc_sat_l I, Definitional.Term.eval_weaken]
   rfl
 
-def Fseq_step_d (ω X S Q J H K : M.Domain) : Prop :=
+def Fseq_step_d (κ X S Q J H K : M.Domain) : Prop :=
   M.IsSetRelation I K ∧ ∀ F z, M.PairMember I F z K ↔
-    M.mem F S ∧ M.mem z ω ∧ Fseq_at_d I X Q J H F z
+    M.mem F S ∧ M.mem z κ ∧ Fseq_at_d I X Q J H F z
 
-def fseq_step_m {d} (ω X S Q J H K : Term d) : Formula 1 d :=
+def fseq_step_m {d} (κ X S Q J H K : Term d) : Formula 1 d :=
   .conj (Formula.isRelation 𝒞 K) (.forallE (.forallE (.iff
     (Formula.orderedPairMem 𝒞 (.bound 1) .newest K.weaken.weaken) (.conj
-    (.mem (.bound 1) S.weaken.weaken) (.conj (.mem .newest ω.weaken.weaken)
+    (.mem (.bound 1) S.weaken.weaken) (.conj (.mem .newest κ.weaken.weaken)
     (fseq_at_m (𝒞 := 𝒞) X.weaken.weaken Q.weaken.weaken J.weaken.weaken H.weaken.weaken (.bound 1) .newest))))))
 derive_free_closed fseq_step_m
 
-theorem fseq_step_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω X S Q J H K : Term d) :
-    Formula.satisfies ρ (fseq_step_m (𝒞 := 𝒞) ω X S Q J H K) ↔
-      Fseq_step_d I (ω.eval ρ) (X.eval ρ) (S.eval ρ) (Q.eval ρ) (J.eval ρ) (H.eval ρ) (K.eval ρ) := by
+theorem fseq_step_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ X S Q J H K : Term d) :
+    Formula.satisfies ρ (fseq_step_m (𝒞 := 𝒞) κ X S Q J H K) ↔
+      Fseq_step_d I (κ.eval ρ) (X.eval ρ) (S.eval ρ) (Q.eval ρ) (J.eval ρ) (H.eval ρ) (K.eval ρ) := by
   simp only [fseq_step_m, Fseq_step_d, Formula.satisfies_conj_iff, Formula.satisfies_isRelation_iff I,
     Formula.satisfies_forall_iff, Formula.satisfies_iff_iff, Formula.satisfies_orderedPairMem_iff I,
     Formula.satisfies_mem_iff, fseq_at_sat_l I hE, Definitional.Term.eval_weaken]
   rfl
 
-def fseq_env_l (ω X S Q J : M.Domain) : Env M 5 :=
-  ⟨Fin.cases J (Fin.cases Q (Fin.cases S (Fin.cases X (fun _ => ω)))), fun _ => ω⟩
+def fseq_env_l (κ X S Q J : M.Domain) : Env M 5 :=
+  ⟨Fin.cases J (Fin.cases Q (Fin.cases S (Fin.cases X (fun _ => κ)))), fun _ => κ⟩
 
 def fseq_step_s : BinarySchema 5 where
   body := fseq_step_m (𝒞 := 𝒞) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest
 
-theorem fseq_op_l (hE : Extensional M) (ω X S Q J : M.Domain) :
-    (fseq_step_s (𝒞 := 𝒞)).denote (fseq_env_l ω X S Q J) = Fseq_step_d I ω X S Q J := by
+theorem fseq_op_l (hE : Extensional M) (κ X S Q J : M.Domain) :
+    (fseq_step_s (𝒞 := 𝒞)).denote (fseq_env_l κ X S Q J) = Fseq_step_d I κ X S Q J := by
   funext H K
   apply propext
   exact fseq_step_sat_l I hE _ _ _ _ _ _ _ _

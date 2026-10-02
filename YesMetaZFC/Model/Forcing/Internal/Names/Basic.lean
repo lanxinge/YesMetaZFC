@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.Pair
+import YesMetaZFC.SetTheory.Kuratowski
 
 /-! # 地模型内部的名称谓词
 

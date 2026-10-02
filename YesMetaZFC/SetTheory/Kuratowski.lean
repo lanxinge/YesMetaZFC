@@ -1,14 +1,13 @@
 import YesMetaZFC.SetTheory.SetConstruction
 
-/-! # 内部名称的有序对编码
+/-! # 模型内部的 Kuratowski 有序对
 
-名称采用 Kuratowski 对 {{a},{a,b}}。左坐标沿三条成员边下降到包含该对的名称，
-因此地模型的外部良基性足以解释名称。编码接入已有 OrderedPairConvention，
-不更改其他模块的平坦有序对约定。
+采用 {{a},{a,b}}，编码解释只需外延性与配对。成员路径、坐标单射及原公式
+供 rudimentary 运算和内部名称共同使用；不要求模型外部良基。
 -/
 
-namespace YesMetaZFC.Model.Forcing.Internal
-open SetTheory SetTheory.Definitional.Project
+namespace YesMetaZFC.SetTheory
+open Definitional.Project
 universe u
 variable (M : SetTheory.Structure.{u})
 
@@ -99,4 +98,4 @@ theorem kpair_descent_l {p a b t} (h : KPair_d M p a b) (hp : M.mem p t) :
   obtain ⟨s, v, hs, _, hv⟩ := h
   exact .tail (.tail (.single ((hs a).mpr rfl)) ((hv s).mpr (Or.inl rfl))) hp
 
-end YesMetaZFC.Model.Forcing.Internal
+end YesMetaZFC.SetTheory

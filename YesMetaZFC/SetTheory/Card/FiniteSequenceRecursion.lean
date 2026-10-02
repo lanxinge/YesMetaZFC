@@ -37,14 +37,14 @@ theorem fseq_space_exists_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (X : M
   exact (hD p).mpr ⟨i, hω.transitive hZF n hn i (hF.input_mem_of_pairMember hi),
     x, hF.output_mem_of_pairMember hi, hc⟩
 
-theorem fseq_step_exists_l (hZF : M.Models ZF) (ω X S Q J H : M.Domain) :
-    ∃ K, Fseq_step_d I ω X S Q J H K := by
-  obtain ⟨U, hU⟩ := KP.exists_unionOfTwo (modelsKP hZF) S ω
-  let ρ := (fseq_env_l ω X S Q J).push H
+theorem fseq_step_exists_l (hZF : M.Models ZF) (κ X S Q J H : M.Domain) :
+    ∃ K, Fseq_step_d I κ X S Q J H K := by
+  obtain ⟨U, hU⟩ := KP.exists_unionOfTwo (modelsKP hZF) S κ
+  let ρ := (fseq_env_l κ X S Q J).push H
   let φ : BinarySchema 6 := {
     body := .conj (.mem (.bound 1) (.bound 5)) (.conj (.mem .newest (.bound 7))
       (fseq_at_m (𝒞 := 𝒞) (.bound 6) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest)) }
-  have hφ F z : φ.denote ρ F z ↔ M.mem F S ∧ M.mem z ω ∧ Fseq_at_d I X Q J H F z := by
+  have hφ F z : φ.denote ρ F z ↔ M.mem F S ∧ M.mem z κ ∧ Fseq_at_d I X Q J H F z := by
     simp only [BinarySchema.denote, φ, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
       fseq_at_sat_l I hZF.1]
     rfl
@@ -54,16 +54,16 @@ theorem fseq_step_exists_l (hZF : M.Models ZF) (ω X S Q J H : M.Domain) :
     ⟨(hU F).mpr (Or.inl h.1), (hU z).mpr (Or.inr h.2.1), (hφ F z).mpr h⟩⟩
 
 /-- 全部编号层统一来自一条实际 ω 递归，尚不预设编号性质。 -/
-theorem fseq_recursion_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (X S Q J : M.Domain) :
-    ∃ H, M.IsRecursiveSequence I (Fseq_step_d I ω X S Q J) H ω := by
-  have ho := fseq_op_l I hZF.1 ω X S Q J
-  have hc : M.IsClassFunctionOnTransfiniteSequences I ((fseq_step_s (𝒞 := 𝒞)).denote (fseq_env_l ω X S Q J)) := by
+theorem fseq_recursion_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (κ X S Q J : M.Domain) :
+    ∃ H, M.IsRecursiveSequence I (Fseq_step_d I κ X S Q J) H ω := by
+  have ho := fseq_op_l I hZF.1 κ X S Q J
+  have hc : M.IsClassFunctionOnTransfiniteSequences I ((fseq_step_s (𝒞 := 𝒞)).denote (fseq_env_l κ X S Q J)) := by
     rw [ho]
     intro P _
-    obtain ⟨K, hK⟩ := fseq_step_exists_l I hZF ω X S Q J P
+    obtain ⟨K, hK⟩ := fseq_step_exists_l I hZF κ X S Q J P
     exact ⟨K, hK, fun L hL => hL.1.eq_of_pairMember_iff hZF.1 hK.1
       (fun F z => (hL.2 F z).trans (hK.2 F z).symm)⟩
-  obtain ⟨H, hH⟩ := recursiveSequence_exists hZF I (fseq_env_l ω X S Q J) (fseq_step_s (𝒞 := 𝒞)) hc (hω.isOrdinal hZF)
+  obtain ⟨H, hH⟩ := recursiveSequence_exists hZF I (fseq_env_l κ X S Q J) (fseq_step_s (𝒞 := 𝒞)) hc (hω.isOrdinal hZF)
   exact ⟨H, by simpa only [ho] using hH⟩
 
 end ZF

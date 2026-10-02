@@ -1,8 +1,8 @@
 import YesMetaZFC.SetTheory.Card.FiniteSequenceNumbering
 
-/-! # ZF 中可数字母表的全部有限序列仍可数
+/-! # ZF 中内部有限序列的无限基数界
 
-一条内部 ω 递归统一给出每层单射，最终编号为 (长度,层内编号) 的自然数配对。
+一条内部 ω 递归统一给出每层单射，最终编号为 (长度,层内编号) 的κ 内部配对。
 没有逐层任选枚举，也没有把可数选择藏在可数并定理中。
 -/
 
@@ -11,15 +11,18 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-/-- 全部内部有限序列具有一个模型内自然数编号；只用原 ZF。 -/
-theorem countable_fseq_l (hZF : M.Models ZF) {ω X S} (hω : M.IsOmega ω)
-    (hX : M.CardinalLessOrEqual I X ω) (hS : Fseq_space_d I ω X S) : M.CardinalLessOrEqual I S ω := by
+/-- κ 小字母表的全部内部有限序列仍为 κ 小；包括非标准有限长度。 -/
+theorem fseq_bound_l (hZF : M.Models ZF) {ω κ X S} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
+    (hX : M.CardinalLessOrEqual I X κ) (hS : Fseq_space_d I ω X S) : M.CardinalLessOrEqual I S κ := by
+  have hωκ := hω.subset_limitOrdinal hZF
+    (infiniteCardinal_isLimitOrdinal hZF I hω (omega_cardinal_l I hZF hω) hκ)
   obtain ⟨Q, hQ⟩ := hX
-  obtain ⟨W, hW⟩ := exists_cartesianProduct hZF I ω ω
-  obtain ⟨T, hT⟩ := exists_identityBijection hZF I ω
-  obtain ⟨J, hJ⟩ := countable_product_l I hZF hω ⟨T, hT.1⟩ ⟨T, hT.1⟩ hW
-  obtain ⟨H, hH⟩ := fseq_recursion_l I hZF hω X S Q J
-  have levels := fseq_numbering_l I hZF hω hS hW hQ hJ hH
+  obtain ⟨W, hW⟩ := exists_cartesianProduct hZF I κ κ
+  obtain ⟨T, hT⟩ := exists_identityBijection hZF I κ
+  obtain ⟨J, hJ⟩ := infinite_product_l I hZF hω hκ ⟨T, hT.1⟩ ⟨T, hT.1⟩ hW
+  obtain ⟨H, hH⟩ := fseq_recursion_l I hZF hω κ X S Q J
+  have levels := fseq_numbering_l I hZF hω hωκ hS hW hQ hJ hH
   let ρ : Env M 4 := (((⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push X).push H).push J
   let φ : BinarySchema 4 := {
     body := .existsE (.existsE (.existsE (.existsE (.conj (.mem (.bound 3) (.bound 9)) (.conj
@@ -42,7 +45,7 @@ theorem countable_fseq_l (hZF : M.Models ZF) {ω X S} (hω : M.IsOmega ω)
     obtain ⟨A, hA, hk⟩ := levels n hn K hK
     obtain ⟨t, ht, hFt⟩ := hk.1.2.2 F ((hA F).mpr hf)
     obtain ⟨p, hp⟩ := I.total n t
-    obtain ⟨z, _, hz⟩ := hJ.1.2.2 p ((hW p).mpr ⟨n, hn, t, ht, hp⟩)
+    obtain ⟨z, _, hz⟩ := hJ.1.2.2 p ((hW p).mpr ⟨n, hωκ n hn, t, ht, hp⟩)
     exact ⟨z, (hφ F z).mpr ⟨n, K, t, p, hn, hf, hK, hFt, hp, hz⟩⟩
   · intro F _ z w hz hw
     obtain ⟨n, K, t, p, hn, hf, hK, hFt, hp, hz⟩ := (hφ F z).mp hz
@@ -72,6 +75,12 @@ theorem countable_fseq_l (hZF : M.Models ZF) {ω X S} (hω : M.IsOmega ω)
     subst L
     obtain ⟨A, _, hk⟩ := levels n hn K hK
     exact hk.2 F G t hFt hGs
+
+/-- 可数性是无限基数界的 ω 实例；沿用同一个内部递归编号。 -/
+theorem countable_fseq_l (hZF : M.Models ZF) {ω X S} (hω : M.IsOmega ω)
+    (hX : M.CardinalLessOrEqual I X ω) (hS : Fseq_space_d I ω X S) : M.CardinalLessOrEqual I S ω := by
+  obtain ⟨T, hT⟩ := exists_identityBijection hZF I ω
+  exact fseq_bound_l I hZF hω ⟨omega_cardinal_l I hZF hω, T, hT.1⟩ hX hS
 
 /-- 从一个内部可数字母表直接装配有限序列全集及其内部单射。 -/
 theorem fseq_countable_space_l (hZF : M.Models ZF) {ω X} (hω : M.IsOmega ω)
