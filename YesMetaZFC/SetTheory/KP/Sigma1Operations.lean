@@ -1,4 +1,6 @@
 import YesMetaZFC.SetTheory.KP.Sigma1
+import YesMetaZFC.SetTheory.KP.Kuratowski
+import YesMetaZFC.SetTheory.KP.Finite
 
 /-! # Σ₁ 正规形的复合与集合像
 
@@ -8,6 +10,36 @@ import YesMetaZFC.SetTheory.KP.Sigma1
 namespace YesMetaZFC.SetTheory.Definitional.Project
 universe u
 variable {M : Structure.{u}}
+
+/-- 对同一输入的两个 Σ₁ 输出作实际 Kuratowski 配对。 -/
+def S1_binary.pair {n} (φ ψ : S1_binary n) : S1_binary n where
+  matrix := {
+    body := Formula.existsMem .newest (Formula.existsMem (.bound 1) (Formula.existsMem (.bound 2)
+      (Formula.existsMem (.bound 3) (.conj
+        (φ.matrix_m (fun i => .bound ⟨i.val + 7, by omega⟩) (.bound 6) (.bound 3) (.bound 1))
+        (.conj (ψ.matrix_m (fun i => .bound ⟨i.val + 7, by omega⟩) (.bound 6) (.bound 2) .newest)
+          (kpair0_m (.bound 5) (.bound 3) (.bound 2)))))))
+    freeClosed := by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]
+    delta0 := .existsMem _ (.existsMem _ (.existsMem _ (.existsMem _
+      (.conj (φ.matrix.delta0.bind_l _) (.conj (ψ.matrix.delta0.bind_l _) (kpair0_delta_l ..)))))) }
+
+theorem S1_binary.pair_sat_l (hKP : M.Models KP) {n} (φ ψ : S1_binary n) (ρ : Env M n) (x p : M.Domain) :
+    (φ.pair ψ).schema.denote ρ x p ↔ ∃ a b, φ.schema.denote ρ x a ∧ ψ.schema.denote ρ x b ∧ KPair_d M p a b := by
+  rw [S1_binary.sat_l]
+  simp only [S1_binary.pair, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
+    S1_binary.matrix_sat_l, kpair0_sat_l hKP.1]
+  change (∃ T a, M.mem a T ∧ ∃ b, M.mem b T ∧ ∃ w, M.mem w T ∧ ∃ v, M.mem v T ∧
+    φ.matrix_binary.toBinarySchema.denote (ρ.push x) a w ∧
+    ψ.matrix_binary.toBinarySchema.denote (ρ.push x) b v ∧ KPair_d M p a b) ↔ _
+  constructor
+  · rintro ⟨_, a, _, b, _, w, _, v, _, hw, hv, hp⟩
+    exact ⟨a, b, (φ.sat_l ρ x a).mpr ⟨w, hw⟩, (ψ.sat_l ρ x b).mpr ⟨v, hv⟩, hp⟩
+  · rintro ⟨a, b, ha, hb, hp⟩
+    obtain ⟨w, hw⟩ := (φ.sat_l ρ x a).mp ha
+    obtain ⟨v, hv⟩ := (ψ.sat_l ρ x b).mp hb
+    obtain ⟨T, ht⟩ := kp_finite_cover_l hKP [a, b, w, v]
+    exact ⟨T, a, (ht a (by simp)).2, b, (ht b (by simp)).2,
+      w, (ht w (by simp)).2, v, (ht v (by simp)).2, hw, hv, hp⟩
 
 def S1_binary.comp {n} (φ ψ : S1_binary n) : S1_binary n where
   matrix := {

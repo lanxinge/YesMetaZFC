@@ -10,6 +10,14 @@ variable {M : Structure.{u}}
 def Rd_closed_d (D : M.Domain) : Prop := ∀ k a b c, M.mem a D → M.mem b D → M.mem c D →
   ∀ t, Rd_fun_d k a b c t → M.mem t D
 
+def rd_closed_m {n} (C : Term n) : Formula 1 n := rd_step_m C C
+derive_free_closed rd_closed_m
+theorem rd_closed_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (C : Term n) :
+    Formula.satisfies ρ (rd_closed_m C) ↔ Rd_closed_d (C.eval ρ) := by
+  rw [rd_closed_m, rd_step_sat_l hKP]
+  exact ⟨fun h k a b c ha hb hc t ht => (h t).mpr (Or.inr ⟨k, a, b, c, ha, hb, hc, ht⟩),
+    fun h t => ⟨Or.inl, fun ht => ht.elim id (fun ⟨k, a, b, c, ha, hb, hc, ht⟩ => h k a b c ha hb hc t ht)⟩⟩
+
 theorem rd_iter_le_l (hM : M.Models KPi) {U D a Y : M.Domain}
     (hd : Rd_closed_d D) (hu : M.MemberSubset U D) (hy : Rd_iter_d U a Y) : M.MemberSubset Y D := by
   obtain ⟨hKP, hi⟩ := KPi.models_iff_l.mp hM

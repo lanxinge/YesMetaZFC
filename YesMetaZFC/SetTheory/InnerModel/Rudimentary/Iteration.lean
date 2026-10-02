@@ -14,22 +14,6 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}}
 
-def join0_m {n} (H U V : Term n) : Formula 1 n :=
-  .conj (Formula.subset U H) (.conj (Formula.subset V H)
-    (Formula.forallMem H (.disj (.mem .newest U.weaken) (.mem .newest V.weaken))))
-derive_free_closed join0_m
-
-theorem join0_delta_l {n} (H U V : Term n) : (join0_m H U V).IsDelta0 :=
-  .conj (.atom _ _ _) (.conj (.atom _ _ _) (.forallMem _ (.disj (.mem _ _) (.mem _ _))))
-
-theorem join0_sat_l {n} (ρ : Env M n) (H U V : Term n) :
-    Formula.satisfies ρ (join0_m H U V) ↔ M.IsUnionOfTwo (H.eval ρ) (U.eval ρ) (V.eval ρ) := by
-  simp only [join0_m, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
-    Formula.satisfies_forallMem_iff, Formula.satisfies_disj_iff, Formula.satisfies_mem_iff,
-    Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
-  exact ⟨fun ⟨hu, hv, h⟩ t => ⟨h t, fun ht => ht.elim (hu t) (hv t)⟩,
-    fun h => ⟨fun t ht => (h t).mpr (Or.inl ht), fun t ht => (h t).mpr (Or.inr ht), fun t => (h t).mp⟩⟩
-
 def rd_iter_op_s : S1_binary 1 where
   matrix := {
     body := Formula.existsMem .newest (Formula.existsMem (.bound 1) (Formula.existsMem (.bound 2)

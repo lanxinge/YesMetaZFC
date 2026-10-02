@@ -19,40 +19,67 @@ def rw_successor_s : S1_binary 2 where
       Formula.existsMem (.bound 3) <| Formula.existsMem (.bound 4) <|
         .conj (pair0_m (.bound 1) (.bound 7) (.bound 7)) <|
           .conj (Formula.forallMem .newest .falsum) <|
-            .conj (rw_union_m (.bound 4) (.bound 7) (.bound 1)) <|
+            .conj (join0_m (.bound 4) (.bound 7) (.bound 1)) <|
               .conj (rw_table_m rw_append_s (.bound 7) (.bound 8) .newest (.bound 4) (.bound 3)) <|
                 .conj (rw_domain_m (.bound 4) (.bound 2)) <|
                   rw_fold_cert_m rd_menu_l (.bound 5) (.bound 4) (.bound 3) (.bound 2)
                     (.bound 4) (.bound 3) (.bound 6) (.bound 9)
     freeClosed := by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]
     delta0 := .existsMem _ (.existsMem _ (.existsMem _ (.existsMem _ (.existsMem _
-      (.conj (pair0_delta_l ..) (.conj (.forallMem _ .falsum) (.conj (rw_union_delta_l ..)
+      (.conj (pair0_delta_l ..) (.conj (.forallMem _ .falsum) (.conj (join0_delta_l ..)
         (.conj (rw_table_delta_l ..) (.conj (rw_domain_delta_l ..) (rw_fold_cert_delta_l ..)))))))))) }
+
+def Rw_successor_cert_d (B U R V S : M.Domain) : Prop :=
+  ∃ A, M.mem A B ∧ ∃ Q, M.mem Q B ∧ ∃ P, M.mem P B ∧ ∃ Y, M.mem Y B ∧ ∃ E, M.mem E B ∧
+    Pair_d M Y U U ∧ (∀ x, ¬ M.mem x E) ∧ M.IsUnionOfTwo A U Y ∧ Rw_rel_d (Rw_append_d U R E) A Q ∧
+    Rw_domain_d A P ∧ Rw_fold_cert_d rd_menu_l B A Q P A Q V S
+
+theorem rw_successor_matrix_l (hKP : M.Models KP) (ρ : Env M 2) (U V B : M.Domain) :
+    Formula.satisfies (((ρ.push U).push V).push B) rw_successor_s.matrix.body ↔
+      Rw_successor_cert_d B U (ρ.bound 0) V (ρ.bound 1) := by
+  let η A Q P Y E := ((((((((ρ.push U).push V).push B).push A).push Q).push P).push Y).push E)
+  have fold A Q P Y E (hp : Rw_domain_d A P) :
+      Formula.satisfies (η A Q P Y E) (rw_fold_cert_m rd_menu_l (.bound 5) (.bound 4) (.bound 3) (.bound 2)
+        (.bound 4) (.bound 3) (.bound 6) (.bound 9)) ↔ Rw_fold_cert_d rd_menu_l B A Q P A Q V (ρ.bound 1) :=
+    rw_fold_cert_sat_l hKP _ _ _ _ _ _ _ _ _ _ hp
+  simp only [rw_successor_s, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, pair0_sat_l hKP.1,
+    Formula.satisfies_forallMem_iff, Formula.satisfies_falsum_iff, join0_sat_l, rw_table_formula_l hKP, rw_domain_sat_l hKP]
+  simp only [Rw_rel_d, rw_append_sat_l hKP.1]
+  change (∃ A, M.mem A B ∧ ∃ Q, M.mem Q B ∧ ∃ P, M.mem P B ∧ ∃ Y, M.mem Y B ∧ ∃ E, M.mem E B ∧
+    Pair_d M Y U U ∧ (∀ x, M.mem x E → False) ∧ M.IsUnionOfTwo A U Y ∧ Rw_rel_d (Rw_append_d U (ρ.bound 0) E) A Q ∧
+    Rw_domain_d A P ∧ Formula.satisfies (η A Q P Y E) (rw_fold_cert_m rd_menu_l (.bound 5) (.bound 4) (.bound 3) (.bound 2)
+      (.bound 4) (.bound 3) (.bound 6) (.bound 9))) ↔ _
+  constructor
+  · rintro ⟨A, haB, Q, hqB, P, hpB, Y, hyB, E, heB, hy, he, ha, hq, hp, hf⟩
+    exact ⟨A, haB, Q, hqB, P, hpB, Y, hyB, E, heB, hy, he, ha, hq, hp, (fold A Q P Y E hp).mp hf⟩
+  · rintro ⟨A, haB, Q, hqB, P, hpB, Y, hyB, E, heB, hy, he, ha, hq, hp, hf⟩
+    exact ⟨A, haB, Q, hqB, P, hpB, Y, hyB, E, heB, hy, he, ha, hq, hp, (fold A Q P Y E hp).mpr hf⟩
+
+theorem rw_successor_cert_sound_l {B U R V S : M.Domain} (h : Rw_successor_cert_d B U R V S) :
+    Rw_successor_d U R V S := by
+  obtain ⟨A, _, Q, _, P, _, Y, _, E, _, hy, he, ha, hq, hp, hf⟩ := h
+  exact ⟨A, Q, ⟨Y, E, hy, he, ha, hq⟩, ⟨P, hp, rw_fold_cert_sound_l hf⟩⟩
+
+theorem rw_successor_matrix_formula_l (hKP : M.Models KP) {n} (ρ : Env M n)
+    (e : Fin 2 → Term n) (U V B : Term n) : Formula.satisfies ρ (rw_successor_s.matrix_m e U V B) ↔
+      Rw_successor_cert_d (B.eval ρ) (U.eval ρ) ((e 0).eval ρ) (V.eval ρ) ((e 1).eval ρ) :=
+  (rw_successor_s.matrix_sat_l ρ e U V B).trans (rw_successor_matrix_l hKP
+    ⟨fun i => (e i).eval ρ, ρ.free⟩ (U.eval ρ) (V.eval ρ) (B.eval ρ))
+
+theorem rw_successor_cert_exists_l (hKP : M.Models KP) {U R V S : M.Domain} (h : Rw_successor_d U R V S) :
+    ∃ B, Rw_successor_cert_d B U R V S := by
+  obtain ⟨A, Q, ⟨Y, E, hy, he, ha, hq⟩, ⟨P, hp, hf⟩⟩ := h
+  obtain ⟨D, hd⟩ := rw_fold_cert_exists_l hKP hf
+  obtain ⟨B, hb⟩ := kp_finite_cover_l hKP [A, Q, P, Y, E, D]
+  exact ⟨B, A, (hb A (by simp)).2, Q, (hb Q (by simp)).2, P, (hb P (by simp)).2,
+    Y, (hb Y (by simp)).2, E, (hb E (by simp)).2, hy, he, ha, hq, hp,
+    rw_fold_cert_mono_l hd (hb D (by simp)).1⟩
 
 theorem rw_successor_sat_l (hKP : M.Models KP) (ρ : Env M 2) (U V : M.Domain) :
     rw_successor_s.schema.denote ρ U V ↔ Rw_successor_d U (ρ.bound 0) V (ρ.bound 1) := by
-  let η B A Q P Y E := ((((((((ρ.push U).push V).push B).push A).push Q).push P).push Y).push E)
-  have fold B A Q P Y E (hp : Rw_domain_d A P) :
-      Formula.satisfies (η B A Q P Y E) (rw_fold_cert_m rd_menu_l (.bound 5) (.bound 4) (.bound 3) (.bound 2)
-        (.bound 4) (.bound 3) (.bound 6) (.bound 9)) ↔ Rw_fold_cert_d rd_menu_l B A Q P A Q V (ρ.bound 1) :=
-    rw_fold_cert_sat_l hKP _ _ _ _ _ _ _ _ _ _ hp
   rw [S1_binary.sat_l]
-  simp only [rw_successor_s, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, pair0_sat_l hKP.1,
-    Formula.satisfies_forallMem_iff, Formula.satisfies_falsum_iff, rw_union_sat_l, rw_table_formula_l hKP, rw_domain_sat_l hKP]
-  simp only [Rw_rel_d, rw_append_sat_l hKP.1]
-  change (∃ B A, M.mem A B ∧ ∃ Q, M.mem Q B ∧ ∃ P, M.mem P B ∧ ∃ Y, M.mem Y B ∧ ∃ E, M.mem E B ∧
-    Pair_d M Y U U ∧ (∀ x, M.mem x E → False) ∧ M.IsUnionOfTwo A U Y ∧ Rw_rel_d (Rw_append_d U (ρ.bound 0) E) A Q ∧
-    Rw_domain_d A P ∧ Formula.satisfies (η B A Q P Y E) (rw_fold_cert_m rd_menu_l (.bound 5) (.bound 4) (.bound 3) (.bound 2)
-      (.bound 4) (.bound 3) (.bound 6) (.bound 9))) ↔ _
-  constructor
-  · rintro ⟨B, A, _, Q, _, P, _, Y, _, E, _, hy, he, ha, hq, hp, hf⟩
-    exact ⟨A, Q, ⟨Y, E, hy, he, ha, hq⟩, ⟨P, hp, rw_fold_cert_sound_l ((fold B A Q P Y E hp).mp hf)⟩⟩
-  · rintro ⟨A, Q, ⟨Y, E, hy, he, ha, hq⟩, ⟨P, hp, hf⟩⟩
-    obtain ⟨D, hd⟩ := rw_fold_cert_exists_l hKP hf
-    obtain ⟨B, hb⟩ := kp_finite_cover_l hKP [A, Q, P, Y, E, D]
-    exact ⟨B, A, (hb A (by simp)).2, Q, (hb Q (by simp)).2, P, (hb P (by simp)).2,
-      Y, (hb Y (by simp)).2, E, (hb E (by simp)).2, hy, he, ha, hq, hp,
-      (fold B A Q P Y E hp).mpr (rw_fold_cert_mono_l hd (hb D (by simp)).1)⟩
+  simp only [rw_successor_matrix_l hKP]
+  exact ⟨fun ⟨_, h⟩ => rw_successor_cert_sound_l h, rw_successor_cert_exists_l hKP⟩
 
 /-- 同一个 Σ₁ 公式在任意 KP 背景上定义唯一的有序微后继。 -/
 theorem rw_successor_defined_l (hKP : M.Models KP) (U R : M.Domain) : ∃ V S,

@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.Rudimentary.FamilyBound
+import YesMetaZFC.SetTheory.InnerModel.Separation.Enclosure
 
 /-! # 一步扩张自身属于 rud 闭包
 
@@ -64,5 +65,18 @@ theorem rd_step_closed_l (hKP : M.Models KP) {C U V : M.Domain} (hC : Rd_closed_
   have hY : Rd_step_d U Y := fun z => (hY z).trans (or_congr Iff.rfl
     ⟨fun ⟨k, _, h⟩ => ⟨k, h⟩, fun ⟨k, h⟩ => ⟨k, rd_menu_mem_l k, h⟩⟩)
   exact rd_step_unique_l hKP.1 hY hv ▸ hYC
+
+theorem rd_fun_enclosed_l (hKP : M.Models KP) {C a b c v : M.Domain} (hC : Rd_closed_d C)
+    (ha : ∃ T, M.mem T C ∧ M.TransitiveSet T ∧ M.mem a T)
+    (hb : ∃ T, M.mem T C ∧ M.TransitiveSet T ∧ M.mem b T)
+    (hc : ∃ T, M.mem T C ∧ M.TransitiveSet T ∧ M.mem c T) {k} (hv : Rd_fun_d k a b c v) :
+    ∃ T, M.mem T C ∧ M.TransitiveSet T ∧ M.mem v T := by
+  obtain ⟨A, hAC, hat, haA⟩ := ha
+  obtain ⟨B, hBC, hbt, ab, hL⟩ := rd_finite_enclosed_l hKP hC hAC hat [b, c] (by
+    intro x hx; simp only [List.mem_cons, List.not_mem_nil, or_false] at hx
+    exact hx.elim (fun h => h ▸ hb) (fun h => h ▸ hc))
+  obtain ⟨T, ht⟩ := rd_step_exists_l hKP B
+  exact ⟨T, rd_step_closed_l hKP hC hBC hbt ht, rd_step_transitive_l hKP.1 hbt ht,
+    (ht v).mpr (Or.inr ⟨k, a, b, c, ab a haA, hL b (by simp), hL c (by simp), hv⟩)⟩
 
 end YesMetaZFC.SetTheory.InnerModel

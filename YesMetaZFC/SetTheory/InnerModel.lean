@@ -2,7 +2,7 @@ import YesMetaZFC.SetTheory.InnerModel.Jensen.ZF.Model
 import YesMetaZFC.SetTheory.InnerModel.Computation.Readback
 import YesMetaZFC.SetTheory.InnerModel.Computation.Library
 import YesMetaZFC.SetTheory.InnerModel.ProofCode
-import YesMetaZFC.SetTheory.InnerModel.Order.Sigma1
+import YesMetaZFC.SetTheory.InnerModel.Order.Uniform
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Definable
 
 /-! # 内模型技术的共同基础
@@ -14,5 +14,6 @@ J 自身满足 KPi，内部层级与背景层级一致，并满足原演绎核�
 J 搜索在 KPi + V=L 中实现互补 Σ₁ 正规形与总布尔计算的双向等价。
 J 构造推导码具有内部语法检查、Σ₁ 求值及覆盖性；精确码初段和唯一最小代表
 产生 L 上无参数 Σ₁ 全局良序及初段函数。良序在 L 上为 Δ₁，与 J 内部解释绝对。
-Jensen 逐层良序的一步构造已有实际 Σ₁ 图及端延拓；整层的统一局部定义尚待证明。
+Jensen 逐层良序由同一无参数 Σ₁ 公式在每个非空 J 层内定义；各层均为其初段。
+完整递归历史的局部存在性已证明，不要求单层满足 KP 或可容许性。
 -/

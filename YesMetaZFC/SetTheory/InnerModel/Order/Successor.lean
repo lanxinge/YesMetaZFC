@@ -85,4 +85,20 @@ theorem rw_successor_correct_l (hKP : M.Models KP) {U R V S : M.Domain}
   obtain ⟨hv, hS, he⟩ := rw_step_correct_l hKP hA.1 (rw_adjoin_bound_l hKP ha) hs
   exact ⟨⟨A, rw_adjoin_carrier_l hKP.1 ha, hv⟩, hS, rw_end_trans_l hA.2 he⟩
 
+theorem rw_adjoin_transitive_l (hE : Extensional M) {U R A Q : M.Domain}
+    (hu : M.TransitiveSet U) (h : Rw_adjoin_d U R A Q) : M.TransitiveSet A := by
+  have hs := rw_adjoin_carrier_l hE h
+  intro x hx y hy
+  exact (hs y).mpr (Or.inl (((hs x).mp hx).elim (fun hx => hu x hx y hy)
+    (fun he => hE.eq_of_same_members x U he ▸ hy)))
+
+theorem rw_successor_transitive_l (hKP : M.Models KP) {U R V S : M.Domain}
+    (hu : M.TransitiveSet U) (h : Rw_successor_d U R V S) : M.TransitiveSet V := by
+  obtain ⟨A, Q, ha, hs⟩ := h
+  exact rd_step_transitive_l hKP.1 (rw_adjoin_transitive_l hKP.1 hu ha) (rw_step_carrier_l hKP hs)
+
+theorem rw_successor_bounded_l {U R V S : M.Domain} (h : Rw_successor_d U R V S) : Rw_bound_d V S := by
+  obtain ⟨A, Q, ⟨_, _, _, _, _, hq⟩, ⟨_, _, hf⟩⟩ := h
+  exact rw_fold_bounded_l hq.bounded_l hf
+
 end YesMetaZFC.SetTheory.InnerModel

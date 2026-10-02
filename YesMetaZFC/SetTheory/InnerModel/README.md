@@ -173,9 +173,7 @@ def cp_product_l : Cp_code 2 := setfn! (x, y) {
 `lo_universe_s` 是已证明的目标句子，没有作为新增公理加入理论。
 这些良序结论均按模型内部集合解释，不声称非标准模型的关系外部良基。
 
-## 尚未完成
-
-### J 层的统一局部 Σ₁ 定义：进行中
+## J 层的统一局部 Σ₁ 定义
 
 逐层构造采用 `S(U)=s(U∪{U})`：保留旧序，按固定 rud 运算菜单、输入三元组的
 字典最小原像依次追加新对象。原 `lo_*` 的 L 并类绝对性不直接给出小 J 层中的局部性。
@@ -187,11 +185,27 @@ def cp_product_l : Cp_code 2 := setfn! (x, y) {
 | [Rudimentary/SetImage](Rudimentary/SetImage.lean) 的 `rd_step_closed_l` | 传递 U 属于有限基闭包 C 时，整个 s(U) 属于 C；未假定 C 满足 KP |
 | `rw_successor_carrier_closed_l` | 微后继载体自身属于同一个 rud 闭包 |
 | [Jensen/Definable](Jensen/Definable.lean) 的 `jh_definable_l` | 任意原公式在非空 Jₐ 内定义的子集属于 Jₐ₊₁；不要求 Jₐ 可容许 |
+| [Order/Coherence](Order/Coherence.lean) 的 `js_coherence_l`、`js_end_l` | 有序微层级的内部递归、各层实际良序及端延拓 |
+| [Order/LocalSuccessor](Order/LocalSuccessor.lean) 的 `rw_successor_absolute_l` | 规范微后继的同一 Σ₁ 公式在传递 rud 闭包中的局部解释 |
+| [Order/HistoryLocal](Order/HistoryLocal.lean) 的 `js_state_in_l` | 若微层 Sᵦ 本身属于传递 rud 闭包 C，则其完整递归证书也属于 C |
+| [Order/Access](Order/Access.lean) 的 `js_cut_l` | 以有界可见历史收集真实序数截口，识别由较早微层覆盖的闭包 |
+| [Order/Macro](Order/Macro.lean) 的 `jh_order_rep_l` | 原宏观 Jₐ 是同一有序微层级中的实际一层，不增设索引对应假设 |
+| [Order/Uniform](Order/Uniform.lean) 的 `jh_local_sigma1_l` | 固定无参数 Σ₁ 公式 `js_less_s` 在每个非空 Jₐ 内定义 `Js_lt_d` 的限制 |
+| `jh_local_wellorder_l`、`jh_order_initial_l` | 合并实际集合编码良序与层内定义，并证明各 Jₐ 都是全局序的初段 |
 
 公共真值表现在支持坐标映射；原 Δ₀ 分离直接复用完整定义集构造。
 上述接口允许背景模型外部非标准、非良基，所有存在性均以集合关系证明。
-仍需证明序关系和构造证书的局部封闭性，完成有序微层级的内部递归，识别当前宏观
-J 索引，并证明每个 J 层容纳所需短历史；统一局部 Σ₁ 良序及跨层一致性尚未完成。
+完整局部定理只要求背景满足 KPi；不要求 Jₐ 本身满足 KP、可容许性或收集模式。
+对所有 x,y∈Jₐ，同一个无参数公式满足
+`Jₐ ⊨ js_less_s(x,y) ↔ Js_lt_d(x,y)`。因此不同层在共同对象上的比较自动一致。
+J₀ 的空良序也已包括在 `jh_local_wellorder_l` 中；非空条件仅用于建立仓库的非空结构载体。
+
+极限阶段使用 Δ₀ 查询精确收集可见的短历史，重用较早层作为所有旧见证的共同界。
+宏观层的识别通过最小 rud 闭包和序数截口证明，没有假设微层与原层级的等价性。
+`Js_lt_d` 是逐层端延拓得到的 Jensen 序；上节 `lo_*` 是最小构造码名序。
+两者各有已证接口，当前没有声称这两个关系逐点相同。
+
+## 尚未完成
 
 一般 Levy Σ₁ 归一化及通用 DSL 内部非标准程序码的统一解释器尚未实现；上节 J 内部推导码、
 精确初段、最小代表及目标全局良序已经实现。当前总搜索等价及全局良序使用 KPi + V=L；

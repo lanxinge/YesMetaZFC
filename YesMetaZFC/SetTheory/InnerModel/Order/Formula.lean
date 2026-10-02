@@ -93,16 +93,4 @@ theorem rw_table_formula_l (hKP : M.Models KP) {n} (ρ : Env M n) (φ : Delta0Bi
       (φ.toBinarySchema.denote ⟨fun i => (if i.val = 0 then a else if i.val = 1 then b else c).eval ρ, ρ.free⟩) (X.eval ρ) (S.eval ρ) := by
   rw [rw_table_m, binary_pred_sat_l, rw_table_sat_l hKP]
 
-def rw_union_m {n} (V A B : Term n) : Formula 1 n := .conj (Formula.subset A V)
-  (.conj (Formula.subset B V) (Formula.forallMem V (.disj (.mem .newest A.weaken) (.mem .newest B.weaken))))
-derive_free_closed rw_union_m
-theorem rw_union_delta_l {n} (V A B : Term n) : (rw_union_m V A B).IsDelta0 :=
-  .conj (.atom _ _ _) (.conj (.atom _ _ _) (.forallMem _ (.disj (.mem _ _) (.mem _ _))))
-theorem rw_union_sat_l {n} (ρ : Env M n) (V A B : Term n) :
-    Formula.satisfies ρ (rw_union_m V A B) ↔ M.IsUnionOfTwo (V.eval ρ) (A.eval ρ) (B.eval ρ) := by
-  simp only [rw_union_m, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff, Formula.satisfies_forallMem_iff,
-    Formula.satisfies_disj_iff, Formula.satisfies_mem_iff, Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
-  exact ⟨fun ⟨h, g, f⟩ x => ⟨f x, fun hx => hx.elim (h x) (g x)⟩,
-    fun h => ⟨fun x hx => (h x).mpr (Or.inl hx), fun x hx => (h x).mpr (Or.inr hx), fun x => (h x).mp⟩⟩
-
 end YesMetaZFC.SetTheory.InnerModel

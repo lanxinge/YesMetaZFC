@@ -18,12 +18,12 @@ def rw_add_cert_m {n} (k : Rd_sym) (B U R P V S W T : Term n) : Formula 1 n :=
   Formula.existsMem B (Formula.existsMem B.weaken
     (.conj (rw_image_m k U.weaken.weaken P.weaken.weaken (.bound 1))
       (.conj (rw_table_m (rw_cmp_s k) U.weaken.weaken R.weaken.weaken P.weaken.weaken (.bound 1) .newest)
-        (.conj (rw_union_m W.weaken.weaken V.weaken.weaken (.bound 1))
+        (.conj (join0_m W.weaken.weaken V.weaken.weaken (.bound 1))
           (rw_table_m rw_append_s V.weaken.weaken S.weaken.weaken .newest W.weaken.weaken T.weaken.weaken)))))
 derive_free_closed rw_add_cert_m
 theorem rw_add_cert_delta_l {n} (k : Rd_sym) (B U R P V S W T : Term n) :
     (rw_add_cert_m k B U R P V S W T).IsDelta0 := .existsMem _ (.existsMem _
-      (.conj (rw_image_delta_l ..) (.conj (rw_table_delta_l ..) (.conj (rw_union_delta_l ..) (rw_table_delta_l ..)))))
+      (.conj (rw_image_delta_l ..) (.conj (rw_table_delta_l ..) (.conj (join0_delta_l ..) (rw_table_delta_l ..)))))
 theorem rw_add_cert_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (k : Rd_sym) (B U R P V S W T : Term n)
     (hp : Rw_domain_d (U.eval ρ) (P.eval ρ)) : Formula.satisfies ρ (rw_add_cert_m k B U R P V S W T) ↔
       Rw_add_cert_d k (B.eval ρ) (U.eval ρ) (R.eval ρ) (P.eval ρ) (V.eval ρ) (S.eval ρ) (W.eval ρ) (T.eval ρ) := by
@@ -32,7 +32,7 @@ theorem rw_add_cert_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (k : Rd_sym) (B
   apply exists_congr; intro Q; apply and_congr_right; intro _
   have hp' : Rw_domain_d (U.weaken.weaken.eval ((ρ.push Y).push Q))
       (P.weaken.weaken.eval ((ρ.push Y).push Q)) := by simpa only [Definitional.Term.eval_weaken] using hp
-  simp only [Formula.satisfies_conj_iff, rw_image_sat_l hKP _ k _ _ _ hp', rw_table_formula_l hKP, rw_union_sat_l,
+  simp only [Formula.satisfies_conj_iff, rw_image_sat_l hKP _ k _ _ _ hp', rw_table_formula_l hKP, join0_sat_l,
     Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
   simp only [Rw_rel_d, rw_cmp_sat_l hKP, rw_append_sat_l hKP.1]
   simp -implicitDefEqProofs [Definitional.Term.eval_weaken]; rfl

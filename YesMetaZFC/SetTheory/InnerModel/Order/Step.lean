@@ -104,6 +104,14 @@ theorem rw_fold_correct_l (hKP : M.Models KP) {L U R P V S W T}
     exact ⟨hw, rw_end_trans_l hA.2 he⟩
 
 def Rw_step_d (U R V S : M.Domain) : Prop := ∃ P, Rw_domain_d U P ∧ Rw_fold_d rd_menu_l U R P U R V S
+
+theorem rw_fold_bounded_l {L : List Rd_sym} {U R P V S W T : M.Domain}
+    (hb : Rw_bound_d V S) (h : Rw_fold_d L U R P V S W T) : Rw_bound_d W T := by
+  induction L generalizing V S with
+  | nil => exact h.1.symm ▸ h.2.symm ▸ hb
+  | cons k L ih =>
+    obtain ⟨A, Q, ⟨Y, Z, _, _, _, hq⟩, hf⟩ := h
+    exact ih hq.bounded_l hf
 theorem rw_step_exists_l (hKP : M.Models KP) (U R : M.Domain) : ∃ V S, Rw_step_d U R V S := by
   obtain ⟨P, hp⟩ := rd_triples_exists_l hKP U U U
   obtain ⟨V, S, hs⟩ := rw_fold_exists_l hKP rd_menu_l (R := R) hp U R
