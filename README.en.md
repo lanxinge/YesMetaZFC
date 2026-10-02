@@ -50,6 +50,18 @@ silently identified with KP. Square brackets allow the whole set A as a fixed pa
 round brackets additionally allow internally finite sequences from A. Relativized L[A]
 and stronger complexity results for OD code and order graphs remain to be formalized.
 
+## Descriptive set theory foundations
+
+[Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) constructs Baire and Cantor spaces
+and their internal topologies in arbitrary ZF models. It includes nonstandard finite
+prefixes, infinite extensions, actual countable clopen bases, Hausdorff separation,
+and the absence of isolated points. Cantor is a closed nowhere dense subspace of Baire,
+with a bijection to the internal power set of ω. A prefix ultrametric with canonical
+rational codes is constructed, and both spaces are internally complete. Cantor is
+compact; an explicit Baire open cover has no internal finite subcover. These results
+use ZF, with object formulas and semantic correspondence proofs. The Borel/projective
+hierarchies remain to be implemented.
+
 ## Explore the infrastructure
 
 The independent arithmetic library provides Q, PA, and Z₂ axiom schemas and derivations,

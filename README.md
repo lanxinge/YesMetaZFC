@@ -31,6 +31,14 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
 集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
 
+## 描述集合论基础
+
+[Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) 在任意 ZF 模型内构造 Baire、Cantor
+空间及其拓扑，包含非标准有限前缀、无限延拓、实际可数开闭基、Hausdorff 分离和无孤立点。
+Cantor 是 Baire 的闭且无处稠密子空间，并与内部自然数幂集等势。规范有理数码的前缀
+超度量已实际构造，两空间内部完备；Cantor 紧致，Baire 有具体的无有限子覆盖开覆盖。
+这些结论只用 ZF，定义均有原公式及语义对应。Borel／射影层次尚未实现。
+
 ## 算术理论
 
 独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
