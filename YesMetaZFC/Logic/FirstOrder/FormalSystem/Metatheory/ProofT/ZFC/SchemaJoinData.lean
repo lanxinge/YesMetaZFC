@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaTable
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaClosure
-import YesMetaZFC.Automation.ObjectCodeBounds
-import YesMetaZFC.Automation.ObjectArithmeticTerm
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeBounds
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectArithmeticTerm
 
 /-! # 模式流水线的固定槽位和量词见证界 -/
 namespace YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.SchemaJoin

@@ -1,7 +1,6 @@
 import YesMetaZFC.SetTheory.Card.Properties.Syntax
 import YesMetaZFC.SetTheory.Card.Cofinality.Basic
 import YesMetaZFC.SetTheory.SetConstruction
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 基数基础性质语义
 本层解释不可数、极限、正则、奇异与强极限基数，并整理这些性质的基础投影和互斥性。
@@ -68,7 +67,7 @@ theorem not_regular {ℳ : Structure.{u}}
   intro hRegular
   rcases hSingular.2 with ⟨cf, hcfκ, hCofinality⟩
   have hEq : cf = κ := by
-    prove_auto
+    exact IsCofinality.eq hCofinality hRegular
   subst cf
   exact hRegular.isCardinal.1.wellOrder.linear.irrefl
     κ hcfκ hcfκ
@@ -78,7 +77,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 不可数基数公式与相对 `ω` 的严格序数比较语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isUncountableCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω κ : Term depth) :
@@ -89,7 +88,7 @@ theorem satisfies_isUncountableCardinal_iff
     satisfies_conj_iff, satisfies_mem_iff,
     satisfies_isCardinal_iff 𝕀 hExt]
 /-- 极限基数公式与较小基数无上界的模型内部语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isLimitCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ : Term depth) :
@@ -102,7 +101,7 @@ theorem satisfies_isLimitCardinal_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 正则基数公式与 `cf(κ) = κ` 的模型内部语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isRegularCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ : Term depth) :
@@ -111,7 +110,7 @@ theorem satisfies_isRegularCardinal_iff
   simp only [isRegularCardinal, Structure.IsRegularCardinal,
     satisfies_isCofinality_iff 𝕀 hExt]
 /-- 奇异基数公式与“小于自身的共尾度”语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isSingularCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ : Term depth) :
@@ -123,7 +122,7 @@ theorem satisfies_isSingularCardinal_iff
     satisfies_isCofinality_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 强极限基数公式与所有较小幂集的基数界语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isStrongLimitCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ : Term depth) :

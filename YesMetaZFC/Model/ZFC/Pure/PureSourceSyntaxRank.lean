@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectSyntaxReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectSyntaxReflection
 import YesMetaZFC.Model.ZFC.Pure.PureSourceHornElimination
 
 /-! # 一般语法规则在任意源模型中的秩下降

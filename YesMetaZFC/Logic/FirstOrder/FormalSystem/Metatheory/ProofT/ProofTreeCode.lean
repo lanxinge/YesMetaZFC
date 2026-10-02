@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.NatEncode
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.IntrinsicQuotationDecode
-import YesMetaZFC.Automation.ObjectCodeProjection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeProjection
 
 /-! # 带上下文和结论标注的完整证明树
 

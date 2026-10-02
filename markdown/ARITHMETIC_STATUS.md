@@ -1,5 +1,7 @@
 # 算术子库接口与来源
 
+> 文中旧基点的构建数量、耗时和扫描器结果属于历史证据。当前主项目已移出通用证明器；当前边界与验证见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
+
 Q、PA、Z₂ 核心、内部有限编码和逐程序原始递归表示已经实现。
 本页是接口导航；历史分批记录保留在 Git 历史，扩展边界见 [工作规划](ARITHMETIC_PLAN.md)。
 
@@ -149,7 +151,6 @@ PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规�
 python scripts/lean_cache.py build --native
 python scripts/test_arithmetic_guard.py
 python scripts/check_arithmetic.py
-lake --no-build exe prove_auto_sweep --help
 ```
 
 CI 枚举全部独立模块（包括可选 Provability），随后测试并执行算术公理／数据边界审计。

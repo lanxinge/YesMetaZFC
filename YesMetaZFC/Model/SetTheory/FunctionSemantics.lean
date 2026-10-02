@@ -2,7 +2,6 @@ import YesMetaZFC.SetTheory.Definitional.Project.Order
 import YesMetaZFC.SetTheory.Definitional.Project.Hierarchy
 import YesMetaZFC.SetTheory.Extension
 import YesMetaZFC.Model.SetTheory.OrderSemantics
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 集合编码关系与函数的纸面语义
 有序对公式本身只给出编码语法。`OrderedPairConvention.Interpretation` 明确记录一个模型
@@ -45,25 +44,25 @@ end Project
 end Definitional
 namespace Structure
 /-- 关系集合 `relation` 含有表示 `(left, right)` 的有序对。 -/
-@[prove_auto_norm definition]
+
 def PairMember {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (left right relation : ℳ.Domain) : Prop :=
   ∃ pair, 𝕀.Codes pair left right ∧ ℳ.mem pair relation
 /-- `relation` 的每个成员都编码某个有序对。 -/
-@[prove_auto_norm definition]
+
 def IsSetRelation {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (relation : ℳ.Domain) : Prop :=
   ∀ pair, ℳ.mem pair relation →
     ∃ left right, 𝕀.Codes pair left right
 /-- `relation` 是只连接 `carrier` 中元素的集合编码关系。 -/
-@[prove_auto_norm definition]
+
 def IsSetRelationOn {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (relation carrier : ℳ.Domain) : Prop :=
   IsSetRelation 𝕀 relation ∧
     ∀ left right, PairMember 𝕀 left right relation →
       ℳ.mem left carrier ∧ ℳ.mem right carrier
 /-- `function` 是单值的集合编码关系。 -/
-@[prove_auto_norm definition]
+
 def IsSetFunction {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function : ℳ.Domain) : Prop :=
   IsSetRelation 𝕀 function ∧
@@ -72,13 +71,13 @@ def IsSetFunction {ℳ : Structure.{u}}
       PairMember 𝕀 input second function →
         first = second
 /-- `domain` 正好是 `relation` 的定义域。 -/
-@[prove_auto_norm definition]
+
 def IsDomainOf {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (domain relation : ℳ.Domain) : Prop :=
   ∀ input, ℳ.mem input domain ↔
     ∃ output, PairMember 𝕀 input output relation
 /-- `range` 正好是 `relation` 的值域。 -/
-@[prove_auto_norm definition]
+
 def IsRangeOf {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (range relation : ℳ.Domain) : Prop :=
   ∀ output, ℳ.mem output range ↔
@@ -94,7 +93,6 @@ theorem eq {ℳ : Structure.{u}}
   intro input
   exact (hLeft input).trans (hRight input).symm
 end IsDomainOf
-register_prove_auto_hr_rule IsDomainOf.eq PRIORITY 200
 namespace IsRangeOf
 /-- 同一关系的两个精确值域相等。 -/
 theorem eq {ℳ : Structure.{u}}
@@ -106,9 +104,8 @@ theorem eq {ℳ : Structure.{u}}
   intro output
   exact (hLeft output).trans (hRight output).symm
 end IsRangeOf
-register_prove_auto_hr_rule IsRangeOf.eq PRIORITY 200
 /-- `function` 是从 `source` 到 `target` 的集合编码函数。 -/
-@[prove_auto_norm definition]
+
 def IsSetFunctionFromTo {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function source target : ℳ.Domain) : Prop :=
   IsSetFunction 𝕀 function ∧
@@ -117,7 +114,7 @@ def IsSetFunctionFromTo {ℳ : Structure.{u}}
         ∃ output, ℳ.mem output target ∧
           PairMember 𝕀 input output function
 /-- 集合编码函数在其定义域上是单射。 -/
-@[prove_auto_norm definition]
+
 def IsSetInjective {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function : ℳ.Domain) : Prop :=
   ∀ first second output,
@@ -125,20 +122,20 @@ def IsSetInjective {ℳ : Structure.{u}}
       ℳ.PairMember 𝕀 second output function →
         first = second
 /-- 集合编码函数把 `source` 满射到 `target`。 -/
-@[prove_auto_norm definition]
+
 def IsSetSurjectiveOnto {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function source target : ℳ.Domain) : Prop :=
   ∀ output, ℳ.mem output target →
     ∃ input, ℳ.mem input source ∧
       ℳ.PairMember 𝕀 input output function
 /-- `function` 是从 `source` 到 `target` 的集合编码单射。 -/
-@[prove_auto_norm definition]
+
 def IsSetInjectionFromTo {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function source target : ℳ.Domain) : Prop :=
   ℳ.IsSetFunctionFromTo 𝕀 function source target ∧
     ℳ.IsSetInjective 𝕀 function
 /-- `function` 是从 `source` 到 `target` 的集合编码双射。 -/
-@[prove_auto_norm definition]
+
 def IsSetBijectionFromTo {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (function source target : ℳ.Domain) : Prop :=
   ℳ.IsSetInjectionFromTo 𝕀 function source target ∧
@@ -166,9 +163,8 @@ theorem output_mem_of_pairMember {ℳ : Structure.{u}}
     hFunction.1.2 input output selected hPair hSelectedPair
   simpa [hOutputEq] using hSelectedTarget
 end IsSetFunctionFromTo
-register_prove_auto_hr_rule IsSetFunctionFromTo.input_mem_of_pairMember PRIORITY 200
 /-- `restriction` 正好是 `function` 在 `source` 上的限制。 -/
-@[prove_auto_norm definition]
+
 def IsRestrictionOf {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (restriction function source : ℳ.Domain) : Prop :=
   IsSetRelation 𝕀 restriction ∧
@@ -210,8 +206,6 @@ theorem eq_of_pairMember_iff {ℳ : Structure.{u}}
   · rintro ⟨input, output, hCode, hMember⟩
     exact ⟨input, output, hCode, (hPairs input output).mpr hMember⟩
 end IsSetRelation
-register_prove_auto_hr_rule
-  IsSetRelation.eq_of_pairMember_iff PRIORITY 200
 namespace IsRestrictionOf
 /-- 单值函数的任意限制仍是单值函数。 -/
 theorem isSetFunction {ℳ : Structure.{u}}
@@ -298,20 +292,10 @@ theorem comp_l {ℳ : Structure.{u}} {𝒞 : Definitional.Project.OrderedPairCon
   ⟨h.1, fun i x => (h.2 i x).trans ⟨fun ⟨hi, hx⟩ => ⟨hi, ((k.2 i x).mp hx).2⟩,
     fun ⟨hi, hx⟩ => ⟨hi, (k.2 i x).mpr ⟨hST i hi, hx⟩⟩⟩⟩
 end IsRestrictionOf
-register_prove_auto_hr_rule
-  IsRestrictionOf.isSetFunction PRIORITY 200
-register_prove_auto_hr_rule
-  IsRestrictionOf.isDomainOf PRIORITY 200
-register_prove_auto_hr_rule
-  IsRestrictionOf.isSetFunctionFromTo PRIORITY 200
-register_prove_auto_hr_rule
-  IsRestrictionOf.eq PRIORITY 200
-register_prove_auto_hr_rule
-  IsRestrictionOf.trans PRIORITY 200
 end Structure
 namespace Definitional.Project.Formula
 /-- schema 实例化与参数向量解释出的纸面关系一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_related_iff
     {ℳ : Structure.{u}} {parameterCount depth : Nat} (env : Env ℳ depth) (schema : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (input output : Term depth) :

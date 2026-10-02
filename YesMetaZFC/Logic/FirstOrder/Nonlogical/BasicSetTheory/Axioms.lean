@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.TheoryInclusion
+import YesMetaZFC.Tactic.TheoryInclusion
 import YesMetaZFC.Logic.FirstOrder.Metatheory.Quantifier.Closure
 import YesMetaZFC.Logic.FirstOrder.Nonlogical.BasicSetTheory.Language
 

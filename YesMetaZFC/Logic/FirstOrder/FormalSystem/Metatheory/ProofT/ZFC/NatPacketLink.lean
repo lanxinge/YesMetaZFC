@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectPacketDerives
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPacketDerives
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaClosure
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.NatDecode
 

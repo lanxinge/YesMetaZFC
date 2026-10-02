@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectRangeTable
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectRangeTable
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaRenameInstances
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.IntrinsicKernel
 

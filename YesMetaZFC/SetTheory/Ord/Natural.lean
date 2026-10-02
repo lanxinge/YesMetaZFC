@@ -1,7 +1,6 @@
 import YesMetaZFC.SetTheory.Definitional.Project.FlatPairing
 import YesMetaZFC.SetTheory.Foundation
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Recursion
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 最小归纳集与自然数归纳
 本文件为对象公式 `isInductive`、`isOmega` 补上纸面语义，并从 ZF 的无穷与分离公理
@@ -64,7 +63,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 对象公式中的归纳集定义与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isInductive_iff {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (set : Term depth) :
     satisfies env (isInductive set) ↔
@@ -77,7 +76,7 @@ theorem satisfies_isInductive_iff {ℳ : Structure.{u}}
     Definitional.Term.eval_weaken, Term.eval_bound_zero_push,
     Term.eval_bound_one_push]
 /-- 对象公式中的最小归纳集定义与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isOmega_iff {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (ω : Term depth) :
     satisfies env (isOmega ω) ↔

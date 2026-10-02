@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectHornRanking
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornRanking
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornReflection
 import YesMetaZFC.Model.ZFC.Pure.PureSourceStrongInduction
 import YesMetaZFC.Model.ZFC.Pure.PureSourceSyntaxRank

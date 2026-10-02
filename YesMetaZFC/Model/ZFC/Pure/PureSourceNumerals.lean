@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosser
-import YesMetaZFC.Automation.NaturalProofPresentation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.NaturalProofPresentation
 
 /-! # 任意原模型与其规范重扩张的基础数码对应
 

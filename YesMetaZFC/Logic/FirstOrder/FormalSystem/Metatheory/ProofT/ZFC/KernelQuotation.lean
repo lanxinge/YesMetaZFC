@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectProjectQuotationDerives
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectProjectQuotationDerives
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaJoinInstances
 
 /-! # 原始转换与当前类型安全内核 quotation 的交换律 -/

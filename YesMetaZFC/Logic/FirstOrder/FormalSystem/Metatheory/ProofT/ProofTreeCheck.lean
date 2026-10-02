@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectProofTreeSpec
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectProofTreeSpec
 
 /-! # 完整带标注证明树检查的可靠性与完备性
 

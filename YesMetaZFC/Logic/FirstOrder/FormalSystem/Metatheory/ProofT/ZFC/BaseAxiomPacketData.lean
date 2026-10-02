@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.AxiomCanonical
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaPacketSpec
-import YesMetaZFC.Automation.ObjectFiniteTable
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectFiniteTable
 
 /-! # 完整 ZFC 基础公理包的独立规格
 

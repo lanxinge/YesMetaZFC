@@ -50,6 +50,35 @@ silently identified with KP. Square brackets allow the whole set A as a fixed pa
 round brackets additionally allow internally finite sequences from A. Relativized L[A]
 and stronger complexity results for OD code and order graphs remain to be formalized.
 
+## Descriptive set theory foundations
+
+[Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) constructs Baire and Cantor spaces
+and their internal topologies in arbitrary ZF models. It includes nonstandard finite
+prefixes, infinite extensions, actual countable clopen bases, Hausdorff separation,
+and the absence of isolated points. Cantor is a closed nowhere dense subspace of Baire,
+with a bijection to the internal power set of ω. A prefix ultrametric with canonical
+rational codes is constructed, and both spaces are internally complete. Cantor is
+compact; an explicit Baire open cover has no internal finite subcover. Internal prefix
+trees and their bodies are implemented: bodies are closed, and every closed set has a
+unique canonical prefix tree representation, using only KP. In internal Baire space this
+canonical tree has no dead ends. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel.lean)
+are internally well-founded labelled prefix trees with unique evaluations and denotations.
+Basic cylinders, complements, internal countable unions, open sets, and closed tree bodies
+have actual codes. Grafting has a unique output and an object formula; codes also restrict
+to internal subspaces. The constructions use at most ZF, with no additional choice axiom;
+countable union takes an internal family of codes. The [analytic layer](YesMetaZFC/SetTheory/Descriptive/Analytic.lean)
+uses internal Baire projections of Borel relations, with unique denotations, coded countable
+unions, countable intersections of coanalytic complements, and closed tree projections.
+Closed-set and closed-tree projection normal forms are proved by closed evaluation
+certificates and witness pairing. The direct criterion quantifies over an internal real
+and all internal prefix lengths, and also has a relative subspace version.
+The [projective layer](YesMetaZFC/SetTheory/Descriptive/Projective.lean) constructs Σ¹ₙ, Π¹ₙ,
+and Δ¹ₙ along the model's own ω, including nonstandard levels. Base and first-level identities,
+successor projection equations, complement duality, monotonicity, and Borel ⊆ Δ¹₁ are proved.
+Individual projective codes and the entire hierarchy have unique internal interpretations;
+Cantor pointclasses are obtained by subspace traces. Borel ranks, separation and perfect-set
+theorems, Δ¹₁ ⊆ Borel, and strictness remain to be implemented.
+
 ## Explore the infrastructure
 
 The independent arithmetic library provides Q, PA, and Z₂ axiom schemas and derivations,
@@ -69,7 +98,7 @@ These interfaces support the current results and the broader research-platform g
 | --- | --- |
 | Mathematical results and exact hypotheses | [TROPHIES.md](markdown/TROPHIES.md) |
 | J/L, OD/HOD, set computation, and forcing comparison | [Inner-model progress and interfaces](YesMetaZFC/SetTheory/InnerModel/README.md) |
-| Reusable proof interfaces and `prove_auto` automation | [ENGINEERING.md](markdown/ENGINEERING.md) |
+| Reusable proof interfaces and lightweight derivation tactics | [ENGINEERING.md](markdown/ENGINEERING.md) |
 | Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
 | Definitions, internal recursion, and staged extensions | [ELIMINATION.md](markdown/ELIMINATION.md) |
 | Axiom coverage, model correspondence, and recorded dependency audits | [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) |
@@ -128,3 +157,5 @@ module in a [GitHub issue](https://github.com/lanxinge/YesMetaZFC/issues).
 Original project code and accompanying documentation are licensed under the
 [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.
 Separately identified third-party material retains its original license.
+
+Lightweight derivation tactics are available through `YesMetaZFC.Tactic`. The general proof-search engine has been archived outside this project; see the [split record](markdown/PROVER_SPLIT.md) for the source archive and module migration.

@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Card.Aleph.Hartogs
 import YesMetaZFC.SetTheory.Ord.Closure
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # Aleph 数的递归定理
 本层完成基数后继的存在唯一性，并把 Aleph 递归算子接入公共超限递归内核。由此得到
@@ -18,7 +17,7 @@ theorem eq {ℳ : Structure.{u}}
     first = second := by
   rcases hFirst.2.2 second hSecond.1 hSecond.2.1 with
     hFirstEq | hFirstMem
-  · prove_auto
+  · exact hFirstEq
   · rcases hSecond.2.2 first hFirst.1 hFirst.2.1 with
       hSecondEq | hSecondMem
     · exact hSecondEq.symm
@@ -373,7 +372,7 @@ theorem aleph_limit_iff
       rw [hRange member, hSelectedRange member]
     subst selectedRange
     have hValueEq : value = selected := by
-      prove_auto
+      exact Structure.IsUnionOf.eq hZF.1 hUnion hSelectedUnion
     simpa [hValueEq] using hSelected
 /--
 若 Aleph 递归的首项 `ω` 是基数，则每个 Aleph 值都是基数。

@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectTreeTemplate
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTreeTemplate
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaRenameInstances
 
 /-!

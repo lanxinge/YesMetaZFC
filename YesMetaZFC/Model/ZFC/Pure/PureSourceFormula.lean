@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceHorn
-import YesMetaZFC.Automation.ObjectArithmeticTerm
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectArithmeticTerm
 
 /-! # 自然数参数公式的组合对应
 

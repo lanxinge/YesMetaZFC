@@ -31,6 +31,27 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
 集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
 
+## 描述集合论基础
+
+[Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) 在任意 ZF 模型内构造 Baire、Cantor
+空间及其拓扑，包含非标准有限前缀、无限延拓、实际可数开闭基、Hausdorff 分离和无孤立点。
+Cantor 是 Baire 的闭且无处稠密子空间，并与内部自然数幂集等势。规范有理数码的前缀
+超度量已实际构造，两空间内部完备；Cantor 紧致，Baire 有具体的无有限子覆盖开覆盖。
+内部前缀树、分支与树体已实现；闭集与树体双向等价，规范前缀树唯一，这部分只需 KP。
+在内部 Baire 空间上，该规范树没有死节点。
+[Borel 码](YesMetaZFC/SetTheory/Descriptive/Borel.lean) 使用内部良基的带标签前缀树，
+已构造唯一求值与解释集合、基本柱集码、补码和内部可数并码，并证明开集与闭树体有码。
+码的拼接输出唯一；原公式支持模型内部化及既有相对化接口，同一码可限制到内部子空间。
+以上构造不超过 ZF，不增添选择公理；可数并的输入是内部码族。
+[解析层](YesMetaZFC/SetTheory/Descriptive/Analytic.lean) 按 Borel 关系的内部 Baire
+投影定义，支持唯一解释、有实际码族的可数并、余解析补族的可数交和闭树投影。
+解析集的闭集／闭树投影正规形已完成：Borel 求值先转为闭证书，再合并实数见证。
+直接接口给出“存在内部实数、每个内部长度都有树内前缀”的双向判据及子空间相对版本。
+[射影层](YesMetaZFC/SetTheory/Descriptive/Projective.lean) 沿模型自身的 ω 构造
+Σ¹ₙ、Π¹ₙ、Δ¹ₙ，已证明零层／第一层对应、后继投影方程、补对偶、单调性及 Borel ⊆ Δ¹₁。
+单个射影码和全部层次图都有唯一实际解释；Cantor 点类由内部子空间迹给出。
+Borel 秩、分离／完美集定理、Δ¹₁ ⊆ Borel 和射影层次严格性尚未实现。
+
 ## 算术理论
 
 独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
@@ -47,15 +68,15 @@ lake --wfail build
 bash scripts/check-all.sh
 ```
 
-全源脚本需要 Python 3.11 或以上，覆盖默认入口未导入的独立模块与 `prove_auto_sweep`，
+全源脚本需要 Python 3.11 或以上，覆盖默认入口未导入的独立模块，
 warning 会使检查失败。工具链恢复见 [RESTORE.md](markdown/RESTORE.md)。
-仅检查全部库模块时，运行 `bash scripts/check-all.sh --library-only`。
+默认检查全部 Lean 模块；另需原生对象及库时，运行 `bash scripts/check-all.sh --native`。
 模型接口及可信依赖见 [model](YesMetaZFC/Model/README.md)；通用入口为 `import YesMetaZFC.Model`，具体入口为 `import YesMetaZFC.Model.SmallGraph` 和 `import YesMetaZFC.Model.Boolean`。
 
 ## 获取构建缓存
 
 安装工具链后，在对应提交运行 `python scripts/lean_cache.py get` 获取编辑和证明开发所需缓存；
-使用 `python scripts/lean_cache.py get --kind full` 可同时获取原生库与扫描工具。
+使用 `python scripts/lean_cache.py get --kind full` 可同时获取原生对象和库。
 CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，完成后按提交发布。
 平台范围、离线恢复和发布条件见 [CACHE.md](markdown/CACHE.md)。
 
@@ -81,3 +102,5 @@ CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，�
 
 本项目的原创代码与随附文档采用 [Apache License 2.0](LICENSE)，署名见 [NOTICE](NOTICE)。
 第三方材料如有单独声明，仍遵循其原有许可。
+
+轻量证明派生入口为 `YesMetaZFC.Tactic`，包括命题推导、闭合性、理论包含和有限公理基装配。通用搜索证明器已移出主项目，源码留档与模块迁移见 [拆分说明](markdown/PROVER_SPLIT.md)。

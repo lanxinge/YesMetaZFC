@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceInfinity
-import YesMetaZFC.Automation.ObjectTraceSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTraceSemantics
 
 /-! # 任意原模型中的幂集界与轨迹载体
 

@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectHornValues
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornValues
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaObjectGraph
 
 /-! # 正文检查器到统一对象图的证书 -/

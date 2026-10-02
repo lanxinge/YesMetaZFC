@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornReflection
-import YesMetaZFC.Automation.ObjectArithmeticTerm
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectArithmeticTerm
 
 /-! # 保持实际模板替换的正反射组合
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.Tarski
-import YesMetaZFC.Automation.ObjectTarskiFixedPoint
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTarskiFixedPoint
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedRosser
 
 /-! # 原支撑理论上的塔斯基真不可定义定理

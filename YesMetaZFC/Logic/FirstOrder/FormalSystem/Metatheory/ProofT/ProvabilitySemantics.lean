@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.Provability
-import YesMetaZFC.Automation.NaturalRosserSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.NaturalRosserSemantics
 
 /-! # 普通可证明性的任意模型语义 -/
 namespace YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.Delta0ProofGraph

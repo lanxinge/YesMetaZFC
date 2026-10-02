@@ -2,7 +2,6 @@ import YesMetaZFC.SetTheory.Card.Cofinality.Syntax
 import YesMetaZFC.SetTheory.Card.Basic
 import YesMetaZFC.SetTheory.Ord.Normal
 import YesMetaZFC.SetTheory.SetConstruction
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 共尾度的基础语义
 本层把共尾度公式解释为模型内部的集合论关系，并给出最小见证唯一性和值域共尾性。
@@ -222,13 +221,12 @@ theorem eq {ℳ : Structure.{u}}
   exact False.elim <|
     hκ.isCardinal.1.wellOrder.linear.irrefl κ hSelf hSelf
 end IsCofinality
-register_prove_auto_hr_rule IsCofinality.eq PRIORITY 200
 end Structure
 namespace Definitional
 namespace Project
 namespace Formula
 /-- 共尾序列公式与模型内部的序数序列语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCofinalOrdinalSequence_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (sequence length α : Term depth) :
@@ -246,7 +244,7 @@ theorem satisfies_isCofinalOrdinalSequence_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 非递减共尾序列公式与模型内部序列语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCofinalNondecreasingOrdinalSequence_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (sequence length α : Term depth) :
@@ -265,7 +263,7 @@ theorem satisfies_isCofinalNondecreasingOrdinalSequence_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 共尾序列存在公式与模型内部存在量词语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_hasCofinalOrdinalSequence_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (length α : Term depth) :
@@ -277,7 +275,7 @@ theorem satisfies_hasCofinalOrdinalSequence_iff
     satisfies_isCofinalOrdinalSequence_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 非递减共尾序列存在公式与模型内部存在量词语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_hasCofinalNondecreasingOrdinalSequence_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (length α : Term depth) :
@@ -289,7 +287,7 @@ theorem satisfies_hasCofinalNondecreasingOrdinalSequence_iff
     satisfies_isCofinalNondecreasingOrdinalSequence_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 共尾子集公式与“子集且并为目标”的纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCofinalSubset_iff
     {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (set α : Term depth) :
     satisfies env (isCofinalSubset set α) ↔
@@ -299,7 +297,7 @@ theorem satisfies_isCofinalSubset_iff
     satisfies_subset_iff, satisfies_isUnion_iff,
     Structure.MemberSubset]
 /-- 共尾度公式与最小共尾序列长度的模型内部语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCofinality_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ α : Term depth) :

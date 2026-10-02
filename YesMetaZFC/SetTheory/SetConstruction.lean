@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Extension
 import YesMetaZFC.Model.SetTheory.FunctionSemantics
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 基础集合构造的模型语义接口
 本层从 KP 的空集、配对与并集公理提取普通 Lean 可消费的存在定理，并组合出单元素集
@@ -52,7 +51,6 @@ theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
   intro member
   exact (hLeft member).trans (hRight member).symm
 end IsSingletonOf
-register_prove_auto_hr_rule IsSingletonOf.eq PRIORITY 200
 namespace IsUnionOf
 /-- 同一集合族的两个并集相等。 -/
 theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
@@ -62,7 +60,6 @@ theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
   intro member
   exact (hLeft member).trans (hRight member).symm
 end IsUnionOf
-register_prove_auto_hr_rule IsUnionOf.eq PRIORITY 200
 namespace IsPowerSetOf
 /-- 同一集合的两个幂集相等。 -/
 theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
@@ -72,7 +69,6 @@ theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
   intro subset
   exact (hLeft subset).trans (hRight subset).symm
 end IsPowerSetOf
-register_prove_auto_hr_rule IsPowerSetOf.eq PRIORITY 200
 namespace IsFunctionSpace
 /-- 同一源集和目标集的两个函数集相等。 -/
 theorem eq {ℳ : Structure.{u}}
@@ -84,7 +80,6 @@ theorem eq {ℳ : Structure.{u}}
   intro function
   exact (hLeft function).trans (hRight function).symm
 end IsFunctionSpace
-register_prove_auto_hr_rule IsFunctionSpace.eq PRIORITY 200
 namespace IsDisjoint
 /-- 不交关系交换左右参数后仍成立。 -/
 theorem symm {ℳ : Structure.{u}}
@@ -102,7 +97,6 @@ theorem swap {ℳ : Structure.{u}}
   rw [hUnion value]
   exact or_comm
 end IsUnionOfTwo
-register_prove_auto_hr_rule IsUnionOfTwo.swap PRIORITY 200
 end Structure
 namespace Definitional.Project.Formula
 /-- `left` 与 `right` 不相交。 -/
@@ -130,7 +124,7 @@ def isFunctionSpace (𝒞 : OrderedPairConvention)
     .iff (.mem Term.newest space.weaken) <|
       isFunctionFromTo 𝒞 Term.newest source.weaken target.weaken
 /-- 单元素集公式与纸面单元素集语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isSingleton_iff
     {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (singleton element : Term depth) :
@@ -143,7 +137,7 @@ theorem satisfies_isSingleton_iff
     or_self,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 并集公式与纸面并集语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isUnion_iff {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (union family : Term depth) :
     satisfies env (isUnion union family) ↔
@@ -155,7 +149,7 @@ theorem satisfies_isUnion_iff {ℳ : Structure.{u}}
     Definitional.Term.eval_weaken,
     Term.eval_bound_zero_push, Term.eval_bound_one_push]
 /-- 幂集公式与纸面幂集语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isPowerSet_iff
     {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (power set : Term depth) :
     satisfies env (isPowerSet power set) ↔
@@ -165,7 +159,7 @@ theorem satisfies_isPowerSet_iff
     satisfies_mem_iff, satisfies_subset_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 不相交公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isDisjoint_iff
     {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (left right : Term depth) :
     satisfies env (isDisjoint left right) ↔
@@ -175,7 +169,7 @@ theorem satisfies_isDisjoint_iff
     satisfies_conj_iff, satisfies_mem_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 二元并公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isUnionOfTwo_iff
     {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (union left right : Term depth) :
     satisfies env (isUnionOfTwo union left right) ↔

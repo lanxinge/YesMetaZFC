@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Semantics
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数算术的递归定理
 本层先提取序数算术共同使用的零、后继、极限三分支递归算子，并证明该算子在所有
@@ -29,7 +28,6 @@ theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
   apply hExt.eq_of_same_members
   intro value
   exact (hLeft value).trans (hRight value).symm
-register_prove_auto_hr_rule SuccessorOf.eq PRIORITY 200
 /-- 两个序数若有同一后继，则它们相等。 -/
 theorem predecessor_eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     {successor first second : ℳ.Domain} (hFirstOrdinal : ℳ.IsOrdinal first) (hFirst : ℳ.SuccessorOf successor first)
@@ -54,7 +52,6 @@ theorem predecessor_eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     · exact
         (hExt.eq_of_same_members second first hSame').symm
   · exact hExt.eq_of_same_members first second hSame
-register_prove_auto_hr_rule predecessor_eq PRIORITY 200
 end SuccessorOf
 namespace IsOrdinalOne
 /-- 任意两个序数一相等。 -/
@@ -73,7 +70,6 @@ theorem eq {ℳ : Structure.{u}} (hExt : Extensional ℳ)
       exact False.elim (hRightEmpty value hValue)
   subst rightZero
   exact SuccessorOf.eq hExt hLeftSuccessor hRightSuccessor
-register_prove_auto_hr_rule IsOrdinalOne.eq PRIORITY 200
 end IsOrdinalOne
 namespace IsSequenceOfLength
 /-- 同一序列的两个精确定义域相等。 -/
@@ -83,7 +79,6 @@ theorem length_eq {ℳ : Structure.{u}}
     {sequence left right : ℳ.Domain} (hLeft : ℳ.IsSequenceOfLength 𝕀 sequence left) (hRight : ℳ.IsSequenceOfLength 𝕀 sequence right) :
     left = right :=
   IsDomainOf.eq hExt hLeft.2.2 hRight.2.2
-register_prove_auto_hr_rule length_eq PRIORITY 200
 end IsSequenceOfLength
 namespace IsZeroLengthSequence
 /-- 零长度序列不可能同时具有后继长度。 -/
@@ -149,7 +144,6 @@ theorem last_eq {ℳ : Structure.{u}}
   exact
     hFirstSequence.2.1.2 firstPredecessor first second
       hFirstValue hSecondValue
-register_prove_auto_hr_rule IsSuccessorLengthSequenceWithLast.last_eq PRIORITY 200
 /-- 后继长度序列不可能同时具有非零极限长度。 -/
 theorem not_limitLength {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention}
@@ -205,7 +199,6 @@ theorem union_eq {ℳ : Structure.{u}}
   apply hExt.eq_of_same_members
   intro value
   exact (hLeftUnion value).trans (hRightUnion value).symm
-register_prove_auto_hr_rule IsLimitLengthSequenceWithUnion.union_eq PRIORITY 200
 end IsLimitLengthSequenceWithUnion
 namespace IsRecursiveSequence
 /--

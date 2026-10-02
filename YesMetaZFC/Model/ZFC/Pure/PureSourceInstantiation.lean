@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectCodeInstantiation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeInstantiation
 import YesMetaZFC.Model.ZFC.Pure.PureSourceTransformConstruction
 
 /-! # 固定公式骨架的内部数值代入
