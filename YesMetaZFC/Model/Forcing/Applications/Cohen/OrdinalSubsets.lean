@@ -35,11 +35,7 @@ theorem cohen_od_recovery_l {κ B R} {U : M.Domain → Prop}
       ∀ X : (extension_l M hZF B R B U).Domain, Od_d X →
         (∀ x, x ∈ X → (extension_l M hZF B R B U).IsOrdinal x) →
         ∃ Y, Od_d Y ∧ e Y = X := by
-  have hpre := (cohen_spec_top_l I hZF h).1
-  have hz p (_hp : M.mem p B) (hpb : Entry_d M p B R) : p = B := by
-    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, hR⟩ := h
-    exact False.elim (KP.mem_irrefl_d (ZF.modelsKP hZF) B ((hR p B).mp hpb).2.1)
-  let O : Cond_order_d M B R B := ⟨hpre.1, hpre.2, hz⟩
+  let O := cohen_cond_order_l hZF h
   obtain ⟨b, hb⟩ := hU.inhabited
   obtain ⟨e, hv, he, hi, ho⟩ := check_map_ordinals_l O hZF hU hb
   obtain ⟨hB, hR⟩ := cohen_presentation_od_l hZF hκ h

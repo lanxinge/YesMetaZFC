@@ -1,86 +1,32 @@
 # J 层级、OD、HOD 与可容许递归
 
-入口为 `YesMetaZFC.SetTheory.InnerModel`。当前工作沿 Jensen 的 rudimentary
-有限基构造 J 层级，允许背景模型的自然数、序数和隶属关系在外部非标准、非良基。
-OD 已具有基于 V 层满足关系的内部定义、标准原公式对应及单序数解码。
-底层使用规范序数配对、内部有限序数列编码及内部公式的自然数编码与统一满足关系，
-见 [规范编码接口](../../Model/README.md)。OD/HOD 的 Σ₂ 成员定义、OD 最小代表
-及全局良序已完成，HOD 的实际隶属结构已验证原选择集公理。
-两种集合参数版本现已分别构造实际 ZFC 与 ZF 模型，见下节。
+当前已完成 Jensen J 层级及其 L 内模型的 ZFC＋GCH、J 层内统一局部良序、
+OD/HOD 的内部定义与参数模型，以及弱齐性力迫的 HOD 比较。本文按可调用定理
+整理研究进度；详细实现沿“J 与计算 → 良序 → 凝聚与 GCH → OD/HOD → 力迫比较”阅读。
 
-## 内部 OD
+内模型入口为 `YesMetaZFC.SetTheory.InnerModel`；力迫比较另导入
+`YesMetaZFC.Model.Forcing.Internal.Homogeneous.HOD`，或总入口 `YesMetaZFC.Model.Forcing`。
+底层 [规范编码](../../Model/README.md) 支持内部有限序数列、公式码及统一满足关系。
+全部模型侧结论允许背景 ω 非标准、隶属关系外部非良基；良序、序数、有限性和幂集
+始终按所选模型解释。代码中的 ZF 前提不包含该模型的选择公理。
 
-入口为 [OD](OD.lean)。`Od_d x` 是固定 Kuratowski 编码下的无参数原公式谓词，
-不量化宿主 AST。定义见证包含内部累积层 `Vθ`、内部公式自然数码和内部有限序数
-参数列码；空集补齐列外赋值，零号变量读取候选对象，要求该候选在层内唯一满足公式。
+## 进度总览
 
-| 接口 | 结论与前提 |
-| --- | --- |
-| [Syntax](OD/Syntax.lean) 的 `od_code_unique_l` | ZF 中相同定义码的输出唯一；层、公式、参数列的辅助表示均不影响结果 |
-| [Source](OD/Source.lean) 的 `od_source_l` | 从原公式及其序数参数的唯一性，经实际有限反射与统一编译生成内部定义码 |
-| `od_code_external_l`、`od_in_iff_external_l` | 内部 OD 恰为原公式序数参数唯一可定义的对象，即使公式码或参数长度非标准也成立 |
-| `od_convention_l` | 更换实际有序对编码约定不改变 OD 类 |
-| [Code](OD/Code.lean) 的 `od_eval_unique_l`、`od_one_parameter_l` | 单序数代码求值单值；每个 OD 对象由同一条固定原公式和一个序数参数唯一指定 |
-| [Definition](OD/Definition.lean) 的 `od_sat_l`、`od_iff_external_l` | 公开谓词的原公式解释及 ZF 中的通常 OD 语义 |
-| `od_ordinal_l`、`od_parameter_free_l`、`od_separation_l` | 全部序数与无参数唯一可定义对象属于 OD；任意集合与 OD 的交实际存在 |
-| `od_rel_sat_l` | 同一原公式在内部传递集合结构中的相对化解释；该结构的 OD 按自身满足关系计算 |
-| [Complexity](OD/Complexity.lean) 的 `od_sigma_complexity_l`、`od_sigma_sat_l` | 实际 `∃∃∃∃∃∀Δ₀` 公式及其与既有 OD 谓词的等价证明 |
-| [Minimum](OD/Minimum.lean) 的 `od_min_exists_l`、`od_min_unique_l`、`od_min_injective_l` | 每个 OD 对象的最小序数代码存在、唯一，不同对象的最小代码不同 |
-| [Order](OD/Order.lean) | 最小码诱导严格线序；每个非空 OD 元素集合有最小元，每个严格初段为实际集合 |
-| [Choice](OD/Choice.lean) 的 `od_unique_parameter_l`、`od_choices_exists_l` | 从 OD 参数唯一可定义的对象仍为 OD，规范选择集可直接由分离构造 |
+| 研究层 | 已完成的可调用结果 | 所需背景与范围 |
+| --- | --- | --- |
+| J 闭包、层级与可构造公理 | [Jensen/Constructibility](Jensen/Constructibility.lean)：`l_model_kpl_l`、`l_model_kpi_l` | KPi 构造实际 J 并类；其满足 KP＋V=L 及完整公式成员归纳 |
+| 基本集合计算与 DSL | [Totality](Computation/Totality.lean)、[Delta0](Computation/Delta0.lean)、[Sigma1](Computation/Sigma1.lean)、[DSL](Computation/DSL.lean) | KP；基础运算、Δ₀ 判定及 Σ₁ 见证验证的双向编译，提供 `setfn!` 前端 |
+| Δ₁ 可定义与可计算等价 | [Readback](Computation/Readback.lean)：`cd_equiv_l` | KPi＋V=L；互补 Σ₁ 正规形与总 J 搜索布尔程序对应 |
+| 全局及逐层 Jensen 良序 | [Order/Statement](Order/Statement.lean)：`jh_order_model_l`；[Uniform](Order/Uniform.lean)：`jh_local_sigma1_l` | KPi；每个非空 J 层统一局部 Σ₁，比较为 Δ₁，完整初段留在同层；无需该层可容许 |
+| 坍塌凝聚 | [Condensation](Condensation.lean)：`jc_bounded_condensation_l` | KPi；任意内部大小的 Σ₁ 子结构坍塌为唯一 J 层，并有高度界 |
+| L 的最终模型 | [GCH/Model](GCH/Model.lean)：`l_model_gch_l` | 背景仅 ZF；同一实际 L 模型满足 ZFC＋GCH，内部解释后继基数及幂集 |
+| OD/HOD 成员、最小码及选择 | [OD](OD.lean)、[HOD](HOD.lean)：`od_iff_external_l`、`hod_sigma_sat_l`、`hod_model_choice_l` | ZF；内部定义、Σ₂ 成员证书、OD 最小代表与全局良序、HOD 选择集 |
+| 两种参数内模型 | [BracketChoice](HOD/BracketChoice.lean)：`hb_model_zfc_l`；[Models](HOD/Models.lean)：`hp_model_zf_l` | ZF；HOD[A] 满足 ZFC，HOD(A) 满足 ZF；圆括号使用内部有限 A 参数列 |
+| 弱齐性 HOD 比较 | [Homogeneous/HOD](../../Model/Forcing/Internal/Homogeneous/HOD.lean)：`whom_hod_comparison_l`、`whom_hb_comparison_l` | ZF、泛型及弱齐性；完整呈现为 OD 或 OD[A]，扩张 HOD 恢复到地模型；已有 Cohen 实例 |
 
-数学存在性与等价定理仅用背景 ZF，不要求背景选择公理、外部良基性或 ω 标准性。
-语法解释和相对化使用较弱的语义条件。反向对应通过标准解码公式读取内部代码，
-不把非标准程序转换为宿主 AST。相对化结论不声称内部 OD 与背景 OD 的限制相同。
-Σ₂ 证书先将固定解码公式限制在一个真实 V 层：层内唯一性是 Δ₀ 性质；
-正向由有限反射取得该层，反向用层高度与解码序数唯一指定对象。
-[CumulativeCertificate](../CumulativeCertificate.lean) 对层历史给出全称 Δ₀ 检查，
-并在 KP 下证明证书与原递归值等价。证明没有假定所有非标准公式一起反射。
-
-## HOD 与选择公理
-
-[HOD/Definition](HOD/Definition.lean) 用全部成员属于 OD 的内部传递容器定义 `Hod_d`，
-`hod_tc_l` 证明它恰为 `TC({x})⊆OD`；该类传递并包含全部内部序数。
-`hod_sigma_complexity_l` 与 `hod_sigma_sat_l` 给出实际 Σ₂ 公式及语义等价。
-
-[HOD/Choice](HOD/Choice.lean) 的 `hod_choice_set_l` 对 HOD 中任意互不相交非空族，
-构造属于 HOD 的选择集。每行选择最早出现的序数定义码，所得集合从原族唯一可定义，
-故仍是 OD；其元素又属于原族的遗传 OD 容器，因此整个集合属于 HOD。
-`hod_model_choice_l` 将此结果落实为实际 `hod_model_l` 满足原 `Axioms.choice`。
-背景仅假设 ZF，未假设背景 AC，也没有从存在命题选择外部数据。
-
-OD 良序在背景模型中计算，不宣称同一公式在 HOD 内重算得到原关系。
-当前尚未认证原序数解码图、最小代表图或良序图的 Δ₂ 复杂度；OD/HOD 的 Σ₂
-成员证书已经完成。原无参数 `hod_model_l` 的完整 ZF 接口尚未归并到下述参数模型定理。
-
-## 两种参数版本及实际模型
-
-参数约定采用 [Jech §13，195–196 页](https://daiwz.net/course/disc_math/2023/set_theory_jech.pdf#page=195)：
-`OD[A]` 允许整个 A 作固定参数；`OD(A)` 在此之外允许 A 中的有限参数列。
-相应的遗传类分别为 HOD[A] 和 HOD(A)。本库中的 A 总是背景模型内部的集合。
-
-| 原公式与语义接口 | 已证明的内容 |
-| --- | --- |
-| [OD/Brackets](OD/Brackets.lean) 的 `Ob_d`、`ob_m`、`ob_iff_external_l` | OD[A] 的内部谓词，等价于标准原公式从 A 和序数参数唯一可定义；允许背景非标准 |
-| `ob_code_l`、`ob_eval_unique_l` | A 固定后的单序数定义码及单值求值 |
-| [OD/Relative](OD/Relative.lean) 的 `Op_d`、`op_statement_l` | OD(A) 精确等于某条内部有限 A 序列 s 下的 OD[A,s]；二参数以 Kuratowski 对表示 |
-| [OD/RelativeClosure](OD/RelativeClosure.lean) 的 `oa_unique_l`、`op_member_l` | 两种参数类均对有限唯一原公式定义封闭，A 的每个成员属于 OD(A) |
-| [HOD/Parameters](HOD/Parameters.lean) 的 `hb_statement_l`、`hp_statement_l` | 遗传类恰由 TC({x}) 的全部元素属于相应 OD 类刻画 |
-| `hb_subset_hp_l`、`hp_transitive_parameter_l` | HOD[A]⊆HOD(A)；传递 A 连同其成员属于 HOD(A) |
-| [HOD/Models](HOD/Models.lean) 的 `ha_model_zf_l`、`hp_model_zf_l` | 两个实际隶属结构的全部原 ZF 公理，包括任意模式的全分离和全收集 |
-| [HOD/BracketChoice](HOD/BracketChoice.lean) 的 `hb_model_zfc_l` | 仅用背景 ZF，HOD[A] 满足原 ZFC；选择集自身属于 HOD[A] |
-
-固定参数通过 OD 偏函数图在 A 处的值解释。[OD/Graph](OD/Graph.lean) 将任意原公式的
-唯一值部分限制到真实 V 层，实际构造这样的 OD 图；反向由既有单序数解码恢复标准公式。
-因此参数版本继续使用原内部满足关系与规范编码，没有新增解释语言或可定义性公理。
-
-圆括号的有限性始终是模型内部有限性。[FiniteSequenceJoin](../Card/FiniteSequenceJoin.lean)
-用内部序数加法拼接参数列，并给出可定义的前段与尾段投影，从而合并任意有限多个参数包。
-`op_statement_l` 不声称非标准有限 A 序列可以展开为宿主标准有限个 A 元素。
-
-共同的模型证明先构造 `H∩Vα`，并证明它仍属于相应遗传类。全收集在背景取得见证界后，
-直接使用这样的秩切片；没有为每个对象挑选一个参数列。只有方括号的选择证明对固定 A
-后的序数定义码取最小值。圆括号模型定理不附加 AC，也不宣称它总是不满足 AC。
+本表的模型性是对原 Project 公理和模式的实际语义证明。可构造公理已接入原演绎核，
+但不能把每项模型语义定理自动视为已给出的 `Derives` 证明。理论强度的精确区分见
+[理论与模型的分层](#理论与模型的分层)，尚缺的接口统一列在[尚未完成](#尚未完成)。
 
 ## 已实现的数学接口
 
@@ -155,10 +101,10 @@ ZF 全分离使用已有的背景 Lévy 反射：同时收集后继、J 层值�
 J 层界，再在 J 内分离。整个证明允许背景模型在外部非标准、非良基。
 
 可容许递归按照已确定的范围发展：Σ₁ 对应半可计算，Δ₁ 对应可计算，参数
-及计算见证均相对于所选模型。本轮程序片段由十三个 rudimentary 运算、复合、
+及计算见证均相对于所选模型。程序片段由十三个 rudimentary 运算、复合、
 局部绑定和集合有界并合组成，求值不调用公式真值。真假分别用 ∅、{∅} 表示，
 成员测试与逻辑联结都编译成实际集合运算。有限 `Cp_code` 的总性只需原 KP。
-新增 `Cs_code` 是可能不终止的 J 搜索层，返回 ∅ 表示继续，返回 {y} 表示以 y 停机。
+`Cs_code` 是可能不终止的 J 搜索层，返回 ∅ 表示继续，返回 {y} 表示以 y 停机。
 其 Σ₁ 执行证书在同一个内部集合中保存终止层及所有此前阶段的计算证据。
 Δ₁ 编译每层分别检查正、反见证，返回 {1}、{0} 或 ∅；互补性保证结果正确，
 V=L 提供包含实际见证的 J 层，KPi 的原公式归纳保证存在最早停机层。
@@ -346,13 +292,121 @@ J₀ 的空良序也已包括在 `jh_local_wellorder_l` 中；非空条件仅用
 `|P(κ)|≤κ⁺`；实际序型构造及 Cantor 定理最终得到 `2^κ=κ⁺`。
 原可数积、并、有限序列和 Skolem 壳的入口均已改用同一套一般无限基数证明。
 
+## 内部 OD
+
+入口为 [OD](OD.lean)。`Od_d x` 是固定 Kuratowski 编码下的无参数原公式谓词，
+不量化宿主 AST。定义见证包含内部累积层 `Vθ`、内部公式自然数码和内部有限序数
+参数列码；空集补齐列外赋值，零号变量读取候选对象，要求该候选在层内唯一满足公式。
+
+| 接口 | 结论与前提 |
+| --- | --- |
+| [Syntax](OD/Syntax.lean) 的 `od_code_unique_l` | ZF 中相同定义码的输出唯一；层、公式、参数列的辅助表示均不影响结果 |
+| [Source](OD/Source.lean) 的 `od_source_l` | 从原公式及其序数参数的唯一性，经实际有限反射与统一编译生成内部定义码 |
+| `od_code_external_l`、`od_in_iff_external_l` | 内部 OD 恰为原公式序数参数唯一可定义的对象，即使公式码或参数长度非标准也成立 |
+| `od_convention_l` | 更换实际有序对编码约定不改变 OD 类 |
+| [Code](OD/Code.lean) 的 `od_eval_unique_l`、`od_one_parameter_l` | 单序数代码求值单值；每个 OD 对象由同一条固定原公式和一个序数参数唯一指定 |
+| [Definition](OD/Definition.lean) 的 `od_sat_l`、`od_iff_external_l` | 公开谓词的原公式解释及 ZF 中的通常 OD 语义 |
+| `od_ordinal_l`、`od_parameter_free_l`、`od_separation_l` | 全部序数与无参数唯一可定义对象属于 OD；任意集合与 OD 的交实际存在 |
+| `od_rel_sat_l` | 同一原公式在内部传递集合结构中的相对化解释；该结构的 OD 按自身满足关系计算 |
+| [Complexity](OD/Complexity.lean) 的 `od_sigma_complexity_l`、`od_sigma_sat_l` | 实际 `∃∃∃∃∃∀Δ₀` 公式及其与既有 OD 谓词的等价证明 |
+| [Minimum](OD/Minimum.lean) 的 `od_min_exists_l`、`od_min_unique_l`、`od_min_injective_l` | 每个 OD 对象的最小序数代码存在、唯一，不同对象的最小代码不同 |
+| [Order](OD/Order.lean) | 最小码诱导严格线序；每个非空 OD 元素集合有最小元，每个严格初段为实际集合 |
+| [Choice](OD/Choice.lean) 的 `od_unique_parameter_l`、`od_choices_exists_l` | 从 OD 参数唯一可定义的对象仍为 OD，规范选择集可直接由分离构造 |
+
+数学存在性与等价定理仅用背景 ZF，不要求背景选择公理、外部良基性或 ω 标准性。
+语法解释和相对化使用较弱的语义条件。反向对应通过标准解码公式读取内部代码，
+不把非标准程序转换为宿主 AST。相对化结论不声称内部 OD 与背景 OD 的限制相同。
+Σ₂ 证书先将固定解码公式限制在一个真实 V 层：层内唯一性是 Δ₀ 性质；
+正向由有限反射取得该层，反向用层高度与解码序数唯一指定对象。
+[CumulativeCertificate](../CumulativeCertificate.lean) 对层历史给出全称 Δ₀ 检查，
+并在 KP 下证明证书与原递归值等价。证明没有假定所有非标准公式一起反射。
+
+## HOD 与选择公理
+
+[HOD/Definition](HOD/Definition.lean) 用全部成员属于 OD 的内部传递容器定义 `Hod_d`，
+`hod_tc_l` 证明它恰为 `TC({x})⊆OD`；该类传递并包含全部内部序数。
+`hod_sigma_complexity_l` 与 `hod_sigma_sat_l` 给出实际 Σ₂ 公式及语义等价。
+
+[HOD/Choice](HOD/Choice.lean) 的 `hod_choice_set_l` 对 HOD 中任意互不相交非空族，
+构造属于 HOD 的选择集。每行选择最早出现的序数定义码，所得集合从原族唯一可定义，
+故仍是 OD；其元素又属于原族的遗传 OD 容器，因此整个集合属于 HOD。
+`hod_model_choice_l` 将此结果落实为实际 `hod_model_l` 满足原 `Axioms.choice`。
+背景仅假设 ZF，未假设背景 AC，也没有从存在命题选择外部数据。
+
+OD 良序在背景模型中计算，不宣称同一公式在 HOD 内重算得到原关系。
+原无参数 `hod_model_l` 目前有选择公理接口；实际完整 ZFC 模型入口为下节的
+`hb_model_zfc_l`。`hb_ordinal_parameter_l` 已证明序数参数 A 下 HOD[A]=HOD，
+但尚未把完整模型性迁移到 `hod_model_l`。成员 Σ₂ 证书与原解码／良序图的复杂度是不同接口。
+
+## 两种参数版本及实际模型
+
+参数约定采用 [Jech §13，195–196 页](https://daiwz.net/course/disc_math/2023/set_theory_jech.pdf#page=195)：
+`OD[A]` 允许整个 A 作固定参数；`OD(A)` 在此之外允许 A 中的有限参数列。
+相应的遗传类分别为 HOD[A] 和 HOD(A)。本库中的 A 总是背景模型内部的集合。
+
+| 原公式与语义接口 | 已证明的内容 |
+| --- | --- |
+| [OD/Brackets](OD/Brackets.lean) 的 `Ob_d`、`ob_m`、`ob_iff_external_l` | OD[A] 的内部谓词，等价于标准原公式从 A 和序数参数唯一可定义；允许背景非标准 |
+| `ob_code_l`、`ob_eval_unique_l` | A 固定后的单序数定义码及单值求值 |
+| [OD/Relative](OD/Relative.lean) 的 `Op_d`、`op_statement_l` | OD(A) 精确等于某条内部有限 A 序列 s 下的 OD[A,s]；二参数以 Kuratowski 对表示 |
+| [OD/RelativeClosure](OD/RelativeClosure.lean) 的 `oa_unique_l`、`op_member_l` | 两种参数类均对有限唯一原公式定义封闭，A 的每个成员属于 OD(A) |
+| [HOD/Parameters](HOD/Parameters.lean) 的 `hb_statement_l`、`hp_statement_l` | 遗传类恰由 TC({x}) 的全部元素属于相应 OD 类刻画 |
+| `hb_subset_hp_l`、`hp_transitive_parameter_l` | HOD[A]⊆HOD(A)；传递 A 连同其成员属于 HOD(A) |
+| [HOD/Models](HOD/Models.lean) 的 `ha_model_zf_l`、`hp_model_zf_l` | 两个实际隶属结构的全部原 ZF 公理，包括任意模式的全分离和全收集 |
+| [HOD/BracketChoice](HOD/BracketChoice.lean) 的 `hb_model_zfc_l` | 仅用背景 ZF，HOD[A] 满足原 ZFC；选择集自身属于 HOD[A] |
+| [OD/Parameters](OD/Parameters.lean) 的 `ob_ordinal_parameter_l`、[HOD/Relative](HOD/Relative.lean) 的 `hb_ordinal_parameter_l` | A 为内部序数时，OD[A]=OD、HOD[A]=HOD |
+| [OD/Relations](OD/Relations.lean) 的 `ob_product_l`、`ob_relation_l` | OD[A] 对笛卡尔积及任意原公式定义的关系集合化封闭 |
+
+固定参数通过 OD 偏函数图在 A 处的值解释。[OD/Graph](OD/Graph.lean) 将任意原公式的
+唯一值部分限制到真实 V 层，实际构造这样的 OD 图；反向由既有单序数解码恢复标准公式。
+因此参数版本继续使用原内部满足关系与规范编码，没有新增解释语言或可定义性公理。
+
+圆括号的有限性始终是模型内部有限性。[FiniteSequenceJoin](../Card/FiniteSequenceJoin.lean)
+用内部序数加法拼接参数列，并给出可定义的前段与尾段投影，从而合并任意有限多个参数包。
+`op_statement_l` 不声称非标准有限 A 序列可以展开为宿主标准有限个 A 元素。
+
+共同的模型证明先构造 `H∩Vα`，并证明它仍属于相应遗传类。全收集在背景取得见证界后，
+直接使用这样的秩切片；没有为每个对象挑选一个参数列。只有方括号的选择证明对固定 A
+后的序数定义码取最小值。圆括号模型定理不附加 AC，也不宣称它总是不满足 AC。
+
+## 序数关系呈现与力迫比较
+
+[HOD/Coding](HOD/Coding.lean) 的 `ob_code_bound_l` 在 ZF 内收集一个集合的全部
+OD[A] 对象所需的定义码界；`ob_code_graph_l` 在该界内保留所有有效代码，构造实际解码满射。
+[HOD/Presentation](HOD/Presentation.lean) 的 `hb_presentation_l` 对 `TC({x})` 应用此构造，
+把隶属关系回拉到代码载体，证明载体、关系均为 OD[A]，解码图恰为其总坍塌图。
+重复代码允许坍塌到同一个值，故背景无需 AC。
+
+[通用关系坍塌](../Collapse/RelationExistence.lean) 的 `wc_collapse_l` 对任意内部集合良基
+关系构造总图和传递值域；唯一性通过原公式的内部关系归纳证明。这里不要求模型外部良基，
+也不把非外延关系的坍塌误称为单射。
+
+[弱齐性 HOD 比较](../../Model/Forcing/Internal/Homogeneous/HOD.lean) 先恢复这些代码，
+再利用地模型的实际坍塌和扩张内部的唯一性，取得以下实际接口。e 是定理自动构造的
+成员满单射；两个模型的序数相同也由定理返回，不是调用者另给的假设。
+
+| 接口 | 精确前提与结论 |
+| --- | --- |
+| `whom_hod_comparison_l` | M 满足 ZF，U 为泛型，呈现 B、R、z 弱齐性且各自属于 OD；`HOD^{M[U]} ⊆ e[HOD^M]` |
+| `whom_hb_comparison_l` | 同上，将呈现的 OD 前提放宽为 OD[A]；`HOD^{M[U]}[e(A)] ⊆ e[HOD^M[A]]` |
+| [Cohen/HOD](../../Model/Forcing/Applications/Cohen/HOD.lean) 的 `cohen_hod_comparison_l` | 实际 Cohen 呈现、序数添加量及泛型自动给出无参数比较，不另要求 OD 或自同构证书 |
+
+不增加序数本身只需 ZF 与泛型。比较不要求偏序有最大条件，也不要求背景 AC。
+包含方向由扩张指向地模型；不据此断言两边相等、恢复所有 OD 对象，或给出 HOD(A) 的比较。
+
 ## 尚未完成
 
-一般 Levy Σ₁ 归一化及通用 DSL 内部非标准程序码的统一解释器尚未实现；上节 J 内部推导码、
-精确初段、最小代表及目标全局良序已经实现。当前总搜索等价及全局良序使用 KPi + V=L；
-向原 KP + V=L 降低归纳前提需要另证。本层用 J 层级表达
-可构造公理；与另行以 `Def` 递归定义的 Gödel L 层级之间的等价性尚未形式化。后续相对化
-保留加入 `x ↦ x ∩ A` 的运算位置，但本入口目前没有宣称已构造 `L[A]`。
+下列是现有接口之外的研究任务，不作为已完成定理的隐含前提。
+
+| 待建部分 | 当前已具备的基础与尚缺的结论 |
+| --- | --- |
+| L[A] 的相对 J 构造 | 普通 J 层级及 rud 有限基已经完成；含谓词 A 的闭包、层递归及相应模型定理尚未实现，OD[A] 不代替 L[A] |
+| 一般可容许递归接口 | 已处理实际 `S1_binary` 正规形及互补 Δ₁ 关系；一般 Lévy Σ₁ 语法的归一化、内部非标准 DSL 程序码的统一解释器尚未实现 |
+| 降低归纳强度 | J 总搜索、层递归和全局良序使用 KPi；将相关端点降至原 KP＋V=L 仍需证明，不能只改参数类型 |
+| 传统层级与有限基比较 | 尚未证明所选 rud 有限基与一般 rudimentary 项定义、其他 J 索引、独立 Def 递归的 Gödel L 层级之间的等价 |
+| OD 图的复杂度强化 | OD/HOD 成员的 Σ₂ 证书已完成；原解码图、最小代表图和良序图的 Δ₂ 证书尚未认证，背景 OD 序在 HOD 内重算的绝对性也未证明 |
+| 无参数 HOD 模型接口归并 | `hb_ordinal_parameter_l` 已识别序数参数下 HOD[A]=HOD；仍需把已证的完整参数模型性接到原 `hod_model_l` |
+| 更广的力迫比较 | 已完成 HOD 与固定参数 HOD[A] 的弱齐性比较及 Cohen 实例；HOD(A) 比较和迭代后的比较端点尚未提供 |
 
 ## 数学定义来源
 

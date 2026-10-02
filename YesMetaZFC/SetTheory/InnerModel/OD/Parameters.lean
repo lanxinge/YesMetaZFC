@@ -81,6 +81,15 @@ theorem ob_of_od_l (hZF : M.Models ZF) (A : M.Domain) {x : M.Domain} (hx : Od_d 
   refine ob_source_l hZF ψ ρ hρ (fun y => ?_)
   exact (pred_sat_l M φ ((ρ.push A).push y) _ _).trans (hx y)
 
+/-- 固定参数本身为序数时，两种可定义性相同。 -/
+theorem ob_ordinal_parameter_l (hZF : M.Models ZF) {A x : M.Domain} (hA : M.IsOrdinal A) :
+    Ob_d A x ↔ Od_d x := by
+  refine ⟨?_, ob_of_od_l hZF A⟩
+  intro hx
+  obtain ⟨n, φ, ρ, hρ, hdef⟩ := (ob_iff_external_l hZF).mp hx
+  let ψ : UnarySchema (n+1) := ⟨φ.body, φ.freeClosed⟩
+  exact od_of_unique_l hZF ψ (ρ.push A) (Fin.cases hA hρ) hdef
+
 theorem ob_pair_l (hZF : M.Models ZF) (B : M.Domain) {a b p : M.Domain}
     (ha : Ob_d B a) (hb : Ob_d B b) (hp : KPair_d M p a b) : Ob_d B p := by
   let φ : UnarySchema 2 := { body := kpair_m .newest (.bound 1) (.bound 2) }

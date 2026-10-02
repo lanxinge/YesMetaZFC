@@ -173,6 +173,12 @@ OD 的 Σ₂ 正规形已由 [Complexity](../SetTheory/InnerModel/OD/Complexity.
 有界化固定解码公式，用真实累积层的全称递归证书核验幂集，直接连接既有 OD 定义。
 这一结论不自动给出原编码图或原解码图的 Δ₂ 证书。
 
+[内模型进度总览](../SetTheory/InnerModel/README.md) 统一列出其后的 J/L、OD/HOD
+研究接口：ZF 背景下 L 满足 ZFC＋GCH，HOD[A] 满足 ZFC，HOD(A) 满足 ZF。
+同一套规范码还用于 HOD 的有界序数关系呈现和内部坍塌；
+[弱齐性比较](Forcing/Internal/Homogeneous/HOD.lean) 因而恢复扩张 HOD 的地模型 HOD 原像。
+这些结论继续使用内部语法与模型自身序数，允许外部非良基及非标准有限长度。
+
 [Skolem](SetTheory/Internal/Skolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
 函数图 K 及任意内部可数种子 A 的最小闭包 N。规则域为全部内部公式码与变量编号
 的积，输入是内部有限参数列；列外取基点 u，再在被量化变量处更新。存在见证时

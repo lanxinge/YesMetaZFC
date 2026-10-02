@@ -39,9 +39,11 @@ MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("CumulativeCertificate", "Ord.DefinableMinimum", "Definitional.Project.Hierarchy.Levy",
              "InnerModel.HOD.Definition", "InnerModel.HOD")]
 MODULES += ["YesMetaZFC.SetTheory.InnerModel.OD." + name for name in
-            ("Graph", "Brackets", "Parameters", "Relative", "RelativeClosure", "Separation")]
+            ("Graph", "Brackets", "Parameters", "Relative", "RelativeClosure", "Separation", "Relations")]
 MODULES += ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in
-            ("Relative", "Relativization", "Closure", "Schemas", "Models", "Parameters")]
+            ("Relative", "Relativization", "Closure", "Schemas", "Models", "Parameters", "Coding", "Presentation")]
+MODULES += ["YesMetaZFC.SetTheory.Collapse." + name for name in
+            ("RelationSyntax", "RelationRecursion", "RelationExistence")]
 MODULES += ["YesMetaZFC.SetTheory.Card.FiniteSequenceJoin"]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
@@ -89,6 +91,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
                  "Oa_param_d", "oa_param_m", "Oa_d", "oa_m", "Op_d", "Ha_d", "Hb_d", "Hp_d",
                  "ha_m", "ha_cut_s", "ha_rel_m", "oa_sep_s", "Hb_pick_d", "hb_pick_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Fs_tail_d", "YesMetaZFC.SetTheory.fs_tail_m"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
+                ("Wf_rel_d", "wf_rel_m", "Wc_step_d", "wc_step_m", "Wc_graph_d", "wc_graph_m",
+                 "Wc_value_d", "wc_value_m", "wf_rel_sat_l", "wc_step_sat_l", "wc_graph_sat_l",
+                 "wc_value_sat_l", "wc_union_entry_l")]
 
 SKOLEM_MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("Skolem", "ElementaryHull", "ElementaryClub")]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory.FinitaryClub"]

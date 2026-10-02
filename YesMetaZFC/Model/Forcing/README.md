@@ -17,6 +17,14 @@
 并保持旧无限基数；`not_ch_extension_l` 默认添加 ω₂ 条实数。`ch_independent_l` 与
 `ch_consistency_l` 已把两侧模型接入原推导核，给出 CH 双侧不可证及两侧扩充的一致性。
 
+[弱齐性 OD/HOD 比较](Internal/Homogeneous/README.md) 已从内部自同构作用推进到
+完整 HOD 恢复：背景仅需 ZF，若条件呈现 B、R、z 均为 OD 且弱齐性，则
+`HOD^{M[U]} ⊆ e[HOD^M]`。`whom_hod_comparison_l` 自动构造地嵌入 e，并返回序数相同；
+`whom_hb_comparison_l` 给出 OD[A] 呈现下的固定参数版。
+证明使用有界序数关系编码、旧子集恢复和内部坍塌，允许模型外部非良基；
+[Cohen/HOD](Applications/Cohen/HOD.lean) 已提供实际实例。内模型侧进度见
+[J/L、OD/HOD 总览](../../SetTheory/InnerModel/README.md)。
+
 ## 文献选择
 
 检索与版本核对日期：2026-09-29。下表区分论文发表、预印本修订及工程判断，

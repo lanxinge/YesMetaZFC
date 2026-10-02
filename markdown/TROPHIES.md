@@ -73,9 +73,29 @@
 
 源理论、保留源编码的纯翻译和纯公式自身编码的具体合同分列如下。
 原元数学核验覆盖 530 个依赖审计入口；小图层另核验 38 个关键接口。布尔层新增
-50 个关键接口审计，并复核 8 个小图入口。当前全部 1,534 个独立模块及扫描工具严格构建通过。
+50 个关键接口审计，并复核 8 个小图入口。全库构建与内模型审计的当前范围见核验指南。
 原公理的 8 处句法闭合性原生依赖仍保留；详见
 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
+
+## 内模型与可容许递归
+
+总入口为 `YesMetaZFC.SetTheory.InnerModel`；[详细进度与调用边界](../YesMetaZFC/SetTheory/InnerModel/README.md)
+区分 KP、KPi、ZF 和参数版本。以下是实际模型语义定理，允许模型 ω 非标准和外部非良基。
+
+| 成果 | 最终入口 | 前提与范围 |
+| --- | --- | --- |
+| J 构造与可构造公理 | [Jensen/Constructibility](../YesMetaZFC/SetTheory/InnerModel/Jensen/Constructibility.lean)：`l_model_kpl_l` | 背景 KPi；实际 J 并类满足 KP＋V=L，并有完整公式成员归纳 |
+| Δ₁ 可计算性等价 | [Computation/Readback](../YesMetaZFC/SetTheory/InnerModel/Computation/Readback.lean)：`cd_equiv_l` | KPi＋V=L；互补 Σ₁ 正规形与总 J 搜索布尔程序双向编译，基本运算及 Δ₀ 判定只需 KP |
+| J 层的统一局部良序 | [Order/Statement](../YesMetaZFC/SetTheory/InnerModel/Order/Statement.lean)：`jh_order_model_l` | KPi；每个非空 J 层满足同一原语言良序句子，比较统一局部 Σ₁／Δ₁，完整初段属于同层；不假设单层可容许 |
+| Σ₁ 凝聚及高度界 | [Condensation/Size](../YesMetaZFC/SetTheory/InnerModel/Condensation/Size.lean)：`jc_bounded_condensation_l` | KPi；任意内部大小的 Σ₁ 子结构坍塌为唯一 J 层，返回高度单射，并固定传递参数的子集 |
+| L 满足 ZFC＋GCH | [GCH/Model](../YesMetaZFC/SetTheory/InnerModel/GCH/Model.lean)：`l_model_gch_l` | 背景仅 ZF；幂集、后继基数及等势双射均在同一实际 L 模型内解释 |
+| 内部 OD/HOD 与 Σ₂ 证书 | [OD/Complexity](../YesMetaZFC/SetTheory/InnerModel/OD/Complexity.lean)、[HOD/Definition](../YesMetaZFC/SetTheory/InnerModel/HOD/Definition.lean) | ZF；内部 V 层满足关系、规范序数码、原公式唯一可定义性对应，以及 OD/HOD 成员的实际 Σ₂ 公式 |
+| 参数内模型 | [HOD/BracketChoice](../YesMetaZFC/SetTheory/InnerModel/HOD/BracketChoice.lean)：`hb_model_zfc_l`；[Models](../YesMetaZFC/SetTheory/InnerModel/HOD/Models.lean)：`hp_model_zf_l` | 背景仅 ZF；HOD[A] 满足 ZFC，HOD(A) 满足 ZF；圆括号允许内部有限 A 参数列 |
+| 弱齐性 HOD 比较 | [Homogeneous/HOD](../YesMetaZFC/Model/Forcing/Internal/Homogeneous/HOD.lean)：`whom_hod_comparison_l`、`whom_hb_comparison_l` | ZF、泛型、弱齐性及 OD／OD[A] 完整呈现；扩张 HOD／HOD[e(A)] 包含于地模型相应类的像，自动构造嵌入及坍塌 |
+| Cohen 比较实例 | [Cohen/HOD](../YesMetaZFC/Model/Forcing/Applications/Cohen/HOD.lean)：`cohen_hod_comparison_l` | ZF、实际 Cohen 呈现、序数添加量和泛型；不另要求自同构、OD 呈现或坍塌证书 |
+
+HOD 比较只断言从扩张到地模型的包含关系。L[A]、原 OD 解码／良序图的 Δ₂ 证书、
+原无参数 `hod_model_l` 的完整模型接口归并等仍未完成，统一见详细指南的待建表。
 
 ## 裸 ZFC Rosser 实例
 

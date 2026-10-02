@@ -30,4 +30,6 @@ OD 与 HOD 均具有实际 Σ₂ 证书；OD 的唯一最小序数代表导出�
 背景仅需 ZF，实际 HOD 隶属结构满足原选择集公理，选择集自身属于 HOD。
 两种集合参数版本已给出原公式陈述：HOD[A] 为实际 ZFC 模型，HOD(A) 为实际 ZF 模型；
 全收集使用秩切片作内部见证池，允许非标准有限参数列且不使用背景选择公理。
+HOD[A] 的有界序数关系呈现与总坍塌已构造。弱齐性力迫的 HOD/HOD[A] 比较
+另由 Model.Forcing.Internal.Homogeneous.HOD 导出；具体边界和待建内容见 InnerModel/README.md。
 -/

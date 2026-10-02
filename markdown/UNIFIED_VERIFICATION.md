@@ -12,6 +12,26 @@
 任意原模型及每一组参数赋值。`PureTarskiSource` 另已给出保留源编码的裸 ZFC 版本；
 其合同按源公式索引。`PureTarski` 现已完成只量化纯公式、使用最终纯公式自身编码的版本。
 
+## 内模型与弱齐性比较的核验
+
+当前内模型端点及理论强度统一见[内模型进度](../YesMetaZFC/SetTheory/InnerModel/README.md)。
+J 的递归与局部良序消费 KPi；L 的 ZFC＋GCH、OD/HOD 参数模型及弱齐性比较消费 ZF。
+内部全公式小壳的一般构造使用 ZFC，GCH 证明先在 L 中导出 AC，再在 L 内调用它，
+因此 `l_model_gch_l` 的背景前提仍为 ZF。
+
+2026-10-02 的源码核验覆盖全部 1,842 个 Lean 模块和 `prove_auto_sweep`，均通过
+`lake --wfail build`；使用 `python scripts/lean_cache.py build` 枚举独立模块。
+HOD 比较增量另审计 18 个模块、217 个实际声明，包括生成的私有声明，
+并对 15 个坍塌语法、解释及传输端点排除 `Classical.choice`。
+该数字表示此次比较切片，不表示对全库所有声明作了同一强度的公理审计。
+
+`whom_hod_comparison_l`、`whom_hb_comparison_l`、`cohen_hod_comparison_l` 的递归依赖
+仅包含 Lean 的 `propext`、`Quot.sound`、`Classical.choice` 与原七条 ZF 公理正文的
+自由闭合性证书，没有 `sorryAx`、新增公理或不可计算数据声明。这里的命题内经典证明
+不等于假定背景模型满足 AC；上述三个定理也不依赖原选择公理正文的闭合性证书。
+临时审计模块及其产物已移除，生产审计清单维护在
+[check_internal_models.py](../scripts/check_internal_models.py) 和 [check_forcing.py](../scripts/check_forcing.py)。
+
 ## 模型、公理与推导
 
 | 要使用的结果 | 接口与源码 | 精确范围 |
@@ -37,7 +57,7 @@
 一致性证明使用已有 `propext`、`Quot.sound`、`Classical.choice`。`zfc_consistent`
 还继承原八条固定公理的 `sentence!` 自由闭合性 `native_decide` 依赖：外延、空集、配对、
 并集、幂集、无穷、基础及选择各一处。没有新增公理常量、`sorryAx` 或原生验证依赖。
-当前全部 1,594 个独立模块及扫描工具严格构建通过；代码范围及载体边界见
+全库构建的当前范围见上节；代码范围及载体边界见
 [模型论指南](../YesMetaZFC/Model/README.md)。
 
 布尔层新增 50 个关键依赖入口并交叉复核 8 个小图入口。`name_structure`、名称等号的

@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.OD.RelativeClosure
+import YesMetaZFC.SetTheory.InnerModel.HOD.Definition
 import YesMetaZFC.Model.SetTheory.ProjectBounded
 import YesMetaZFC.SetTheory.KP.Ordinal
 
@@ -33,6 +34,17 @@ theorem ha_oa_l {k A x} (h : Ha_d (M := M) k A x) : Oa_d k A x := h.elim fun _ h
 theorem ha_trans_l {k A x y} (h : Ha_d (M := M) k A x) (hy : M.mem y x) : Ha_d k A y := by
   obtain ⟨T, ht, hx, ho⟩ := h
   exact ⟨T, ht, ht x hx y hy, ho⟩
+
+theorem hb_of_hod_l (hZF : M.Models ZF) (A : M.Domain) {x} (h : Hod_d x) : Hb_d A x := by
+  obtain ⟨T, ht, hx, ho⟩ := h
+  exact ⟨T, ht, hx, fun y hy => oa_bracket_l.mpr (ob_of_od_l hZF A (ho y hy))⟩
+
+/-- 序数参数不改变遗传序数可定义类。 -/
+theorem hb_ordinal_parameter_l (hZF : M.Models ZF) {A x : M.Domain} (hA : M.IsOrdinal A) :
+    Hb_d A x ↔ Hod_d x := by
+  refine ⟨?_, hb_of_hod_l hZF A⟩
+  rintro ⟨T, ht, hx, ho⟩
+  exact ⟨T, ht, hx, fun y hy => (ob_ordinal_parameter_l hZF hA).mp (oa_bracket_l.mp (ho y hy))⟩
 
 theorem ha_ordinal_l (hZF : M.Models ZF) (k : Bool) (A : M.Domain) {x} (hx : M.IsOrdinal x) : Ha_d k A x := by
   obtain ⟨s, hs, hxs⟩ := KP.ordinal_successor_l (ZF.modelsKP hZF) hx

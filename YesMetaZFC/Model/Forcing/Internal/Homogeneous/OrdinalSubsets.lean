@@ -33,23 +33,30 @@ theorem ordinal_set_ground_bound_l (X : (E).Domain) (hX : ∀ x, x ∈ X → (E)
   · exact hh.symm ▸ hD.predecessor_mem
   · exact (hD x).mpr (Or.inl hh)
 
-/-- 弱齐性、OD[A] 呈现的扩张中，每个 OD[e(A)] 序数子集来自地模型 OD[A]。 -/
-theorem whom_ob_ordinal_subset_l (hH : Whom_d M B R z) {A}
-    (hB : Ob_d A B) (hR : Ob_d A R) (hz : Ob_d A z)
-    {X : (E).Domain} (hX : Ob_d (e A) X) (hOrd : ∀ x, x ∈ X → (E).IsOrdinal x) :
+/-- 任意 OD[A] 旧集合的 OD[e(A)] 子集均能恢复，包括序数代码的有序对关系。 -/
+theorem whom_ob_old_subset_l (hH : Whom_d M B R z) {A D}
+    (hB : Ob_d A B) (hR : Ob_d A R) (hz : Ob_d A z) (hD : Ob_d A D)
+    {X : (E).Domain} (hX : Ob_d (e A) X) (hsub : (E).MemberSubset X (e D)) :
     ∃ Y, Ob_d A Y ∧ e Y = X := by
   let hE := preserves_zf_l O hZF hU
-  obtain ⟨α, hα, hXα⟩ := ordinal_set_ground_bound_l O hZF hU hb e hv he hi X hOrd
   obtain ⟨n, φ, η, hη, hdef⟩ := (ob_iff_external_l hE).mp hX
   obtain ⟨v, hv'⟩ := Classical.axiomOfChoice (fun i =>
     no_new_ordinals_l O hZF hU (hU.proper b hb).1 e hv he hi (hη i))
   let ρ : Env M n := ⟨v, fun _ => A⟩
   let ψ : UnarySchema (n+1) := ⟨φ.body, φ.freeClosed⟩
   have hψ y : ψ.denote (η.push (e A)) y ↔ y = X := hdef y
-  exact whom_definable_subset_l O hZF hU hb e hv he hH hB hR hz (ob_ordinal_l hZF A hα)
+  exact whom_definable_subset_l O hZF hU hb e hv he hH hB hR hz hD
     (od_member_s ψ) (ρ.push A) (η.push (e A))
     (Fin.cases (ob_parameter_l hZF A) (fun i => ob_ordinal_l hZF A (hv' i).1))
-    (Fin.cases rfl (fun i => (hv' i).2)) hXα (od_member_sat_l ψ _ hψ)
+    (Fin.cases rfl (fun i => (hv' i).2)) hsub (od_member_sat_l ψ _ hψ)
+
+/-- 弱齐性、OD[A] 呈现的扩张中，每个 OD[e(A)] 序数子集来自地模型 OD[A]。 -/
+theorem whom_ob_ordinal_subset_l (hH : Whom_d M B R z) {A}
+    (hB : Ob_d A B) (hR : Ob_d A R) (hz : Ob_d A z)
+    {X : (E).Domain} (hX : Ob_d (e A) X) (hOrd : ∀ x, x ∈ X → (E).IsOrdinal x) :
+    ∃ Y, Ob_d A Y ∧ e Y = X := by
+  obtain ⟨α, hα, hXα⟩ := ordinal_set_ground_bound_l O hZF hU hb e hv he hi X hOrd
+  exact whom_ob_old_subset_l O hZF hU hb e hv he hi hH hB hR hz (ob_ordinal_l hZF A hα) hX hXα
 
 /-- 无参数版本：OD 弱齐性力迫不增加 OD 序数子集，且原像仍是地模型中的 OD 集。 -/
 theorem whom_od_ordinal_subset_l (hH : Whom_d M B R z)
@@ -60,9 +67,6 @@ theorem whom_od_ordinal_subset_l (hH : Whom_d M B R z)
   obtain ⟨A, hA⟩ := KP.exists_empty (ZF.modelsKP hZF)
   obtain ⟨Y, hY, hYX⟩ := whom_ob_ordinal_subset_l O hZF hU hb e hv he hi hH
     (ob_of_od_l hZF A hB) (ob_of_od_l hZF A hR) (ob_of_od_l hZF A hz) (ob_of_od_l hE (e A) hX) hOrd
-  obtain ⟨n, φ, ρ, hρ, hdef⟩ := (ob_iff_external_l hZF).mp hY
-  let ψ : UnarySchema (n+1) := ⟨φ.body, φ.freeClosed⟩
-  exact ⟨Y, od_of_unique_l hZF ψ (ρ.push A)
-    (Fin.cases (Structure.IsOrdinal.of_no_members hA) hρ) hdef, hYX⟩
+  exact ⟨Y, (ob_ordinal_parameter_l hZF (Structure.IsOrdinal.of_no_members hA)).mp hY, hYX⟩
 
 end YesMetaZFC.Model.Forcing.Internal

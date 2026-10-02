@@ -16,6 +16,21 @@ YesMetaZFC 在 Lean 4 中发展一阶逻辑、集合论与元数学的形式化�
 Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义版覆盖任意裸 ZFC
 模型和每组有限参数赋值。准确的公式范围、编码约定与声明见 [TROPHIES.md](markdown/TROPHIES.md)。
 
+## 内模型与可容许递归
+
+[内模型进度与接口](YesMetaZFC/SetTheory/InnerModel/README.md) 汇总已实现结果及其理论强度：
+
+| 方向 | 当前结果 |
+| --- | --- |
+| Jensen J 与 L | KPi 中构造闭包、J 层级及实际 L 模型；ZF 背景下同一 L 满足 ZFC＋GCH |
+| 集合计算与良序 | C 风格集合 DSL、Δ₀ 判定与 Σ₁ 见证验证；KPi＋V=L 下 Δ₁ 与总 J 搜索等价；各非空 J 层有统一局部 Σ₁ 良序及同层完整初段 |
+| OD 与 HOD | 内部规范编码、Σ₂ 成员证书、最小代表；仅需 ZF，HOD[A] 为 ZFC 模型，HOD(A) 为 ZF 模型 |
+| 弱齐性力迫比较 | 呈现为 OD 的弱齐性力迫满足 HOD 从扩张到地模型的包含关系；固定参数版和 Cohen 实例均已完成 |
+
+模型可以在外部非良基、ω 非标准；上述对象和良序均按模型内部解释。
+普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
+集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
+
 ## 算术理论
 
 独立算术子库提供 Q、PA、Z₂ 的公理模式与推导、内部有限编码，以及逐程序原始递归的
@@ -51,6 +66,7 @@ CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，�
 | 要做的工作 | 入口 |
 | --- | --- |
 | 找到终局定理与准确的数学结论 | [TROPHIES.md](markdown/TROPHIES.md) |
+| 使用 J/L、OD/HOD、可容许递归与弱齐性比较 | [内模型进度与接口](YesMetaZFC/SetTheory/InnerModel/README.md) |
 | 复用替换、内部反射、固定点、纯语言传输与自动化证明 | [ENGINEERING.md](markdown/ENGINEERING.md) |
 | 使用自然数证明证书、源 quotation、纯公式自身编码与整树检查器 | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
 | 使用纯定义、内部递归、阶段扩张和原规格 | [ELIMINATION.md](markdown/ELIMINATION.md) |

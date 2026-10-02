@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.InnerModel.OD.Complexity
 import YesMetaZFC.SetTheory.InnerModel.OD.Choice
 import YesMetaZFC.SetTheory.InnerModel.OD.Order
 import YesMetaZFC.SetTheory.InnerModel.OD.RelativeClosure
+import YesMetaZFC.SetTheory.InnerModel.OD.Relations
 
 /-! # OD：内部定义、原公式对应与单序数解码
 
@@ -12,4 +13,5 @@ import YesMetaZFC.SetTheory.InnerModel.OD.RelativeClosure
 是实际集合。OD 参数的唯一可定义闭性保证规范选择集仍属于 OD。
 OD[A] 把整个 A 作为固定参数；OD(A) 额外允许模型内部有限 A 参数列。
 固定参数版本与原公式从 A 及序数参数唯一可定义等价，两种版本都满足有限定义闭性。
+OD[A] 对笛卡尔积及任意原公式关系的集合化封闭；固定序数参数时 OD[A]=OD。
 -/

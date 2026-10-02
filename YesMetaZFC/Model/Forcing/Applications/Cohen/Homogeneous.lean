@@ -60,4 +60,11 @@ theorem cohen_whom_l {κ B R} (h : Cohen_spec_d I κ B R) : Whom_d M B R B := by
   obtain ⟨_, _, _, _, _, hω, _, _, hY, _, hB, _, hR⟩ := h
   exact fn_whom_l hZF hω hY hB hR
 
+/-- Cohen 呈现直接给出内部条件序；载体自身充当不在载体中的零标记。 -/
+theorem cohen_cond_order_l {κ B R} (h : Cohen_spec_d I κ B R) : Cond_order_d M B R B := by
+  have hp := (cohen_spec_top_l I hZF h).1
+  refine ⟨hp.1, hp.2, fun p _ hpb => ?_⟩
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, hR⟩ := h
+  exact False.elim (KP.mem_irrefl_d (ZF.modelsKP hZF) B ((hR p B).mp hpb).2.1)
+
 end YesMetaZFC.Model.Forcing.Internal

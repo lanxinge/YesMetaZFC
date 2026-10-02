@@ -16,6 +16,7 @@
 | [Flip.lean](Flip.lean) | — | 保留内部有限性的实际条件自同构、翻转还原及固定空条件 |
 | [Homogeneous.lean](Homogeneous.lean) | — | 用差异坐标翻转和有限并图证明弱齐性 |
 | [OrdinalSubsets.lean](OrdinalSubsets.lean) | — | 呈现的 OD 性，以及自动构造地嵌入、不增加序数和恢复 OD 序数子集 |
+| [HOD.lean](HOD.lean) | — | 仅需 ZF 的 `cohen_hod_comparison_l`：扩张 HOD 的对象均有地模型 HOD 原像 |
 | [Add.lean](Add.lean) | `CohenAdd.lean` | 一次添加任意参数量的 Cohen 实数 |
 | [Algebra.lean](Algebra.lean) | `Cohen.lean` | 一个 Cohen 实数的布尔条件代数 |
 | [NameSyntax.lean](NameSyntax.lean) | `CohenNameSyntax.lean` | 规范 Cohen 名称的原公式规格 |
