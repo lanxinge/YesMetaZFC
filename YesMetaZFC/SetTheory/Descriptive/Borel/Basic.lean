@@ -18,7 +18,7 @@ def bbasic_m {d} (s c : Term d) : Formula 1 d := .existsE (.existsE (.existsE (.
       (.conj (Formula.isSingleton .newest (.bound 1))
         (bpack_m (𝒞 := 𝒞) c.weaken.weaken.weaken.weaken (.bound 2) (.bound 3) (.bound 3) .newest))))))))
 derive_free_closed bbasic_m
-@[prove_auto_norm semantic]
+
 theorem bbasic_sat_l (hE : Extensional M) {d} (ρ : Env M d) (s c : Term d) :
     Formula.satisfies ρ (bbasic_m (𝒞 := 𝒞) s c) ↔ Bbasic_d I (s.eval ρ) (c.eval ρ) := by
   simp only [bbasic_m, Bbasic_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,

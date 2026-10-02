@@ -18,7 +18,7 @@ def rp_m {d} (J x y t : Term d) : Formula 1 d := .conj (Formula.isRelation 𝒞 
       (.conj (Formula.orderedPairMem 𝒞 (.bound 3) .newest y.weaken.weaken.weaken.weaken)
         (np_m (𝒞 := 𝒞) J.weaken.weaken.weaken.weaken (.bound 1) .newest (.bound 2)))))))))
 derive_free_closed rp_m
-@[prove_auto_norm semantic]
+
 theorem rp_sat_l {d} (ρ : Env M d) (J x y t : Term d) :
     Formula.satisfies ρ (rp_m (𝒞 := 𝒞) J x y t) ↔ Rp_d I (J.eval ρ) (x.eval ρ) (y.eval ρ) (t.eval ρ) := by
   simp only [rp_m, Rp_d, Formula.satisfies_conj_iff, Formula.satisfies_isRelation_iff I,

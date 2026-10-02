@@ -18,7 +18,7 @@ def ps_m {d} (ω A B J n K : Term d) : Formula 1 d := .existsE (.existsE (.conj
   (bden_m (𝒞 := 𝒞) ω.weaken.weaken A.weaken.weaken A.weaken.weaken B.weaken.weaken (.bound 1) .newest)
   (pval_m (𝒞 := 𝒞) ω.weaken.weaken B.weaken.weaken J.weaken.weaken n.weaken.weaken .newest K.weaken.weaken))))
 derive_free_closed ps_m
-@[prove_auto_norm semantic]
+
 theorem ps_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J n K : Term d) :
     Formula.satisfies ρ (ps_m (𝒞 := 𝒞) ω A B J n K) ↔
       Ps_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (n.eval ρ) (K.eval ρ) := by
@@ -29,7 +29,7 @@ def Pp_d (ω A B J n K : M.Domain) : Prop := ∃ L, Ps_d I ω A B J n L ∧ Cm_d
 def pp_m {d} (ω A B J n K : Term d) : Formula 1 d := .existsE (.conj
   (ps_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken n.weaken .newest) (cm_m B.weaken .newest K.weaken))
 derive_free_closed pp_m
-@[prove_auto_norm semantic]
+
 theorem pp_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J n K : Term d) :
     Formula.satisfies ρ (pp_m (𝒞 := 𝒞) ω A B J n K) ↔
       Pp_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (n.eval ρ) (K.eval ρ) := by
@@ -40,7 +40,7 @@ def Pd_d (ω A B J n K : M.Domain) : Prop := Ps_d I ω A B J n K ∧ Pp_d I ω A
 def pd_m {d} (ω A B J n K : Term d) : Formula 1 d :=
   .conj (ps_m (𝒞 := 𝒞) ω A B J n K) (pp_m (𝒞 := 𝒞) ω A B J n K)
 derive_free_closed pd_m
-@[prove_auto_norm semantic]
+
 theorem pd_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J n K : Term d) :
     Formula.satisfies ρ (pd_m (𝒞 := 𝒞) ω A B J n K) ↔
       Pd_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (n.eval ρ) (K.eval ρ) := by

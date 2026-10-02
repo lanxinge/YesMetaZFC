@@ -17,7 +17,7 @@ def tree_m {d} (S T : Term d) : Formula 1 d := .conj (Formula.subset T S)
   (Formula.forallMem T (Formula.forallMem S.weaken
     (.imp (Formula.subset .newest (.bound 1)) (.mem .newest T.weaken.weaken))))
 derive_free_closed tree_m
-@[prove_auto_norm semantic]
+
 theorem tree_sat_l {d} (ρ : Env M d) (S T : Term d) :
     Formula.satisfies ρ (tree_m S T) ↔ Tree_d (M := M) (S.eval ρ) (T.eval ρ) := by
   simp only [tree_m, Tree_d, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
@@ -86,7 +86,7 @@ def Ktree_d (S K T : M.Domain) : Prop := ∀ s,
 def ktree_m {d} (S K T : Term d) : Formula 1 d := .forallE (.iff (.mem .newest T.weaken)
   (.conj (.mem .newest S.weaken) (Formula.existsMem K.weaken (Formula.subset (.bound 1) .newest))))
 derive_free_closed ktree_m
-@[prove_auto_norm semantic]
+
 theorem ktree_sat_l {d} (ρ : Env M d) (S K T : Term d) :
     Formula.satisfies ρ (ktree_m S K T) ↔ Ktree_d (M := M) (S.eval ρ) (K.eval ρ) (T.eval ρ) := by
   simp only [ktree_m, Ktree_d, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff,

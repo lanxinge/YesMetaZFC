@@ -81,8 +81,6 @@ jobs:
         run: |
           python scripts/test_arithmetic_guard.py
           python scripts/check_arithmetic.py
-      - name: Check scanner
-        run: lake --no-build exe prove_auto_sweep --help
       - name: Audit filters and Boolean completion
         run: python scripts/check_filters.py
       - name: Audit elementary substructures

@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Algebra
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数算术的比较与分解
 本文件整理序数算术值的成员分解。加法值由左侧初段和右参数索引的尾段值组成；

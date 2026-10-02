@@ -93,7 +93,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 单射公式与纸面单射语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isInjective_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (function : Term depth) :
@@ -111,7 +111,7 @@ theorem satisfies_isInjective_iff
   · intro h first second output hPairs
     exact h first second output hPairs.1 hPairs.2
 /-- 从源到目标的单射公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isInjectionFromTo_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (function source target : Term depth) :
@@ -122,7 +122,7 @@ theorem satisfies_isInjectionFromTo_iff
     satisfies_isFunctionFromTo_iff 𝕀 hExt,
     satisfies_isInjective_iff 𝕀 hExt]
 /-- 从源到目标的双射公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isBijectionFromTo_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (function source target : Term depth) :
@@ -133,7 +133,7 @@ theorem satisfies_isBijectionFromTo_iff
     satisfies_isInjectionFromTo_iff 𝕀 hExt,
     satisfies_isSurjectiveOnto_iff 𝕀]
 /-- 等势公式与纸面等势语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_equinumerous_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (left right : Term depth) :
@@ -143,7 +143,7 @@ theorem satisfies_equinumerous_iff
     satisfies_exists_iff, satisfies_isBijectionFromTo_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 基数小于等于公式与纸面单射定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_cardinalLessOrEqual_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (left right : Term depth) :
@@ -153,7 +153,7 @@ theorem satisfies_cardinalLessOrEqual_iff
     satisfies_exists_iff, satisfies_isInjectionFromTo_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 基数严格小于公式与纸面定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_cardinalLess_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (left right : Term depth) :
@@ -164,7 +164,7 @@ theorem satisfies_cardinalLess_iff
     satisfies_cardinalLessOrEqual_iff 𝕀 hExt,
     satisfies_equinumerous_iff 𝕀 hExt]
 /-- 基数公式与初始序数的纸面定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ : Term depth) :
@@ -175,7 +175,7 @@ theorem satisfies_isCardinal_iff
     satisfies_isOrdinal_iff, satisfies_equinumerous_iff 𝕀 hExt,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- “`κ` 是 `set` 的基数”公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinalOf_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (κ set : Term depth) :

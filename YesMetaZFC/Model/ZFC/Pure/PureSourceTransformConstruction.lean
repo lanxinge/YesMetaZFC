@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceProjection
-import YesMetaZFC.Automation.ObjectSyntaxTransformAccept
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectSyntaxTransformAccept
 
 /-! # 当前语法变换图的内部规则构造
 

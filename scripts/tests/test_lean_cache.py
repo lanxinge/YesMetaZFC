@@ -123,7 +123,7 @@ class CacheTests(unittest.TestCase):
         for name in ("lib/lean/A.olean.private", "lib/lean/A.ilean", "lib/lean/A.trace",
                      "ir/A.c", "ir/A.c.hash", "ir/A.setup.json", "share/YesMetaZFC/LICENSE"):
             self.assertTrue(cache.selected(PurePosixPath(name), "lean"), name)
-        for name in ("ir/A.c.o", "ir/A.c.o.export", "lib/libYesMetaZFC.a", "bin/prove_auto_sweep"):
+        for name in ("ir/A.c.o", "ir/A.c.o.export", "lib/libYesMetaZFC.a", "bin/example_tool"):
             self.assertFalse(cache.selected(PurePosixPath(name), "lean"), name)
             self.assertTrue(cache.selected(PurePosixPath(name), "full"), name)
 

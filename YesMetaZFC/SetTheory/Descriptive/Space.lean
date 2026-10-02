@@ -35,13 +35,13 @@ def cantor_m {d} (ω C : Term d) : Formula 1 d := .conj (Formula.isOmega ω)
     (cantor_m (𝒞 := 𝒞) ω C).FreeClosed := by
   simp -implicitDefEqProofs [cantor_m, Formula.isFunctionSpace, Definitional.Formula.FreeClosed, hω, hC]
 
-@[prove_auto_norm semantic]
+
 theorem baire_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω B : Term d) :
     Formula.satisfies ρ (baire_m (𝒞 := 𝒞) ω B) ↔ Baire_d I (ω.eval ρ) (B.eval ρ) := by
   simp only [baire_m, Baire_d, Formula.satisfies_conj_iff, Formula.satisfies_isOmega_iff,
     Formula.satisfies_isFunctionSpace_iff I hE]
 
-@[prove_auto_norm semantic]
+
 theorem cantor_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω C : Term d) :
     Formula.satisfies ρ (cantor_m (𝒞 := 𝒞) ω C) ↔ Cantor_d I (ω.eval ρ) (C.eval ρ) := by
   simp only [cantor_m, Cantor_d, Structure.IsOrdinalTwo, Formula.satisfies_conj_iff,

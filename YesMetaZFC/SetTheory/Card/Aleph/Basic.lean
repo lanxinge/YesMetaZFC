@@ -55,7 +55,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 无限基数公式与纸面定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isInfiniteCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω κ : Term depth) :
@@ -66,7 +66,7 @@ theorem satisfies_isInfiniteCardinal_iff
     satisfies_isCardinal_iff 𝕀 hExt,
     satisfies_cardinalLessOrEqual_iff 𝕀 hExt]
 /-- 可数无限公式与纸面等势定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCountablyInfinite_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω set : Term depth) :
@@ -75,7 +75,7 @@ theorem satisfies_isCountablyInfinite_iff
   simp only [isCountablyInfinite, Structure.IsCountablyInfinite,
     satisfies_equinumerous_iff 𝕀 hExt]
 /-- 至多可数公式与纸面基数比较定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isAtMostCountable_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω set : Term depth) :
@@ -84,7 +84,7 @@ theorem satisfies_isAtMostCountable_iff
   simp only [isAtMostCountable, Structure.IsAtMostCountable,
     satisfies_cardinalLessOrEqual_iff 𝕀 hExt]
 /-- 基数后继公式与最小严格更大基数的纸面定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinalSuccessor_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (successor predecessor : Term depth) :
@@ -108,7 +108,7 @@ theorem satisfies_isCardinalSuccessor_iff
 end Formula
 namespace BinarySchema
 /-- Aleph 递归算子的 schema 解释与纸面三分支定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem denote_alephOperator_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ) (env : Env ℳ 1) (sequence output : ℳ.Domain) :
     (alephOperator 𝒞).denote env sequence output ↔
@@ -134,7 +134,7 @@ theorem denote_alephOperator_iff
     Term.eval_bound_two_push, Definitional.Term.eval_newest]
   rfl
 /-- Aleph 类关系的 schema 解释与纸面递归值定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem denote_aleph_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ) (env : Env ℳ 1) (index value : ℳ.Domain) :
     (aleph 𝒞).denote env index value ↔
@@ -153,7 +153,7 @@ theorem denote_aleph_iff
 end BinarySchema
 namespace Formula
 /-- Aleph 数公式与纸面递归值定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isAlephNumber_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω index aleph : Term depth) :

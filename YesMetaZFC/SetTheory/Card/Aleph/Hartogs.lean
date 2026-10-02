@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Card.Aleph.Existence
 import YesMetaZFC.SetTheory.Ord.OrderType
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # Hartogs 序数
 本文件在模型内部收集给定集合各子集上的集合编码良序，并以其序型后继之并构造

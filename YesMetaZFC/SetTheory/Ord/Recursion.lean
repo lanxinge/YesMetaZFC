@@ -2,7 +2,6 @@ import YesMetaZFC.SetTheory.FunctionConstruction
 import YesMetaZFC.SetTheory.Ord.Induction
 import YesMetaZFC.SetTheory.Replacement
 import YesMetaZFC.SetTheory.SetConstruction
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 超限递归
 本文件先把集合编码递归序列整理成纸面语义，再沿序数归纳证明递归序列的唯一性与
@@ -13,14 +12,14 @@ namespace SetTheory
 universe u
 namespace Structure
 /-- `sequence` 是定义域恰为序数 `length` 的集合编码函数。 -/
-@[prove_auto_norm definition]
+
 def IsSequenceOfLength {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (sequence length : ℳ.Domain) : Prop :=
   ℳ.IsOrdinal length ∧
     ℳ.IsSetFunction 𝕀 sequence ∧
       ℳ.IsDomainOf 𝕀 length sequence
 /-- `sequence` 是长度为 `length`、取值于 `target` 的集合编码函数。 -/
-@[prove_auto_norm definition]
+
 def IsSequenceIn {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (sequence length target : ℳ.Domain) : Prop :=
   ℳ.IsOrdinal length ∧
@@ -44,13 +43,13 @@ def ObeysRecursion {ℳ : Structure.{u}}
         ℳ.IsRestrictionOf 𝕀 restriction sequence index ∧
           operator restriction value
 /-- `sequence` 是长度为 `length`、服从 `operator` 的递归序列。 -/
-@[prove_auto_norm definition]
+
 def IsRecursiveSequence {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (operator : ℳ.Domain → ℳ.Domain → Prop) (sequence length : ℳ.Domain) : Prop :=
   ℳ.IsSequenceOfLength 𝕀 sequence length ∧
     ℳ.ObeysRecursion 𝕀 operator sequence length
 /-- `sequence` 是长度为 `length`、取值于 `target` 的递归序列。 -/
-@[prove_auto_norm definition]
+
 def IsRecursiveSequenceIn {ℳ : Structure.{u}}
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (operator : ℳ.Domain → ℳ.Domain → Prop)
     (sequence length target : ℳ.Domain) : Prop :=

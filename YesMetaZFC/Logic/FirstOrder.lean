@@ -11,8 +11,7 @@ import YesMetaZFC.Logic.FirstOrder.Lindenbaum
 import YesMetaZFC.Model.FirstOrder.LevyAbsoluteness
 /-!
 # 一阶语义与 Derives 核聚合入口
-新 Automation 的 Formula/Theory/Derives 与完备性证明层统一从这里消费，而不是恢复
-旧 MF1。
+类型化公式、理论、Derives 与完备性证明层统一消费本入口。
 -/
 namespace YesMetaZFC
 namespace Logic

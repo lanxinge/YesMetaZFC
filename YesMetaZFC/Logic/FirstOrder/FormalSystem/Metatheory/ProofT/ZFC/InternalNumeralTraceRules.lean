@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralTraceReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralTraceReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPredicateTransport
 
 /-! # 数码递归图的内部零规则与后继规则

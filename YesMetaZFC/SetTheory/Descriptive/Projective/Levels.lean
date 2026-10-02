@@ -19,7 +19,7 @@ def plevel_m {d} (ω A B J n p : Term d) : Formula 1 d := .existsE (.existsE (.c
   (.forallE (.iff (.mem .newest (.bound 1)) (pp_m (𝒞 := 𝒞) ω.weaken.weaken.weaken
     A.weaken.weaken.weaken B.weaken.weaken.weaken J.weaken.weaken.weaken n.weaken.weaken.weaken .newest))))))
 derive_free_closed plevel_m
-@[prove_auto_norm semantic]
+
 theorem plevel_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J n p : Term d) :
     Formula.satisfies ρ (plevel_m (𝒞 := 𝒞) ω A B J n p) ↔
       Plevel_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (n.eval ρ) (p.eval ρ) := by
@@ -66,7 +66,7 @@ def phier_m {d} (ω A B J H : Term d) : Formula 1 d := .conj (Formula.isFunction
     (.conj (.mem (.bound 1) ω.weaken.weaken) (plevel_m (𝒞 := 𝒞) ω.weaken.weaken
       A.weaken.weaken B.weaken.weaken J.weaken.weaken (.bound 1) .newest)))))
 derive_free_closed phier_m
-@[prove_auto_norm semantic]
+
 theorem phier_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J H : Term d) :
     Formula.satisfies ρ (phier_m (𝒞 := 𝒞) ω A B J H) ↔
       Phier_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (H.eval ρ) := by

@@ -29,7 +29,7 @@ def Anrel_d (ω A B J X K : M.Domain) : Prop := ∃ L, An_d I ω A B J L ∧ Tr_
 def anrel_m {d} (ω A B J X K : Term d) : Formula 1 d := .existsE (.conj
   (an_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken .newest) (tr_m X.weaken .newest K.weaken))
 derive_free_closed anrel_m
-@[prove_auto_norm semantic]
+
 theorem anrel_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J X K : Term d) :
     Formula.satisfies ρ (anrel_m (𝒞 := 𝒞) ω A B J X K) ↔
       Anrel_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (X.eval ρ) (K.eval ρ) := by

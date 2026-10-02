@@ -68,15 +68,15 @@ lake --wfail build
 bash scripts/check-all.sh
 ```
 
-全源脚本需要 Python 3.11 或以上，覆盖默认入口未导入的独立模块与 `prove_auto_sweep`，
+全源脚本需要 Python 3.11 或以上，覆盖默认入口未导入的独立模块，
 warning 会使检查失败。工具链恢复见 [RESTORE.md](markdown/RESTORE.md)。
-仅检查全部库模块时，运行 `bash scripts/check-all.sh --library-only`。
+默认检查全部 Lean 模块；另需原生对象及库时，运行 `bash scripts/check-all.sh --native`。
 模型接口及可信依赖见 [model](YesMetaZFC/Model/README.md)；通用入口为 `import YesMetaZFC.Model`，具体入口为 `import YesMetaZFC.Model.SmallGraph` 和 `import YesMetaZFC.Model.Boolean`。
 
 ## 获取构建缓存
 
 安装工具链后，在对应提交运行 `python scripts/lean_cache.py get` 获取编辑和证明开发所需缓存；
-使用 `python scripts/lean_cache.py get --kind full` 可同时获取原生库与扫描工具。
+使用 `python scripts/lean_cache.py get --kind full` 可同时获取原生对象和库。
 CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，完成后按提交发布。
 平台范围、离线恢复和发布条件见 [CACHE.md](markdown/CACHE.md)。
 
@@ -102,3 +102,5 @@ CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，�
 
 本项目的原创代码与随附文档采用 [Apache License 2.0](LICENSE)，署名见 [NOTICE](NOTICE)。
 第三方材料如有单独声明，仍遵循其原有许可。
+
+轻量证明派生入口为 `YesMetaZFC.Tactic`，包括命题推导、闭合性、理论包含和有限公理基装配。通用搜索证明器已移出主项目，源码留档与模块迁移见 [拆分说明](markdown/PROVER_SPLIT.md)。

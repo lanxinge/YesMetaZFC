@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralEvaluation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralEvaluation
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralQuantifiers
 
 /-! # 二元项求值的可分离数码归纳

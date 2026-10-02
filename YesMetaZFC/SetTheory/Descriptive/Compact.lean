@@ -41,7 +41,7 @@ def compact_m {d} (ω B τ : Term d) : Formula 1 d := .forallE
     (.conj (finite_m 𝒞 ω.weaken.weaken .newest) (.conj (Formula.subset .newest (.bound 1))
       (cover_m B.weaken.weaken .newest))))))
 derive_free_closed compact_m
-@[prove_auto_norm semantic]
+
 theorem compact_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω B τ : Term d) :
     Formula.satisfies ρ (compact_m (𝒞 := 𝒞) ω B τ) ↔ Compact_d I (ω.eval ρ) (B.eval ρ) (τ.eval ρ) := by
   simp only [compact_m, Compact_d, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,

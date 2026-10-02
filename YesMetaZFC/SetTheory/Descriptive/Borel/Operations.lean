@@ -35,7 +35,7 @@ def bjoin_m {d} (ω z H E c : Term d) : Formula 1 d := .existsE (.existsE (.exis
     H.weaken.weaken.weaken.weaken E.weaken.weaken.weaken.weaken (.bound 3) (.bound 2) (.bound 1) .newest)
   (bpack_m (𝒞 := 𝒞) c.weaken.weaken.weaken.weaken (.bound 3) (.bound 2) (.bound 1) .newest)))))
 derive_free_closed bjoin_m
-@[prove_auto_norm semantic]
+
 theorem bjoin_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω z H E c : Term d) :
     Formula.satisfies ρ (bjoin_m (𝒞 := 𝒞) ω z H E c) ↔
       Bjoin_d I (ω.eval ρ) (z.eval ρ) (H.eval ρ) (E.eval ρ) (c.eval ρ) := by

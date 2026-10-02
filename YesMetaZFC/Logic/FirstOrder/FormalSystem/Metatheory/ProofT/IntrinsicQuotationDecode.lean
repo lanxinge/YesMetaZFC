@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectHornValues
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornValues
 
 /-! # 内核 quotation 数值的实际逆解码
 

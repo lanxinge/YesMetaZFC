@@ -78,7 +78,7 @@ def pval_m {d} (ω B J n C D : Term d) : Formula 1 d := .existsE (.conj
   (pseq_m (𝒞 := 𝒞) ω.weaken B.weaken J.weaken C.weaken .newest)
   (Formula.orderedPairMem 𝒞 n.weaken D.weaken .newest))
 derive_free_closed pval_m
-@[prove_auto_norm semantic]
+
 theorem pval_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω B J n C D : Term d) :
     Formula.satisfies ρ (pval_m (𝒞 := 𝒞) ω B J n C D) ↔
       Pval_d I (ω.eval ρ) (B.eval ρ) (J.eval ρ) (n.eval ρ) (C.eval ρ) (D.eval ρ) := by

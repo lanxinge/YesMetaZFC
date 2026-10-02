@@ -98,7 +98,7 @@ These interfaces support the current results and the broader research-platform g
 | --- | --- |
 | Mathematical results and exact hypotheses | [TROPHIES.md](markdown/TROPHIES.md) |
 | J/L, OD/HOD, set computation, and forcing comparison | [Inner-model progress and interfaces](YesMetaZFC/SetTheory/InnerModel/README.md) |
-| Reusable proof interfaces and `prove_auto` automation | [ENGINEERING.md](markdown/ENGINEERING.md) |
+| Reusable proof interfaces and lightweight derivation tactics | [ENGINEERING.md](markdown/ENGINEERING.md) |
 | Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
 | Definitions, internal recursion, and staged extensions | [ELIMINATION.md](markdown/ELIMINATION.md) |
 | Axiom coverage, model correspondence, and recorded dependency audits | [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) |
@@ -157,3 +157,5 @@ module in a [GitHub issue](https://github.com/lanxinge/YesMetaZFC/issues).
 Original project code and accompanying documentation are licensed under the
 [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.
 Separately identified third-party material retains its original license.
+
+Lightweight derivation tactics are available through `YesMetaZFC.Tactic`. The general proof-search engine has been archived outside this project; see the [split record](markdown/PROVER_SPLIT.md) for the source archive and module migration.

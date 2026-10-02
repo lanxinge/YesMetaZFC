@@ -31,7 +31,7 @@ theorem tr_compl_l {B X K L U V : M.Domain} (hX : M.MemberSubset X B) (h : Cm_d 
 def Rclass_d (X C K : M.Domain) : Prop := ∃ L, M.mem L C ∧ Tr_d X L K
 def rclass_m {d} (X C K : Term d) : Formula 1 d := Formula.existsMem C (tr_m X.weaken .newest K.weaken)
 derive_free_closed rclass_m
-@[prove_auto_norm semantic]
+
 theorem rclass_sat_l {d} (ρ : Env M d) (X C K : Term d) :
     Formula.satisfies ρ (rclass_m X C K) ↔ Rclass_d (M := M) (X.eval ρ) (C.eval ρ) (K.eval ρ) := by
   simp only [rclass_m, Rclass_d, Formula.satisfies_existsMem_iff, tr_sat_l, Definitional.Term.eval_weaken]; rfl

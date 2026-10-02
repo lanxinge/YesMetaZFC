@@ -1,5 +1,7 @@
 # 公理验证与不完备性接口指路表
 
+> 文中旧基点的构建数量、耗时和扫描器结果属于历史证据。当前主项目已移出通用证明器；当前边界与验证见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
+
 验证对象是原 `intrinsic_proof_theory`、`intrinsic_zfc_theory` 及纯语言中的
 `PureModel.theory`。裸 ZFC 的 Rosser、原编码表示的 D1–D3、Löb 与哥二实例已完成；
 独立性与哥二的不可证性接口保留裸 ZFC 一致性参数；
@@ -306,7 +308,7 @@ CCC properness 实例及参数化 Cohen 名称的全局 properness 证书已经�
 | 内部加、乘、幂 | [PureSourceArithmetic](../YesMetaZFC/Model/ZFC/Pure/PureSourceArithmetic.lean) 的 `addition_agrees`、`multiplication_agrees`、`exponentiation_agrees` | 使用实际有限递推图及内部唯一性，覆盖所有内部自然数输入 |
 | 配数、字段与根编码 | [PureSourceCoding](../YesMetaZFC/Model/ZFC/Pure/PureSourceCoding.lean) 的 `pairing_agrees`、`fields_agrees`、`node_agrees`；[PureNaturalRosserAgreement](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureNaturalRosserAgreement.lean) 的 `root_agrees` | 实际编码保持；根值不是待填前提 |
 | 幂集界与集合轨迹 | [PureSourceBounds](../YesMetaZFC/Model/ZFC/Pure/PureSourceBounds.lean) 的 `power_agrees`、`trace_bound_agrees`、`trace_row_natural`；[PureNaturalRosserAgreement](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureNaturalRosserAgreement.lean) 的 `proof_trace` | 保留实际 `P(ω)` 界和轨迹行的自然数证据 |
-| 有界见证与局部规则 | [ObjectHornSemantics](../YesMetaZFC/Automation/ObjectHornSemantics.lean)；[PureSourceHorn](../YesMetaZFC/Model/ZFC/Pure/PureSourceHorn.lean) 的 `condition_agrees`、`localTest` | 递归前提读取同一候选集合；不假定其外部有限 |
+| 有界见证与局部规则 | [ObjectHornSemantics](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectHornSemantics.lean)；[PureSourceHorn](../YesMetaZFC/Model/ZFC/Pure/PureSourceHorn.lean) 的 `condition_agrees`、`localTest` | 递归前提读取同一候选集合；不假定其外部有限 |
 | 自然数参数的公式组合 | [PureSourceFormula](../YesMetaZFC/Model/ZFC/Pure/PureSourceFormula.lean) 的 `instantiate`、`quantify` | 保留自然数环境、逐变量相等和实际见证界 |
 | 公理检查 | [PureSourceSchemas](../YesMetaZFC/Model/ZFC/Pure/PureSourceSchemas.lean) 的 `axiomTest` | 固定公理表及分离、收集、替换模式的实际中间码连接 |
 | 节点、行与完整证明图 | [PureSourceLocalTests](../YesMetaZFC/Model/ZFC/Pure/PureSourceLocalTests.lean) 的 `currentNode`、`currentRow`、`row_agrees`、`proof_agreement` | 任意固定结论、全部内部自然数证明码；提供 Rosser 所需的两项 ProofAgreement |
@@ -321,7 +323,7 @@ CCC properness 实例及参数化 Cohen 名称的全局 properness 证书已经�
 | 结果 | 入口 | 边界 |
 | --- | --- | --- |
 | 支撑语言的 Δ₀ 等价代表 | [ReducedRosser](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedRosser.lean) 的 `predicate_delta0`、`delta0Sentence_delta0`、`delta0Sentence_independent` | 语言含 ω、幂集及编码函数；不自动成为纯隶属或一阶算术 Δ₀ |
-| 无参数纯闭 Δ₀ 可决定 | [FunctionFreeDelta0](../YesMetaZFC/Automation/FunctionFreeDelta0.lean) 的 `closed_decided` | 纯 ℒ 只有二元 ∈，没有常元、函数或零元关系 |
+| 无参数纯闭 Δ₀ 可决定 | [FunctionFreeDelta0](../YesMetaZFC/Logic/FirstOrder/FunctionFreeDelta0.lean) 的 `closed_decided` | 纯 ℒ 只有二元 ∈，没有常元、函数或零元关系 |
 | 当前纯闭句非 Δ₀ | [PureRosserDelta0](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserDelta0.lean) 的 `sentence_not_delta0`、`comparison_not_delta0` | 无条件的语法分类；不能再列为正向分类待办 |
 | 排除闭 Δ₀ 等价代表 | [PureRosserDelta0](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserDelta0.lean) 的 `no_closed_delta0_equivalent` | 假定裸 ZFC 一致，排除可证明等价的无参数纯 Δ₀ 闭句 |
 | 三参数纯 Δ₀ 矩阵 | [PureRosserDelta0](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserDelta0.lean) 的 `matrix_delta0`、`parameters_exists`、`parameters_unique`、`sentence_iff_matrix`、`representation_derives` | 参数为内部 ω 与两侧内部证明码集合；参数定义本身未分类为 Δ₀ |
@@ -675,7 +677,7 @@ D1、D2 与 Rosser 的公开结论保持；当前证明图、quotation、
 
 [InternalCheckedRanking](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCheckedRanking.lean) 的 `checked_valid_positive` 对实际
 `ObjectCheckedReflection.atPhase` 公式作内部强归纳，`checkedRankedAt_agrees` 核验最终阶段对应。
-[ObjectCheckedReflection](../YesMetaZFC/Automation/ObjectCheckedReflection.lean) 的 `proof_valid` 以 Lean 内核核验原十二条规则：
+[ObjectCheckedReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectCheckedReflection.lean) 的 `proof_valid` 以 Lean 内核核验原十二条规则：
 节点阶段沿子证明编码下降，根阶段进入节点阶段。[InternalProofTraceReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProofTraceReflection.lean)
 的 `proof_trace_positive` 已填入原行查询正反射和对应合同，覆盖任意内部根行与轨迹。
 
@@ -743,7 +745,7 @@ $\mathcal M\models F(\varphi)\leftrightarrow\varphi$。
 $T\vdash\neg(F(L)\leftrightarrow L)$，其逻辑核心还允许开放公式和任意局部上下文。
 一致性排除相应等价式的推导，可靠性排除模型中的全部真值对应。
 
-[ObjectTarskiFixedPoint](../YesMetaZFC/Automation/ObjectTarskiFixedPoint.lean)
+[ObjectTarskiFixedPoint](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectTarskiFixedPoint.lean)
 对任意 `FormulaTemplate.Unary` 的正文取否定，调用原 `ObjectDiagonal.fixedPoint_spec`。
 [ReducedTarski](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarski.lean)
 以 `ReducedRosser.diagonalSupport` 实例化，令
@@ -760,7 +762,7 @@ $F(\varphi)=P(\texttt{IntrinsicQuotation.quote}\ \varphi)$，并实际生成 `li
 
 ### 参数上下文与逐赋值反例
 
-[ObjectParameterDiagonal](../YesMetaZFC/Automation/ObjectParameterDiagonal.lean)
+[ObjectParameterDiagonal](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectParameterDiagonal.lean)
 对任意有限 `parameters : SetContext` 和 $P(x,\bar z)$ 实际生成固定点，
 将原同时自由代入图的表尾推广为参数变量的恒等替换。对象输出唯一性复用既有最小见证论证。
 [ReducedTarskiParameters](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarskiParameters.lean)

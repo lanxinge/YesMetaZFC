@@ -26,12 +26,12 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 | 需要的接口 | 源码 | 边界 |
 | --- | --- | --- |
 | 保留完整 AST 的 quotation | [IntrinsicQuotation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/IntrinsicQuotation.lean) 的 `quote`、`unquote_quote`、`quote_injective`、`quote_ne`；[IntrinsicQuotationEvaluation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/IntrinsicQuotationEvaluation.lean) 的 `quote_evaluate` | 十一种公式构造子均保留；使用紧凑树项 |
-| 完整公式的实际识别与解码 | [ObjectFormulaSound](../YesMetaZFC/Automation/ObjectFormulaSound.lean) 中 `ObjectFormulaSyntax.checked_decode` | 覆盖所有自然数输入，包括失败分支 |
-| 当前四种类型化变换、逻辑公理和证明规则 | [ObjectSyntaxTransform](../YesMetaZFC/Automation/ObjectSyntaxTransform.lean)、[ObjectLogicalAxiom](../YesMetaZFC/Automation/ObjectLogicalAxiom.lean)、[ObjectProofNode](../YesMetaZFC/Automation/ObjectProofNode.lean) | 分别连接实际核变换、27 类逻辑公理和六条核规则 |
+| 完整公式的实际识别与解码 | [ObjectFormulaSound](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectFormulaSound.lean) 中 `ObjectFormulaSyntax.checked_decode` | 覆盖所有自然数输入，包括失败分支 |
+| 当前四种类型化变换、逻辑公理和证明规则 | [ObjectSyntaxTransform](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectSyntaxTransform.lean)、[ObjectLogicalAxiom](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectLogicalAxiom.lean)、[ObjectProofNode](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectProofNode.lean) | 分别连接实际核变换、27 类逻辑公理和六条核规则 |
 | 八个固定 ZFC 公理与两个模式 | [BaseAxiomPacketSpec](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/BaseAxiomPacketSpec.lean) 的 `BaseAxiomPacket.presentation` | 精确表示原基础公理像；替换作为派生模式接口存在，不额外加入原证书分支 |
 | 与原理论推导等价的完整公理基 | [ReducedAxiomPacket](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedAxiomPacket.lean) 的 `presentation`；[ReducedAxioms](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedAxioms.lean) 的 `derives_iff` | 原 ZFC 像加 119 条有限基；不宣称原无限参数公理成员关系逐值相同 |
 | 带上下文与实际结论标注的证明树 | [ProofTreeCode](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ProofTreeCode.lean)、[ReducedProofTree](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofTree.lean) 的 `derives_iff` | 全部六条规则的真实检查器、可靠性与完备性 |
-| 固定局部测试到整树对象表示 | [ReducedProofPresentation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofPresentation.lean) 的 `nodeTest`、`presentation`；[ObjectProofNode](../YesMetaZFC/Automation/ObjectProofNode.lean) 的 `ofNodeTest` | 要求局部可靠性和全部实际编码的接受完备性，不要求非规范外壳与旧算法逐值相等 |
+| 固定局部测试到整树对象表示 | [ReducedProofPresentation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofPresentation.lean) 的 `nodeTest`、`presentation`；[ObjectProofNode](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectProofNode.lean) 的 `ofNodeTest` | 要求局部可靠性和全部实际编码的接受完备性，不要求非规范外壳与旧算法逐值相等 |
 | 内部自然数码域与 Rosser 装配 | [ReducedNaturalProofPresentation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedNaturalProofPresentation.lean)、[ReducedRosser](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedRosser.lean)、[PureRosserComplete](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureRosserComplete.lean) | 当前实例已完成裸 ZFC 支撑消去及任意原模型对应；精确终点见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) |
 
 旧 `QuineEncoding.quote` 先 Hilbert 化，会合并不同实际 AST；
@@ -48,7 +48,7 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 | 调用方需要 | 公共接口与源码 | 保留的边界 |
 | --- | --- | --- |
 | 内部自然数 Gödel 配对、节点和字段列表单射性 | [PureGodelPairingInversion](../YesMetaZFC/Model/ZFC/Pure/PureGodelPairingInversion.lean) 的 `coordinates_unique`；[PureSourceCodingInversion](../YesMetaZFC/Model/ZFC/Pure/PureSourceCodingInversion.lean) | 所有坐标显式属于模型内部 ω，不转换为宿主 Nat |
-| 内部轨迹合并与插入 | [ObjectTraceComposition](../YesMetaZFC/Automation/ObjectTraceComposition.lean)；[PureSourceTraceComposition](../YesMetaZFC/Model/ZFC/Pure/PureSourceTraceComposition.lean) 的 `merge`、`insert`、`collect` | 幂集界、前提行成员和全部局部检查保持；轨迹可以外部非有限 |
+| 内部轨迹合并与插入 | [ObjectTraceComposition](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectTraceComposition.lean)；[PureSourceTraceComposition](../YesMetaZFC/Model/ZFC/Pure/PureSourceTraceComposition.lean) 的 `merge`、`insert`、`collect` | 幂集界、前提行成员和全部局部检查保持；轨迹可以外部非有限 |
 | 任意自然数参数的 Horn 规则实例 | [PureSourceHornConstruction](../YesMetaZFC/Model/ZFC/Pure/PureSourceHornConstruction.lean) 的 `rule_intro` | 自动验证头表达式中的变量界，逐一保留 guards 和前提 |
 | 固定字段位置的实际投影轨迹 | [PureSourceProjection](../YesMetaZFC/Model/ZFC/Pure/PureSourceProjection.lean) 的 `field_node` | 位置及字段列表为语法参数，字段值可以非标准 |
 | 原证明根行的结论与节点连边 | [ReducedProofHeaders](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofHeaders.lean) 的 `root_header_code`、`root_header` | 内部结论码不要求是标准 quotation；同时恢复自由变量数、结论字段、结论上界和原节点行 |
@@ -58,7 +58,7 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 | 任意内部自然数的唯一数码 | [PureSourceNumeralTotality](../YesMetaZFC/Model/ZFC/Pure/PureSourceNumeralTotality.lean) 中 `PureSourceNumeralSyntax.total`、`functional`、`totalUnique_derives` | 对整个内部 ω 成立，使用既有 `ObjectNumeralSyntax.condition`；`standard_iff` 连接现有 AST 算法 |
 | 内部项码的参数列与函数应用 | [PureSourceTermConstruction](../YesMetaZFC/Model/ZFC/Pure/PureSourceTermConstruction.lean) 的 `arguments_cons`、`arguments_list`、`application` | 上下文长度和项码可非标准；规则表须包含完整项与参数列规则，函数元数保留 |
 | 同一个唯一数码的实际闭项证书 | [InternalNumeralQuotation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralQuotation.lean) 中 `PureSourceNumeralSyntax.quotation_exists_unique`、`wellFormed_derives`、`graph_term` | 使用当前逻辑公理检查器共享的 `ObjectFormulaSyntax.rules`；`graph_term` 以带上下文参数的实际公式归纳，覆盖任意内部 bound/free 长度 |
-| 固定 AST 的参数化码构造 | [ObjectCodeInstantiation](../YesMetaZFC/Automation/ObjectCodeInstantiation.lean) 的 `term`、`arguments`、`formula`；[PureSourceInstantiation](../YesMetaZFC/Model/ZFC/Pure/PureSourceInstantiation.lean) 的 `original_quote`、`formula_natural` | 只遍历标准语法骨架，槽位码值可非标准；原变量赋值精确恢复当前 quotation |
+| 固定 AST 的参数化码构造 | [ObjectCodeInstantiation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectCodeInstantiation.lean) 的 `term`、`arguments`、`formula`；[PureSourceInstantiation](../YesMetaZFC/Model/ZFC/Pure/PureSourceInstantiation.lean) 的 `original_quote`、`formula_natural` | 只遍历标准语法骨架，槽位码值可非标准；原变量赋值精确恢复当前 quotation |
 | 真实变换图上的内部规则实例 | [PureSourceTransformConstruction](../YesMetaZFC/Model/ZFC/Pure/PureSourceTransformConstruction.lean) 的 `lookup_list`、`bound_point`、`application`、`binary`、`unary` | guards、前提和编码上界均保留；模式 2 点代入与模式 3 自由代入不混用 |
 | 非标准数码代入总性 | [PureSourceSubstitution](../YesMetaZFC/Model/ZFC/Pure/PureSourceSubstitution.lean) 中 `PureSourceInstantiation.formula_substitution`；[InternalNumeralSubstitution](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralSubstitution.lean) 的 `total_derives` | 模式 3 的固定公式代入；自然数输出和实际轨迹由本层提供，数码实例的语法证书见下行；未证明变换图一般唯一性 |
 | 同一证明图的内部结论参数 | [ReducedProofCodeSemantics](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedProofCodeSemantics.lean) 的 `CodeProof`、`codeProof_trace`、`codeProof_quotation` | 直接解释原二元模板；不是替代的证明谓词 |
@@ -76,14 +76,14 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 | 二元相等／不等反射 | [InternalNumeralEqualityRules](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralEqualityRules.lean) 的 `equal`、`successor_inequality`；[InternalNumeralEqualityReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralEqualityReflection.lean) 的 `unequal`、`unequal_derives` | 任意两个内部自然数；不等式反射的归纳性质全称覆盖第二个数及两个数码，已证明最终阶段对应 |
 | 严格序与非严格序的正负反射 | [InternalNumeralOrderReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralOrderReflection.lean) 的 `order`、`weak_order`、`order_derives` | 非严格序按 x∈S(y) 表示；右参数内部归纳，后继步消费等式与不等式反射 |
 | 内部加、乘、幂数码求值 | [InternalArithmeticEvaluation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalArithmeticEvaluation.lean) 的 `addition_evaluation`、`multiplication_evaluation`、`exponentiation_evaluation`、`arithmetic_evaluation_derives` | 生成运算项等于结果数码的实际证明；二元项共用 `evaluation_induction`，依次用加法构造乘法、乘法构造幂 |
-| 复合项求值的统一组合 | [InternalTermComposition](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalTermComposition.lean) 的 `binary_term_evaluation`；[ObjectCodeSubstitution](../YesMetaZFC/Automation/ObjectCodeSubstitution.lean) 的 `term_mapped` | 子项证明与原始运算证明经有限参数特化和 MP 合成；任意有限自由上下文，无需重建编码 AST |
+| 复合项求值的统一组合 | [InternalTermComposition](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalTermComposition.lean) 的 `binary_term_evaluation`；[ObjectCodeSubstitution](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectCodeSubstitution.lean) 的 `term_mapped` | 子项证明与原始运算证明经有限参数特化和 MP 合成；任意有限自由上下文，无需重建编码 AST |
 | Gödel 配对及编码项求值 | [InternalPairingEvaluation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPairingEvaluation.lean) 的 `pairing_evaluation`、`pairing_evaluation_derives`；[InternalCodingEvaluation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalCodingEvaluation.lean) | 配对两分支消费序反射和复合算术求值；覆盖字段列、节点、Horn 表达式及参数化项／参数列／公式码项 |
 | 原结构 quotation 的求值 | [InternalQuotationEvaluation](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalQuotationEvaluation.lean) 的 `quotation_evaluation`、`tree_term_evaluation` | 保留原节点与字段顺序；生成 quotation 项等于其结果数码的实际证明，未改写为另一种 quotation |
 | 复合项原子判断与逻辑组合 | [InternalAtomicReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalAtomicReflection.lean) 的 `atomic_reflection`；[InternalBooleanReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalBooleanReflection.lean) 的 `boolean_reflection`、`negation_reflection`、`reflection_of_iff` | 等式、成员及全部命题联结词的正负反射，复用子项数码求值 |
 | 任意有限参数的量词见证 | [InternalQuantifierReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalQuantifierReflection.lean) 的 `exists_values`、`forall_counterexample` | 实际数码点实例化及原存在公理，覆盖内部自然数见证 |
 | 自然数界的全称／存在正负反射 | [InternalBoundedReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalBoundedReflection.lean) 的 `bounded_forall_reflection`；[InternalBoundedExistence](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalBoundedExistence.lean) 的 `bounded_exists_reflection`；[InternalBoundedTerms](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalBoundedTerms.lean) 的 `bounded_term_reflection` | 界可为已求值的算术／编码复合项；`bounded_bundle` 使用实际公式归纳，有限参数表示及最终阶段对应均已消去 |
 | 固定有限轨迹骨架的内部证明 | [InternalTraceReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalTraceReflection.lean) 的 `finite_trace_values`、`checked_trace_values`；[InternalVerificationTrace](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalVerificationTrace.lean) 的 `finite_verification`、`verificationMatrix_trace` | 由逐行内部证明装配原幂集量词正文，并逐字接回原验证矩阵；此有限骨架接口的输入条件保留 |
-| 含量词图谓词的复合项／数码传输 | [InternalPredicateTransport](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPredicateTransport.lean) 的 `predicate_transport`；[ObjectCodeSubstitution](../YesMetaZFC/Automation/ObjectCodeSubstitution.lean) 的 `formula_mapped_of_depth`、`formula_substituteFree` | 覆盖全部 binder 深度，正负公式及两个传输方向共用原模板同余 |
+| 含量词图谓词的复合项／数码传输 | [InternalPredicateTransport](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalPredicateTransport.lean) 的 `predicate_transport`；[ObjectCodeSubstitution](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectCodeSubstitution.lean) 的 `formula_mapped_of_depth`、`formula_substituteFree` | 覆盖全部 binder 深度，正负公式及两个传输方向共用原模板同余 |
 | 任意内部数码递归轨迹的正负反射 | [InternalNumeralTraceReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralTraceReflection.lean) 的 `numeral_trace_positive`、`numeral_trace_positive_derives`；[InternalNumeralTraceDecision](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalNumeralTraceDecision.lean) 的 `numeral_trace_negative`、`numeral_trace_reflection` | 使用原 `ObjectNumeralSyntax.condition` 和原证明图；实际对象公式归纳，无外部有限轨迹或反射假设，支持已求值复合项 |
 | Horn 根行反演与统一内部规则证明 | [PureSourceHornElimination](../YesMetaZFC/Model/ZFC/Pure/PureSourceHornElimination.lean) 的 `rule_cases`；[InternalHornReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalHornReflection.lean) 的 `horn_rule_values`、`horn_term_transfer` | 参数自动命名，守卫由原子反射证明；有限规则前提复用任意内部集合轨迹，不需要全图反射假设 |
 | 原投影图的内部正反射 | [InternalProjectionReflection](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/InternalProjectionReflection.lean) 的 `projection_get_positive`、`projection_positive`、`projection_term_positive`、`projection_positive_derives` | 全部七条规则、任意非标准索引与非规范外壳；按实际 `getAt` 公式作内部归纳，保留原局部投影图 |
@@ -110,7 +110,7 @@ intrinsic_zfc_nat_check : Nat → SetSentence → Bool
 也未调用额外的一阶算术 Σ₁ 完备性。
 
 Löb 固定点继续使用同一 `code_domain`、`presentation.graph` 和结构 quotation。
-[ObjectLoebFixedPoint](../YesMetaZFC/Automation/ObjectLoebFixedPoint.lean) 的 `reflectionTemplate_m`
+[ObjectLoebFixedPoint](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectLoebFixedPoint.lean) 的 `reflectionTemplate_m`
 表示 $\Box x\to\varphi$，`fixed_point_m` 从原对角构造导出其实际固定点等价。
 [ReducedLoeb](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedLoeb.lean)
 的 `loeb_fixed_point_m`、`loeb_axiom_m`、`loeb_m` 直接消费该表示和 D1–D3。
@@ -126,7 +126,7 @@ Löb 固定点继续使用同一 `code_domain`、`presentation.graph` 和结构 
 从而可以证明纯算子的 D3 及其实际 Löb 固定点。纯一致性句子 `consistency_m`
 等于原 `consistency` 的消元翻译；这是已有编码的纯语言表示，没有重新定义纯证明树编码。
 
-Tarski 的 [ObjectTarskiFixedPoint](../YesMetaZFC/Automation/ObjectTarskiFixedPoint.lean)
+Tarski 的 [ObjectTarskiFixedPoint](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectTarskiFixedPoint.lean)
 使用同一原码域、自代入图与 `IntrinsicQuotation.quote`，将任意一元模板的否定交给原对角构造。
 [ReducedTarski](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedTarski.lean)
 的 `predicate_m P φ` 精确为 `P (IntrinsicQuotation.quote φ)`；反例句在理论内部满足
@@ -134,7 +134,7 @@ $L_P\leftrightarrow\neg P(\ulcorner L_P\urcorner)$。
 候选公式及句子是宿主语法对象，模型不必标准；此接口不声称构造了全部非标准内部语法的满足关系。
 纯公式自身编码的对应由下述 `PureQuotation.self_code_m` 核验，不以可证明等价代替编码相等。
 
-带参数的 [ObjectParameterDiagonal](../YesMetaZFC/Automation/ObjectParameterDiagonal.lean)
+带参数的 [ObjectParameterDiagonal](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectParameterDiagonal.lean)
 保留任意有限自由上下文。自代入表为“首槽数码项的码 + 尾部恒等变量项的码”，
 继续由原模式 3、深度 0 的同时自由代入图检查；两层最小输出给出对象唯一性。
 `quote_m` 只将原 `IntrinsicQuotation.quote` 闭项放入参数上下文，
@@ -164,7 +164,7 @@ $L_P\leftrightarrow\neg P(\ulcorner L_P\urcorner)$。
 $\operatorname{specialize}(B,n)=\exists x(N_n(x)\land B(x,\bar z))$。
 `self_code_m` 证明该式在 $n=\ulcorner B\urcorner$ 时的自身码恰好为
 $d(n)=\operatorname{node}_{10}[\operatorname{node}_5[\ulcorner N_n\urcorner,n]]$。
-[ObjectExpressionIteration](../YesMetaZFC/Automation/ObjectExpressionIteration.lean) 的两条固定 Horn 规则
+[ObjectExpressionIteration](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Arithmetic/ObjectExpressionIteration.lean) 的两条固定 Horn 规则
 给出 $\ulcorner N_n\urcorner$ 的正负表示；最小输出语义排除任意模型中的伪见证。
 [PureDiagonalGraph](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureDiagonalGraph.lean) 将该实际图消元为纯公式，
 [PureFixedPoint](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/PureFixedPoint.lean) 因而得到最终纯公式自身编码的固定点。

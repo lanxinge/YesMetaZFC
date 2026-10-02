@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectTransformRanking
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTransformRanking
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaTable
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaObjectGraph
 

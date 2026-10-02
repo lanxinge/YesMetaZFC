@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectTermDerives
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTermDerives
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SupportParameters
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.IntrinsicKernel
 

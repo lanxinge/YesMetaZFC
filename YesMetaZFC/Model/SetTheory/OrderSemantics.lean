@@ -14,7 +14,7 @@ namespace Structure
 def SameMembers (ℳ : Structure.{u}) (left right : ℳ.Domain) : Prop :=
   ∀ value, ℳ.mem value left ↔ ℳ.mem value right
 /-- `left` 的每个成员也是 `right` 的成员。 -/
-@[prove_auto_norm definition]
+
 def MemberSubset (ℳ : Structure.{u}) (left right : ℳ.Domain) : Prop :=
   ∀ value, ℳ.mem value left → ℳ.mem value right
 /-- `set` 关于隶属关系是传递的。 -/

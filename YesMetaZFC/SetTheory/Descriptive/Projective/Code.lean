@@ -38,7 +38,7 @@ def pcode_m {d} (ω A p : Term d) : Formula 1 d := .existsE (.existsE (.existsE 
   (.disj (Formula.isEmpty (.bound 1)) (Formula.isOrdinalOne (.bound 1)))
   (bcode_m (𝒞 := 𝒞) ω.weaken.weaken.weaken A.weaken.weaken.weaken A.weaken.weaken.weaken .newest))))))
 derive_free_closed pcode_m
-@[prove_auto_norm semantic]
+
 theorem pcode_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A p : Term d) :
     Formula.satisfies ρ (pcode_m (𝒞 := 𝒞) ω A p) ↔ Pcode_d I (ω.eval ρ) (A.eval ρ) (p.eval ρ) := by
   simp only [pcode_m, Pcode_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
@@ -58,7 +58,7 @@ def pden_m {d} (ω A B J p K : Term d) : Formula 1 d := .existsE (.existsE (.exi
     (.conj (Formula.isOrdinalOne (.bound 3))
       (cm_m B.weaken.weaken.weaken.weaken.weaken .newest K.weaken.weaken.weaken.weaken.weaken))))))))))
 derive_free_closed pden_m
-@[prove_auto_norm semantic]
+
 theorem pden_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J p K : Term d) :
     Formula.satisfies ρ (pden_m (𝒞 := 𝒞) ω A B J p K) ↔
       Pden_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (p.eval ρ) (K.eval ρ) := by
@@ -104,7 +104,7 @@ def projective_m {d} (ω A B J K : Term d) : Formula 1 d := Formula.existsMem ω
   (ps_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken .newest K.weaken)
   (pp_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken .newest K.weaken))
 derive_free_closed projective_m
-@[prove_auto_norm semantic]
+
 theorem projective_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J K : Term d) :
     Formula.satisfies ρ (projective_m (𝒞 := 𝒞) ω A B J K) ↔
       Projective_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (K.eval ρ) := by

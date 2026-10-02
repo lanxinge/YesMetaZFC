@@ -86,7 +86,7 @@ def bsat_m {d} (ω A S c x : Term d) : Formula 1 d := .existsE (.existsE (.exist
     S.weaken.weaken.weaken.weaken (.bound 3) (.bound 2) (.bound 1) .newest)
   (bvalue_m (𝒞 := 𝒞) (.bound 3) (.bound 2) (.bound 1) .newest x.weaken.weaken.weaken.weaken))))))
 derive_free_closed bsat_m
-@[prove_auto_norm semantic]
+
 theorem bsat_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A S c x : Term d) :
     Formula.satisfies ρ (bsat_m (𝒞 := 𝒞) ω A S c x) ↔
       Bsat_d I (ω.eval ρ) (A.eval ρ) (S.eval ρ) (c.eval ρ) (x.eval ρ) := by

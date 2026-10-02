@@ -102,7 +102,7 @@ def dist_m {d} (ω D z o f g q : Term d) : Formula 1 d := .existsE (.conj
   (sep_m (𝒞 := 𝒞) ω.weaken f.weaken g.weaken .newest)
   (dyad_m (𝒞 := 𝒞) ω.weaken D.weaken z.weaken o.weaken .newest q.weaken))
 derive_free_closed dist_m
-@[prove_auto_norm semantic]
+
 theorem dist_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω D z o f g q : Term d) :
     Formula.satisfies ρ (dist_m (𝒞 := 𝒞) ω D z o f g q) ↔
       Dist_d I (ω.eval ρ) (D.eval ρ) (z.eval ρ) (o.eval ρ) (f.eval ρ) (g.eval ρ) (q.eval ρ) := by

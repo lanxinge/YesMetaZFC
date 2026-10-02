@@ -10,7 +10,7 @@ def Cl_d (A B K : M.Domain) : Prop := M.MemberSubset K B ∧ ∃ U, Cm_d B K U �
 def cl_m {d} (A B K : Term d) : Formula 1 d := .conj (Formula.subset K B)
   (.existsE (.conj (cm_m B.weaken K.weaken .newest) (open_m A.weaken B.weaken .newest)))
 derive_free_closed cl_m
-@[prove_auto_norm semantic]
+
 theorem cl_sat_l {d} (ρ : Env M d) (A B K : Term d) :
     Formula.satisfies ρ (cl_m A B K) ↔ Cl_d (M := M) (A.eval ρ) (B.eval ρ) (K.eval ρ) := by
   simp only [cl_m, Cl_d, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,

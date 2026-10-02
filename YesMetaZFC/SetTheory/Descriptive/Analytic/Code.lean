@@ -15,7 +15,7 @@ def aden_m {d} (ω A B J c K : Term d) : Formula 1 d := .existsE (.conj
   (bden_m (𝒞 := 𝒞) ω.weaken A.weaken A.weaken B.weaken c.weaken .newest)
   (pr_m (𝒞 := 𝒞) B.weaken J.weaken .newest K.weaken))
 derive_free_closed aden_m
-@[prove_auto_norm semantic]
+
 theorem aden_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J c K : Term d) :
     Formula.satisfies ρ (aden_m (𝒞 := 𝒞) ω A B J c K) ↔
       Aden_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (c.eval ρ) (K.eval ρ) := by
@@ -41,7 +41,7 @@ def an_m {d} (ω A B J K : Term d) : Formula 1 d := .existsE (.conj
   (bcode_m (𝒞 := 𝒞) ω.weaken A.weaken A.weaken .newest)
   (aden_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken .newest K.weaken))
 derive_free_closed an_m
-@[prove_auto_norm semantic]
+
 theorem an_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J K : Term d) :
     Formula.satisfies ρ (an_m (𝒞 := 𝒞) ω A B J K) ↔
       An_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (K.eval ρ) := by
@@ -57,7 +57,7 @@ def Coan_d (ω A B J K : M.Domain) : Prop := ∃ L, An_d I ω A B J L ∧ Cm_d B
 def coan_m {d} (ω A B J K : Term d) : Formula 1 d := .existsE (.conj
   (an_m (𝒞 := 𝒞) ω.weaken A.weaken B.weaken J.weaken .newest) (cm_m B.weaken .newest K.weaken))
 derive_free_closed coan_m
-@[prove_auto_norm semantic]
+
 theorem coan_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A B J K : Term d) :
     Formula.satisfies ρ (coan_m (𝒞 := 𝒞) ω A B J K) ↔
       Coan_d I (ω.eval ρ) (A.eval ρ) (B.eval ρ) (J.eval ρ) (K.eval ρ) := by

@@ -73,7 +73,7 @@ def borel_m {d} (ω A S B K : Term d) : Formula 1 d := .existsE (.conj
   (bcode_m (𝒞 := 𝒞) ω.weaken A.weaken S.weaken .newest)
   (bden_m (𝒞 := 𝒞) ω.weaken A.weaken S.weaken B.weaken .newest K.weaken))
 derive_free_closed borel_m
-@[prove_auto_norm semantic]
+
 theorem borel_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A S B K : Term d) :
     Formula.satisfies ρ (borel_m (𝒞 := 𝒞) ω A S B K) ↔
       Borel_d I (ω.eval ρ) (A.eval ρ) (S.eval ρ) (B.eval ρ) (K.eval ρ) := by

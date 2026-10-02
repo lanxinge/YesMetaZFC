@@ -87,7 +87,7 @@ def mlimit_m {d} (ω D z o H f : Term d) : Formula 1 d := Formula.forallMem ω (
           z.weaken.weaken.weaken.weaken o.weaken.weaken.weaken.weaken (.bound 3) .newest
           f.weaken.weaken.weaken.weaken)))))))
 derive_free_closed mlimit_m
-@[prove_auto_norm semantic]
+
 theorem mcauchy_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω D z o H : Term d) :
     Formula.satisfies ρ (mcauchy_m (𝒞 := 𝒞) ω D z o H) ↔
       MCauchy_d I (ω.eval ρ) (D.eval ρ) (z.eval ρ) (o.eval ρ) (H.eval ρ) := by
@@ -95,7 +95,7 @@ theorem mcauchy_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω D z o H : Term
     Formula.satisfies_conj_iff, Formula.satisfies_mem_iff, Formula.satisfies_imp_iff,
     Formula.satisfies_neg_iff, Formula.satisfies_forall_iff, Formula.satisfies_orderedPairMem_iff I,
     ball_sat_l I hE, Definitional.Term.eval_weaken]; rfl
-@[prove_auto_norm semantic]
+
 theorem mlimit_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω D z o H f : Term d) :
     Formula.satisfies ρ (mlimit_m (𝒞 := 𝒞) ω D z o H f) ↔
       MLimit_d I (ω.eval ρ) (D.eval ρ) (z.eval ρ) (o.eval ρ) (H.eval ρ) (f.eval ρ) := by
@@ -166,7 +166,7 @@ def complete_m {d} (ω D z o B : Term d) : Formula 1 d := .forallE
       (Formula.existsMem B.weaken (mlimit_m (𝒞 := 𝒞) ω.weaken.weaken D.weaken.weaken
         z.weaken.weaken o.weaken.weaken (.bound 1) .newest))))
 derive_free_closed complete_m
-@[prove_auto_norm semantic]
+
 theorem complete_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω D z o B : Term d) :
     Formula.satisfies ρ (complete_m (𝒞 := 𝒞) ω D z o B) ↔
       Complete_d I (ω.eval ρ) (D.eval ρ) (z.eval ρ) (o.eval ρ) (B.eval ρ) := by

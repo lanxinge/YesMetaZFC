@@ -79,14 +79,11 @@
   Quine shape、有限轨迹、已检查证明行和环境传输按 ENGINEERING 指路表消费。
 - 不按元数复制 binder 展开，不重复维护 `*_of_depth` 已覆盖的递归。
   shape 合同不能代替 scope 和总码域；行表公共装配不能省略实际逻辑行条件。
-- 机械 Hilbert 步骤优先改进或复用 tactic。新章节使用 `prove_auto`，不继续使用
-  旧 `mf1_fo_core`。通用证明器、预处理和调度放在 `YesMetaZFC.Automation`，
-  领域目录只保留领域合同。
-- 自动化共用 `Certificate` / `DAGCertificate`，新后端优先映射 checked payload
-  到公共 DAG 节点。CoreNormalForm / SourcePreprocessing 提供一阶公共前端，
-  Scheduler 组织预处理、Superposition 与 CDCL residual。
-- 扩张复合保留新鲜变量、函数界的单调性以及类型与环境条件。FOOL guard、高阶 λ
-  同余和 HO bound stack 约束不得在公共化时省略。
+- 机械 Hilbert 步骤优先复用 `YesMetaZFC.Tactic` 中的 `derive_prop` 等轻量策略；
+  数学构造和存在唯一性直接调用已有接口。通用搜索证明器已移出主项目，
+  不重新引入其调度、注册属性、证书运行时或兼容转发层。
+- 对象编码、反射、固定点等数学模块位于 `Logic.FirstOrder.FormalSystem.Arithmetic`；
+  数学声明保留既有命名空间，旧 Automation 模块路径已迁移。
 - 大模型跨阶段比较复用 `RelationalCongruence.openFormula_congr`、
   `RelationalTransfer`、`RelationalInheritance` 和 `ModelClosure`；
   用 `CoveredExtension.trans` 组合覆盖与旧图保持，不逐层重抄参数映射和规格包装；
@@ -105,10 +102,9 @@
 ## 验证
 
 - 正常构建使用 `lake build`；稳定节点用 `lake --wfail build` 和
-  `bash scripts/check-all.sh` 检查全部独立模块及扫描工具。
-- 不仅凭默认导入图不可达删除模块；`ProveAutoBranchProbe` 由扫描器动态导入。
-  `prove_auto_sweep` 仅静态导入 `Automation.HostAvatar.Dispatch`，完整库运行时加载，
-  不改回静态导入根模块。工具依赖变化后检查 `--help` 与一次实际目标扫描。
+  `bash scripts/check-all.sh` 检查全部独立模块。
+- 不仅凭默认导入图不可达删除数学模块。全源脚本继续枚举每个独立模块；
+  原生验证使用 `python scripts/lean_cache.py build --native`。
 - 已由通用定理证明的性质使用正常内核构建验证，不维护枚举样本、`#eval` 回归
   或仅重复调用定理的 `example` 模块；保留有独立数学内容的规格和正负表示证明。
 - 不恢复常开的 `simp.rewrite` 追踪；性能问题先作声明级测量。

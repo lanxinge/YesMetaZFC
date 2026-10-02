@@ -30,6 +30,7 @@ MODULES = [MODULE_PREFIX + n for n in (
     "YesMetaZFC.Model.SetTheory.ProjectBounded",
     "YesMetaZFC.SetTheory.Definitional.Language",
     "YesMetaZFC.SetTheory.Definitional.Project.Predicate",
+    "YesMetaZFC.SetTheory.Kuratowski",
 ]
 
 ZFC_MODULES = [MODULE_PREFIX + n for n in (
@@ -233,8 +234,12 @@ CHOICE_FREE = [PREFIX + n for n in (
     "ro_principal_ne_bot_l", "ro_meet_eq_bot_l", "ro_condition_l", "ro_map_l",
 )] + [PREFIX + "PO_dense." + n for n in ("id_l", "comp_l")]
 
-CHOICE_FREE += [PREFIX + "Internal." + n for n in (
+# 公共有序对接口已迁入集合论层，模块路径与声明命名空间分别列出。
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + n for n in (
     "Pair_d", "KPair_d", "kpair_m", "kpair_convention_l", "kpair_interpretation_l",
+)]
+
+CHOICE_FREE += [PREFIX + "Internal." + n for n in (
     "Entry_d", "entry_ext_l", "Supp_d", "Name_d", "supp_m", "name_m", "name_entry_l", "name_empty_l",
     "Setlike_d", "node_l", "decode_graph_l", "Rep_d", "decode_rep_l", "decode_exists_l",
     "rep_child_l", "rep_val_eq_l", "Val_d", "val_exists_unique_l", "val_mem_l", "name_domain_l",

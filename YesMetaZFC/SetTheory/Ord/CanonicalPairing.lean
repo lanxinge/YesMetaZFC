@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Ord.OrderType
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数对的典范次序
 本层形式化基数论中使用的典范序数对次序：先比较两个坐标的最大值，最大值相同时

@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.FirstOrderDerives
+import YesMetaZFC.Tactic.FirstOrderDerives
 import YesMetaZFC.Model.Boolean.Completion
 import YesMetaZFC.Model.Boolean.Filter
 

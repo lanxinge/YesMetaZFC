@@ -77,7 +77,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 弱不可达基数公式与三个定义分量的合取语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isWeaklyInaccessibleCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω κ : Term depth) :
@@ -90,7 +90,7 @@ theorem satisfies_isWeaklyInaccessibleCardinal_iff
     satisfies_isRegularCardinal_iff 𝕀 hExt,
     satisfies_isLimitCardinal_iff 𝕀 hExt]
 /-- 强不可达基数公式与三个定义分量的合取语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isStronglyInaccessibleCardinal_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω κ : Term depth) :

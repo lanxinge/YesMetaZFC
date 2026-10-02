@@ -139,21 +139,21 @@ def satisfies {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (formula
     satisfies env (.existsE body) ↔
       ∃ value, satisfies (env.push value) body := by
   simp only [satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_forallMem_iff
     {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (set : Term depth) (body : Formula 1 (depth + 1)) :
     satisfies env (forallMem set body) ↔
       ∀ value, ℳ.mem value (Definitional.Term.eval env set) →
         satisfies (env.push value) body := by
   simp [forallMem, satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_existsMem_iff
     {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (set : Term depth) (body : Formula 1 (depth + 1)) :
     satisfies env (existsMem set body) ↔
       ∃ value, ℳ.mem value (Definitional.Term.eval env set) ∧
         satisfies (env.push value) body := by
   simp [existsMem, satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_rename
     {ℳ : Structure.{v}} {sourceDepth targetDepth : Nat} (env : Env ℳ targetDepth) (indexMap : Fin sourceDepth → Fin targetDepth)
     (formula : Formula 1 sourceDepth) :

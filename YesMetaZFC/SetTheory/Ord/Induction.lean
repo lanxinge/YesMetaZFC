@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Ord.Basic
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 超限归纳
 本文件把序数良序上的最小反例论证整理为通用语义核，并将任意一元公式模式编译为
@@ -25,7 +24,6 @@ namespace Structure.SuccessorOf
 theorem predecessor_mem {ℳ : SetTheory.Structure.{u}}
     {successor predecessor : ℳ.Domain} (hSuccessor : ℳ.SuccessorOf successor predecessor) :
     ℳ.mem predecessor successor := (hSuccessor predecessor).mpr (Or.inr fun _ => Iff.rfl)
-register_prove_auto_hr_rule predecessor_mem PRIORITY 200
 end Structure.SuccessorOf
 namespace Structure.IsOrdinal
 /-- 序数上的最小反例归纳核。 -/
@@ -181,7 +179,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 对象公式中的空集条件与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isEmpty_iff {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (set : Term depth) :
     satisfies env (isEmpty set) ↔
       ∀ value, ¬ ℳ.mem value (set.eval env) := by
@@ -189,7 +187,7 @@ theorem satisfies_isEmpty_iff {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ
     satisfies_mem_iff, Definitional.Term.eval_newest,
     Definitional.Term.eval_weaken]
 /-- 对象公式中的后继关系与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isSuccessor_iff {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (successor predecessor : Term depth) :
     satisfies env (isSuccessor successor predecessor) ↔
@@ -200,7 +198,7 @@ theorem satisfies_isSuccessor_iff {ℳ : Structure.{u}}
     satisfies_disj_iff, satisfies_extensionalEq_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 对象公式中的极限序数定义与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isLimitOrdinal_iff {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (α : Term depth) :
     satisfies env (isLimitOrdinal α) ↔
@@ -219,29 +217,29 @@ def neg {parameterCount : Nat} (schema : UnarySchema parameterCount) :
     UnarySchema parameterCount where
   body := .neg schema.body
 /-- 该性质对序数递进。 -/
-@[prove_auto_norm definition]
+
 def progressiveCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
   .forallE <| .imp (Formula.isOrdinal Term.newest) <|
     .imp (Formula.forallMem Term.newest <|
         schema.body.rename BoundEmbedding.unaryUnderOne)
       schema.body
 /-- 该性质在所有序数上成立。 -/
-@[prove_auto_norm definition]
+
 def inductionCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
   .forallE <| .imp (Formula.isOrdinal Term.newest) schema.body
 /-- 性质在零序数处成立。 -/
-@[prove_auto_norm definition]
+
 def zeroCaseCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
   .forallE <| .imp (Formula.isEmpty Term.newest) schema.body
 /-- 性质对序数后继封闭。 -/
-@[prove_auto_norm definition]
+
 def successorCaseCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
   .forallE <| .forallE <|
     .imp (Formula.isOrdinal (.bound 1)) <|
       .imp (schema.body.rename Fin.succ) <|
         .imp (Formula.isSuccessor Term.newest (.bound 1)) (schema.body.rename BoundEmbedding.unaryUnderOne)
 /-- 性质对非零极限序数封闭。 -/
-@[prove_auto_norm definition]
+
 def limitCaseCore {parameterCount : Nat} (schema : UnarySchema parameterCount) : Formula 1 parameterCount :=
   .forallE <| .imp (Formula.isLimitOrdinal Term.newest) <|
     .imp (Formula.forallMem Term.newest <|
@@ -265,13 +263,13 @@ private theorem casesCore_freeClosed {parameterCount : Nat} (schema : UnarySchem
   simpa [casesCore, Formula.FreeClosed] using
     And.intro (zeroCaseCore_freeClosed schema) (And.intro (successorCaseCore_freeClosed schema) (limitCaseCore_freeClosed schema))
 /-- 超限归纳原理的闭句。 -/
-@[prove_auto_unfold setTheory.ordinal.induction]
+
 def inductionSentence {parameterCount : Nat} (schema : UnarySchema parameterCount) : Sentence :=
   Sentence.forallClosure (.imp (progressiveCore schema) (inductionCore schema)) <| by
       simpa [Formula.FreeClosed] using
         And.intro (progressiveCore_freeClosed schema) (inductionCore_freeClosed schema)
 /-- 按零、后继与极限三类序数表述的超限归纳闭句。 -/
-@[prove_auto_unfold setTheory.ordinal.induction.cases]
+
 def caseInductionSentence {parameterCount : Nat} (schema : UnarySchema parameterCount) : Sentence :=
   Sentence.forallClosure (.imp (casesCore schema) (inductionCore schema)) <| by
       simpa [Formula.FreeClosed] using

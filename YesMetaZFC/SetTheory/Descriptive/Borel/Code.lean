@@ -73,7 +73,7 @@ def btree_m {d} (ω A S T R N F : Term d) : Formula 1 d := .conj (tree_m A T)
         (Formula.forallMem T.weaken.weaken (.imp (rd_entry_m .newest (.bound 2) R.weaken.weaken.weaken)
           (Formula.extensionalEq .newest (.bound 1)))))))))))))
 derive_free_closed btree_m
-@[prove_auto_norm semantic]
+
 theorem btree_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A S T R N F : Term d) :
     Formula.satisfies ρ (btree_m (𝒞 := 𝒞) ω A S T R N F) ↔
       Btree_d I (ω.eval ρ) (A.eval ρ) (S.eval ρ) (T.eval ρ) (R.eval ρ) (N.eval ρ) (F.eval ρ) := by
@@ -95,7 +95,7 @@ def bcode_m {d} (ω A S c : Term d) : Formula 1 d := .existsE (.existsE (.exists
   (btree_m (𝒞 := 𝒞) ω.weaken.weaken.weaken.weaken A.weaken.weaken.weaken.weaken
     S.weaken.weaken.weaken.weaken (.bound 3) (.bound 2) (.bound 1) .newest)))))
 derive_free_closed bcode_m
-@[prove_auto_norm semantic]
+
 theorem bcode_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω A S c : Term d) :
     Formula.satisfies ρ (bcode_m (𝒞 := 𝒞) ω A S c) ↔ Bcode_d I (ω.eval ρ) (A.eval ρ) (S.eval ρ) (c.eval ρ) := by
   simp only [bcode_m, Bcode_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,

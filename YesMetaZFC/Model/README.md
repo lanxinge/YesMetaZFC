@@ -62,15 +62,15 @@
 
 `import YesMetaZFC.Model` 只汇集通用语义入口；Henkin、解释消去和具体集合论层按需导入。
 纯 Rosser、Löb、第二不完备与 Tarski 的元数学终点仍由原元数学入口提供，并直接
-消费这里的实际模型模块。证明搜索 tactic、语法编码和集合论领域定理按其职责保留。
+消费这里的实际模型模块。轻量派生策略、语法编码和集合论领域定理按其职责保留。
 
-验证使用 `lake --wfail build`；`bash scripts/check-all.sh --library-only` 覆盖包含本目录在内
+验证使用 `lake --wfail build`；`bash scripts/check-all.sh` 覆盖包含本目录在内
 的全部独立模块，且不生成或运行扫描器可执行程序。全源检查分批传递同一组模块名，以适配
 Windows 的命令行长度限制。
 全源脚本默认使用 4 线程，并保留显式设置的 `LEAN_NUM_THREADS`。
 
 已迁移的 185 个模型模块最长为 1,132 行，没有旧模块路径或循环导入残留。
-既有四个超长模块及历史构建性能的边界见 [工程指南](../../markdown/ENGINEERING.md)。
+模块规模及历史构建性能的边界见 [工程指南](../../markdown/ENGINEERING.md)。
 
 ## 原 ZF 中的有限公式反射
 

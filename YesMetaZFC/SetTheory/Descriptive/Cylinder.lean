@@ -17,7 +17,7 @@ def cyl_m {d} (B s U : Term d) : Formula 1 d := .forallE
   (.iff (.mem .newest U.weaken) (.conj (.mem .newest B.weaken) (Formula.subset s.weaken .newest)))
 derive_free_closed cyl_m
 
-@[prove_auto_norm semantic]
+
 theorem cyl_sat_l {d} (ρ : Env M d) (B s U : Term d) :
     Formula.satisfies ρ (cyl_m B s U) ↔ Cyl_d (M := M) (B.eval ρ) (s.eval ρ) (U.eval ρ) := by
   simp only [cyl_m, Cyl_d, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff,

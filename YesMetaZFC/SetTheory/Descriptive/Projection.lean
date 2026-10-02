@@ -45,7 +45,7 @@ def Pr_d (B J R K : M.Domain) : Prop := ∀ x, M.mem x K ↔ M.mem x B ∧ Prv_d
 def pr_m {d} (B J R K : Term d) : Formula 1 d := .forallE (.iff (.mem .newest K.weaken)
   (.conj (.mem .newest B.weaken) (prv_m (𝒞 := 𝒞) B.weaken J.weaken R.weaken .newest)))
 derive_free_closed pr_m
-@[prove_auto_norm semantic]
+
 theorem pr_sat_l {d} (ρ : Env M d) (B J R K : Term d) :
     Formula.satisfies ρ (pr_m (𝒞 := 𝒞) B J R K) ↔ Pr_d I (B.eval ρ) (J.eval ρ) (R.eval ρ) (K.eval ρ) := by
   simp only [pr_m, Pr_d, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff,

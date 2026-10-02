@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureDiagonalGraph
-import YesMetaZFC.Automation.FormulaBinderSemantics
+import YesMetaZFC.Model.FirstOrder.FormulaBinderSemantics
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureQuotationFaithful
 
 /-! # 裸 ZFC 中带参数的纯公式自身编码固定点

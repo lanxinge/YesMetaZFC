@@ -1,4 +1,3 @@
-import YesMetaZFC.Automation.HostNormalization.RuleRegistry
 import YesMetaZFC.SetTheory.Binding
 /-!
 # 集合论语法共享的模型底座
@@ -27,7 +26,7 @@ def reindex {ℳ : Structure.{u}} {sourceDepth targetDepth : Nat} (env : Env ℳ
   bound := env.bound ∘ indexMap
   free := env.free
 /-- 压栈后，提升的索引嵌入与环境重索引交换。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_lift {ℳ : Structure.{u}}
     {sourceDepth targetDepth : Nat} (env : Env ℳ targetDepth) (value : ℳ.Domain) (indexMap : Fin sourceDepth → Fin targetDepth) :
     (env.push value).reindex (BoundEmbedding.lift indexMap) = (env.reindex indexMap).push value := by
@@ -37,13 +36,13 @@ theorem reindex_push_lift {ℳ : Structure.{u}}
     refine Fin.cases ?_ (fun previous => ?_) entry <;> rfl
   · rfl
 /-- 两次压栈后按 `Fin.succ` 拉回，保留较早压入的对象。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_succ {ℳ : Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (older newer : ℳ.Domain) : ((env.push older).push newer).reindex Fin.succ =
       env.push older :=
   rfl
 /-- 一元模式主变量下插入 binder 后，拉回环境只保留最新模式对象。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_unaryUnderOne {ℳ : Structure.{u}}
     {parameterCount : Nat} (env : Env ℳ parameterCount) (ordinal value : ℳ.Domain) : ((env.push ordinal).push value).reindex (BoundEmbedding.unaryUnderOne
           (parameterCount := parameterCount)) =
@@ -54,7 +53,7 @@ theorem reindex_push_unaryUnderOne {ℳ : Structure.{u}}
     refine Fin.cases ?_ (fun parameter => ?_) entry <;> rfl
   · rfl
 /-- 一元模式穿过两个局部 binder 后，拉回环境保留模式对象与参数。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_unaryUnderTwo {ℳ : Structure.{u}}
     {parameterCount : Nat} (env : Env ℳ parameterCount) (source subset value : ℳ.Domain) : (((env.push source).push subset).push value).reindex
         (BoundEmbedding.unaryUnderTwo (parameterCount := parameterCount)) =
@@ -65,7 +64,7 @@ theorem reindex_push_unaryUnderTwo {ℳ : Structure.{u}}
     refine Fin.cases ?_ (fun parameter => ?_) entry <;> rfl
   · rfl
 /-- 二元模式穿过一个局部 binder 后，拉回环境保留输入、输出与参数。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_binaryUnderOne {ℳ : Structure.{u}}
     {parameterCount : Nat} (env : Env ℳ parameterCount) (source input output : ℳ.Domain) : ((((env.push source).push input).push output).reindex
         (BoundEmbedding.binaryUnderOne (parameterCount := parameterCount))) = (env.push input).push output := by
@@ -77,7 +76,7 @@ theorem reindex_push_binaryUnderOne {ℳ : Structure.{u}}
     · refine Fin.cases ?_ (fun parameter => ?_) previous <;> rfl
   · rfl
 /-- 二元模式穿过两个局部 binder 后，拉回环境保留输入、输出与参数。 -/
-@[prove_auto_norm index]
+
 theorem reindex_push_binaryUnderTwo {ℳ : Structure.{u}}
     {parameterCount : Nat} (env : Env ℳ parameterCount) (source collection input output : ℳ.Domain) :
     (((((env.push source).push collection).push input).push output).reindex (BoundEmbedding.binaryUnderTwo (parameterCount := parameterCount))) =

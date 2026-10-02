@@ -17,7 +17,7 @@ def npair_m {d} (ω J : Term d) : Formula 1 d := .existsE (.conj
   (Formula.isCartesianProduct 𝒞 .newest ω.weaken ω.weaken)
   (Formula.isBijectionFromTo 𝒞 J.weaken .newest ω.weaken))
 derive_free_closed npair_m
-@[prove_auto_norm semantic]
+
 theorem npair_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω J : Term d) :
     Formula.satisfies ρ (npair_m (𝒞 := 𝒞) ω J) ↔ Npair_d I (ω.eval ρ) (J.eval ρ) := by
   simp only [npair_m, Npair_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,

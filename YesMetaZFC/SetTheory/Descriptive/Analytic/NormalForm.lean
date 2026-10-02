@@ -47,7 +47,7 @@ def Atree_d (A B J T K : M.Domain) : Prop := Tree_d A T ∧ ∃ C, Body_d A B T 
 def atree_m {d} (A B J T K : Term d) : Formula 1 d := .conj (tree_m A T) (.existsE (.conj
   (body_m A.weaken B.weaken T.weaken .newest) (pr_m (𝒞 := 𝒞) B.weaken J.weaken .newest K.weaken)))
 derive_free_closed atree_m
-@[prove_auto_norm semantic]
+
 theorem atree_sat_l {d} (ρ : Env M d) (A B J T K : Term d) :
     Formula.satisfies ρ (atree_m (𝒞 := 𝒞) A B J T K) ↔
       Atree_d I (A.eval ρ) (B.eval ρ) (J.eval ρ) (T.eval ρ) (K.eval ρ) := by
@@ -85,7 +85,7 @@ def tpath_m {d} (ω J T x y : Term d) : Formula 1 d := Formula.forallMem ω (.ex
   (rp_m (𝒞 := 𝒞) J.weaken.weaken.weaken.weaken (.bound 2) (.bound 1) .newest)
   (.mem .newest T.weaken.weaken.weaken.weaken)))))))))
 derive_free_closed tpath_m
-@[prove_auto_norm semantic]
+
 theorem tpath_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω J T x y : Term d) :
     Formula.satisfies ρ (tpath_m (𝒞 := 𝒞) ω J T x y) ↔
       Tpath_d I (ω.eval ρ) (J.eval ρ) (T.eval ρ) (x.eval ρ) (y.eval ρ) := by

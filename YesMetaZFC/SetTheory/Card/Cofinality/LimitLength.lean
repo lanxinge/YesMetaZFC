@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Card.Cofinality.Basic
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 共尾序列长度
 本层证明严格递增共尾序列的长度必为非零极限序数，并构造任意极限序数上的恒等共尾

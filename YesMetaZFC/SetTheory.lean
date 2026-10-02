@@ -48,7 +48,6 @@ import YesMetaZFC.SetTheory.Axioms.ZFC
 import YesMetaZFC.SetTheory.Extension
 import YesMetaZFC.SetTheory.SetConstruction
 import YesMetaZFC.SetTheory.Foundation
-import YesMetaZFC.SetTheory.Automation.Context
 /-!
 # 项目集合论公共入口
 本层以带定义原子的 Project 核作为唯一生产公式语言：
@@ -58,7 +57,7 @@ import YesMetaZFC.SetTheory.Automation.Context
 * Jech 风格的类是公式/元层谓词，不是对象语言中的集合；
 * `L_{κ,κ}` 扩展只提升无穷索引族，不改变底层原子语言。
 * KP（含无穷）、ZF 与 ZFC 形成可传递的理论扩张层级；
-* 有限公理切片可以直接进入 checked preprocessing、SearchDAG 与 `prove_auto`。
+* 数学证明通过现有语义接口和轻量派生策略组合。
 旧纯 `∈` AST 仅由 `SetTheory.Definitional.Audit` 显式导入，用于展开与双向保守性审计。
 -/
 namespace YesMetaZFC

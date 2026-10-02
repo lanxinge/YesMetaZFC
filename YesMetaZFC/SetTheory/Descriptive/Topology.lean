@@ -21,7 +21,7 @@ def open_m {d} (S B U : Term d) : Formula 1 d := .conj (Formula.subset U B)
       (.mem .newest U.weaken.weaken.weaken))))))
 derive_free_closed open_m
 
-@[prove_auto_norm semantic]
+
 theorem open_sat_l {d} (ρ : Env M d) (S B U : Term d) :
     Formula.satisfies ρ (open_m S B U) ↔ Open_d (M := M) (S.eval ρ) (B.eval ρ) (U.eval ρ) := by
   simp only [open_m, Open_d, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
@@ -51,7 +51,7 @@ def top_m {d} (B τ : Term d) : Formula 1 d := .conj
     (top_m B τ).FreeClosed := by
   simp -implicitDefEqProofs [top_m, Definitional.Formula.FreeClosed, hB, hτ]
 
-@[prove_auto_norm semantic]
+
 theorem top_sat_l {d} (ρ : Env M d) (B τ : Term d) :
     Formula.satisfies ρ (top_m B τ) ↔ Top_d (M := M) (B.eval ρ) (τ.eval ρ) := by
   simp only [top_m, Top_d, Formula.satisfies_conj_iff, Formula.satisfies_forallMem_iff,

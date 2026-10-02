@@ -47,14 +47,14 @@ def limit_m {d} (ω H f : Term d) : Formula 1 d := Formula.forallMem ω (.exists
         (senv_agree_m (𝒞 := 𝒞) (.bound 3) .newest f.weaken.weaken.weaken.weaken)))))))
 derive_free_closed limit_m
 
-@[prove_auto_norm semantic]
+
 theorem cauchy_sat_l {d} (ρ : Env M d) (ω H : Term d) :
     Formula.satisfies ρ (cauchy_m (𝒞 := 𝒞) ω H) ↔ Cauchy_d I (ω.eval ρ) (H.eval ρ) := by
   simp only [cauchy_m, Cauchy_d, Formula.satisfies_forallMem_iff, Formula.satisfies_exists_iff,
     Formula.satisfies_conj_iff, Formula.satisfies_mem_iff, Formula.satisfies_imp_iff,
     Formula.satisfies_neg_iff, Formula.satisfies_forall_iff, Formula.satisfies_orderedPairMem_iff I,
     senv_agree_sat_l I, Definitional.Term.eval_weaken]; rfl
-@[prove_auto_norm semantic]
+
 theorem limit_sat_l {d} (ρ : Env M d) (ω H f : Term d) :
     Formula.satisfies ρ (limit_m (𝒞 := 𝒞) ω H f) ↔ Limit_d I (ω.eval ρ) (H.eval ρ) (f.eval ρ) := by
   simp only [limit_m, Limit_d, Formula.satisfies_forallMem_iff, Formula.satisfies_exists_iff,
@@ -132,7 +132,7 @@ def tendsto_m {d} (ω τ H f : Term d) : Formula 1 d := Formula.forallMem τ
       (.imp (Formula.orderedPairMem 𝒞 (.bound 1) .newest H.weaken.weaken.weaken.weaken)
         (.mem .newest (.bound 3)))))))))
 derive_free_closed tendsto_m
-@[prove_auto_norm semantic]
+
 theorem tendsto_sat_l {d} (ρ : Env M d) (ω τ H f : Term d) :
     Formula.satisfies ρ (tendsto_m (𝒞 := 𝒞) ω τ H f) ↔
       Tendsto_d I (ω.eval ρ) (τ.eval ρ) (H.eval ρ) (f.eval ρ) := by
