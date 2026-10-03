@@ -1,6 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.Borel.Operations
 
-/-! # 可逐项调用的唯一补码与内部可数交 -/
+/-! # 可逐项调用的唯一补码与内部部分指标域 -/
 namespace YesMetaZFC.SetTheory.Descriptive
 open Definitional.Project
 universe u
@@ -63,44 +63,5 @@ theorem family_domain_l (hZF : M.Models ZF) {ω H} (hH : ∀ i c, M.PairMember I
     simp only [φ, UnarySchema.denote, Formula.satisfies_exists_iff, Formula.satisfies_orderedPairMem_iff I]; rfl
   exact ⟨D, fun i hi => ((hD i).mp hi).1, fun i => ((hD i).trans (and_congr_right fun _ => hp i)).trans
     ⟨And.right, fun ⟨c, hc⟩ => ⟨hH i c hc, c, hc⟩⟩⟩
-
-theorem bcode_countable_inter_l (hZF : M.Models ZF) {ω A S H} (hω : M.IsOmega ω)
-    (hA : Fseq_space_d I ω ω A) (hH : Bfam_d I ω A S H) :
-    ∃ c, Bcode_d I ω A S c ∧ ∀ x, Bsat_d I ω A S c x ↔
-      ∀ i d, M.PairMember I i d H → Bsat_d I ω A S d x := by
-  let ρ : Env M 2 := (⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push H
-  let φ : BinarySchema 2 := { body := .existsE (.conj (Formula.orderedPairMem 𝒞 (.bound 2) .newest (.bound 3))
-    (bneg_m (𝒞 := 𝒞) (.bound 4) .newest (.bound 1))) }
-  have hp i d : φ.denote ρ i d ↔ ∃ c, M.PairMember I i c H ∧ Bneg_d I ω c d := by
-    simp only [φ, BinarySchema.denote, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-      Formula.satisfies_orderedPairMem_iff I, bneg_sat_l I hZF.1]; rfl
-  obtain ⟨D, _, hD⟩ := family_domain_l I hZF (fun i c hc => (hH.2 i c hc).1)
-  have total i (hi : M.mem i D) : ∃ d, φ.denote ρ i d :=
-    ((hD i).mp hi).elim fun c hc => (bneg_exists_l I hZF hω hA (hH.2 i c hc).2).imp
-      fun d hd => (hp i d).mpr ⟨c, hc, hd.1⟩
-  have unique i (_ : M.mem i D) c d (hc : φ.denote ρ i c) (hd : φ.denote ρ i d) : c = d := by
-    obtain ⟨a, ha, hc⟩ := (hp i c).mp hc
-    obtain ⟨b, hb, hd⟩ := (hp i d).mp hd
-    exact bneg_unique_l I hZF.1 hc (hH.1.2 i b a hb ha ▸ hd)
-  obtain ⟨C, hC⟩ := ZF.exists_functionalImageOn hZF φ ρ D total unique
-  obtain ⟨G, hg, eg⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := D) (target := C)
-    total unique (fun i d hi hd => (hC d).mpr ⟨i, hi, hd⟩)
-  have value i d (hd : M.PairMember I i d G) : ∃ c, M.PairMember I i c H ∧ Bcode_d I ω A S d ∧
-      ∀ x, Bsat_d I ω A S d x ↔ ¬ Bsat_d I ω A S c x := by
-    obtain ⟨c, hc, hn⟩ := (hp i d).mp ((eg i d).mp hd).2
-    obtain ⟨e, he, he', hev⟩ := bneg_exists_l I hZF hω hA (hH.2 i c hc).2
-    exact ⟨c, hc, bneg_unique_l I hZF.1 he hn ▸ he', bneg_unique_l I hZF.1 he hn ▸ hev⟩
-  have fam : Bfam_d I ω A S G := ⟨hg.1, fun i d hd => (value i d hd).elim fun c hc => ⟨(hH.2 i c hc.1).1, hc.2.1⟩⟩
-  obtain ⟨u, hu, uv⟩ := bcode_union_l I hZF hω hA fam
-  obtain ⟨c, _, hc, cv⟩ := bneg_exists_l I hZF hω hA hu
-  refine ⟨c, hc, fun x => (cv x).trans ((not_congr (uv x)).trans ⟨?_, ?_⟩)⟩
-  · intro hn i d hd
-    obtain ⟨e, _, he⟩ := hg.2.2 i ((hD i).mpr ⟨d, hd⟩)
-    obtain ⟨d', hd', _, hev⟩ := value i e he
-    have en := hH.1.2 i d' d hd' hd
-    exact Classical.byContradiction (fun h => hn ⟨i, e, he, (hev x).mpr (en.symm ▸ h)⟩)
-  · intro hall ⟨i, d, hd, hx⟩
-    obtain ⟨e, he, _, hv⟩ := value i d hd
-    exact (hv x).mp hx (hall i e he)
 
 end YesMetaZFC.SetTheory.Descriptive

@@ -119,4 +119,9 @@ theorem borel_pd_one_l (hZF : M.Models ZF) {ω A B J o K} (hB : Baire_d I ω B)
   exact ⟨(ps_one_l I hZF hB.1 hA ho).mpr (borel_an_l I hZF hB hA ha hJ hK),
     (pp_one_l I hZF hB.1 hA ho).mpr ⟨L, borel_an_l I hZF hB hA ha hJ hb, cm_symm_l hKB hl⟩⟩
 
+theorem pd_one_borel_l (hZF : M.Models ZF) {ω A B J o K} (hB : Baire_d I ω B)
+    (hA : Fseq_space_d I ω ω A) (ha : M.CardinalLessOrEqual I A ω) (hJ : Npair_d I ω J)
+    (ho : M.IsOrdinalOne o) : Pd_d I ω A B J o K ↔ Borel_d I ω A A B K :=
+  (and_congr (ps_one_l I hZF hB.1 hA ho) (pp_one_l I hZF hB.1 hA ho)).trans (suslin_l I hZF hB hA ha hJ).symm
+
 end YesMetaZFC.SetTheory.Descriptive

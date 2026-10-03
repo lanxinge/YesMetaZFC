@@ -37,6 +37,14 @@ theorem ac_graph_l (hZF : M.Models ZF) {ω A B J} (hB : Baire_d I ω B)
   exact ⟨t, (hA t).mpr ⟨n, hn, ht⟩, htp,
     fun p' q' hpq' htp' => eu ▸ ac_sub_l I hJ htu ((eqn p' q').mp hpq').2 htp'⟩
 
+theorem ps_pull_l (hZF : M.Models ZF) {ω A B J n f K V} (hB : Baire_d I ω B)
+    (hA : Fseq_space_d I ω ω A) (ha : M.CardinalLessOrEqual I A ω) (hJ : Npair_d I ω J)
+    (hn : M.mem n ω) (hf : Cont_d I A B f) (hk : Ps_d I ω A B J n K) (hv : Ip_d I B f K V) : Ps_d I ω A B J n V := by
+  obtain ⟨z, hz, _⟩ := hB.1.1.1
+  obtain ⟨p, hp, hk⟩ := (pc_sigma_l I hn hz).mp hk
+  obtain ⟨q, L, hq, hl, hv'⟩ := pc_pull_l I hZF hB hA ha hJ hp hk hf
+  exact ip_unique_l I hZF.1 hv' hv ▸ (pc_sigma_l I hn hz).mpr ⟨q, hq, hl⟩
+
 theorem pp_pull_l (hZF : M.Models ZF) {ω A B J n f K V} (hB : Baire_d I ω B)
     (hA : Fseq_space_d I ω ω A) (ha : M.CardinalLessOrEqual I A ω) (hJ : Npair_d I ω J)
     (hn : M.mem n ω) (hf : Cont_d I A B f) (hk : Pp_d I ω A B J n K) (hv : Ip_d I B f K V) : Pp_d I ω A B J n V := by

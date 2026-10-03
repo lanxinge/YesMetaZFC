@@ -1,5 +1,4 @@
-import YesMetaZFC.SetTheory.Descriptive.Analytic.Diagonal
-import YesMetaZFC.SetTheory.Descriptive.Analytic.NormalForm
+import YesMetaZFC.SetTheory.Descriptive.Analytic.Suslin
 import YesMetaZFC.SetTheory.Descriptive.Trace
 
 /-! # 内部解析层入口
@@ -9,6 +8,8 @@ import YesMetaZFC.SetTheory.Descriptive.Trace
 表示。`an_closed_l`、`an_tree_iff_l`、`an_prefix_iff_l` 给出闭集、闭树和逐内部
 长度的正规形；`an_normal_l` 还返回规范无死节点树。解析类与任意内部子空间
 上的迹都形成实际集合，全部定义有原公式。
+`an_separation_l` 为不交解析集构造实际 Borel 分离集；`suslin_l` 证明解析且
+余解析当且仅当 Borel。分离沿同步乘积树内部递归，只需 ZF。
 -/
 namespace YesMetaZFC.SetTheory.Descriptive
 open Definitional.Project

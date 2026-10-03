@@ -35,8 +35,8 @@ Borel 关系的内部 Baire 投影，`Coan_d` 为其补。解析码解释唯一�
 存在内部实数见证、每个内部长度都有树内成对前缀的判据；`anrel_prefix_iff_l`
 给出其子空间相对化版本。证书使用最小子编号，不引入可数选择。
 `Ps_d`、`Pp_d`、`Pd_d` 是以 Borel 为零层的粗体射影点类；`ps_succ_l` 给出
-后继投影方程，`ps_one_l`、`pp_one_l` 识别第一层，`borel_pd_one_l` 给出
-Borel ⊆ Δ¹₁。三类均已证明内部层号下的单调性。
+后继投影方程，`ps_one_l`、`pp_one_l` 识别第一层，`pd_one_borel_l` 给出
+Δ¹₁=Borel。三类均已证明内部层号下的单调性。
 `Pcode_d` 把层号、极性和 Borel 码打包；`pden_exists_unique_l` 给出唯一解释。
 `phier_exists_unique_l` 构造全部内部层的唯一函数图，`dst_projective_l` 自动给出
 空间、配对、层次及 Baire/Cantor 的射影集合族。`Tr_d`、`Rclass_d` 提供子空间迹。
@@ -53,10 +53,20 @@ Borel ⊆ Δ¹₁。三类均已证明内部层号下的单调性。
 子空间解释及并交相容性。`ps_standard_l`、`pp_standard_l`、`pd_standard_l`
 把标准数码 Num_d k n 处的内部层识别为 k 个交替实数量词的 Borel 正规形。
 
+`tree_wf_iff_l` 证明无内部实数分支等价于反向子边内部良基。
+`an_separation_l` 沿同步乘积树构造 Borel 分离码；`suslin_l` 证明解析且余解析
+当且仅当 Borel。`suslin_relative_l` 只要求子空间解析；`prden_suslin_l` 将
+同一相对集合的 Σ¹₁、Π¹₁ 两码转成相对子空间的 Borel 码。
+`universal_closed_l` 构造通用闭集；`universal_ps_l`、`universal_pp_l` 构造全部
+正内部层的通用集。`projective_nonselfdual_l` 返回 Σ\Π、Π\Σ 的实际对角见证；
+`projective_strict_l` 证明 Σ、Π 每个后继层严格增长，`pd_strict_l` 证明 Δ 从
+第一层以后严格增长，Δ₀=Δ₁=Borel。`dst_suslin_l` 从 ZF 模型直接给出实例。
+
 所有点、有限长度、开集及开集族都在模型内部解释。Baire、Cantor、柱集、
 开集、拓扑、距离、柯西、极限和紧致性均有原公式及语义对应，可使用既有分离
 与相对化接口。树、Borel 码、求值、解释及码操作也有原公式。空间、正规形、
-连续逆像和有限布尔运算只用 ZF；一般射影可数并交的选择条件在接口中单独列出。
+连续逆像、有限布尔运算、分离、Suslin 定理、通用集与层次严格性只用 ZF；
+一般射影可数并交的选择条件在接口中单独列出。
 射影层号取模型自己的 ω，标准层比较不缩小内部量词或见证的范围。
-尚未实现 Borel 秩、分离／完美集定理、Δ¹₁ ⊆ Borel 和射影层次严格性。
+尚未实现 Borel 秩、完美集定理、统一化与决定性。
 -/

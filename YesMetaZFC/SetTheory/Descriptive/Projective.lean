@@ -1,4 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.Projective.Finite
+import YesMetaZFC.SetTheory.Descriptive.Projective.Strict
+import YesMetaZFC.SetTheory.Descriptive.Projective.RelativeSuslin
 
 /-! # 解析与射影层入口
 
@@ -11,8 +13,11 @@ import YesMetaZFC.SetTheory.Descriptive.Projective.Finite
 可数选择；更弱入口 `pf_countable_with_l` 只要求该码族指标集上的选择。
 `ps_standard_l`、`pp_standard_l`、`pd_standard_l` 识别每个标准有限层的交替量词式。
 
-当前不包含 Suslin 分离及完美集定理、Δ¹₁ ⊆ Borel、
-射影层次严格性、统一化或决定性结论。
+`suslin_l`、`pd_one_borel_l` 完成 Δ¹₁=Borel；`an_separation_l` 返回实际分离码。
+`universal_ps_l`、`universal_pp_l` 构造全部正内部层的通用集；`projective_strict_l`
+与 `pd_strict_l` 给出严格上升的实际集合见证，Δ₀=Δ₁ 是唯一零层例外。
+`suslin_relative_l` 处理解析子空间中的相对 Borel 解释。以上结果只需 ZF。
+当前不包含 Borel 秩、完美集定理、统一化或决定性结论。
 -/
 namespace YesMetaZFC.SetTheory.Descriptive
 open Definitional.Project
@@ -53,5 +58,19 @@ theorem dst_countable_l (hZFC : M.Models ZFC) : ∃ ω A B J,
   have hcc := rcc_zfc_l I hZFC ω B
   exact ⟨ω, A, B, J, hB, hA, ha, hJ, hcc, fun _ _ _ h b =>
     pjoin_exists_l I hZF hB hA ha hJ (fcc_real_l I hcc (fun i p hp => (h.2.2.2 i p hp).1)) h b⟩
+
+/-- 直接从 ZF 模型启动 Suslin 定理及任意非零内部层的通用集构造。 -/
+theorem dst_suslin_l (hZF : M.Models ZF) : ∃ ω A B J,
+    Baire_d I ω B ∧ Fseq_space_d I ω ω A ∧ M.CardinalLessOrEqual I A ω ∧ Npair_d I ω J ∧
+    (∀ K, Borel_d I ω A A B K ↔ An_d I ω A B J K ∧ Coan_d I ω A B J K) ∧
+    (∀ n, M.mem n ω → (∃ i, M.mem i n) → ∃ U, Us_d I ω A B J n U) ∧
+    ∀ n m, M.mem n ω → M.SuccessorOf m n →
+      (∃ S, Ps_d I ω A B J m S ∧ ¬ Ps_d I ω A B J n S) ∧
+      ∃ P, Pp_d I ω A B J m P ∧ ¬ Pp_d I ω A B J n P := by
+  obtain ⟨ω, _, B, _, A, _, hB, _, _, hA, ha, _, _⟩ := ds_spaces_l I hZF
+  obtain ⟨J, hJ⟩ := npair_exists_l I hZF hB.1
+  exact ⟨ω, A, B, J, hB, hA, ha, hJ, fun _ => suslin_l I hZF hB hA ha hJ,
+    fun _ hn hne => universal_ps_l I hZF hB hA ha hJ hn hne,
+    fun _ _ hn hm => (projective_strict_l I hZF hB hA ha hJ hn hm).2.2⟩
 
 end YesMetaZFC.SetTheory.Descriptive

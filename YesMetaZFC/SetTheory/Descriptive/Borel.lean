@@ -1,7 +1,7 @@
 import YesMetaZFC.SetTheory.Descriptive.Borel.Open
 import YesMetaZFC.SetTheory.Descriptive.Borel.Finite
 import YesMetaZFC.SetTheory.Descriptive.Borel.Relabel
-import YesMetaZFC.SetTheory.Descriptive.Borel.Countable
+import YesMetaZFC.SetTheory.Descriptive.Borel.Canonical
 
 /-! # 内部 Borel 集及空间实例
 
