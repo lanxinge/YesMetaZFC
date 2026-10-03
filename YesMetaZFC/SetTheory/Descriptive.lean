@@ -40,10 +40,23 @@ Borel ⊆ Δ¹₁。三类均已证明内部层号下的单调性。
 `Pcode_d` 把层号、极性和 Borel 码打包；`pden_exists_unique_l` 给出唯一解释。
 `phier_exists_unique_l` 构造全部内部层的唯一函数图，`dst_projective_l` 自动给出
 空间、配对、层次及 Baire/Cantor 的射影集合族。`Tr_d`、`Rclass_d` 提供子空间迹。
+`Pedit_d` 唯一改写补码和交替量词码；`pc_project_l`、`pc_all_l` 合并同极性的
+相邻量词，保持正层 Σ、Π 的层号。`pc_raise_l` 保持极性并升层。
+`Bpull_d` 只在原叶后增加一层柱集并；`Ppull_d` 迭代 f↦f×id，把此唯一替换
+提升到任意内部射影层。`pc_pull_l` 返回同层连续逆像码与实际解释。
+`pc_binary_l`、`pd_binary_l` 在 ZF 中构造各层二元并交。
+`Pf_d`、`Fd_d` 分别表示实际码族及其解释函数图；`pf_countable_l` 和
+`pd_countable_l` 构造 Σ、Π、Δ 同层可数并交。输入按内部自然数部分编号，允许空族。
+一般可数族使用内部实数可数选择；`pf_countable_with_l` 进一步只要求当前指标集
+上的选择。`dst_countable_l` 从原 ZFC 模型构造此条件及全部空间实例。
+`Pjoin_d` 给出并交运算的原公式；`Prden_d`、`pf_relative_countable_l` 给出
+子空间解释及并交相容性。`ps_standard_l`、`pp_standard_l`、`pd_standard_l`
+把标准数码 Num_d k n 处的内部层识别为 k 个交替实数量词的 Borel 正规形。
 
 所有点、有限长度、开集及开集族都在模型内部解释。Baire、Cantor、柱集、
 开集、拓扑、距离、柯西、极限和紧致性均有原公式及语义对应，可使用既有分离
-与相对化接口。树、Borel 码、求值、解释及码操作也有原公式。构造只用 ZF，
-不增加对象选择公理；可数并接收内部码族。射影层号取模型自己的 ω，而非外部 Nat。
+与相对化接口。树、Borel 码、求值、解释及码操作也有原公式。空间、正规形、
+连续逆像和有限布尔运算只用 ZF；一般射影可数并交的选择条件在接口中单独列出。
+射影层号取模型自己的 ω，标准层比较不缩小内部量词或见证的范围。
 尚未实现 Borel 秩、分离／完美集定理、Δ¹₁ ⊆ Borel 和射影层次严格性。
 -/

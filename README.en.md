@@ -76,7 +76,13 @@ The [projective layer](YesMetaZFC/SetTheory/Descriptive/Projective.lean) constru
 and Δ¹ₙ along the model's own ω, including nonstandard levels. Base and first-level identities,
 successor projection equations, complement duality, monotonicity, and Borel ⊆ Δ¹₁ are proved.
 Individual projective codes and the entire hierarchy have unique internal interpretations;
-Cantor pointclasses are obtained by subspace traces. Borel ranks, separation and perfect-set
+Cantor pointclasses are obtained by subspace traces. Code operations now include complements,
+alternating quantifiers, merging adjacent quantifiers of the same polarity, raising levels,
+continuous preimages, and binary unions/intersections in ZF. Coded countable unions/intersections
+preserve each Σ, Π, and Δ level under countable choice for internal reals; the finer interface
+only needs choice on the given index set. Standard numeral levels agree with finite alternating
+real quantifiers over Borel matrices, with subspace-relative interfaces.
+Borel ranks, separation and perfect-set
 theorems, Δ¹₁ ⊆ Borel, and strictness remain to be implemented.
 
 ## Explore the infrastructure
