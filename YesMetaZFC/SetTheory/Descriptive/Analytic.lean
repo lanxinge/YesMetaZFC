@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.Analytic.Suslin
 import YesMetaZFC.SetTheory.Descriptive.Trace
+import YesMetaZFC.SetTheory.Descriptive.Perfect
 
 /-! # 内部解析层入口
 
@@ -10,6 +11,9 @@ import YesMetaZFC.SetTheory.Descriptive.Trace
 上的迹都形成实际集合，全部定义有原公式。
 `an_separation_l` 为不交解析集构造实际 Borel 分离集；`suslin_l` 证明解析且
 余解析当且仅当 Borel。分离沿同步乘积树内部递归，只需 ZF。
+`an_perfect_l` 证明解析集可数或含非空闭且无孤立点的子集；`borel_perfect_l`
+给出内部有码 Borel 集的结论。分裂导集经 Hartogs 界稳定，融合返回实际完美集。
+`dst_perfect_l` 自动构造所有空间实例，证明不要求可数选择或 ω₁ 正则。
 -/
 namespace YesMetaZFC.SetTheory.Descriptive
 open Definitional.Project

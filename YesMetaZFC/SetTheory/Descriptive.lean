@@ -1,6 +1,7 @@
 import YesMetaZFC.SetTheory.Descriptive.Completion
 import YesMetaZFC.SetTheory.Descriptive.Borel
 import YesMetaZFC.SetTheory.Descriptive.Projective
+import YesMetaZFC.SetTheory.Descriptive.BorelRank
 
 /-! # 内部描述集合论：空间、Borel、解析与射影层
 
@@ -62,11 +63,21 @@ Borel 关系的内部 Baire 投影，`Coan_d` 为其补。解析码解释唯一�
 `projective_strict_l` 证明 Σ、Π 每个后继层严格增长，`pd_strict_l` 证明 Δ 从
 第一层以后严格增长，Δ₀=Δ₁=Borel。`dst_suslin_l` 从 ZF 模型直接给出实例。
 
+`Brank_d` 构造码树上满足 sup(子秩+1) 的唯一实际秩函数；`Bcr_d` 取根秩。
+`Bsig_d`、`Bpi_d` 是标准超限 Borel 层级，第一层为开／闭，第二个 Σ 层为 Fσ。
+`Bsr_d` 取集合所属 Σ⁰α ∪ Π⁰α 的最小正阶数。`bsr_exists_l` 证明有码集合
+有唯一内部可数秩；补集保秩、子空间限制不增秩，任意内部子空间的码解释也有秩。
+`dst_borel_rank_l` 自动给出 Baire、Cantor 及两种秩的实际接口。
+`an_perfect_l`、`borel_perfect_l` 证明解析／内部有码 Borel 集可数或含非空完美
+子集，输出实际闭且无孤立点的集合。分裂导集的稳定性及融合只用 ZF，
+不假定 ω₁ 正则或可数选择；`dst_perfect_l` 自动构造所需实例。
+
 所有点、有限长度、开集及开集族都在模型内部解释。Baire、Cantor、柱集、
 开集、拓扑、距离、柯西、极限和紧致性均有原公式及语义对应，可使用既有分离
 与相对化接口。树、Borel 码、求值、解释及码操作也有原公式。空间、正规形、
 连续逆像、有限布尔运算、分离、Suslin 定理、通用集与层次严格性只用 ZF；
 一般射影可数并交的选择条件在接口中单独列出。
 射影层号取模型自己的 ω，标准层比较不缩小内部量词或见证的范围。
-尚未实现 Borel 秩、完美集定理、统一化与决定性。
+超限 Borel 层号与码树秩取模型自己的序数，不要求外部良基。
+尚未实现统一化与决定性；未断言 ZF 中无统一码族的集合式 Borel 类都满足完美集定理。
 -/
