@@ -21,7 +21,7 @@ theorem oa_common_l (hZF : M.Models ZF) (k : Bool) {A p q : M.Domain}
     let I := kp_pair_l (ZF.modelsKP hZF)
     obtain ⟨n, hn, hs⟩ := (oa_seq_decode_l hZF hω).mp hs
     obtain ⟨m, hm, ht⟩ := (oa_seq_decode_l hZF hω).mp ht
-    obtain ⟨l, F, hl, hF, hS, hT⟩ := ZF.fseq_join_l I hZF hω hn hm hs ht
+    obtain ⟨l, F, hl, _, hF, hS, hT⟩ := ZF.fseq_join_l I hZF hω hn hm hs ht
     obtain ⟨r, hr⟩ := I.total A F
     obtain ⟨ha, hf⟩ := ob_pair_components_l hZF r (ob_parameter_l hZF r) hr
     have hno := ob_ordinal_l hZF r (hω.members_areOrdinals hZF n hn)

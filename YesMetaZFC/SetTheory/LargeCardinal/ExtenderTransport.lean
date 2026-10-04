@@ -24,7 +24,7 @@ theorem ep_space_map_l {ω κ κ' K K' X R Y S c d π n D D' : M.Domain}
   intro f
   exact ⟨fun hf => (read f (target.transitive D' (hπ.1.1.output_mem_of_pairMember hD) f hf)).mp hf,
     fun hf => (read f (sc_finite_function_l hZF target.omega target.transitive hn target.theory target.omega_mem
-      target.cardinal_mem hnω hf)).mpr hf⟩
+      (target.transitive κ' target.cardinal_mem) hnω hf)).mpr hf⟩
 
 theorem ec_measure_image_l {ω c d N R N' S σ F F' a a' U V A A' : M.Domain}
     (hω : M.IsOmega ω) (hN : M.TransitiveSet N) (hN' : M.TransitiveSet N')
@@ -59,7 +59,7 @@ theorem ec_index_image_l {ω c d N R N' S σ L L' a a' b b' q m n : M.Domain}
     (hmω : M.mem m ω) (hnω : M.mem n ω) (hq : Fn0_d m n q) (hb : Fn0_d n L b) (ha : Cp0_d m n L q b a) :
     Fn0_d n L' b' ∧ Cp0_d m n L' q b' a' := by
   have qω := hq.mono_target_l (hω.transitive hZF n hnω)
-  have hqN := sc_finite_function_l hZF hω hN hm theory hωN hωN hmω qω
+  have hqN := sc_finite_function_l hZF hω hN hm theory hωN (hN ω hωN) hmω qω
   have hqq := hσ.finite_fixed_l hZF hω hN hN' hm hn hωN hmω hqN qω
   have nat := hσ.natural_l hZF hω hN hN' hm hn hωN
   exact ⟨(hσ.function_l hZF hω hN hN' hm hn (nat n hnω) hL hbb).mp hb,

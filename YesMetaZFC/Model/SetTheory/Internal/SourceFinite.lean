@@ -16,7 +16,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem sc_finite_function_l {ω c X R A n f : M.Domain} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
-    (hωX : M.mem ω X) (hA : M.mem A X) (hn : M.mem n ω) (hf : Fn0_d n A f) : M.mem f X := by
+    (hωX : M.mem ω X) (hA : M.MemberSubset A X) (hn : M.mem n ω) (hf : Fn0_d n A f) : M.mem f X := by
   let ρ := (⟨fun _ => A, fun _ => A⟩ : Env M 1).push X
   let φ : UnarySchema 2 := {
     body := .forallE (.imp (fn0_m (.bound 1) (.bound 3) .newest) (.mem .newest (.bound 2))) }
@@ -51,13 +51,13 @@ theorem sc_finite_function_l {ω c X R A n f : M.Domain} (hω : M.IsOmega ω)
           Formula.satisfies_extensionalEq_iff_eq hZF.1]; rfl
       obtain ⟨f', C, hfX, _, hfn, choose⟩ := sc_uniform_source_l hZF hω hX hm theory ψ
         (.disj (.conj (.mem _ _) (rd_entry0_delta_l ..)) (.conj (.neg (.mem _ _)) (.atom _ _ _))) η
-        (Fin.cases (hX A hA x hx) (Fin.cases hgX (fun _ => hX ω hωX n hn))) (hX ω hωX m hmω)
+        (Fin.cases (hA x hx) (Fin.cases hgX (fun _ => hX ω hωX n hn))) (hX ω hωX m hmω)
         (fun i _ => by
           classical
           by_cases hi : M.mem i n
           · obtain ⟨y, hy, hiy⟩ := hgn.2.2 i hi
-            exact ⟨y, hX A hA y hy, (read i y).mpr (Or.inl ⟨hi, hiy⟩)⟩
-          · exact ⟨x, hX A hA x hx, (read i x).mpr (Or.inr ⟨hi, rfl⟩)⟩)
+            exact ⟨y, hA y hy, (read i y).mpr (Or.inl ⟨hi, hiy⟩)⟩
+          · exact ⟨x, hA x hx, (read i x).mpr (Or.inr ⟨hi, rfl⟩)⟩)
       have eq : f' = f := hfn.ext_l hZF.1 hf (fun i hi => by
         obtain ⟨y, _, hiy⟩ := hfn.2.1 i hi
         refine ⟨y, hiy, ?_⟩

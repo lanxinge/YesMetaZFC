@@ -62,6 +62,6 @@ theorem sc_sequences_forward_l {ω c d X R Y S q : M.Domain}
     exact ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) hf⟩
   · rintro ⟨n, hnω, hf⟩
     have fn := fn0_of_function_l (ZF.modelsKP hZF) hf
-    exact (spec f (sc_finite_function_l hZF hω hY hn theory hωY hA hnω fn)).mpr ⟨n, hnω, fn⟩
+    exact (spec f (sc_finite_function_l hZF hω hY hn theory hωY (hY A hA) hnω fn)).mpr ⟨n, hnω, fn⟩
 
 end YesMetaZFC.SetTheory.Internal

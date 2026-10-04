@@ -85,6 +85,11 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name 
 MODULES += ["YesMetaZFC.SetTheory.Filter.SourceUltrafilter"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderRelative", "ExtenderTransport", "ExtenderCopyPull", "ExtenderCopySyntax")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in ("Bounded", "DeltaImage")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("ExtenderFunctionCode", "ExtenderNormalSource", "ExtenderRepresentative", "ExtenderCoordinateSource",
+             "ExtenderSeed", "ExtenderSeedNormal", "ExtenderSeedCollapse", "ExtenderCopySeed", "ExtenderCopyCollapse",
+             "ExtenderTuple", "ExtenderSetCode")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderSystemSyntax", "ExtenderEdge", "ExtenderDescentSyntax", "ExtenderWellFounded")]
 MODULES += ["YesMetaZFC.SetTheory.OrdinalChoice"]
@@ -275,6 +280,9 @@ LOS_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Copy"]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderUltrapower", "ExtenderCopyComponent", "ExtenderCopy", "ExtenderCopyApplication")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("ExtenderValue", "ExtenderTupleValue", "ExtenderValueAgreement", "ExtenderValueBound",
+                "ExtenderSetTransfer", "ExtenderSuccessor", "ExtenderSuccessorApplication", "ExtenderCopySuccessor")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("RankEnumeration", "RankCover", "RankLength",
                 "ExtenderPredicateComponent", "ExtenderPredicateLimit", "ExtenderStrength", "WoodinStrength")]
 LOS_CHOICE_FREE = ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
@@ -305,6 +313,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("Em_source_d", "Ec_source_d", "Ea_agree_d", "Ea_maps_d", "Ec_class_d", "ec_class_m",
                  "Ec_node_d", "ec_node_m", "Ec_limit_d")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Ec_ultrapowers_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("En_source_d", "Ep_repr_d", "ep_repr_m", "Ep_coord_d", "ep_coord_m", "Ep_seed_d", "ep_seed_m", "ep_pair_at_m")]
+LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                    ("Ep_value_d", "ep_value_m", "ep_subspace_m", "Ep_successor_d")]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in

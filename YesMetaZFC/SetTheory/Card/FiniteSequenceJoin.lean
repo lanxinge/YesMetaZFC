@@ -35,7 +35,7 @@ theorem fs_tail_unique_l (hE : Extensional M) {n m F g h} (hg : Fs_tail_d I n m 
 
 theorem ZF.fseq_join_l (hZF : M.Models ZF) {ω A n m f g} (hω : M.IsOmega ω)
     (hn : M.mem n ω) (hm : M.mem m ω) (hf : M.IsSetFunctionFromTo I f n A)
-    (hg : M.IsSetFunctionFromTo I g m A) : ∃ k F, M.mem k ω ∧ M.IsSetFunctionFromTo I F k A ∧
+    (hg : M.IsSetFunctionFromTo I g m A) : ∃ k F, M.mem k ω ∧ M.IsOrdinalAddition I k n m ∧ M.IsSetFunctionFromTo I F k A ∧
       M.IsRestrictionOf I f F n ∧ Fs_tail_d I n m F g := by
   have no := hω.members_areOrdinals hZF n hn
   have mo := hω.members_areOrdinals hZF m hm
@@ -77,7 +77,7 @@ theorem ZF.fseq_join_l (hZF : M.Models ZF) {ω A n m f g} (hω : M.IsOmega ω)
     refine ⟨And.right, fun h => ⟨?_, h⟩⟩
     exact (ordinalAddition_mem_iff hZF I mo hk).mpr (h.elim
       (fun h => Or.inl (hf.input_mem_of_pairMember h)) (fun ⟨j, hj, ha, _⟩ => Or.inr ⟨j, hj, ha⟩))
-  refine ⟨k, F, ordinalAddition_mem_omega hZF I hω hn hm hk, hF, ⟨hf.1.1, ?_⟩, hg.1.1, ?_⟩
+  refine ⟨k, F, ordinalAddition_mem_omega hZF I hω hn hm hk, hk, hF, ⟨hf.1.1, ?_⟩, hg.1.1, ?_⟩
   · intro i x
     exact ⟨fun h => ⟨hf.input_mem_of_pairMember h, (graph i x).mpr (Or.inl h)⟩,
       fun ⟨hi, h⟩ => ((graph i x).mp h).elim id (fun ⟨j, hj, ha, _⟩ => (disjoint i j hi hj ha).elim)⟩

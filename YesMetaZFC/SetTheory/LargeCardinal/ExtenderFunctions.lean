@@ -74,8 +74,8 @@ theorem ep_pull_id_l (hE : Extensional M) {κ X n q f : M.Domain} (hf : Ep_fun_d
     exact ⟨y, hiy, (idq i j hij).symm ▸ hjy⟩
   exact e ▸ Iff.rfl
 
-theorem ep_pull_unique_l (hKP : M.Models KP) {κ X m n q f g h : M.Domain} (hq : Fn0_d m n q)
-    (hg : Ep_pull_d κ X m n q f g) (hh : Ep_pull_d κ X m n q f h) : g = h := by
+theorem ep_pull_unique_l (hKP : M.Models KP) {κ X Y m n q f g h : M.Domain} (hq : Fn0_d m n q)
+    (hg : Ep_pull_d κ X m n q f g) (hh : Ep_pull_d κ Y m n q f h) : g = h := by
   obtain ⟨E, he, hge⟩ := hg.2.1
   have hhe := hh.2.1.at_l hKP.1 he
   apply hge.ext_l hKP.1 hhe

@@ -281,6 +281,31 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 和对应的完整复制。正则 Hχ 的大小在这里用于产生初始实例；通用复制定理
 消费任意已有的相对源及实际初等图。迭代树与非平凡迭代的可迭代性仍待证明。
 
+## 已证明：后继子集一致性与复制的支撑保持
+
+[ExtenderSuccessor](ExtenderSuccessor.lean) 的 `ep_successor_agree_l` 证明：同一个 F
+作用于 `Ea_agree_d ω κ X Y` 的两源，若两侧已实际传递坍塌，则对每个 μ∈L，
+后继 N、N′ 满足 `Ea_agree_d ω μ N N′`。这里量化全部内部自然数 m 以及 μᵐ 的全部
+背景子集；结论精确为这些子集是否属于两侧模型的一致性。
+输入只消费相对测度、源内协调与正规性、坐标原子及实际坍塌，不要求原派生嵌入。
+
+证明的关键是两个识别。[ExtenderSeedNormal](ExtenderSeedNormal.lean) 用源内正规性
+排除坐标类的额外前驱，[ExtenderSeedCollapse](ExtenderSeedCollapse.lean) 再以原公式成员
+归纳证明坐标 α 的坍塌值就是 α。[ExtenderValueBound](ExtenderValueBound.lean) 把 A⊆μᵐ
+的代表逐点正规化为 κᵐ 的子集；[ExtenderSetCode](ExtenderSetCode.lean) 用坐标拼接
+编码整张成员图，在另一源重建同一代表。[ExtenderTupleValue](ExtenderTupleValue.lean)
+识别有限坐标列的坍塌值，[ExtenderSetTransfer](ExtenderSetTransfer.lean) 由相同的成员判定
+与外延性恢复同一个 A。投影和列长度保持内部表示。
+
+[ExtenderSuccessorApplication](ExtenderSuccessorApplication.lean) 的 `Ex_short_d.successors_l`
+实际构造两侧传递后继，保留绑定原系统与坍塌的 `Ep_successor_d` 证书，返回上述一致性；
+对每个 ω⊆μ∈L，还自动返回两侧的下一步源证书。
+[ExtenderCopyCollapse](ExtenderCopyCollapse.lean) 在同一原复制图上共轭两侧坍塌，
+证明所得完整初等图 k 满足 k↾L=σ↾L，并保留精确共轭方程。
+[ExtenderCopySuccessor](ExtenderCopySuccessor.lean) 的 `ep_copy_successors_l` 自动构造这些对象；
+原侧只需预扩展器，目标侧的可数共同纤维经复制回传原侧良基性。
+这两个入口已经产出后继条件；迭代树递归、极限分支和可迭代性仍待实现。
+
 ## 已证明：按指定秩选长并恢复强性
 
 [`woodin_rank_strength_l`](WoodinStrength.lean) 在 ZFC 中对每个 A⊆Vδ 固定 κ，
@@ -361,6 +386,7 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
 实际源理论下的源内部 Łoś、存在见证对角化及传递后继源保持也已完成。
 相对测度的跨模型施加、双映射完整初等复制、常值交换方块与良基性回传已完成。
+同一扩展器的两次施加保持支撑以下的有限幂子集一致性，坍塌后的复制在支撑上等于 σ。
 常值初等嵌入、分量间初等映射以及恒等、复合和交换律现已完成。
 通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
 通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。

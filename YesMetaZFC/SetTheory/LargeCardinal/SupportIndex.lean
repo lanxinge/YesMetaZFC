@@ -71,7 +71,7 @@ theorem ec_join_l (hZF : M.Models ZF) {ω L m n a b : M.Domain} (hω : M.IsOmega
       M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) c k L ∧
       Fn0_d m k q ∧ Cp0_d m k L q c a ∧ Fn0_d n k r ∧ Cp0_d n k L r c b := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨l, d, hl, hd, had, hbd⟩ := ZF.fseq_join_l I hZF hω hm hn
+  obtain ⟨l, d, hl, _, hd, had, hbd⟩ := ZF.fseq_join_l I hZF hω hm hn
     (fn0_function_l (ZF.modelsKP hZF) ha) (fn0_function_l (ZF.modelsKP hZF) hb)
   obtain ⟨D, hD⟩ := ZF.exists_range_of_setFunction hZF I hd.1 hd.2.1
   have dD : M.IsSetFunctionFromTo I d l D := ⟨hd.1, hd.2.1,
