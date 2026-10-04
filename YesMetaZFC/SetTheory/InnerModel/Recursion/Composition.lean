@@ -57,6 +57,34 @@ theorem cp0_mono_l {m n K L q s t} (hKL : M.MemberSubset K L) (h : Cp0_d m n K q
   ⟨h.1.mono_target_l hKL, fun i hi => (h.2 i hi).imp fun _ hr => ⟨hr.1,
     hr.2.imp fun x hx => ⟨hKL x hx.1, hx.2⟩⟩⟩
 
+theorem Cp0_d.value_l {A B C t f g v w x : M.Domain} (h : Cp0_d A B C t f g)
+    (ht : Fn0_d A B t) (hf : Fn0_d B C f) (hw : Rd_entry_d v w t) :
+    Rd_entry_d v x g ↔ Rd_entry_d w x f := by
+  obtain ⟨w', hw', y, hy, htw, hfy, hgy⟩ := h.2 v (ht.bound_l hw).1
+  have eq := ht.2.2 v (ht.bound_l hw).1 w' hw' w (ht.bound_l hw).2 htw hw
+  subst w'
+  exact ⟨fun hx => (h.1.2.2 v (h.1.bound_l hx).1 x (h.1.bound_l hx).2 y hy hx hgy).symm ▸ hfy,
+    fun hx => (hf.2.2 w (ht.bound_l hw).2 x (hf.bound_l hx).2 y hy hx hfy).symm ▸ hgy⟩
+
+theorem Cp0_d.assoc_l {A B C X t s u f g k : M.Domain}
+    (ht : Fn0_d B A t) (hs : Fn0_d C B s) (hu : Cp0_d C B A s t u) (hf : Fn0_d A X f)
+    (hg : Cp0_d B A X t f g) (hk : Cp0_d C B X s g k) : Cp0_d C A X u f k := by
+  refine ⟨hk.1, fun v hv => ?_⟩
+  obtain ⟨w, hw, hvw⟩ := hs.2.1 v hv
+  obtain ⟨z, hz, hwz⟩ := ht.2.1 w hw
+  obtain ⟨x, hx, hvx⟩ := hk.1.2.1 v hv
+  exact ⟨z, hz, x, hx, (hu.value_l hs ht hvw).mpr hwz,
+    (hg.value_l ht hf hwz).mp ((hk.value_l hs hg.1 hvw).mp hvx), hvx⟩
+
+theorem Cp0_d.retarget_l {A B X Y t f g : M.Domain} (h : Cp0_d A B X t f g)
+    (hf : Fn0_d B Y f) : Cp0_d A B Y t f g := by
+  have bound v x (hx : Rd_entry_d v x g) : M.mem x Y := by
+    obtain ⟨w, _, y, hy, _, hwy, hvy⟩ := h.2 v (h.1.bound_l hx).1
+    exact (h.1.2.2 v (h.1.bound_l hx).1 x (h.1.bound_l hx).2 y hy hx hvy).symm ▸ (hf.bound_l hwy).2
+  refine ⟨h.1.retarget_l bound, fun v hv => ?_⟩
+  obtain ⟨w, hw, x, _, hvw, hwx, hvx⟩ := h.2 v hv
+  exact ⟨w, hw, x, (hf.bound_l hwx).2, hvw, hwx, hvx⟩
+
 theorem cp0_exists_l (hKP : M.Models KP) {m n K q s : M.Domain} (hq : Fn0_d m n q) (hs : Fn0_d n K s) :
     ∃ t, Cp0_d m n K q s t := by
   let ρ : Env M 3 := ⟨Fin.cases s (Fin.cases q (fun _ => n)), fun _ => n⟩
@@ -98,5 +126,29 @@ theorem cp0_projection_l (hKP : M.Models KP) {m n K q H D} (hq : Fn0_d m n q)
     (fun s hs t v ht hv => cp0_unique_l hKP.1 hq ((hH s).mp hs) ((sat s t).mp ht) ((sat s v).mp hv))
     (fun s _ t ht => (hD t).mpr ((sat s t).mp ht).1)
   exact ⟨p, hp, fun s t => (hs s t).trans (and_congr_right fun _ => sat s t)⟩
+
+/-- 恒等坐标重排在整个实际函数空间上也是恒等。 -/
+theorem cp0_projection_id_l {n X D q p : M.Domain} (hD : ∀ f, M.mem f D → Fn0_d n X f)
+    (hp : Fn0_d D D p) (hq : ∀ i j, Rd_entry_d i j q ↔ M.mem i n ∧ i = j)
+    (hs : ∀ f g, Rd_entry_d f g p ↔ M.mem f D ∧ Cp0_d n n X q f g) :
+    ∀ f g, Rd_entry_d f g p ↔ M.mem f D ∧ f = g := by
+  have fixed f (hf : M.mem f D) : Rd_entry_d f f p := (hs f f).mpr ⟨hf, hD f hf, fun i hi => by
+    obtain ⟨x, hx, hix⟩ := (hD f hf).2.1 i hi
+    exact ⟨i, hi, x, hx, (hq i i).mpr ⟨hi, rfl⟩, hix, hix⟩⟩
+  exact fun f g => ⟨fun h => ⟨(hp.bound_l h).1,
+    hp.2.2 f (hp.bound_l h).1 f (hp.bound_l h).1 g (hp.bound_l h).2 (fixed f (hp.bound_l h).1) h⟩,
+    fun ⟨hf, he⟩ => he ▸ fixed f hf⟩
+
+/-- 坐标函数的复合诱导反向的实际投影复合。 -/
+theorem cp0_projection_comp_l {m n l X D E F q s u p r t : M.Domain}
+    (hq : Fn0_d m n q) (hs : Fn0_d n l s) (hu : Cp0_d m n l q s u)
+    (hF : ∀ f, M.mem f F → Fn0_d l X f) (hp : Fn0_d E D p) (hr : Fn0_d F E r) (ht : Fn0_d F D t)
+    (hP : ∀ f g, Rd_entry_d f g p → Cp0_d m n X q f g)
+    (hR : ∀ f g, Rd_entry_d f g r → Cp0_d n l X s f g)
+    (hT : ∀ f g, M.mem f F → Cp0_d m l X u f g → Rd_entry_d f g t) : Cp0_d F E D r p t := by
+  refine ⟨ht, fun f hf => ?_⟩
+  obtain ⟨g, hg, hfg⟩ := hr.2.1 f hf
+  obtain ⟨k, hk, hgk⟩ := hp.2.1 g hg
+  exact ⟨g, hg, k, hk, hfg, hgk, hT f k hf (Cp0_d.assoc_l hs hq hu (hF f hf) (hR f g hfg) (hP g k hgk))⟩
 
 end YesMetaZFC.SetTheory.InnerModel

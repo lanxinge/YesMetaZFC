@@ -45,13 +45,9 @@ theorem rs_satisfies_l {A a e z} (hA : Scode_d I ω A) (ha : M.mem a E)
   apply imp_congr_right
   intro hvB
   have hvD := hU.base.bounds B hB' v hvB
-  constructor
-  · intro ht
-    obtain ⟨f, hfE, he⟩ := pe_value_exists_l I hZF hX hE ha (fun _ h => h) hvD hm.1.2.1 repr
-    exact ⟨f, hfE, he, (satisfies_decode_l I hZF.1 hm.1 hf hE).mpr
-      ((pe_sat_value_l I hZF hf.2.1 hB hf.2.2 hE ha hfE (fun i hi => he i (bω i hi))).mp ht)⟩
-  · rintro ⟨f, hfE, he, ht⟩
-    exact ⟨f, hfE, fun i hi => he i (bω i hi), (satisfies_decode_l I hZF.1 hm.1 hf hE).mp ht⟩
+  apply (pe_sat_full_l I hZF hX hE hf.2.1 hB bω hf.2.2 ha repr hvD hm.1.2.1).trans
+  exact exists_congr fun f => and_congr_right fun _ => and_congr_right fun _ =>
+    (satisfies_decode_l I hZF.1 hm.1 hf hE).symm
 
 omit hE in
 /-- 从实际 ω→G 代表赋值图一次构造赋值空间、商赋值和全部公式码。 -/

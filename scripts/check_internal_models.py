@@ -54,13 +54,14 @@ MODULES += ["YesMetaZFC.SetTheory.InnerModel.Relative." + name for name in
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("EmbeddingSource", "PredicateSource", "Isomorphism", "Collapse", "SeparationCode", "Separation",
              "BinaryTruth", "CollectionCode", "DeltaCode", "UniformizationCode", "FunctionCode",
-             "PointwiseAssignment", "PointwiseSyntax", "PointwiseSteps", "PointwiseValue", "PointwiseTruth")]
+             "PointwiseAssignment", "PointwiseSyntax", "PointwiseSteps", "PointwiseValue", "PointwiseTruth",
+             "SeparationSource", "SourceField")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in
             ("Relation", "Classes", "Model", "Truth", "Update", "Assignment", "Atomic", "LosSyntax",
-             "SourceSyntax", "SourceTruth", "SourceAssignment")]
+             "SourceSyntax", "SourceTruth", "SourceAssignment", "SourceProjection", "PullbackKernel", "ProjectionLaws")]
 MODULES += ["YesMetaZFC.SetTheory.CumulativeClosure", "YesMetaZFC.SetTheory.InnerModel.Recursion.Graph",
             "YesMetaZFC.SetTheory.InnerModel.Recursion.Composition"]
-MODULES += ["YesMetaZFC.SetTheory.Filter." + name for name in ("Relative", "Source")]
+MODULES += ["YesMetaZFC.SetTheory.Filter." + name for name in ("Relative", "Source", "Projection")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("DerivedFilter", "SourceMeasure", "CriticalMeasure", "CriticalOrdinal", "MeasureCompleteness", "Measurable",
              "TreeReflection", "MeasureFamily", "FiberCompleteness", "FiniteSupport", "SupportCompleteness",
@@ -131,6 +132,14 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                  "Pe_sat_d", "pe_sat_m", "Pe_holds_d", "pe_holds_m", "Rs_eval_d", "rs_eval_m", "Rs_los_d", "rs_los_m",
                  "Pe_repr_d.update_l", "Pe_assign_d.value_l", "Pe_assign_d.agree_right_l", "Rs_eval_d.repr_l")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.FilterZF.Rel_ultra_d.nor_l"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.FilterZF." + name for name in
+                ("Pull_d", "pull_m", "Push_d", "push_m", "Pull_d.comp_l", "Push_d.comp_l", "Push_d.member_l", "push_id_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Rs_const_d", "rs_const_m", "rs_const_unique_l", "Rp_lift_d",
+                 "rs_projection_id_l", "rs_projection_comp_l", "rs_projection_constant_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
+                ("Fn0_d.retarget_l", "Cp0_d.value_l", "Cp0_d.assoc_l", "Cp0_d.retarget_l",
+                 "cp0_projection_id_l", "cp0_projection_comp_l")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Rp_eq_d", "rp_eq_m", "Rp_eq_d.symm_l", "Rp_rel_d", "rp_rel_m", "rp_rel_congr_l",
                 "Rp_class_d", "rp_class_m", "Rp_map_d", "rp_map_m", "rp_kernel_l", "Rp_model_d", "rp_model_m",
@@ -163,13 +172,15 @@ SKOLEM_MODULES += ["YesMetaZFC.SetTheory.InnerModel.Condensation.Internal"]
 SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.SeparationHull"]
 SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
                    ("Collection", "Uniformization", "UniformizationHull", "UniformizationSource",
-                    "PointwiseQuantifier", "Pointwise", "PointwiseTrace", "PointwiseDiagonal", "PointwiseWitness")]
+                    "PointwiseQuantifier", "Pointwise", "PointwiseTrace", "PointwiseDiagonal", "PointwiseWitness", "SourceReindex")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
                 ("Rk_d", "rk_m", "Tc_d", "tc_m", "Hmem_d", "hmem_m", "H_d", "h_m")]
 ZFC_BASELINE = BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
 # 见证统一化与完整内部 Łoś 单独允许原对象选择公理；其余约化幂层仍按 ZF 审计。
 LOS_MODULES = ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in
-               ("Witness", "Los", "SourceLos", "SourceSatisfaction")]
+               ("Witness", "Los", "SourceLos", "SourceSatisfaction", "Constant", "Lift", "SourceComposition", "SourceTrace", "Projection")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.SourceProjection"]
+LOS_ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.rp_lift_exists_l": BASELINE}
 ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.Ssk_d." + name: BASELINE for name in
              ("value_l", "closed_l", "point_mem_l")}
 ZF_BOUNDS["YesMetaZFC.SetTheory.InnerModel.jc_internal_l"] = BASELINE
@@ -188,5 +199,5 @@ if __name__ == "__main__":
     if not result:
         result = main(SKOLEM_MODULES, [], ZFC_BASELINE, "INTERNAL_SKOLEM_GUARD_PASS", ZF_BOUNDS)
     if not result:
-        result = main(LOS_MODULES, [], ZFC_BASELINE, "INTERNAL_LOS_GUARD_PASS")
+        result = main(LOS_MODULES, [], ZFC_BASELINE, "INTERNAL_LOS_GUARD_PASS", LOS_ZF_BOUNDS)
     sys.exit(result)

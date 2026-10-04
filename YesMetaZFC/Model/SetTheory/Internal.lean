@@ -10,6 +10,8 @@ import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
+import YesMetaZFC.Model.SetTheory.Internal.SourceField
+import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -25,6 +27,7 @@ import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 `rp_los_assignment_l` 自动构造商赋值和代码集。源模型版本 `rs_satisfies_l` 另从实际
 源内真值集和对角见证证明完整内部 Łoś，源为实际初等嵌入正则 H(χ) 的传递模型。
 `rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值；有向极限及迭代仍待证明。
+常值初等嵌入及源内坐标拉回的分量初等映射现已构造，并核验恒等、复合与常值交换律。
 
 `smdl_membership_l` 构造任意非空内部集合的隶属结构码；`scode_exists_l` 收集全部
 内部有限公式码；`smdl_satisfaction_l` 构造统一满足关系集合。`smdl_table_l` 一次

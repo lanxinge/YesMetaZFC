@@ -147,6 +147,21 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 自动构造赋值空间、商赋值及全部内部代码集；G 精确为源中的 D→X 函数。
 源内入口使用 ZFC；赋值投影、逐点逻辑方程与相对超滤布尔规则分别保留 ZF 或纯逻辑强度。
 
+[ReducedPower/Constant](../../Model/SetTheory/Internal/ReducedPower/Constant.lean) 的 `rs_constant_embedding_l`
+实际收集源内常值函数，构造 x↦[cₓ] 的完整内部初等嵌入，并返回其精确代表方程。
+[ReducedPower/Projection](../../Model/SetTheory/Internal/ReducedPower/Projection.lean) 的 `rs_projection_embedding_l`
+从实际 t:D₁→D₀ 与测度投影方程构造 [f]↦[f∘t]；复合函数图属于源，映射精确保持、
+反映代表等价，并保持全部内部代码。源内逆像与相等集的构造仅用 ZF。
+[ProjectionLaws](../../Model/SetTheory/Internal/ReducedPower/ProjectionLaws.lean) 核验恒等、复合和
+常值交换律；这些图方程只读取既有证书，不需要额外集合公理。
+
+[SourceProjection](SourceProjection.lean) 的 `es_source_projection_l` 是有限支撑入口：从已有
+`Es_coherent_d`、对应分量超滤及源中的坐标数据，自动生成源子集代数、限制超滤、
+真实坐标投影、两侧源内部超幂、两个常值初等嵌入和一个分量初等映射，并返回交换方程。
+原超滤与限制超滤的精确成员对应、常值嵌入的代表方程也作为结论保留，供后续良基性与极限构造使用。
+坐标函数只要求是实际函数图，允许重复、遗漏和置换。坐标层的恒等与反向复合
+另由 `cp0_projection_id_l`、`cp0_projection_comp_l` 核验，可直接接入商层复合律。
+
 [ReducedPower/Los](../../Model/SetTheory/Internal/ReducedPower/Los.lean) 对全部背景内部 D→Q 函数的代表族，
 在 ZFC 下证明全部内部公式代码的 Łoś 方程。`rp_los_assignment_l` 从实际赋值族自动构造商赋值，
 `rp_satisfies_l` 直接比较两边统一满足关系；内部代码可以非标准。
@@ -160,7 +175,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 的短扩展器、迭代树、齐性树与泛型迭代路线推进。有限支撑测度图及任意有限坐标投影已构造；
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
 对上述 H(χ) 初等源的源内部 Łoś 及存在见证对角化也已完成。
-分量间映射与有向极限、良基性、与标准短扩展器的识别、迭代及决定性蕴涵尚待实现。
+常值初等嵌入、分量间初等映射以及恒等、复合和交换律现已完成。
+有向极限、良基性、与标准短扩展器的识别、迭代及决定性蕴涵尚待实现。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 本层选择上述标准刻画作为定义，尚未在 Lean 中证明它与 extender 刻画、

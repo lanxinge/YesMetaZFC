@@ -28,6 +28,13 @@ theorem rp_eq_sat_l (hE : Extensional M) {d} (ρ : Env M d) (Q U f g : Term d) :
 theorem rp_eq_refl_l {D Q U f} (hU : FilterZF.Base_d (ℳ := M) D U) (hf : Fn0_d D Q f) : Rp_eq_d Q U f f :=
   ⟨D, hU.top, fun i hi => (hf.2.1 i hi).imp fun _ hx => ⟨hx.1, hx.2, hx.2⟩⟩
 
+theorem rp_eq_member_l {D Q P U f g A} (hU : FilterZF.Rel_ultra_d (ℳ := M) D P U)
+    (hA : M.mem A P) (hs : ∀ v, M.mem v A ↔ M.mem v D ∧
+      ∃ x, M.mem x Q ∧ Rd_entry_d v x f ∧ Rd_entry_d v x g) : M.mem A U ↔ Rp_eq_d Q U f g := by
+  refine ⟨fun h => ⟨A, h, fun v hv => ((hs v).mp hv).2⟩, ?_⟩
+  rintro ⟨B, hB, hb⟩
+  exact hU.upward B A hB hA (fun v hv => (hs v).mpr ⟨hU.base.bounds B hB v hv, hb v hv⟩)
+
 theorem Rp_eq_d.symm_l {Q U f g : M.Domain} (h : Rp_eq_d Q U f g) : Rp_eq_d Q U g f :=
   h.imp fun _ ha => ⟨ha.1, fun i hi => (ha.2 i hi).imp fun _ hx => ⟨hx.1, hx.2.symm⟩⟩
 

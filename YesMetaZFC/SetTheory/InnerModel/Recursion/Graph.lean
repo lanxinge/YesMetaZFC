@@ -74,6 +74,13 @@ theorem Fn0_d.mono_target_l {A B C F : M.Domain}
     fun a ha => (h.2.1 a ha).imp fun b hb => ⟨hBC b hb.1, hb.2⟩,
     fun a ha b _ c _ hab hac => h.2.2 a ha b (h.bound_l hab).2 c (h.bound_l hac).2 hab hac⟩
 
+theorem Fn0_d.retarget_l {A B C F : M.Domain} (h : Fn0_d A B F)
+    (hc : ∀ a b, Rd_entry_d a b F → M.mem b C) : Fn0_d A C F :=
+  ⟨fun p hp => (h.1 p hp).elim fun a ha => ha.2.elim fun b hb =>
+      ⟨a, ha.1, b, hc a b ⟨p, hb.2, hp⟩, hb.2⟩,
+    fun a ha => (h.2.1 a ha).imp fun b hb => ⟨hc a b hb.2, hb.2⟩,
+    fun a ha b _ c _ hab hac => h.2.2 a ha b (h.bound_l hab).2 c (h.bound_l hac).2 hab hac⟩
+
 def Res0_d (R F A B : M.Domain) : Prop := M.MemberSubset R F ∧
   (∀ p, M.mem p R → ∃ a, M.mem a A ∧ ∃ b, M.mem b B ∧ KPair_d M p a b) ∧
   ∀ a, M.mem a A → ∀ b, M.mem b B → (Rd_entry_d a b R ↔ Rd_entry_d a b F)

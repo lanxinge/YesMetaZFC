@@ -43,6 +43,15 @@ theorem pe_sat_value_l (hZF : M.Models ZF) {ω b D X R E F n r a p f}
   exact (ssat_agree_l I hZF hF hB hE hr hg hf
     (hk.agree_right_l I he ((hE a).mp ha).1 ((hE g).mp hg).1 ((hE f).mp hf).1)).mp hs
 
+theorem pe_sat_full_l (hZF : M.Models ZF) {ω b D X R E F n r a p}
+    (hX : M.TransitiveSet X) (hE : M.IsFunctionSpace I E ω X) (hF : Sfm_d I ω n F)
+    (hB : Sbound_d I F b) (hb : M.MemberSubset b ω) (hr : M.mem r n)
+    (ha : M.mem a E) (hh : Pe_repr_d I ω D X a) (hp : M.mem p D) (hz : ∃ z, M.mem z X) :
+    Pe_sat_d I b D X R E F n r a p ↔ Pe_sat_d I ω D X R E F n r a p := by
+  obtain ⟨f, hf, he⟩ := pe_value_exists_l I hZF hX hE ha (fun _ h => h) hp hz hh
+  exact ⟨fun ht => ⟨f, hf, he, (pe_sat_value_l I hZF hF hB hr hE ha hf (fun i hi => he i (hb i hi))).mp ht⟩,
+    fun ⟨g, hg, hk, ht⟩ => ⟨g, hg, fun i hi => hk i (hb i hi), ht⟩⟩
+
 theorem pe_sat_atom_l (hZF : M.Models ZF) {ω b D X R E F n H r z i j a p g l x y}
     (hX : M.TransitiveSet X) (hE : M.IsFunctionSpace I E ω X) (hF : Sfm_d I ω n F)
     (hH : Seval_d I X R E F n H) (hB : Sbound_d I F b) (hb : M.MemberSubset b ω)
