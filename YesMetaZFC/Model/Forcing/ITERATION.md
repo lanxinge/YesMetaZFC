@@ -1046,21 +1046,22 @@ ZFC 模型、两个集合参数与内部序数长度，一次构造整个可数�
 函数和单射共用 `fn_env_l`；`fn_name_index_l` 只要求函数性，并分别保留力迫条件和
 规范名称的基点。原单射消费者已迁移到该函数接口。
 
-[InternalClosedFunction](Closed/Function.lean) 的 `closed_fn_dense_l` 从实际
-可数闭性证明：存在一张地模型内部函数图、且条件决定其全部旧坐标的谓词是稠密的。
-`closed_intersection_l` 只要求各成员在指定条件以下稠密；逐坐标旧值由
+[Distributive/Function](Distributive/Function.lean) 的 `distributive_fn_dense_l` 在 ZF 中从实际
+可数分配性证明：存在一张地模型内部函数图、且条件决定其全部旧坐标的谓词是稠密的。
+`distributive_intersection_l` 只要求各成员在指定条件以下稠密；逐坐标旧值由
 [InternalFunctionDecision](Internal/Functions/Decision.lean) 取得，函数唯一性与规范名称
 忠实性使原替换模式可收集整个图。
 
-[NoNewFunctions](Closed/NoNewFunctions.lean) 的 `no_new_functions_l` 让给定原泛型遇到这个
+[NoNewFunctions](Distributive/NoNewFunctions.lean) 的 `no_new_functions_l` 让给定原泛型遇到这个
 实际原公式稠密集，返回 `G : ω → X` 及 `e G = F`。目标 `X` 可以是任意旧集合。
-[NoNewCountable](Closed/NoNewCountable.lean) 的 `no_new_countable_l` 对任意扩张内部可数
+[NoNewCountable](Distributive/NoNewCountable.lean) 的 `no_new_countable_l` 对任意扩张内部可数
 `Y ⊆ e X` 返回 `A ⊆ X`、地模型内部 `|A| ≤ ω` 及 `e A = Y`。
-非空分支反射带默认值的枚举再取实际值域，空集单独处理。
+非空分支反射带默认值的枚举再取实际值域，以自然数纤维的最小原像证明可数性；空集单独处理。
+`closed_distributive_l` 只需 ZF＋DC；上述序列和子集反射均只需 ZF＋分配性。
 
 `closed_extension_l`、`row_iteration_closed_preserves_l` 和
 `collapse_iteration_preserves_l` 均在同一个规范嵌入上自动返回这些结论。
-整个证明只使用内部 ω 图与原公式分离、替换；没有外部自然数枚举或外部良基假设。
+下降链所需 DC 从原 ZFC 实例取得；序列反射只使用内部图与 ZF 分离、替换，没有外部自然数枚举或外部良基假设。
 
 
 ## 可数闭预序的 proper club 与塌缩区间实例

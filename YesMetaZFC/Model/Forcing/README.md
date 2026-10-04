@@ -91,8 +91,8 @@
 | `SetTheory.Choice`／[Internal/Maximum/Selection](Internal/Maximum/Selection.lean)／[Internal/Extension/Choice](Internal/Extension/Choice.lean) | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
 | [Internal/Extension/Instance](Internal/Extension/Instance.lean) | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
 | [Internal/Extension/Generic](Internal/Extension/Generic.lean) | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
-| [Closed/Basic](Closed/Basic.lean)／[Applications/Collapse/Basic](Applications/Collapse/Basic.lean) | 原模型内的可数递降链、可数稠密交、可数部分函数条件集及其实际可数闭性。 |
-| [Closed/NoNewReals](Closed/NoNewReals.lean)／[Closed/NoNewFunctions](Closed/NoNewFunctions.lean)／[Closed/NoNewCountable](Closed/NoNewCountable.lean)／[Internal/Ground/Transfer](Internal/Ground/Transfer.lean) | 可数闭力迫不增加实数、取值于任意旧集合的内部 ω 函数或旧集合的内部可数子集；返回实际旧原像及旧可数性。规范嵌入保持成员、函数图、单射、序数和 ω。 |
+| [Closed/Basic](Closed/Basic.lean)／[Applications/Collapse/Basic](Applications/Collapse/Basic.lean) | 内部可数递降链；ZF＋DC 下可数闭推出分配性，另有 ZFC 下可数部分函数塌缩的实际闭性。 |
+| [Distributive](Distributive/README.md)／[Internal/Ground/Transfer](Internal/Ground/Transfer.lean) | ZF＋可数分配性下不增加实数、旧值序列或旧集合的可数子集，并反射可数性、保持 ω₁。可数性证明使用最小原像。原 CH 与闭扩张接口自动从 ZFC 的 DC 实例接入。 |
 | [Applications/Collapse/Generic](Applications/Collapse/Generic.lean)／[Applications/Continuum/CH](Applications/Continuum/CH.lean) | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
 | `SetTheory.Card.Finite`／`PartialFunction`／`PartialFunctionCCC` | 内部有限集合的删除归纳、有限部分函数添值与合并，以及任意坐标集和可数值集上的内部可数链条件。 |
 | `SetTheory.Fiber`／`Card.CountableUnion` | 可定义纤维自动组成集合函数；小集合族的并单射到 κ×κ，供可数覆盖与基数保持共同使用。 |

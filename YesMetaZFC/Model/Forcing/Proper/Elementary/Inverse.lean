@@ -98,7 +98,7 @@ theorem h_inverse_l {ω χ H D} (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal 
     obtain ⟨a, b, hab⟩ := hF.1 v hv
     have ht := hF.2 a b ⟨v, hab, hv⟩
     exact (hP v).mpr ⟨a, ht.1, b, ht.2, hab⟩
-  exact ⟨F, ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH (h_product_l hZFC hω hχ hωχ hH hTH hTH hP) F hFP, hF.1, he⟩
+  exact ⟨F, ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH (ZFC.h_product_l hZFC hω hχ hωχ hH hTH hTH hP) F hFP, hF.1, he⟩
 
 theorem selem_inverse_l {ω χ H c T d N S D} (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal I χ)
     (hωχ : M.mem ω χ) (hH : H_d I χ H)
@@ -129,7 +129,7 @@ theorem selem_kpair_closed_l {ω χ H c T d N S p a b} (hω : M.IsOmega ω) (hχ
   let φ : UnarySchema 2 := { body := kpair_m .newest (.bound 2) (.bound 1) }
   have hφ (p : L.Domain) : φ.denote ρ p ↔ KPair_d M p.val a b :=
     (kpair_sat_l L (smem_ext_l I hS.source hT htr hZF.1) _ _ _ _).trans (smem_kpair_l I hS.source hT htr p _ _)
-  have hpH := h_kpair_l hZFC hω hχ hωχ hH hp (hS.subset a ha) (hS.subset b hb)
+  have hpH := ZFC.h_kpair_l hZFC hω hχ hωχ hH hp (hS.subset a ha) (hS.subset b hb)
   obtain ⟨p', hp'⟩ := selem_witness_l I hZF hω hS he φ ρ η (Fin.cases rfl (fun _ => rfl)) ⟨⟨p, hpH⟩, (hφ _).mpr hp⟩
   exact kpair_unique_l M hZF.1 ((hφ _).mp hp') hp ▸ p'.property
 

@@ -1,26 +1,26 @@
-import YesMetaZFC.Model.Forcing.Closed.NoNewFunctions
+import YesMetaZFC.Model.Forcing.Distributive.NoNewFunctions
 import YesMetaZFC.Model.Forcing.Internal.Extension.ZF
 import YesMetaZFC.SetTheory.FunctionRetraction
+import YesMetaZFC.SetTheory.Card.Cofinality.Comparison
 
-/-! # 可数闭扩张中旧集合的可数子集全部来自地模型
+/-! # ZF 中可数分配扩张不增加旧集合的可数子集
 
 非空可数集的单射给出带默认值的枚举；反射该枚举，再取地模型中的实际值域。
-这同时返回旧子集、内部可数性和精确的嵌入等式。
+自然数的最小原像给出旧值域的可数性，全程不使用纤维选择。
 -/
 
 namespace YesMetaZFC.Model.Forcing.Internal
 open SetTheory SetTheory.Definitional.Project
 universe u
 variable {M : SetTheory.Structure.{u}} {B R z : M.Domain} {U : M.Domain → Prop}
-variable (O : Cond_order_d M B R z) (hZFC : M.Models ZFC) (hU : Generic_d M B R z U)
-local notation "hZF" => ZFC.models_zf_l hZFC
-local notation "I" => kpair_interpretation_l M (And.left hZFC) (KP.exists_pair (ZF.modelsKP hZF))
+variable (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
+local notation "I" => kpair_interpretation_l M (And.left hZF) (KP.exists_pair (ZF.modelsKP hZF))
 local notation "E" => extension_l M hZF B R z U
 local notation "J" => kpair_interpretation_l E (extension_ext_l O hZF hU) (internal_pair_l O hZF hU)
 include O hU
 
 /-- 扩张内部可数的旧集合子集，恰好是一个地模型内部可数子集的像。 -/
-theorem no_new_countable_l {ω b X} (hω : M.IsOmega ω) (hc : Closed_d I B R z ω) (hb : U b)
+theorem no_new_countable_l {ω b X} (hω : M.IsOmega ω) (hD : Distributive_d (M := M) B R z ω) (hb : U b)
     (e : M.Domain → (E).Domain) (hv : ∀ a s, Check_d M b a s → Qval_d M B R z U s (e a))
     (he : ∀ a y, y ∈ e a ↔ ∃ x, M.mem x a ∧ e x = y)
     {Y : (E).Domain} (hY : (E).MemberSubset Y (e X)) (hy : (E).CardinalLessOrEqual J Y (e ω)) :
@@ -33,12 +33,13 @@ theorem no_new_countable_l {ω b X} (hω : M.IsOmega ω) (hc : Closed_d I B R z 
     have hFX : (E).IsSetFunctionFromTo J F (e ω) (e X) := ⟨hF.1, hF.2.1, fun i hi => by
       obtain ⟨x, hx, hix⟩ := hF.2.2 i hi
       exact ⟨x, hY x hx, hix⟩⟩
-    obtain ⟨G, hG, hGF⟩ := no_new_functions_l O hZFC hU hω hc hb e hv he hFX
+    obtain ⟨G, hG, hGF⟩ := no_new_functions_l O hZF hU hD hb e hv he hFX
     obtain ⟨A, hA⟩ := ZF.exists_range_of_setFunction hZF I hG.1 hG.2.1
     have hGA : M.IsSetFunctionFromTo I G ω A := ⟨hG.1, hG.2.1, fun i hi => by
       obtain ⟨x, _, hix⟩ := hG.2.2 i hi
       exact ⟨x, (hA x).mpr ⟨i, hix⟩, hix⟩⟩
-    refine ⟨A, (fun x hx => ?_), ZFC.surjection_bound_l I hZFC hGA (fun x hx => ?_), ?_⟩
+    refine ⟨A, (fun x hx => ?_),
+      ZF.exists_rightInverseInjection_of_surjection_from_ordinal hZF I (hω.isOrdinal hZF) hGA (fun x hx => ?_), ?_⟩
     · obtain ⟨i, hix⟩ := (hA x).mp hx
       exact hG.output_mem_of_pairMember hix
     · obtain ⟨i, hix⟩ := (hA x).mp hx

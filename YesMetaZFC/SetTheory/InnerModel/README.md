@@ -1,7 +1,7 @@
-# J 层级、OD、HOD 与可容许递归
+# J 层级、L(ℝ)、OD、HOD 与可容许递归
 
 当前已完成 Jensen J 层级及其 L 内模型的 ZFC＋GCH、J 层内统一局部良序、
-OD/HOD 的内部定义与参数模型，以及弱齐性力迫的 HOD 比较。本文按可调用定理
+OD/HOD 的内部定义与参数模型、相对 Jensen 构造的 L(ℝ)，以及弱齐性力迫的 HOD 比较。本文按可调用定理
 整理研究进度；详细实现沿“J 与计算 → 良序 → 凝聚与 GCH → OD/HOD → 力迫比较”阅读。
 
 内模型入口为 `YesMetaZFC.SetTheory.InnerModel`；力迫比较另导入
@@ -20,6 +20,8 @@ OD/HOD 的内部定义与参数模型，以及弱齐性力迫的 HOD 比较。�
 | 全局及逐层 Jensen 良序 | [Order/Statement](Order/Statement.lean)：`jh_order_model_l`；[Uniform](Order/Uniform.lean)：`jh_local_sigma1_l` | KPi；每个非空 J 层统一局部 Σ₁，比较为 Δ₁，完整初段留在同层；无需该层可容许 |
 | 坍塌凝聚 | [Condensation](Condensation.lean)：`jc_bounded_condensation_l` | KPi；任意内部大小的 Σ₁ 子结构坍塌为唯一 J 层，并有高度界 |
 | L 的最终模型 | [GCH/Model](GCH/Model.lean)：`l_model_gch_l` | 背景仅 ZF；同一实际 L 模型满足 ZFC＋GCH，内部解释后继基数及幂集 |
+| 相对 J 与 L(ℝ) | [Relative](Relative/README.md)：`la_model_zf_l`、`lr_model_zf_l` | 层递归及统一层界只需 KPi；ZF 中构造以 TC({ℝ}) 起步的规范模型，满足 ZF 并保留全部原实数 |
+| AD 与武丁基数陈述 | [决定性](Relative/Determinacy.lean)、[武丁基数](../LargeCardinal/README.md) | 两个概念及“L(ℝ) 满足 AD”均有原公式和语义对应；大基数蕴涵尚未证明 |
 | OD/HOD 成员、最小码及选择 | [OD](OD.lean)、[HOD](HOD.lean)：`od_iff_external_l`、`hod_sigma_sat_l`、`hod_model_choice_l` | ZF；内部定义、Σ₂ 成员证书、OD 最小代表与全局良序、HOD 选择集 |
 | 两种参数内模型 | [BracketChoice](HOD/BracketChoice.lean)：`hb_model_zfc_l`；[Models](HOD/Models.lean)：`hp_model_zf_l` | ZF；HOD[A] 满足 ZFC，HOD(A) 满足 ZF；圆括号使用内部有限 A 参数列 |
 | 弱齐性 HOD 比较 | [Homogeneous/HOD](../../Model/Forcing/Internal/Homogeneous/HOD.lean)：`whom_hod_comparison_l`、`whom_hb_comparison_l` | ZF、泛型及弱齐性；完整呈现为 OD 或 OD[A]，扩张 HOD 恢复到地模型；已有 Cohen 实例 |
@@ -257,11 +259,15 @@ J₀ 的空良序也已包括在 `jh_local_wellorder_l` 中；非空条件仅用
 | [Collapse/Mostowski](../Collapse/Mostowski.lean) 的 `mc_collapse_l` | 外延隶属子结构的传递值域、集合图及隶属同构；`Mc_iso_d.bijection_l` 接入原集合双射接口 |
 | [Collapse/Uniqueness](../Collapse/Uniqueness.lean) 的 `mc_iso_unique_l` | 任意传递坍塌均等于规范递归，值域和图均唯一 |
 | [Collapse/Transport](../Collapse/Transport.lean) 的 `Mc_iso_d.formula_l` | 通过集合编码同构传输原公式，有限参数逐项回拉 |
+| [Internal/Isomorphism](../../Model/SetTheory/Internal/Isomorphism.lean) 的 `smap_of_iso_l`；[Internal/Collapse](../../Model/SetTheory/Internal/Collapse.lean) 的 `mc_smaps_l` | ZF；通过原公式内部强归纳保持全部内部公式码，自动得到坍塌正逆图的完整初等证书 |
 | [Condensation/Recognition](Condensation/Recognition.lean) 的 `jc_rud_macro_l` | rud 封闭微层必是原宏观 J 层；通过原公式内部归纳证明 |
 | [Condensation/Collapse](Condensation/Collapse.lean) 的 `jc_condensation_l`、`jc_condensation_unique_l` | Σ₁ 子结构坍塌到唯一原 J 层；没有可数性或外部良基性前提 |
 | [Condensation/Size](Condensation/Size.lean) 的 `jc_bounded_condensation_l` | 同时返回实际高度单射 β→X；若 A 传递、A⊆X、x∈X 且 x⊆A，则 π(x)=x |
 | [Condensation/Internal](Condensation/Internal.lean) 的 `jc_internal_l` | 直接消费已有全内部 `Selem_d` 证书；解码原公式的现有接口要求背景 ZF |
-| `jc_countable_hull_l` | 从现有内部可数种子实际构造初等壳及其凝聚；壳构造使用 ZFC，凝聚主定理不限于可数壳 |
+| [Internal/ElementaryHull](../../Model/SetTheory/Internal/ElementaryHull.lean) 的 `selem_hull_collapse_l` | ZFC；任意传递隶属结构及其可数种子，自动得到可数壳、可数传递坍塌、逆坍塌图和返回原结构的完整内部初等嵌入 |
+| [Internal/SeparationHull](../../Model/SetTheory/Internal/SeparationHull.lean) 的 `v_separation_hull_l` | ZFC；极限 V 层的可数传递壳具有全部内部代码的分离，种子元素有实际原像；分离代码构造与回拉仅需 ZF |
+| [Internal/UniformizationHull](../../Model/SetTheory/Internal/UniformizationHull.lean) 的 `h_uniform_hull_l` | ZFC；从可数种子自动选择正则 H(χ) 并构造可数传递壳；同一模型具有全部内部代码的分离、收集与统一化，返回真实源内函数图及值域界；两个实参使用不同坐标 |
+| `jc_countable_hull_l` | 使用通用可数坍塌构造，再识别为 J 层；同时返回坍塌的可数性、结构码与完整内部初等嵌入 |
 
 证明先构造 Mostowski 集合图，再把 rud 运算及完整微层证书的存在式传入坍塌。
 传递值域于是 rud 封闭并由可见微层覆盖；规范截口和宏观层识别给出 Jᵦ。
@@ -400,7 +406,8 @@ OD[A] 对象所需的定义码界；`ob_code_graph_l` 在该界内保留所有�
 
 | 待建部分 | 当前已具备的基础与尚缺的结论 |
 | --- | --- |
-| L[A] 的相对 J 构造 | 普通 J 层级及 rud 有限基已经完成；含谓词 A 的闭包、层递归及相应模型定理尚未实现，OD[A] 不代替 L[A] |
+| L[A] 的谓词构造 | 已完成以实际传递集合为起层的 L(A) 型 J 构造及 L(ℝ)；每步附加谓词 A 的方括号 L[A] 构造仍未实现 |
+| 武丁基数到 L(ℝ) 的 AD | 定义及 L(ℝ) 的 ZF 模型已完成；有限支撑 κ 完备测度、协调、共同纤维、实际分量商结构及全背景函数版本的内部 Łoś 已完成；源内部函数族、有向极限、良基性、迭代及 AD 蕴涵待证 |
 | 一般可容许递归接口 | 已处理实际 `S1_binary` 正规形及互补 Δ₁ 关系；一般 Lévy Σ₁ 语法的归一化、内部非标准 DSL 程序码的统一解释器尚未实现 |
 | 降低归纳强度 | J 总搜索、层递归和全局良序使用 KPi；将相关端点降至原 KP＋V=L 仍需证明，不能只改参数类型 |
 | 传统层级与有限基比较 | 尚未证明所选 rud 有限基与一般 rudimentary 项定义、其他 J 索引、独立 Def 递归的 Gödel L 层级之间的等价 |

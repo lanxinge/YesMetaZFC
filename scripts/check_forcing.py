@@ -38,6 +38,8 @@ ZFC_MODULES = [MODULE_PREFIX + n for n in (
 )]
 
 INTERNAL_MODULES = [MODULE_PREFIX + n for n in (
+    "Closed.Basic", "Distributive.Basic", "Distributive.Function", "Distributive.NoNewReals",
+    "Distributive.NoNewFunctions", "Distributive.NoNewCountable", "Distributive.Extension",
     "Internal.Automorphism.Basic", "Internal.Automorphism.Names", "Internal.Automorphism.Atomic",
     "Internal.Automorphism.Forcing", "Applications.Cohen.FlipSyntax", "Applications.Cohen.Flip",
     "Internal.Ground.NameRank", "Internal.Ground.Ordinals", "Internal.Forcing.Finite",
@@ -79,6 +81,7 @@ INTERNAL_MODULES = [MODULE_PREFIX + n for n in (
     "TwoStep.Proper.Projection", "TwoStep.Proper.Pull",
 )] + [
     "YesMetaZFC.SetTheory.Card.Aleph.Hartogs",
+    "YesMetaZFC.SetTheory.Axioms.DependentChoice",
     "YesMetaZFC.SetTheory.Card.Cofinality.Basic",
     "YesMetaZFC.SetTheory.Card.Cofinality.Countable",
     "YesMetaZFC.SetTheory.Card.Cofinality.LimitLength",
@@ -99,13 +102,14 @@ CHOICE_MODULES = [MODULE_PREFIX + n for n in (
     "Internal.Extension.Choice",
 )] + [
     "YesMetaZFC.Model.SetTheory.ClassChoice",
+    "YesMetaZFC.Model.SetTheory.DependentChoice",
     "YesMetaZFC.SetTheory.Choice",
     "YesMetaZFC.SetTheory.CollectionChoice",
 ]
 
 CH_MODULES = [MODULE_PREFIX + n for n in (
     "Applications.Collapse.Basic", "Applications.Collapse.Generic", "Applications.Continuum.CH",
-    "Closed.Basic", "Closed.NoNewReals", "Internal.Ground.Transfer",
+    "Internal.Ground.Transfer",
 )] + [
     "YesMetaZFC.Model.SetTheory.Countable",
     "YesMetaZFC.Model.SetTheory.CountableGround",
@@ -132,8 +136,8 @@ ITERATION_MODULES = [MODULE_PREFIX + n for n in (
     "Applications.Cohen.Successor", "Applications.Cohen.TwoStep", "Applications.Collapse.Closed",
     "Applications.Collapse.Iteration", "Applications.Collapse.Names", "Applications.Collapse.Presentation",
     "Applications.Collapse.Proper", "Applications.Collapse.Rule", "CCC.Name", "CCC.Predense", "CCC.Syntax",
-    "Closed.Extension", "Closed.Function", "Closed.Master", "Closed.Name", "Closed.NoNewCountable",
-    "Closed.NoNewFunctions", "Closed.Proper", "Closed.ProperName", "Internal.Forcing.Congruence",
+    "Closed.Extension", "Closed.Master", "Closed.Name",
+    "Closed.Proper", "Closed.ProperName", "Internal.Forcing.Congruence",
     "Internal.Forcing.OrderCongruence", "Internal.Forcing.Rules", "Internal.Maximum.Basic",
     "Internal.Maximum.Bounded", "Internal.Maximum.Member", "Internal.Maximum.Mixing", "Internal.Maximum.Pool",
     "Internal.Maximum.Unique", "Internal.Maximum.UniqueRules", "Internal.Maximum.WitnessPool",
@@ -198,6 +202,7 @@ ITERATION_MODULES = [MODULE_PREFIX + n for n in (
     "YesMetaZFC.SetTheory.BinaryWitnessClub",
     "YesMetaZFC.SetTheory.CountableClub",
     "YesMetaZFC.SetTheory.CountableHull",
+    "YesMetaZFC.SetTheory.HereditaryAlgebra",
 ]
 
 PREFIX = "YesMetaZFC.Model.Forcing."

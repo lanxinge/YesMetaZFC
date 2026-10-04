@@ -1,9 +1,9 @@
-import YesMetaZFC.Model.Forcing.Applications.Collapse.Basic
+import YesMetaZFC.Model.Forcing.Distributive.Basic
 import YesMetaZFC.Model.Forcing.Internal.Extension.Operations
 
-/-! # 内部可数闭力迫不增加实数
+/-! # ZF 中内部可数分配力迫不增加实数
 
-同时判定规范自然数对名称的隶属；内部可数闭性给出稠密的全判定条件。
+同时判定规范自然数对名称的隶属；内部可数分配性给出稠密的全判定条件。
 泛型滤子遇到该实际可定义稠密集后，地模型分离得到解释完全相同的旧实数。
 -/
 
@@ -32,19 +32,16 @@ theorem dec_check_sat_l (hE : Extensional M) {n} (ρ : Env M n) (B R z b t a p :
     Definitional.Term.eval_newest, Term.eval_bound_one_push, Term.eval_bound_zero_push]
 
 variable {M} {B R z ω : M.Domain} {U : M.Domain → Prop}
-variable (O : Cond_order_d M B R z) (hZFC : M.Models ZFC) (hU : Generic_d M B R z U)
-include O hZFC hU
+variable (O : Cond_order_d M B R z) (hZF : M.Models ZF) (hU : Generic_d M B R z U)
+include O hZF hU
 
 /-- 每个扩张实数都是一个模型内部旧子集的规范名称解释。 -/
-theorem no_new_reals_l (hω : M.IsOmega ω)
-    (hc : Closed_d (kpair_interpretation_l M hZFC.1
-      (KP.exists_pair (ZF.modelsKP (ZFC.models_zf_l hZFC)))) B R z ω)
+theorem no_new_reals_l (hD : Distributive_d (M := M) B R z ω)
     {b w t : M.Domain} {W x : Name_quot_l M B R z U} (hb : U b)
     (hw : Check_d M b ω w) (hv : Qval_d M B R z U w W) (ht : Qval_d M B R z U t x)
     (hx : ∀ y, y ∈ x → y ∈ W) :
     ∃ a s, M.MemberSubset a ω ∧ Check_d M b a s ∧ Qval_d M B R z U s x := by
   classical
-  let hZF := ZFC.models_zf_l hZFC
   have hbB := (hU.proper b hb).1
   let ρ : Env M 5 := ((((⟨fun _ => B, fun _ => B⟩ : Env M 1).push R).push z).push b).push t
   let φ : BinarySchema 5 := {
@@ -75,7 +72,7 @@ theorem no_new_reals_l (hω : M.IsOmega ω)
   obtain ⟨p₀, hp₀⟩ := hU.inhabited
   obtain ⟨p, hp, hdec⟩ := generic_pick_l hZF hU ⟨6, ψ, ρ.push ω, hψ⟩ hp₀ (by
     intro q hq
-    obtain ⟨r, hr, hd⟩ := closed_intersection_l O hZFC hω hc φ ρ (fun i hi => hd i hi q hq.1 hq.2.1) hl hq.1 hq.2.1
+    obtain ⟨r, hr, hd⟩ := distributive_intersection_l hZF hD φ ρ (fun i hi => hd i hi q hq.1 hq.2.1) hl hq.1 hq.2.1
     exact ⟨r, hr, fun n hn => (hφ n r).mp (hd n hn)⟩)
   let χ : UnarySchema 6 := {
     body := .existsE (.conj (check_m (.bound 4) (.bound 1) .newest)

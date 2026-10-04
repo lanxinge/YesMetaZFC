@@ -28,6 +28,7 @@ theorem ch_forcing_l (hZFC : M.Models ZFC) :
   obtain ⟨κ, hκ⟩ := ZF.exists_hartogsNumber hZF J ω
   obtain ⟨A, hA⟩ := ZF.exists_powerSet hZF ω
   obtain ⟨B, R, hB, hR, O, hc⟩ := collapse_closed_l M hZFC hω κ A
+  have hD := closed_distributive_l O hZF (ZFC.dc_l J hZFC hω) hω hc
   obtain ⟨o, ho⟩ := KP.exists_empty (ZF.modelsKP hZF)
   have hoB := (hB o).mpr (coll_empty_l J ho)
   refine ⟨B, R, O, ⟨o, hoB, fun he => KP.mem_irrefl_d (ZF.modelsKP hZF) B (he ▸ hoB)⟩, fun U hU => ?_⟩
@@ -52,7 +53,7 @@ theorem ch_forcing_l (hZFC : M.Models ZFC) :
     · intro hX
       obtain ⟨t, _, ht⟩ := value_name_l X
       obtain ⟨w, hw, _, _⟩ := zf_check_l M hZF (hU.proper b hb).1 ω
-      obtain ⟨a, s, ha, has, hs⟩ := no_new_reals_l O hZFC hU hω hc hb hw (hv ω w hw) ht hX
+      obtain ⟨a, s, ha, has, hs⟩ := no_new_reals_l O hZF hU hD hb hw (hv ω w hw) ht hX
       exact (he' A X).mpr ⟨a, (hA a).mpr ha, qval_unique_l (hv a s has) hs⟩
   have hsmall α (hα : E.mem α (e κ)) : E.CardinalLessOrEqual K α (e ω) := by
     obtain ⟨a, ha, rfl⟩ := (he' κ α).mp hα

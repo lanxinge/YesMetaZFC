@@ -2,8 +2,12 @@ import YesMetaZFC.SetTheory.Descriptive.Completion
 import YesMetaZFC.SetTheory.Descriptive.Borel
 import YesMetaZFC.SetTheory.Descriptive.Projective
 import YesMetaZFC.SetTheory.Descriptive.BorelRank
+import YesMetaZFC.SetTheory.Descriptive.Determinacy
 
-/-! # 内部描述集合论：空间、Borel、解析与射影层
+/-! # 内部描述集合论：空间、Borel、解析、射影层与博弈
+
+`Gm_win_d` 用内部有限局面、内部策略图和 ω 长对局定义双方获胜；
+`AD_d` 量化全部内部收益子集。`Axioms.ad_axiom` 是语义对应已核验的原句子。
 
 `Descriptive.baire_cantor_l` 在任意 ZF 模型内实际构造 Baire、Cantor、全部有限
 前缀及其拓扑。`ds_countable_basis_l` 返回实际可数基；`ds_separate_l`、

@@ -10,10 +10,12 @@ import YesMetaZFC.SetTheory.Card
 import YesMetaZFC.SetTheory.Collection
 import YesMetaZFC.SetTheory.Choice
 import YesMetaZFC.SetTheory.DependentChoice
+import YesMetaZFC.Model.SetTheory.DependentChoice
 import YesMetaZFC.SetTheory.IndexedIteration
 import YesMetaZFC.SetTheory.FunctionCoordinates
 import YesMetaZFC.SetTheory.Continuum
 import YesMetaZFC.SetTheory.Descriptive
+import YesMetaZFC.SetTheory.LargeCardinal
 import YesMetaZFC.SetTheory.Card.CountableUnion
 import YesMetaZFC.SetTheory.Card.FiniteSequenceCountable
 import YesMetaZFC.SetTheory.Card.FiniteSequenceLift
@@ -29,6 +31,7 @@ import YesMetaZFC.SetTheory.CumulativeUnion
 import YesMetaZFC.SetTheory.RankImage
 import YesMetaZFC.SetTheory.HereditaryCover
 import YesMetaZFC.SetTheory.HereditaryClosure
+import YesMetaZFC.SetTheory.HereditaryAlgebra
 import YesMetaZFC.SetTheory.CountableDirected
 import YesMetaZFC.SetTheory.CountableCofinal
 import YesMetaZFC.SetTheory.Card.Cofinality.Countable

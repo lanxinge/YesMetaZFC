@@ -24,7 +24,7 @@ theorem h_support_l {B s t} (hs : Name_d M B s) (ht : Name_d M B t) (hsH : M.mem
     ∃ S, M.mem s S ∧ M.mem t S ∧ Supp_d M B S ∧ M.mem S H := by
   obtain ⟨A, hsA, htA, hA⟩ := name_support_l M (KP.exists_pair (ZF.modelsKP hZF)) (KP.exists_union (ZF.modelsKP hZF)) hs ht
   obtain ⟨P, hP⟩ := KP.exists_pair (ZF.modelsKP hZF) s t
-  obtain ⟨T, μ, hT, hμ, hTc⟩ := (hH P).mp (h_pair_l hZFC hω hχ hωχ hH hP hsH htH)
+  obtain ⟨T, μ, hT, hμ, hTc⟩ := (hH P).mp (ZFC.h_pair_l hZFC hω hχ hωχ hH hP hsH htH)
   have hTH := (hH T).mpr (ZF.hmem_of_subset_l I hZF hχ.isLimitOrdinal hT.1 (fun _ h => h) hμ hTc)
   obtain ⟨S, hS⟩ := KP.intersection_exists_d (ZF.modelsKP hZF) A T
   refine ⟨S, (hS s).mpr ⟨hsA, hT.1 P hT.2.1 s ((hP s).mpr (Or.inl rfl))⟩,
@@ -42,7 +42,7 @@ theorem h_triple_relation_l {B S F} (hB : M.mem B H) (hS : M.mem S H)
   obtain ⟨P, hP⟩ := ZF.exists_cartesianProduct hZF I S S
   obtain ⟨Q, hQ⟩ := ZF.exists_cartesianProduct hZF I B P
   apply ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH
-    (h_product_l hZFC hω hχ hωχ hH hB (h_product_l hZFC hω hχ hωχ hH hS hS hP) hQ) F
+    (ZFC.h_product_l hZFC hω hχ hωχ hH hB (ZFC.h_product_l hZFC hω hχ hωχ hH hS hS hP) hQ) F
   intro v hv
   obtain ⟨p, s, t, hp, hs, ht, a, ha, hv⟩ := hF v hv
   exact (hQ v).mpr ⟨p, hp, a, (hP a).mpr ⟨s, hs, t, ht, ha⟩, hv⟩

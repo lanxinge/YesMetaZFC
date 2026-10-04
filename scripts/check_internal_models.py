@@ -45,6 +45,26 @@ MODULES += ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in
 MODULES += ["YesMetaZFC.SetTheory.Collapse." + name for name in
             ("RelationSyntax", "RelationRecursion", "RelationExistence")]
 MODULES += ["YesMetaZFC.SetTheory.Card.FiniteSequenceJoin"]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.PredicateEmbedding",
+            "YesMetaZFC.SetTheory.LargeCardinal.Woodin",
+            "YesMetaZFC.SetTheory.Descriptive.Game", "YesMetaZFC.SetTheory.Descriptive.Determinacy"]
+MODULES += ["YesMetaZFC.SetTheory.InnerModel.Relative." + name for name in
+            ("Operator", "Hierarchy", "Class", "Structure", "Relativization", "Reflection",
+             "Schemas", "Model", "Reals", "LReal", "Determinacy")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("EmbeddingSource", "PredicateSource", "Isomorphism", "Collapse", "SeparationCode", "Separation",
+             "BinaryTruth", "CollectionCode", "DeltaCode", "UniformizationCode", "FunctionCode",
+             "PointwiseAssignment", "PointwiseSyntax", "PointwiseSteps", "PointwiseValue", "PointwiseTruth")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in
+            ("Relation", "Classes", "Model", "Truth", "Update", "Assignment", "Atomic", "LosSyntax",
+             "SourceSyntax", "SourceTruth", "SourceAssignment")]
+MODULES += ["YesMetaZFC.SetTheory.CumulativeClosure", "YesMetaZFC.SetTheory.InnerModel.Recursion.Graph",
+            "YesMetaZFC.SetTheory.InnerModel.Recursion.Composition"]
+MODULES += ["YesMetaZFC.SetTheory.Filter." + name for name in ("Relative", "Source")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("DerivedFilter", "SourceMeasure", "CriticalMeasure", "CriticalOrdinal", "MeasureCompleteness", "Measurable",
+             "TreeReflection", "MeasureFamily", "FiberCompleteness", "FiniteSupport", "SupportCompleteness",
+             "SupportProjection", "Coherence", "SupportConstruction")]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Num_d", "num_m", "num_unique_l", "Smdl_d", "smdl_m", "smdl_structure_l",
@@ -91,6 +111,42 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in
                  "Oa_param_d", "oa_param_m", "Oa_d", "oa_m", "Op_d", "Ha_d", "Hb_d", "Hp_d",
                  "ha_m", "ha_cut_s", "ha_rel_m", "oa_sep_s", "Hb_pick_d", "hb_pick_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Fs_tail_d", "YesMetaZFC.SetTheory.fs_tail_m"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Spred_d", "spred_m", "Smap_assign_d", "smap_assign_m", "Smap_d", "smap_m",
+                 "Spred_emb_d", "spred_emb_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
+                ("Gm_even_d", "gm_even_m", "Gm_follows_d", "gm_follows_m", "Gm_win_d", "gm_win_m",
+                 "Det_d", "det_m", "AD_d", "ad_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("Wd_crit_d", "wd_crit_m", "Wd_witness_d", "wd_witness_m", "Wd_strong_d", "wd_strong_m",
+                 "Woodin_d", "woodin_m", "Wd_proper_d", "wd_proper_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.spred_core_l"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Smap_assign_d.update_l", "Smap_row_d", "smap_row_m", "Smap_d.ssat_l", "Senv_update_d.agree_l", "Ssep_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in ("Sbin_d", "sbin_m", "Scollect_d", "sbin_update_l", "sbin_value_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.Suniform_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Sfun_d", "sfun_m", "Sfun_d.function_l", "Pe_assign_d", "pe_assign_m", "pe_atom_m",
+                 "Pe_row_d", "pe_row_m", "Pe_state_d", "pe_state_m", "Pe_repr_d", "pe_repr_m",
+                 "Pe_sat_d", "pe_sat_m", "Pe_holds_d", "pe_holds_m", "Rs_eval_d", "rs_eval_m", "Rs_los_d", "rs_los_m",
+                 "Pe_repr_d.update_l", "Pe_assign_d.value_l", "Pe_assign_d.agree_right_l", "Rs_eval_d.repr_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.FilterZF.Rel_ultra_d.nor_l"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Rp_eq_d", "rp_eq_m", "Rp_eq_d.symm_l", "Rp_rel_d", "rp_rel_m", "rp_rel_congr_l",
+                "Rp_class_d", "rp_class_m", "Rp_map_d", "rp_map_m", "rp_kernel_l", "Rp_model_d", "rp_model_m",
+                "Rp_holds_d", "rp_holds_m", "Rp_trace_d", "rp_trace_m", "Rp_update_d", "rp_update_m", "Rp_ex_d", "rp_ex_m",
+                "Rp_column_d", "rp_column_m", "Rp_eval_d", "rp_eval_m", "Rp_los_d", "rp_los_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("Ed_trace_d", "ed_trace_m", "Ed_filter_d", "ed_filter_m", "Ed_nonprincipal_d", "ed_nonprincipal_m",
+                 "Ed_all_d", "ed_all_m", "Ed_complete_d", "ed_complete_m", "Measurable_d", "measurable_m",
+                 "Eb_d", "eb_m", "Ef_family_d", "ef_family_m", "Ef_levels_d", "ef_levels_m",
+                 "Ef_fiber_d", "ef_fiber_m", "Ef_image_fiber_d", "ef_image_fiber_m",
+                 "Es_value_d", "es_value_m", "Es_family_d", "es_family_m", "Es_fiber_d", "es_fiber_m",
+                 "Es_pull_d", "es_pull_m", "Es_reindex_d", "es_reindex_m", "Es_coherent_d", "es_coherent_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.FilterZF." + name for name in
+                ("Base_d", "base_m", "Field_d", "field_m", "Rel_ultra_d", "rel_ultra_m", "Source_d", "source_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel.Fn0_d." + name for name in ("domain_eq_l", "mono_target_l", "ext_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel." + name for name in ("Cp0_d", "cp0_m", "cp0_unique_l", "cp0_mono_l")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
                 ("Wf_rel_d", "wf_rel_m", "Wc_step_d", "wc_step_m", "Wc_graph_d", "wc_graph_m",
                  "Wc_value_d", "wc_value_m", "wf_rel_sat_l", "wc_step_sat_l", "wc_graph_sat_l",
@@ -101,13 +157,22 @@ SKOLEM_MODULES += ["YesMetaZFC.SetTheory.FinitaryClub"]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory.FinitaryTrace", "YesMetaZFC.Model.SetTheory.Internal.ElementaryTrace"]
 SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.ClassChoice"]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory." + name for name in
-                   ("Card.Properties.SuccessorRegularity", "Card.SmallUnion", "HereditaryClosure",
+                   ("Card.Properties.SuccessorRegularity", "Card.SmallUnion", "HereditaryClosure", "HereditaryAlgebra",
                     "HereditaryCover", "IndexedChoice", "CountableDirected")]
+SKOLEM_MODULES += ["YesMetaZFC.SetTheory.InnerModel.Condensation.Internal"]
+SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.SeparationHull"]
+SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+                   ("Collection", "Uniformization", "UniformizationHull", "UniformizationSource",
+                    "PointwiseQuantifier", "Pointwise", "PointwiseTrace", "PointwiseDiagonal", "PointwiseWitness")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
                 ("Rk_d", "rk_m", "Tc_d", "tc_m", "Hmem_d", "hmem_m", "H_d", "h_m")]
 ZFC_BASELINE = BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
+# 见证统一化与完整内部 Łoś 单独允许原对象选择公理；其余约化幂层仍按 ZF 审计。
+LOS_MODULES = ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in
+               ("Witness", "Los", "SourceLos", "SourceSatisfaction")]
 ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.Ssk_d." + name: BASELINE for name in
              ("value_l", "closed_l", "point_mem_l")}
+ZF_BOUNDS["YesMetaZFC.SetTheory.InnerModel.jc_internal_l"] = BASELINE
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
@@ -122,4 +187,6 @@ if __name__ == "__main__":
         result = main(HOD_CHOICE_MODULES, [], ZFC_BASELINE, "HOD_CHOICE_GUARD_PASS", HOD_ZF_BOUNDS)
     if not result:
         result = main(SKOLEM_MODULES, [], ZFC_BASELINE, "INTERNAL_SKOLEM_GUARD_PASS", ZF_BOUNDS)
+    if not result:
+        result = main(LOS_MODULES, [], ZFC_BASELINE, "INTERNAL_LOS_GUARD_PASS")
     sys.exit(result)

@@ -92,7 +92,7 @@ theorem selem_row_map_l (hZFC : M.Models ZFC) {ω χ H c J d N K α t C D F} (h�
   let I := kpair_interpretation_l M hZFC.1 (KP.exists_pair (ZF.modelsKP hZF))
   have htr := ZF.h_transitive_l I hZF hH
   obtain ⟨P, hP⟩ := ZF.exists_cartesianProduct hZF I C D
-  have hPH := h_product_l hZFC hω hχ hωχ hH (hSub.subset C hC) (hSub.subset D hD) hP
+  have hPH := ZFC.h_product_l hZFC hω hχ hωχ hH (hSub.subset C hC) (hSub.subset D hD) hP
   have hFH := ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH hPH F (fun v hv => (hP v).mpr (by
     obtain ⟨c, q, hc, hq, hv⟩ := hF.1 v hv
     exact ⟨c, hc, q, hq, hv⟩))

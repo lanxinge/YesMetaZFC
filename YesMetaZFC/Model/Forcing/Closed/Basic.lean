@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Definability
-import YesMetaZFC.SetTheory.DependentChoice
+import YesMetaZFC.Model.Forcing.Distributive.Basic
+import YesMetaZFC.Model.SetTheory.DependentChoice
 
 /-! # 模型内部可数闭性与可数稠密交
 
@@ -53,16 +53,14 @@ theorem chain_lower_l (hω : M.IsOmega ω) {f} (hf : Chain_d I B R z ω f) :
         exact he.symm ▸ hqr
   exact fun i j p q hij hip hjq => h j (hf.1.input_mem_of_pairMember hjq) i p q hij hip hjq
 
-omit hZF in
 /-- 可数闭偏序中，模型内任意可数可定义稠密开族具有稠密交。 -/
-theorem closed_intersection_l (hZFC : M.Models ZFC) (hω : M.IsOmega ω)
-    (hc : Closed_d (kpair_interpretation_l M hZFC.1 (KP.exists_pair (ZF.modelsKP (ZFC.models_zf_l hZFC)))) B R z ω)
+private theorem closed_family_l (hDC : Dc_d I ω) (hω : M.IsOmega ω)
+    (hc : Closed_d I B R z ω)
     {n} (φ : BinarySchema n) (ρ : Env M n) {p}
     (hd : ∀ i, M.mem i ω → Dense_d M B R z (φ.denote ρ i) p)
     (hl : ∀ i, M.mem i ω → Lower_d M B R z (φ.denote ρ i))
     (hp : M.mem p B) (hn : p ≠ z) :
     ∃ q, Below_d M B R z q p ∧ ∀ i, M.mem i ω → φ.denote ρ i q := by
-  let hZF := ZFC.models_zf_l hZFC
   let J := kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))
   let δ := ((((ρ.push ω).push B).push R).push z).push p
   let es : Fin n → Term (n+8) := fun i => .bound ⟨i.val+8, by omega⟩
@@ -108,7 +106,7 @@ theorem closed_intersection_l (hZFC : M.Models ZFC) (hω : M.IsOmega ω)
   obtain ⟨e, he, heω⟩ := hω.1.1
   obtain ⟨q₀, hq₀, hφ₀⟩ := hd e heω p (below_refl_l O hp hn)
   obtain ⟨s₀, hs₀⟩ := J.total e q₀
-  obtain ⟨g, hg, hg₀, hgs⟩ := ZFC.dependent_choice_l J hZFC hω ((hk s₀).mpr ⟨e, q₀, hs₀, heω, hq₀, hφ₀⟩) ht
+  obtain ⟨g, hg, hg₀, hgs⟩ := hDC K T s₀ ((hk s₀).mpr ⟨e, q₀, hs₀, heω, hq₀, hφ₀⟩) ht
   have step i j s t (hji : M.SuccessorOf j i) (his : Entry_d M i s g) (hjt : Entry_d M j t g) :=
     (hθ s t).mp ((hT s t).mp (hgs i j s t hji his hjt)).2.2
   have index : ∀ i, M.mem i ω → ∀ s, Entry_d M i s g → ∃ q, KPair_d M s i q := by
@@ -178,5 +176,17 @@ theorem closed_intersection_l (hZFC : M.Models ZFC) (hω : M.IsOmega ω)
   obtain ⟨q, hq, hiq⟩ := hf.2.2 i hi
   obtain ⟨s, his, hs⟩ := pair hiq
   exact hl i hi q r hq ⟨hr, hrz, hrs i q hiq⟩ (info his hs).2
+
+/-- ZF＋当前 ω 的依赖选择将可数闭性提升为实际关系码上的可数分配性。 -/
+theorem closed_distributive_l (hDC : Dc_d I ω) (hω : M.IsOmega ω)
+    (hc : Closed_d I B R z ω) : Distributive_d (M := M) B R z ω := by
+  intro H p hd hl hp hn
+  let φ : BinarySchema 1 := { body := entry_m (.bound 1) .newest (.bound 2) }
+  let ρ : Env M 1 := ⟨fun _ => H, fun _ => H⟩
+  have hφ i q : φ.denote ρ i q ↔ Entry_d M i q H := entry_sat_l M hZF.1 ((ρ.push i).push q) _ _ _
+  obtain ⟨q, hq, hi⟩ := closed_family_l O hZF hDC hω hc φ ρ
+    (fun i hi p hp => (hd i hi p hp).imp fun q h => ⟨h.1, (hφ i q).mpr h.2⟩)
+    (fun i hi p q hp hq h => (hφ i q).mpr (hl i hi p q hp hq ((hφ i p).mp h))) hp hn
+  exact ⟨q, hq, fun i h => (hφ i q).mp (hi i h)⟩
 
 end YesMetaZFC.Model.Forcing.Internal

@@ -155,7 +155,7 @@ theorem selem_countable_subset_l (hZFC : M.Models ZFC) {ω χ d N S A}
   have hPL : ∀ a b : Q.Domain, ∃ p, Pair_d Q p a b := by
     intro a b
     obtain ⟨p, hp⟩ := KP.exists_pair (ZF.modelsKP hZF) a.val b.val
-    exact ⟨⟨p, h_pair_l hZFC hω hχ hωχ hH hp a.property b.property⟩,
+    exact ⟨⟨p, ZFC.h_pair_l hZFC hω hχ hωχ hH hp a.property b.property⟩,
       (smem_pair_l I hS.source hR hX _ a b).mpr hp⟩
   let JL := kpair_interpretation_l Q hEL hPL
   let ρ : Env Q 2 := (⟨fun _ => ⟨ω, hS.subset ω hωN⟩, fun _ => ⟨ω, hS.subset ω hωN⟩⟩ : Env Q 1).push ⟨A, hS.subset A hAN⟩
@@ -166,7 +166,7 @@ theorem selem_countable_subset_l (hZFC : M.Models ZFC) {ω χ d N S A}
       (smem_injection_l I hS.source hR hX hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) hPL f _ _)
   obtain ⟨F, hF⟩ := hA
   obtain ⟨P, hP⟩ := ZF.exists_cartesianProduct hZF J A ω
-  have hPH := h_product_l hZFC hω hχ hωχ hH (hS.subset A hAN) (hS.subset ω hωN) hP
+  have hPH := ZFC.h_product_l hZFC hω hχ hωχ hH (hS.subset A hAN) (hS.subset ω hωN) hP
   have hFH := ZF.h_subsets_l J hZF hχ.isLimitOrdinal hH hPH F (fun v hv => by
     obtain ⟨a, b, hv⟩ := hF.1.1.1 v hv
     have hab : Entry_d M a b F := ⟨v, hv, ‹M.mem v F›⟩

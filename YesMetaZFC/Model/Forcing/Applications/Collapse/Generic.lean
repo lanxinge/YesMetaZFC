@@ -1,4 +1,5 @@
-import YesMetaZFC.Model.Forcing.Closed.NoNewReals
+import YesMetaZFC.Model.Forcing.Distributive.NoNewReals
+import YesMetaZFC.Model.Forcing.Applications.Collapse.Basic
 import YesMetaZFC.Model.Forcing.Internal.Functions.Generic
 
 /-! # 塌缩泛型函数的内部名称

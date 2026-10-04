@@ -18,7 +18,8 @@
 | [TwoStep](TwoStep/README.md) | 51 | 实际二步偏序、名称转换、泛型分解、扩张同构及 CCC、proper、可数闭保持。 |
 | [CCC](CCC/README.md) | 5 | CCC 原公式、有限部分函数实例、基数界和可数预稠密子族。 |
 | [Proper](Proper/README.md) | 62 | 主条件、内部初等闭包、N[G] 提升、H(χ) 对应及 proper 扩张保持。 |
-| [Closed](Closed/README.md) | 12 | 内部可数稠密交、名称下降链、不新增旧目标序列与可数子集，以及实际 proper club。 |
+| [Closed](Closed/README.md) | 8 | ZF＋DC 下可数闭推出分配；名称下降链及 ZFC 下的实际 proper club。 |
+| [Distributive](Distributive/README.md) | 6 | ZF 下不新增实数、旧值序列与可数子集，反射可数性并保持 ω₁。 |
 | [Iteration](Iteration/README.md) | 97 | 共同条件表示、内部超限递归、支撑极限，以及有限支撑 CCC、可数支撑 proper 和闭性保持。 |
 | [Applications](Applications/README.md) | 33 | Cohen 添加、弱齐性与 OD/HOD 比较，可数部分函数塌缩和 CH 独立性；各实例接入对应的支撑迭代接口。 |
 

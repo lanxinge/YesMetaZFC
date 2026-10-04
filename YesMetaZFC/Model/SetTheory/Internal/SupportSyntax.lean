@@ -59,6 +59,14 @@ theorem senv_agree_sat_l {d} (ρ : Env M d) (b f g : Term d) :
 theorem Senv_agree_d.symm_l {b f g} (h : Senv_agree_d I b f g) : Senv_agree_d I b g f :=
   fun i x hi => (h i x hi).symm
 
+/-- 更新支撑外的坐标保留支撑上的整张赋值图。 -/
+theorem Senv_update_d.agree_l {b f i x g} (h : Senv_update_d I f i x g) (hi : ¬ M.mem i b) :
+    Senv_agree_d I b f g := by
+  intro j y hj
+  have hji : j ≠ i := fun he => hi (he ▸ hj)
+  exact ⟨fun hy => (h.2 j y).mpr (Or.inr ⟨hji, hy⟩),
+    fun hy => ((h.2 j y).mp hy).elim (fun h => (hji h.1).elim) And.right⟩
+
 theorem Senv_agree_d.update_l {b f g i x h k} (ha : Senv_agree_d I b f g)
     (hh : Senv_update_d I f i x h) (hk : Senv_update_d I g i x k) : Senv_agree_d I b h k := by
   intro j y hj

@@ -1,6 +1,8 @@
 # 遗传小名称与 H(χ)
 
 小名称定理、原子绝对性、H(χ) 泛型对应及实际 H(χ) 中的模型装配。
+配对和乘积封闭统一复用 [HereditaryAlgebra](../../../../SetTheory/HereditaryAlgebra.lean)，
+名称专用装配界保留在本目录。
 
 [总索引](../../INDEX.md) · [上级目录](../README.md)
 

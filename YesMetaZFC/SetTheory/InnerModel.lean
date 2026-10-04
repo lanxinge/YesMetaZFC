@@ -8,6 +8,7 @@ import YesMetaZFC.SetTheory.InnerModel.GCH
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Definable
 import YesMetaZFC.SetTheory.InnerModel.OD
 import YesMetaZFC.SetTheory.InnerModel.HOD
+import YesMetaZFC.SetTheory.InnerModel.Relative.Determinacy
 
 /-! # 内模型技术的共同基础
 
@@ -32,4 +33,7 @@ OD 与 HOD 均具有实际 Σ₂ 证书；OD 的唯一最小序数代表导出�
 全收集使用秩切片作内部见证池，允许非标准有限参数列且不使用背景选择公理。
 HOD[A] 的有界序数关系呈现与总坍塌已构造。弱齐性力迫的 HOD/HOD[A] 比较
 另由 Model.Forcing.Internal.Homogeneous.HOD 导出；具体边界和待建内容见 InnerModel/README.md。
+相对 Jensen 层级在 KPi 上构造；任意传递基集的并类在 ZF 上满足原 ZF。
+`Relative.lr_model_l` 以 TC({ℝ}) 为起层构造规范 L(ℝ)，保留全部序数与实数；
+`lr_ad_axiom_sat_l` 精确识别 L(ℝ) 中 AD 的原句子，目前未证明大基数蕴涵 AD。
 -/

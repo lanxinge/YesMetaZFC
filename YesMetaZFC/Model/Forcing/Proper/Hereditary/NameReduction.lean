@@ -44,7 +44,7 @@ theorem h_name_reduce_l {ω χ H b T μ w f t p} (hω : M.IsOmega ω)
     have huH := ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH hB u (fun x hx => (hu x hx).elim)
     have huN := name_empty_l M (KP.exists_pair (ZF.modelsKP hZF)) B u hu
     obtain ⟨D, hD⟩ := ZF.exists_cartesianProduct hZF I μ B
-    have hDH := h_product_l hZFC hω hχ hωχ hH (ZF.h_ordinal_l I hZF hχ.isLimitOrdinal hH hμ) hB hD
+    have hDH := ZFC.h_product_l hZFC hω hχ hωχ hH (ZF.h_ordinal_l I hZF hχ.isLimitOrdinal hH hμ) hB hD
     obtain ⟨G, A, hG, hGA, hAH, hAN, hg⟩ := hchild_choice_l (B := B) (R := R) (z := z)
       (b := b) (f := f) (t := t) (p := p) hZFC huH huN hD
     obtain ⟨ν, hν, hDν⟩ := ZF.hmem_size_l I hZF ((hH D).mp hDH)

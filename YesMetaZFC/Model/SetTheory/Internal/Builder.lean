@@ -35,6 +35,16 @@ theorem sfm_node_build_l (hZF : M.Models ZF) {ω n F c} (hω : M.IsOmega ω)
   exact ⟨m, G, ⟨hG, hp, sfm_prefix_subset_l I hF hG hp, hm.predecessor_mem⟩,
     (he n c).mpr (Or.inr ⟨rfl, rfl⟩)⟩
 
+theorem sfm_rel_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
+    (hF : Sfm_d I ω n F) (hi : M.mem i ω) (hj : M.mem j ω) : ∃ m G,
+    Sbuild_d I ω n F m G n ∧ ∀ X R E f x y, M.IsFunctionSpace I E ω X → M.mem f E →
+      M.PairMember I i x f → M.PairMember I j y f → (Ssat_d I X R E G m n f ↔ M.PairMember I x y R) := by
+  obtain ⟨c, hc⟩ := sop_exists_l I (ZF.modelsKP hZF) 0 i j
+  obtain ⟨m, G, h, he⟩ := sfm_node_build_l I hZF hω hF (Or.inl ⟨i, j, hc, hi, hj⟩)
+  refine ⟨m, G, h, fun X R E f x y hE hf hix hjy => ?_⟩
+  obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E G h.program.2.1.1
+  exact ssat_rel_l I hZF h.program hH he hc hE hf hix hjy
+
 theorem sfm_nor_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
     (hF : Sfm_d I ω n F) (hi : M.mem i n) (hj : M.mem j n) : ∃ m G k,
     Sbuild_d I ω n F m G k ∧ ∀ X R E f, M.mem f E →
@@ -112,5 +122,23 @@ theorem sfm_ex_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
   obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E G h.program.2.1.1
   exact (ssat_exists_l I hZF h.program hH he hc hf).trans (exists_congr fun x => exists_congr fun g =>
     and_congr_right fun _ => and_congr_right fun _ => (h.sat_l I hZF hF hj X R E g).symm)
+
+/-- 全称量词由或非与存在指令构造，规格覆盖每个实际单坐标更新。 -/
+theorem sfm_all_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
+    (hF : Sfm_d I ω n F) (hi : M.mem i ω) (hj : M.mem j n) : ∃ m G k,
+    Sbuild_d I ω n F m G k ∧ ∀ X R E f, M.IsFunctionSpace I E ω X → M.mem f E →
+      (Ssat_d I X R E G m k f ↔ ∀ x g, M.mem x X → Senv_update_d I f i x g → Ssat_d I X R E F n j g) := by
+  obtain ⟨m, G, k, h, ht⟩ := sfm_neg_l I hZF hω hF hj
+  obtain ⟨l, H, r, a, ha⟩ := sfm_ex_l I hZF hω h.program hi h.root
+  obtain ⟨v, J, s, b, hb⟩ := sfm_neg_l I hZF hω a.program a.root
+  refine ⟨v, J, s, (h.comp I a).comp I b, fun X R E f hE hf => ?_⟩
+  rw [hb X R E f hf, ha X R E f hf]
+  constructor
+  · intro hn x g hx hu
+    apply Classical.byContradiction
+    exact fun hg => hn ⟨x, g, hx, hu,
+      (ht X R E g ((hE g).mpr (hu.function_l I ((hE f).mp hf) hi hx))).mpr hg⟩
+  · rintro hh ⟨x, g, hx, hu, hg⟩
+    exact (ht X R E g ((hE g).mpr (hu.function_l I ((hE f).mp hf) hi hx))).mp hg (hh x g hx hu)
 
 end YesMetaZFC.SetTheory.Internal

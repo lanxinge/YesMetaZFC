@@ -62,6 +62,18 @@ theorem fn0_of_function_l (hKP : M.Models KP) {A B F : M.Domain}
   have he : M.PairMember (kp_pair_l hKP) a b F := ⟨p, hab, hp⟩
   exact ⟨a, h.input_mem_of_pairMember he, b, h.output_mem_of_pairMember he, hab⟩
 
+theorem Fn0_d.domain_eq_l (hE : Extensional M) {A B C D F : M.Domain}
+    (h : Fn0_d A B F) (k : Fn0_d C D F) : A = C :=
+  hE.eq_of_same_members A C fun a =>
+    ⟨fun ha => (h.2.1 a ha).elim fun _ hb => (k.bound_l hb.2).1,
+      fun ha => (k.2.1 a ha).elim fun _ hb => (h.bound_l hb.2).1⟩
+
+theorem Fn0_d.mono_target_l {A B C F : M.Domain}
+    (h : Fn0_d A B F) (hBC : M.MemberSubset B C) : Fn0_d A C F := by
+  exact ⟨fun p hp => (h.1 p hp).elim fun a ha => ha.2.elim fun b hb => ⟨a, ha.1, b, hBC b hb.1, hb.2⟩,
+    fun a ha => (h.2.1 a ha).imp fun b hb => ⟨hBC b hb.1, hb.2⟩,
+    fun a ha b _ c _ hab hac => h.2.2 a ha b (h.bound_l hab).2 c (h.bound_l hac).2 hab hac⟩
+
 def Res0_d (R F A B : M.Domain) : Prop := M.MemberSubset R F ∧
   (∀ p, M.mem p R → ∃ a, M.mem a A ∧ ∃ b, M.mem b B ∧ KPair_d M p a b) ∧
   ∀ a, M.mem a A → ∀ b, M.mem b B → (Rd_entry_d a b R ↔ Rd_entry_d a b F)

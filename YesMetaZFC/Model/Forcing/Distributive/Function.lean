@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Internal.Functions.Decision
-import YesMetaZFC.Model.Forcing.Closed.Basic
+import YesMetaZFC.Model.Forcing.Distributive.Basic
 
-/-! # 可数闭力迫同时判定整个内部函数图
+/-! # 可数分配力迫同时判定整个内部函数图
 
 先对每个内部自然数决定旧值，再用内部可数稠密交获得统一条件。
 同一条件上的唯一性允许替换收集整个旧函数图；所得见证仍由原公式定义。
@@ -33,13 +33,12 @@ theorem old_fn_sat_l (I : kpair_convention_l.Interpretation M) (hE : Extensional
     Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
   rfl
 
-variable (O : Cond_order_d M B R z) (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
-local notation "I" => kpair_interpretation_l M (And.left hZFC) (KP.exists_pair (ZF.modelsKP hZF))
+variable (O : Cond_order_d M B R z) (hZF : M.Models ZF)
+local notation "I" => kpair_interpretation_l M (And.left hZF) (KP.exists_pair (ZF.modelsKP hZF))
 include O
 
 /-- 在函数证书以下，决定全部内部 ω 坐标的实际旧函数图形成稠密集。 -/
-theorem closed_fn_dense_l {ω a b T w f X} (hω : M.IsOmega ω) (hc : Closed_d I B R z ω)
+theorem distributive_fn_dense_l {ω a b T w f X} (hD : Distributive_d (M := M) B R z ω)
     (h : Fn_name_d M B R z a T w f) (hb : M.mem b B) (ha : Below_d M B R z a b)
     (hT : Check_d M b ω T) (hw : Check_d M b X w) :
     Dense_d M B R z (Old_fn_d I B R z b f ω X) a := by
@@ -50,7 +49,7 @@ theorem closed_fn_dense_l {ω a b T w f X} (hω : M.IsOmega ω) (hc : Closed_d I
       (old_value_m (.bound 8) (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 1) (.bound 2) .newest)) }
   have hφ i q : φ.denote ρ i q ↔ ∃ x, M.mem x X ∧ Old_value_d M B R z b f q i x := by
     simp only [BinarySchema.denote, φ, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-      Formula.satisfies_mem_iff, old_value_sat_l hZFC.1]
+      Formula.satisfies_mem_iff, old_value_sat_l hZF.1]
     rfl
   have hd i (hi : M.mem i ω) : Dense_d M B R z (φ.denote ρ i) p := by
     intro r hr
@@ -60,7 +59,7 @@ theorem closed_fn_dense_l {ω a b T w f X} (hω : M.IsOmega ω) (hc : Closed_d I
     intro r q hr hq hi
     obtain ⟨x, hx, hv⟩ := (hφ i r).mp hi
     exact (hφ i q).mpr ⟨x, hx, old_value_lower_l O hZF hb h.2.2.1 r q hr hq hv⟩
-  obtain ⟨q, hq, hdec⟩ := closed_intersection_l O hZFC hω hc φ ρ hd hl hp.1 hp.2.1
+  obtain ⟨q, hq, hdec⟩ := distributive_intersection_l hZF hD φ ρ hd hl hp.1 hp.2.1
   have hqa := below_trans_l O ha.1 hq hp
   have hqb := below_trans_l O hb hqa ha
   let ψ : BinarySchema 7 := {
@@ -68,7 +67,7 @@ theorem closed_fn_dense_l {ω a b T w f X} (hω : M.IsOmega ω) (hc : Closed_d I
       (old_value_m (.bound 8) (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 2) (.bound 1) .newest) }
   have hψ i x : ψ.denote (ρ.push q) i x ↔ M.mem x X ∧ Old_value_d M B R z b f q i x := by
     simp only [BinarySchema.denote, ψ, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
-      old_value_sat_l hZFC.1]
+      old_value_sat_l hZF.1]
     rfl
   obtain ⟨F, hF, hf⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I ψ (ρ.push q)
     (source := ω) (target := X) (by

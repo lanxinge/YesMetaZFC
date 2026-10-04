@@ -6,8 +6,25 @@ import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
+import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
+import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
+import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
+
+`Spred_emb_d` 编码带集合谓词的初等嵌入，量化全部内部公式码；
+`spred_exists_l`、`spred_identity_l` 在 ZF 内构造谓词结构码及实际恒等嵌入。
+`smap_source_l` 沿实际嵌入复合内部赋值；`spred_source_l` 恢复原隶属语言的
+完整初等性，`spred_delta_l` 在传递载体上直接传输背景中的原 Δ₀ 公式。
+`rp_model_exists_l` 对有共同细化的实际集合族与非空合法代表函数族，在 ZF 中构造等价类集合、
+投影和商关系的内部结构码；`rp_kernel_l` 识别投影核，商关系与代表元无关。
+`rp_family_model_l` 先在指定候选集合内分离合法函数；大基数层的 `ed_source_model_l`
+已实例化为源模型内部函数与相对派生超滤的商。
+对全部背景内部函数的代表族，`rp_satisfies_l` 在 ZFC 下给出全部内部代码的 Łoś 方程；
+`rp_los_assignment_l` 自动构造商赋值和代码集。源模型版本 `rs_satisfies_l` 另从实际
+源内真值集和对角见证证明完整内部 Łoś，源为实际初等嵌入正则 H(χ) 的传递模型。
+`rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值；有向极限及迭代仍待证明。
 
 `smdl_membership_l` 构造任意非空内部集合的隶属结构码；`scode_exists_l` 收集全部
 内部有限公式码；`smdl_satisfaction_l` 构造统一满足关系集合。`smdl_table_l` 一次
@@ -25,6 +42,22 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 及全部内部赋值。有限支撑与完整内部 Tarski–Vaught 等价仅需 ZF；初等关系可
 复合并保持内部编码理论的模型性。`selem_source_l`、`selem_witness_l` 通过同一编译码
 把完整内部初等性接回原生产公式；力迫层用它反射见证池中的实际名称。
+`smap_of_iso_l` 用实际原公式内部归纳证明同构保持全部内部码；`mc_smaps_l`
+据此给出 Mostowski 正逆图的完整初等证书。`selem_collapse_l` 在 ZF 中自动构造
+传递坍塌及其到原传递结构的初等嵌入；`selem_hull_collapse_l` 再在 ZFC 中从可数种子
+同时构造壳与可数传递模型。`Smap_d.models_l` 沿嵌入回拉任意已证明的内部编码理论。
+`sfm_sep_l` 直接构造任意内部程序的分离实例代码，支撑外新变量不会捕获旧参数。
+`smap_separation_l` 在目标容纳像集合的全部子集时，回拉源中的实际分离集；
+`v_separation_hull_l` 从极限 V 层及可数种子自动构造具有全内部码分离的可数传递模型。
+`sfm_total_l` 与 `sfm_collect_l` 构造全内部公式的收集实例；正则 H(χ) 中的实际小见证集
+沿 `smap_collection_l` 回到源。`sfm_uniform_l` 构造统一函数图的内部代码，
+`smap_uniform_l` 回拉实际源内函数。`h_uniform_hull_l` 从可数种子自动构造同一个具有
+全内部码分离、收集与统一化的可数传递模型；统一化的两个实参使用不同坐标。
+`pe_compile_l` 对任意内部程序构造逐点解释码及旧根到新根的实际函数图；
+原子读取代表函数值，存在量词使用源内常值代表，内部归纳具有实际原公式。
+`smap_pe_trace_l` 从真实代表函数赋值构造源中的真值逆像；逐点赋值也实际构造。
+`smap_diagonal_l` 把源内部函数族的逐点对角延拓到整个定义域；`smap_pe_witness_l`
+由此取得源中统一代表。`rs_los_l` 在实际原公式上完成全部内部行的 Łoś 归纳。
 `selem_club_hull_l` 在任意指定内部 club 中构造这样的初等模型，供 proper 主条件装配使用。
 `selem_trace_club_l` 以固定司寇伦图的最小闭包在任意子集上实际构造交集 club。
 `ssk_mem_s` 在实际集合隶属结构上统一表达全部内部码的司寇伦见证，供泛型初等提升使用。
