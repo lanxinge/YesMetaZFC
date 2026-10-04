@@ -10,6 +10,10 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
+/-- 常值箭头的实际代表证书，保留代表的源内定义域及源内值域界。 -/
+def Ep_constants_d (X q i : M.Domain) : Prop := ∀ x E, Rd_entry_d x E i →
+  ∃ u a B f D, M.mem D X ∧ Sfun_d X D f ∧ Rs_const_d D x f ∧ M.mem f B ∧ KPair_d M u a B ∧ Rd_entry_d u E q
+
 theorem ep_constant_limit_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S q c C V a d : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_family_d ω κ L F)
     (coherent : Es_coherent_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L F)

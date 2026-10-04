@@ -12,6 +12,13 @@ variable {M : Structure.{u}}
 def Wc_ext_d (X R : M.Domain) : Prop := ∀ a, M.mem a X → ∀ b, M.mem b X →
   (∀ z, M.mem z X → (Rd_entry_d z a R ↔ Rd_entry_d z b R)) → a = b
 
+theorem Wc_graph_d.member_l {X R F B a b x y : M.Domain} (h : Wc_graph_d X R F)
+    (hf : Fn0_d X B F) (inj : ∀ a b y, Rd_entry_d a y F → Rd_entry_d b y F → a = b)
+    (ha : Rd_entry_d a x F) (hb : Rd_entry_d b y F) : Rd_entry_d a b R ↔ M.mem x y := by
+  refine ⟨fun hab => ((h.2 b y hb).2.2 x).mpr ⟨a, (hf.bound_l ha).1, hab, ha⟩, fun hxy => ?_⟩
+  obtain ⟨z, _, hzb, hz⟩ := ((h.2 b y hb).2.2 x).mp hxy
+  exact inj z a x hz ha ▸ hzb
+
 theorem wc_value_injective_l (hZF : M.Models ZF) {X R a b y : M.Domain}
     (hw : Wf_rel_d X R) (he : Wc_ext_d X R) (ha : M.mem a X) (hb : M.mem b X)
     (h : Wc_value_d X R a y) (g : Wc_value_d X R b y) : a = b := by

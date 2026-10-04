@@ -229,6 +229,38 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 返回同一个系统的完整初等极限、传递坍塌和原目标因子 `Ep_derived_limit_d`。
 原 j 因此只作用于已经证明属于 Vδ 的代表。
 
+## 已证明：按指定秩选长并恢复强性
+
+[`woodin_rank_strength_l`](WoodinStrength.lean) 在 ZFC 中对每个 A⊆Vδ 固定 κ，
+对每个 ν<δ 自动选择 κ,ν<L<δ 的短扩展器。`Ep_strong_limit_d` 将强性证书
+绑定到这张 F 的同一个全系统和商投影；其传递实现 N 及嵌入 i 满足：
+
+- i:(Vδ,∈,A)≺(N,∈,B)，初等性覆盖全部内部公式码，包括非标准码。
+- crit(i)=κ，L≤i(κ)，Vν⊆N，A∩Vν=B∩Vν。
+- 原嵌入分解为 j=k∘i；k 的像精确为全部有限支撑求值 j(f)(a)，且 k 逐点固定 Vν。
+
+[ExtenderCoordinates](ExtenderCoordinates.lean) 先由坐标代表覆盖所有 α<L，
+[ExtenderLength](ExtenderLength.lean) 据传递坍塌固定性恢复临界点与长度界。
+秩覆盖则使用实际枚举，而非只由序数固定性推断：
+[RankLength](RankLength.lean) 将 Vν 的一个小序数枚举及其整张图放进 V_L；
+[CumulativeRelative](../CumulativeRelative.lean) 与 [RankTransport](RankTransport.lean)
+比较相对累积历史，在原目标已经覆盖 Vν 时恢复真实 Vν。
+[RankEnumeration](RankEnumeration.lean) 同时构造源中各 Vα 的最小序数枚举。
+其最小性把目标 ν 层所需索引压到 L 以下；[RankCover](RankCover.lean)
+用两个有限坐标表示每个 x∈Vν，并将它送入同一个极限。
+
+谓词初等性另由完整 Łoś 证明。[HereditaryFunction](../HereditaryFunction.lean)
+先证明正则 Hδ 对小定义域函数封闭，再以 Hδ=Vδ 核验原代表族确已包含全部所需函数。
+[FullEmbedding](../../Model/SetTheory/Internal/ReducedPower/FullEmbedding.lean)
+给出任意关系下的完整常值与投影初等性；[DerivedPredicate](DerivedPredicate.lean)
+识别原嵌入的谓词原子。[ExtenderPredicateLimit](ExtenderPredicateLimit.lean)
+沿原过渡图装配全部内部公式码的初等性；[ExtenderStrength](ExtenderStrength.lean)
+将它传到同一个传递实现，并由原因子的逆像构造 B。
+此处源为实际 Vδ；一般初等子源仍使用源内部 Łoś，不能未经闭性证明更换代表族。
+
+长度随 ν 选择。当前端点恢复上述秩覆盖和谓词强性；它没有断言任意较短截断保留
+原嵌入的全部强度，也尚未包装成带 N⊆Vδ、δ⊆N 全部字段的 `Wd_witness_d`。
+
 ## 已证明：通用短扩展器与武丁实例的识别
 
 公共入口为 [Extender](Extender.lean)。[ExtenderShort](ExtenderShort.lean) 的 `Ex_pre_d`
@@ -280,10 +312,10 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
 通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。
 极限的完整内部初等性、整体 Mostowski 坍塌及原目标关系因子已完成。
+按 ν 选长的 Vν 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
 迭代树和迭代性、决定性蕴涵尚待实现。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
-当前武丁定义到实际短扩展器的方向已实现；按每个 ν 选择足够长的扩展器后恢复 Vν 覆盖和谓词一致性、
-因子映射固定长度以下序数，
-以及与全宇宙类嵌入刻画的完整等价仍待证明。当前定义没有把超幂、良基性或 AD
+当前武丁定义到具有上述强性的实际短扩展器的方向已实现；
+与全宇宙类嵌入刻画的完整等价仍待证明。当前定义没有把超幂、良基性或 AD
 当作未实现的操作参数。

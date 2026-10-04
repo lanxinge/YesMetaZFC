@@ -45,6 +45,12 @@ theorem Ep_source_d.space_mem_l (hZF : M.Models ZF) {ω κ K X R n D : M.Domain}
   obtain ⟨E, he, hs⟩ := h.space_l hZF hn
   exact hZF.1.eq_of_same_members E D (fun s => (hs s).trans (hD s).symm) ▸ he
 
+theorem Ep_source_d.function_l (hZFC : M.Models ZFC) {ω κ K X R D f : M.Domain}
+    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hD : M.mem D X) (hf : M.mem f X)
+    (hF : Fn0_d D X f) : Sfun_d X D f := by
+  obtain ⟨χ, c, d, H, S, e, hχ, hωχ, hH, hm, hn, he⟩ := h.presentation
+  exact smap_function_domain_l hZFC h.omega hχ hωχ hH h.transitive hm hn he hD hf hF
+
 theorem Ep_source_d.projection_l (hZFC : M.Models ZFC) {ω κ K X R m n q D E : M.Domain}
     (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hm : M.mem m ω) (hn : M.mem n ω)
     (hq : Fn0_d m n q) (hD : Ep_space_d κ m D) (hE : Ep_space_d κ n E) :

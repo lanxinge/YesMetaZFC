@@ -16,7 +16,7 @@ theorem woodin_short_l (hZF : M.Models ZF) {δ : M.Domain}
     let I := kp_pair_l (ZF.modelsKP hZF)
     ∃ ω V, M.IsOmega ω ∧ V_d I δ V ∧ ∀ A, M.MemberSubset A V → ∃ κ, M.mem κ δ ∧
       ∀ L, M.mem L δ → M.mem κ L → ∃ ν N B j W k S F K E,
-        Wd_witness_d I ω δ V A κ ν N B j W k ∧ M.mem L k ∧ Fseq_space_d I ω L S ∧ M.mem S N ∧
+        Wd_witness_d I ω δ V A κ ν N B j W k ∧ M.mem L ν ∧ M.mem L k ∧ Fseq_space_d I ω L S ∧ M.mem S N ∧
         Fseq_space_d I ω κ K ∧ Es_family_d I j κ L S F ∧ Ex_short_d hZF ω κ L F ∧
         Ex_operator_d K S F E ∧ Ex_derived_d j S E := by
   let I := kp_pair_l (ZF.modelsKP hZF)
@@ -27,7 +27,7 @@ theorem woodin_short_l (hZF : M.Models ZF) {δ : M.Domain}
   refine ⟨κ, hκ, fun L hL hκL => ?_⟩
   have hLo := hδ.1.mem hL
   have hωL : M.MemberSubset ω L := fun x hx => hLo.transitive κ hκL x (hκo.transitive ω hωκ x hx)
-  obtain ⟨ν, N, B, j, W, k, S, F, hw, hLk, hS, hSN, hF, _, _, complete⟩ := family L hL hωL
+  obtain ⟨ν, N, B, j, W, k, S, F, hw, hLν, hLk, hS, hSN, hF, _, _, complete⟩ := family L hL hωL
   have hj := hw.2.2.2.2.2.1
   have hc := hw.2.2.2.2.2.2.1
   have hsub := hc.ordinal_image.transitive L hLk
@@ -35,7 +35,7 @@ theorem woodin_short_l (hZF : M.Models ZF) {δ : M.Domain}
   have short : Ex_short_d hZF ω κ L F := ⟨hpre, fun H f hH hf => (complete H f hH hf).imp fun _ hh => hh.2⟩
   obtain ⟨K, hK⟩ := ZF.fseq_space_exists_l I hZF hω κ
   obtain ⟨E, he⟩ := ex_operator_exists_l hZF K S F
-  exact ⟨ν, N, B, j, W, k, S, F, K, E, hw, hLk, hS, hSN, hK, hF, short, he,
+  exact ⟨ν, N, B, j, W, k, S, F, K, E, hw, hLν, hLk, hS, hSN, hK, hF, short, he,
     ex_derived_l hZF hω hV hδ hj hw.1 hc hsub hS (hw.1 S hSN) hF hK he⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

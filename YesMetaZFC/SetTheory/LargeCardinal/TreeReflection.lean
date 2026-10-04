@@ -58,7 +58,7 @@ theorem ed_branch_pull_l (hZF : M.Models ZF) {ω X A Y B j D D' T T' f}
 theorem wd_cover_embedding_l (hZF : M.Models ZF) {ω δ X A κ L G}
     (hV : V_d I δ X) (hδ : M.IsLimitOrdinal δ)
     (hk : Wd_strong_d I ω δ X A κ) (hL : M.mem L δ) (hGX : M.mem G X) :
-    ∃ ν N B j W k, Wd_witness_d I ω δ X A κ ν N B j W k ∧ M.mem L k ∧ M.mem G N := by
+    ∃ ν N B j W k, Wd_witness_d I ω δ X A κ ν N B j W k ∧ M.mem L ν ∧ M.mem L k ∧ M.mem G N := by
   obtain ⟨γ, V, hγ, hVγ, hGV⟩ := (ZF.v_limit_mem_l I hZF hV hδ.2.2 G).mp hGX
   obtain ⟨η, hη, hLη⟩ := hδ.2.2 L hL
   have bound : ∃ ν, M.mem ν δ ∧ M.mem L ν ∧ M.MemberSubset γ ν := by
@@ -71,6 +71,6 @@ theorem wd_cover_embedding_l (hZF : M.Models ZF) {ω δ X A κ L G}
   obtain ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩ := hw
   have hGN := hWN G (ZF.v_mono_l I hZF hVγ hW hγν G hGV)
   have hLk := hc.ordinal_image.transitive ν hνk L hLν
-  exact ⟨ν, N, B, j, W, k, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLk, hGN⟩
+  exact ⟨ν, N, B, j, W, k, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLν, hLk, hGN⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

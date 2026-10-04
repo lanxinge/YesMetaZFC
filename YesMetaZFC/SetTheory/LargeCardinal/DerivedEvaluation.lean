@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.DerivedSeparation
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Restriction
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Constant
 
 /-! # 派生测度上的原嵌入求值
 
@@ -36,6 +37,25 @@ theorem ed_evaluation_l (hZF : M.Models ZF) {ω X A Y B j D D' a f : M.Domain}
   refine ⟨y, hY C' hCY y hy, ⟨f', hjf, hay⟩, fun z ⟨g, hjg, haz⟩ => ?_⟩
   have eq := hj.1.2 f g f' hjg hjf
   exact (fn0_function_l (ZF.modelsKP hZF) fun').1.2 a z y (eq ▸ haz) hay
+
+/-- 一个源常值函数的任何合法像求值，恰为原常值的像。 -/
+theorem ed_constant_value_l (hZF : M.Models ZF) {ω X A Y B j D a f x y z : M.Domain}
+    (hω : M.IsOmega ω) (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j)
+    (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y) (hD : M.mem D X) (hf : Sfun_d X D f)
+    (hs : Rs_const_d D x f) (hx : Rd_entry_d x z j) (hy : Ee_value_d j a f y) : y = z := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  have hj : M.IsSetFunctionFromTo I j X Y := by obtain ⟨_, _, _, _, _, _, e⟩ := h; exact e.1.1
+  obtain ⟨_, C, hCX, hFC⟩ := hf
+  obtain ⟨D', _, hjD⟩ := hj.2.2 D hD
+  obtain ⟨C', _, hjC⟩ := hj.2.2 C hCX
+  obtain ⟨f', hjf, haf⟩ := hy
+  have ff := (spred_function_l I hZF hω h hX hY hjD hjC hjf).mp hFC
+  let φ : Formula 1 3 := Formula.forallMem (.bound 2) (rd_entry0_m .newest (.bound 2) (.bound 1))
+  have tr := spred_delta_l I hZF hω h hX hY φ (by simp -implicitDefEqProofs [φ])
+    (.forallMem _ (rd_entry0_delta_l ..)) ⟨Fin.cases f (Fin.cases x (fun _ => D)), fun _ => D⟩
+    ⟨Fin.cases f' (Fin.cases z (fun _ => D')), fun _ => D'⟩ (Fin.cases hjf (Fin.cases hx (fun _ => hjD)))
+  simp only [φ, Formula.satisfies_forallMem_iff, rd_entry0_sat_l hZF.1] at tr
+  exact (fn0_function_l (ZF.modelsKP hZF) ff).1.2 a y z haf (tr.mp hs a (ff.bound_l haf).1)
 
 theorem ed_evaluation_atoms_l (hZF : M.Models ZF) {ω X A Y B j D D' a U P c R f g y z : M.Domain}
     (hω : M.IsOmega ω) (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j)

@@ -20,7 +20,8 @@ derive_free_closed ee_node_m
 def Ee_factor_d (hZF : M.Models ZF) (j Y q C W : M.Domain) : Prop :=
   ∃ g, M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) g C Y ∧
     (∀ E y, Rd_entry_d E y g ↔ M.mem E C ∧ ∃ u, Rd_entry_d u E q ∧ Ee_node_d j u y) ∧
-    ∀ E H y z, Rd_entry_d E y g → Rd_entry_d H z g → (Rd_entry_d E H W ↔ M.mem y z)
+    (∀ E H y z, Rd_entry_d E y g → Rd_entry_d H z g → (Rd_entry_d E H W ↔ M.mem y z)) ∧
+    ∀ u a B f E y, Rd_entry_d u E q → KPair_d M u a B → M.mem f B → Rd_entry_d E y g → Ee_value_d j a f y
 
 theorem ee_node_sat_l (hE : Extensional M) {d} (ρ : Env M d) (j u y : Term d) :
     Formula.satisfies ρ (ee_node_m j u y) ↔ Ee_node_d (j.eval ρ) (u.eval ρ) (y.eval ρ) := by
@@ -43,8 +44,9 @@ theorem ee_nodes_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D
     (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V) :
     ∃ e, Fn0_d D Y e ∧ (∀ u y, Rd_entry_d u y e ↔ M.mem u D ∧ Ee_node_d j u y) ∧
       (∀ u v y z, Rd_entry_d u v T → Rd_entry_d u y e → Rd_entry_d v z e → y = z) ∧
-      ∀ u v a y z, Rd_entry_d u a p → Rd_entry_d v a p → Rd_entry_d u y e → Rd_entry_d v z e →
-        (u = v ↔ y = z) ∧ (Rd_entry_d u v V ↔ M.mem y z) := by
+      (∀ u v a y z, Rd_entry_d u a p → Rd_entry_d v a p → Rd_entry_d u y e → Rd_entry_d v z e →
+        (u = v ↔ y = z) ∧ (Rd_entry_d u v V ↔ M.mem y z)) ∧
+      ∀ u a B y f, KPair_d M u a B → Rd_entry_d u y e → M.mem f B → Ee_value_d j a f y := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨Q, hZ, models⟩ := system.models
@@ -80,7 +82,7 @@ theorem ee_nodes_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D
   have any u a E y f (hp : KPair_d M u a E) (hy : Rd_entry_d u y e) (hf : M.mem f E) : Ee_value_d j a f y := by
     obtain ⟨_, _, _, t, _, _, hE, _, ts, all, _⟩ := atMap a E (system.toEp_graph_d.at_l (he.input_mem_of_pairMember hy) hp)
     exact all E y f ((ts E y).mpr ⟨hE, (ee_node_pair_l hp).mp ((spec u y).mp hy).2⟩) hf
-  refine ⟨e, fn0_of_function_l (ZF.modelsKP hZF) he, spec, ?_, ?_⟩
+  refine ⟨e, fn0_of_function_l (ZF.modelsKP hZF) he, spec, ?_, ?_, any⟩
   · intro u v y z huv huy hvz
     obtain ⟨a, E, hu, _⟩ := (system.nodes u).mp (he.input_mem_of_pairMember huy)
     obtain ⟨b, H, hv, _⟩ := (system.nodes v).mp (he.input_mem_of_pairMember hvz)
@@ -116,9 +118,9 @@ theorem ee_factor_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z 
     (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V)
     (limit : Di_limit_d D p T V q C W) : Ee_factor_d (ZFC.models_zf_l hZFC) j Y q C W := by
   let hZF := ZFC.models_zf_l hZFC
-  obtain ⟨e, he, es, comm, fiber⟩ := ee_nodes_l hZFC source hV hδ h hY hc hL hS hSY hF system
+  obtain ⟨e, he, es, comm, fiber, any⟩ := ee_nodes_l hZFC source hV hδ h hY hc hL hS hSY hF system
   obtain ⟨g, hg, law, rel, _⟩ := di_factor_embedding_l hZF system.diagram limit he comm fiber
-  refine ⟨g, hg, fun E y => ⟨?_, ?_⟩, rel⟩
+  refine ⟨g, hg, fun E y => ⟨?_, ?_⟩, rel, ?_⟩
   · intro hy
     have hE := hg.1.input_mem_of_pairMember hy
     obtain ⟨u, hu⟩ := (limit.range E).mp hE
@@ -127,5 +129,8 @@ theorem ee_factor_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z 
     exact ⟨hE, u, hu, eq ▸ ((es u z).mp huz).2⟩
   · rintro ⟨_, u, hu, hnode⟩
     exact law u E y hu ((es u y).mpr ⟨(limit.projection.bound_l hu).1, hnode⟩)
+  · intro u a B f E y hu hp hf hy
+    obtain ⟨z, _, huz⟩ := he.2.1 u (limit.projection.bound_l hu).1
+    exact hg.1.1.2 E z y (law u E z hu huz) hy ▸ any u a B z f hp huz hf
 
 end YesMetaZFC.SetTheory.LargeCardinal

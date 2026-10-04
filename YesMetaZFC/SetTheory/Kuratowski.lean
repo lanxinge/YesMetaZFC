@@ -92,6 +92,13 @@ def kpair_interpretation_l (hE : Extensional M)
   unique := kpair_unique_l M hE
   injective := kpair_injective_l M
 
+/-- 传递集合中的 Kuratowski 有序对，其两个坐标也属于该集合。 -/
+theorem KPair_d.mem_l {p a b T : M.Domain} (h : KPair_d M p a b) (hT : M.TransitiveSet T) (hp : M.mem p T) :
+    M.mem a T ∧ M.mem b T := by
+  obtain ⟨_, t, _, ht, hpair⟩ := h
+  have htT := hT p hp t ((hpair t).mpr (Or.inr rfl))
+  exact ⟨hT t htT a ((ht a).mpr (Or.inl rfl)), hT t htT b ((ht b).mpr (Or.inr rfl))⟩
+
 /-- 左坐标 a ∈ {a} ∈ (a,b) ∈ τ，严格下降由实际成员路径给出。 -/
 theorem kpair_descent_l {p a b t} (h : KPair_d M p a b) (hp : M.mem p t) :
     Relation.TransGen M.mem a t := by

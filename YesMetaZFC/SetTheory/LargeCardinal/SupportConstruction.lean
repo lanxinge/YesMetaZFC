@@ -15,7 +15,7 @@ variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpreta
 theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
     ∃ ω X, M.IsOmega ω ∧ V_d I δ X ∧ ∀ A, M.MemberSubset A X → ∃ κ, M.mem κ δ ∧ M.IsOrdinal κ ∧ M.mem ω κ ∧
       ∀ L, M.mem L δ → M.MemberSubset ω L → ∃ ν N B j W k S F,
-        Wd_witness_d I ω δ X A κ ν N B j W k ∧ M.mem L k ∧
+        Wd_witness_d I ω δ X A κ ν N B j W k ∧ M.mem L ν ∧ M.mem L k ∧
         Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S ∧ M.mem S N ∧ Es_family_d I j κ L S F ∧
         (∀ a U, M.PairMember I a U F → ∃ n D, Fn0_d n L a ∧ (∀ s, M.mem s D ↔ Fn0_d n κ s) ∧
           Ed_filter_d I j a D U ∧ FilterZF.Maximal_d (ℳ := M) D U ∧ Ed_complete_d κ D U ∧
@@ -36,7 +36,7 @@ theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
   obtain ⟨Q, hQ⟩ := ZF.exists_powerSet hZF R
   have bound {n a} (hn : M.MemberSubset n L) (ha : Fn0_d n L a) : M.mem a R :=
     hR a fun p hp => (ha.1 p hp).elim fun i hi => hi.2.elim fun b hb => ⟨i, hn i hi.1, b, hb⟩
-  obtain ⟨ν, N, B, j, W, k, hw, hLk, hQN⟩ := wd_cover_embedding_l I hZF hV hD.1 hk hL
+  obtain ⟨ν, N, B, j, W, k, hw, hLν, hLk, hQN⟩ := wd_cover_embedding_l I hZF hV hD.1 hk hL
     (ZF.v_power_mem_l I hZF hV hD.1 hRX hQ)
   obtain ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩ := hw
   obtain ⟨S, hS⟩ := ZF.fseq_space_exists_l (kp_pair_l (ZF.modelsKP hZF)) hZF hω L
@@ -47,7 +47,7 @@ theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
   have hGN : M.mem G N := hN Q hQN G ((hQ G).mpr fun f hf =>
     bound hωL (fn0_of_function_l (ZF.modelsKP hZF) ((hG f).mp hf)))
   obtain ⟨F, hF⟩ := es_family_exists_l I hZF hω hS j κ
-  refine ⟨ν, N, B, j, W, k, S, F, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLk, hS, hSN, hF,
+  refine ⟨ν, N, B, j, W, k, S, F, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLν, hLk, hS, hSN, hF,
     ?_,
     es_coherent_l I hZF hω hV hD.1 hj hN hc (hc.ordinal_image.transitive L hLk) (hN S hSN) hF,
     fun _ _ hH hf => ef_common_fiber_l I hZF hω hV hD.1 hj hN hc

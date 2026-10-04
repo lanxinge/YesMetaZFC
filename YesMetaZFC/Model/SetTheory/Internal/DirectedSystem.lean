@@ -2,6 +2,7 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Union
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.AscendingDescent
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Elementary
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Factor
+import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.RelationChange
 
 /-! # 通用内部定向系统与直接极限
 
@@ -14,5 +15,6 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Factor
 `di_wf_of_no_step_l` 把非良基极限转为指标递增的内部下降链。
 `di_elementary_limit_l` 对实际初等过渡系统证明极限的完整内部初等性，背景仅需 ZF。
 `di_factor_embedding_l` 将分量关系嵌入组成的相容锥下降为极限的关系嵌入。
+`di_relation_change_l` 复用同一个商投影与过渡图扩张关系，已用于完整谓词初等极限。
 有限支撑测度族的实际实例、良基极限及传递坍塌由 LargeCardinal.ExtenderLimit 提供。
 -/

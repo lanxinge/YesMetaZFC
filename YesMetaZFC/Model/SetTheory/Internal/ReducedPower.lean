@@ -1,6 +1,7 @@
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Los
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.ProjectionLaws
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.FullProjection
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.FullEmbedding
 
 /-! # 实际内部约化幂
 
@@ -12,5 +13,7 @@ ZF 中对指定的实际函数族收集等价类，构造投影与商关系，�
 `rs_los_assignment_l` 从实际 ω→G 图自动构造赋值空间、商赋值和全部公式码。
 `rs_constant_embedding_l` 实际构造 x↦[cₓ] 的完整初等嵌入；`rs_projection_embedding_l`
 从实际测度投影构造 [f]↦[f∘t] 的完整初等单射。恒等、复合和常值交换律均已证明。
-有限支撑全系统与良基极限由 LargeCardinal.ExtenderLimit 装配；极限完整内部初等性尚待证明。
+完整函数族的常值与投影初等性也适用于任意关系，包括实际集合谓词的扩张。
+有限支撑全系统与完整初等良基极限由 LargeCardinal.ExtenderLimit 装配；
+WoodinStrength 对 Vδ 源按指定秩选择长度，返回完整谓词初等嵌入与秩覆盖。
 -/
