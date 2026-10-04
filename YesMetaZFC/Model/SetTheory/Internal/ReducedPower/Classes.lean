@@ -97,4 +97,18 @@ theorem rp_kernel_l (hE : Extensional M) {D Q U G p C f g B E}
   obtain ⟨hgG, hE'⟩ := (hp.classes g E).mp hg
   exact rp_class_eq_l hE hU hp.functions hfG hgG hB hE'
 
+theorem Rp_map_d.representative_l {D X U G p C f B} (hU : FilterZF.Base_d (ℳ := M) D U)
+    (h : Rp_map_d I D X U G p C) (hf : M.PairMember I f B p) : M.mem f B := by
+  obtain ⟨hfG, hB⟩ := (h.classes f B).mp hf
+  exact (hB f).mpr ⟨hfG, rp_eq_refl_l hU (h.functions f hfG)⟩
+
+/-- 类中的每个成员都是这个类的代表，无需选择规范代表。 -/
+theorem Rp_map_d.member_l (hE : Extensional M) {D X U G p C f B}
+    (hU : FilterZF.Base_d (ℳ := M) D U) (h : Rp_map_d I D X U G p C)
+    (hB : M.mem B C) (hf : M.mem f B) : M.PairMember I f B p := by
+  obtain ⟨g, hg⟩ := (h.range B).mp hB
+  obtain ⟨hfG, hgf⟩ := ((h.classes g B).mp hg).2 f |>.mp hf
+  obtain ⟨E, _, he⟩ := h.projection.2.2 f hfG
+  exact ((rp_kernel_l I hE hU h hg he).mpr hgf).symm ▸ he
+
 end YesMetaZFC.SetTheory.Internal

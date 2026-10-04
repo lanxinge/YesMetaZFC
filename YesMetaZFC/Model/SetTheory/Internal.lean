@@ -12,6 +12,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 import YesMetaZFC.Model.SetTheory.Internal.SourceField
 import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
+import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 

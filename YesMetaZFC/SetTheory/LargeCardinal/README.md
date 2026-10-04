@@ -162,6 +162,47 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 坐标函数只要求是实际函数图，允许重复、遗漏和置换。坐标层的恒等与反向复合
 另由 `cp0_projection_id_l`、`cp0_projection_comp_l` 核验，可直接接入商层复合律。
 
+[DirectedSystem](../../Model/SetTheory/Internal/DirectedSystem.lean) 用内部索引、标签图及过渡图
+表示任意集合大小的定向关系嵌入系统。在 ZF 中构造规范商、极限关系、分量嵌入、
+非空极限的结构码及关系保持映射的唯一分解。`di_sigma_wf_l` 在 ZF＋DC 中证明
+可数定向系统的良基极限；`di_cone_wf_l` 在 ZF 中从实际良基目标的相容锥推得良基性。
+任意定向子结构族及幂集索引族均有自动构造的实例。这里的“可数定向”要求每个
+内部 ω 指标族有共同上界，不能用有限支撑系统通常具有的有限定向性替代。
+
+[ComponentWellFounded](ComponentWellFounded.lean) 的 `rp_wf_l` 在 ZF＋DC 下，
+从完整滤子的可数交性质证明任意源函数族的关系商内部良基。
+完整真值集合由背景分离构造；源超滤只须包含于原滤子，不要求源拥有这些背景集合。
+[WellFoundedComponents](WellFoundedComponents.lean) 的 `woodin_wf_components_l`
+已将它接入实际武丁测度族：自动构造全部良基分量，并保留原协调与共同纤维性质。
+此处没有把分量良基性当成整个有限支撑极限的良基性，也没有让原嵌入作用于高秩代表。
+
+## 已证明：有限支撑全系统与整个良基极限
+
+[ExtenderSystem](ExtenderSystem.lean) 的 `ep_system_exists_l` 实际构造全部分量模型图、
+带支撑标签的载体、过渡图和分量关系，并核验恒等、复合、单射及关系保持与反映。
+索引为全部内部有限单射坐标列，允许置换和非标准有限长度；
+`ep_support_cover_l` 证明任意有限坐标列（包括重复坐标）都可投影到某个索引。
+每个分量的代表族精确为 `G_n={f∈X:f:κ^n→X}`。
+[ExtenderComponents](ExtenderComponents.lean) 利用分量结构码的唯一性和替代一次收集模型图；
+[ExtenderGraphs](ExtenderGraphs.lean) 利用类均为 X 的子集给出统一集合界，再分离全部过渡。
+[ExtenderSource](ExtenderSource.lean) 的 `ep_source_exists_l` 自动构造包含所需参数的实际正则 H(χ) 源，
+已有源内分离与统一化接口提供坐标投影及函数拉回，系统装配的背景为 ZFC。
+
+[JointFiber](JointFiber.lean) 的 `es_joint_fiber_l` 在 ZF 中把共同纤维性质转为任意
+内部可数有限支撑约束族的同时实现。先将全部出现的坐标嵌入一条单射 ω 列，
+再在每个有限前缀上取有限多个测度约束的交；一个共同纤维便同时满足全部约束。
+支撑长度可以无界，统一求值与坐标投影交换。
+
+[ExtenderWellFounded](ExtenderWellFounded.lean) 的 `ep_limit_wf_l` 只用 ZF＋DC 证明整个极限内部良基。
+反设有内部下降链，先取指标递增的代表节点链及一张源代表函数图；
+把每一步下降改写为较后分量上的测度约束，实际收集约束族，调用共同纤维统一求值，
+最终得到源关系中的内部下降链，违反源良基性。
+此处消费实际共同纤维性质，不要求有限支撑索引族可数定向。
+
+[ExtenderLimit](ExtenderLimit.lean) 的 `ep_limit_exists_l` 返回完整系统、实际商极限、
+结构码及良基性；`woodin_extender_l` 从武丁基数自动生成同一个测度族及所需源，
+直接返回这些结论。原强嵌入仅用于生成测度及共同纤维证书，源代表的秩不受其定义域限制。
+
 [ReducedPower/Los](../../Model/SetTheory/Internal/ReducedPower/Los.lean) 对全部背景内部 D→Q 函数的代表族，
 在 ZFC 下证明全部内部公式代码的 Łoś 方程。`rp_los_assignment_l` 从实际赋值族自动构造商赋值，
 `rp_satisfies_l` 直接比较两边统一满足关系；内部代码可以非标准。
@@ -176,7 +217,9 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
 对上述 H(χ) 初等源的源内部 Łoś 及存在见证对角化也已完成。
 常值初等嵌入、分量间初等映射以及恒等、复合和交换律现已完成。
-有向极限、良基性、与标准短扩展器的识别、迭代及决定性蕴涵尚待实现。
+通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
+极限的完整内部初等性、整体 Mostowski 坍塌与标准短扩展器的识别、迭代树和迭代性、
+决定性蕴涵尚待实现。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 本层选择上述标准刻画作为定义，尚未在 Lean 中证明它与 extender 刻画、
