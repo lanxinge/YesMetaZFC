@@ -25,13 +25,12 @@ theorem rs_const_unique_l (hE : Extensional M) {D X Y x f g : M.Domain}
     (hf : Fn0_d D X f) (hg : Fn0_d D Y g) (h : Rs_const_d D x f) (k : Rs_const_d D x g) : f = g :=
   hf.ext_l hE hg (fun v hv => ⟨x, h v hv, k v hv⟩)
 
-variable (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem rs_constants_l {ω χ c d X R H S q D G} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q) (hD : M.mem D X)
+theorem rs_constants_l {ω c X R D G} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R) (hD : M.mem D X)
     (hG : ∀ g, M.mem g G ↔ M.mem g X ∧ Fn0_d D X g) : ∃ K, M.IsSetFunctionFromTo I K X G ∧
       ∀ x f, M.PairMember I x f K ↔ M.mem x X ∧ M.mem f G ∧ Rs_const_d D x f := by
   let ρ : Env M 2 := ⟨Fin.cases G (fun _ => D), fun _ => D⟩
@@ -41,7 +40,7 @@ theorem rs_constants_l {ω χ c d X R H S q D G} (hω : M.IsOmega ω)
     rfl
   obtain ⟨K, hK, spec⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := X) (target := G)
     (fun x hx => by
-      obtain ⟨f, C, hf, hC, hFC, hc⟩ := smap_constant_l hZFC hω hχ hωχ hH hX hm hn hq hD hx
+      obtain ⟨f, C, hf, hC, hFC, hc⟩ := sc_constant_l hZF hω hX hm theory hD hx
       exact ⟨f, (sat x f).mpr ⟨(hG f).mpr ⟨hf, hFC.mono_target_l (hX C hC)⟩,
         fun v hv => (hc v x).mpr ⟨hv, rfl⟩⟩⟩)
     (fun x _ f g hf hg => rs_const_unique_l hZF.1 ((hG f).mp ((sat x f).mp hf).1).2
@@ -49,14 +48,13 @@ theorem rs_constants_l {ω χ c d X R H S q D G} (hω : M.IsOmega ω)
     (fun x f _ hf => ((sat x f).mp hf).1)
   exact ⟨K, hK, fun x f => (spec x f).trans (and_congr_right fun _ => sat x f)⟩
 
-theorem rs_constant_embedding_l {ω χ c d X R H S q D P U o G p C T}
-    (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ)
-    (hH : H_d I χ H) (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (hn : Smem_d I d H S)
-    (hq : Smap_d I ω c d X H q) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
+theorem rs_constant_embedding_l {ω c X R D P U o G p C T}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
     (hU : FilterZF.Rel_ultra_d D P U) (hG : ∀ g, M.mem g G ↔ M.mem g X ∧ Fn0_d D X g)
     (hM : Rp_model_d I D X U R o G p C T) : ∃ j, Smap_d I ω c o X C j ∧
       ∀ x B, M.PairMember I x B j ↔ M.mem x X ∧ ∃ f, M.mem f G ∧ Rs_const_d D x f ∧ M.PairMember I f B p := by
-  obtain ⟨K, hK, hc⟩ := rs_constants_l hZFC hω hχ hωχ hH hX hm hn hq hD hG
+  obtain ⟨K, hK, hc⟩ := rs_constants_l hZF hω hX hm theory hD hG
   obtain ⟨j, hj, spec⟩ := ZF.exists_compositionFunction hZF I hK hM.map.projection
   have value x f (hf : M.PairMember I x f K) := ((hc x f).mp hf).2.2
   have inj : M.IsSetInjectionFromTo I j X C := ⟨hj, fun x y B hx hy => by
@@ -77,7 +75,7 @@ theorem rs_constant_embedding_l {ω χ c d X R H S q D P U o G p C T}
   · obtain ⟨a, ha, hfa⟩ := ZF.exists_compositionFunction hZF I hf hK
     have haX : M.IsSetFunctionFromTo I a ω X := ⟨ha.1, ha.2.1, fun i hi =>
       (ha.2.2 i hi).imp fun g hg => ⟨((hG g).mp hg.1).1, hg.2⟩⟩
-    have sfun g (hg : M.mem g G) := smap_function_domain_l hZFC hω hχ hωχ hH hX hm hn hq hD
+    have sfun g (hg : M.mem g G) := sc_function_domain_l hZF hω hX hm theory hD
       ((hG g).mp hg).1 ((hG g).mp hg).2
     have eval : Rs_eval_d I ω D X p a e := by
       intro i hi
@@ -91,7 +89,7 @@ theorem rs_constant_embedding_l {ω χ c d X R H S q D P U o G p C T}
       obtain ⟨x, hx, hix⟩ := hf.2.2 i hi
       obtain ⟨g, hg, hxg⟩ := hK.2.2 x hx
       exact ⟨g, x, (hfa i g).mpr ⟨hi, x, hix, hxg⟩, sfun g hg, value x g hxg v hv, hix⟩
-    have los := rs_satisfies_l hZFC hω hχ hωχ hH hX hm hn hq hD hP hU hG hM hE hA ((hE a).mpr haX) he eval hz
+    have los := rs_satisfies_l hZF hω hX hm theory hD hP hU hG hM hE hA ((hE a).mpr haX) he eval hz
     refine ⟨fun hs => los.mpr ⟨D, hU.base.top, fun v hv => ⟨f, (hE f).mpr hf, point v hv, hs⟩⟩, fun hs => ?_⟩
     obtain ⟨B, hB, hb⟩ := los.mp hs
     obtain ⟨v, hv⟩ := hU.proper B hB

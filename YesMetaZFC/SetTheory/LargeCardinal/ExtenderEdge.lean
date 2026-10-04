@@ -36,7 +36,7 @@ theorem ee_constraint_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ L X R a 
     rp_atom_sat_l I hE, Definitional.Term.eval_weaken]; rfl
 
 theorem ee_common_edge_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S u v a b B C f g c w z : M.Domain}
-    (hF : Em_family_d ω κ L F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (hF : Em_source_d ω κ L X F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
     (hu : KPair_d M u a B) (hv : KPair_d M v b C) (hf : M.mem f B) (hg : M.mem g C)
     (hwc : Rd_entry_d w c p) (hzc : Rd_entry_d z c p) (huw : Rd_entry_d u w T)
     (hvz : Rd_entry_d v z T) (hwz : Rd_entry_d w z S) : ∃ E U, Rd_entry_d c U F ∧ M.mem E U ∧

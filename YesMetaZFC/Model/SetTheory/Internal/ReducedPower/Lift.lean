@@ -15,11 +15,11 @@ variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpreta
 def Rp_lift_d (K p q j : M.Domain) : Prop := ∀ f g B C,
   M.PairMember I f g K → M.PairMember I f B p → M.PairMember I g C q → M.PairMember I B C j
 
-theorem rp_lift_exists_l (hZF : M.Models ZF) {D E X U V F G p q C N K}
+theorem rp_lift_exists_l (hZF : M.Models ZF) {D E X Y U V F G p q C N K}
     (hU : FilterZF.Base_d (ℳ := M) D U) (hV : FilterZF.Base_d (ℳ := M) E V)
-    (hp : Rp_map_d I D X U F p C) (hq : Rp_map_d I E X V G q N) (hK : M.IsSetFunctionFromTo I K F G)
+    (hp : Rp_map_d I D X U F p C) (hq : Rp_map_d I E Y V G q N) (hK : M.IsSetFunctionFromTo I K F G)
     (he : ∀ f g f' g', M.PairMember I f f' K → M.PairMember I g g' K →
-      (Rp_eq_d X U f g ↔ Rp_eq_d X V f' g')) :
+      (Rp_eq_d X U f g ↔ Rp_eq_d Y V f' g')) :
     ∃ j, M.IsSetInjectionFromTo I j C N ∧ Rp_lift_d I K p q j := by
   let ρ : Env M 5 := ⟨Fin.cases F (Fin.cases G (Fin.cases p (Fin.cases q (fun _ => K)))), fun _ => C⟩
   let φ : BinarySchema 5 := {
@@ -50,8 +50,8 @@ theorem rp_lift_exists_l (hZF : M.Models ZF) {D E X U V F G p q C N K}
       (sat B A).mpr ⟨f, hK.input_mem_of_pairMember hfg, g, hK.output_mem_of_pairMember hfg, hfp, hfg, hgq⟩⟩⟩
 
 /-- 实际代表变换唯一确定商上的提升图。 -/
-theorem rp_lift_unique_l (hE : Extensional M) {D E X U V F G p q C N K j k}
-    (hp : Rp_map_d I D X U F p C) (hq : Rp_map_d I E X V G q N) (hK : M.IsSetFunctionFromTo I K F G)
+theorem rp_lift_unique_l (hE : Extensional M) {D E X Y U V F G p q C N K j k}
+    (hp : Rp_map_d I D X U F p C) (hq : Rp_map_d I E Y V G q N) (hK : M.IsSetFunctionFromTo I K F G)
     (hj : M.IsSetFunctionFromTo I j C N) (hk : M.IsSetFunctionFromTo I k C N)
     (lj : Rp_lift_d I K p q j) (lk : Rp_lift_d I K p q k) : j = k := by
   have common B (hB : M.mem B C) : ∃ A, M.PairMember I B A j ∧ M.PairMember I B A k := by

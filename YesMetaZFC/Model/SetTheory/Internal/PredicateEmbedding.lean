@@ -133,10 +133,9 @@ theorem spred_emb_sat_l (hE : Extensional M) {n} (ρ : Env M n) (ω X A Y B j : 
     spred_sat_l I hE, smap_sat_l I hE, Definitional.Term.eval_weaken]
   rfl
 
-/-- 恒等图给出每个实际带谓词集合结构的初等嵌入实例。 -/
-theorem spred_identity_l (hZF : M.Models ZF) {ω X A} (hω : M.IsOmega ω)
-    (hX : ∃ x, M.mem x X) (hA : M.MemberSubset A X) : ∃ j, Spred_emb_d I ω X A X A j := by
-  obtain ⟨c, R, hc⟩ := spred_exists_l I hZF hX hA
+/-- 实际恒等图及其全内部初等性，同时保留逐点图方程。 -/
+theorem smap_identity_l (hZF : M.Models ZF) {ω X c} (hω : M.IsOmega ω) :
+    ∃ j, Smap_d I ω c c X X j ∧ ∀ x y, M.PairMember I x y j ↔ M.mem x X ∧ x = y := by
   let ρ : Env M 0 := ⟨Fin.elim0, fun _ => X⟩
   have hd x y := Formula.denote_identityValue_iff hZF.1 ρ x y
   obtain ⟨j, hj, hj'⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I BinarySchema.identityValue ρ
@@ -148,12 +147,19 @@ theorem spred_identity_l (hZF : M.Models ZF) {ω X A} (hω : M.IsOmega ω)
   have hi : M.IsSetInjectionFromTo I j X X := ⟨hj,
     fun x y z hx hy => ((he x z).mp hx).2.trans ((he y z).mp hy).2.symm⟩
   obtain ⟨C, hC⟩ := scode_exists_l I hZF hω
-  refine ⟨j, c, R, c, R, hc, hc, hi, C, hC, fun a f g _ hf hg hh => ?_⟩
+  refine ⟨j, ⟨hi, C, hC, fun a f g _ hf hg hh => ?_⟩, he⟩
   have eq : f = g := hf.1.1.eq_of_pairMember_iff hZF.1 hg.1.1 (fun n x => ⟨fun hx => ?_, fun hx => ?_⟩)
   · exact eq ▸ Iff.rfl
   · exact hh n (hf.input_mem_of_pairMember hx) x x hx ((he x x).mpr ⟨hf.output_mem_of_pairMember hx, rfl⟩)
   · obtain ⟨y, hy, hny⟩ := hf.2.2 n (hg.input_mem_of_pairMember hx)
     have hng := hh n (hg.input_mem_of_pairMember hx) y y hny ((he y y).mpr ⟨hy, rfl⟩)
     exact hg.1.2 n y x hng hx ▸ hny
+
+/-- 恒等图给出每个实际带谓词集合结构的初等嵌入实例。 -/
+theorem spred_identity_l (hZF : M.Models ZF) {ω X A} (hω : M.IsOmega ω)
+    (hX : ∃ x, M.mem x X) (hA : M.MemberSubset A X) : ∃ j, Spred_emb_d I ω X A X A j := by
+  obtain ⟨c, R, hc⟩ := spred_exists_l I hZF hX hA
+  obtain ⟨j, hj, _⟩ := smap_identity_l I hZF (X := X) (c := c) hω
+  exact ⟨j, c, R, c, R, hc, hc, hj⟩
 
 end YesMetaZFC.SetTheory.Internal

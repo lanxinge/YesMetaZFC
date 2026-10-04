@@ -31,8 +31,8 @@ theorem ep_arrow_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω κ L X a b B 
     Formula.satisfies_mem_iff, fn0_sat_l hE, cp0_sat_l hE, ep_pull_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
 theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain}
-    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_family_d ω κ L F)
-    (hco : Es_coherent_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L F)
+    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (hco : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (hm : M.mem m ω) (hn : M.mem n ω) (hq : Fn0_d m n q) (hb : Fn0_d n L b)
     (hinj : ∀ i j x, Rd_entry_d i x b → Rd_entry_d j x b → i = j) (hqa : Cp0_d m n L q b a)
     (haM : Ep_component_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F a c)
@@ -53,35 +53,47 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
   subst n'
   have hU := hF.at_l hZF.1 haU ha hD₀
   have hV := hF.at_l hZF.1 hbV hb hD₁
-  obtain ⟨t, P, htX, ht, ts, hp, ps⟩ := h.family_l hZFC hm hn hq hD₀ hD₁ hG₀ hG₁
-  obtain ⟨Q₀, hQ₀⟩ := ZF.exists_powerSet hZF D₀
-  obtain ⟨Q₁, hQ₁⟩ := ZF.exists_powerSet hZF D₁
-  have hu := maximal_relative_l hZF hU hQ₀
-  have hv := maximal_relative_l hZF hV hQ₁
-  have push : Push_d D₀ D₁ Q₀ Q₁ U V t := ⟨ht, fun A hA => by
-    obtain ⟨B, hB, eq⟩ := hco m n q b a U V A hm hn hq hb hqa hbV haU
-      (fun r hr => (hD₀ r).mp ((hQ₀ A).mp hA r hr))
-    refine ⟨B, (hQ₁ B).mpr (fun s hs => (hD₁ s).mpr ((hB s).mp hs).1), fun s => ?_, eq⟩
-    exact (hB s).trans ⟨fun ⟨hs, r, hr, hsr⟩ => ⟨(hD₁ s).mpr hs, r, hr, (ts s r).mpr ⟨(hD₁ s).mpr hs, hsr⟩⟩,
-      fun ⟨hs, r, hr, hsr⟩ => ⟨(hD₁ s).mp hs, r, hr, ((ts s r).mp hsr).2⟩⟩⟩
-  obtain ⟨j, hj, lift, rel⟩ := rp_full_projection_l I hZF hQ₀ hu hv push hM₀ hM₁ hp
-    (fun f g hfg => ((ps f g).mp hfg).2.2)
-  obtain ⟨χ, c₀, d₀, H, W, e, hχ, hωχ, hH, hm₀, hn₀, he⟩ := h.presentation
-  have elem := rs_full_projection_l hZFC h.omega hχ hωχ hH h.transitive hm₀ hn₀ he
-    (h.space_mem_l hZF hm hD₀) (h.space_mem_l hZF hn hD₁) htX hQ₀ hU hV push hG₀ hG₁ hM₀ hM₁ hp ps hj.1 lift
+  obtain ⟨t, P, htX, ht, ts, hp, ps⟩ := h.family_l hZF hm hn hq hD₀ hD₁ hG₀ hG₁
+  obtain ⟨c₀, hm₀⟩ := h.code
+  obtain ⟨Q₀, U', hQ₀, hu, us, model₀⟩ := rs_restrict_model_l hZF h.omega h.transitive hm₀ h.theory
+    (h.space_mem_l hZF hm hD₀) hU hG₀ hM₀
+  obtain ⟨Q₁, V', hQ₁, hv, vs, model₁⟩ := rs_restrict_model_l hZF h.omega h.transitive hm₀ h.theory
+    (h.space_mem_l hZF hn hD₁) hV hG₁ hM₁
+  have push : Push_d D₀ D₁ Q₀ Q₁ U' V' t := ⟨ht, fun A hA => by
+    obtain ⟨B, hBX, bs⟩ := sc_pull_l I hZF h.omega h.transitive hm₀ h.theory
+      (h.space_mem_l hZF hn hD₁) htX ((hQ₀ A).mp hA).1
+    have hBQ := (hQ₁ B).mpr ⟨hBX, fun s hs => ((bs s).mp hs).1⟩
+    obtain ⟨B', hB', eq⟩ := hco m n q b a U V A hm hn ((hQ₀ A).mp hA).1 hq hb hqa hbV haU
+      (fun r hr => (hD₀ r).mp (((hQ₀ A).mp hA).2 r hr))
+    have eB : B' = B := hZF.1.eq_of_same_members B' B fun s => (hB' s).trans
+      ⟨fun ⟨hs, r, hr, hsr⟩ => (bs s).mpr ⟨(hD₁ s).mpr hs, r, hr, (ts s r).mpr ⟨(hD₁ s).mpr hs, hsr⟩⟩,
+        fun hs => by
+          obtain ⟨hs, r, hr, hsr⟩ := (bs s).mp hs
+          exact ⟨(hD₁ s).mp hs, r, hr, ((ts s r).mp hsr).2⟩⟩
+    subst B'
+    have vr : M.mem B V' ↔ M.mem B V := (vs B).trans ⟨And.right, fun h => ⟨hBQ, h⟩⟩
+    have ur : M.mem A U' ↔ M.mem A U := (us A).trans ⟨And.right, fun h => ⟨hA, h⟩⟩
+    exact ⟨B, hBQ, bs, vr.trans (eq.trans ur.symm)⟩⟩
+  obtain ⟨P', j, hp', ps', elem, lift⟩ := rs_projection_embedding_l hZFC h.omega h.transitive hm₀ h.theory
+    (h.space_mem_l hZF hm hD₀) (h.space_mem_l hZF hn hD₁) htX hQ₀ hQ₁ hu hv push hG₀ hG₁ model₀ model₁
+  have eqP := hp'.1.1.eq_of_pairMember_iff hZF.1 hp.1.1 (fun f g => (ps' f g).trans (ps f g).symm)
+  subst P'
+  have hj := elem.1
+  have rel B D B' D' (hb : Rd_entry_d B B' j) (hd : Rd_entry_d D D' j) :=
+    elem.relation_l I hZF h.omega hM₀.code hM₁.code hb hd
   have pull f g (hfg : Rd_entry_d f g P) : Ep_pull_d κ X m n q f g :=
     ep_pull_of_comp_l hD₀ hD₁ ht (hM₀.map.functions f (hp.input_mem_of_pairMember hfg)) ts ((ps f g).mp hfg).2.2
   have any B D (hBD : Rd_entry_d B D j) f (hf : M.mem f B) : ∃ g, M.mem g D ∧ Ep_pull_d κ X m n q f g := by
-    have hfp := hM₀.map.member_l I hZF.1 hu.base (hj.1.input_mem_of_pairMember hBD) hf
+    have hfp := hM₀.map.member_l I hZF.1 hU.base (hj.1.input_mem_of_pairMember hBD) hf
     obtain ⟨g, hg, hfg⟩ := hp.2.2 f (hM₀.map.projection.input_mem_of_pairMember hfp)
     obtain ⟨D', _, hgp⟩ := hM₁.map.projection.2.2 g hg
     have e := hj.1.1.2 B D' D (lift f g B D' hfg hfp hgp) hBD
-    exact ⟨g, e ▸ hM₁.map.representative_l I hv.base hgp, pull f g hfg⟩
+    exact ⟨g, e ▸ hM₁.map.representative_l I hV.base hgp, pull f g hfg⟩
   refine ⟨j, C, S, E, T, hM₀.code, hM₁.code, hj, elem, rel, fun B D => ⟨?_, ?_⟩, any⟩
   · intro hBD
     have hBC := hj.1.input_mem_of_pairMember hBD
     obtain ⟨f, hf⟩ := (hM₀.map.range B).mp hBC
-    have hff := hM₀.map.representative_l I hu.base hf
+    have hff := hM₀.map.representative_l I hU.base hf
     obtain ⟨g, hg, hfg⟩ := any B D hBD f hff
     exact ⟨hBC, hj.1.output_mem_of_pairMember hBD, m, n, q, f, g, hm, hn, hq, hb, hqa, hff, hg, hfg⟩
   · rintro ⟨hBC, hDE, m', n', q', f, g, _, _, hq', hb', hqa', hfB, hgD, hfg⟩
@@ -91,8 +103,8 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
     subst m'
     have eq := ec_factor_unique_l hZF.1 hinj hq' hq hqa' hqa
     subst q'
-    have hfp := hM₀.map.member_l I hZF.1 hu.base hBC hfB
-    have hgp := hM₁.map.member_l I hZF.1 hv.base hDE hgD
+    have hfp := hM₀.map.member_l I hZF.1 hU.base hBC hfB
+    have hgp := hM₁.map.member_l I hZF.1 hV.base hDE hgD
     obtain ⟨g', _, hfg'⟩ := hp.2.2 f (hM₀.map.projection.input_mem_of_pairMember hfp)
     have eg := ep_pull_unique_l (ZF.modelsKP hZF) hq (pull f g' hfg') hfg
     exact lift f g B D (eg ▸ hfg') hfp hgp

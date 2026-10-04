@@ -25,7 +25,7 @@ theorem ep_comparison_l (hZF : M.Models ZF) {ω X A Y B j R q c C V : M.Domain}
     Ep_comparison_d hZF ω X R j Y q C := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   have hj : M.IsSetFunctionFromTo I j X Y := by obtain ⟨_, _, _, _, _, _, e⟩ := h; exact e.1.1
-  obtain ⟨_, b, t, N, e, inv, d, W, i, hm, ht, constants, hn, wc, bij, hd, _, bi, inverse, _, hi, is⟩ := collapse
+  obtain ⟨_, b, t, N, e, inv, d, W, i, hm, ht, constants, hn, wc, bij, hd, _, bi, inverse, _, hi, is, _⟩ := collapse
   obtain ⟨g, hg, gs, rel, any⟩ := factor
   obtain ⟨k, hk, ks⟩ := ZF.exists_compositionFunction hZF I bi.1.1 hg.1
   have inj : M.IsSetInjectionFromTo I k N Y := ⟨hk, fun x y z hx hy => by

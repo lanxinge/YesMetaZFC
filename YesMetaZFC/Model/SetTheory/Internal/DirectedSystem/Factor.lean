@@ -7,13 +7,14 @@ universe u
 variable {M : Structure.{u}}
 
 theorem di_factor_embedding_l (hZF : M.Models ZF) {J L A p T R q C S Y f : M.Domain}
+    {relation : M.Domain → M.Domain → Prop}
     (h : Di_system_d J L A p T R) (limit : Di_limit_d A p T R q C S) (hf : Fn0_d A Y f)
     (comm : ∀ x y u v, Rd_entry_d x y T → Rd_entry_d x u f → Rd_entry_d y v f → u = v)
     (fiber : ∀ x y i u v, Rd_entry_d x i p → Rd_entry_d y i p → Rd_entry_d x u f → Rd_entry_d y v f →
-      (x = y ↔ u = v) ∧ (Rd_entry_d x y R ↔ M.mem u v)) :
+      (x = y ↔ u = v) ∧ (Rd_entry_d x y R ↔ relation u v)) :
     ∃ g, M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) g C Y ∧
       (∀ x B y, Rd_entry_d x B q → Rd_entry_d x y f → Rd_entry_d B y g) ∧
-      (∀ B D u v, Rd_entry_d B u g → Rd_entry_d D v g → (Rd_entry_d B D S ↔ M.mem u v)) ∧
+      (∀ B D u v, Rd_entry_d B u g → Rd_entry_d D v g → (Rd_entry_d B D S ↔ relation u v)) ∧
       ∀ k, Fn0_d C Y k → (∀ x B y, Rd_entry_d x B q → Rd_entry_d x y f → Rd_entry_d B y k) → k = g := by
   obtain ⟨g, hg, law, unique⟩ := di_factor_l hZF h limit hf comm
   have push x B y (hx : Rd_entry_d x B q) (hy : Rd_entry_d B y g) : Rd_entry_d x y f := by

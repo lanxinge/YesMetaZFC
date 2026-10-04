@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.Uniformization
+import YesMetaZFC.Model.SetTheory.Internal.SourceTheory
 
 /-! # 原有界关系在源模型内的统一化
 
@@ -8,13 +8,11 @@ import YesMetaZFC.Model.SetTheory.Internal.Uniformization
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem smap_uniform_source_l {ω χ c d X R H S q D} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem sc_uniform_source_l {ω c X R D} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
     {p} (φ : BinarySchema p) (hd : φ.body.IsDelta0) (ρ : Env M p) (hρ : ∀ i, M.mem (ρ.bound i) X)
     (hD : M.mem D X) (ht : ∀ x, M.mem x D → ∃ y, M.mem y X ∧ φ.denote ρ x y) :
     ∃ B C, M.mem B X ∧ M.mem C X ∧ Fn0_d D C B ∧ ∀ x y, Rd_entry_d x y B → φ.denote ρ x y := by
@@ -38,22 +36,21 @@ theorem smap_uniform_source_l {ω χ c d X R H S q D} (hω : M.IsOmega ω)
           exact (hk.2 _ _).mpr (Or.inr ⟨h0, (hg.2 _ _).mpr (Or.inr ⟨h1, hp i.succ.succ⟩)⟩)))
     exact (sbin_value_l I hZF.1 hg hk).trans
       (hc.delta_l I φ.freeClosed hd ((ρ.push x).push y) hX hm hE ((hE k).mpr hkf) params)
-  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := smap_uniform_l hZFC hω hχ hωχ hH hX hm hn hq hE hF.2.1 hF.2.2
+  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := theory.uniformization E F n r (v 1) (v 0) f D hE hF.2.1 hF.2.2
     (hωv 1) (hωv 0) h10 hf hD (fun x hx => (ht x hx).imp fun y hy =>
       ⟨hy.1, (read x y (hX D hD x hx) hy.1).mpr hy.2⟩)
   exact ⟨B, C, hBX, hCX, hBC, fun x y hxy =>
     (read x y (hX D hD x (hBC.bound_l hxy).1) (hX C hCX y (hBC.bound_l hxy).2)).mp (select x y hxy)⟩
 
 /-- 每个源对象都有实际源内常值代表，并保留源内值域界。 -/
-theorem smap_constant_l {ω χ c d X R H S q D x} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem sc_constant_l {ω c X R D x} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
     (hD : M.mem D X) (hx : M.mem x X) : ∃ g C, M.mem g X ∧ M.mem C X ∧ Fn0_d D C g ∧
       ∀ a y, Rd_entry_d a y g ↔ M.mem a D ∧ y = x := by
   let φ : BinarySchema 1 := { body := Formula.extensionalEq .newest (.bound 2) }
   let ρ : Env M 1 := ⟨fun _ => x, fun _ => x⟩
   have sat a y : φ.denote ρ a y ↔ y = x := Formula.satisfies_extensionalEq_iff_eq hZF.1 ..
-  obtain ⟨g, C, hg, hC, hf, hs⟩ := smap_uniform_source_l hZFC hω hχ hωχ hH hX hm hn hq φ (.atom _ _ _)
+  obtain ⟨g, C, hg, hC, hf, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ (.atom _ _ _)
     ρ (fun _ => hx) hD (fun a _ => ⟨x, hx, (sat a x).mpr rfl⟩)
   refine ⟨g, C, hg, hC, hf, fun a y => ⟨fun h => ⟨(hf.bound_l h).1, (sat a y).mp (hs a y h)⟩, ?_⟩⟩
   rintro ⟨ha, rfl⟩
@@ -61,14 +58,13 @@ theorem smap_constant_l {ω χ c d X R H S q D x} (hω : M.IsOmega ω)
   exact (sat a y).mp (hs a y hy) ▸ hy
 
 /-- 已在源中的函数图也有源内值域界，因而属于代码化函数域。 -/
-theorem smap_function_domain_l {ω χ c d X R H S q D F} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem sc_function_domain_l {ω c X R D F} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
     (hD : M.mem D X) (hF : M.mem F X) (hf : Fn0_d D X F) : Sfun_d X D F := by
   let φ : BinarySchema 1 := { body := rd_entry0_m (.bound 1) .newest (.bound 2) }
   let ρ : Env M 1 := ⟨fun _ => F, fun _ => F⟩
   have sat x y : φ.denote ρ x y ↔ Rd_entry_d x y F := rd_entry0_sat_l hZF.1 ..
-  obtain ⟨g, C, _, hC, hg, hs⟩ := smap_uniform_source_l hZFC hω hχ hωχ hH hX hm hn hq φ (rd_entry0_delta_l ..)
+  obtain ⟨g, C, _, hC, hg, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ (rd_entry0_delta_l ..)
     ρ (fun _ => hF) hD (fun x hx => (hf.2.1 x hx).imp fun y hy => ⟨hy.1, (sat x y).mpr hy.2⟩)
   have select x y (hxy : Rd_entry_d x y g) := (sat x y).mp (hs x y hxy)
   have eq : g = F := (fn0_function_l (ZF.modelsKP hZF) hg).1.1.eq_of_pairMember_iff hZF.1

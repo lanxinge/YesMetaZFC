@@ -131,21 +131,21 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 存在量词在实际源内部函数域量化；[UniformizationSource](../../Model/SetTheory/Internal/UniformizationSource.lean)
 构造源内常值函数及源内值域界，保证对象见证与函数见证对应。程序长度归纳使用真实原公式，
 覆盖非标准代码，不调用外部有限列表递归。
-[PointwiseTrace](../../Model/SetTheory/Internal/PointwiseTrace.lean) 的 `smap_pe_trace_l`
+[PointwiseTrace](../../Model/SetTheory/Internal/PointwiseTrace.lean) 的 `sc_pe_trace_l`
 将这一翻译接入源内分离，实际构造指定代表函数赋值的真值逆像 A∈X。
-逐点对象赋值也由唯一值收集构造；整个源内入口目前使用 ZFC，原子、布尔、状态与求值构造保留 ZF。
+逐点对象赋值也由唯一值收集构造；给定实际源理论后，逐点解释和源内真值集只需 ZF。
 
-[PointwiseWitness](../../Model/SetTheory/Internal/PointwiseWitness.lean) 的 `smap_pe_witness_l`
+[PointwiseWitness](../../Model/SetTheory/Internal/PointwiseWitness.lean) 的 `sc_pe_witness_l`
 在源中集合 A 上把逐点存在见证统一成一个 D 上的源内代表。先对翻译码统一选取函数值，
-再由 [PointwiseDiagonal](../../Model/SetTheory/Internal/PointwiseDiagonal.lean) 的 `smap_diagonal_l`
+再由 [PointwiseDiagonal](../../Model/SetTheory/Internal/PointwiseDiagonal.lean) 的 `sc_diagonal_l`
 构造 h(p)=gₚ(p)，在 D∖A 上取源中基点；函数图和值域界都属于源。
 [ReducedPower/SourceLos](../../Model/SetTheory/Internal/ReducedPower/SourceLos.lean) 的 `rs_los_l`
 在真实原公式 `rs_los_m` 上完成全部内部行的归纳。或非明确使用源内真值逆像，
-存在步使用上述实际统一代表。此定理的源为实际完整初等嵌入正则不可数 H(χ) 的传递集合。
+存在步使用上述实际统一代表。此定理消费传递源的 `Sc_theory_d`；正则 H(χ) 及其传递初等后继均有实际实例。
 [SourceSatisfaction](../../Model/SetTheory/Internal/ReducedPower/SourceSatisfaction.lean) 的 `rs_satisfies_l`
 给出统一满足关系上的源内部 Łoś，`rs_los_assignment_l` 从实际 ω→G 代表赋值图
 自动构造赋值空间、商赋值及全部内部代码集；G 精确为源中的 D→X 函数。
-源内入口使用 ZFC；赋值投影、逐点逻辑方程与相对超滤布尔规则分别保留 ZF 或纯逻辑强度。
+源内部 Łoś 与常值初等嵌入只需 ZF；分量间的完整初等映射另用 ZFC 选择商赋值的代表。
 
 [ReducedPower/Constant](../../Model/SetTheory/Internal/ReducedPower/Constant.lean) 的 `rs_constant_embedding_l`
 实际收集源内常值函数，构造 x↦[cₓ] 的完整内部初等嵌入，并返回其精确代表方程。
@@ -229,6 +229,58 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 返回同一个系统的完整初等极限、传递坍塌和原目标因子 `Ep_derived_limit_d`。
 原 j 因此只作用于已经证明属于 Vδ 的代表。
 
+## 已证明：传递后继继续作为源
+
+[ExtenderSource](ExtenderSource.lean) 的 `Ep_source_d.successor_l` 在 ZF 中证明：
+若 X 是实际源，j:X→N 为完整内部初等嵌入，N 传递，则每个 κ′∈N、ω⊆κ′
+都实际得到 K′∈N 和 `Ep_source_d ω κ′ K′ N W`。κ′ 可以不在 j 的像中。
+`Ep_source_d` 已统一改为源自身满足的全内部分离、统一化与有限序列空间证书；
+源内 Łoś、常值、复合、投影和全部有限支撑消费者均使用该接口。
+
+[UniversalClosure](../../Model/SetTheory/Internal/UniversalClosure.lean) 用实际原公式归纳
+构造任意非标准内部程序的全称闭包，`Smap_d.valid_l` 传输全部赋值上的有效性，
+`Smap_d.models_forward_l` 正向保持任意已编码理论。
+[SourceTheory](../../Model/SetTheory/Internal/SourceTheory.lean) 据此保持分离与统一化，覆盖 N 的全部新参数。
+[EmbeddingOmega](../../Model/SetTheory/Internal/EmbeddingOmega.lean) 证明 j(ω)=ω；
+[SourceFinite](../../Model/SetTheory/Internal/SourceFinite.lean) 用内部归纳证明 N 包含全部背景内部有限函数。
+[SourceSequences](../../Model/SetTheory/Internal/SourceSequences.lean) 再把相对序列空间识别为真实全部有限序列空间。
+
+初始正则 Hχ 的理论和全部字母表序列空间分别由 `sc_h_theory_l` 与
+[HereditarySequences](../HereditarySequences.lean) 的 `ZFC.h_fseq_l` 在 ZFC 中构造，
+实际 Vδ 源复用 Hδ＝Vδ。`ep_collapse_l` 已把下一步源证书直接附在同一个传递坍塌 N 上，
+因此 `Ex_short_d.limit_l`、`woodin_extender_l` 与秩强性入口的坍塌结果自动保留它。
+此结论保证后继模型可复用现有源内部超幂构造；下一扩展器的可迭代性仍须另证。
+
+## 已证明：跨模型施加与双映射复制
+
+[ExtenderRelative](ExtenderRelative.lean) 的 `Em_source_d` 与 `Ec_source_d` 只要求
+测度决定施加源中的子集，并在这些子集上协调。`Ea_agree_d` 精确表示两个模型
+在全部内部有限 κ 幂的子集上相同。原分量、过渡、初等极限和坍塌构造已直接消费
+相对接口；完整测度族由 `Em_family_d.source_l` 给出实例。
+[ExtenderUltrapower](ExtenderUltrapower.lean) 的 `ep_apply_l` 由子集一致性自动构造
+另一源上的整个内部超幂，代表始终是该源中的实际函数。
+
+[ExtenderCopy](ExtenderCopy.lean) 的 `ep_copy_l` 对施加源之间的 π 和所属模型之间的 σ，
+在 σ(F)=F′、σ(L)=L′、π(κ)=κ′ 及两图在相关源子集上一致时，构造
+τ([a,f])=[σ(a),π(f)]。它保持全部内部公式码，满足 τ∘i_F=i_F′∘π，
+由该代表方程唯一确定，并从目标超幂良基性推出原超幂良基性。
+`ep_copy_identity_l` 在同一个超幂上证明两张恒等原图诱导恒等复制。
+
+[SourceTransport](../../Model/SetTheory/Internal/SourceTransport.lean) 对所有模型统一编译
+逐点解释码；[ReducedPower/Copy](../../Model/SetTheory/Internal/ReducedPower/Copy.lean)
+据两侧源内部 Łoś 证明分量复制的完整初等性。
+[DirectedSystem/FiniteCover](../../Model/SetTheory/Internal/DirectedSystem/FiniteCover.lean)
+仅在 ZF 中作内部有限归纳，随后唯一收集共同分量中的代表；
+[ElementaryFactor](../../Model/SetTheory/Internal/DirectedSystem/ElementaryFactor.lean)
+由此在 ZF 中证明任意完整初等锥的唯一因子仍完整初等。
+分量复制的商赋值代表选择与整个系统装配仍按 ZFC 边界提供。
+
+[ExtenderCopyApplication](ExtenderCopyApplication.lean) 的 `ep_copy_apply_l` 同时构造
+两侧施加系统、超幂及复制图。`ep_owned_copy_l` 从已有完整测度族自动构造
+包含 F、L 的所属模型 N，再构造 N∈X 的施加源，返回子集一致性、实际恒等原图
+和对应的完整复制。正则 Hχ 的大小在这里用于产生初始实例；通用复制定理
+消费任意已有的相对源及实际初等图。迭代树与非平凡迭代的可迭代性仍待证明。
+
 ## 已证明：按指定秩选长并恢复强性
 
 [`woodin_rank_strength_l`](WoodinStrength.lean) 在 ZFC 中对每个 A⊆Vδ 固定 κ，
@@ -307,7 +359,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf)
 的短扩展器、迭代树、齐性树与泛型迭代路线推进。有限支撑测度图及任意有限坐标投影已构造；
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
-对上述 H(χ) 初等源的源内部 Łoś 及存在见证对角化也已完成。
+实际源理论下的源内部 Łoś、存在见证对角化及传递后继源保持也已完成。
+相对测度的跨模型施加、双映射完整初等复制、常值交换方块与良基性回传已完成。
 常值初等嵌入、分量间初等映射以及恒等、复合和交换律现已完成。
 通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
 通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。

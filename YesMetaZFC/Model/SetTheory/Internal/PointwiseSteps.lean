@@ -10,18 +10,20 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-theorem pe_atom_step_l (hZF : M.Models ZF) {ω b t D X R E F n H m G r c z i j σ}
-    (hω : M.IsOmega ω) (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H)
-    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (hE : M.IsFunctionSpace I E ω X)
-    (hb : Sbound_d I F b) (hG : Sfm_d I ω m G) (hc : M.PairMember I r z F)
+theorem pe_atom_step_l (hZF : M.Models ZF) {ω b t F n m G r z i j σ}
+    (hω : M.IsOmega ω) (hF : Sfm_d I ω n F) (hb : Sbound_d I F b)
+    (hG : Sfm_d I ω m G) (hc : M.PairMember I r z F)
     (e : Bool) (hs : Sop_d I (if e then 1 else 0) z i j)
     (hσ : M.mem σ ω) (ht : M.mem t σ) (hi : M.mem i σ) (hj : M.mem j σ) :
-    ∃ v J k, Sbuild_d I ω m G v J k ∧ Pe_row_d I b t D X R E F n v J r k := by
+    ∃ v J k, Sbuild_d I ω m G v J k ∧ ∀ c X R D E, Pe_context_d I ω c X R D E →
+      Pe_row_d I b t D X R E F n v J r k := by
   let q : Fin 3 → M.Domain := Fin.cases t (Fin.cases i (fun _ => j))
   let φ : Formula 1 3 := pe_atom_m e (.bound 0) (.bound 1) (.bound 2)
   obtain ⟨v, J, k, h, read⟩ := sfm_delta_l I hZF hω hG φ
     (pe_atom_closed_l e _ _ _ rfl rfl rfl) (pe_atom_delta_l ..) q hσ (Fin.cases ht (Fin.cases hi (fun _ => hj)))
-  refine ⟨v, J, k, h, fun p a f hp ha hf _ htp he => ?_⟩
+  refine ⟨v, J, k, h, fun c X R D E context p a f hp ha hf _ htp he => ?_⟩
+  obtain ⟨hX, hm, hE, _, _⟩ := context
+  obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E F hF.2.1.1
   obtain ⟨g, x, hgi, hg, hpx, hix⟩ := he i (hb.operands_l I hc hs).1
   obtain ⟨l, y, hlj, hl, hpy, hjy⟩ := he j (hb.operands_l I hc hs).2
   let ρ : Env M 3 := ⟨Fin.cases p (Fin.cases g (fun _ => l)), fun _ => p⟩
@@ -42,14 +44,15 @@ theorem pe_atom_step_l (hZF : M.Models ZF) {ω b t D X R E F n H m G r c z i j �
     · exact ssat_eq_l I hZF hF hH hc hs hE hf hix hjy
   exact old.trans (new.trans value).symm
 
-theorem pe_nor_step_l (hZF : M.Models ZF) {ω b t D X R E F n H m G r c i j u v}
-    (hω : M.IsOmega ω) (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H)
-    (hG : Sfm_d I ω m G) (hc : M.PairMember I r c F) (hs : Sop_d I 2 c i j)
-    (hu : M.mem u m) (hv : M.mem v m) (hi : Pe_row_d I b t D X R E F n m G i u)
-    (hj : Pe_row_d I b t D X R E F n m G j v) :
-    ∃ l J k, Sbuild_d I ω m G l J k ∧ Pe_row_d I b t D X R E F n l J r k := by
+theorem pe_nor_step_l (hZF : M.Models ZF) {ω b t F n m G r c i j u v}
+    (hω : M.IsOmega ω) (hF : Sfm_d I ω n F) (hG : Sfm_d I ω m G)
+    (hc : M.PairMember I r c F) (hs : Sop_d I 2 c i j) (hu : M.mem u m) (hv : M.mem v m) :
+    ∃ l J k, Sbuild_d I ω m G l J k ∧ ∀ c X R D E, Pe_context_d I ω c X R D E →
+      Pe_row_d I b t D X R E F n m G i u → Pe_row_d I b t D X R E F n m G j v →
+      Pe_row_d I b t D X R E F n l J r k := by
   obtain ⟨l, J, k, h, read⟩ := sfm_nor_l I hZF hω hG hu hv
-  refine ⟨l, J, k, h, fun p a f hp ha hf hD ht he => ?_⟩
+  refine ⟨l, J, k, h, fun c X R D E _ hi hj p a f hp ha hf hD ht he => ?_⟩
+  obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E F hF.2.1.1
   exact (ssat_nor_l I hZF hF hH hc hs hf).trans ((not_congr
     (or_congr (hi p a f hp ha hf hD ht he) (hj p a f hp ha hf hD ht he))).trans (read X R E a ha).symm)
 

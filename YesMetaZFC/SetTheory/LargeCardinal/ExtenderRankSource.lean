@@ -28,7 +28,7 @@ theorem ep_inaccessible_source_l (hZFC : M.Models ZFC) {ω δ V κ K : M.Domain}
     obtain ⟨a, b, hab⟩ := hfn.1.1 p hp
     exact ⟨a, hωκ a (hω.transitive hZF n hn a (hfn.input_mem_of_pairMember ⟨p, hab, hp⟩)),
       b, hfn.output_mem_of_pairMember ⟨p, hab, hp⟩, hab⟩
-  exact ep_source_of_h_l hZF hω hωκ hr hωδ (ZFC.inaccessible_hereditary_l I hZFC hω hωδ hr hs hV)
+  exact ep_source_of_h_l hZFC hω hωκ hr hωδ (ZFC.inaccessible_hereditary_l I hZFC hω hωδ hr hs hV)
     (ZF.v_ordinal_mem_l I hZF hV hωδ) hκV hKV hK
 
 end YesMetaZFC.SetTheory.LargeCardinal

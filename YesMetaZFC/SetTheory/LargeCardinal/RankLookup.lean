@@ -11,14 +11,13 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
-theorem er_lookup_l (hZFC : M.Models ZFC) {ω κ K X R T G n D i r : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hT : M.TransitiveSet T)
+theorem er_lookup_l (hZF : M.Models ZF) {ω κ K X R T G n D i r : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (hT : M.TransitiveSet T)
     (hTX : M.mem T X) (hGX : M.mem G X) (hκT : M.mem κ T) (hG : Fn0_d κ T G)
-    (enums : ∀ α p, Rd_entry_d α p G → Er_enum_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) α p)
+    (enums : ∀ α p, Rd_entry_d α p G → Er_enum_d (kp_pair_l (ZF.modelsKP hZF)) α p)
     (hn : M.mem n ω) (hD : Ep_space_d κ n D) (hi : M.mem i n) (hr : M.mem r n) :
     ∃ f, M.mem f X ∧ Fn0_d D T f ∧
       ∀ s x, M.mem s D → Er_hit_d T G i r s x → Rd_entry_d s x f := by
-  let hZF := ZFC.models_zf_l hZFC
   let ρ := ((((⟨fun _ => T, fun _ => T⟩ : Env M 1).push G).push i).push r).push κ
   let φ : BinarySchema 5 := {
     body := .disj (er_hit_m (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 1) .newest)
@@ -29,8 +28,8 @@ theorem er_lookup_l (hZFC : M.Models ZFC) {ω κ K X R T G n D i r : M.Domain}
       Formula.satisfies_conj_iff, Formula.satisfies_extensionalEq_iff_eq hZF.1, Formula.satisfies_neg_iff,
       Formula.satisfies_existsMem_iff]; rfl
   have hinX a (ha : M.mem a n) := source.transitive ω source.omega_mem a (source.omega.transitive hZF n hn a ha)
-  obtain ⟨χ, c, d, H, S, e, hχ, hωχ, hH, hm, ht, he⟩ := source.presentation
-  obtain ⟨f, C, hfX, hCX, hf, fs⟩ := smap_uniform_source_l hZFC source.omega hχ hωχ hH source.transitive hm ht he φ
+  obtain ⟨c, hm⟩ := source.code
+  obtain ⟨f, C, hfX, hCX, hf, fs⟩ := sc_uniform_source_l hZF source.omega source.transitive hm source.theory φ
     (.disj (er_hit_delta_l ..) (.conj (.atom _ _ _) (.neg (.existsMem _ (er_hit_delta_l ..))))) ρ
     (Fin.cases source.cardinal_mem (Fin.cases (hinX r hr) (Fin.cases (hinX i hi) (Fin.cases hGX (fun _ => hTX)))))
     (source.space_mem_l hZF hn hD) (fun s _ => by

@@ -34,23 +34,22 @@ theorem ee_node_pair_l {j u a D y : M.Domain} (hu : KPair_d M u a D) :
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hu hv
   exact ⟨f, hf, hy⟩
 
-theorem ee_nodes_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D p T V : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
-    (hV : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) (hδ : M.IsLimitOrdinal δ)
-    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω X A Y B j) (hY : M.TransitiveSet Y)
-    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) X j κ k)
-    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S)
-    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V) :
+theorem ee_nodes_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z D p T V : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R)
+    (hV : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hδ : M.IsLimitOrdinal δ)
+    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j) (hY : M.TransitiveSet Y)
+    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
+    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
+    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
+    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) :
     ∃ e, Fn0_d D Y e ∧ (∀ u y, Rd_entry_d u y e ↔ M.mem u D ∧ Ee_node_d j u y) ∧
       (∀ u v y z, Rd_entry_d u v T → Rd_entry_d u y e → Rd_entry_d v z e → y = z) ∧
       (∀ u v a y z, Rd_entry_d u a p → Rd_entry_d v a p → Rd_entry_d u y e → Rd_entry_d v z e →
         (u = v ↔ y = z) ∧ (Rd_entry_d u v V ↔ M.mem y z)) ∧
       ∀ u a B y f, KPair_d M u a B → Rd_entry_d u y e → M.mem f B → Ee_value_d j a f y := by
-  let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨Q, hZ, models⟩ := system.models
-  have component a c (hac : Rd_entry_d a c Z) := ee_component_l hZFC source hV hδ h hY hc hL hS hSY hF (models a c hac)
+  have component a c (hac : Rd_entry_d a c Z) := ee_component_l hZF source hV hδ h hY hc hL hS hSY hF (models a c hac)
   have atMap a E (hat : Ep_at_d Z a E) : ∃ c C W e, Rd_entry_d a c Z ∧ Smdl_d I c C W ∧
       M.mem E C ∧ M.IsSetInjectionFromTo I e C Y ∧
       (∀ D y, Rd_entry_d D y e ↔ M.mem D C ∧ ∃ f, M.mem f D ∧ Ee_value_d j a f y) ∧
@@ -93,7 +92,7 @@ theorem ee_nodes_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D
     have hfX : M.mem f X := by
       obtain ⟨_, _, _, _, _, _, hj⟩ := h
       exact hfy.elim fun _ ht => hj.1.1.input_mem_of_pairMember ht.1
-    exact ee_pull_l hZFC source hV hδ h hY hc hL hm hn hq haY hbY hnb hqa hfX pull hfy (any v b H z g hv hvz hg)
+    exact ee_pull_l hZF source hV hδ h hY hc hL hm hn hq haY hbY hnb hqa hfX pull hfy (any v b H z g hv hvz hg)
   · intro u v a y z hua hva huy hvz
     obtain ⟨E, hu, hat⟩ := system.toEp_graph_d.label_l hua
     obtain ⟨H, hv, hbt⟩ := system.toEp_graph_d.label_l hva
@@ -108,17 +107,16 @@ theorem ee_nodes_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D
           fun hr => ⟨he.input_mem_of_pairMember huy, he.input_mem_of_pairMember hvz, (rel E H y z hEy hHz).mpr hr⟩⟩)
 
 /-- 整个极限到原目标的实际因子；每个商元素的所有代表都读同一个值。 -/
-theorem ee_factor_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F J O Z D p T V q C W : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
-    (hV : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) (hδ : M.IsLimitOrdinal δ)
-    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω X A Y B j) (hY : M.TransitiveSet Y)
-    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) X j κ k)
-    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S)
-    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V)
-    (limit : Di_limit_d D p T V q C W) : Ee_factor_d (ZFC.models_zf_l hZFC) j Y q C W := by
-  let hZF := ZFC.models_zf_l hZFC
-  obtain ⟨e, he, es, comm, fiber, any⟩ := ee_nodes_l hZFC source hV hδ h hY hc hL hS hSY hF system
+theorem ee_factor_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z D p T V q C W : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R)
+    (hV : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hδ : M.IsLimitOrdinal δ)
+    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j) (hY : M.TransitiveSet Y)
+    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
+    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
+    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
+    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V)
+    (limit : Di_limit_d D p T V q C W) : Ee_factor_d hZF j Y q C W := by
+  obtain ⟨e, he, es, comm, fiber, any⟩ := ee_nodes_l hZF source hV hδ h hY hc hL hS hSY hF system
   obtain ⟨g, hg, law, rel, _⟩ := di_factor_embedding_l hZF system.diagram limit he comm fiber
   refine ⟨g, hg, fun E y => ⟨?_, ?_⟩, rel, ?_⟩
   · intro hy

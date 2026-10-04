@@ -9,25 +9,23 @@ import YesMetaZFC.Model.SetTheory.Internal.UniformizationSource
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem pe_ex_step_l {ω χ c d X R H S q D E F n V b t m G r z i j v u σ}
-    (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ)
-    (hH : H_d I χ H) (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (hn : Smem_d I d H S)
-    (hq : Smap_d I ω c d X H q) (hD : M.mem D X) (hE : M.IsFunctionSpace I E ω X)
-    (hF : Sfm_d I ω n F) (hV : Seval_d I X R E F n V) (hG : Sfm_d I ω m G)
-    (hc : M.PairMember I r z F) (hs : Sop_d I 3 z i j) (hv : M.mem v m)
-    (hj : Pe_row_d I b t D X R E F n m G j v) (hσ : M.mem σ ω)
+theorem pe_ex_step_l {ω F n b t m G r z i j v u σ}
+    (hω : M.IsOmega ω) (hF : Sfm_d I ω n F) (hG : Sfm_d I ω m G)
+    (hc : M.PairMember I r z F) (hs : Sop_d I 3 z i j) (hv : M.mem v m) (hσ : M.mem σ ω)
     (hi : M.mem i σ) (hb : M.mem b σ) (hu : M.mem u σ)
     (hub : u ≠ b) (hui : u ≠ i) (hbi : b ≠ i) (hti : t ≠ i) :
-    ∃ l J k, Sbuild_d I ω m G l J k ∧ Pe_row_d I b t D X R E F n l J r k := by
+    ∃ l J k, Sbuild_d I ω m G l J k ∧ ∀ c X R D E, Pe_context_d I ω c X R D E →
+      Pe_row_d I b t D X R E F n m G j v → Pe_row_d I b t D X R E F n l J r k := by
   have hiω := hω.transitive hZF σ hσ i hi
   obtain ⟨n₁, F₁, r₁, h₁, a₁⟩ := sfm_function_l I hZF hω hG hσ hi hb hu hub hui
   obtain ⟨n₂, F₂, r₂, h₂, a₂⟩ := sfm_and_l I hZF hω h₁.program h₁.root (h₁.span v hv)
   obtain ⟨l, J, k, h₃, a₃⟩ := sfm_ex_l I hZF hω h₂.program hiω h₂.root
-  refine ⟨l, J, k, (h₁.comp I h₂).comp I h₃, fun p a f hp ha hf hDa ht he => ?_⟩
+  refine ⟨l, J, k, (h₁.comp I h₂).comp I h₃, fun c X R D E context hj p a f hp ha hf hDa ht he => ?_⟩
+  obtain ⟨hX, hm, hE, _, constants⟩ := context
+  obtain ⟨V, hV⟩ := seval_exists_l I hZF X R E F hF.2.1.1
   have body B a' (hB : M.mem B X) (ha' : Senv_update_d I a i B a') :
       Ssat_d I X R E F₂ n₂ r₂ a' ↔ Sfun_d X D B ∧ Ssat_d I X R E G m v a' := by
     have hA := (hE a').mpr (ha'.function_l I ((hE a).mp ha) hiω hB)
@@ -44,11 +42,11 @@ theorem pe_ex_step_l {ω χ c d X R H S q D E F n V b t m G r z i j v u σ}
   rw [ssat_exists_l I hZF hF hV hc hs hf, a₃ X R E a ha]
   constructor
   · rintro ⟨x, f', hx, hf', ht⟩
-    obtain ⟨B, C, hBX, hCX, hBC, hB⟩ := smap_constant_l hZFC hω hχ hωχ hH hX hm hn hq hD hx
+    obtain ⟨B, hfun, hB⟩ := constants x hx
+    have hBX := hfun.1
     obtain ⟨a', ha', _⟩ := senv_update_exists_l I hZF ((hE a).mp ha) hiω hBX
-    have hfun : Sfun_d X D B := ⟨hBX, C, hCX, hBC⟩
     exact ⟨B, a', hBX, ha', (body B a' hBX ha').mpr
-      ⟨hfun, (row B x a' f' hfun ((hB p x).mpr ⟨hp, rfl⟩) ha' hf').mp ht⟩⟩
+      ⟨hfun, (row B x a' f' hfun (hB p hp) ha' hf').mp ht⟩⟩
   · rintro ⟨B, a', hBX, ha', ht⟩
     obtain ⟨hB, hs⟩ := (body B a' hBX ha').mp ht
     obtain ⟨x, hx, hpx⟩ := (hB.function_l hX).2.1 p hp

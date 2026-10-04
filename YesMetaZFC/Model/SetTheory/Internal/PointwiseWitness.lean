@@ -9,14 +9,12 @@ import YesMetaZFC.Model.SetTheory.Internal.PointwiseDiagonal
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem smap_pe_witness_l {ω χ c d X R H S q D E F n V r z i j b a A}
-    (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ)
-    (hH : H_d I χ H) (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (hn : Smem_d I d H S)
-    (hq : Smap_d I ω c d X H q) (hD : M.mem D X) (hE : M.IsFunctionSpace I E ω X)
+theorem sc_pe_witness_l {ω c X R D E F n V r z i j b a A}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hE : M.IsFunctionSpace I E ω X)
     (hF : Sfm_d I ω n F) (hV : Seval_d I X R E F n V) (hc : M.PairMember I r z F)
     (hs : Sop_d I 3 z i j) (hj : M.mem j n) (hb : M.mem b ω) (hB : Sbound_d I F b)
     (ha : M.mem a E) (hA : M.mem A X) (hAD : M.MemberSubset A D)
@@ -34,7 +32,7 @@ theorem smap_pe_witness_l {ω χ c d X R H S q D E F n V r z i j b a A}
   have hbi : b ≠ i := fun e => ir i (e ▸ hi)
   have hti : t ≠ i := fun e => ir i (e ▸ bt i hi)
   have hbt : b ≠ t := fun e => ir t (e ▸ ht.predecessor_mem)
-  obtain ⟨m, G, T, h⟩ := pe_compile_bound_l hZFC hω hχ hωχ hH hX hm hn hq hD hE hF hb hB ht
+  obtain ⟨m, G, T, h⟩ := pe_compile_bound_l hZF hω hF hb hB ht
   obtain ⟨v, hv, hjv⟩ := h.2.1.2.2 j hj
   obtain ⟨n₁, F₁, r₁, h₁, a₁⟩ := sfm_function_l I hZF hω h.1 hσω
     (uσ i (tu i (bt i hi))) (uσ b (tu b ht.predecessor_mem)) hσ.predecessor_mem
@@ -55,18 +53,18 @@ theorem smap_pe_witness_l {ω χ c d X R H S q D E F n V r z i j b a A}
       (hT : Senv_update_d I aD t p aT) (hG : Senv_update_d I aT i g aF)
       (hf : M.mem f E) (he : Pe_assign_d I b D X a f p) (hff : Senv_update_d I f i x f') :
       Ssat_d I X R E F n j f' ↔ Ssat_d I X R E G m v aF :=
-    h.2.2 j v hjv p aF f' hp ((hE aF).mpr (hG.function_l I
+    h.2.2 c X R D E (sc_pe_context_l hZF hω hX hm theory hD hE) j v hjv p aF f' hp ((hE aF).mpr (hG.function_l I
       (hT.function_l I haD htω (hX D hD p hp)) hiω hg.1))
       ((hE f').mpr (hff.function_l I ((hE f).mp hf) hiω ((hg.function_l hX).bound_l hx).2))
       ((hG.2 b D).mpr (Or.inr ⟨hbi, (hT.2 b D).mpr
         (Or.inr ⟨hbt, (hDa.2 b D).mpr (Or.inl ⟨rfl, rfl⟩)⟩)⟩))
       ((hG.2 t p).mpr (Or.inr ⟨hti, (hT.2 t p).mpr (Or.inl ⟨rfl, rfl⟩)⟩))
       ((he.congr_left_l I (agree p aT hT)).update_l I hg hx hG hff)
-  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := smap_uniform_l hZFC hω hχ hωχ hH hX hm hn hq hE h₂.program
+  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := theory.uniformization E F₂ n₂ r₂ t i aD A hE h₂.program
     h₂.root htω hiω hti ((hE aD).mpr haD) hA (fun p hp => by
       obtain ⟨f, hf, he, hsat⟩ := htot p hp
       obtain ⟨x, f', hx, hff, hsat⟩ := (ssat_exists_l I hZF hF hV hc hs hf).mp hsat
-      obtain ⟨g, L, hg, hL, hfL, hcst⟩ := smap_constant_l hZFC hω hχ hωχ hH hX hm hn hq hD hx
+      obtain ⟨g, L, hg, hL, hfL, hcst⟩ := sc_constant_l hZF hω hX hm theory hD hx
       obtain ⟨aT, hT, haT⟩ := senv_update_exists_l I hZF haD htω (hX A hA p hp)
       obtain ⟨aF, hG, _⟩ := senv_update_exists_l I hZF haT hiω hg
       have hfun : Sfun_d X D g := ⟨hg, L, hL, hfL⟩
@@ -75,7 +73,7 @@ theorem smap_pe_witness_l {ω χ c d X R H S q D E F n V r z i j b a A}
   have chosen p g (hpg : Rd_entry_d p g B) : Sfun_d X D g := by
     obtain ⟨aT, aF, hT, hG, hs⟩ := select p g hpg
     exact ((matrix p g aT aF (hAD p (hBC.bound_l hpg).1) (hX C hCX g (hBC.bound_l hpg).2) hT hG).mp hs).1
-  obtain ⟨g, hg, diag⟩ := smap_diagonal_l hZFC hω hχ hωχ hH hX hm hn hq hD hA hBX hCX hAD hBC chosen
+  obtain ⟨g, hg, diag⟩ := sc_diagonal_l hZF hω hX hm theory hD hA hBX hCX hAD hBC chosen
   obtain ⟨a', ha', _⟩ := senv_update_exists_l I hZF ((hE a).mp ha) hiω hg.1
   refine ⟨g, a', hg, ha', fun p hp => ?_⟩
   obtain ⟨f, hf, he, _⟩ := htot p hp

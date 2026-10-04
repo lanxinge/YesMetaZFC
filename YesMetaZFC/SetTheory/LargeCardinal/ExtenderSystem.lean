@@ -11,8 +11,8 @@ universe u
 variable {M : Structure.{u}}
 
 theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_family_d ω κ L F)
-    (coherent : Es_coherent_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L F)
+    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (h : Ep_graph_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S) :
     Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S := by
   let hZF := ZFC.models_zf_l hZFC
@@ -124,8 +124,8 @@ theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
       (ep_at_read_l hz hbd hd.1).mp (h.at_l hvA hv), ((h.arrow_l hu hv).mp huv).2.2⟩)
 
 theorem ep_system_exists_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
-    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_family_d ω κ L F)
-    (hc : Es_coherent_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L F)
+    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (hc : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S,
       Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S := by
   obtain ⟨J, O, Z, A, p, T, S, hg⟩ := ep_graphs_l hZFC h hF hωL

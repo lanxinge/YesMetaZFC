@@ -9,13 +9,12 @@ import YesMetaZFC.SetTheory.InnerModel.Recursion.Composition
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem smap_compose_l {ω χ c d X R H S q A B t f} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem sc_compose_l {ω c X R A B t f} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R)
     (hA : M.mem A X) (hB : M.mem B X) (htX : M.mem t X) (hfX : M.mem f X)
     (ht : Fn0_d A B t) (hf : Fn0_d B X f) : ∃ g, Sfun_d X A g ∧ Cp0_d A B X t f g := by
   let ρ : Env M 3 := ⟨Fin.cases f (Fin.cases t (fun _ => B)), fun _ => B⟩
@@ -25,7 +24,7 @@ theorem smap_compose_l {ω χ c d X R H S q A B t f} (hω : M.IsOmega ω)
   have sat v x : φ.denote ρ v x ↔ ∃ w, M.mem w B ∧ Rd_entry_d v w t ∧ Rd_entry_d w x f := by
     simp only [φ, BinarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, rd_entry0_sat_l hZF.1]
     rfl
-  obtain ⟨g, C, hg, hC, hgf, hs⟩ := smap_uniform_source_l hZFC hω hχ hωχ hH hX hm hn hq φ
+  obtain ⟨g, C, hg, hC, hgf, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ
     (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))) ρ (Fin.cases hfX (Fin.cases htX (fun _ => hB))) hA
     (fun v hv => by
       obtain ⟨w, hw, hvw⟩ := ht.2.1 v hv
@@ -36,9 +35,9 @@ theorem smap_compose_l {ω χ c d X R H S q A B t f} (hω : M.IsOmega ω)
   obtain ⟨w, hw, hvw, hwx⟩ := (sat v x).mp (hs v x hvx)
   exact ⟨w, hw, x, hX C hC x hx, hvw, hwx, hvx⟩
 
-theorem rs_pullback_family_l {ω χ c d X R H S q A B t F G} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem rs_pullback_family_l {ω c X R A B t F G} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R)
     (hA : M.mem A X) (hB : M.mem B X) (htX : M.mem t X) (ht : Fn0_d A B t)
     (hF : ∀ f, M.mem f F ↔ M.mem f X ∧ Fn0_d B X f)
     (hG : ∀ g, M.mem g G ↔ M.mem g X ∧ Fn0_d A X g) : ∃ K, M.IsSetFunctionFromTo I K F G ∧
@@ -51,7 +50,7 @@ theorem rs_pullback_family_l {ω χ c d X R H S q A B t F G} (hω : M.IsOmega ω
     rfl
   obtain ⟨K, hK, spec⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := F) (target := G)
     (fun f hf => by
-      obtain ⟨g, hg, hc⟩ := smap_compose_l hZFC hω hχ hωχ hH hX hm hn hq hA hB htX ((hF f).mp hf).1 ht ((hF f).mp hf).2
+      obtain ⟨g, hg, hc⟩ := sc_compose_l hZF hω hX hm theory hA hB htX ((hF f).mp hf).1 ht ((hF f).mp hf).2
       exact ⟨g, (sat f g).mpr ⟨(hG g).mpr ⟨hg.1, hc.1⟩, hc⟩⟩)
     (fun f hf g k hg hk => cp0_unique_l hZF.1 ht ((hF f).mp hf).2 ((sat f g).mp hg).2 ((sat f k).mp hk).2)
     (fun f g _ hg => ((sat f g).mp hg).1)

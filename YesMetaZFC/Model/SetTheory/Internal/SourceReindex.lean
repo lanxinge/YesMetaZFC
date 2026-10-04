@@ -8,22 +8,20 @@ import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.SourceComposition
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem smap_reindex_l {ω χ c d X R H S e m n κ q D E} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (he : Smap_d I ω c d X H e)
+theorem sc_reindex_l {ω c X R m n κ q D E} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
     (hmX : M.mem m X) (hnX : M.mem n X) (hκX : M.mem κ X) (hqX : M.mem q X) (hEX : M.mem E X)
     (hq : Fn0_d m n q) (hD : ∀ s, M.mem s D ↔ Fn0_d m κ s) (hE : ∀ s, M.mem s E ↔ Fn0_d n κ s) :
     ∃ t, M.mem t X ∧ Fn0_d E D t ∧ ∀ s r, Rd_entry_d s r t ↔ M.mem s E ∧ Cp0_d m n κ q s r := by
   let ρ : Env M 4 := ⟨Fin.cases q (Fin.cases κ (Fin.cases n (fun _ => m))), fun _ => m⟩
   let φ : BinarySchema 4 := { body := cp0_m (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest }
   have sat s r : φ.denote ρ s r ↔ Cp0_d m n κ q s r := cp0_sat_l hZF.1 ..
-  obtain ⟨t, C, htX, hC, hTC, select⟩ := smap_uniform_source_l hZFC hω hχ hωχ hH hX hm hn he φ (cp0_delta_l ..) ρ
+  obtain ⟨t, C, htX, hC, hTC, select⟩ := sc_uniform_source_l hZF hω hX hm theory φ (cp0_delta_l ..) ρ
     (Fin.cases hqX (Fin.cases hκX (Fin.cases hnX (fun _ => hmX)))) hEX (fun s hs => by
-      obtain ⟨r, hr, hc⟩ := smap_compose_l hZFC hω hχ hωχ hH hX hm hn he hmX hnX hqX (hX E hEX s hs)
+      obtain ⟨r, hr, hc⟩ := sc_compose_l hZF hω hX hm theory hmX hnX hqX (hX E hEX s hs)
         hq (((hE s).mp hs).mono_target_l (hX κ hκX))
       exact ⟨r, hr.1, (sat s r).mpr (hc.retarget_l ((hE s).mp hs))⟩)
   have read s r (h : Rd_entry_d s r t) := (sat s r).mp (select s r h)

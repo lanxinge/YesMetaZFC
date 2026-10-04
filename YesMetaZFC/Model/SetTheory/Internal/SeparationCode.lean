@@ -31,65 +31,67 @@ theorem ssep_agree_l (hZF : M.Models ZF) {ω X R E F n r i f g b D A}
   exact forall_congr' fun x => iff_congr Iff.rfl (and_congr_right fun hx =>
     ⟨transfer hf hg ha x hx, transfer hg hf (ha.symm_l I) x hx⟩)
 
+/-- 检查指定 A 的分离方程；A、D 是赋值中的参数。 -/
+theorem sfm_sep_test_l (hZF : M.Models ZF) {ω n F r i s t} (hω : M.IsOmega ω)
+    (hF : Sfm_d I ω n F) (hr : M.mem r n) (hi : M.mem i ω) (hs : M.mem s ω) (ht : M.mem t ω)
+    (hsi : s ≠ i) (hti : t ≠ i) : ∃ m G k, Sbuild_d I ω n F m G k ∧ ∀ X R E c f D A,
+      M.TransitiveSet X → Smem_d I c X R → M.IsFunctionSpace I E ω X → M.mem f E →
+      M.PairMember I s D f → M.PairMember I t A f →
+      (Ssat_d I X R E G m k f ↔ Ssep_d I X R E F n r i f D A) := by
+  obtain ⟨n₁, F₁, h₁, a₁⟩ := sfm_rel_l I hZF hω hF hi hs
+  obtain ⟨n₂, F₂, r₂, h₂, a₂⟩ := sfm_and_l I hZF hω h₁.program h₁.root (h₁.span r hr)
+  obtain ⟨n₃, F₃, h₃, a₃⟩ := sfm_rel_l I hZF hω h₂.program hi ht
+  obtain ⟨n₄, F₄, r₄, h₄, a₄⟩ := sfm_iff_l I hZF hω h₃.program h₃.root (h₃.span r₂ h₂.root)
+  obtain ⟨m, G, k, h₅, a₅⟩ := sfm_all_l I hZF hω h₄.program hi h₄.root
+  refine ⟨m, G, k, (((h₁.comp I h₂).comp I h₃).comp I h₄).comp I h₅,
+    fun X R E c f D A hX hm hE hf hD hA => ?_⟩
+  have hDX := ((hE f).mp hf).output_mem_of_pairMember hD
+  have hAX := ((hE f).mp hf).output_mem_of_pairMember hA
+  have read x v (hx : M.mem x X) (hv : Senv_update_d I f i x v) :
+      Ssat_d I X R E F₄ n₄ r₄ v ↔ (M.mem x A ↔ M.mem x D ∧
+        ∃ w, Senv_update_d I f i x w ∧ Ssat_d I X R E F n r w) := by
+    have hve := (hE v).mpr (hv.function_l I ((hE f).mp hf) hi hx)
+    rw [a₄ X R E v hve, a₃ X R E v x A hE hve
+      ((hv.2 i x).mpr (Or.inl ⟨rfl, rfl⟩)) ((hv.2 t A).mpr (Or.inr ⟨hti, hA⟩)),
+      ← h₃.sat_l I hZF h₂.program h₂.root X R E v, a₂ X R E v hve,
+      a₁ X R E v x D hE hve ((hv.2 i x).mpr (Or.inl ⟨rfl, rfl⟩))
+        ((hv.2 s D).mpr (Or.inr ⟨hsi, hD⟩)), ← h₁.sat_l I hZF hF hr X R E v]
+    have memA := (hm.2 x A).trans (show (M.mem x X ∧ M.mem A X ∧ M.mem x A) ↔ M.mem x A from
+      ⟨fun h => h.2.2, fun h => ⟨hx, hAX, h⟩⟩)
+    have memD := (hm.2 x D).trans (show (M.mem x X ∧ M.mem D X ∧ M.mem x D) ↔ M.mem x D from
+      ⟨fun h => h.2.2, fun h => ⟨hx, hDX, h⟩⟩)
+    exact iff_congr memA (and_congr Iff.rfl ⟨fun h => ⟨v, hv, h⟩,
+      fun ⟨w, hw, h⟩ => senv_update_unique_l I hZF.1 hw hv ▸ h⟩) |>.trans (iff_congr Iff.rfl (and_congr memD Iff.rfl))
+  rw [a₅ X R E f hE hf]
+  constructor
+  · intro h x
+    by_cases hx : M.mem x X
+    · obtain ⟨v, hv, _⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hi hx
+      exact (read x v hx hv).mp (h x v hx hv)
+    · exact iff_of_false (fun h => hx (hX A hAX x h)) (fun h => hx (hX D hDX x h.1))
+  · exact fun h x v hx hv => (read x v hx hv).mpr (h x)
+
 theorem sfm_sep_l (hZF : M.Models ZF) {ω n F r i s t b} (hω : M.IsOmega ω)
     (hF : Sfm_d I ω n F) (hr : M.mem r n) (hi : M.mem i ω) (hs : M.mem s ω) (ht : M.mem t ω)
     (hsi : s ≠ i) (hti : t ≠ i) (hst : s ≠ t) (hb : Sbound_d I F b) (htb : ¬ M.mem t b) :
     ∃ m G k, Sbuild_d I ω n F m G k ∧ ∀ X R E c f D,
       M.TransitiveSet X → Smem_d I c X R → M.IsFunctionSpace I E ω X → M.mem f E →
       M.PairMember I s D f → (Ssat_d I X R E G m k f ↔ ∃ A, M.mem A X ∧ Ssep_d I X R E F n r i f D A) := by
-  obtain ⟨n₁, F₁, h₁, a₁⟩ := sfm_rel_l I hZF hω hF hi hs
-  obtain ⟨n₂, F₂, r₂, h₂, a₂⟩ := sfm_and_l I hZF hω h₁.program h₁.root (h₁.span r hr)
-  obtain ⟨n₃, F₃, h₃, a₃⟩ := sfm_rel_l I hZF hω h₂.program hi ht
-  obtain ⟨n₄, F₄, r₄, h₄, a₄⟩ := sfm_iff_l I hZF hω h₃.program h₃.root (h₃.span r₂ h₂.root)
-  obtain ⟨n₅, F₅, r₅, h₅, a₅⟩ := sfm_all_l I hZF hω h₄.program hi h₄.root
-  obtain ⟨m, G, k, h₆, a₆⟩ := sfm_ex_l I hZF hω h₅.program ht h₅.root
-  refine ⟨m, G, k, ((((h₁.comp I h₂).comp I h₃).comp I h₄).comp I h₅).comp I h₆,
-    fun X R E c f D hX hm hE hf hD => ?_⟩
-  have hDX := ((hE f).mp hf).output_mem_of_pairMember hD
-  have matrix v x A (hv : M.mem v E) (hix : M.PairMember I i x v)
-      (hsD : M.PairMember I s D v) (htA : M.PairMember I t A v) :
-      Ssat_d I X R E F₄ n₄ r₄ v ↔ (M.PairMember I x A R ↔
-        M.PairMember I x D R ∧ Ssat_d I X R E F n r v) := by
-    rw [a₄ X R E v hv, a₃ X R E v x A hE hv hix htA,
-      ← h₃.sat_l I hZF h₂.program h₂.root X R E v, a₂ X R E v hv,
-      a₁ X R E v x D hE hv hix hsD, ← h₁.sat_l I hZF hF hr X R E v]
-  have body A g (hAX : M.mem A X) (hu : Senv_update_d I f t A g) :
-      Ssat_d I X R E F₅ n₅ r₅ g ↔ Ssep_d I X R E F n r i f D A := by
-    have hg := (hE g).mpr (hu.function_l I ((hE f).mp hf) ht hAX)
-    have value x v (hx : M.mem x X) (hv : Senv_update_d I g i x v) :
-        (∃ w, Senv_update_d I f i x w ∧ Ssat_d I X R E F n r w) ↔ Ssat_d I X R E F n r v := by
-      have compare w (hw : Senv_update_d I f i x w) :
-          Ssat_d I X R E F n r w ↔ Ssat_d I X R E F n r v :=
-        ssat_agree_l I hZF hF hb hE hr ((hE w).mpr (hw.function_l I ((hE f).mp hf) hi hx))
-          ((hE v).mpr (hv.function_l I ((hE g).mp hg) hi hx)) ((hu.agree_l I htb).update_l I hw hv)
-      refine ⟨fun ⟨w, hw, hh⟩ => (compare w hw).mp hh, fun hh => ?_⟩
-      obtain ⟨w, hw, _⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hi hx
-      exact ⟨w, hw, (compare w hw).mpr hh⟩
-    have read x v (hx : M.mem x X) (hv : Senv_update_d I g i x v) :
-        Ssat_d I X R E F₄ n₄ r₄ v ↔ (M.mem x A ↔ M.mem x D ∧
-          ∃ w, Senv_update_d I f i x w ∧ Ssat_d I X R E F n r w) := by
-      have hvφ := matrix v x A ((hE v).mpr (hv.function_l I ((hE g).mp hg) hi hx))
-        ((hv.2 i x).mpr (Or.inl ⟨rfl, rfl⟩))
-        ((hv.2 s D).mpr (Or.inr ⟨hsi, (hu.2 s D).mpr (Or.inr ⟨hst, hD⟩)⟩))
-        ((hv.2 t A).mpr (Or.inr ⟨hti, (hu.2 t A).mpr (Or.inl ⟨rfl, rfl⟩)⟩))
-      have memA : M.PairMember I x A R ↔ M.mem x A := (hm.2 x A).trans
-        ⟨fun h => h.2.2, fun h => ⟨hx, hAX, h⟩⟩
-      have memD : M.PairMember I x D R ↔ M.mem x D := (hm.2 x D).trans
-        ⟨fun h => h.2.2, fun h => ⟨hx, hDX, h⟩⟩
-      exact hvφ.trans (iff_congr memA (and_congr memD (value x v hx hv).symm))
-    rw [a₅ X R E g hE hg]
-    constructor
-    · intro hh x
-      by_cases hx : M.mem x X
-      · obtain ⟨v, hv, _⟩ := senv_update_exists_l I hZF ((hE g).mp hg) hi hx
-        exact (read x v hx hv).mp (hh x v hx hv)
-      · exact iff_of_false (fun h => hx (hX A hAX x h)) (fun h => hx (hX D hDX x h.1))
-    · exact fun hh x v hx hv => (read x v hx hv).mpr (hh x)
-  rw [a₆ X R E f hf]
+  obtain ⟨v, J, u, h, test⟩ := sfm_sep_test_l I hZF hω hF hr hi hs ht hsi hti
+  obtain ⟨m, G, k, build, read⟩ := sfm_ex_l I hZF hω h.program ht h.root
+  refine ⟨m, G, k, h.comp I build, fun X R E c f D hX hm hE hf hD => ?_⟩
+  have body A g (hA : M.mem A X) (hu : Senv_update_d I f t A g) :
+      Ssat_d I X R E J v u g ↔ Ssep_d I X R E F n r i f D A := by
+    have hg := (hE g).mpr (hu.function_l I ((hE f).mp hf) ht hA)
+    exact (test X R E c g D A hX hm hE hg ((hu.2 s D).mpr (Or.inr ⟨hst, hD⟩))
+      ((hu.2 t A).mpr (Or.inl ⟨rfl, rfl⟩))).trans
+      (ssep_agree_l I hZF hF hb hr hi hE hf hg (hu.agree_l I htb)
+        (hX D (((hE f).mp hf).output_mem_of_pairMember hD))).symm
+  rw [read X R E f hf]
   constructor
-  · exact fun ⟨A, g, ha, hu, hh⟩ => ⟨A, ha, (body A g ha hu).mp hh⟩
-  · rintro ⟨A, ha, hh⟩
-    obtain ⟨g, hu, _⟩ := senv_update_exists_l I hZF ((hE f).mp hf) ht ha
-    exact ⟨A, g, ha, hu, (body A g ha hu).mpr hh⟩
+  · exact fun ⟨A, g, hA, hu, hh⟩ => ⟨A, hA, (body A g hA hu).mp hh⟩
+  · rintro ⟨A, hA, hh⟩
+    obtain ⟨g, hu, _⟩ := senv_update_exists_l I hZF ((hE f).mp hf) ht hA
+    exact ⟨A, g, hA, hu, (body A g hA hu).mpr hh⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -67,7 +67,7 @@ theorem er_cover_l (hZFC : M.Models ZFC)
   have h12 := h2.predecessor_mem
   have ne : zero ≠ one := fun eq => KP.mem_irrefl_d (ZF.modelsKP hZF) one (eq ▸ h1.predecessor_mem)
   obtain ⟨D₀, hD₀X, hD₀⟩ := source.space_l hZF h2ω
-  obtain ⟨f, hfX, hf, read⟩ := er_lookup_l hZFC source hQ hQX hGX hκQ hG enums h2ω hD₀ hz2 h12
+  obtain ⟨f, hfX, hf, read⟩ := er_lookup_l hZF source hQ hQX hGX hκQ hG enums h2ω hD₀ hz2 h12
   obtain ⟨f', _, hjf⟩ := hj.2.2 f hfX
   obtain ⟨D₁, _, hjD⟩ := hj.2.2 D₀ hD₀X
   let ψ : Formula 1 6 := Formula.forallMem (.bound 5) (Formula.forallMem (.bound 5)
@@ -94,7 +94,7 @@ theorem er_cover_l (hZFC : M.Models ZFC)
   have haD := es_seed_l I hZF source.omega h source.transitive hY
     (hc.fixed two (hc.ordinal.transitive ω hωκ two h2ω)) hc.image hjD hD₀ hL
     (hSY a ((hS a).mpr ⟨two, h2ω, ha⟩)) (fn0_of_function_l (ZF.modelsKP hZF) ha)
-  exact ee_represent_l hZFC source hX hr.isLimitOrdinal h hY hc hL hωL hS hSY hF system limit
+  exact ee_represent_l hZF source hX hr.isLimitOrdinal h hY hc hL hωL hS hSY hF system limit
     h2ω hD₀ (fn0_of_function_l (ZF.modelsKP hZF) ha) hfX (hf.mono_target_l (source.transitive Q hQX))
     ⟨f', hjf, eval a haD x (hit.bound_l hQ') hit⟩
 

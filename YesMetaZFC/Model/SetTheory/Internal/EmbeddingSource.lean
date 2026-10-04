@@ -32,4 +32,14 @@ theorem smap_source_l (hZF : M.Models ZF) {ω c d X Y R S j} (hω : M.IsOmega ω
     ((ht a f g ((hC a).mpr ⟨l, F, k, ha⟩) ((hE f).mp hf) hg hfg).trans
       ((satisfies_decode_l I hZF.1 hY ha hD).trans (hc Y S hY.2.1 D hD g ((hD g).mpr hg) η hη)))
 
+theorem Smap_d.relation_l (hZF : M.Models ZF) {ω c d X R Y S j x y x' y' : M.Domain}
+    (hω : M.IsOmega ω) (hm : Smdl_d I c X R) (hn : Smdl_d I d Y S) (hj : Smap_d I ω c d X Y j)
+    (hx : M.PairMember I x x' j) (hy : M.PairMember I y y' j) :
+    M.PairMember I x y R ↔ M.PairMember I x' y' S := by
+  simpa only [Formula.satisfies_mem_iff, smdl_structure_l, Definitional.Term.newest, Term.eval_bound, Fin.cases_succ, Fin.cases_zero] using smap_source_l I hZF hω hm hn hj (n := 2) (.mem (.bound (Fin.succ 0)) .newest) (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed])
+    ⟨Fin.cases ⟨y, hj.1.1.input_mem_of_pairMember hy⟩ (fun _ => ⟨x, hj.1.1.input_mem_of_pairMember hx⟩),
+      fun _ => ⟨x, hj.1.1.input_mem_of_pairMember hx⟩⟩
+    ⟨Fin.cases ⟨y', hj.1.1.output_mem_of_pairMember hy⟩ (fun _ => ⟨x', hj.1.1.output_mem_of_pairMember hx⟩),
+      fun _ => ⟨x', hj.1.1.output_mem_of_pairMember hx⟩⟩ (Fin.cases hy (fun _ => hx))
+
 end YesMetaZFC.SetTheory.Internal

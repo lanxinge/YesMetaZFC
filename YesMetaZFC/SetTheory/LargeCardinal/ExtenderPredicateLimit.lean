@@ -43,7 +43,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     have eqn := hnb'.domain_eq_l hZF.1 hnb
     subst m' n'
     obtain ⟨_, _, _, inj⟩ := (system.indices b).mp hb
-    obtain ⟨v, H₀', T₀', H₁', T₁', code₀, code₁, hv, _, _, vs, _⟩ := ep_map_l hZFC source hF coherent
+    obtain ⟨v, H₀', T₀', H₁', T₁', code₀, code₁, hv, _, _, vs, _⟩ := ep_map_l hZFC source (hF.source_l hZF X) (coherent.source_l I X)
       hm hn hs hnb inj hsa (models a a₀ haa) (models b b₀ hbb)
     obtain ⟨rfl, rfl⟩ := smdl_unique_l I code₀ old₀.code
     obtain ⟨rfl, rfl⟩ := smdl_unique_l I code₁ old₁.code
@@ -89,11 +89,10 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     have huN := (stage.2.1 u).mpr ⟨huD, (system.index u a E hp).mpr huD⟩
     exact ⟨u, (ss E u).mpr ⟨huN, hp⟩, (ws u E').mpr ⟨huN, huE⟩⟩
   subst v'
-  obtain ⟨χ, b₀, d₀, H₀, S₀, e₀, hχ, hωχ, hH₀, hm₀, hn₀, he₀⟩ := source.presentation
+  obtain ⟨b₀, hm₀⟩ := source.code
   have ultra := hF.at_l hZF.1 haU ha hQ
-  obtain ⟨P, U', hP, hU', _, restricted⟩ := rs_restrict_model_l hZFC source.omega hχ hωχ hH₀ source.transitive
-    hm₀ hn₀ he₀ (source.space_mem_l hZF hn hQ) ultra hG old
-  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZFC source.omega hχ hωχ hH₀ source.transitive hm₀ hn₀ he₀
+  obtain ⟨P, U', hP, hU', _, restricted⟩ := rs_restrict_model_l hZF source.omega source.transitive hm₀ source.theory (source.space_mem_l hZF hn hQ) (ultra.source_l hZF X) hG old
+  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hm₀ source.theory
     (source.space_mem_l hZF hn hQ) hP hU' hG restricted
   have hi' := rp_full_constant_l hZFC source.omega ultra hx.1 new full hi.1 is
   obtain ⟨t', ht', ts⟩ := smap_comp_l I hZF hi' he'
@@ -114,7 +113,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     obtain ⟨_, u, hp, huE⟩ := (vs B E).mp hBE
     have value := any u a B f E y huE hp (old.map.representative_l I ultra.1.base_l hfr) hEy
     have eyz := ed_constant_value_l hZF source.omega ⟨c₀, R₀, c₁, R₁, hx, hy, hj⟩ source.transitive hY
-      (source.space_mem_l hZF hn hQ) (source.function_l hZFC (source.space_mem_l hZF hn hQ) ((hG f).mp hf).1 ((hG f).mp hf).2)
+      (source.space_mem_l hZF hn hQ) (source.function_l hZF (source.space_mem_l hZF hn hQ) ((hG f).mp hf).1 ((hG f).mp hf).2)
       hs (constant x H' z hxH hHz) value
     exact ⟨E, hxE, (hg.2 E H' z (eyz ▸ hEy) hHz).symm ▸ hxH⟩
   exact ⟨d, W', md, eqt ▸ ht', rel⟩

@@ -8,13 +8,12 @@ import YesMetaZFC.Model.SetTheory.Internal.UniformizationSource
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem smap_diagonal_l {ω χ c d X R H S q D A B C} (hω : M.IsOmega ω)
-    (hχ : M.IsRegularCardinal I χ) (hωχ : M.mem ω χ) (hH : H_d I χ H) (hX : M.TransitiveSet X)
-    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+theorem sc_diagonal_l {ω c X R D A B C} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
+    (theory : Sc_theory_d I ω X R)
     (hD : M.mem D X) (hA : M.mem A X) (hB : M.mem B X) (hC : M.mem C X)
     (hAD : M.MemberSubset A D) (hBC : Fn0_d A C B)
     (hg : ∀ p g, Rd_entry_d p g B → Sfun_d X D g) :
@@ -34,7 +33,7 @@ theorem smap_diagonal_l {ω χ c d X R H S q D A B C} (hω : M.IsOmega ω)
     rfl
   have hd : φ.body.IsDelta0 := .disj (.conj (.mem _ _) (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))))
     (.conj (.neg (.mem _ _)) (.atom _ _ _))
-  obtain ⟨f, L, hf, hL, hFL, hs⟩ := smap_uniform_source_l hZFC hω hχ hωχ hH hX hm hn hq φ hd ρ
+  obtain ⟨f, L, hf, hL, hFL, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ hd ρ
     (Fin.cases hA (Fin.cases hB (Fin.cases hC (fun _ => hz)))) hD (fun p hp => by
       by_cases ha : M.mem p A
       · obtain ⟨g, hgc, hpg⟩ := hBC.2.1 p ha

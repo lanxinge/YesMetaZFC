@@ -18,22 +18,22 @@ def Ep_derived_limit_d (hZF : M.Models ZF) (ω κ L X R F j Y : M.Domain) : Prop
   Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S ∧ Ep_collapse_d hZF ω X R q c C V ∧
   Ee_factor_d hZF j Y q C V ∧ Ep_length_d hZF ω κ L X R j Y q C
 
-theorem Ep_limit_d.factor_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
-    (hV : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) (hδ : M.IsLimitOrdinal δ)
-    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω X A Y B j) (hY : M.TransitiveSet Y)
-    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) X j κ k)
+theorem Ep_limit_d.factor_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R)
+    (hV : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hδ : M.IsLimitOrdinal δ)
+    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j) (hY : M.TransitiveSet Y)
+    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
     (hL : M.MemberSubset L k) (hLo : M.IsOrdinal L) (hκL : M.mem κ L)
-    (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S)
-    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (limit : Ep_limit_d (ZFC.models_zf_l hZFC) ω κ L X R F) :
-    Ep_derived_limit_d (ZFC.models_zf_l hZFC) ω κ L X R F j Y := by
+    (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
+    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
+    (limit : Ep_limit_d hZF ω κ L X R F) :
+    Ep_derived_limit_d hZF ω κ L X R F j Y := by
   obtain ⟨J, O, Z, D, p, T, V, q, c, C, W, system, limit, code, wf, elem, collapse⟩ := limit
-  have factor := ee_factor_l hZFC source hV hδ h hY hc hL hS hSY hF system limit
-  have comparison := ep_comparison_l (ZFC.models_zf_l hZFC) source.omega h source.transitive hY collapse factor
+  have factor := ee_factor_l hZF source hV hδ h hY hc hL hS hSY hF system limit
+  have comparison := ep_comparison_l hZF source.omega h source.transitive hY collapse factor
   exact ⟨J, O, Z, D, p, T, V, q, c, C, W, system, limit, code, wf, elem, collapse,
-    factor, ep_length_l (ZFC.models_zf_l hZFC) comparison source.transitive hc hLo hκL hL
-      (fun _ hα => ee_ordinal_node_l (ZFC.models_zf_l hZFC) source.omega hV hδ h hY hc hL hS hSY hF system limit hα)⟩
+    factor, ep_length_l hZF comparison source.transitive hc hLo hκL hL
+      (fun _ hα => ee_ordinal_node_l hZF source.omega hV hδ h hY hc hL hS hSY hF system limit hα)⟩
 
 /-- 同一个标准短扩展器自动给出 Vδ 源、全部分量、完整初等极限、坍塌和原目标因子。 -/
 theorem woodin_extender_l (hZFC : M.Models ZFC) {δ : M.Domain}
@@ -58,7 +58,7 @@ theorem woodin_extender_l (hZFC : M.Models ZFC) {δ : M.Domain}
   obtain ⟨R, source⟩ := ep_inaccessible_source_l hZFC hω hωδ hr hstrong hV hκ
     (short.critical.1.transitive ω short.uncountable) hK
   exact ⟨ν, N, B, j, W, k, S, F, K, E, R, hw, hLν, hLk, hS, hSN, hF, short, he, derived, source,
-    Ep_limit_d.factor_l hZFC source hV hr.isLimitOrdinal hw.2.2.2.2.2.1 hw.1 hw.2.2.2.2.2.2.1
+    Ep_limit_d.factor_l hZF source hV hr.isLimitOrdinal hw.2.2.2.2.2.1 hw.1 hw.2.2.2.2.2.2.1
       (hw.2.2.2.2.2.2.1.ordinal_image.transitive L hLk) short.length short.above hS (hw.1 S hSN) hF
       (short.limit_l hZFC source)⟩
 

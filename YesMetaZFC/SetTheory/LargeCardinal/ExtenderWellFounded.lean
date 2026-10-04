@@ -25,7 +25,7 @@ theorem ep_limit_wf_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C V : M
   have rep i a f (hr : Ee_rep_d H i a f) : M.mem f X ∧ ∃ n, M.mem n ω ∧ Fn0_d n L a ∧ Ep_fun_d κ X n f := by
     obtain ⟨u, B, hiu, hu, hf⟩ := hr
     obtain ⟨c, D, W, _, hc, hm, hBD⟩ := ep_at_model_l hZF models (h.at_l (hH.bound_l hiu).2 hu)
-    obtain ⟨n, hn, ha, _, funcs⟩ := ep_representatives_l I hZF.1 hF hc hm hBD
+    obtain ⟨n, hn, ha, _, funcs⟩ := ep_representatives_l I hZF.1 (hF.source_l hZF X) hc hm hBD
     exact ⟨(funcs f hf).1, n, hn, ha, (funcs f hf).2⟩
   let choose : BinarySchema 1 := { body := .existsE (ee_rep_m (.bound 3) (.bound 2) .newest (.bound 1)) }
   have cs i f : choose.denote ⟨fun _ => H, fun _ => H⟩ i f ↔ ∃ a, Ee_rep_d H i a f := by
@@ -34,7 +34,7 @@ theorem ep_limit_wf_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C V : M
     obtain ⟨u, huA, hiu⟩ := hH.2.1 i hi
     obtain ⟨a, B, hu, hat⟩ := (h.nodes u).mp huA
     obtain ⟨c, D, W, _, hc, hm, hBD⟩ := ep_at_model_l hZF models hat
-    obtain ⟨_, _, _, ⟨f, hf⟩, funcs⟩ := ep_representatives_l I hZF.1 hF hc hm hBD
+    obtain ⟨_, _, _, ⟨f, hf⟩, funcs⟩ := ep_representatives_l I hZF.1 (hF.source_l hZF X) hc hm hBD
     exact ⟨f, (funcs f hf).1, (cs i f).mpr ⟨a, u, B, hiu, hu, hf⟩⟩)
   have rows i (hi : M.mem i ω) : ∃ a f, Ee_row_d H G i a f := by
     obtain ⟨f, _, hif⟩ := hG.2.1 i hi
@@ -84,7 +84,7 @@ theorem ep_limit_wf_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C V : M
     obtain ⟨c', w, hvc', hwc, huw, hvw⟩ := step i m u v hmi hiu hmv
     have ec := (fn0_function_l (ZF.modelsKP hZF) h.projection).1.2 v c' c hvc' hvc
     subst c'
-    obtain ⟨E₀, U', hcU', hE₀, constraint⟩ := ee_common_edge_l hZF hF system hv hu hg hf hvc hwc
+    obtain ⟨E₀, U', hcU', hE₀, constraint⟩ := ee_common_edge_l hZF (hF.source_l hZF X) system hv hu hg hf hvc hwc
       (system.diagram.identity v (hH.bound_l hmv).2) huw hvw
     have eu := hF.function c U' U hcU' hcU
     subst U'

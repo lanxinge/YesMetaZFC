@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSource
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRelative
 
 /-! # 全部有限支撑源分量的统一模型图
 
@@ -33,7 +33,7 @@ theorem ep_component_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω κ L X R 
     Formula.satisfies_forall_iff, Formula.satisfies_iff_iff, rp_model_sat_l I hE, Definitional.Term.eval_weaken]; rfl
 
 theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Domain}
-    (hF : Em_family_d ω κ L F) (hc : Ep_component_d I ω κ L X R F a c)
+    (hF : Em_source_d ω κ L X F) (hc : Ep_component_d I ω κ L X R F a c)
     (hd : Ep_component_d I ω κ L X R F a d) : c = d := by
   obtain ⟨n, D, U, G, p, C, T, _, hn, hD, haU, hG, hm⟩ := hc
   obtain ⟨n', D', U', G', p', C', T', _, hn', hD', haU', hG', hm'⟩ := hd
@@ -62,12 +62,11 @@ theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Doma
   subst T'
   exact I.unique hm.code.1 hm'.code.1
 
-variable (hZFC : M.Models ZFC)
-local notation "hZF" => ZFC.models_zf_l hZFC
+variable (hZF : M.Models ZF)
 local notation "Kp" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_components_l {ω κ K L X R F J : M.Domain}
-    (h : Ep_source_d hZF ω κ K X R) (hF : Em_family_d ω κ L F)
+    (h : Ep_source_d hZF ω κ K X R) (hF : Em_source_d ω κ L X F)
     (hJ : ∀ a, M.mem a J → ∃ n, M.mem n ω ∧ Fn0_d n L a) : ∃ Z Q, Fn0_d J Q Z ∧
       ∀ a c, Rd_entry_d a c Z → Ep_component_d Kp ω κ L X R F a c := by
   let ρ := (((((⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push κ).push L).push X).push R).push F
@@ -80,7 +79,7 @@ theorem ep_components_l {ω κ K L X R F J : M.Domain}
     obtain ⟨n', D, _, hna', hD, hU⟩ := hF.measure a U haU
     have en := hna'.domain_eq_l hZF.1 hna
     subst n'
-    obtain ⟨G, c, p, C, T, hG, hm⟩ := h.model_l hZFC hn hD hU.1.base_l
+    obtain ⟨G, c, p, C, T, hG, hm⟩ := h.model_l hZF hn hD hU.base
     exact ⟨c, (sat a c).mpr ⟨n, D, U, G, p, C, T, hn, hna, hD, haU, hG, hm⟩⟩
   have unique a (_ : M.mem a J) c d hc hd := ep_component_unique_l Kp hZF.1 hF ((sat a c).mp hc) ((sat a d).mp hd)
   obtain ⟨Q, hQ⟩ := ZF.exists_functionalImageOn hZF φ ρ J total unique

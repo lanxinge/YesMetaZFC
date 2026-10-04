@@ -14,6 +14,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceField
 import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
 import YesMetaZFC.Model.SetTheory.Internal.RelationCollapse
+import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -27,7 +28,8 @@ import YesMetaZFC.Model.SetTheory.Internal.RelationCollapse
 已实例化为源模型内部函数与相对派生超滤的商。
 对全部背景内部函数的代表族，`rp_satisfies_l` 在 ZFC 下给出全部内部代码的 Łoś 方程；
 `rp_los_assignment_l` 自动构造商赋值和代码集。源模型版本 `rs_satisfies_l` 另从实际
-源内真值集和对角见证证明完整内部 Łoś，源为实际初等嵌入正则 H(χ) 的传递模型。
+源内真值集和对角见证在 ZF 中证明完整内部 Łoś，消费 `Sc_theory_d` 的实际全内部模式。
+正则 H(χ) 在 ZFC 中提供初始实例；`Sc_theory_d.map_l` 在 ZF 中传到任意传递初等后继。
 `rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值。
 `di_elementary_limit_l` 对任意完整初等定向系统证明极限的完整初等性；
 `wc_smaps_l` 构造良基外延结构的传递坍塌及完整内部同构。迭代仍待证明。
@@ -53,6 +55,10 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 据此给出 Mostowski 正逆图的完整初等证书。`selem_collapse_l` 在 ZF 中自动构造
 传递坍塌及其到原传递结构的初等嵌入；`selem_hull_collapse_l` 再在 ZFC 中从可数种子
 同时构造壳与可数传递模型。`Smap_d.models_l` 沿嵌入回拉任意已证明的内部编码理论。
+`sfm_close_l` 用原公式内部归纳构造非标准程序的全称闭包；`Smap_d.valid_l` 保持
+全部赋值上的有效性，`Smap_d.models_forward_l` 据此正向传输同一个内部编码理论。
+`Smap_d.omega_l` 固定背景 ω；`sc_sequences_forward_l` 保持全部字母表的实际有限序列空间，
+包括目标中的新参数和全部背景内部有限图。
 `sfm_sep_l` 直接构造任意内部程序的分离实例代码，支撑外新变量不会捕获旧参数。
 `smap_separation_l` 在目标容纳像集合的全部子集时，回拉源中的实际分离集；
 `v_separation_hull_l` 从极限 V 层及可数种子自动构造具有全内部码分离的可数传递模型。
@@ -62,8 +68,8 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 全内部码分离、收集与统一化的可数传递模型；统一化的两个实参使用不同坐标。
 `pe_compile_l` 对任意内部程序构造逐点解释码及旧根到新根的实际函数图；
 原子读取代表函数值，存在量词使用源内常值代表，内部归纳具有实际原公式。
-`smap_pe_trace_l` 从真实代表函数赋值构造源中的真值逆像；逐点赋值也实际构造。
-`smap_diagonal_l` 把源内部函数族的逐点对角延拓到整个定义域；`smap_pe_witness_l`
+`sc_pe_trace_l` 从真实代表函数赋值构造源中的真值逆像；逐点赋值也实际构造。
+`sc_diagonal_l` 把源内部函数族的逐点对角延拓到整个定义域；`sc_pe_witness_l`
 由此取得源中统一代表。`rs_los_l` 在实际原公式上完成全部内部行的 Łoś 归纳。
 `selem_club_hull_l` 在任意指定内部 club 中构造这样的初等模型，供 proper 主条件装配使用。
 `selem_trace_club_l` 以固定司寇伦图的最小闭包在任意子集上实际构造交集 club。

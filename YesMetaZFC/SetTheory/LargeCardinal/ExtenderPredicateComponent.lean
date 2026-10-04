@@ -38,7 +38,7 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
   have embed : Spred_emb_d I ω X A Y B j := ⟨c₀, R₀, c₁, R₁, hx, hy, hj⟩
   obtain ⟨_, _, models⟩ := system.models
   obtain ⟨n, Q, U, G, r, H, V₀, hn, ha, hQ, haU, hG, hm⟩ := models a b hab
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZFC source hF coherent system limit model hab hm.code
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZFC source (hF.source_l hZF X) (coherent.source_l I X) system limit model hab hm.code
   obtain ⟨e, V₁, code, vr⟩ := smdl_pull_l hZF hm.code.2.1 hv.1.1 W'
   obtain ⟨haS, m, Q₀, ha₀, hQ₀, hu⟩ := (family.2.2 a U).mp haU
   have eq := ha₀.domain_eq_l hZF.1 ha
@@ -52,7 +52,7 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
     (hc.fixed n (hc.ordinal.transitive ω hωκ n hn)) hc.image hjQ hQ hL (hSY a haS) ha
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF Q
   have hPX := source.transitive P (ZF.v_power_mem_l I hZF hV hδ.isLimitOrdinal hQX hP)
-  have sf f (hf : M.mem f G) := source.function_l hZFC hQX ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sf f (hf : M.mem f G) := source.function_l hZF hQX ((hG f).mp hf).1 ((hG f).mp hf).2
   have ultra := hF.at_l hZF.1 haU ha hQ
   have newModel : Rp_model_d I Q X U R₀ e G r H V₁ := ⟨hm.map, code, by
     intro f f' E E' hf hf'
@@ -83,7 +83,7 @@ theorem ep_predicate_map_l {ω κ K L X R F a b m n s Q₀ Q₁ U V G₀ G₁ r�
     (code : Smdl_d I c X S) (hj : M.IsSetInjectionFromTo I j H₀ H₁)
     (spec : ∀ E H, Rd_entry_d E H j ↔ M.mem E H₀ ∧ M.mem H H₁ ∧ Ep_arrow_d ω κ L X a b E H) :
     Smap_d I ω c₀ c₁ H₀ H₁ j := by
-  obtain ⟨t, K', _, ht, ts, hK, ks⟩ := source.family_l hZFC hm hn hs hQ₀ hQ₁ hG₀ hG₁
+  obtain ⟨t, K', _, ht, ts, hK, ks⟩ := source.family_l hZF hm hn hs hQ₀ hQ₁ hG₀ hG₁
   obtain ⟨P₀, hP₀⟩ := ZF.exists_powerSet hZF Q₀
   obtain ⟨P₁, hP₁⟩ := ZF.exists_powerSet hZF Q₁
   have push : Push_d Q₀ Q₁ P₀ P₁ U V t := ⟨ht, fun E hE => by

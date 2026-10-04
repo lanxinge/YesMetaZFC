@@ -1,6 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderWellFounded
 import YesMetaZFC.SetTheory.LargeCardinal.WoodinExtender
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCollapse
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderUltrapower
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankSource
 
 /-! # 武丁测度族的实际良基定向极限
@@ -34,25 +34,17 @@ theorem ep_limit_exists_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     (hωL : M.MemberSubset ω L) : Ep_limit_d (ZFC.models_zf_l hZFC) ω κ L X R F := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨J, O, Z, A, p, T, S, hs⟩ := ep_system_exists_l hZFC h hF hc hωL
-  obtain ⟨z, hz, hzω⟩ := h.omega.1.1
-  have hzfn : Fn0_d z L z := ⟨fun r hr => (hz r hr).elim, fun r hr => (hz r hr).elim, fun r hr => (hz r hr).elim⟩
-  have hzJ := (hs.indices z).mpr ⟨z, hzω, hzfn, fun i j x hi _ => hi.elim fun r hr => (hz r hr.2).elim⟩
-  obtain ⟨Q, hZ, models⟩ := hs.models
-  obtain ⟨d, _, hzd⟩ := hZ.2.1 z hzJ
-  obtain ⟨_, _, _, _, _, D, W, _, _, _, _, _, hm⟩ := models z d hzd
-  obtain ⟨B, hBD⟩ := hm.code.2.1
-  obtain ⟨u, hu⟩ := I.total z B
-  have huA := (hs.nodes u).mpr ⟨z, B, hu, d, D, W, hzd, hm.code.1, hBD⟩
-  obtain ⟨c, q, C, V, limit, model⟩ := di_model_exists_l hZF hs.diagram ⟨u, huA⟩
+  have family := hF.source_l hZF X
+  have coherent := hc.source_l I X
+  obtain ⟨J, O, Z, A, p, T, S, q, c, C, V, hs, limit, model, elem⟩ := ep_ultrapower_l hZFC h family coherent hωL
   have wf : Wf_rel_d X R := by
-    obtain ⟨_, _, _, _, _, _, _, _, _, hM, _⟩ := h.presentation
+    obtain ⟨_, hM⟩ := h.code
     intro Y _ hn
     obtain ⟨x, hx, least⟩ := KP.mem_minimal_exists_d (ZF.modelsKP hZF) hn
     exact ⟨x, hx, fun y hy hyx => least y hy (((hM.2 y x).mp hyx).2.2)⟩
   have hw := ep_limit_wf_l hZF h.omega (ZFC.dc_l I hZFC h.omega) hωL hF hc complete hs limit wf
   exact ⟨J, O, Z, A, p, T, S, q, c, C, V, hs, limit, model, hw,
-    hs.toEp_graph_d.elementary_l hZFC h hF hc, ep_collapse_l hZFC h hF hc hs limit model hw⟩
+    elem, ep_collapse_l hZFC h family coherent hs limit model hw⟩
 
 /-- 每个实际短扩展器都可在现有源内部函数族上自动形成良基极限。 -/
 theorem Ex_short_d.limit_l (hZFC : M.Models ZFC) {ω κ L F K X R : M.Domain}

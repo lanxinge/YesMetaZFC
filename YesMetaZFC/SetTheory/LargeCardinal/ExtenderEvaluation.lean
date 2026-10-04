@@ -12,20 +12,19 @@ open Definitional.Project InnerModel Internal FilterZF
 universe u
 variable {M : Structure.{u}}
 
-theorem ee_component_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F a c : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
-    (hV : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) (hδ : M.IsLimitOrdinal δ)
-    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω X A Y B j) (hY : M.TransitiveSet Y)
-    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) X j κ k)
-    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S)
-    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (hm : Ep_component_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F a c) :
-    let I := kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))
+theorem ee_component_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F a c : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R)
+    (hV : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hδ : M.IsLimitOrdinal δ)
+    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP hZF)) ω X A Y B j) (hY : M.TransitiveSet Y)
+    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
+    (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
+    (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
+    (hm : Ep_component_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F a c) :
+    let I := kp_pair_l (ZF.modelsKP hZF)
     ∃ C T e, Smdl_d I c C T ∧ M.IsSetInjectionFromTo I e C Y ∧
       (∀ D y, Rd_entry_d D y e ↔ M.mem D C ∧ ∃ f, M.mem f D ∧ Ee_value_d j a f y) ∧
       (∀ D y f, Rd_entry_d D y e → M.mem f D → Ee_value_d j a f y) ∧
       ∀ D E y z, Rd_entry_d D y e → Rd_entry_d E z e → (Rd_entry_d D E T ↔ M.mem y z) := by
-  let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   have hj : M.IsSetFunctionFromTo I j X Y := by obtain ⟨_, _, _, _, _, _, e⟩ := h; exact e.1.1
   obtain ⟨n, D, U, G, p, C, T, hn, ha, hD, haU, hG, model⟩ := hm
@@ -41,8 +40,8 @@ theorem ee_component_l (hZFC : M.Models ZFC) {ω δ X A Y B j κ k K R L S F a c
     (hc.fixed n (hc.ordinal.transitive ω hωκ n hn)) hc.image hjD hD hL (hSY a haS) ha
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF D
   have hPX := source.transitive P (ZF.v_power_mem_l I hZF hV hδ hDX hP)
-  obtain ⟨χ, b, d, H, Q, t, hχ, hωχ, hH, hX, hN, ht⟩ := source.presentation
-  have sf f (hf : M.mem f G) := smap_function_domain_l hZFC source.omega hχ hωχ hH source.transitive hX hN ht
+  obtain ⟨b, hX⟩ := source.code
+  have sf f (hf : M.mem f G) := sc_function_domain_l hZF source.omega source.transitive hX source.theory
     hDX ((hG f).mp hf).1 ((hG f).mp hf).2
   have eval f (hf : M.mem f G) := ed_evaluation_l hZF source.omega h source.transitive hY hjD haD (sf f hf)
   have atoms f g y z (hf : M.mem f G) (hg : M.mem g G) (hy : Ee_value_d j a f y) (hz : Ee_value_d j a g z) :=

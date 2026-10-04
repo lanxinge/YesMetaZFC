@@ -7,12 +7,12 @@ universe u
 variable {M : Structure.{u}} (I : kpair_convention_l.Interpretation M)
 
 theorem ep_representatives_l (hE : Extensional M) {ω κ L X R F a c C S B : M.Domain}
-    (hF : Em_family_d ω κ L F) (hm : Ep_component_d I ω κ L X R F a c)
+    (hF : Em_source_d ω κ L X F) (hm : Ep_component_d I ω κ L X R F a c)
     (hc : Smdl_d I c C S) (hB : M.mem B C) : ∃ n, M.mem n ω ∧ Fn0_d n L a ∧
       (∃ f, M.mem f B) ∧ ∀ f, M.mem f B → M.mem f X ∧ Ep_fun_d κ X n f := by
   obtain ⟨n, D, U, G, p, C', S', hn, ha, hD, haU, hG, hp⟩ := hm
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I hp.code hc
-  have hu := (hF.at_l hE haU ha hD).1.base_l
+  have hu := (hF.at_l hE haU ha hD).base
   obtain ⟨f, hf⟩ := (hp.map.range B).mp hB
   refine ⟨n, hn, ha, ⟨f, hp.map.representative_l I hu hf⟩, fun g hg => ?_⟩
   have hgp := hp.map.member_l I hE hu hB hg
@@ -20,18 +20,18 @@ theorem ep_representatives_l (hE : Extensional M) {ω κ L X R F a c C S B : M.D
   exact ⟨((hG g).mp hgG).1, D, hD, ((hG g).mp hgG).2⟩
 
 theorem ep_relation_l (hE : Extensional M) {ω κ L X R F a c C S B D U f g : M.Domain}
-    (hF : Em_family_d ω κ L F) (hm : Ep_component_d I ω κ L X R F a c)
+    (hF : Em_source_d ω κ L X F) (hm : Ep_component_d I ω κ L X R F a c)
     (hc : Smdl_d I c C S) (hB : M.mem B C) (hD : M.mem D C) (hf : M.mem f B) (hg : M.mem g D)
     (haU : Rd_entry_d a U F) : M.PairMember I B D S ↔ Rp_rel_d I X U R f g := by
   obtain ⟨n, E, V, G, p, C', S', _, ha, hE', haV, _, hp⟩ := hm
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I hp.code hc
   have eu := hF.function a V U haV haU
   subst V
-  have hu := (hF.at_l hE haU ha hE').1.base_l
+  have hu := (hF.at_l hE haU ha hE').base
   exact hp.relation f g B D (hp.map.member_l I hE hu hB hf) (hp.map.member_l I hE hu hD hg)
 
 theorem ep_arrow_id_l (hZF : M.Models ZF) {ω κ L X R F a c C S B : M.Domain}
-    (hF : Em_family_d ω κ L F) (ha : Ei_d ω L a) (hm : Ep_component_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F a c)
+    (hF : Em_source_d ω κ L X F) (ha : Ei_d ω L a) (hm : Ep_component_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F a c)
     (hc : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C S) (hB : M.mem B C) : Ep_arrow_d ω κ L X a a B B := by
   obtain ⟨_, _, _, inj⟩ := ha
   obtain ⟨n, hn, hna, ⟨f, hf⟩, functions⟩ := ep_representatives_l _ hZF.1 hF hm hc hB
@@ -42,8 +42,8 @@ theorem ep_arrow_id_l (hZF : M.Models ZF) {ω κ L X R F a c C S B : M.Domain}
   exact ⟨n, n, q, f, f, hn, hn, hq, hna, hqa, hf, hf, ep_pull_id_l hZF.1 (functions f hf).2 idq⟩
 
 theorem ep_arrow_comp_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c v w B T C V x y z : M.Domain}
-    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_family_d ω κ L F)
-    (hco : Es_coherent_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L F)
+    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (hco : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (hc : Ei_d ω L c)
     (hbM : Ep_component_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F b v)
     (hcM : Ep_component_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F c w)
