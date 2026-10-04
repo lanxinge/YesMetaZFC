@@ -200,8 +200,68 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 此处消费实际共同纤维性质，不要求有限支撑索引族可数定向。
 
 [ExtenderLimit](ExtenderLimit.lean) 的 `ep_limit_exists_l` 返回完整系统、实际商极限、
-结构码及良基性；`woodin_extender_l` 从武丁基数自动生成同一个测度族及所需源，
-直接返回这些结论。原强嵌入仅用于生成测度及共同纤维证书，源代表的秩不受其定义域限制。
+结构码、良基性、完整内部初等性及传递坍塌。通用短扩展器仍可作用于任意实际 `Ep_source_d`。
+
+## 已证明：完整内部初等性、坍塌及原嵌入因子
+
+[DirectedSystem/Elementary](../../Model/SetTheory/Internal/DirectedSystem/Elementary.lean)
+的 `di_elementary_limit_l` 在 ZF 中，对任意实际初等过渡系统构造分量到极限的完整 `Smap_d`。
+归纳量化全部阶段与赋值；存在量词的反向步骤把当前阶段与见证的阶段推到共同后继，
+再用过渡的完整初等性回拉。仅用有限定向性，公式码可以内部非标准。
+[ReducedPower/Restriction](../../Model/SetTheory/Internal/ReducedPower/Restriction.lean)
+证明将完整测度限制到源内子集代数保持同一个类集合、商图及结构码；
+[ExtenderElementary](ExtenderElementary.lean) 据此把现有过渡图升级为完整内部初等映射。
+[ExtenderConstant](ExtenderConstant.lean) 构造源到整个极限的常值初等嵌入及精确代表方程。
+
+[Internal/Extensionality](../../Model/SetTheory/Internal/Extensionality.lean)
+用真正的内部等号指令编译外延性句子，证明完整初等嵌入将关系外延性传到目标。
+[Collapse/RelationIso](../Collapse/RelationIso.lean) 在 ZF 中对良基外延关系构造传递坍塌同构；
+[ExtenderCollapse](ExtenderCollapse.lean) 因而返回整体坍塌及逆图的完整内部初等性，
+并得到源到传递目标的完整内部初等嵌入。
+
+[InaccessibleHierarchy](../InaccessibleHierarchy.lean) 在 ZFC 中证明不可达 δ 以下的 Vα 具有实际较小序数单射界，
+进而证明 Hδ＝Vδ。[ExtenderRankSource](ExtenderRankSource.lean) 直接构造 Vδ 的源实例。
+[DerivedEvaluation](DerivedEvaluation.lean) 证明原求值 j(f)(a) 精确识别商等号及成员关系；
+[ExtenderFactor](ExtenderFactor.lean) 装配全部求值并下降为整个极限到原目标的实际关系嵌入。
+其图方程保留每一个类代表，尚未断言该因子到原目标的完整初等性。
+
+自动入口 [`woodin_extender_l`](ExtenderDerivedLimit.lean) 已迁移到上述 Vδ 源，
+返回同一个系统的完整初等极限、传递坍塌和原目标因子 `Ep_derived_limit_d`。
+原 j 因此只作用于已经证明属于 Vδ 的代表。
+
+## 已证明：通用短扩展器与武丁实例的识别
+
+公共入口为 [Extender](Extender.lean)。[ExtenderShort](ExtenderShort.lean) 的 `Ex_pre_d`
+刻画有限列表示中的实际预扩展器：临界点 κ 为不可数基数，长度 L>κ，F 是实际函数图，
+其分量超滤 κ 完备，满足坐标协调、等号与序关系、正规性和临界点种子条件。
+`Ex_short_d` 另加入共同纤维的可数完备性。定义只读取 F；
+[ExtenderSyntax](ExtenderSyntax.lean) 的 `ex_pre_m`、`ex_short_m` 及语义定理已接通原一阶语言，
+量词包含模型内全部有限长度和实际层族。
+
+[ExtenderNormal](ExtenderNormal.lean) 的 `es_normal_l` 在 ZF 中证明正规性：
+若 f(s)<s(i) 在 U_a 上几乎处处成立，则 β=j(f)(a)<a(i)；把 β 添加到 a 的末尾，
+实际分离测度一集合，使 f(s↾n)=s(n)。此处 f:κ^n→κ 已证明属于原嵌入的定义域。
+[ExtenderSeeds](ExtenderSeeds.lean) 同时证明坐标等号与序的真值集合、
+临界点以下种子的主性，以及含不小于 κ 坐标的种子的非主性；空支撑允许主测度。
+
+[ExtenderOperator](ExtenderOperator.lean) 实际收集
+`E:P(κ^{<ω})→P(L^{<ω})`，输入可以混合不同长度。
+[ExtenderAlgebra](ExtenderAlgebra.lean) 证明交、补集和任意坐标逆像保持；
+[ExtenderProduct](ExtenderProduct.lean) 实际构造并保持两张坐标图指定的乘积。
+[ExtenderBounded](ExtenderBounded.lean) 从正规性与协调律证明有界投影保持，
+见证函数由 [OrdinalChoice](../OrdinalChoice.lean) 逐纤维取最小序数构造，只需 ZF。
+`ex_countable_l` 给出算子形式的共同纤维完备性。
+[ExtenderTruncation](ExtenderTruncation.lean) 的 `ex_restrict_l` 对 κ<μ≤L 实际构造长度 μ 的短扩展器，
+并保留原测度值；正规性产生的新坐标小于旧坐标，因此仍落在 μ 中。
+
+[WoodinExtender](WoodinExtender.lean) 的 `woodin_short_l` 在 ZF 中，对选定谓词固定 κ，
+再对每个 κ<L<δ 自动返回上述短扩展器、实际算子及精确识别
+`E(A)=j(A)∩L^{<ω}`。[ExtenderRestriction](ExtenderRestriction.lean) 对全部有限列集合 A 证明此方程。
+这里使用有限列表示，参照 [Neeman《Determinacy and Large Cardinals》§2](https://www.math.ucla.edu/~ineeman/dlc.pdf/#page=5)
+的嵌入限制与有限支撑超幂，以及 [《Determinacy in L(R)》定义 1.2、注 1.5](https://www.math.ucla.edu/~ineeman/detLR.pdf/#page=9)
+的算子性质与测度族表述；未将序列图改成 Gödel 序数编码。
+`woodin_extender_l` 已直接迁移为这个短扩展器的源系统与良基极限入口；
+任意实际短扩展器均可通过 `Ex_short_d.limit_l` 使用同一构造。
 
 [ReducedPower/Los](../../Model/SetTheory/Internal/ReducedPower/Los.lean) 对全部背景内部 D→Q 函数的代表族，
 在 ZFC 下证明全部内部公式代码的 Łoś 方程。`rp_los_assignment_l` 从实际赋值族自动构造商赋值，
@@ -218,10 +278,12 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 对上述 H(χ) 初等源的源内部 Łoś 及存在见证对角化也已完成。
 常值初等嵌入、分量间初等映射以及恒等、复合和交换律现已完成。
 通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
-极限的完整内部初等性、整体 Mostowski 坍塌与标准短扩展器的识别、迭代树和迭代性、
-决定性蕴涵尚待实现。
+通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。
+极限的完整内部初等性、整体 Mostowski 坍塌及原目标关系因子已完成。
+迭代树和迭代性、决定性蕴涵尚待实现。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
-本层选择上述标准刻画作为定义，尚未在 Lean 中证明它与 extender 刻画、
-全宇宙类嵌入刻画之间的等价。后续 extender 和迭代论须接入实际构造；
-当前定义没有把超幂、良基性或 AD 当作未实现的操作参数。
+当前武丁定义到实际短扩展器的方向已实现；按每个 ν 选择足够长的扩展器后恢复 Vν 覆盖和谓词一致性、
+因子映射固定长度以下序数，
+以及与全宇宙类嵌入刻画的完整等价仍待证明。当前定义没有把超幂、良基性或 AD
+当作未实现的操作参数。

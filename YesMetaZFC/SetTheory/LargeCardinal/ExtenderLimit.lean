@@ -1,10 +1,12 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderWellFounded
-import YesMetaZFC.SetTheory.LargeCardinal.SupportConstruction
+import YesMetaZFC.SetTheory.LargeCardinal.WoodinExtender
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCollapse
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankSource
 
 /-! # 武丁测度族的实际良基定向极限
 
 先装配全部有限支撑源分量，再形成真实结构码，并由共同纤维证明整个极限
-内部良基。源只使用自身的函数代表；其秩不受派生测度的原强嵌入定义域限制。
+内部良基，并构造完整内部初等嵌入和传递坍塌。源只使用自身的函数代表。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -13,7 +15,8 @@ variable {M : Structure.{u}}
 
 def Ep_limit_d (hZF : M.Models ZF) (ω κ L X R F : M.Domain) : Prop := ∃ J O Z A p T S q c C V,
   Ep_system_d hZF ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
-  Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V
+  Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V ∧
+  Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S ∧ Ep_collapse_d hZF ω X R c C V
 
 /-- 单射列索引覆盖每一个有限坐标列，包括带重复坐标的原始表示。 -/
 theorem ep_support_cover_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S m a : M.Domain}
@@ -47,35 +50,16 @@ theorem ep_limit_exists_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     intro Y _ hn
     obtain ⟨x, hx, least⟩ := KP.mem_minimal_exists_d (ZF.modelsKP hZF) hn
     exact ⟨x, hx, fun y hy hyx => least y hy (((hM.2 y x).mp hyx).2.2)⟩
-  exact ⟨J, O, Z, A, p, T, S, q, c, C, V, hs, limit, model,
-    ep_limit_wf_l hZF h.omega (ZFC.dc_l I hZFC h.omega) hωL hF hc complete hs limit wf⟩
+  have hw := ep_limit_wf_l hZF h.omega (ZFC.dc_l I hZFC h.omega) hωL hF hc complete hs limit wf
+  exact ⟨J, O, Z, A, p, T, S, q, c, C, V, hs, limit, model, hw,
+    hs.toEp_graph_d.elementary_l hZFC h hF hc, ep_collapse_l hZFC h hF hc hs limit model hw⟩
 
-/-- 同一个武丁测度族自动生成实际源、全部分量和良基极限。 -/
-theorem woodin_extender_l (hZFC : M.Models ZFC) {δ : M.Domain}
-    (hd : Woodin_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ) :
-    let hZF := ZFC.models_zf_l hZFC
-    let I := kp_pair_l (ZF.modelsKP hZF)
-    ∃ ω V, M.IsOmega ω ∧ V_d I δ V ∧ ∀ A, M.MemberSubset A V → ∃ κ, M.mem κ δ ∧
-      ∀ L, M.mem L δ → M.MemberSubset ω L → ∃ ν N B j W k S F K X R,
-        Wd_witness_d I ω δ V A κ ν N B j W k ∧ M.mem L k ∧ Fseq_space_d I ω L S ∧
-        Es_family_d I j κ L S F ∧ Es_coherent_d I ω κ L F ∧ Ep_source_d hZF ω κ K X R ∧
-        Ep_limit_d hZF ω κ L X R F := by
-  let hZF := ZFC.models_zf_l hZFC
-  let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨ω, V, hω, hV, all⟩ := woodin_components_l I hZF hd
-  refine ⟨ω, V, hω, hV, fun A hA => ?_⟩
-  obtain ⟨κ, hκ, family⟩ := all A hA
-  refine ⟨κ, hκ, fun L hL hωL => ?_⟩
-  obtain ⟨ν, N, B, j, W, k, S, F, hw, hLk, hS, hF, components, coherent, complete⟩ := family L hL hωL
-  have measures : Em_family_d ω κ L F := ⟨fun n a hn ha => (hF.2.1 a).mp ((hS a).mpr
-      ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) ha⟩), hF.1.2, fun a U ha => by
-    obtain ⟨n, D, hn, hD, _, hU, _⟩ := components a U ha
-    obtain ⟨m, hm, hma⟩ := (hS a).mp ((hF.2.2 a U).mp ha).1
-    have en := (fn0_of_function_l (ZF.modelsKP hZF) hma).domain_eq_l hZF.1 hn
-    exact ⟨n, D, en ▸ hm, hn, hD, hU⟩⟩
-  have hωκ := ed_critical_omega_l I hZF hω hw.2.2.2.2.2.1 (ZF.v_transitive_l I hZF hV) hw.1 hw.2.2.2.2.2.2.1
-  obtain ⟨K, X, R, source⟩ := ep_source_exists_l hZFC hω (hw.2.2.2.2.2.2.1.ordinal.transitive ω hωκ)
-  exact ⟨ν, N, B, j, W, k, S, F, K, X, R, hw, hLk, hS, hF, coherent, source,
-    ep_limit_exists_l hZFC source measures coherent (fun H f hH hf => (complete H f hH hf).imp fun _ hh => hh.2) hωL⟩
+/-- 每个实际短扩展器都可在现有源内部函数族上自动形成良基极限。 -/
+theorem Ex_short_d.limit_l (hZFC : M.Models ZFC) {ω κ L F K X R : M.Domain}
+    (h : Ex_short_d (ZFC.models_zf_l hZFC) ω κ L F)
+    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) :
+    Ep_limit_d (ZFC.models_zf_l hZFC) ω κ L X R F :=
+  ep_limit_exists_l hZFC source h.measures h.coherent h.countable
+    (fun x hx => h.length.transitive κ h.above x (h.critical.1.transitive ω h.uncountable x hx))
 
 end YesMetaZFC.SetTheory.LargeCardinal

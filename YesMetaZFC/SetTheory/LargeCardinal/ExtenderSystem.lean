@@ -45,7 +45,7 @@ theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
     obtain ⟨c, _, hac⟩ := hz.2.1 a ha
     obtain ⟨d, _, hbd⟩ := hz.2.1 b hb
     obtain ⟨_, _, _, inj⟩ := (h.indices b).mp hb
-    obtain ⟨j, C, V, D, W, hc, hd, hj, rel, spec, any⟩ := ep_map_l hZFC source hF coherent hm hn hq hnb inj hqa
+    obtain ⟨j, C, V, D, W, hc, hd, hj, _, rel, spec, any⟩ := ep_map_l hZFC source hF coherent hm hn hq hnb inj hqa
       (models a c hac) (models b d hbd)
     exact ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, hj, rel, spec, fun B E hBE f hf =>
       (any B E hBE f hf).elim fun g hg => ⟨m, n, q, g, hm, hn, hq, hnb, hqa, hg⟩⟩

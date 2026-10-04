@@ -49,6 +49,26 @@ theorem rp_lift_exists_l (hZF : M.Models ZF) {D E X U V F G p q C N K}
     fun f g B A hfg hfp hgq => (spec B A).mpr ⟨hp.projection.output_mem_of_pairMember hfp,
       (sat B A).mpr ⟨f, hK.input_mem_of_pairMember hfg, g, hK.output_mem_of_pairMember hfg, hfp, hfg, hgq⟩⟩⟩
 
+/-- 实际代表变换唯一确定商上的提升图。 -/
+theorem rp_lift_unique_l (hE : Extensional M) {D E X U V F G p q C N K j k}
+    (hp : Rp_map_d I D X U F p C) (hq : Rp_map_d I E X V G q N) (hK : M.IsSetFunctionFromTo I K F G)
+    (hj : M.IsSetFunctionFromTo I j C N) (hk : M.IsSetFunctionFromTo I k C N)
+    (lj : Rp_lift_d I K p q j) (lk : Rp_lift_d I K p q k) : j = k := by
+  have common B (hB : M.mem B C) : ∃ A, M.PairMember I B A j ∧ M.PairMember I B A k := by
+    obtain ⟨f, hfp⟩ := (hp.range B).mp hB
+    obtain ⟨g, hg, hfg⟩ := hK.2.2 f (hp.projection.input_mem_of_pairMember hfp)
+    obtain ⟨A, _, hgq⟩ := hq.projection.2.2 g hg
+    exact ⟨A, lj f g B A hfg hfp hgq, lk f g B A hfg hfp hgq⟩
+  apply hj.1.1.eq_of_pairMember_iff hE hk.1.1
+  intro B A
+  constructor
+  · intro ha
+    obtain ⟨A', hbj, hbk⟩ := common B (hj.input_mem_of_pairMember ha)
+    exact hj.1.2 B A' A hbj ha ▸ hbk
+  · intro ha
+    obtain ⟨A', hbj, hbk⟩ := common B (hk.input_mem_of_pairMember ha)
+    exact hk.1.2 B A' A hbk ha ▸ hbj
+
 /-- 对任意实际商赋值，原对象选择公理给出一张内部代表赋值图。 -/
 theorem rp_representatives_l (hZFC : M.Models ZFC) {ω D X U F p C e}
     (hp : Rp_map_d I D X U F p C) (he : M.IsSetFunctionFromTo I e ω C) :

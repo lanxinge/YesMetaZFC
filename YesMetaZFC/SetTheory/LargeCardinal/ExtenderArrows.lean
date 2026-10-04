@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderComponents
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.FullElementary
 
 /-! # 全系统过渡映射的统一图公式
 
@@ -38,6 +39,7 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
     (hbM : Ep_component_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F b d) :
     let I := kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))
     ∃ j C S E T, Smdl_d I c C S ∧ Smdl_d I d E T ∧ M.IsSetInjectionFromTo I j C E ∧
+      Smap_d I ω c d C E j ∧
       (∀ B D B' D', Rd_entry_d B B' j → Rd_entry_d D D' j → (Rd_entry_d B D S ↔ Rd_entry_d B' D' T)) ∧
       (∀ B D, Rd_entry_d B D j ↔ M.mem B C ∧ M.mem D E ∧ Ep_arrow_d ω κ L X a b B D) ∧
       ∀ B D, Rd_entry_d B D j → ∀ f, M.mem f B → ∃ g, M.mem g D ∧ Ep_pull_d κ X m n q f g := by
@@ -51,7 +53,7 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
   subst n'
   have hU := hF.at_l hZF.1 haU ha hD₀
   have hV := hF.at_l hZF.1 hbV hb hD₁
-  obtain ⟨t, P, _, ht, ts, hp, ps⟩ := h.family_l hZFC hm hn hq hD₀ hD₁ hG₀ hG₁
+  obtain ⟨t, P, htX, ht, ts, hp, ps⟩ := h.family_l hZFC hm hn hq hD₀ hD₁ hG₀ hG₁
   obtain ⟨Q₀, hQ₀⟩ := ZF.exists_powerSet hZF D₀
   obtain ⟨Q₁, hQ₁⟩ := ZF.exists_powerSet hZF D₁
   have hu := maximal_relative_l hZF hU hQ₀
@@ -64,6 +66,9 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
       fun ⟨hs, r, hr, hsr⟩ => ⟨(hD₁ s).mp hs, r, hr, ((ts s r).mp hsr).2⟩⟩⟩
   obtain ⟨j, hj, lift, rel⟩ := rp_full_projection_l I hZF hQ₀ hu hv push hM₀ hM₁ hp
     (fun f g hfg => ((ps f g).mp hfg).2.2)
+  obtain ⟨χ, c₀, d₀, H, W, e, hχ, hωχ, hH, hm₀, hn₀, he⟩ := h.presentation
+  have elem := rs_full_projection_l hZFC h.omega hχ hωχ hH h.transitive hm₀ hn₀ he
+    (h.space_mem_l hZF hm hD₀) (h.space_mem_l hZF hn hD₁) htX hQ₀ hU hV push hG₀ hG₁ hM₀ hM₁ hp ps hj.1 lift
   have pull f g (hfg : Rd_entry_d f g P) : Ep_pull_d κ X m n q f g :=
     ep_pull_of_comp_l hD₀ hD₁ ht (hM₀.map.functions f (hp.input_mem_of_pairMember hfg)) ts ((ps f g).mp hfg).2.2
   have any B D (hBD : Rd_entry_d B D j) f (hf : M.mem f B) : ∃ g, M.mem g D ∧ Ep_pull_d κ X m n q f g := by
@@ -72,7 +77,7 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
     obtain ⟨D', _, hgp⟩ := hM₁.map.projection.2.2 g hg
     have e := hj.1.1.2 B D' D (lift f g B D' hfg hfp hgp) hBD
     exact ⟨g, e ▸ hM₁.map.representative_l I hv.base hgp, pull f g hfg⟩
-  refine ⟨j, C, S, E, T, hM₀.code, hM₁.code, hj, rel, fun B D => ⟨?_, ?_⟩, any⟩
+  refine ⟨j, C, S, E, T, hM₀.code, hM₁.code, hj, elem, rel, fun B D => ⟨?_, ?_⟩, any⟩
   · intro hBD
     have hBC := hj.1.input_mem_of_pairMember hBD
     obtain ⟨f, hf⟩ := (hM₀.map.range B).mp hBC

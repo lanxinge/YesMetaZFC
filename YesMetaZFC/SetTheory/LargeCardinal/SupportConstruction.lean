@@ -13,10 +13,10 @@ universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
 theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
-    ∃ ω X, M.IsOmega ω ∧ V_d I δ X ∧ ∀ A, M.MemberSubset A X → ∃ κ, M.mem κ δ ∧
+    ∃ ω X, M.IsOmega ω ∧ V_d I δ X ∧ ∀ A, M.MemberSubset A X → ∃ κ, M.mem κ δ ∧ M.IsOrdinal κ ∧ M.mem ω κ ∧
       ∀ L, M.mem L δ → M.MemberSubset ω L → ∃ ν N B j W k S F,
         Wd_witness_d I ω δ X A κ ν N B j W k ∧ M.mem L k ∧
-        Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S ∧ Es_family_d I j κ L S F ∧
+        Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S ∧ M.mem S N ∧ Es_family_d I j κ L S F ∧
         (∀ a U, M.PairMember I a U F → ∃ n D, Fn0_d n L a ∧ (∀ s, M.mem s D ↔ Fn0_d n κ s) ∧
           Ed_filter_d I j a D U ∧ FilterZF.Maximal_d (ℳ := M) D U ∧ Ed_complete_d κ D U ∧
           ∀ Q R, (∃ x, M.mem x Q) → ∃ c G p C T,
@@ -24,11 +24,14 @@ theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
         Es_coherent_d I ω κ L F ∧
         ∀ H f, Ef_levels_d ω κ H → Es_fiber_d I ω L F H f →
           ∃ g, M.mem g X ∧ Ef_fiber_d ω κ H g := by
-  obtain ⟨ω, X, hω, _, hr, _, hV, hd⟩ := hd
+  obtain ⟨ω, X, hω, hωδ, hr, _, hV, hd⟩ := hd
   obtain ⟨D, hD⟩ := hr.2.1
   refine ⟨ω, X, hω, hV, fun A hA => ?_⟩
   obtain ⟨κ, hκ, hk⟩ := hd A hA
-  refine ⟨κ, hκ, fun L hL hωL => ?_⟩
+  obtain ⟨N₀, B₀, j₀, W₀, k₀, h₀⟩ := hk ω hωδ
+  have hc₀ := h₀.2.2.2.2.2.2.1
+  have hωκ := ed_critical_omega_l I hZF hω h₀.2.2.2.2.2.1 (ZF.v_transitive_l I hZF hV) h₀.1 hc₀
+  refine ⟨κ, hκ, hc₀.ordinal, hωκ, fun L hL hωL => ?_⟩
   obtain ⟨R, hRX, hR⟩ := ZF.v_relation_cover_l I hZF hV hD.1 (ZF.v_ordinal_mem_l I hZF hV hL)
   obtain ⟨Q, hQ⟩ := ZF.exists_powerSet hZF R
   have bound {n a} (hn : M.MemberSubset n L) (ha : Fn0_d n L a) : M.mem a R :=
@@ -44,7 +47,7 @@ theorem woodin_components_l (hZF : M.Models ZF) {δ} (hd : Woodin_d I δ) :
   have hGN : M.mem G N := hN Q hQN G ((hQ G).mpr fun f hf =>
     bound hωL (fn0_of_function_l (ZF.modelsKP hZF) ((hG f).mp hf)))
   obtain ⟨F, hF⟩ := es_family_exists_l I hZF hω hS j κ
-  refine ⟨ν, N, B, j, W, k, S, F, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLk, hS, hF,
+  refine ⟨ν, N, B, j, W, k, S, F, ⟨hN, hNX, hδN, hW, hWN, hj, hc, hνk, ht⟩, hLk, hS, hSN, hF,
     ?_,
     es_coherent_l I hZF hω hV hD.1 hj hN hc (hc.ordinal_image.transitive L hLk) (hN S hSN) hF,
     fun _ _ hH hf => ef_common_fiber_l I hZF hω hV hD.1 hj hN hc

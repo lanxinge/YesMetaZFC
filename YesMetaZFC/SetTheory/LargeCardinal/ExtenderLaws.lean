@@ -59,7 +59,7 @@ theorem ep_arrow_comp_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c v w B T C V
   obtain ⟨n', l, r, _, _, _, hl, hr, hlc, hrb, _⟩ := hyz
   have en := hrb.1.domain_eq_l hZF.1 hnb
   subst n'
-  obtain ⟨j, B', T', C', V', hb, hc, _, _, spec, any⟩ := ep_map_l hZFC h hF hco hn hl hr hlc inj hrb hbM hcM
+  obtain ⟨j, B', T', C', V', hb, hc, _, _, _, spec, any⟩ := ep_map_l hZFC h hF hco hn hl hr hlc inj hrb hbM hcM
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I hb hB
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I hc hC
   obtain ⟨g', hg', hgg'⟩ := any y z ((spec y z).mpr ⟨hy, hz, edge⟩) g hg

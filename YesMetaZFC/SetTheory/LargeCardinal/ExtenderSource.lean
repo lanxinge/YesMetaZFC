@@ -84,7 +84,29 @@ theorem Ep_source_d.model_l (hZFC : M.Models ZFC) {ω κ K X R n D U : M.Domain}
     (h.space_mem_l hZF hn hD) h.cardinal_mem
   exact rp_family_model_l I hZF hU hfX (hf.mono_target_l (h.transitive A hAX)) R
 
-/-- 对任意 κ 实际构造包含其全部内部有限函数的源；原测度嵌入不限制此源的秩。 -/
+/-- 给定实际正则 Hχ 和所需参数，以恒等图提供全部源证书。 -/
+theorem ep_source_of_h_l (hZF : M.Models ZF) {ω κ K χ X : M.Domain}
+    (hω : M.IsOmega ω) (hωκ : M.MemberSubset ω κ)
+    (hχ : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP hZF)) χ) (hωχ : M.mem ω χ)
+    (hX : H_d (kp_pair_l (ZF.modelsKP hZF)) χ X) (hωX : M.mem ω X) (hκX : M.mem κ X)
+    (hKX : M.mem K X) (hK : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω κ K) :
+    ∃ R, Ep_source_d hZF ω κ K X R := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  have ht := ZF.h_transitive_l I hZF hX
+  obtain ⟨c, R, hc, hr⟩ := smdl_membership_l I hZF ⟨κ, hκX⟩
+  let φ : BinarySchema 0 := { body := Formula.extensionalEq (.bound 1) .newest }
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => ω⟩
+  have sat x y : φ.denote ρ x y ↔ x = y := Formula.satisfies_extensionalEq_iff_eq hZF.1 _ _ _
+  obtain ⟨e, he, spec⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := X) (target := X)
+    (fun x _ => ⟨x, (sat x x).mpr rfl⟩) (fun x _ y z hy hz => ((sat x y).mp hy).symm.trans ((sat x z).mp hz))
+    (fun x y hx hy => (sat x y).mp hy ▸ hx)
+  have eq x y (hxy : M.PairMember I x y e) := (sat x y).mp ((spec x y).mp hxy).2
+  have bij : M.IsSetBijectionFromTo I e X X := ⟨⟨he, fun x y z hx hy => (eq x z hx).trans (eq y z hy).symm⟩,
+    fun x hx => ⟨x, hx, (spec x x).mpr ⟨hx, (sat x x).mpr rfl⟩⟩⟩
+  have elem := smap_of_iso_l I hZF hω hc hc bij (fun a b x y ha hb => eq a x ha ▸ eq b y hb ▸ Iff.rfl)
+  exact ⟨R, hω, hωκ, ht, hωX, hκX, hKX, hK, χ, c, c, X, R, e, hχ, hωχ, hX, ⟨hc, hr⟩, ⟨hc, hr⟩, elem⟩
+
+/-- 对任意 κ 实际构造包含其全部内部有限函数的源。 -/
 theorem ep_source_exists_l (hZFC : M.Models ZFC) {ω κ : M.Domain}
     (hω : M.IsOmega ω) (hωκ : M.MemberSubset ω κ) :
     ∃ K X R, Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R := by
@@ -97,19 +119,8 @@ theorem ep_source_exists_l (hZFC : M.Models ZFC) {ω κ : M.Domain}
   have ht := ZF.h_transitive_l I hZF hX
   have hωX := ht Q hQX ω ((hQ ω).mpr (Or.inl rfl))
   have hPX := ht Q hQX P ((hQ P).mpr (Or.inr rfl))
-  have hκX := ht P hPX κ ((hP κ).mpr (Or.inl rfl))
-  have hKX := ht P hPX K ((hP K).mpr (Or.inr rfl))
-  obtain ⟨c, R, hc, hr⟩ := smdl_membership_l I hZF ⟨κ, hκX⟩
-  let φ : BinarySchema 0 := { body := Formula.extensionalEq (.bound 1) .newest }
-  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => ω⟩
-  have sat x y : φ.denote ρ x y ↔ x = y := Formula.satisfies_extensionalEq_iff_eq hZF.1 _ _ _
-  obtain ⟨e, he, spec⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := X) (target := X)
-    (fun x _ => ⟨x, (sat x x).mpr rfl⟩) (fun x _ y z hy hz => ((sat x y).mp hy).symm.trans ((sat x z).mp hz))
-    (fun x y hx hy => (sat x y).mp hy ▸ hx)
-  have eq x y (hxy : M.PairMember I x y e) := (sat x y).mp ((spec x y).mp hxy).2
-  have bij : M.IsSetBijectionFromTo I e X X := ⟨⟨he, fun x y z hx hy => (eq x z hx).trans (eq y z hy).symm⟩,
-    fun x hx => ⟨x, hx, (spec x x).mpr ⟨hx, (sat x x).mpr rfl⟩⟩⟩
-  have elem := smap_of_iso_l I hZF hω hc hc bij (fun a b x y ha hb => eq a x ha ▸ eq b y hb ▸ Iff.rfl)
-  exact ⟨K, X, R, hω, hωκ, ht, hωX, hκX, hKX, hK, χ, c, c, X, R, e, hχ, hωχ, hX, ⟨hc, hr⟩, ⟨hc, hr⟩, elem⟩
+  obtain ⟨R, hR⟩ := ep_source_of_h_l hZF hω hωκ hχ hωχ hX hωX
+    (ht P hPX κ ((hP κ).mpr (Or.inl rfl))) (ht P hPX K ((hP K).mpr (Or.inr rfl))) hK
+  exact ⟨K, X, R, hR⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

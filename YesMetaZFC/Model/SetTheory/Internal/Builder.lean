@@ -45,6 +45,17 @@ theorem sfm_rel_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
   obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E G h.program.2.1.1
   exact ssat_rel_l I hZF h.program hH he hc hE hf hix hjy
 
+/-- 真正的对象等号指令；不把成员外延等同预先解释为等号。 -/
+theorem sfm_eq_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
+    (hF : Sfm_d I ω n F) (hi : M.mem i ω) (hj : M.mem j ω) : ∃ m G,
+    Sbuild_d I ω n F m G n ∧ ∀ X R E f x y, M.IsFunctionSpace I E ω X → M.mem f E →
+      M.PairMember I i x f → M.PairMember I j y f → (Ssat_d I X R E G m n f ↔ x = y) := by
+  obtain ⟨c, hc⟩ := sop_exists_l I (ZF.modelsKP hZF) 1 i j
+  obtain ⟨m, G, h, he⟩ := sfm_node_build_l I hZF hω hF (Or.inr (Or.inl ⟨i, j, hc, hi, hj⟩))
+  refine ⟨m, G, h, fun X R E f x y hE hf hix hjy => ?_⟩
+  obtain ⟨H, hH⟩ := seval_exists_l I hZF X R E G h.program.2.1.1
+  exact ssat_eq_l I hZF h.program hH he hc hE hf hix hjy
+
 theorem sfm_nor_l (hZF : M.Models ZF) {ω n F i j} (hω : M.IsOmega ω)
     (hF : Sfm_d I ω n F) (hi : M.mem i n) (hj : M.mem j n) : ∃ m G k,
     Sbuild_d I ω n F m G k ∧ ∀ X R E f, M.mem f E →

@@ -13,6 +13,7 @@ import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 import YesMetaZFC.Model.SetTheory.Internal.SourceField
 import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
+import YesMetaZFC.Model.SetTheory.Internal.RelationCollapse
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -27,7 +28,9 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
 对全部背景内部函数的代表族，`rp_satisfies_l` 在 ZFC 下给出全部内部代码的 Łoś 方程；
 `rp_los_assignment_l` 自动构造商赋值和代码集。源模型版本 `rs_satisfies_l` 另从实际
 源内真值集和对角见证证明完整内部 Łoś，源为实际初等嵌入正则 H(χ) 的传递模型。
-`rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值；有向极限及迭代仍待证明。
+`rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值。
+`di_elementary_limit_l` 对任意完整初等定向系统证明极限的完整初等性；
+`wc_smaps_l` 构造良基外延结构的传递坍塌及完整内部同构。迭代仍待证明。
 常值初等嵌入及源内坐标拉回的分量初等映射现已构造，并核验恒等、复合与常值交换律。
 
 `smdl_membership_l` 构造任意非空内部集合的隶属结构码；`scode_exists_l` 收集全部

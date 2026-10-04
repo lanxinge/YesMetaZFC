@@ -27,11 +27,9 @@ theorem woodin_wf_components_l (hM : M.Models ZFDC) {δ : M.Domain}
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨ω, X, hω, hX, components⟩ := woodin_components_l I hZF hd
   refine ⟨ω, X, hω, hX, fun A hA => ?_⟩
-  obtain ⟨κ, hκ, family⟩ := components A hA
+  obtain ⟨κ, hκ, _, hωκ, family⟩ := components A hA
   refine ⟨κ, hκ, fun L hL hωL => ?_⟩
-  obtain ⟨ν, N, B, j, W, k, S, F, hw, hLk, hS, hF, component, coherent, fiber⟩ := family L hL hωL
-  have hωκ := ed_critical_omega_l I hZF hω hw.2.2.2.2.2.1
-    (ZF.v_transitive_l I hZF hX) hw.1 hw.2.2.2.2.2.2.1
+  obtain ⟨ν, N, B, j, W, k, S, F, hw, hLk, hS, _, hF, component, coherent, fiber⟩ := family L hL hωL
   refine ⟨ν, N, B, j, W, k, S, F, hw, hLk, hS, hF, coherent, fiber, fun a U ha => ?_⟩
   obtain ⟨n, D, hn, hD, hu, hU, hc, models⟩ := component a U ha
   refine ⟨n, D, hn, hD, hu, hU, hc, fun Q R hQ hR => ?_⟩

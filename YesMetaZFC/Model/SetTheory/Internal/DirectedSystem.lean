@@ -1,5 +1,7 @@
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Union
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.AscendingDescent
+import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Elementary
+import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Factor
 
 /-! # 通用内部定向系统与直接极限
 
@@ -10,5 +12,7 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.AscendingDescent
 `di_cone_wf_l` 在 ZF 内处理已有实际良基目标的相容锥。
 `di_union_l` 自动构造任意定向子结构族，`di_power_limit_l` 给出可数定向判据的实际实例。
 `di_wf_of_no_step_l` 把非良基极限转为指标递增的内部下降链。
-有限支撑测度族的实际系统与良基极限由 LargeCardinal.ExtenderLimit 提供；极限完整内部初等性尚待证明。
+`di_elementary_limit_l` 对实际初等过渡系统证明极限的完整内部初等性，背景仅需 ZF。
+`di_factor_embedding_l` 将分量关系嵌入组成的相容锥下降为极限的关系嵌入。
+有限支撑测度族的实际实例、良基极限及传递坍塌由 LargeCardinal.ExtenderLimit 提供。
 -/
