@@ -141,9 +141,9 @@ theorem cons_injective_l (hZF : M.Models ZF) {ω z a b s t v n m} (hω : M.IsOme
   exact ⟨h.1, hZF.1.eq_of_same_members s t (fun p => ⟨h.2 p, k.2 p⟩)⟩
 
 /-- 直接子边等价于图包含与长度相差一个后继。 -/
-theorem tree_step_iff_l (hZF : M.Models ZF) {ω s t n m} (hω : M.IsOmega ω)
-    (hn : M.mem n ω) (hm : M.mem m ω) (hs : M.IsSetFunctionFromTo I s n ω)
-    (ht : M.IsSetFunctionFromTo I t m ω) :
+theorem tree_step_iff_l (hZF : M.Models ZF) {ω X s t n m} (hω : M.IsOmega ω)
+    (hn : M.mem n ω) (hm : M.mem m ω) (hs : M.IsSetFunctionFromTo I s n X)
+    (ht : M.IsSetFunctionFromTo I t m X) :
     Step_d I ω s t ↔ M.SuccessorOf m n ∧ M.MemberSubset s t := by
   constructor
   · rintro ⟨a, j, k, h⟩

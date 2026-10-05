@@ -1,4 +1,5 @@
 import YesMetaZFC.Model.SetTheory.Internal.SourceTheory
+import YesMetaZFC.Model.SetTheory.Internal.SeparationSource
 
 /-! # 原有界关系在源模型内的统一化
 
@@ -73,5 +74,40 @@ theorem sc_function_domain_l {ω c X R D F} (hω : M.IsOmega ω)
       exact hf.2.2 x (hf.bound_l hxy).1 z (hf.bound_l (select x z hxz)).2 y (hf.bound_l hxy).2
         (select x z hxz) hxy ▸ hxz⟩)
   exact ⟨hF, C, hC, eq ▸ hg⟩
+
+/-- 逐项读取源内函数图的首坐标，再分离出精确的定义域。 -/
+theorem sc_function_domain_mem_l {ω c X R A B F : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (hF : M.mem F X) (hf : Fn0_d A B F) : M.mem A X := by
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => F⟩
+  let φ : BinarySchema 0 := {
+    body := Formula.existsMem (.bound 1) (Formula.existsMem .newest (kpair0_m (.bound 3) (.bound 2) .newest)) }
+  have sat p a : φ.denote ρ p a ↔ ∃ t, M.mem t p ∧ ∃ b, M.mem b t ∧ KPair_d M p a b := by
+    simp only [φ, BinarySchema.denote, Formula.satisfies_existsMem_iff, kpair0_sat_l hZF.1]; rfl
+  obtain ⟨g, C, _, hCX, hg, select⟩ := sc_uniform_source_l hZF hω hX hm theory φ
+    (.existsMem _ (.existsMem _ (kpair0_delta_l ..))) ρ (fun i => Fin.elim0 i) hF (fun p hp => by
+      obtain ⟨a, _, b, _, hab⟩ := hf.1 p hp
+      obtain ⟨t, ht, hb⟩ := (kpair_union_l M hab b).mpr (Or.inr rfl)
+      exact ⟨a, (rd_entry_transitive_l hX hF ⟨p, hab, hp⟩).1, (sat p a).mpr ⟨t, ht, b, hb, hab⟩⟩)
+  have bound a (ha : M.mem a A) : M.mem a C := by
+    obtain ⟨b, _, p, hp, hpf⟩ := hf.2.1 a ha
+    obtain ⟨v, hv, hpv⟩ := hg.2.1 p hpf
+    obtain ⟨_, _, w, _, hp'⟩ := (sat p v).mp (select p v hpv)
+    exact (kpair_injective_l M hp' hp).1 ▸ hv
+  let η : Env M 1 := ⟨fun _ => F, fun _ => F⟩
+  let ψ : UnarySchema 1 := {
+    body := Formula.existsMem (.bound 1) (Formula.existsMem .newest
+      (Formula.existsMem .newest (kpair0_m (.bound 2) (.bound 3) .newest))) }
+  have read a : ψ.denote η a ↔ ∃ p, M.mem p F ∧ ∃ t, M.mem t p ∧ ∃ b, M.mem b t ∧ KPair_d M p a b := by
+    simp only [ψ, UnarySchema.denote, Formula.satisfies_existsMem_iff, kpair0_sat_l hZF.1]; rfl
+  obtain ⟨D, hDX, spec⟩ := sc_separate_source_l I hZF hω hX hm theory ψ
+    (.existsMem _ (.existsMem _ (.existsMem _ (kpair0_delta_l ..)))) η (fun _ => hF) hCX
+  have eq : D = A := hZF.1.eq_of_same_members D A (fun a => by
+    rw [spec a, read a]
+    refine ⟨fun ⟨_, p, hp, _, _, b, _, hab⟩ => (hf.bound_l ⟨p, hab, hp⟩).1, fun ha => ?_⟩
+    obtain ⟨b, _, p, hp, hpf⟩ := hf.2.1 a ha
+    obtain ⟨t, ht, hb⟩ := (kpair_union_l M hp b).mpr (Or.inr rfl)
+    exact ⟨bound a ha, p, hpf, t, ht, b, hb, hp⟩)
+  exact eq ▸ hDX
 
 end YesMetaZFC.SetTheory.Internal

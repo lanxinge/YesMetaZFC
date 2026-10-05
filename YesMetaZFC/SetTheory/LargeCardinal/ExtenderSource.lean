@@ -3,12 +3,13 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.SeparationSource
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Constant
 import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
 import YesMetaZFC.SetTheory.HereditaryCover
 import YesMetaZFC.SetTheory.HereditarySequences
 
 /-! # 有限支撑系统的实际源数据
 
-正则 Hχ 实际满足全内部分离、统一化及有限序列空间存在性；这些性质
+正则 Hχ 实际满足全内部分离、统一化、有限序列空间及良基关系塌缩存在性；这些性质
 沿完整初等嵌入传递到后继模型。全部函数空间、投影与代表拉回由此构造。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
@@ -27,12 +28,14 @@ structure Ep_source_d (hZF : M.Models ZF) (ω κ K X R : M.Domain) : Prop where
   code : ∃ c, Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R
   theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R
   sequences : Sc_sequences_d (kp_pair_l (ZF.modelsKP hZF)) ω X
+  collapse : Sc_collapse_d X
+  branch : Sc_branch_d ω X
 
 /-- 任意已在源中的新字母表，都有实际有限序列空间。 -/
 theorem Ep_source_d.rebase_l (hZF : M.Models ZF) {ω κ K X R μ : M.Domain} (h : Ep_source_d hZF ω κ K X R)
     (hμ : M.mem μ X) (hωμ : M.MemberSubset ω μ) : ∃ K', Ep_source_d hZF ω μ K' X R := by
   obtain ⟨K', hk, hs⟩ := h.sequences μ hμ
-  exact ⟨K', h.omega, hωμ, h.transitive, h.omega_mem, hμ, hk, hs, h.code, h.theory, h.sequences⟩
+  exact ⟨K', h.omega, hωμ, h.transitive, h.omega_mem, hμ, hk, hs, h.code, h.theory, h.sequences, h.collapse, h.branch⟩
 
 theorem Ep_source_d.space_l (hZF : M.Models ZF) {ω κ K X R n : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) : ∃ D, M.mem D X ∧ Ep_space_d κ n D := by
@@ -106,7 +109,8 @@ theorem ep_source_of_h_l (hZFC : M.Models ZFC) {ω κ K χ X : M.Domain}
   have ht := ZF.h_transitive_l I hZF hX
   obtain ⟨c, R, hc, hr⟩ := smdl_membership_l I hZF ⟨κ, hκX⟩
   exact ⟨R, hω, hωκ, ht, hωX, hκX, hKX, hK, ⟨c, hc, hr⟩,
-    sc_h_theory_l hZFC hω hχ hωχ hX R, fun _ hA => ZFC.h_fseq_l hZFC hω hχ hωχ hX hA⟩
+    sc_h_theory_l hZFC hω hχ hωχ hX R, (fun _ hA => ZFC.h_fseq_l hZFC hω hχ hωχ hX hA),
+    sc_h_collapse_l hZFC hω hχ hωχ hX, sc_h_branch_l hZFC hω hχ hωχ hX hωX⟩
 
 /-- 传递初等后继在任意新参数 κ′ 上重新成为源；无需 κ′ 在旧嵌入的像中。 -/
 theorem Ep_source_d.successor_l (hZF : M.Models ZF) {ω κ K X R c d N W j κ' : M.Domain}
@@ -121,7 +125,9 @@ theorem Ep_source_d.successor_l (hZF : M.Models ZF) {ω κ K X R c d N W j κ' :
     source.omega_mem source.sequences theory
   obtain ⟨K', hK, hs⟩ := seq κ' hκ
   have hωN := hj.1.1.output_mem_of_pairMember (hj.omega_l I hZF source.omega source.transitive hN hm hn source.omega_mem)
-  exact ⟨K', source.omega, hωκ, hN, hωN, hκ, hK, hs, ⟨d, hn⟩, theory, seq⟩
+  exact ⟨K', source.omega, hωκ, hN, hωN, hκ, hK, hs, ⟨d, hn⟩, theory, seq,
+    source.collapse.map_l hZF source.omega source.transitive hN hm hn hj,
+    source.branch.map_l hZF source.omega source.transitive hN source.omega_mem hm hn hj⟩
 
 /-- 自动覆盖指定参数，并包含有限 κ 幂的全部子集；可分别用作所属模型与施加源。 -/
 theorem ep_source_exists_l (hZFC : M.Models ZFC) (A : M.Domain) {ω κ : M.Domain}

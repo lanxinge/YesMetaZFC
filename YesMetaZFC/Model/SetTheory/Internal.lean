@@ -15,6 +15,10 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
 import YesMetaZFC.Model.SetTheory.Internal.RelationCollapse
 import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
+import YesMetaZFC.Model.SetTheory.Internal.SourceCollapse
+import YesMetaZFC.Model.SetTheory.Internal.SourceOmegaBound
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
+import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -32,7 +36,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
 正则 H(χ) 在 ZFC 中提供初始实例；`Sc_theory_d.map_l` 在 ZF 中传到任意传递初等后继。
 `rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值。
 `di_elementary_limit_l` 对任意完整初等定向系统证明极限的完整初等性；
-`wc_smaps_l` 构造良基外延结构的传递坍塌及完整内部同构。迭代仍待证明。
+`wc_smaps_l` 构造良基外延结构的传递坍塌及完整内部同构；大基数层已接入迭代后继和枝极限。
 常值初等嵌入及源内坐标拉回的分量初等映射现已构造，并核验恒等、复合与常值交换律。
 
 `smdl_membership_l` 构造任意非空内部集合的隶属结构码；`scode_exists_l` 收集全部
@@ -59,6 +63,12 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 全部赋值上的有效性，`Smap_d.models_forward_l` 据此正向传输同一个内部编码理论。
 `Smap_d.omega_l` 固定背景 ω；`sc_sequences_forward_l` 保持全部字母表的实际有限序列空间，
 包括目标中的新参数和全部背景内部有限图。
+`sc_h_collapse_l` 实际证明正则 Hχ 中任意相对良基关系的塌缩闭包；
+`Sc_collapse_d.map_l` 传输整条存在句子，覆盖后继模型中新出现的关系。
+`Sc_collapse_d.wf_absolute_l` 反映良基性；`sc_branch_absolute_l` 把外部下降链换为源内下降链。
+可数枝闭包由实际正则 Hχ 和初等传输提供。`Sc_hierarchy_d` 则单独由极限 Vδ 提供，
+并传到初等后继的全部新序数；相对层的传递性与唯一性只用 ZF。
+`smap_omega_bound_l` 双向保持模型内的不可数共尾性；实际正则基数由 `sc_regular_bound_l` 给出实例。
 `sfm_sep_l` 直接构造任意内部程序的分离实例代码，支撑外新变量不会捕获旧参数。
 `smap_separation_l` 在目标容纳像集合的全部子集时，回拉源中的实际分离集；
 `v_separation_hull_l` 从极限 V 层及可数种子自动构造具有全内部码分离的可数传递模型。

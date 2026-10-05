@@ -24,6 +24,15 @@ def Ec_source_d (I : kpair_convention_l.Interpretation M) (ω κ L X F : M.Domai
 def Ea_agree_d (ω κ X Y : M.Domain) : Prop := ∀ n D A, M.mem n ω → Ep_space_d κ n D →
   M.MemberSubset A D → (M.mem A X ↔ M.mem A Y)
 
+/-- 完整字母表上的一致性自动覆盖任意子字母表，包含端点本身。 -/
+theorem Ea_agree_d.mono_l (hZF : M.Models ZF) {ω κ μ X Y : M.Domain}
+    (h : Ea_agree_d ω κ X Y) (hμ : M.MemberSubset μ κ) : Ea_agree_d ω μ X Y := by
+  intro n D A hn hD sub
+  obtain ⟨E, he⟩ := ZF.exists_functionSpace hZF (kp_pair_l (ZF.modelsKP hZF)) n κ
+  have hE : Ep_space_d κ n E := fun s => (he s).trans
+    ⟨fn0_of_function_l (ZF.modelsKP hZF), fn0_function_l (ZF.modelsKP hZF)⟩
+  exact h n E A hn hE (fun s hs => (hE s).mpr (((hD s).mp (sub s hs)).mono_target_l hμ))
+
 theorem Em_source_d.at_l (hE : Extensional M) {ω κ L X F a U n D : M.Domain}
     (h : Em_source_d ω κ L X F) (ha : Rd_entry_d a U F) (hn : Fn0_d n L a)
     (hD : Ep_space_d κ n D) : Sf_ultra_d X D U := by

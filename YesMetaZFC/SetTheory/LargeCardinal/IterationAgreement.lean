@@ -4,7 +4,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSuccessor
 /-! # 迭代树后继与所属模型超幂之间的一致性
 
 树前驱与所属模型分别施加同一个扩展器。两张实际超幂边的坍塌目标在
-支撑以下一致；自动入口把这一结论与新加入树中的同一个模型绑定。
+包含支撑端点的全部有限幂子集上一致；自动入口绑定新加入树中的同一个模型。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -17,7 +17,7 @@ theorem it_ultra_agree_l (hZFC : M.Models ZFC)
     (source' : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K' Y S) (agree : Ea_agree_d ω κ X Y)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (atoms : Ea_atoms_d ω κ L F) (normal : En_source_d ω κ L X F)
-    (hκ : M.TransitiveSet κ) (hL : M.TransitiveSet L) (hωL : M.MemberSubset ω L)
+    (hκ : M.IsOrdinal κ) (hL : M.IsOrdinal L) (hωL : M.MemberSubset ω L)
     (mx : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c X R)
     (my : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c' Y S)
     (nx : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d N V)
@@ -25,7 +25,7 @@ theorem it_ultra_agree_l (hZFC : M.Models ZFC)
     (hN : M.TransitiveSet N) (hN' : M.TransitiveSet N')
     (u : It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F c d j)
     (v : It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F c' d' j') :
-    M.MemberSubset L N ∧ M.MemberSubset L N' ∧ ∀ μ, M.mem μ L → Ea_agree_d ω μ N N' := by
+    M.mem L N ∧ M.mem L N' ∧ Ea_agree_d ω L N N' := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨X₀, R₀, N₀, V₀, J, O, Z, A, p, T, B, q, b, C, W, _, e,
@@ -41,12 +41,8 @@ theorem it_ultra_agree_l (hZFC : M.Models ZFC)
     fun ⟨_, hx⟩ => bij.1.1.output_mem_of_pairMember hx⟩
   have range' : M.IsRangeOf I N' e' := fun x => ⟨fun hx => (bij'.2 x hx).imp fun _ hh => hh.2,
     fun ⟨_, hx⟩ => bij'.1.1.output_mem_of_pairMember hx⟩
-  exact ⟨(ep_seed_collapse_l hZF source hκ hL hωL family coherent atoms normal hs limit wc
-      (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1)).1,
-    (ep_seed_collapse_l hZF source' hκ hL hωL (family.transfer_l agree) (coherent.transfer_l hZF agree) atoms
-      (normal.transfer_l hZF source source' agree) hs' limit' wc' (fn0_of_function_l (ZF.modelsKP hZF) bij'.1.1)).1,
-    ep_successor_agree_l hZFC source source' agree family coherent atoms normal hκ hL hωL
-      hs limit model hN nx he range wc hs' limit' model' hN' ny he' range' wc'⟩
+  exact ep_successor_agree_l hZFC source source' agree family coherent atoms normal hκ hL hωL
+    hs limit model hN nx he range wc hs' limit' model' hN' ny he' range' wc'
 
 theorem it_short_apply_agree_l (hZFC : M.Models ZFC)
     {ω c₀ α ξ T Q G E k c d X R Y S κ L F : M.Domain}
@@ -61,7 +57,7 @@ theorem it_short_apply_agree_l (hZFC : M.Models ZFC)
       It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F d b j ∧ It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F c b' j' ∧
       Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) b N V ∧
       Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) b' N' V' ∧
-      (∀ μ, M.mem μ L → Ea_agree_d ω μ N N') ∧ ∀ μ, M.mem μ L → M.MemberSubset ω μ →
+      Ea_agree_d ω L N N' ∧ ∀ μ, (M.mem μ L ∨ μ = L) → M.MemberSubset ω μ →
         ∃ K K', Ep_source_d (ZFC.models_zf_l hZFC) ω μ K N V ∧ Ep_source_d (ZFC.models_zf_l hZFC) ω μ K' N' V' := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
@@ -80,15 +76,15 @@ theorem it_short_apply_agree_l (hZFC : M.Models ZFC)
   obtain ⟨eY, eS⟩ := smdl_unique_l I code₂.1 parent.1
   subst Y₀ S₀
   obtain ⟨K₃, source₂⟩ := ready₂.rebase_l hZF hκY hωκ
-  obtain ⟨cover, cover', common⟩ := it_ultra_agree_l hZFC source₂ source
+  obtain ⟨hLN, hLN', common⟩ := it_ultra_agree_l hZFC source₂ source
     (fun n D A hn hD hA => (agree n D A hn hD hA).symm) (ex.measures.source_l hZF Y) (ex.coherent.source_l I Y)
-    ex.atoms (ex.normal.source_l Y) ex.critical.1.transitive ex.length.transitive
+    ex.atoms (ex.normal.source_l Y) ex.critical.1 ex.length
     (fun x hx => ex.length.transitive κ ex.above x (hωκ x hx)) parent owner code₁ code'
     next.transitive next'.transitive ultra ultra'
   refine ⟨β, U, Q', G', E', b, j, b', j', N, V, N', V', h', extension, hb, edge, ultra, ultra', code₁, code', common, ?_⟩
   intro μ hμ hωμ
-  obtain ⟨K, hk⟩ := next.rebase_l hZF (cover μ hμ) hωμ
-  obtain ⟨K', hk'⟩ := next'.rebase_l hZF (cover' μ hμ) hωμ
+  obtain ⟨K, hk⟩ := next.rebase_l hZF (hμ.elim (next.transitive L hLN μ) (fun eq => eq.symm ▸ hLN)) hωμ
+  obtain ⟨K', hk'⟩ := next'.rebase_l hZF (hμ.elim (next'.transitive L hLN' μ) (fun eq => eq.symm ▸ hLN')) hωμ
   exact ⟨K, K', hk, hk'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

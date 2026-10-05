@@ -234,7 +234,7 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 [ExtenderSource](ExtenderSource.lean) 的 `Ep_source_d.successor_l` 在 ZF 中证明：
 若 X 是实际源，j:X→N 为完整内部初等嵌入，N 传递，则每个 κ′∈N、ω⊆κ′
 都实际得到 K′∈N 和 `Ep_source_d ω κ′ K′ N W`。κ′ 可以不在 j 的像中。
-`Ep_source_d` 已统一改为源自身满足的全内部分离、统一化与有限序列空间证书；
+`Ep_source_d` 已统一改为源自身满足的全内部分离、统一化、有限序列空间与关系塌缩证书；
 源内 Łoś、常值、复合、投影和全部有限支撑消费者均使用该接口。
 
 [UniversalClosure](../../Model/SetTheory/Internal/UniversalClosure.lean) 用实际原公式归纳
@@ -244,11 +244,15 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 [EmbeddingOmega](../../Model/SetTheory/Internal/EmbeddingOmega.lean) 证明 j(ω)=ω；
 [SourceFinite](../../Model/SetTheory/Internal/SourceFinite.lean) 用内部归纳证明 N 包含全部背景内部有限函数。
 [SourceSequences](../../Model/SetTheory/Internal/SourceSequences.lean) 再把相对序列空间识别为真实全部有限序列空间。
+[SourceCollapse](../../Model/SetTheory/Internal/SourceCollapse.lean) 传输整条塌缩存在句子，
+覆盖目标中的任意相对良基关系；相对良基性只量化目标模型自身的子集。
 
 初始正则 Hχ 的理论和全部字母表序列空间分别由 `sc_h_theory_l` 与
 [HereditarySequences](../HereditarySequences.lean) 的 `ZFC.h_fseq_l` 在 ZFC 中构造，
 实际 Vδ 源复用 Hδ＝Vδ。`ep_collapse_l` 已把下一步源证书直接附在同一个传递坍塌 N 上，
 因此 `Ex_short_d.limit_l`、`woodin_extender_l` 与秩强性入口的坍塌结果自动保留它。
+初始塌缩闭包由 [HereditaryCollapse](../HereditaryCollapse.lean) 与 `sc_h_collapse_l`
+实际证明：Hχ 包含其元素的全部实际子集，关系的塌缩像大小不超过载体，图属于相应乘积。
 此结论保证后继模型可复用现有源内部超幂构造；下一扩展器的可迭代性仍须另证。
 
 ## 已证明：跨模型施加与双映射复制
@@ -285,26 +289,31 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 ## 已证明：后继子集一致性与复制的支撑保持
 
 [ExtenderSuccessor](ExtenderSuccessor.lean) 的 `ep_successor_agree_l` 证明：同一个 F
-作用于 `Ea_agree_d ω κ X Y` 的两源，若两侧已实际传递坍塌，则对每个 μ∈L，
-后继 N、N′ 满足 `Ea_agree_d ω μ N N′`。这里量化全部内部自然数 m 以及 μᵐ 的全部
-背景子集；结论精确为这些子集是否属于两侧模型的一致性。
+作用于 `Ea_agree_d ω κ X Y` 的两源，若 κ、L 为序数且两侧已实际传递坍塌，
+则 L 本身属于两侧后继 N、N′，且 `Ea_agree_d ω L N N′`。
+这里量化全部内部自然数 m 以及 Lᵐ 的全部背景子集，包含原接口遗漏的支撑端点。
+`Ea_agree_d.mono_l` 自动推出任意子字母表 μ⊆L 上的一致性。
 输入只消费相对测度、源内协调与正规性、坐标原子及实际坍塌，不要求原派生嵌入。
 
 证明的关键是两个识别。[ExtenderSeedNormal](ExtenderSeedNormal.lean) 用源内正规性
 排除坐标类的额外前驱，[ExtenderSeedCollapse](ExtenderSeedCollapse.lean) 再以原公式成员
-归纳证明坐标 α 的坍塌值就是 α。[ExtenderValueBound](ExtenderValueBound.lean) 把 A⊆μᵐ
+归纳证明坐标 α 的坍塌值就是 α。[ExtenderSupportBound](ExtenderSupportBound.lean)
+把常值 κ 与任意坐标移到共同支撑，证明 L⊆j(κ)，并由序数比较得到 L∈N。
+[ExtenderValueBound](ExtenderValueBound.lean) 以常值 κ 的像作界，把 A⊆Lᵐ
 的代表逐点正规化为 κᵐ 的子集；[ExtenderSetCode](ExtenderSetCode.lean) 用坐标拼接
 编码整张成员图，在另一源重建同一代表。[ExtenderTupleValue](ExtenderTupleValue.lean)
-识别有限坐标列的坍塌值，[ExtenderSetTransfer](ExtenderSetTransfer.lean) 由相同的成员判定
-与外延性恢复同一个 A。投影和列长度保持内部表示。
+识别有限坐标列的坍塌值，[ExtenderSetTransfer](ExtenderSetTransfer.lean) 比较完整支撑中的
+有限列成员资格。最后在目标内的实际 L 值有限列空间中分离其迹，恢复同一个 A；
+不把 L 当成支撑中的一个坐标。原严格界证明已直接迁移，投影和列长度保留内部表示。
 
 [ExtenderSuccessorApplication](ExtenderSuccessorApplication.lean) 的 `Ex_short_d.successors_l`
 实际构造两侧传递后继，保留绑定原系统与坍塌的 `Ep_successor_d` 证书，返回上述一致性；
-对每个 ω⊆μ∈L，还自动返回两侧的下一步源证书。
+对每个 ω⊆μ、μ∈L 或 μ=L，还自动返回两侧的下一步源证书。
 [ExtenderCopyCollapse](ExtenderCopyCollapse.lean) 在同一原复制图上共轭两侧坍塌，
 证明所得完整初等图 k 满足 k↾L=σ↾L，并保留精确共轭方程。
 [ExtenderCopySuccessor](ExtenderCopySuccessor.lean) 的 `ep_copy_successors_l` 自动构造这些对象；
 原侧只需预扩展器，目标侧的可数共同纤维经复制回传原侧良基性。
+其结果还包含两侧支撑端点的成员资格，以及同一个复制图的小传递域限制恢复结论。
 这两个入口产出的条件已接入下面的迭代树后继构造。
 
 ## 已证明：实际迭代树及后继扩张
@@ -363,9 +372,82 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 | `it_pruned_extend_l` | 结合实际选枝与相容实现：从可延伸树及其相容良基实现，自动选出共尾良基枝并完成极限扩张。 |
 | `it_padding_limit_l`、`it_padding_pruned_l` | 从已有真实源构造任意内部极限长度的 padding 树，实际调用同一商、坍塌、选枝与添枝接口，给出参数实例。 |
 
-这些条件均在定理签名中明示。一般树的无条件共尾良基分支、规范树的迭代策略以及由
-大基数推出这些策略，仍未证明。后继模型逐个良基并不足以替代极限处的论证；一般
+这些条件均在定理签名中明示。后继模型逐个良基不足以替代极限处的论证；一般
 共尾分支假说的范围与反例可参见 [Neeman–Steel](https://math.berkeley.edu/~steel/papers/cbhcounter.pdf)。
+本项目的 AD 路线所需目标是 [Neeman《Determinacy in L(R)》定理 2.3、推论 2.4](https://www.math.ucla.edu/~ineeman/detLR.pdf#page=19)：
+对可数模型到 Vθ 的初等嵌入，nice 的 ω 长迭代树具有共尾枝，且枝模型仍能初等嵌回 Vθ；
+由此获得证明所需的弱迭代性。该目标尚未完成，也未以任意树的无条件选枝取代它。
+
+## 已证明：小传递模型的编码与跨源还原
+
+[RelationBounded](../Collapse/RelationBounded.lean) 的 `Wc_iso_d` 用 Δ₀ 证书描述
+关系载体到传递集合的实际双射。其关系外延性只需背景外延性，关系良基性只需 KP；
+传递像唯一性复用原 ZF 关系递归。`Sc_collapse_d` 的 Hχ 实例和完整初等后继保持
+已接入所有 `Ep_source_d` 构造，因而每次实际后继继续具有内部塌缩能力。
+
+[ExtenderRelationCode](ExtenderRelationCode.lean) 把 κ 上的二元关系编码为二项 κ 值列的集合，
+再由 `Ea_agree_d` 搬运并在目标内还原原关系。
+[ExtenderModelCode](ExtenderModelCode.lean) 的 `Ea_agree_d.transitive_l` 给出自动端点：
+若两源的有限 κ 幂子集一致，B 传递，且源 X 内有实际双射图 F:κ→B，
+则 B 属于另一源 Y。关系码、目标内塌缩及其与原 B 的相等全部在证明中构造；
+不另要求调用者给出关系码、外延性或良基性。该端点及编码只需 ZF，
+初始正则 Hχ 的闭包实例单独使用 ZFC。
+
+这为 Neeman 引理 2.8 最后的小模型编码步骤提供实际还原接口。
+
+## 已证明：可数复制的秩段限制恢复
+
+[EmbeddingSmallRestriction](EmbeddingSmallRestriction.lean) 的 `smap_small_restriction_l`
+证明：若 f:κ→B 是源内实际双射、B 传递，且目标 Y 已有 j↾κ，
+则 B 属于 Y，并在 Y 中构造整张 j↾B。证明先将 B 的关系码的像沿 j↾κ 回拉，
+再在 Y 中作 Mostowski 塌缩；图唯一性还原 f 后，按 j(f)(j(α)) 逐项构造限制。
+
+[EmbeddingCountableBound](EmbeddingCountableBound.lean) 用模型内对旧嵌入 σ 的可数编号
+实际收集 ω→φ 的第二坐标图，再由内部不可数共尾性取得 μ<φ；
+[EmbeddingOrdinal](../../Model/SetTheory/Internal/EmbeddingOrdinal.lean) 的序数不下降性同时界住首坐标。
+所用 `Sc_omega_bound_d` 只要求模型内每张 ω→φ 图有严格界，弱于完整不可达性。
+[SourceOmegaBound](../../Model/SetTheory/Internal/SourceOmegaBound.lean) 已从实际正则基数给出实例，
+并沿完整初等图双向传输这条句子，覆盖目标中的新函数。
+
+[ExtenderCopyRestriction](ExtenderCopyRestriction.lean) 的 `ep_copy_countable_restriction_l`
+因此只需 φ 以下逐层的有限幂一致性：自动取小界、分离并搬运 σ↾κ，
+利用实际复制的支撑保持识别 j↾κ，再恢复整个已枚举传递域 B 上的复制限制图。
+可数性由模型内真实的 σ→ω 单射图见证；一般入口的枚举同样是源内真实双射。
+[InaccessibleEnumeration](../InaccessibleEnumeration.lean) 实际证明 |Vκ|=κ；
+[EmbeddingRankRestriction](EmbeddingRankRestriction.lean) 在正则 Hχ 源中自动构造该枚举，
+给出不再输入枚举的不可达秩段实例，Vδ 源通过 Hδ=Vδ 使用同一实例。
+通用恢复、可数小界与共尾性传输只需 ZF；不可达枚举的构造单独使用 ZFC。
+
+这些是 Neeman 引理 2.8、断言 2.9 所需的编码与限制恢复步骤。
+
+## 已证明：相对秩层装配与源内树枝
+
+[CumulativeRelativeAlgebra](../CumulativeRelativeAlgebra.lean) 对原历史公式作内部成员归纳，
+证明同一传递载体中的相对 Vα 唯一且传递。全程只比较载体中的子集。
+[SourceHierarchy](../../Model/SetTheory/Internal/SourceHierarchy.lean) 从极限 Vδ 实际提供
+全部序数处的相对层，并沿完整初等嵌入传输全称存在句子，覆盖目标中的新序数。
+层级闭包单独保留，未加入一般 Hχ 的源条件。
+[RelativeRankSegment](RelativeRankSegment.lean) 的 `ep_relative_rank_l` 在初始 Vδ 中
+从不可达 κ 自动构造相对秩层及源内 κ 枚举。`Er_level_d.map_l` 将递归历史和枚举的
+有界塌缩证书一起传输；其像可直接调用 `Er_level_d.restriction_l` 恢复整层限制，
+无需把像序数当成背景中的不可达基数。
+
+[SourceCollapse](../../Model/SetTheory/Internal/SourceCollapse.lean) 的闭包现覆盖任意良基关系，
+不再限于外延关系；`Wc_map_d` 的 Δ₀ 证书在 KP 下反映背景良基性。
+[SourceBranch](../../Model/SetTheory/Internal/SourceBranch.lean) 从正则 Hχ 构造实际可数枝闭包，
+再传到每个初等后继。`Sc_collapse_d.wf_absolute_l` 与 `sc_branch_absolute_l` 因而给出
+良基性和存在可数下降链的绝对性，源条件的全部初始、改参和后继构造已经迁移。
+
+[ExtenderTreeBranch](ExtenderTreeBranch.lean) 的 `Ep_source_d.tree_branch_l` 对任意源内字母表 A、
+源内前缀树 T⊆A^{<ω} 和外部存在的分支，实际返回源内的 ω→A 分支图。
+证明在源内分离子边，取得下降节点列，收集其全部前缀，再逐坐标统一化；
+没有把节点列当作最终分支，也不要求内部 ω 外部标准。
+该端点仅需 ZF 和实际源证书；初始 Hχ 的可数枝闭包单独使用 ZFC。
+
+**尚未完成的边界：**还须把完整初等嵌入要求及规定的秩段限制编码为源内尝试树，
+并从其源内枝恢复满足断言 2.10 的嵌入；随后在相应模型内构造带小枚举的 Skolem 壳，
+完成 Pₙ₊₁∈Pₙ 的逐步装配及内部递归。这里没有把上述嵌入或递降步骤作为假设包装成结论；
+Neeman 定理 2.3、推论 2.4 的完整弱迭代性仍未得到。
 
 ## 已证明：按指定秩选长并恢复强性
 
@@ -454,7 +536,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 极限的完整内部初等性、整体 Mostowski 坍塌及原目标关系因子已完成。
 按 ν 选长的 Vν 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
 实际迭代树、单根与 pad、任意树前驱上的后继扩张，以及其后继一致性已实现。
-极限处添枝、共尾良基分支、迭代性与决定性蕴涵尚待实现。
+极限处添枝和上述条件下的共尾良基分支已实现；小模型的内部编码与跨源还原也已实现。
+nice 树的弱迭代性、其策略构造与决定性蕴涵仍待证明。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；
