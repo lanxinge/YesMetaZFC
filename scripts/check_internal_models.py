@@ -93,6 +93,12 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("IterationOrder", "IterationDiagram", "IterationNextMaps", "IterationDiagramExtend", "IterationStep",
              "IterationTree", "IterationTreeExtend", "IterationRoot", "IterationLimit", "Iteration")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Isomorphism"]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("IterationBranch", "IterationTag", "IterationTagIso", "IterationSystem", "IterationDirectLimit",
+             "IterationProjection", "IterationLimitModel", "IterationLimitOrder", "IterationLimitMaps",
+             "IterationLimitDiagram", "IterationLimitExtend", "IterationWellFounded", "IterationCofinal",
+             "IterationRealizer", "IterationBranchExtend", "IterationPadding")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderSystemSyntax", "ExtenderEdge", "ExtenderDescentSyntax", "ExtenderWellFounded")]
@@ -328,6 +334,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("It_pred_d", "It_order_d", "It_map_d", "it_map_m", "It_comp_d", "it_comp_m", "It_diagram_d",
                  "It_next_d", "it_next_m", "It_source_d", "It_local_d", "It_ultra_d", "It_payload_d", "It_active_d",
                  "It_step_d", "It_limit_d", "It_tree_d", "It_extension_d", "It_image_d", "it_image_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("It_branch_d", "It_tag_d", "It_arrow_d", "it_arrow_m", "It_system_d",
+                 "It_project_d", "it_project_m", "It_cone_d", "It_finish_d", "it_finish_m",
+                 "It_wf_branch_d", "It_realizer_d", "It_value_d", "it_value_m", "It_limit_extension_d")]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in

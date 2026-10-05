@@ -338,7 +338,34 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 `Di_system_d` 与 `Di_limit_d`：前驱的嵌入像组成带指标定向系统，取值图实现同一目标。
 [IterationFork](IterationFork.lean) 的 `it_fork_l` 从给定的合法短扩展器自动构造三结点树
 0→1、0→2，并证明两个后继不可比较；第一步为 pad，第二步为实际扩展器施加。
-极限处的新结点构造、共尾良基分支及可迭代性策略仍是后续工作。
+
+## 已证明：极限添枝与共尾良基分支判据
+
+[IterationBranch](IterationBranch.lean) 的 `It_branch_d` 是向下封闭的共尾链。
+[IterationTag](IterationTag.lean)、[IterationSystem](IterationSystem.lean) 从原 Q、G 实际构造
+带标号并 `(i,x)` 及全部过渡图；[IterationDirectLimit](IterationDirectLimit.lean) 构造真实集合商，
+并证明每个原模型到商的规范图保持全部内部公式码。这里不预设新的极限模型。
+
+[IterationLimitModel](IterationLimitModel.lean) 从商的内部良基性构造传递坍塌、新源证书和整列
+规范初等嵌入。各腿由同一个代表公式唯一定义并经替代收集，不选择商类代表。
+[IterationBranchExtend](IterationBranchExtend.lean) 的 `it_wf_branch_extend_l` 自动添入极限顶点，
+其严格前驱恰为 B；旧模型、旧嵌入及操作列保持。输出 `It_limit_extension_d` 同时保存原带标号
+系统和新模型的 `Di_limit_d`，因而新模型、嵌入和直接极限是同一次构造的对象。
+树序添枝只需 KP；商、坍塌与完整扩张只需 ZF。
+
+已实现的良基性及选枝入口如下：
+
+| 入口 | 数学条件与结论 |
+| --- | --- |
+| `it_sigma_branch_l`、`it_sigma_extend_l` | ZF＋DC；给定共尾枝 B 和 ω<cf(α)。任意内部可数指标族被枝上某阶段控制，故原隶属分量的良基性传到直接极限，并自动添枝。 |
+| `it_cofinal_branch_l` | ZF；给定内部 ω 共尾序列，每个结点都有任意高的树后继。沿最小后继作确定递归，实际构造经过指定起点的共尾枝。 |
+| `it_realized_branch_l` | ZF；给定非空共尾枝及实际相容映射列到内部良基目标。只要求函数保持成员关系并交换，不要求这些腿单射、满射或初等；直接极限良基。 |
+| `it_pruned_extend_l` | 结合实际选枝与相容实现：从可延伸树及其相容良基实现，自动选出共尾良基枝并完成极限扩张。 |
+| `it_padding_limit_l`、`it_padding_pruned_l` | 从已有真实源构造任意内部极限长度的 padding 树，实际调用同一商、坍塌、选枝与添枝接口，给出参数实例。 |
+
+这些条件均在定理签名中明示。一般树的无条件共尾良基分支、规范树的迭代策略以及由
+大基数推出这些策略，仍未证明。后继模型逐个良基并不足以替代极限处的论证；一般
+共尾分支假说的范围与反例可参见 [Neeman–Steel](https://math.berkeley.edu/~steel/papers/cbhcounter.pdf)。
 
 ## 已证明：按指定秩选长并恢复强性
 

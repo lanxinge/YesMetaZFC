@@ -4,6 +4,7 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.AscendingDescent
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Elementary
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Factor
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.RelationChange
+import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Isomorphism
 
 /-! # 通用内部定向系统与直接极限
 
@@ -18,5 +19,6 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.RelationChange
 `di_factor_embedding_l` 将分量关系嵌入组成的相容锥下降为极限的关系嵌入。
 `di_factor_elementary_l` 用内部有限参数覆盖证明完整初等锥的因子仍完整初等，仅需 ZF。
 `di_relation_change_l` 复用同一个商投影与过渡图扩张关系，已用于完整谓词初等极限。
+`di_limit_iso_l` 沿实际同构传递投影、核与关系证书，应用于树枝极限的传递坍塌。
 有限支撑测度族的实际实例、良基极限及传递坍塌由 LargeCardinal.ExtenderLimit 提供。
 -/
