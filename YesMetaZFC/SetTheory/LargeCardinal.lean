@@ -3,6 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
+import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
 
@@ -19,5 +20,6 @@ import YesMetaZFC.SetTheory.LargeCardinal.Extender
 并用共同纤维证明整个极限内部良基；返回完整内部初等嵌入、传递坍塌和到原目标的关系因子。
 武丁实例由 Hδ＝Vδ 采用原 Vδ 源；通用装配保留正则 H(χ) 初等源，背景为 ZFC。
 通用初等极限与外延坍塌只需 ZF，良基性核心只需 ZF＋DC。
-原强性的恢复、迭代及 AD 蕴涵仍待证明。
+按 ν 选长的秩覆盖与谓词强性已经恢复。实际迭代树、pad、任意树前驱上的
+超幂后继扩张及后继子集一致性已经构造；共尾良基分支、可迭代性与 AD 蕴涵仍待证明。
 -/

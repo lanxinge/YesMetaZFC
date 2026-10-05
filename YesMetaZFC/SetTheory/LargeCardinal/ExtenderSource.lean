@@ -28,6 +28,12 @@ structure Ep_source_d (hZF : M.Models ZF) (ω κ K X R : M.Domain) : Prop where
   theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R
   sequences : Sc_sequences_d (kp_pair_l (ZF.modelsKP hZF)) ω X
 
+/-- 任意已在源中的新字母表，都有实际有限序列空间。 -/
+theorem Ep_source_d.rebase_l (hZF : M.Models ZF) {ω κ K X R μ : M.Domain} (h : Ep_source_d hZF ω κ K X R)
+    (hμ : M.mem μ X) (hωμ : M.MemberSubset ω μ) : ∃ K', Ep_source_d hZF ω μ K' X R := by
+  obtain ⟨K', hk, hs⟩ := h.sequences μ hμ
+  exact ⟨K', h.omega, hωμ, h.transitive, h.omega_mem, hμ, hk, hs, h.code, h.theory, h.sequences⟩
+
 theorem Ep_source_d.space_l (hZF : M.Models ZF) {ω κ K X R n : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) : ∃ D, M.mem D X ∧ Ep_space_d κ n D := by
   let I := kp_pair_l (ZF.modelsKP hZF)

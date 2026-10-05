@@ -91,6 +91,10 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "ExtenderSeed", "ExtenderSeedNormal", "ExtenderSeedCollapse", "ExtenderCopySeed", "ExtenderCopyCollapse",
              "ExtenderTuple", "ExtenderSetCode")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("IterationOrder", "IterationDiagram", "IterationNextMaps", "IterationDiagramExtend", "IterationStep",
+             "IterationTree", "IterationTreeExtend", "IterationRoot", "IterationLimit", "Iteration")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal"]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderSystemSyntax", "ExtenderEdge", "ExtenderDescentSyntax", "ExtenderWellFounded")]
 MODULES += ["YesMetaZFC.SetTheory.OrdinalChoice"]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
@@ -282,6 +286,7 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderValue", "ExtenderTupleValue", "ExtenderValueAgreement", "ExtenderValueBound",
                 "ExtenderSetTransfer", "ExtenderSuccessor", "ExtenderSuccessorApplication", "ExtenderCopySuccessor")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("IterationApply", "IterationAgreement", "IterationFork")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("RankEnumeration", "RankCover", "RankLength",
                 "ExtenderPredicateComponent", "ExtenderPredicateLimit", "ExtenderStrength", "WoodinStrength")]
@@ -299,6 +304,8 @@ LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for
 LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.LargeCardinal.ep_support_cover_l"] = BASELINE
 LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.Internal.rp_matrix_l"] = BASELINE
 LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.LargeCardinal.ep_copy_identity_l"] = BASELINE
+LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.LargeCardinal.Ep_source_d.rebase_l"] = BASELINE
+LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.LargeCardinal.it_apply_l"] = BASELINE
 LOS_ZF_BOUNDS["YesMetaZFC.SetTheory.LargeCardinal.er_stage_l"] = BASELINE
 ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.Ssk_d." + name: BASELINE for name in
              ("value_l", "closed_l", "point_mem_l")}
@@ -317,6 +324,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("En_source_d", "Ep_repr_d", "ep_repr_m", "Ep_coord_d", "ep_coord_m", "Ep_seed_d", "ep_seed_m", "ep_pair_at_m")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                     ("Ep_value_d", "ep_value_m", "ep_subspace_m", "Ep_successor_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("It_pred_d", "It_order_d", "It_map_d", "it_map_m", "It_comp_d", "it_comp_m", "It_diagram_d",
+                 "It_next_d", "it_next_m", "It_source_d", "It_local_d", "It_ultra_d", "It_payload_d", "It_active_d",
+                 "It_step_d", "It_limit_d", "It_tree_d", "It_extension_d", "It_image_d", "it_image_m")]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in

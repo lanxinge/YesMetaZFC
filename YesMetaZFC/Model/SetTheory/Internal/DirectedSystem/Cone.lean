@@ -122,4 +122,44 @@ theorem di_cone_system_l (hZF : M.Models ZF) {J L A p Y V e : M.Domain}
       (rs c d j j z w hcj hdj hcz hdw).trans ⟨And.right, fun hr => ⟨rfl, hr⟩⟩
     exact h₁.trans (by rw [ex, ey]; exact h₂.symm)
 
+/-- 一个覆盖目标的单射相容锥已经实现了直接极限。 -/
+theorem di_cone_limit_l {J L A p T R e Y V : M.Domain}
+    (h : Di_system_d J L A p T R) (he : Fn0_d A Y e)
+    (range : ∀ y, M.mem y Y ↔ ∃ a, Rd_entry_d a y e)
+    (step : ∀ a b i j x y, Rd_entry_d a i p → Rd_entry_d b j p → Rd_entry_d a x e → Rd_entry_d b y e →
+      (Rd_entry_d a b T ↔ Rd_entry_d i j L ∧ x = y))
+    (rel : ∀ a b i j x y, Rd_entry_d a i p → Rd_entry_d b j p → Rd_entry_d a x e → Rd_entry_d b y e →
+      (Rd_entry_d a b R ↔ i = j ∧ Rd_entry_d x y V))
+    (bound : ∀ x y, Rd_entry_d x y V → M.mem x Y ∧ M.mem y Y)
+    (graph : ∀ r, M.mem r V → ∃ x y, KPair_d M r x y) : Di_limit_d A p T R e Y V := by
+  have val a b x y (hab : Rd_entry_d a b T) (hax : Rd_entry_d a x e) (hby : Rd_entry_d b y e) : x = y := by
+    obtain ⟨i, _, hai⟩ := h.index.2.1 a (h.bound a b hab).1
+    obtain ⟨j, _, hbj⟩ := h.index.2.1 b (h.bound a b hab).2
+    exact ((step a b i j x y hai hbj hax hby).mp hab).2
+  refine ⟨he, range, fun a b x y hax hby => ?_, fun a b x y hax hby => ?_, bound, graph⟩
+  · constructor
+    · intro eq
+      obtain ⟨i, u, v, hui, hvi, hau, hbv⟩ := h.common_l (he.bound_l hax).1 (he.bound_l hby).1
+      obtain ⟨z, _, huz⟩ := he.2.1 u (h.bound a u hau).2
+      obtain ⟨w, _, hvw⟩ := he.2.1 v (h.bound b v hbv).2
+      have same := (val a u x z hau hax huz).symm.trans (eq.trans (val b v y w hbv hby hvw))
+      have huv := (step u v i i z w hui hvi huz hvw).mpr ⟨h.order.refl i (h.index.bound_l hui).2, same⟩
+      have uv := h.unique u u v i hui hvi (h.identity u (h.bound a u hau).2) huv
+      exact ⟨u, hau, uv.symm ▸ hbv⟩
+    · rintro ⟨u, hau, hbu⟩
+      obtain ⟨z, _, huz⟩ := he.2.1 u (h.bound a u hau).2
+      exact (val a u x z hau hax huz).trans (val b u y z hbu hby huz).symm
+  · constructor
+    · intro hxy
+      obtain ⟨i, u, v, hui, hvi, hau, hbv⟩ := h.common_l (he.bound_l hax).1 (he.bound_l hby).1
+      obtain ⟨z, _, huz⟩ := he.2.1 u (h.bound a u hau).2
+      obtain ⟨w, _, hvw⟩ := he.2.1 v (h.bound b v hbv).2
+      exact ⟨i, u, v, hui, hvi, hau, hbv, (rel u v i i z w hui hvi huz hvw).mpr
+        ⟨rfl, val a u x z hau hax huz ▸ val b v y w hbv hby hvw ▸ hxy⟩⟩
+    · rintro ⟨i, u, v, hui, hvi, hau, hbv, huv⟩
+      obtain ⟨z, _, huz⟩ := he.2.1 u (h.bound a u hau).2
+      obtain ⟨w, _, hvw⟩ := he.2.1 v (h.bound b v hbv).2
+      exact (val a u x z hau hax huz).symm ▸ (val b v y w hbv hby hvw).symm ▸
+        ((rel u v i i z w hui hvi huz hvw).mp huv).2
+
 end YesMetaZFC.SetTheory.Internal

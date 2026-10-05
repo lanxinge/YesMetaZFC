@@ -279,7 +279,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 两侧施加系统、超幂及复制图。`ep_owned_copy_l` 从已有完整测度族自动构造
 包含 F、L 的所属模型 N，再构造 N∈X 的施加源，返回子集一致性、实际恒等原图
 和对应的完整复制。正则 Hχ 的大小在这里用于产生初始实例；通用复制定理
-消费任意已有的相对源及实际初等图。迭代树与非平凡迭代的可迭代性仍待证明。
+消费任意已有的相对源及实际初等图。迭代树后继构造见 [Iteration](Iteration.lean)；
+非平凡迭代的可迭代性仍待证明。
 
 ## 已证明：后继子集一致性与复制的支撑保持
 
@@ -304,7 +305,40 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 证明所得完整初等图 k 满足 k↾L=σ↾L，并保留精确共轭方程。
 [ExtenderCopySuccessor](ExtenderCopySuccessor.lean) 的 `ep_copy_successors_l` 自动构造这些对象；
 原侧只需预扩展器，目标侧的可数共同纤维经复制回传原侧良基性。
-这两个入口已经产出后继条件；迭代树递归、极限分支和可迭代性仍待实现。
+这两个入口产出的条件已接入下面的迭代树后继构造。
+
+## 已证明：实际迭代树及后继扩张
+
+[IterationTree](IterationTree.lean) 的 `It_tree_d` 保存对象模型内部的树序 T、模型码列 Q、
+完整初等嵌入列 G 和操作列 E。长度为任意内部序数。树序以自反闭包存储，
+严格边沿序数递增，每个结点的前驱构成链，序数后继有树前驱，极限的前驱共尾。
+模型均为已实现的传递源；已有极限结点要求被严格前驱的嵌入像覆盖。
+结构遵循 [Neeman 定义 1.24–1.25](https://www.math.ucla.edu/~ineeman/detLR.pdf/#page=16)。
+
+`It_local_d` 使用所属模型内对原 `ex_short_m` 的满足关系；`it_local_short_l` 将该模型内
+实际的 `Ex_short_d` 接入这个判断。活动步从当前结点 ξ 读取 F，施加到其树前驱 k 的源，
+并保留所需的有限 κ 幂子集一致性。`It_ultra_d` 把边 j 与同一个源内部超幂、常值图、
+整个商极限和传递坍塌绑定。操作记录用空集标记 pad，用实际有序对保存 κ、L、F。
+
+[IterationTreeExtend](IterationTreeExtend.lean) 的 `it_tree_extend_l` 实际添加整个后继列：
+新结点 α 可以接到任意 k<α；新增祖先嵌入为 j∘jᵢ,ₖ，新对角线为恒等图。
+[IterationNextMaps](IterationNextMaps.lean) 用替代统一收集这些图；
+[IterationDiagramExtend](IterationDiagramExtend.lean) 证明全部交换三角形，
+随后保持旧操作、旧模型和已有极限条件。树序添枝与操作列添加只需 KP；
+复合图唯一性只需外延性，其余一般扩张装配只需 ZF。
+
+[IterationRoot](IterationRoot.lean) 的 `it_root_l` 和 `it_pad_l` 给出实际单根树与恒等延长。
+[IterationApply](IterationApply.lean) 的 `it_apply_l` 直接消费现有 `Ep_limit_d`，构造新模型和
+超幂边，再调用整树扩张；`it_short_apply_l` 进一步从背景短扩展器的共同纤维自动构造该极限。
+模型内的短扩展器判断本身不保证背景中的良基性，一般入口保留实际良基超幂证书。
+[IterationAgreement](IterationAgreement.lean) 的 `it_short_apply_agree_l` 同时构造所属模型的
+超幂，证明它与树中新加入的同一个模型在每个 μ∈L 的有限幂子集上一致，并返回下一步源。
+
+[IterationLimit](IterationLimit.lean) 的 `it_branch_limit_l` 将上述极限覆盖条件实现为实际
+`Di_system_d` 与 `Di_limit_d`：前驱的嵌入像组成带指标定向系统，取值图实现同一目标。
+[IterationFork](IterationFork.lean) 的 `it_fork_l` 从给定的合法短扩展器自动构造三结点树
+0→1、0→2，并证明两个后继不可比较；第一步为 pad，第二步为实际扩展器施加。
+极限处的新结点构造、共尾良基分支及可迭代性策略仍是后续工作。
 
 ## 已证明：按指定秩选长并恢复强性
 
@@ -392,7 +426,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。
 极限的完整内部初等性、整体 Mostowski 坍塌及原目标关系因子已完成。
 按 ν 选长的 Vν 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
-迭代树和迭代性、决定性蕴涵尚待实现。
+实际迭代树、单根与 pad、任意树前驱上的后继扩张，以及其后继一致性已实现。
+极限处添枝、共尾良基分支、迭代性与决定性蕴涵尚待实现。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；
