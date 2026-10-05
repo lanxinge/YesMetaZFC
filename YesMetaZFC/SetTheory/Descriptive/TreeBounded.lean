@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.TreeCons
 import YesMetaZFC.SetTheory.KP.Natural
+import YesMetaZFC.SetTheory.Collapse.RelationSequence
 
 /-! # 任意字母表前缀树的有界子边
 
@@ -37,27 +38,31 @@ theorem tb_step_l (hZF : M.Models ZF) {ω A J s t : M.Domain} (hω : M.IsOmega �
     fun h => ⟨n, hn, m, hm, fn0_of_function_l (ZF.modelsKP hZF) hsn, fn0_of_function_l (ZF.modelsKP hZF) htm,
       (tree_step_iff_l _ hZF hω hn hm hsn htm).mp h⟩⟩
 
-theorem tree_branch_not_wf_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
-    (hZF : M.Models ZF) {ω A J T R f : M.Domain} (hω : M.IsOmega ω)
-    (hJ : Fseq_space_d I ω A J) (hf : M.IsSetFunctionFromTo I f ω A)
-    (hb : Branch_d J T f) (hr : Edge_d I ω T R) : ¬ Wf_rel_d T R := by
-  intro hw
-  let φ : Delta0UnarySchema 1 := { body := Formula.subset .newest (.bound 1), delta0 := .atom _ _ _ }
-  obtain ⟨Q, spec⟩ := KP.separation_exists_d (ZF.modelsKP hZF) φ ⟨fun _ => f, fun _ => f⟩ J
-  have read s : M.mem s Q ↔ M.mem s J ∧ M.MemberSubset s f :=
-    (spec s).trans (and_congr_right fun _ => Formula.satisfies_subset_iff ..)
-  obtain ⟨z, hz, hzω⟩ := hω.1.1
-  obtain ⟨s, hs, minimal⟩ := hw Q (fun s hs => hb s ((read s).mp hs).1 ((read s).mp hs).2)
-    ⟨z, (read z).mpr ⟨(hJ z).mpr ⟨z, hzω, ds_empty_fun_l I hz⟩, fun p hp => (hz p hp).elim⟩⟩
-  obtain ⟨hsJ, hsf⟩ := (read s).mp hs
-  obtain ⟨n, hn, hsn⟩ := (hJ s).mp hsJ
-  obtain ⟨m, hm, hmω⟩ := hω.1.2 n hn
-  obtain ⟨t, htm, htr, _⟩ := ds_prefix_l I hZF hω hf hmω
-  have htJ := (hJ t).mpr ⟨m, hmω, htm⟩
-  have htf := (ds_restrict_iff_l I htm hf.1).mp htr
-  have hst := ds_prefix_mono_l I hsn htm.1 ((ds_restrict_iff_l I hsn hf.1).mpr hsf) htr
-    (fun i hi => (hm i).mpr (Or.inl hi))
-  exact minimal t ((read t).mpr ⟨htJ, htf⟩) ((hr.2 s t).mpr
-    ⟨hb s hsJ hsf, hb t htJ htf, (tree_step_iff_l I hZF hω hn hmω hsn htm).mpr ⟨hm, hst⟩⟩)
+/-- 实际无限枝的全部有限前缀组成真实 ω 下降链。 -/
+theorem tree_branch_desc_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M) (hZF : M.Models ZF) {ω A J T R f : M.Domain} (hω : M.IsOmega ω)
+    (hJ : Fseq_space_d I ω A J)
+    (hf : M.IsSetFunctionFromTo I f ω A)
+    (hb : Branch_d J T f) (hr : Edge_d I ω T R) :
+    ∃ G, Fn0_d ω T G ∧ Wf_desc_d R G := by
+  let φ : BinarySchema 1 := { body := Formula.isRestriction 𝒞 .newest (.bound 2) (.bound 1) }
+  let ρ : Env M 1 := ⟨fun _ => f, fun _ => f⟩
+  have sat n s : φ.denote ρ n s ↔ M.IsRestrictionOf I s f n := Formula.satisfies_isRestriction_iff I ..
+  obtain ⟨G, fn, select⟩ := ZF.exists_setFunctionFromTo_of_denote hZF (kp_pair_l (ZF.modelsKP hZF)) φ ρ (source := ω) (target := T)
+    (fun n hn => (ds_prefix_l I hZF hω hf hn).imp fun s hs => (sat n s).mpr hs.2.1)
+    (fun _ _ _ _ hs ht => ((sat ..).mp hs).eq hZF.1 ((sat ..).mp ht))
+    (fun n s hn hs => by
+      have res := (sat n s).mp hs
+      have fn := res.isSetFunctionFromTo hf (hω.transitive hZF n hn)
+      exact hb s ((hJ s).mpr ⟨n, hn, fn⟩) ((ds_restrict_iff_l I fn hf.1).mp res))
+  refine ⟨G, fn0_of_function_l (ZF.modelsKP hZF) fn, fun i j s t hs hi hj => ?_⟩
+  have si := (sat i s).mp ((select i s).mp hi).2
+  have tj := (sat j t).mp ((select j t).mp hj).2
+  have hiω := fn.input_mem_of_pairMember hi
+  have hjω := fn.input_mem_of_pairMember hj
+  have sfn := si.isSetFunctionFromTo hf (hω.transitive hZF i hiω)
+  have tfn := tj.isSetFunctionFromTo hf (hω.transitive hZF j hjω)
+  exact (hr.2 s t).mpr ⟨fn.output_mem_of_pairMember hi, fn.output_mem_of_pairMember hj,
+    (tree_step_iff_l I hZF hω hiω hjω sfn tfn).mpr
+      ⟨hs, ds_prefix_mono_l I sfn tfn.1 si tj (fun n hn => (hs n).mpr (Or.inl hn))⟩⟩
 
 end YesMetaZFC.SetTheory.Descriptive

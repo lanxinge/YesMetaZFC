@@ -60,64 +60,17 @@ theorem ep_binary_pair_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ z o s p
   simp only [ep_binary_pair_m, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
     rd_entry0_sat_l hE, kpair0_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
-/-- 两个任意源对象的有序对，由源内常值函数的值域再作一次常值图得到。 -/
+/-- 源内基本配对给出任意两个已知对象的 Kuratowski 对。 -/
 theorem Ep_source_d.kpair_l {ω κ K X R a b : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (ha : M.mem a X) (hb : M.mem b X) : ∃ p, M.mem p X ∧ KPair_d M p a b := by
-  obtain ⟨c, hc⟩ := source.code
-  obtain ⟨z, _, hz⟩ := source.omega.1.1
-  obtain ⟨g, A, _, hA, hg, val⟩ := sc_constant_l hZF source.omega source.transitive hc source.theory source.omega_mem ha
-  have haA := (hg.bound_l ((val z a).mpr ⟨hz, rfl⟩)).2
-  obtain ⟨f, _, hf, _, _, val⟩ := sc_constant_l hZF source.omega source.transitive hc source.theory hA hb
-  obtain ⟨p, hp, hpf⟩ := (val a b).mpr ⟨haA, rfl⟩
-  exact ⟨p, source.transitive f hf p hpf, hp⟩
+    (ha : M.mem a X) (hb : M.mem b X) : ∃ p, M.mem p X ∧ KPair_d M p a b :=
+  source.theory.algebra.kpair_l ha hb
 
-/-- 任意源内字母表的二项序列空间给出其实际笛卡尔平方。 -/
+/-- 源的实际乘积闭包直接给出任意字母表的平方。 -/
 theorem Ep_source_d.square_l {ω κ K X R A : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hA : M.mem A X) : ∃ P, M.mem P X ∧ M.IsCartesianProduct I P A A := by
-  obtain ⟨z, hz, hzω⟩ := source.omega.1.1
-  obtain ⟨o, ho, hoω⟩ := source.omega.1.2 z hzω
-  obtain ⟨n, hn, hnω⟩ := source.omega.1.2 o hoω
-  have hzo : z ≠ o := by intro e; subst o; exact hz z ho.predecessor_mem
-  have hzn := (hn z).mpr (Or.inl ho.predecessor_mem)
-  obtain ⟨c, hc⟩ := source.code
-  obtain ⟨J, hJX, hJ⟩ := source.sequences A hA
-  let ξ : Env M 2 := ⟨Fin.cases n (fun _ => A), fun _ => n⟩
-  let ψ₀ : UnarySchema 2 := { body := fn0_m (.bound 1) (.bound 2) .newest }
-  obtain ⟨D, hDX, spec⟩ := sc_separate_source_l I hZF source.omega source.transitive hc source.theory
-    ψ₀ (fn0_delta_l ..) ξ (Fin.cases (source.transitive ω source.omega_mem n hnω) (fun _ => hA)) hJX
-  have hD s : M.mem s D ↔ Fn0_d n A s := (spec s).trans ((and_congr_right fun _ => fn0_sat_l hZF.1 ..).trans
-    ⟨And.right, fun hs => ⟨(hJ s).mpr ⟨n, hnω, fn0_function_l (ZF.modelsKP hZF) hs⟩, hs⟩⟩)
-  let ρ : Env M 3 := ⟨Fin.cases z (Fin.cases o (fun _ => A)), fun _ => z⟩
-  let φ : BinarySchema 3 := { body := ep_binary_pair_m (.bound 4) (.bound 2) (.bound 3) (.bound 1) .newest }
-  have sat s p : φ.denote ρ s p ↔ ∃ a, M.mem a A ∧ ∃ b, M.mem b A ∧
-      Rd_entry_d z a s ∧ Rd_entry_d o b s ∧ KPair_d M p a b := ep_binary_pair_sat_l hZF.1 ..
-  obtain ⟨f, C, _, hCX, hf, select⟩ := sc_uniform_source_l hZF source.omega source.transitive hc source.theory
-    φ (ep_binary_pair_delta_l ..) ρ (Fin.cases (source.transitive ω source.omega_mem z hzω)
-      (Fin.cases (source.transitive ω source.omega_mem o hoω) (fun _ => hA))) hDX (fun s hs => by
-        have hs := (hD s).mp hs
-        obtain ⟨a, ha, hza⟩ := hs.2.1 z hzn
-        obtain ⟨b, hb, hob⟩ := hs.2.1 o hn.predecessor_mem
-        obtain ⟨p, hpX, hp⟩ := source.kpair_l hZF (source.transitive A hA a ha) (source.transitive A hA b hb)
-        exact ⟨p, hpX, (sat s p).mpr ⟨a, ha, b, hb, hza, hob, hp⟩⟩)
-  let η : Env M 1 := ⟨fun _ => A, fun _ => A⟩
-  let ψ : UnarySchema 1 := {
-    body := Formula.existsMem (.bound 1)
-      (Formula.existsMem (.bound 2) (kpair0_m (.bound 2) (.bound 1) .newest)) }
-  have pair p : ψ.denote η p ↔ ∃ a, M.mem a A ∧ ∃ b, M.mem b A ∧ KPair_d M p a b := by
-    simp only [ψ, UnarySchema.denote, Formula.satisfies_existsMem_iff, kpair0_sat_l hZF.1]; rfl
-  obtain ⟨P, hPX, spec⟩ := sc_separate_source_l I hZF source.omega source.transitive hc source.theory ψ
-    (.existsMem _ (.existsMem _ (kpair0_delta_l ..))) η (fun _ => hA) hCX
-  refine ⟨P, hPX, fun p => (spec p).trans ?_⟩
-  rw [pair p]
-  refine ⟨And.right, fun ⟨a, ha, b, hb, hp⟩ => ⟨?_, a, ha, b, hb, hp⟩⟩
-  obtain ⟨s, hs, hza, hob⟩ := ep_two_values_l hZF hzo hzn hn.predecessor_mem ha hb
-  obtain ⟨q, hqC, hsq⟩ := hf.2.1 s ((hD s).mpr hs)
-  obtain ⟨a', ha', b', hb', hza', hob', hq⟩ := (sat s q).mp (select s q hsq)
-  have ea := hs.2.2 z hzn a ha a' ha' hza hza'
-  have eb := hs.2.2 o hn.predecessor_mem b hb b' hb' hob hob'
-  subst a'; subst b'
-  exact (kpair_unique_l M hZF.1 hq hp) ▸ hqC
+    (hA : M.mem A X) : ∃ P, M.mem P X ∧ M.IsCartesianProduct I P A A :=
+  source.theory.algebra.product A A hA hA
 
+/-- 有限幂子集一致性搬运源中的实际二元关系。 -/
 theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
     (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
     (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
@@ -151,12 +104,7 @@ theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
   let ψ : BinarySchema 3 := { body := ep_binary_pair_m (.bound 4) (.bound 2) (.bound 3) (.bound 1) .newest }
   have read s p : ψ.denote η s p ↔ ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧
       Rd_entry_d z a s ∧ Rd_entry_d o b s ∧ KPair_d M p a b := ep_binary_pair_sat_l hZF.1 ..
-  obtain ⟨f, B, _, hBY, hf, select⟩ := sc_uniform_source_l hZF target.omega target.transitive hd target.theory
-    ψ (ep_binary_pair_delta_l ..) η (Fin.cases hzY (Fin.cases hoY (fun _ => target.cardinal_mem))) hCY (fun s hs => by
-      obtain ⟨_, a, ha, b, hb, hza, hob, _⟩ := (code s).mp hs
-      obtain ⟨p, hpY, hp⟩ := target.kpair_l hZF (target.transitive κ target.cardinal_mem a ha)
-        (target.transitive κ target.cardinal_mem b hb)
-      exact ⟨p, hpY, (read s p).mpr ⟨a, ha, b, hb, hza, hob, hp⟩⟩)
+  obtain ⟨B, hBY, product⟩ := target.theory.algebra.product κ κ target.cardinal_mem target.cardinal_mem
   let ξ : Env M 4 := ⟨Fin.cases z (Fin.cases o (Fin.cases κ (fun _ => C))), fun _ => z⟩
   let χ : UnarySchema 4 := {
     body := Formula.existsMem (.bound 4)
@@ -183,12 +131,7 @@ theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
       obtain ⟨a, ha, b, hb, hp⟩ := bound p hpT
       obtain ⟨s, hs, hza, hob⟩ := ep_two_values_l hZF hzo hzn hn.predecessor_mem ha hb
       have hsC := (code s).mpr ⟨(hD s).mpr hs, a, ha, b, hb, hza, hob, p, hp, hpT⟩
-      obtain ⟨q, hqB, hsq⟩ := hf.2.1 s hsC
-      obtain ⟨a', ha', b', hb', hza', hob', hq⟩ := (read s q).mp (select s q hsq)
-      have ea := hs.2.2 z hzn a ha a' ha' hza hza'
-      have eb := hs.2.2 o hn.predecessor_mem b hb b' hb' hob hob'
-      subst a'; subst b'
-      exact ⟨(kpair_unique_l M hZF.1 hq hp) ▸ hqB, s, hsC, (read s p).mpr ⟨a, ha, b, hb, hza, hob, hp⟩⟩)
+      exact ⟨(product p).mpr ⟨a, ha, b, hb, hp⟩, s, hsC, (read s p).mpr ⟨a, ha, b, hb, hza, hob, hp⟩⟩)
   exact eq ▸ hQY
 
 /-- 搬运小关系码并在目标源内重新塌缩，得到同一个实际传递集合。 -/
@@ -197,8 +140,8 @@ theorem Ea_agree_d.collapse_l {ω κ K X R K' Y S T B F : M.Domain}
     (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
     (bound : ∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b)
     (h : Wc_iso_d κ T B F) : M.mem B Y := by
-  obtain ⟨C, G, hC, _, g⟩ := target.collapse.collapse_l hZF target.cardinal_mem
-    (agree.relation_l hZF source target hT bound) (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
+  obtain ⟨C, G, hC, _, g⟩ := target.collapse.collapse_l target.cardinal_mem
+    (agree.relation_l hZF source target hT bound) target.cardinal_small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
   exact (h.unique_l hZF g).symm ▸ hC
 
 end YesMetaZFC.SetTheory.LargeCardinal

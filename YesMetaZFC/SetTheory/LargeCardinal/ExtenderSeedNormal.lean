@@ -57,8 +57,8 @@ theorem ep_seed_down_l {ω κ K L X R F J O Z A p T S q C W α E H : M.Domain}
   -- 回归关系的精确真值集属于源，因而可以继续施加源内协调律。
   obtain ⟨B₀, hB₀X, bs₀⟩ := sc_member_trace_l hZF source.omega source.transitive code source.theory
     (source.space_mem_l hZF hn hD)
-    (source.function_l hZF (source.space_mem_l hZF hn hD) hg'X (hg'.mono_target_l (source.transitive κ source.cardinal_mem)))
-    (source.function_l hZF (source.space_mem_l hZF hn hD) hfX (hf.1.mono_target_l (source.transitive κ source.cardinal_mem)))
+    (source.function_l hZF hg'X (hg'.mono_target_l (source.transitive κ source.cardinal_mem)))
+    (source.function_l hZF hfX (hf.1.mono_target_l (source.transitive κ source.cardinal_mem)))
   have below := (ep_repr_atoms_l hZF family h limit hcU repr value).2.mp hHE
   have hB₀U : M.mem B₀ U := by
     obtain ⟨B, hBU, bound⟩ := below

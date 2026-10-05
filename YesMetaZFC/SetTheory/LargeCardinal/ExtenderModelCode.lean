@@ -17,7 +17,7 @@ theorem ep_transitive_code_l {ω κ K X R B F : M.Domain} (source : Ep_source_d 
     ∃ T, M.mem T X ∧
       (∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b) ∧ Wc_iso_d κ T B F := by
   have hf := fn0_of_function_l (ZF.modelsKP hZF) bij.1.1
-  obtain ⟨_, C, hCX, hfc⟩ := source.function_l hZF source.cardinal_mem hF
+  obtain ⟨_, C, hCX, hfc⟩ := source.function_l hZF hF
     (hf.retarget_l fun a b hab => (rd_entry_transitive_l source.transitive hF hab).2)
   obtain ⟨P, hPX, hP⟩ := source.square_l hZF source.cardinal_mem
   obtain ⟨c, hc⟩ := source.code

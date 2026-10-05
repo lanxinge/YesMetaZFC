@@ -52,7 +52,7 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
     (hc.fixed n (hc.ordinal.transitive ω hωκ n hn)) hc.image hjQ hQ hL (hSY a haS) ha
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF Q
   have hPX := source.transitive P (ZF.v_power_mem_l I hZF hV hδ.isLimitOrdinal hQX hP)
-  have sf f (hf : M.mem f G) := source.function_l hZF hQX ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sf f (hf : M.mem f G) := source.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2
   have ultra := hF.at_l hZF.1 haU ha hQ
   have newModel : Rp_model_d I Q X U R₀ e G r H V₁ := ⟨hm.map, code, by
     intro f f' E E' hf hf'

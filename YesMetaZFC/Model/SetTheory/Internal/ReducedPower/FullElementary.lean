@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem rs_full_projection_l {ω c X R D₀ D₁ Q₀ Q₁ U V t o₀ o₁ G₀ G₁ p₀ p₁ C₀ C₁ T₀ T₁ K j : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R)
+    (theory : Sc_theory_d I ω X R) (u₀ : Sc_uniform_d I ω X R D₀) (u₁ : Sc_uniform_d I ω X R D₁)
     (hD₀ : M.mem D₀ X) (hD₁ : M.mem D₁ X) (htX : M.mem t X)
     (hQ₀ : M.IsPowerSetOf Q₀ D₀) (hU : Maximal_d (ℳ := M) D₀ U) (hV : Maximal_d (ℳ := M) D₁ V)
     (ht : Push_d D₀ D₁ Q₀ Q₁ U V t)
@@ -36,7 +36,7 @@ theorem rs_full_projection_l {ω c X R D₀ D₁ Q₀ Q₁ U V t o₀ o₁ G₀ 
     have left : M.mem B V' ↔ M.mem B V := (vs B).trans ⟨And.right, fun h => ⟨hBP, h⟩⟩
     have right : M.mem A U' ↔ M.mem A U := (us A).trans ⟨And.right, fun h => ⟨ha, h⟩⟩
     exact ⟨B, hBP, hb, left.trans (eq.trans right.symm)⟩
-  obtain ⟨K', j', hk', ks, elem, lift'⟩ := rs_projection_embedding_l hZFC hω hX hm theory
+  obtain ⟨K', j', hk', ks, elem, lift'⟩ := rs_projection_embedding_l hZFC hω hX hm theory u₀ u₁
     hD₀ hD₁ htX hp₀ hp₁ hu hv push hG₀ hG₁ model₀ model₁
   have ek := hk'.1.1.eq_of_pairMember_iff hZF.1 hK.1.1 (fun f g => (ks f g).trans (spec f g).symm)
   subst K'

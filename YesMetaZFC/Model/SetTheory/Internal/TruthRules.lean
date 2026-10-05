@@ -33,14 +33,20 @@ private theorem arg_restrict_l {k X R H P ω r f i j} (hP : M.IsRestrictionOf I 
       and_congr (hp i A hr.1) (and_congr (hp j B hr.2) Iff.rfl)
   · exact exists_congr fun A => and_congr (hp j A hr.2) Iff.rfl
 
+/-- 原指令只读取严格较早行，故全表与当前行以前的限制给出同一节点真值。 -/
+theorem snode_restrict_l (hKP : M.Models KP) {ω X R H P r c : M.Domain}
+    (hc : Sfm_node_d I ω r c) (hP : M.IsRestrictionOf I P H r) (f : M.Domain) :
+    Snode_d I X R P c f ↔ Snode_d I X R H c f :=
+  exists_congr fun _ => exists_congr fun _ => exists_congr fun _ => and_congr_right fun hs =>
+    arg_restrict_l I hP (refs_l I hKP hc hs)
+
 theorem seval_row_l (hZF : M.Models ZF) {ω X R E F n H r c Y}
     (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H)
     (hc : M.PairMember I r c F) (hY : M.PairMember I r Y H) (f : M.Domain) :
     M.mem f Y ↔ M.mem f E ∧ Snode_d I X R H c f := by
   obtain ⟨P, hP, _, he⟩ := seval_unfold_l I hZF.1 hF.2.1.2.1 hH hc hY
   refine (he f).trans (and_congr_right fun _ => ?_)
-  exact exists_congr fun k => exists_congr fun i => exists_congr fun j => and_congr_right fun hs =>
-    arg_restrict_l I hP (refs_l I (ZF.modelsKP hZF) (hF.2.2 r c hc) hs)
+  exact snode_restrict_l I (ZF.modelsKP hZF) (hF.2.2 r c hc) hP f
 
 /-- 满足关系直接展开为该构造符在唯一真值表中的语义。 -/
 theorem ssat_op_l (hZF : M.Models ZF) {ω X R E F n H r c i j}
@@ -53,9 +59,9 @@ theorem ssat_op_l (hZF : M.Models ZF) {ω X R E F n H r c i j}
     (and_congr Iff.rfl (snode_decode_l I (ZF.modelsKP hZF) k hs)))
 
 /-- 二元关系的编码真值就是解码关系在赋值对象上的真值。 -/
-theorem ssat_rel_l (hZF : M.Models ZF) {ω X R E F n H r c i j f x y}
+theorem ssat_rel_l (hZF : M.Models ZF) {ω V X R E F n H r c i j f x y}
     (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H) (hc : M.PairMember I r c F)
-    (hs : Sop_d I 0 c i j) (hE : M.IsFunctionSpace I E ω X) (hf : M.mem f E)
+    (hs : Sop_d I 0 c i j) (hE : M.IsFunctionSpace I E V X) (hf : M.mem f E)
     (hi : M.PairMember I i x f) (hj : M.PairMember I j y f) :
     Ssat_d I X R E F n r f ↔ M.PairMember I x y R := by
   rw [ssat_op_l I hZF hF hH hc 0 hs f]
@@ -67,9 +73,9 @@ theorem ssat_rel_l (hZF : M.Models ZF) {ω X R E F n H r c i j f x y}
     exact hx ▸ hy ▸ hr
   · exact fun hr => ⟨hf, x, y, hi, hj, hr⟩
 
-theorem ssat_eq_l (hZF : M.Models ZF) {ω X R E F n H r c i j f x y}
+theorem ssat_eq_l (hZF : M.Models ZF) {ω V X R E F n H r c i j f x y}
     (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H) (hc : M.PairMember I r c F)
-    (hs : Sop_d I 1 c i j) (hE : M.IsFunctionSpace I E ω X) (hf : M.mem f E)
+    (hs : Sop_d I 1 c i j) (hE : M.IsFunctionSpace I E V X) (hf : M.mem f E)
     (hi : M.PairMember I i x f) (hj : M.PairMember I j y f) :
     Ssat_d I X R E F n r f ↔ x = y := by
   rw [ssat_op_l I hZF hF hH hc 1 hs f]

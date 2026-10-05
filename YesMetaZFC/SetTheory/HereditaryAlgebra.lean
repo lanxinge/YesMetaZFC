@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.HereditaryClosure
 import YesMetaZFC.SetTheory.Kuratowski
+import YesMetaZFC.SetTheory.InnerModel.Rudimentary.Construction
 
 /-! # 正则 H(χ) 的配对与乘积封闭
 
@@ -59,5 +60,26 @@ theorem h_product_l {A B P} (ha : M.mem A H) (hb : M.mem B H)
   obtain ⟨a, haA, b, hbB, hp⟩ := (hP p).mp hp
   exact h_kpair_l hZFC hω hχ hωχ hH hp
     (ZF.h_transitive_l I hZF hH A ha a haA) (ZF.h_transitive_l I hZF hH B hb b hbB)
+
+theorem h_fibers_l {R B T} (hR : M.mem R H) (hB : M.mem B H)
+    (hT : InnerModel.Rd_fun_d .fibers R B R T) : M.mem T H := by
+  let φ : BinarySchema 1 := { body := InnerModel.rd_fiber_m (.bound 2) (.bound 1) .newest }
+  let ρ : Env M 1 := ⟨fun _ => R, fun _ => R⟩
+  have sat b t : φ.denote ρ b t ↔ InnerModel.Rd_fiber_d R b t := InnerModel.rd_fiber_sat_l hZF.1 ..
+  obtain ⟨F, hf, spec⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := B) (target := T)
+    (fun b _ => (InnerModel.rd_fiber_exists_l (ZF.modelsKP hZF) R b).imp fun t ht => (sat b t).mpr ht)
+    (fun b _ t u ht hu => hZF.1.eq_of_same_members t u fun x => ((sat b t).mp ht x).trans ((sat b u).mp hu x).symm)
+    (fun b t hb ht => (hT t).mpr ⟨b, hb, (sat b t).mp ht⟩)
+  have onto t (ht : M.mem t T) : ∃ b, M.mem b B ∧ M.PairMember I b t F := by
+    obtain ⟨b, hb, hbt⟩ := (hT t).mp ht
+    exact ⟨b, hb, (spec b t).mpr ⟨hb, (sat b t).mpr hbt⟩⟩
+  obtain ⟨μ, hμ, size⟩ := ZF.hmem_size_l I hZF ((hH B).mp hB)
+  apply h_small_closed_l I hZFC hω hχ hωχ hH ?_ hμ
+    (ZF.ordinal_image_bound_l I hZF (hχ.isCardinal.1.mem hμ) size hf onto)
+  intro t ht
+  obtain ⟨b, _, fiber⟩ := (hT t).mp ht
+  obtain ⟨S, ν, hs, hν, bound⟩ := (hH R).mp hR
+  exact (hH t).mpr (ZF.hmem_of_subset_l I hZF hχ.isLimitOrdinal hs.1
+    (fun x hx => (InnerModel.rd_entry_transitive_l hs.1 hs.2.1 ((fiber x).mp hx)).1) hν bound)
 
 end YesMetaZFC.SetTheory.ZFC

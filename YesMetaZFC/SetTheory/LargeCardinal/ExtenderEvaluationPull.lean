@@ -22,8 +22,7 @@ theorem ee_pull_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L m n q a b f g 
   have hωκ := ed_critical_omega_l I hZF source.omega h source.transitive hY hc
   obtain ⟨E', D', t, t', hjE, hjD, ht, ts, hjt, htb⟩ := ed_reindex_l I hZF source.omega hV hδ h hY hc
     (hc.ordinal.transitive ω hωκ m hm) (hc.ordinal.transitive ω hωκ n hn) hq hE hD hL hb ha hnb hqa
-  obtain ⟨_, C, hCX, hFC⟩ := source.function_l hZF
-    (source.space_mem_l hZF hm hD) hfX hf
+  obtain ⟨_, C, hCX, hFC⟩ := source.function_l hZF hfX hf
   have comp : Cp0_d E D X t f g := by
     refine ⟨hg, fun s hs => ?_⟩
     obtain ⟨r, hr, hsr⟩ := ht.2.1 s hs

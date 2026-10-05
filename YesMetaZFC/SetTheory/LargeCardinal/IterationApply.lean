@@ -11,17 +11,17 @@ universe u
 variable {M : Structure.{u}}
 
 theorem it_apply_l (hZF : M.Models ZF)
-    {ω c₀ α ξ T Q G E k c d X R Y S κ K L F : M.Domain}
+    {ω c₀ α ξ T Q G E k c d X R Y S κ L F : M.Domain}
     (tree : It_tree_d hZF ω c₀ α T Q G E) (hα : M.SuccessorOf α ξ)
     (hc : Rd_entry_d ξ c Q) (hd : Rd_entry_d k d Q)
     (owner : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R) (parent : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d Y S)
     (localExt : It_local_d ω X κ L F) (agree : Ea_agree_d ω κ X Y)
-    (source : Ep_source_d hZF ω κ K Y S) (built : Ep_limit_d hZF ω κ L Y S F) :
+    (built : Ep_limit_d hZF ω κ L Y S F) :
     ∃ β U Q' G' E' b j p, It_tree_d hZF ω c₀ β U Q' G' E' ∧ It_extension_d α ξ k T Q G E β U Q' G' E' ∧
       Rd_entry_d α b Q' ∧ It_map_d G' k α j ∧ It_ultra_d hZF ω κ L F d b j ∧
       It_payload_d p κ L F ∧ Rd_entry_d ξ p E' := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨b, j, ultra, ready⟩ := it_ultra_exists_l hZF source parent built
+  obtain ⟨b, j, ultra, ready⟩ := it_ultra_exists_l hZF parent built
   obtain ⟨N, V, K', code, next⟩ := ready
   obtain ⟨r, hr⟩ := I.total L F
   obtain ⟨p, hp⟩ := I.total κ r
@@ -51,6 +51,7 @@ theorem it_short_apply_l (hZFC : M.Models ZFC)
   obtain ⟨Y', S', K₀, code, ready⟩ := tree.sources k d hd
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I code.1 parent.1
   obtain ⟨K, source⟩ := ready.rebase_l hZF hκY (ex.critical.1.transitive ω ex.uncountable)
-  exact it_apply_l hZF tree hα hc hd owner parent localExt agree source (ex.limit_l hZFC source)
+    (sc_ordinal_small_l hZF ready.omega ready.transitive parent ready.theory hκY ex.critical.1)
+  exact it_apply_l hZF tree hα hc hd owner parent localExt agree (ex.limit_l hZFC source)
 
 end YesMetaZFC.SetTheory.LargeCardinal

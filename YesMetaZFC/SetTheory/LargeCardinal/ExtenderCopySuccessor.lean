@@ -29,8 +29,8 @@ theorem ep_copy_successors_l
       (∀ α α', M.mem α L → Rd_entry_d α α' σ → Rd_entry_d α α' k) ∧
       (∀ B f p, M.TransitiveSet B → M.mem f P → M.IsSetBijectionFromTo I f L B →
         M.mem p P' → M.IsRestrictionOf I p k L → M.mem B P' ∧ ∃ r, M.mem r P' ∧ M.IsRestrictionOf I r k B) ∧
-      (∀ ξ, M.mem ξ P → M.MemberSubset ω ξ → ∃ K, Ep_source_d hZF ω ξ K P Rₚ) ∧
-      (∀ ξ, M.mem ξ P' → M.MemberSubset ω ξ → ∃ K, Ep_source_d hZF ω ξ K P' Rₚ') := by
+      (∃ K, Ep_source_d hZF ω ω K P Rₚ) ∧
+      (∃ K, Ep_source_d hZF ω ω K P' Rₚ') := by
   have hκ := ex.critical.1.transitive
   have hL := ex.length.transitive
   have hωL : M.MemberSubset ω L := fun x hx => hL κ ex.above x (hκ ω ex.uncountable x hx)
@@ -56,12 +56,16 @@ theorem ep_copy_successors_l
     ex'.atoms (ex'.normal.source_l Y) h' limit' wc' (fn0_of_function_l (ZF.modelsKP hZF) hg'.1.1)).2
   have hLP := ep_support_mem_l hZFC source family coherent h limit model hP mdl hg seed ex.critical.1 ex.length
   have hLP' := ep_support_mem_l hZFC target family' coherent' h' limit' model' hP' mdl' hg' seed' ex'.critical.1 ex'.length
-  obtain ⟨K₀, ready⟩ := next L hLP hωL
-  obtain ⟨K₁, ready'⟩ := next' L' hLP' hωL'
+  obtain ⟨K₀, base⟩ := next
+  obtain ⟨K₁, base'⟩ := next'
+  obtain ⟨K₂, ready⟩ := base.rebase_l hZF hLP hωL
+    (sc_ordinal_small_l hZF source.omega hP mdl base.theory hLP ex.length)
+  obtain ⟨K₃, ready'⟩ := base'.rebase_l hZF hLP' hωL'
+    (sc_ordinal_small_l hZF target.omega hP' mdl' base'.theory hLP' ex'.length)
   exact ⟨P, Rₚ, P', Rₚ', o, o', k,
     ⟨J, O, Z, A, p, T, V, q, c₀, C, W, o, g, h, limit, model, mdl, hP, wc, bij, hg⟩,
     ⟨J', O', Z', A', p', T', V', q', c₁, C', W', o', g', h', limit', model', mdl', hP', wc', bij', hg'⟩,
     mdl, mdl', hk, hLP, hLP', fixed,
-    (fun B f p hB hf bij hp res => smap_small_restriction_l hZF ready ready' mdl mdl' hk hp res hB hf bij), next, next'⟩
+    (fun B f p hB hf bij hp res => smap_small_restriction_l hZF ready ready' mdl mdl' hk hp res hB hf bij), ⟨K₀, base⟩, ⟨K₁, base'⟩⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -73,8 +73,9 @@ theorem ep_copy_countable_restriction_l
     have hiκ := source.below i hi
     obtain ⟨v, _, hiv⟩ := hσ.1.1.2.2 i (hU κ (hσ.1.1.input_mem_of_pairMember hκφ) i hiκ)
     exact (bounded i v hiκ hiv).1
-  obtain ⟨K₁, owner'⟩ := owner.rebase_l hZF (owner.transitive φ owner.cardinal_mem μ hμ) hωμ
-  obtain ⟨K₂, target'⟩ := target.rebase_l hZF (target.transitive φ target.cardinal_mem μ hμ) hωμ
+  have hφ := hσ.ordinal_l hZF source.omega hU owner.transitive h₀ h₁ hκφ hκ
+  obtain ⟨K₁, owner'⟩ := owner.rebase_l hZF (owner.transitive φ owner.cardinal_mem μ hμ) hωμ (owner.cardinal_small.mono_l (hφ.transitive μ hμ))
+  obtain ⟨K₂, target'⟩ := target.rebase_l hZF (target.transitive φ target.cardinal_mem μ hμ) hωμ (target.cardinal_small.mono_l (hφ.transitive μ hμ))
   exact ep_copy_restriction_l hZF source owner' target' (agree μ hμ) hm hn hj hU
     (fn0_of_function_l (ZF.modelsKP hZF) hσ.1.1) hσZ hκφ bounded fixed hB hf bij
 

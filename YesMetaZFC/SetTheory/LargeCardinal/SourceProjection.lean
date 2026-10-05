@@ -58,7 +58,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 /-- 从真实有限支撑分量一次构造两侧超幂与三个初等映射，并给出交换方程。 -/
 theorem es_source_projection_l {ω c X R κ L F m n q a b U V D E}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R)
+    (theory : Sc_theory_d I ω X R) (u₀ : Sc_uniform_d I ω X R D) (u₁ : Sc_uniform_d I ω X R E)
     (hmX : M.mem m X) (hnX : M.mem n X) (hκX : M.mem κ X) (hqX : M.mem q X)
     (hDX : M.mem D X) (hEX : M.mem E X) (hmω : M.mem m ω) (hnω : M.mem n ω)
     (hq : Fn0_d m n q) (ha : Fn0_d n L a) (hb : Cp0_d m n L q a b)
@@ -83,10 +83,10 @@ theorem es_source_projection_l {ω c X R κ L F m n q a b U V D E}
   obtain ⟨G₀, o₀, p₀, C₀, T₀, hG₀, hM₀⟩ := rp_family_model_l I hZF hU'.base hfX (hf.mono_target_l (hX A hAX)) R
   obtain ⟨f, A, hfX, hAX, hf, _⟩ := sc_constant_l hZF hω hX hm theory hEX hDX
   obtain ⟨G₁, o₁, p₁, C₁, T₁, hG₁, hM₁⟩ := rp_family_model_l I hZF hV'.base hfX (hf.mono_target_l (hX A hAX)) R
-  obtain ⟨K, j, hK, hk, hj, hl⟩ := rs_projection_embedding_l hZFC hω hX hm theory
+  obtain ⟨K, j, hK, hk, hj, hl⟩ := rs_projection_embedding_l hZFC hω hX hm theory u₀ u₁
     hDX hEX htX hP hQ hU' hV' ht hG₀ hG₁ hM₀ hM₁
-  obtain ⟨i₀, hi₀, h₀⟩ := rs_constant_embedding_l hZF hω hX hm theory hDX hP hU' hG₀ hM₀
-  obtain ⟨i₁, hi₁, h₁⟩ := rs_constant_embedding_l hZF hω hX hm theory hEX hQ hV' hG₁ hM₁
+  obtain ⟨i₀, hi₀, h₀⟩ := rs_constant_embedding_l hZF hω hX hm theory u₀ hDX hP hU' hG₀ hM₀
+  obtain ⟨i₁, hi₁, h₁⟩ := rs_constant_embedding_l hZF hω hX hm theory u₁ hEX hQ hV' hG₁ hM₁
   exact ⟨P, Q, U', V', t, G₀, G₁, o₀, o₁, p₀, p₁, C₀, C₁, T₀, T₁, i₀, i₁, K, j,
     hP, hQ, hU', hV', hu, hv, htX, ht, coord, hG₀, hG₁, hM₀, hM₁, hi₀, hi₁, hj, h₀, h₁, hK, hk, hl,
     rs_projection_constant_l I hM₀.map hM₁.map ht.1 hK (fun f g h => ((hk f g).mp h).2.2)

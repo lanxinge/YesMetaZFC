@@ -98,7 +98,8 @@ theorem tree_wf_of_no_branch_l (hZF : M.Models ZF) {ω A B T R} (hB : Baire_d I 
 theorem tree_wf_iff_l (hZF : M.Models ZF) {ω A B T R} (hB : Baire_d I ω B)
     (hA : Fseq_space_d I ω ω A) (ha : M.CardinalLessOrEqual I A ω) (ht : Tree_d A T) (hr : Edge_d I ω T R) :
     Wf_rel_d T R ↔ ∀ f, M.mem f B → ¬ Branch_d A T f := by
-  exact ⟨fun hw f hf hb => tree_branch_not_wf_l I hZF hB.1 hA ((hB.2 f).mp hf) hb hr hw,
-    tree_wf_of_no_branch_l I hZF hB hA ha ht hr⟩
+  refine ⟨fun hw f hf hb => ?_, tree_wf_of_no_branch_l I hZF hB hA ha ht hr⟩
+  obtain ⟨G, hg, desc⟩ := tree_branch_desc_l I hZF hB.1 hA ((hB.2 f).mp hf) hb hr
+  exact wf_no_desc_l hZF hB.1 hw hg desc
 
 end YesMetaZFC.SetTheory.Descriptive

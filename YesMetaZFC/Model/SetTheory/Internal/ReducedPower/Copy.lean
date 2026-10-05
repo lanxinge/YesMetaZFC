@@ -16,7 +16,8 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem rs_copy_embedding_l {ω c d X R Y S π D D' P Q U V o₀ o₁ G H p₀ p₁ C₀ C₁ T₀ T₁ : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hπ : Smap_d I ω c d X Y π)
-    (source : Sc_theory_d I ω X R) (target : Sc_theory_d I ω Y S) (hD : M.PairMember I D D' π)
+    (source : Sc_theory_d I ω X R) (target : Sc_theory_d I ω Y S)
+    (u₀ : Sc_uniform_d I ω X R D) (u₁ : Sc_uniform_d I ω Y S D') (hD : M.PairMember I D D' π)
     (hP : Source_d X D P) (hQ : Source_d Y D' Q) (hU : Rel_ultra_d D P U) (hV : Rel_ultra_d D' Q V)
     (measure : ∀ A A', M.mem A P → M.PairMember I A A' π → (M.mem A U ↔ M.mem A' V))
     (hG : ∀ f, M.mem f G ↔ M.mem f X ∧ Fn0_d D X f)
@@ -27,8 +28,8 @@ theorem rs_copy_embedding_l {ω c d X R Y S π D D' P Q U V o₀ o₁ G H p₀ p
       Smap_d I ω o₀ o₁ C₀ C₁ j ∧ Rp_lift_d I K p₀ p₁ j := by
   have hDX := hπ.1.1.input_mem_of_pairMember hD
   have hDY := hπ.1.1.output_mem_of_pairMember hD
-  have sf f (hf : M.mem f G) := sc_function_domain_l hZF hω hX hm source hDX ((hG f).mp hf).1 ((hG f).mp hf).2
-  have sg f (hf : M.mem f H) := sc_function_domain_l hZF hω hY hn target hDY ((hH f).mp hf).1 ((hH f).mp hf).2
+  have sf f (hf : M.mem f G) := sc_function_domain_l source.algebra ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sg f (hf : M.mem f H) := sc_function_domain_l target.algebra ((hH f).mp hf).1 ((hH f).mp hf).2
   obtain ⟨K, hK, ks⟩ := rs_copy_family_l hZF hω hX hY hm hn hπ source hD hG hH
   obtain ⟨j, hj, lift⟩ := rp_lift_exists_l I hZF hU.base hV.base hM₀.map hM₁.map hK (fun f g f' g' hf hg =>
     rs_copy_kernel_l hZF hω hX hY hm hn hπ source hD hP hQ hU hV measure
@@ -71,9 +72,9 @@ theorem rs_copy_embedding_l {ω c d X R Y S π D D' P Q U V o₀ o₁ G H p₀ p
     (fun i g hi => r₀.repr_l I ha.1 i g (bω i hi)) (fun i g hi => r₁.repr_l I ha'.1 i g (bω i hi)) assign
   have hBP := (hP B).mpr ⟨hBX, fun v hv => ((trace v).mp hv).1⟩
   have hBQ := (hQ B').mpr ⟨hπ.1.1.output_mem_of_pairMember hBB, fun v hv => ((trace' v).mp hv).1⟩
-  have old := rs_los_l hZF hω hX hm source hDX hP hU hG hM₀ hE hQ₀ code.2.1 hb bound code.2.2
+  have old := rs_los_l hZF hω hX hm source u₀ hDX hP hU hG hM₀ hE hQ₀ code.2.1 hb bound code.2.2
     a e₀ ((hE a).mpr ax) ((hQ₀ e₀).mpr he₀) (fun i hi => r₀ i (bω i hi))
-  have next := rs_los_l hZF hω hY hn target hDY hQ hV hH hM₁ hE' hQ₁ code.2.1 hb bound code.2.2
+  have next := rs_los_l hZF hω hY hn target u₁ hDY hQ hV hH hM₁ hE' hQ₁ code.2.1 hb bound code.2.2
     a' e₁ ((hE' a').mpr ay) ((hQ₁ e₁).mpr he₁) (fun i hi => r₁ i (bω i hi))
   exact (satisfies_decode_l I hZF.1 hM₀.code code hQ₀).trans
     (old.symm.trans ((pe_holds_member_l I hU hBP trace).symm.trans ((measure B B' hBP hBB).trans

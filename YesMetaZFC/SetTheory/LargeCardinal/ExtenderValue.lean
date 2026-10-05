@@ -58,7 +58,7 @@ theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q 
     exact ⟨B, md.map.member_l I hZF.1 ultra.base hBH hfB,
       (ts B (ρ.bound i)).mpr ⟨hBH, E, (vs B E).mpr ⟨hBH, u, hu, huE⟩, hEx⟩⟩
   obtain ⟨b, code⟩ := source.code
-  exact rs_delta_image_l hZF source.omega source.transitive code source.theory (source.space_mem_l hZF hn hD)
+  exact rs_delta_image_l hZF source.omega source.transitive code source.theory (source.uniform_l hZF hn hD) (source.space_mem_l hZF hn hD)
     ultra hG md hN target ht φ hφ hd f (fun i => (read i).elim fun _ h => md.map.projection.input_mem_of_pairMember h.1) ρ read
 
 /-- 在指定支撑上取常值初等嵌入，保留每个像的实际常值代表。 -/

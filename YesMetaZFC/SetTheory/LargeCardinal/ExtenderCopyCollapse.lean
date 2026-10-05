@@ -36,8 +36,8 @@ theorem ep_copy_collapse_l
       M.MemberSubset L P ∧ M.MemberSubset L' P' ∧
       (∀ E E' x y, Rd_entry_d E x g → Rd_entry_d E' y g' → (Rd_entry_d x y k ↔ Rd_entry_d E E' τ)) ∧
       (∀ α α', M.mem α L → Rd_entry_d α α' σ → Rd_entry_d α α' k) ∧
-      (∀ ξ, M.mem ξ P → M.MemberSubset ω ξ → ∃ K, Ep_source_d hZF ω ξ K P Rₚ) ∧
-      (∀ ξ, M.mem ξ P' → M.MemberSubset ω ξ → ∃ K, Ep_source_d hZF ω ξ K P' Rₚ') := by
+      (∃ K, Ep_source_d hZF ω ω K P Rₚ) ∧
+      (∃ K, Ep_source_d hZF ω ω K P' Rₚ') := by
   obtain ⟨_, _, _, P, g, inv, o, Rₚ, _, _, _, _, hP, wc, bij, mdl, front, _, inverse, back, _, _, next⟩ := collapse
   obtain ⟨_, _, _, P', g', _, o', Rₚ', _, _, _, _, hP', wc', bij', mdl', forward, _, _, _, _, _, next'⟩ := collapse'
   obtain ⟨t, ht, ts⟩ := smap_comp_l I hZF back hτ

@@ -18,7 +18,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem rs_projection_embedding_l {ω c X R D₀ D₁ P₀ P₁ U₀ U₁ t o₀ o₁ G₀ G₁ p₀ p₁ C₀ C₁ T₀ T₁}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R) (hD₀ : M.mem D₀ X) (hD₁ : M.mem D₁ X) (htX : M.mem t X)
+    (theory : Sc_theory_d I ω X R) (u₀ : Sc_uniform_d I ω X R D₀) (u₁ : Sc_uniform_d I ω X R D₁) (hD₀ : M.mem D₀ X) (hD₁ : M.mem D₁ X) (htX : M.mem t X)
     (hP₀ : Source_d X D₀ P₀) (hP₁ : Source_d X D₁ P₁)
     (hU₀ : Rel_ultra_d D₀ P₀ U₀) (hU₁ : Rel_ultra_d D₁ P₁ U₁) (ht : Push_d D₀ D₁ P₀ P₁ U₀ U₁ t)
     (hG₀ : ∀ g, M.mem g G₀ ↔ M.mem g X ∧ Fn0_d D₀ X g)
@@ -27,9 +27,9 @@ theorem rs_projection_embedding_l {ω c X R D₀ D₁ P₀ P₁ U₀ U₁ t o₀
     ∃ K j, M.IsSetFunctionFromTo I K G₀ G₁ ∧
       (∀ f g, M.PairMember I f g K ↔ M.mem f G₀ ∧ M.mem g G₁ ∧ Cp0_d D₁ D₀ X t f g) ∧
       Smap_d I ω o₀ o₁ C₀ C₁ j ∧ Rp_lift_d I K p₀ p₁ j := by
-  have s₀ g (hg : M.mem g G₀) := sc_function_domain_l hZF hω hX hm theory hD₀
+  have s₀ g (hg : M.mem g G₀) := sc_function_domain_l theory.algebra
     ((hG₀ g).mp hg).1 ((hG₀ g).mp hg).2
-  have s₁ g (hg : M.mem g G₁) := sc_function_domain_l hZF hω hX hm theory hD₁
+  have s₁ g (hg : M.mem g G₁) := sc_function_domain_l theory.algebra
     ((hG₁ g).mp hg).1 ((hG₁ g).mp hg).2
   obtain ⟨K, hK, hk⟩ := rs_pullback_family_l hZF hω hX hm theory hD₁ hD₀ htX ht.1 hG₀ hG₁
   obtain ⟨j, hj, lift⟩ := rp_lift_exists_l I hZF hU₀.base hU₁.base hM₀.map hM₁.map hK (fun f g f' g' hf hg =>
@@ -91,8 +91,8 @@ theorem rs_projection_embedding_l {ω c X R D₀ D₁ P₀ P₁ U₀ U₁ t o₀
     refine ⟨fun h => ⟨A, h, fun v hv => ((hA v).mp hv).2⟩, ?_⟩
     rintro ⟨B, hB, hb⟩
     exact hU.upward B A hB hAP (fun v hv => (hA v).mpr ⟨hU.base.bounds B hB v hv, hb v hv⟩)
-  have los₀ := rs_satisfies_l hZF hω hX hm theory hD₀ hP₀ hU₀ hG₀ hM₀ hE hA ((hE a₀).mpr a₀X) he₀ r₀ hz
-  have los₁ := rs_satisfies_l hZF hω hX hm theory hD₁ hP₁ hU₁ hG₁ hM₁ hE hA ((hE a₁).mpr a₁X) he₁ r₁ hz
+  have los₀ := rs_satisfies_l hZF hω hX hm theory u₀ hD₀ hP₀ hU₀ hG₀ hM₀ hE hA ((hE a₀).mpr a₀X) he₀ r₀ hz
+  have los₁ := rs_satisfies_l hZF hω hX hm theory u₁ hD₁ hP₁ hU₁ hG₁ hM₁ hE hA ((hE a₁).mpr a₁X) he₁ r₁ hz
   exact los₀.trans ((read hU₀ hBP _ hB).symm.trans (measure.symm.trans ((read hU₁ hCQ _ trace).trans los₁.symm)))
 
 end YesMetaZFC.SetTheory.Internal

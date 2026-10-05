@@ -69,13 +69,15 @@ theorem it_short_apply_agree_l (hZFC : M.Models ZFC)
   obtain ⟨_, hκX, _⟩ := localExt
   have hωκ := ex.critical.1.transitive ω ex.uncountable
   obtain ⟨K, source⟩ := ready.rebase_l hZF hκX hωκ
-  obtain ⟨b', j', ultra', ready'⟩ := it_ultra_exists_l hZF source owner (ex.limit_l hZFC source)
+    (sc_ordinal_small_l hZF ready.omega ready.transitive owner ready.theory hκX ex.critical.1)
+  obtain ⟨b', j', ultra', ready'⟩ := it_ultra_exists_l hZF owner (ex.limit_l hZFC source)
   obtain ⟨N', V', K', code', next'⟩ := ready'
   obtain ⟨N, V, K₁, code₁, next⟩ := h'.sources α b hb
   obtain ⟨Y₀, S₀, K₂, code₂, ready₂⟩ := tree.sources k d hd
   obtain ⟨eY, eS⟩ := smdl_unique_l I code₂.1 parent.1
   subst Y₀ S₀
   obtain ⟨K₃, source₂⟩ := ready₂.rebase_l hZF hκY hωκ
+    (sc_ordinal_small_l hZF ready₂.omega ready₂.transitive parent ready₂.theory hκY ex.critical.1)
   obtain ⟨hLN, hLN', common⟩ := it_ultra_agree_l hZFC source₂ source
     (fun n D A hn hD hA => (agree n D A hn hD hA).symm) (ex.measures.source_l hZF Y) (ex.coherent.source_l I Y)
     ex.atoms (ex.normal.source_l Y) ex.critical.1 ex.length
@@ -83,8 +85,11 @@ theorem it_short_apply_agree_l (hZFC : M.Models ZFC)
     next.transitive next'.transitive ultra ultra'
   refine ⟨β, U, Q', G', E', b, j, b', j', N, V, N', V', h', extension, hb, edge, ultra, ultra', code₁, code', common, ?_⟩
   intro μ hμ hωμ
-  obtain ⟨K, hk⟩ := next.rebase_l hZF (hμ.elim (next.transitive L hLN μ) (fun eq => eq.symm ▸ hLN)) hωμ
-  obtain ⟨K', hk'⟩ := next'.rebase_l hZF (hμ.elim (next'.transitive L hLN' μ) (fun eq => eq.symm ▸ hLN')) hωμ
+  have ho := hμ.elim ex.length.mem (fun eq => eq.symm ▸ ex.length)
+  have hm := hμ.elim (next.transitive L hLN μ) (fun eq => eq.symm ▸ hLN)
+  have hm' := hμ.elim (next'.transitive L hLN' μ) (fun eq => eq.symm ▸ hLN')
+  obtain ⟨K, hk⟩ := next.rebase_l hZF hm hωμ (sc_ordinal_small_l hZF next.omega next.transitive code₁ next.theory hm ho)
+  obtain ⟨K', hk'⟩ := next'.rebase_l hZF hm' hωμ (sc_ordinal_small_l hZF next'.omega next'.transitive code' next'.theory hm' ho)
   exact ⟨K, K', hk, hk'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

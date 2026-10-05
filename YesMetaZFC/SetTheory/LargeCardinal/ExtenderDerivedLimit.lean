@@ -55,7 +55,7 @@ theorem woodin_extender_l (hZFC : M.Models ZFC) {δ : M.Domain}
   obtain ⟨κ, hκ, family⟩ := all A hA
   refine ⟨κ, hκ, fun L hL hκL => ?_⟩
   obtain ⟨ν, N, B, j, W, k, S, F, K, E, hw, hLν, hLk, hS, hSN, hK, hF, short, he, derived⟩ := family L hL hκL
-  obtain ⟨R, source⟩ := ep_inaccessible_source_l hZFC hω hωδ hr hstrong hV hκ
+  obtain ⟨R, source⟩ := ep_regular_source_l hZFC hω hωδ hr hV hκ
     (short.critical.1.transitive ω short.uncountable) hK
   exact ⟨ν, N, B, j, W, k, S, F, K, E, R, hw, hLν, hLk, hS, hSN, hF, short, he, derived, source,
     Ep_limit_d.factor_l hZF source hV hr.isLimitOrdinal hw.2.2.2.2.2.1 hw.1 hw.2.2.2.2.2.2.1

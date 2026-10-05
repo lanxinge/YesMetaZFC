@@ -75,7 +75,7 @@ theorem ep_map_l (hZFC : M.Models ZFC) {ω κ K L X R F a b c d m n q : M.Domain
     have ur : M.mem A U' ↔ M.mem A U := (us A).trans ⟨And.right, fun h => ⟨hA, h⟩⟩
     exact ⟨B, hBQ, bs, vr.trans (eq.trans ur.symm)⟩⟩
   obtain ⟨P', j, hp', ps', elem, lift⟩ := rs_projection_embedding_l hZFC h.omega h.transitive hm₀ h.theory
-    (h.space_mem_l hZF hm hD₀) (h.space_mem_l hZF hn hD₁) htX hQ₀ hQ₁ hu hv push hG₀ hG₁ model₀ model₁
+    (h.uniform_l hZF hm hD₀) (h.uniform_l hZF hn hD₁) (h.space_mem_l hZF hm hD₀) (h.space_mem_l hZF hn hD₁) htX hQ₀ hQ₁ hu hv push hG₀ hG₁ model₀ model₁
   have eqP := hp'.1.1.eq_of_pairMember_iff hZF.1 hp.1.1 (fun f g => (ps' f g).trans (ps f g).symm)
   subst P'
   have hj := elem.1

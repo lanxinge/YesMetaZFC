@@ -32,14 +32,14 @@ theorem Ep_source_d.coordinate_l (hZF : M.Models ZF) {ω κ K X R n D i : M.Doma
   let φ : BinarySchema 1 := { body := rd_entry0_m (.bound 2) .newest (.bound 1) }
   let ρ : Env M 1 := ⟨fun _ => i, fun _ => i⟩
   have sat s x : φ.denote ρ s x ↔ Rd_entry_d i x s := rd_entry0_sat_l hZF.1 ..
-  obtain ⟨f, B, hfX, _, hf, select⟩ := sc_uniform_source_l hZF source.omega source.transitive code source.theory
+  obtain ⟨f, hfX, hf, select⟩ := sc_uniform_source_l hZF source.omega source.transitive code source.theory
     φ (rd_entry0_delta_l ..) ρ
     (fun _ => source.transitive ω source.omega_mem i (source.omega.transitive hZF n hn i hi))
-    (source.space_mem_l hZF hn hD) (fun s hs => by
+    (source.space_mem_l hZF hn hD) source.cardinal_mem (fun s hs => by
       obtain ⟨x, hx, hix⟩ := ((hD s).mp hs).2.1 i hi
-      exact ⟨x, source.transitive κ source.cardinal_mem x hx, (sat s x).mpr hix⟩)
+      exact ⟨x, hx, (sat s x).mpr hix⟩)
   have entry s x (hsx : Rd_entry_d s x f) := (sat s x).mp (select s x hsx)
-  refine ⟨f, hfX, hf.retarget_l (fun s x hsx => (((hD s).mp (hf.bound_l hsx).1).bound_l (entry s x hsx)).2),
+  refine ⟨f, hfX, hf,
     fun s x => ⟨fun h => ⟨(hf.bound_l h).1, entry s x h⟩, ?_⟩⟩
   rintro ⟨hs, hix⟩
   obtain ⟨y, _, hsy⟩ := hf.2.1 s hs

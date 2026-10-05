@@ -19,7 +19,7 @@ theorem it_fork_l (hZFC : M.Models ZFC) {ω κ K L F X R c : M.Domain}
       ¬ Rd_entry_d a b T ∧ ¬ Rd_entry_d b a T ∧ Rd_entry_d b d Q ∧ It_map_d G z b j ∧
       It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F c d j ∧ It_payload_d p κ L F ∧ Rd_entry_d a p E := by
   let hZF := ZFC.models_zf_l hZFC
-  obtain ⟨K₀, ready⟩ := source.rebase_l hZF source.omega_mem (fun _ h => h)
+  obtain ⟨K₀, ready⟩ := source.rebase_l hZF source.omega_mem (fun _ h => h) (source.cardinal_small.mono_l source.below)
   obtain ⟨z, a, T₀, Q₀, G₀, hz, ha, root⟩ := it_root_l hZF ⟨X, R, K₀, code, ready⟩
   obtain ⟨b, T₁, Q₁, G₁, E₁, c₁, j₁, hb, tree, pad, hc₁, hca, edge₁, _, _⟩ := it_pad_l hZF root ha
   have eq := root.diagram.model_function.2 z c₁ c hc₁ (root.root z hz)

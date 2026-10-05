@@ -13,14 +13,6 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem ordinal_down_l (hKP : M.Models KP) {a b c : M.Domain} (ha : M.IsOrdinal a) (hc : M.IsOrdinal c)
-    (hab : M.MemberSubset a b) (hbc : M.mem b c) : M.mem a c := by
-  rcases ha.trichotomy hKP.1 (hc.mem hbc) (KP.difference_exists_d hKP)
-    (KP.intersection_exists_d hKP a b) with eq | lt | gt
-  · exact (hKP.1.eq_of_same_members a b eq).symm ▸ hbc
-  · exact hc.transitive b hbc a lt
-  · exact (KP.mem_irrefl_d hKP b (hab b gt)).elim
-
 theorem Smap_d.ordinal_l {ω c d X R Y S j a b : M.Domain} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)
     (hj : Smap_d I ω c d X Y j) (hab : Rd_entry_d a b j) (ha : M.IsOrdinal a) : M.IsOrdinal b := by

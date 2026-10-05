@@ -10,6 +10,10 @@ import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
+import YesMetaZFC.Model.SetTheory.Internal.SourceAlgebra
+import YesMetaZFC.Model.SetTheory.Internal.SourceSmall
+import YesMetaZFC.Model.SetTheory.Internal.SourceCollection
+import YesMetaZFC.Model.SetTheory.Internal.SourceFamily
 import YesMetaZFC.Model.SetTheory.Internal.SourceField
 import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
@@ -19,6 +23,10 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceCollapse
 import YesMetaZFC.Model.SetTheory.Internal.SourceOmegaBound
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
+import YesMetaZFC.Model.SetTheory.Internal.FiniteEvaluation
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingAttemptRelative
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingAttemptDecode
+import YesMetaZFC.Model.SetTheory.Internal.RankSkolem
 
 /-! # 集合结构、公式码与满足关系的地模型内部编码
 
@@ -32,8 +40,8 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
 已实例化为源模型内部函数与相对派生超滤的商。
 对全部背景内部函数的代表族，`rp_satisfies_l` 在 ZFC 下给出全部内部代码的 Łoś 方程；
 `rp_los_assignment_l` 自动构造商赋值和代码集。源模型版本 `rs_satisfies_l` 另从实际
-源内真值集和对角见证在 ZF 中证明完整内部 Łoś，消费 `Sc_theory_d` 的实际全内部模式。
-正则 H(χ) 在 ZFC 中提供初始实例；`Sc_theory_d.map_l` 在 ZF 中传到任意传递初等后继。
+源内真值集和对角见证在 ZF 中证明完整内部 Łoś，仅要求索引集上的 `Sc_uniform_d`。
+`Sc_theory_d` 只保留分离与有界集合代数；`Sc_collection_d` 在源内小定义域上统一化。
 `rs_los_assignment_l` 从真实 ω→G 代表赋值自动构造所需空间与商赋值。
 `di_elementary_limit_l` 对任意完整初等定向系统证明极限的完整初等性；
 `wc_smaps_l` 构造良基外延结构的传递坍塌及完整内部同构；大基数层已接入迭代后继和枝极限。
@@ -63,11 +71,15 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 全部赋值上的有效性，`Smap_d.models_forward_l` 据此正向传输同一个内部编码理论。
 `Smap_d.omega_l` 固定背景 ω；`sc_sequences_forward_l` 保持全部字母表的实际有限序列空间，
 包括目标中的新参数和全部背景内部有限图。
-`sc_h_collapse_l` 实际证明正则 Hχ 中任意相对良基关系的塌缩闭包；
-`Sc_collapse_d.map_l` 传输整条存在句子，覆盖后继模型中新出现的关系。
-`Sc_collapse_d.wf_absolute_l` 反映良基性；`sc_branch_absolute_l` 把外部下降链换为源内下降链。
-可数枝闭包由实际正则 Hχ 和初等传输提供。`Sc_hierarchy_d` 则单独由极限 Vδ 提供，
+`Sc_small_d` 由源内实际单射控制，沿完整初等图保持；小性也随有限序列空间保持。
+`Sc_collapse_d` 仅塌缩源内小的相对良基外延关系；各全称性质覆盖后继中的新参数。
+正则 Hχ 和正则 Vδ 均提供实际源实例。外部枝反射 `Sc_branch_d` 独立于源理论，
+由 Hχ 与极限 Vδ 的实际函数图闭包提供。`Sc_hierarchy_d` 则单独由极限 Vδ 提供，
 并传到初等后继的全部新序数；相对层的传递性与唯一性只用 ZF。
+`ssat_spaces_l` 比较完整与有限赋值空间；`Fb_program_d`、`Fv_eval_d` 保留原程序的
+Δ₀ 检验证书。`At_node_d` 检验全部内部公式；`at_decode_l` 从其总枝恢复完整 `Smap_d`。
+`Fw_cert_d` 以有限赋值检验原 Skolem 见证。`sh_source_of_v_l` 在任意大于 ω 的极限
+秩初段中实际构造选择图、相对最小壳及源内双射枚举，大小参数只须是含 ω 的序数。
 `smap_omega_bound_l` 双向保持模型内的不可数共尾性；实际正则基数由 `sc_regular_bound_l` 给出实例。
 `sfm_sep_l` 直接构造任意内部程序的分离实例代码，支撑外新变量不会捕获旧参数。
 `smap_separation_l` 在目标容纳像集合的全部子集时，回拉源中的实际分离集；

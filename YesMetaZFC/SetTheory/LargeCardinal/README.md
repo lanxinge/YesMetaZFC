@@ -219,8 +219,8 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 [ExtenderCollapse](ExtenderCollapse.lean) 因而返回整体坍塌及逆图的完整内部初等性，
 并得到源到传递目标的完整内部初等嵌入。
 
-[InaccessibleHierarchy](../InaccessibleHierarchy.lean) 在 ZFC 中证明不可达 δ 以下的 Vα 具有实际较小序数单射界，
-进而证明 Hδ＝Vδ。[ExtenderRankSource](ExtenderRankSource.lean) 直接构造 Vδ 的源实例。
+[InaccessibleHierarchy](../InaccessibleHierarchy.lean) 保留不可达秩层的较小序数枚举及 Hδ＝Vδ。
+[ExtenderRankSource](ExtenderRankSource.lean) 的 `ep_regular_source_l` 直接构造正则 Vδ 源，不要求强极限。
 [DerivedEvaluation](DerivedEvaluation.lean) 证明原求值 j(f)(a) 精确识别商等号及成员关系；
 [ExtenderFactor](ExtenderFactor.lean) 装配全部求值并下降为整个极限到原目标的实际关系嵌入。
 其图方程保留每一个类代表，尚未断言该因子到原目标的完整初等性。
@@ -232,20 +232,20 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 ## 已证明：传递后继继续作为源
 
 [ExtenderSource](ExtenderSource.lean) 的 `Ep_source_d.successor_l` 在 ZF 中证明：
-若 X 是实际源，j:X→N 为完整内部初等嵌入，N 传递，则每个 κ′∈N、ω⊆κ′
+若 X 是实际源，j:X→N 为完整内部初等嵌入，N 传递，则每个源内小的 κ′∈N、ω⊆κ′
 都实际得到 K′∈N 和 `Ep_source_d ω κ′ K′ N W`。κ′ 可以不在 j 的像中。
-`Ep_source_d` 已统一改为源自身满足的全内部分离、统一化、有限序列空间与关系塌缩证书；
+`Ep_source_d` 保留全内部分离和有界集合代数；统一化与外延关系塌缩仅要求源内小载体。
 源内 Łoś、常值、复合、投影和全部有限支撑消费者均使用该接口。
 
 [UniversalClosure](../../Model/SetTheory/Internal/UniversalClosure.lean) 用实际原公式归纳
 构造任意非标准内部程序的全称闭包，`Smap_d.valid_l` 传输全部赋值上的有效性，
 `Smap_d.models_forward_l` 正向保持任意已编码理论。
-[SourceTheory](../../Model/SetTheory/Internal/SourceTheory.lean) 据此保持分离与统一化，覆盖 N 的全部新参数。
+[SourceTheory](../../Model/SetTheory/Internal/SourceTheory.lean) 保持分离与有界代数；[SourceCollection](../../Model/SetTheory/Internal/SourceCollection.lean) 保持小定义域统一化，覆盖 N 的全部新参数。
 [EmbeddingOmega](../../Model/SetTheory/Internal/EmbeddingOmega.lean) 证明 j(ω)=ω；
 [SourceFinite](../../Model/SetTheory/Internal/SourceFinite.lean) 用内部归纳证明 N 包含全部背景内部有限函数。
-[SourceSequences](../../Model/SetTheory/Internal/SourceSequences.lean) 再把相对序列空间识别为真实全部有限序列空间。
+[SourceSequences](../../Model/SetTheory/Internal/SourceSequences.lean) 把相对序列空间识别为真实全部有限序列空间，并保持其源内小性。
 [SourceCollapse](../../Model/SetTheory/Internal/SourceCollapse.lean) 传输整条塌缩存在句子，
-覆盖目标中的任意相对良基关系；相对良基性只量化目标模型自身的子集。
+覆盖目标中的小相对良基外延关系；相对良基性只量化目标模型自身的子集。
 
 初始正则 Hχ 的理论和全部字母表序列空间分别由 `sc_h_theory_l` 与
 [HereditarySequences](../HereditarySequences.lean) 的 `ZFC.h_fseq_l` 在 ZFC 中构造，
@@ -382,7 +382,7 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 
 [RelationBounded](../Collapse/RelationBounded.lean) 的 `Wc_iso_d` 用 Δ₀ 证书描述
 关系载体到传递集合的实际双射。其关系外延性只需背景外延性，关系良基性只需 KP；
-传递像唯一性复用原 ZF 关系递归。`Sc_collapse_d` 的 Hχ 实例和完整初等后继保持
+传递像唯一性复用原 ZF 关系递归。`Sc_collapse_d` 的小载体 Hχ、Vδ 实例和完整初等后继保持
 已接入所有 `Ep_source_d` 构造，因而每次实际后继继续具有内部塌缩能力。
 
 [ExtenderRelationCode](ExtenderRelationCode.lean) 把 κ 上的二元关系编码为二项 κ 值列的集合，
@@ -432,21 +432,58 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 有界塌缩证书一起传输；其像可直接调用 `Er_level_d.restriction_l` 恢复整层限制，
 无需把像序数当成背景中的不可达基数。
 
-[SourceCollapse](../../Model/SetTheory/Internal/SourceCollapse.lean) 的闭包现覆盖任意良基关系，
-不再限于外延关系；`Wc_map_d` 的 Δ₀ 证书在 KP 下反映背景良基性。
-[SourceBranch](../../Model/SetTheory/Internal/SourceBranch.lean) 从正则 Hχ 构造实际可数枝闭包，
-再传到每个初等后继。`Sc_collapse_d.wf_absolute_l` 与 `sc_branch_absolute_l` 因而给出
-良基性和存在可数下降链的绝对性，源条件的全部初始、改参和后继构造已经迁移。
+[SourceSmall](../../Model/SetTheory/Internal/SourceSmall.lean) 用源内实际单射图定义小性；
+原图可限制到任意子集。`Sc_collapse_d` 只要求小载体外延关系的塌缩，
+不再从它推出任意大关系的良基绝对性。独立的 `Sc_branch_d` 把实际外部下降链反射到源内；
+正则 Hχ 和大于 ω 的极限 Vδ 有实际实例，一般完整初等映射不自动保持这一外部性质。
 
 [ExtenderTreeBranch](ExtenderTreeBranch.lean) 的 `Ep_source_d.tree_branch_l` 对任意源内字母表 A、
 源内前缀树 T⊆A^{<ω} 和外部存在的分支，实际返回源内的 ω→A 分支图。
 证明在源内分离子边，取得下降节点列，收集其全部前缀，再逐坐标统一化；
 没有把节点列当作最终分支，也不要求内部 ω 外部标准。
-该端点仅需 ZF 和实际源证书；初始 Hχ 的可数枝闭包单独使用 ZFC。
+该端点仅需 ZF、实际源证书和独立枝反射；后者的 Hχ 实例用 ZFC，Vδ 实例用 ZF。
 
-**尚未完成的边界：**还须把完整初等嵌入要求及规定的秩段限制编码为源内尝试树，
-并从其源内枝恢复满足断言 2.10 的嵌入；随后在相应模型内构造带小枚举的 Skolem 壳，
-完成 Pₙ₊₁∈Pₙ 的逐步装配及内部递归。这里没有把上述嵌入或递降步骤作为假设包装成结论；
+## 已证明：完整初等嵌入的尝试树与源内解码
+
+[ExtenderEmbeddingTree](ExtenderEmbeddingTree.lean) 的 `Ep_source_d.at_tree_l` 在源内实际分离
+尝试树。节点记录枚举前缀的像，检查重复编号的一致性、给定限制图 τ，以及全部内部
+公式在全部有限参数列上的双向真值；`At_node_d.prefix_l` 证明前缀封闭。
+`Ep_source_d.at_branch_l` 用已有完整初等嵌入生成外部枝，再由独立枝反射取得源内总枝。
+
+源内节点公式的绝对性依赖实际有限证书：[ExtenderFiniteSyntax](ExtenderFiniteSyntax.lean)
+把每个合法内部程序和有限赋值空间放入源；[ExtenderFiniteEvaluation](ExtenderFiniteEvaluation.lean)
+逐原程序行作内部强归纳，用 Δ₀ 分离构造真值集，最后由有限函数闭性收集真值表。
+因此不要求源包含完整赋值空间的幂集，也不把全部公式真值作为额外输入。
+
+[ExtenderEmbeddingCountable](ExtenderEmbeddingCountable.lean) 的 `Ep_source_d.countable_membership_l`
+消费源内集合 A、B、限制图 τ、实际源内单射 ι:A→ω，以及外部完整初等图 j:A→B
+和 τ⊆j，返回 k、η∈Z，使 k:A→B 为完整内部初等嵌入、τ⊆k，η:k→ω 为单射。
+枚举、两边隶属关系的源内成员资格、尝试树、枝和嵌入图的可数性均自动构造。
+[EmbeddingAttemptDecode](../../Model/SetTheory/Internal/EmbeddingAttemptDecode.lean) 按有限赋值
+编号的共同自然数界选择一个节点，再恢复原 `Smap_d`；包括非标准内部公式。
+任意源内关系结构的入口为 `Ep_source_d.countable_embedding_l`，另消费实际关系图的源内成员资格。
+这些构造给定实际源证书与独立枝反射后仅用 ZF。
+
+## 已证明：模型内小 Skolem 壳与跨源隶属的一步装配
+
+`Internal/RankSkolem.lean` 的 `sh_source_of_v_l` 直接在 Vδ 中构造小壳实例，
+只要求 δ>ω 为极限序数。`ExtenderSkolemInitial.lean` 同时给出正则 Hχ 的实际实例。
+给定源内结构、种子 U 及源内 κ→U 双射，返回实际 Skolem 选择图、对它闭合的
+相对最小壳 N 和源内 κ→N 双射；κ 只须是含 ω 的序数，不要求背景基数正确性。
+
+`ExtenderFiniteWitness.lean` 将源内有限证书双向还原为原完整内部 Skolem 见证。
+`ExtenderSkolemSource.lean` 传输全称存在句子，覆盖后继模型中的新结构、新种子及
+新大小参数。所有代码、有限参数空间、选择图和枚举图都实际属于源。
+
+`ExtenderSkolemCollapse.lean` 的 `ep_skolem_collapse_l` 自动构造源内传递塌缩 B、
+塌缩图、κ→B 双射，以及反塌缩到原传递结构的完整初等嵌入。
+`ep_skolem_step_l` 再从两源的有限 κ 幂子集一致性推出 B 属于另一源；
+关系码、良基性、目标内塌缩和唯一性识别均由现有实现产生。
+
+**尚未完成的边界：**弱源接口及其正则 Vδ 实例已实现并迁移，但论文中的整条 Pₙ 递归尚未装配。
+外部枝反射已与源理论分开，不能仅靠任意完整初等映射传递。
+此外，断言 2.10 的具体秩段、可数编号与指定点，种子 Vφ∪{φ,σ} 的源内枚举，
+以及 σₙ 的相容性、成员资格和可数性保持仍须接入，才能完成 Pₙ₊₁∈Pₙ 的内部递归。
 Neeman 定理 2.3、推论 2.4 的完整弱迭代性仍未得到。
 
 ## 已证明：按指定秩选长并恢复强性

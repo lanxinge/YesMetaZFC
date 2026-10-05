@@ -48,8 +48,13 @@ theorem Ex_short_d.successors_l (hZFC : M.Models ZFC) {ω κ L F K K' X R Y R' :
     ⟨J', O', Z', A', p', T', V', q', c', C', W', d', e', h', limit', model', code', hN', wc', bij', he'⟩,
     hLN, hLN', common, ?_⟩
   intro μ hμ hωμ
-  obtain ⟨K, hk⟩ := next μ (hμ.elim (hN L hLN μ) (fun eq => eq.symm ▸ hLN)) hωμ
-  obtain ⟨K', hk'⟩ := next' μ (hμ.elim (hN' L hLN' μ) (fun eq => eq.symm ▸ hLN')) hωμ
+  obtain ⟨K₀, ready⟩ := next
+  obtain ⟨K₁, ready'⟩ := next'
+  have ho := hμ.elim ex.length.mem (fun eq => eq.symm ▸ ex.length)
+  have hm := hμ.elim (hN L hLN μ) (fun eq => eq.symm ▸ hLN)
+  have hm' := hμ.elim (hN' L hLN' μ) (fun eq => eq.symm ▸ hLN')
+  obtain ⟨K, hk⟩ := ready.rebase_l hZF hm hωμ (sc_ordinal_small_l hZF ready.omega hN code ready.theory hm ho)
+  obtain ⟨K', hk'⟩ := ready'.rebase_l hZF hm' hωμ (sc_ordinal_small_l hZF ready'.omega hN' code' ready'.theory hm' ho)
   exact ⟨K, K', hk, hk'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

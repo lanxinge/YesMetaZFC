@@ -25,7 +25,7 @@ theorem ep_relative_rank_l (hZFC : M.Models ZFC) {ω κ K X R δ : M.Domain}
     ∃ B, Er_level_d X κ B := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  have hκ := v_ordinal_height_l hZF hX hr.isCardinal.1 source.cardinal_mem
+  have hκ := ZF.v_ordinal_height_l hZF hX hr.isCardinal.1 source.cardinal_mem
   obtain ⟨B, hB⟩ := ZF.v_exists_l I hZF hr.isCardinal.1
   have hBX := ZF.v_mem_l I hZF hB hX hκ
   obtain ⟨f, hf⟩ := ZFC.inaccessible_enumeration_l I hZFC source.omega hωκ hr hs hB

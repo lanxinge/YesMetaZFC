@@ -56,13 +56,14 @@ theorem ep_successor_mem_l (hZFC : M.Models ZFC)
     (coherent.transfer_l hZF agree) h' limit' model' he' haJ' ha hD
   have hωN' := hj'.1.1.output_mem_of_pairMember (hj'.omega_l I hZF source.omega source'.transitive hN'
     code' target' source'.omega_mem)
-  obtain ⟨K₀, next⟩ := source'.successor_l hZF code' target' hN' hj' hωN' (fun _ hx => hx)
-  obtain ⟨Q, hQN', hQ⟩ := next.sequences μ hμN'
+  have theory := source'.theory.map_l I hZF source.omega source'.transitive hN' code' target' hj'
+  have seq := sc_sequences_forward_l hZF source.omega source'.transitive hN' code' target' hj' source'.omega_mem source'.sequences theory
+  obtain ⟨Q, hQN', hQ⟩ := seq.space μ hμN'
   let ρ : Env M 3 := ⟨Fin.cases m (Fin.cases μ (fun _ => B')), fun _ => m⟩
   let φ : UnarySchema 3 := { body := .conj (fn0_m (.bound 1) (.bound 2) .newest) (.mem .newest (.bound 3)) }
   have sat t : φ.denote ρ t ↔ Fn0_d m μ t ∧ M.mem t B' := by
     simp only [φ, UnarySchema.denote, Formula.satisfies_conj_iff, fn0_sat_l hZF.1, Formula.satisfies_mem_iff]; rfl
-  obtain ⟨B₀, hB₀, spec⟩ := sc_separate_source_l I hZF source.omega hN' target' next.theory φ
+  obtain ⟨B₀, hB₀, spec⟩ := sc_separate_source_l I hZF source.omega hN' target' theory φ
     (.conj (fn0_delta_l ..) (.mem _ _)) ρ (Fin.cases (hN' ω hωN' m hm) (Fin.cases hμN' (fun _ => hBN'))) hQN'
   have eq : B₀ = B := hZF.1.eq_of_same_members B₀ B (fun t => by
     rw [spec t, sat t]

@@ -63,22 +63,20 @@ theorem smap_countable_bound_l (hZF : M.Models ZF) {ω φ K Z S U R c d σ ι κ
     simp only [ψ, BinarySchema.denote, Formula.satisfies_disj_iff, ec_count_value_sat_l hZF.1,
       Formula.satisfies_conj_iff, Formula.satisfies_neg_iff, Formula.satisfies_existsMem_iff,
       Formula.satisfies_extensionalEq_iff_eq hZF.1]; rfl
-  obtain ⟨f, C, hfZ, _, hf, select⟩ := sc_uniform_source_l hZF owner.omega owner.transitive hn owner.theory ψ
+  obtain ⟨f, hfZ, hf, select⟩ := sc_uniform_source_l hZF owner.omega owner.transitive hn owner.theory ψ
     (.disj (ec_count_value_delta_l ..) (.conj (.neg (.existsMem _ (ec_count_value_delta_l ..))) (.atom _ _ _)))
     ρ (Fin.cases hσZ (Fin.cases hιZ (Fin.cases κZ (Fin.cases owner.cardinal_mem
-      (fun _ => owner.transitive ω owner.omega_mem z hzω))))) owner.omega_mem (fun i _ => by
+      (fun _ => owner.transitive ω owner.omega_mem z hzω))))) owner.omega_mem owner.cardinal_mem (fun i _ => by
         by_cases hi : ∃ y, M.mem y φ ∧ P i y
         · obtain ⟨y, hy, hiy⟩ := hi
-          exact ⟨y, owner.transitive φ owner.cardinal_mem y hy, (sat i y).mpr (Or.inl hiy)⟩
-        · exact ⟨z, owner.transitive ω owner.omega_mem z hzω, (sat i z).mpr (Or.inr ⟨hi, rfl⟩)⟩)
-  have ff := hf.retarget_l (fun i y hiy => ((sat i y).mp (select i y hiy)).elim
-    (value_bound i y) (fun h => h.2.symm ▸ hzφ))
-  obtain ⟨μ, hμ, bound⟩ := regular f hfZ ff
+          exact ⟨y, hy, (sat i y).mpr (Or.inl hiy)⟩
+        · exact ⟨z, hzφ, (sat i z).mpr (Or.inr ⟨hi, rfl⟩)⟩)
+  obtain ⟨μ, hμ, bound⟩ := regular f hfZ hf
   refine ⟨μ, hμ, fun a b ha hab => ?_⟩
   obtain ⟨p, hp, hpσ⟩ := hab
   obtain ⟨i, hi, hpi⟩ := countable.1.2.2 p hpσ
   have hib : P i b := ⟨p, hpσ, a, ha, hp, hpi⟩
-  obtain ⟨y, _, hiy⟩ := ff.2.1 i hi
+  obtain ⟨y, _, hiy⟩ := hf.2.1 i hi
   have eq : y = b := ((sat i y).mp (select i y hiy)).elim
     (fun hy => unique i y b hy hib) (fun h => (h.1 ⟨b, value_bound i b hib, hib⟩).elim)
   have hbμ := eq ▸ bound i y hiy

@@ -75,12 +75,12 @@ theorem Ea_agree_d.function_l {ω κ K X R K' Y S n D f : M.Domain}
   have sat t x : φ.denote ρ t x ↔ M.mem x κ ∧ ∃ s, M.mem s A ∧ M.MemberSubset t s ∧ Rd_entry_d n x s := by
     simp only [φ, BinarySchema.denote, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
       Formula.satisfies_existsMem_iff, Formula.satisfies_subset_iff, rd_entry0_sat_l hZF.1]; rfl
-  obtain ⟨g, B, hgY, _, hg, select⟩ := sc_uniform_source_l hZF target.omega target.transitive code target.theory
+  obtain ⟨g, hgY, hg, select⟩ := sc_uniform_source_l hZF target.omega target.transitive code target.theory
     φ (.conj (.mem _ _) (.existsMem _ (.conj (.atom _ _ _) (rd_entry0_delta_l ..)))) ρ
     (Fin.cases hAY (Fin.cases (target.transitive ω target.omega_mem n hn) (fun _ => target.cardinal_mem)))
-    (target.space_mem_l hZF hn hD) (fun t ht => by
+    (target.space_mem_l hZF hn hD) target.cardinal_mem (fun t ht => by
       obtain ⟨x, hx, htx⟩ := hf.2.1 t ht
-      exact ⟨x, target.transitive κ target.cardinal_mem x hx, (sat t x).mpr ((read t x).mp htx).2⟩)
+      exact ⟨x, hx, (sat t x).mpr ((read t x).mp htx).2⟩)
   have entry t x (htx : Rd_entry_d t x g) : Rd_entry_d t x f :=
     (read t x).mpr ⟨(hg.bound_l htx).1, (sat t x).mp (select t x htx)⟩
   have eq : g = f := (fn0_function_l (ZF.modelsKP hZF) hg).1.1.eq_of_pairMember_iff hZF.1

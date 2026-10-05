@@ -146,7 +146,7 @@ theorem ep_copy_l
       Rd_entry_d B E τ ↔ Rd_entry_d x' E i' := by
     obtain ⟨_, f₀, A₀, v₀, hf₀, hc₀, hfA₀, hv₀, hv₀B⟩ := (is x B).mp hxB
     obtain ⟨f₁, hfY, hff⟩ := hπ.1.1.2.2 f₀ ((hG₀ f₀).mp hf₀).1
-    have sf := source.function_l hZF hD₀X ((hG₀ f₀).mp hf₀).1 ((hG₀ f₀).mp hf₀).2
+    have sf := source.function_l hZF ((hG₀ f₀).mp hf₀).1 ((hG₀ f₀).mp hf₀).2
     have hGf := (hG₁ f₁).mpr ⟨hfY, (hπ.sfun_l hZF source.omega source.transitive target.transitive hm hn hDD hff sf).function_l target.transitive⟩
     have hc₁ := rs_constant_image_l hZF source.omega source.transitive target.transitive hm hn hπ hDD hxx hff hc₀
     obtain ⟨A₁, hA₁, hfA₁⟩ := md₁.map.projection.2.2 f₁ hGf

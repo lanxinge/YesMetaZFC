@@ -1,9 +1,10 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRelationCode
 import YesMetaZFC.SetTheory.Descriptive.TreeBounded
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
 
 /-! # 实际源中任意字母表的树枝绝对性
 
-先在源内分离真实子边，再用塌缩与可数枝闭包取得源内下降节点列。
+先在源内分离真实子边，再用独立的枝反射取得源内下降节点列。
 其全部前缀构成无死节点树；最后逐坐标读取节点列，得到源内的总分支图。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
@@ -39,14 +40,13 @@ theorem Ep_source_d.tree_edges_l {ω κ K X R A J T : M.Domain}
       (sat p).mpr ⟨t, ht, s, hs, hpair, (tb_step_l hZF source.omega hJ (tree.1 s hs) (tree.1 t ht)).mpr hst⟩⟩⟩
 
 theorem Ep_source_d.tree_branch_l {ω κ K X R A J T f : M.Domain}
-    (source : Ep_source_d hZF ω κ K X R) (hA : M.mem A X) (hT : M.mem T X)
+    (source : Ep_source_d hZF ω κ K X R) (branches : Sc_branch_d ω X) (hA : M.mem A X) (hT : M.mem T X)
     (hJ : Fseq_space_d I ω A J) (tree : Tree_d J T) (hf : M.IsSetFunctionFromTo I f ω A)
     (branch : Branch_d J T f) : ∃ g, M.mem g X ∧ M.IsSetFunctionFromTo I g ω A ∧ Branch_d J T g := by
   have hω := source.omega
-  -- 子边在源内实际存在；良基绝对性与源的枝闭包给出真实内部节点列。
+  -- 子边及背景前缀列实际存在，再由独立的枝反射取得源内节点列。
   obtain ⟨E, hEX, edges⟩ := source.tree_edges_l hZF hA hT hJ tree
-  obtain ⟨G, hGX, hG, desc⟩ := source.branch T E hT hEX (fun hw =>
-    tree_branch_not_wf_l I hZF hω hJ hf branch edges ((source.collapse.wf_absolute_l (ZF.modelsKP hZF) hT hEX).mp hw))
+  obtain ⟨G, hGX, hG, desc⟩ := branches T E hT hEX (tree_branch_desc_l I hZF hω hJ hf branch edges)
   have fn := fn0_function_l (ZF.modelsKP hZF) hG
   have next i j s t (hs : M.SuccessorOf j i) (hi : Rd_entry_d i s G) (hj : Rd_entry_d j t G) : Step_d I ω s t :=
     ((edges.2 s t).mp (desc i j s t hs hi hj)).2.2
@@ -54,7 +54,7 @@ theorem Ep_source_d.tree_branch_l {ω κ K X R A J T f : M.Domain}
     obtain ⟨n, hn, hsn⟩ := (hJ s).mp (tree.1 s (hG.bound_l hi).2)
     obtain ⟨m, hm, htm⟩ := (hJ t).mp (tree.1 t (hG.bound_l hj).2)
     exact ((tree_step_iff_l I hZF hω hn hm hsn htm).mp (next i j s t hs hi hj)).2)
-  obtain ⟨J', hJX, specJ⟩ := source.sequences A hA
+  obtain ⟨J', hJX, specJ⟩ := source.sequences.space A hA
   have eqJ := hZF.1.eq_of_same_members J' J (fun s => (specJ s).trans (hJ s).symm)
   have hJX : M.mem J X := eqJ ▸ hJX
   obtain ⟨c, hc⟩ := source.code
@@ -105,10 +105,10 @@ theorem Ep_source_d.tree_branch_l {ω κ K X R A J T f : M.Domain}
     body := .conj (.mem .newest (.bound 2)) (tb_step_m (.bound 3) (.bound 4) (.bound 1) .newest) }
   have choose s t : ψ.denote η s t ↔ M.mem t P ∧ Tb_step_d ω A s t := by
     simp only [ψ, BinarySchema.denote, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff, tb_step_sat_l hZF.1]; rfl
-  obtain ⟨F, C, _, _, hF, select⟩ := sc_uniform_source_l hZF hω source.transitive hc source.theory ψ
+  obtain ⟨F, _, hF, select⟩ := sc_uniform_source_l hZF hω source.transitive hc source.theory ψ
     (.conj (.mem _ _) (tb_step_delta_l ..)) η (Fin.cases hPX (Fin.cases source.omega_mem (fun _ => hA))) hPX
-    (fun s hs => (pruned s hs).imp fun t ht => ⟨source.transitive P hPX t ht.1, (choose s t).mpr ht⟩)
-  have fnF := fn0_function_l (ZF.modelsKP hZF) (hF.retarget_l (fun s t h => ((choose s t).mp (select s t h)).1))
+    hPX (fun s hs => (pruned s hs).imp fun t ht => ⟨ht.1, (choose s t).mpr ht⟩)
+  have fnF := fn0_function_l (ZF.modelsKP hZF) hF
   obtain ⟨z, hz, hzω⟩ := hω.1.1
   obtain ⟨q, hq, hzq⟩ := hG.2.1 z hzω
   have hzP := (read z).mpr ⟨(hJ z).mpr ⟨z, hzω, ds_empty_fun_l I hz⟩, z, hzω, q, hq, hzq, fun p hp => (hz p hp).elim⟩
@@ -130,20 +130,16 @@ theorem Ep_source_d.tree_branch_l {ω κ K X R A J T f : M.Domain}
     (.conj (rd_entry0_m (.bound 1) .newest (.bound 6)) (rd_entry0_m (.bound 3) (.bound 2) .newest))) }
   have value i x : ξ.denote ρ i x ↔ ∃ n, M.mem n ω ∧ ∃ s, M.mem s T ∧ Rd_entry_d n s G ∧ Rd_entry_d i x s := by
     simp only [ξ, BinarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, rd_entry0_sat_l hZF.1]; rfl
-  obtain ⟨g, D, hgX, _, hg, val⟩ := sc_uniform_source_l hZF hω source.transitive hc source.theory ξ
+  obtain ⟨g, hgX, hg, val⟩ := sc_uniform_source_l hZF hω source.transitive hc source.theory ξ
     (.existsMem _ (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))))
-    ρ (Fin.cases source.omega_mem (Fin.cases hT (fun _ => hGX))) source.omega_mem (fun i hi => by
+    ρ (Fin.cases source.omega_mem (Fin.cases hT (fun _ => hGX))) source.omega_mem hA (fun i hi => by
       obtain ⟨j, hj, hjω⟩ := hω.1.2 i hi
       obtain ⟨p, hp, hpn, _⟩ := path j hjω
       obtain ⟨x, hx, hix⟩ := hpn.2.2 i hj.predecessor_mem
       obtain ⟨_, n, hn, s, hs, hns, hps⟩ := (read p).mp hp
-      exact ⟨x, source.transitive A hA x hx, (value i x).mpr
+      exact ⟨x, hx, (value i x).mpr
         ⟨n, hn, s, hs, hns, hix.elim fun p hp => ⟨p, hp.1, hps p hp.2⟩⟩⟩)
-  have hga := hg.retarget_l (C := A) (fun i x h => by
-    obtain ⟨_, _, s, hs, _, his⟩ := (value i x).mp (val i x h)
-    obtain ⟨_, _, hf⟩ := (hJ s).mp (tree.1 s hs)
-    exact hf.output_mem_of_pairMember his)
-  have gfn := fn0_function_l (ZF.modelsKP hZF) hga
+  have gfn := fn0_function_l (ZF.modelsKP hZF) hg
   refine ⟨g, hgX, gfn, (Descriptive.tree_branch_l I hZF hω hJ gfn).mpr ?_⟩
   intro n hn
   obtain ⟨p, hp, hpn, _⟩ := path n hn

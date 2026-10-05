@@ -33,7 +33,7 @@ theorem ep_constant_limit_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
   obtain ⟨b, hX⟩ := source.code
   obtain ⟨P, U', hP, hU', _, hm'⟩ := rs_restrict_model_l hZF source.omega source.transitive hX source.theory
     (source.space_mem_l hZF hn hD) (hF.at_l hZF.1 haU ha hD) hG hm
-  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hX source.theory
+  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hX source.theory (source.uniform_l hZF hn hD)
     (source.space_mem_l hZF hn hD) hP hU' hG hm'
   obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZFC source hF coherent h limit model had hm.code
   obtain ⟨j, hj, js⟩ := smap_comp_l I hZF hi hk

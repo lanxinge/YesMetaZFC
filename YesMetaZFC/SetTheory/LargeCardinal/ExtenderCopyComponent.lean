@@ -73,7 +73,7 @@ theorem ec_component_l (hZFC : M.Models ZFC)
     exact ((us A).trans ⟨And.right, fun h => ⟨hA, h⟩⟩).trans
       (eq.trans ((vs A').trans ⟨And.right, fun h => ⟨hAQ, h⟩⟩).symm)
   obtain ⟨Qf, e, hf, fs, he, lift⟩ := rs_copy_embedding_l hZFC source.omega source.transitive target.transitive hm hn hπ
-    source.theory target.theory hDD hp hq hu' hv' measures hG hH model₀ model₁
+    source.theory target.theory (source.uniform_l hZF hnω space) (target.uniform_l hZF hnω space') hDD hp hq hu' hv' measures hG hH model₀ model₁
   have spec : ∀ B D, Rd_entry_d B D e ↔ M.mem B C ∧ M.mem D C' ∧ Ec_class_d π B D := by
     intro B D
     constructor

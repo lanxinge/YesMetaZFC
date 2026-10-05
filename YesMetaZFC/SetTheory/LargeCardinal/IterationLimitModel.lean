@@ -74,8 +74,10 @@ theorem it_limit_model_l {ω α T Q G B L A p H R q c C V i b X S K : M.Domain}
   obtain ⟨P, r, cone, hr, rs, ps⟩ := it_limit_cone_l hZF source.omega h inside s elementary limit model target.1 elem bij.2
   obtain ⟨f, hf⟩ := (cone.domain i).mp hi
   have ff := cone.elementary i f b X S hf hb mx.1
-  have hωN := ff.1.1.output_mem_of_pairMember (ff.omega_l I hZF source.omega source.transitive ht mx target source.omega_mem)
+  have fix := ff.omega_l I hZF source.omega source.transitive ht mx target source.omega_mem
+  have hωN := ff.1.1.output_mem_of_pairMember fix
   obtain ⟨K', next⟩ := source.successor_l hZF mx target ht ff hωN (fun _ hx => hx)
+    ((ff.small_l hZF source.omega source.transitive ht mx target fix).mp (source.cardinal_small.mono_l source.below))
   exact ⟨d, N, W, P, e, r, cone, ⟨N, W, K', target, next⟩, target, ht, wc, bij, elem, hr, rs, ps⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

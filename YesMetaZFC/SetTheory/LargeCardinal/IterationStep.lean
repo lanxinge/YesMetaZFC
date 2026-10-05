@@ -39,14 +39,13 @@ theorem It_ultra_d.elementary_l {ω κ L F c d j X R Y S : M.Domain} (h : It_ult
   exact hj
 
 /-- 已构造的良基超幂自动给出新模型码、实际超幂边及下一步源。 -/
-theorem it_ultra_exists_l {ω κ K L X R F c : M.Domain}
-    (source : Ep_source_d hZF ω κ K X R) (code : Smem_d I c X R)
+theorem it_ultra_exists_l {ω κ L X R F c : M.Domain}
+    (code : Smem_d I c X R)
     (built : Ep_limit_d hZF ω κ L X R F) : ∃ d j, It_ultra_d hZF ω κ L F c d j ∧ It_source_d hZF ω d := by
   obtain ⟨J, O, Z, A, p, T, V, q, b, C, W, hs, limit, model, _, _, collapse⟩ := built
   obtain ⟨_, c', i, Y, e, _, d, S, j, code', hi, constants, hY, wc, bij, target, he, _, _, _, hj, js, next⟩ := collapse
   obtain ⟨rfl, _⟩ := smem_unique_l I hZF.1 code' code
-  have hωY := hj.1.1.output_mem_of_pairMember (hj.omega_l I hZF source.omega source.transitive hY code target source.omega_mem)
-  obtain ⟨K', source'⟩ := next ω hωY (fun _ h => h)
+  obtain ⟨K', source'⟩ := next
   exact ⟨d, j, ⟨X, R, Y, S, J, O, Z, A, p, T, V, q, b, C, W, i, e, code, target, hs, limit, model,
       wc, bij, he, hi, constants, hj, hj.1.1.1.1, fun x y => (js x y).trans
         ⟨And.right, fun ⟨z, hxz, hzy⟩ => ⟨hi.1.1.input_mem_of_pairMember hxz, z, hxz, hzy⟩⟩⟩,
