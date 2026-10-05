@@ -85,6 +85,13 @@ theorem omega0_exists_l (hM : M.Models KPi) : ∃ ω : M.Domain, Omega0_d ω := 
   obtain ⟨ω, hω, hn⟩ := KPi.exists_omega_l hM
   exact ⟨ω, hω.1, fun a ha => (hn a).mp ha⟩
 
+theorem omega0_iff_l (hM : M.Models KPi) {ω Ω : M.Domain} (hω : M.IsOmega ω) : Omega0_d Ω ↔ Ω = ω := by
+  have unique {Ω} (h : Omega0_d Ω) : Ω = ω := ((KPi.models_iff_l.mp hM).1).1.eq_of_same_members Ω ω
+    (fun a => ⟨fun ha => KPi.n0_in_inductive_l hM hω.1 (h.2 a ha), hω.2 Ω h.1 a⟩)
+  refine ⟨unique, fun eq => ?_⟩
+  obtain ⟨W, hw⟩ := omega0_exists_l hM
+  exact eq ▸ unique hw ▸ hw
+
 theorem rd_iter_omega_closed_l (hM : M.Models KPi) {U ω C : M.Domain}
     (hω : Omega0_d ω) (hc : Rd_iter_d U ω C) : Rd_closed_d C ∧ M.MemberSubset U C := by
   let hKP := (KPi.models_iff_l.mp hM).1

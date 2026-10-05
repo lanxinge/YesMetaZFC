@@ -1,4 +1,6 @@
 import YesMetaZFC.SetTheory.Card.FiniteSequenceNumbering
+import YesMetaZFC.SetTheory.Card.SmallBound
+import YesMetaZFC.SetTheory.KP.Ordinal
 
 /-! # ZF 中内部有限序列的无限基数界
 
@@ -87,5 +89,19 @@ theorem fseq_countable_space_l (hZF : M.Models ZF) {ω X} (hω : M.IsOmega ω)
     (hX : M.CardinalLessOrEqual I X ω) : ∃ S, Fseq_space_d I ω X S ∧ M.CardinalLessOrEqual I S ω := by
   obtain ⟨S, hS⟩ := fseq_space_exists_l I hZF hω X
   exact ⟨S, hS, countable_fseq_l I hZF hω hX hS⟩
+
+/-- 有限列保持给定的无限序数大小界，不必先把该序数假定为基数。 -/
+theorem fseq_ordinal_bound_l (hZF : M.Models ZF) {ω μ A K : M.Domain} (hω : M.IsOmega ω)
+    (hμ : M.IsOrdinal μ) (hw : M.MemberSubset ω μ) (ha : M.CardinalLessOrEqual I A μ)
+    (seq : Fseq_space_d I ω A K) : M.CardinalLessOrEqual I K μ := by
+  obtain ⟨δ, ho, hs⟩ := KP.ordinal_successor_l (modelsKP hZF) hμ
+  have hμδ := hs.predecessor_mem
+  obtain ⟨ν, hν, inf, ⟨g, hg⟩, _⟩ := common_cardinal_l I hZF ho
+    (ordinal_down_l (modelsKP hZF) (hω.isOrdinal hZF) ho hw hμδ) hμδ hμδ
+  obtain ⟨e, he⟩ := ha
+  obtain ⟨q, hq⟩ := fseq_bound_l I hZF hω inf (exists_compositionInjection hZF I he hg) seq
+  have sub : M.MemberSubset ν μ := ((hs ν).mp hν).elim (hμ.transitive ν) (fun eq x hx => (eq x).mp hx)
+  obtain ⟨f, hf⟩ := exists_inclusionInjection hZF I sub
+  exact exists_compositionInjection hZF I hq hf
 
 end YesMetaZFC.SetTheory.ZF

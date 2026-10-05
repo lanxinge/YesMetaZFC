@@ -46,7 +46,8 @@ theorem ep_copy_l
     obtain ⟨a', haa, haJ⟩ := image a (hz.bound_l hao).1
     obtain ⟨o', _, hao'⟩ := hz'.2.1 a' haJ
     obtain ⟨A, R, A', R', s, ma, ma', hs, ss, _⟩ := component a a' o o' haa hao hao'
-    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZFC target family' coherent' h' limit' model' hao' ma'
+    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF target.omega h' limit'
+      (h'.toEp_graph_d.elementary_l hZFC target family' coherent') model' hao' ma'
     obtain ⟨k, hk, ks⟩ := smap_comp_l I hZF hs ht
     refine ⟨A, R, k, ma, hk, fun u B E hu => (ks B E).trans ?_⟩
     apply and_congr_right

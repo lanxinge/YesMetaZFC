@@ -21,6 +21,13 @@ theorem smem_delta_l {c X R : M.Domain} (h : Smem_d I c X R)
     (fun x => x) (fun _ _ he => he) (fun a y => (smem_member_l I h.1 h.2 y a).trans
       ⟨fun hy => ⟨y, hy, rfl⟩, fun ⟨x, hx, he⟩ => he ▸ hx⟩) hφ ρ
 
+theorem smem_delta_image_l {c X R : M.Domain} (hm : Smem_d I c X R) (hX : M.TransitiveSet X)
+    {n} {φ : Formula 1 n} (hd : φ.IsDelta0) (ρ : Env (smdl_structure_l I (R := R) hm.1.2.1) n) :
+    Formula.satisfies ρ φ ↔ Formula.satisfies (image_env_l Subtype.val ρ) φ := by
+  obtain ⟨x, hx⟩ := hm.1.2.1
+  let ne : Nonempty {a // M.mem a X} := ⟨⟨x, hx⟩⟩
+  exact (smem_delta_l I hm ne hd ⟨ρ.bound, ρ.free⟩).symm.trans (rt_model_delta_l hX ne hd _)
+
 theorem smem_sub_l {c d U R X S : M.Domain} (h : Smem_d I c U R) (s : Ssub_d I c d U R X S) : Smem_d I d X S := by
   refine ⟨s.target, fun x y => (s.relation x y).trans ?_⟩
   exact ⟨fun ⟨hx, hy, hxy⟩ => ⟨hx, hy, ((h.2 x y).mp hxy).2.2⟩,

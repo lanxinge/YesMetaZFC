@@ -16,7 +16,7 @@ theorem ep_graphs_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨J, O, hj, ho, os⟩ := ei_order_l hZF h.omega hωL
-  obtain ⟨Z, Q, hz, models⟩ := ep_components_l hZF h hF (fun a ha => ((hj a).mp ha).elim fun n hn => ⟨n, hn.1, hn.2.1⟩)
+  obtain ⟨Z, Q, hz, models⟩ := ep_components_l hZF h hF (fun a ha => ((hj a).mp ha).elim fun n hn => ⟨n, hn.1, hn.2.1⟩) R
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF X
   have bound a B (hat : Ep_at_d Z a B) : M.mem a J ∧ M.mem B P := by
     obtain ⟨c, C, S, hac, hc, hm, hB⟩ := ep_at_model_l hZF models hat

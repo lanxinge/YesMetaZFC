@@ -144,4 +144,27 @@ theorem Ea_agree_d.collapse_l {ω κ K X R K' Y S T B F : M.Domain}
     (agree.relation_l hZF source target hT bound) target.cardinal_small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
   exact (h.unique_l hZF g).symm ▸ hC
 
+/-- 诱导隶属关系由源内平方中的有界分离得到，无须另假设关系码属于源。 -/
+theorem Ep_source_d.membership_relation_l {ω κ K Z W c A R : M.Domain}
+    (source : Ep_source_d hZF ω κ K Z W) (hA : M.mem A Z) (hm : Smem_d I c A R) : M.mem R Z := by
+  obtain ⟨P, hPZ, hP⟩ := source.square_l hZF hA
+  obtain ⟨c₀, hc⟩ := source.code
+  let ρ : Env M 1 := ⟨fun _ => A, fun _ => A⟩
+  let φ : UnarySchema 1 := {
+    body := Formula.existsMem (.bound 1) (Formula.existsMem (.bound 2)
+      (.conj (kpair0_m (.bound 2) (.bound 1) .newest) (.mem (.bound 1) .newest))) }
+  have sat p : φ.denote ρ p ↔ ∃ x, M.mem x A ∧ ∃ y, M.mem y A ∧ KPair_d M p x y ∧ M.mem x y := by
+    simp only [φ, UnarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
+      kpair0_sat_l hZF.1, Formula.satisfies_mem_iff]; rfl
+  obtain ⟨Q, hQZ, spec⟩ := sc_separate_source_l I hZF source.omega source.transitive hc source.theory φ
+    (.existsMem _ (.existsMem _ (.conj (kpair0_delta_l ..) (.mem _ _)))) ρ (fun _ => hA) hPZ
+  have eq : Q = R := hZF.1.eq_of_same_members Q R (fun p => ⟨fun hp => by
+    obtain ⟨x, hx, y, hy, hpair, hxy⟩ := (sat p).mp ((spec p).mp hp).2
+    obtain ⟨q, hq, hqR⟩ := (hm.2 x y).mpr ⟨hx, hy, hxy⟩
+    exact kpair_unique_l M hZF.1 hq hpair ▸ hqR, fun hp => by
+    obtain ⟨x, y, hpair⟩ := hm.1.2.2.1 p hp
+    obtain ⟨hx, hy, hxy⟩ := (hm.2 x y).mp ⟨p, hpair, hp⟩
+    exact (spec p).mpr ⟨(hP p).mpr ⟨x, hx, y, hy, hpair⟩, (sat p).mpr ⟨x, hx, y, hy, hpair, hxy⟩⟩⟩)
+  exact eq ▸ hQZ
+
 end YesMetaZFC.SetTheory.LargeCardinal

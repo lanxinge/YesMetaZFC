@@ -124,12 +124,12 @@ theorem sc_ordinal_small_l (hZF : M.Models ZF) {ω c X R A : M.Domain} (hω : M.
     ⟨fn0_function_l (ZF.modelsKP hZF) fn, fun a b y ha hb => ((sat a y).mp (eq a y ha)).trans ((sat b y).mp (eq b y hb)).symm⟩⟩
 
 /-- 源内满射的像仍由源内实际单射控制；不要求满射本身是单射。 -/
-theorem sc_small_image_l (hZF : M.Models ZF) {ω c X R A B q : M.Domain} (hω : M.IsOmega ω)
+theorem sc_index_image_l (hZF : M.Models ZF) {ω c X R μ e A B q : M.Domain} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
     (theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R)
-    (hA : M.mem A X) (hB : M.mem B X) (hq : M.mem q X) (small : Sc_small_d X A)
-    (fn : Fn0_d A B q) (onto : ∀ b, M.mem b B → ∃ a, M.mem a A ∧ Rd_entry_d a b q) : Sc_small_d X B := by
-  obtain ⟨μ, e, hμ, he, idx⟩ := small
+    (hA : M.mem A X) (hB : M.mem B X) (hq : M.mem q X)
+    (hμ : M.mem μ X) (he : M.mem e X) (idx : Sc_index_d μ A e)
+    (fn : Fn0_d A B q) (onto : ∀ b, M.mem b B → ∃ a, M.mem a A ∧ Rd_entry_d a b q) : ∃ f, M.mem f X ∧ Sc_index_d μ B f := by
   let φ : BinarySchema 3 := {
     body := Formula.existsMem (.bound 4)
       (.conj (rd_entry0_m .newest (.bound 2) (.bound 3)) (rd_entry0_m .newest (.bound 1) (.bound 4))) }
@@ -142,13 +142,22 @@ theorem sc_small_image_l (hZF : M.Models ZF) {ω c X R A B q : M.Domain} (hω : 
       obtain ⟨a, ha, hab⟩ := onto b hb
       obtain ⟨y, hy, hay⟩ := idx.total a ha
       exact ⟨y, hy, (sat b y).mpr ⟨a, ha, hab, hay⟩⟩)
-  refine ⟨μ, f, hμ, hf, Sc_index_d.of_injection_l (ZF.modelsKP hZF) idx.ordinal ⟨fn0_function_l (ZF.modelsKP hZF) hfn, ?_⟩⟩
+  refine ⟨f, hf, Sc_index_d.of_injection_l (ZF.modelsKP hZF) idx.ordinal ⟨fn0_function_l (ZF.modelsKP hZF) hfn, ?_⟩⟩
   intro b c y hb hc
   obtain ⟨a, ha, hab, hay⟩ := (sat b y).mp (select b y hb)
   obtain ⟨d, hd, hdc, hdy⟩ := (sat c y).mp (select c y hc)
   have eq := idx.injective a ha d hd y (hfn.bound_l hb).2 hay hdy
   subst d
   exact (fn0_function_l (ZF.modelsKP hZF) fn).1.2 a b c hab hdc
+
+theorem sc_small_image_l (hZF : M.Models ZF) {ω c X R A B q : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
+    (theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R)
+    (hA : M.mem A X) (hB : M.mem B X) (hq : M.mem q X) (small : Sc_small_d X A)
+    (fn : Fn0_d A B q) (onto : ∀ b, M.mem b B → ∃ a, M.mem a A ∧ Rd_entry_d a b q) : Sc_small_d X B := by
+  obtain ⟨μ, e, hμ, he, idx⟩ := small
+  obtain ⟨f, hf, hi⟩ := sc_index_image_l hZF hω hX hm theory hA hB hq hμ he idx fn onto
+  exact ⟨μ, f, hμ, hf, hi⟩
 
 /-- 小性的回拉只用源内单射，无须字母表本身是序数。 -/
 theorem sc_small_pull_l (hZF : M.Models ZF) {ω c X R A B p : M.Domain} (hω : M.IsOmega ω)
@@ -176,5 +185,34 @@ theorem sc_small_pull_l (hZF : M.Models ZF) {ω c X R A B p : M.Domain} (hω : M
   have eq := idx.injective b hb d hd y (hfn.bound_l ha).2 hby hdy
   subst d
   exact inj.2 a c b hab hcd
+
+/-- 将已有的部分编号限制到指定定义域，实际图仍在源中。 -/
+theorem Sc_index_d.restrict_l (hZF : M.Models ZF) {ω c X R μ A e : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
+    (theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R)
+    (hA : M.mem A X) (hμ : M.mem μ X) (he : M.mem e X) (idx : Sc_index_d μ A e) :
+    ∃ f, M.mem f X ∧ M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) f A μ := by
+  let φ : BinarySchema 1 := { body := rd_entry0_m (.bound 1) .newest (.bound 2) }
+  let ρ : Env M 1 := ⟨fun _ => e, fun _ => e⟩
+  have sat x y : φ.denote ρ x y ↔ Rd_entry_d x y e := rd_entry0_sat_l hZF.1 ..
+  obtain ⟨f, hf, fn, select⟩ := sc_uniform_source_l hZF hω hX hm theory φ (rd_entry0_delta_l ..) ρ
+    (fun _ => he) hA hμ (fun x hx => (idx.total x hx).imp fun y hy => ⟨hy.1, (sat x y).mpr hy.2⟩)
+  exact ⟨f, hf, fn0_function_l (ZF.modelsKP hZF) fn, fun a b y ha hb =>
+    idx.injective a (fn.bound_l ha).1 b (fn.bound_l hb).1 y (fn.bound_l ha).2
+      ((sat a y).mp (select a y ha)) ((sat b y).mp (select b y hb))⟩
+
+/-- 任意源内小集合可用一个包含 ω 的源内序数编号。 -/
+theorem sc_infinite_index_l (hZF : M.Models ZF) {ω c X R A : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
+    (theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R) (hωX : M.mem ω X) (hA : M.mem A X)
+    (small : Sc_small_d X A) : ∃ μ f, M.mem μ X ∧ M.mem f X ∧ M.MemberSubset ω μ ∧ Sc_index_d μ A f := by
+  obtain ⟨μ, e, hμ, he, idx⟩ := small
+  obtain ⟨f, hf, inj⟩ := idx.restrict_l hZF hω hX hm theory hA hμ he
+  rcases idx.ordinal.trichotomy hZF.1 (hω.isOrdinal hZF) (KP.difference_exists_d (ZF.modelsKP hZF))
+    (KP.intersection_exists_d (ZF.modelsKP hZF) μ ω) with eq | lt | gt
+  · exact ⟨μ, e, hμ, he, fun x hx => (eq x).mpr hx, idx⟩
+  · exact ⟨ω, f, hωX, hf, fun _ h => h, Sc_index_d.of_injection_l (ZF.modelsKP hZF) (hω.isOrdinal hZF)
+      ⟨inj.1.mono_target_l _ ((hω.isOrdinal hZF).transitive μ lt), inj.2⟩⟩
+  · exact ⟨μ, e, hμ, he, idx.ordinal.transitive ω gt, idx⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -57,7 +57,7 @@ theorem ep_successor_mem_l (hZFC : M.Models ZFC)
   have hωN' := hj'.1.1.output_mem_of_pairMember (hj'.omega_l I hZF source.omega source'.transitive hN'
     code' target' source'.omega_mem)
   have theory := source'.theory.map_l I hZF source.omega source'.transitive hN' code' target' hj'
-  have seq := sc_sequences_forward_l hZF source.omega source'.transitive hN' code' target' hj' source'.omega_mem source'.sequences theory
+  have seq := (sc_sequences_iff_l hZF source.omega source'.transitive hN' code' target' hj' source'.omega_mem source'.theory theory).mp source'.sequences
   obtain ⟨Q, hQN', hQ⟩ := seq.space μ hμN'
   let ρ : Env M 3 := ⟨Fin.cases m (Fin.cases μ (fun _ => B')), fun _ => m⟩
   let φ : UnarySchema 3 := { body := .conj (fn0_m (.bound 1) (.bound 2) .newest) (.mem .newest (.bound 3)) }

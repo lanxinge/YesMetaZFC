@@ -92,11 +92,11 @@ theorem sc_v_collapse_l (hZF : M.Models ZF) {δ V : M.Domain}
     (iso.function.1 p hp).elim fun a ha => ha.2.elim fun b hb => ⟨a, hAY a ha.1, b, hBY b hb.1, hb.2⟩), iso⟩
 
 /-- 传输封闭句子而非逐个旧参数，目标中的任意新关系都能直接调用。 -/
-theorem Sc_collapse_d.map_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
-    (hω : M.IsOmega ω) (h : Sc_collapse_d X) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+theorem sc_collapse_iff_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
     (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
     (hn : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d Y S)
-    (hq : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y q) : Sc_collapse_d Y := by
+    (hq : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y q) : Sc_collapse_d X ↔ Sc_collapse_d Y := by
   obtain ⟨x, hx⟩ := hm.1.2.1
   obtain ⟨y, hy⟩ := hn.1.2.1
   let nx : Nonempty {a // M.mem a X} := ⟨⟨x, hx⟩⟩
@@ -106,7 +106,8 @@ theorem Sc_collapse_d.map_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
   obtain ⟨e, he⟩ := KP.exists_empty (ZF.modelsKP hZF)
   have tr := spred_source_l _ hZF hω ⟨c, R, d, S, hm.empty_pred_l _ he, hn.empty_pred_l _ he, hq⟩ nx ny
     sc_collapse_m (by simp -implicitDefEqProofs [sc_collapse_m, Definitional.Formula.FreeClosed]) ρ η (fun i => Fin.elim0 i)
-  exact (sc_collapse_sat_l (ZF.modelsKP hZF) hY ny η).mp (tr.mp ((sc_collapse_sat_l (ZF.modelsKP hZF) hX nx ρ).mpr h))
+  exact (sc_collapse_sat_l (ZF.modelsKP hZF) hX nx ρ).symm.trans
+    (tr.trans (sc_collapse_sat_l (ZF.modelsKP hZF) hY ny η))
 
 /-- 背景良基性蕴含相对良基性，故实际关系的塌缩可直接在源中计算。 -/
 theorem Sc_collapse_d.collapse_l {X A R : M.Domain} (h : Sc_collapse_d X)

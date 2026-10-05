@@ -80,4 +80,23 @@ theorem Sc_theory_d.map_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
   ⟨fun _ _ _ _ _ _ _ => sc_separation_forward_l I hZF hω hX hY hm hn hq source,
     (sc_algebra_iff_l I hZF hω hX hY hm hn hq).mp source.algebra⟩
 
+/-- 分离模式的全称闭包沿完整初等图回拉，赋值仍允许内部非标准长度。 -/
+theorem Sc_theory_d.pull_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
+    (hω : M.IsOmega ω) (target : Sc_theory_d I ω Y S) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hq : Smap_d I ω c d X Y q) : Sc_theory_d I ω X R := by
+  refine ⟨fun E F n r i f D hE hF hr hi hf hD => ?_,
+    (sc_algebra_iff_l I hZF hω hX hY hm hn hq).mpr target.algebra⟩
+  obtain ⟨b, s, t, hb, hs, ht, hsi, hti, _, _, hst, hsb, htb⟩ := sbound_fresh_l I hZF hω hF hi hi
+  obtain ⟨m, G, k, build, code⟩ := sfm_sep_l I hZF hω hF hr hi hs ht hsi hti hst hb htb
+  obtain ⟨K, hK⟩ := ZF.exists_functionSpace hZF I ω Y
+  have valid g (hg : M.mem g K) : Ssat_d I Y S K G m k g := by
+    obtain ⟨A, hA, hsA⟩ := ((hK g).mp hg).2.2 s hs
+    exact (code Y S K d g A hY hn hK hg hsA).mpr (target.separation K F n r i g A hK hF hr hi hg hA)
+  obtain ⟨f', update, hff⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hs hD
+  obtain ⟨A, hAX, hA⟩ := (code X R E c f' D hX hm hE ((hE f').mpr hff)
+    ((update.2 s D).mpr (Or.inl ⟨rfl, rfl⟩))).mp
+    ((hq.valid_l I hZF hω hm.1 hn.1 build.program build.root hE hK).mpr valid f' ((hE f').mpr hff))
+  exact ⟨A, hAX, (ssep_agree_l I hZF hF hb hr hi hE hf ((hE f').mpr hff)
+    (update.agree_l I hsb) (hX D hD)).mpr hA⟩
+
 end YesMetaZFC.SetTheory.Internal

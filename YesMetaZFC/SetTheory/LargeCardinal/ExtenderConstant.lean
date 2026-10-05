@@ -35,7 +35,8 @@ theorem ep_constant_limit_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
     (source.space_mem_l hZF hn hD) (hF.at_l hZF.1 haU ha hD) hG hm
   obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hX source.theory (source.uniform_l hZF hn hD)
     (source.space_mem_l hZF hn hD) hP hU' hG hm'
-  obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZFC source hF coherent h limit model had hm.code
+  obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZF source.omega h limit
+    (h.toEp_graph_d.elementary_l hZFC source hF coherent) model had hm.code
   obtain ⟨j, hj, js⟩ := smap_comp_l I hZF hi hk
   refine ⟨b, j, n, D, U, G, r, Y, W, hX, hj, hn, ha, hD, haU, hG, hm, fun x E =>
     (js x E).trans (and_congr_right fun hx => ?_)⟩

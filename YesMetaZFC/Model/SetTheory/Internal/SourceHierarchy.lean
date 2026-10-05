@@ -52,11 +52,11 @@ theorem sc_v_hierarchy_l (hZF : M.Models ZF) {δ X : M.Domain} (hδ : M.IsLimitO
   obtain ⟨B, F, hB, hF, cert, _⟩ := vr_source_l hZF hX hδ hαδ hV
   exact ⟨V, ZF.v_mem_l I hZF hV hX hαδ, B, F, hB, hF, fun t _ => cert t⟩
 
-theorem Sc_hierarchy_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j : M.Domain}
-    (hω : M.IsOmega ω) (h : Sc_hierarchy_d X) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+theorem sc_hierarchy_iff_l (hZF : M.Models ZF) {ω c d X R Y S j : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
     (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
     (hn : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d Y S)
-    (hj : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y j) : Sc_hierarchy_d Y := by
+    (hj : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y j) : Sc_hierarchy_d X ↔ Sc_hierarchy_d Y := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨x, hx⟩ := hm.1.2.1
   obtain ⟨y, hy⟩ := hn.1.2.1
@@ -67,8 +67,8 @@ theorem Sc_hierarchy_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j : M.Domain}
   obtain ⟨e, he⟩ := KP.exists_empty (ZF.modelsKP hZF)
   have tr := spred_source_l I hZF hω ⟨c, R, d, S, hm.empty_pred_l I he, hn.empty_pred_l I he, hj⟩ nx ny
     sc_hierarchy_m (by simp -implicitDefEqProofs [sc_hierarchy_m, Definitional.Formula.FreeClosed]) ρ η (fun i => Fin.elim0 i)
-  exact (sc_hierarchy_sat_l (ZF.modelsKP hZF) hY ny η).mp
-    (tr.mp ((sc_hierarchy_sat_l (ZF.modelsKP hZF) hX nx ρ).mpr h))
+  exact (sc_hierarchy_sat_l (ZF.modelsKP hZF) hX nx ρ).symm.trans
+    (tr.trans (sc_hierarchy_sat_l (ZF.modelsKP hZF) hY ny η))
 
 theorem Smap_d.hierarchy_l (hZF : M.Models ZF) {ω c d X R Y S j α β V W : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)

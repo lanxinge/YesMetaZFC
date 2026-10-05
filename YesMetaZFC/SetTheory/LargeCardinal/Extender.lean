@@ -9,7 +9,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.EmbeddingRankRestriction
 import YesMetaZFC.SetTheory.LargeCardinal.RelativeRankSegment
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderTreeBranch
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderEmbeddingCountable
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSkolemCollapse
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSkolemStep
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBranch
 
 /-! # 扩展器理论的公共入口
 
@@ -30,8 +31,14 @@ woodin_rank_strength_l 按 ν 自动选长，恢复 Vν 覆盖、谓词一致性
 `Ep_source_d.at_tree_l` 实际构造检验全部内部公式的嵌入尝试树；
 `Ep_source_d.countable_membership_l` 从源内可数域及外部完整初等图，返回保留规定限制的
 源内完整初等嵌入及其图的源内可数性见证。
-`sh_source_map_l` 保持模型内小 Skolem 壳及实际枚举；`ep_skolem_step_l` 构造源内壳、
+`sh_source_iff_l` 保持模型内小 Skolem 壳及实际枚举；`ep_skolem_step_l` 构造源内壳、
 传递塌缩与小枚举，再由两源的有限幂一致性证明塌缩属于另一源。
 弱源接口已直接适用于正则 Vβ，无强极限前提；源内小性、统一化、塌缩与后继调用均已迁移。
-完整 Pₙ 递归仍未完成，指定种子和 σₙ 的递归保持尚须装配。
+`ep_skolem_rank_step_l` 已将源内尝试树回收、严格秩界及 Vκ∪{κ,σ} 的指定种子调整接通；
+返回属于两源的新传递模型，嵌入与可数性见证属于新模型自身，指定低秩值保持不变；
+同一输出自动保留完整源、枝反射、层级及小壳闭包。
+`Ex_short_d.node_l` 自动构造携带上述不变量的实际短扩展器后继；枝反射经同一共同纤维证明。
+`Ep_source_d.rank_l` 与 `skolem_rank_l` 保持内部正则秩段的源证书及小壳性质。
+完整 Pₙ 递归仍未完成：任意树内的相对短扩展器判断尚不能直接代入背景共同纤维入口，
+复制嵌入的秩段限制和全部前驱的相容性仍需统一装配。
 -/

@@ -32,10 +32,13 @@ theorem ep_component_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω κ L X R 
     Formula.satisfies_mem_iff, fn0_sat_l hE, ep_space_sat_l hE, rd_entry_sat_l hE,
     Formula.satisfies_forall_iff, Formula.satisfies_iff_iff, rp_model_sat_l I hE, Definitional.Term.eval_weaken]; rfl
 
-theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Domain}
+theorem ep_component_pair_l (hE : Extensional M) {ω κ L X R S F a c d : M.Domain}
     (hF : Em_source_d ω κ L X F) (hc : Ep_component_d I ω κ L X R F a c)
-    (hd : Ep_component_d I ω κ L X R F a d) : c = d := by
-  obtain ⟨n, D, U, G, p, C, T, _, hn, hD, haU, hG, hm⟩ := hc
+    (hd : Ep_component_d I ω κ L X S F a d) : ∃ n D U G p C T V,
+      M.mem n ω ∧ Fn0_d n L a ∧ Ep_space_d κ n D ∧ Rd_entry_d a U F ∧
+      (∀ f, M.mem f G ↔ M.mem f X ∧ Fn0_d D X f) ∧
+      Rp_model_d I D X U R c G p C T ∧ Rp_model_d I D X U S d G p C V := by
+  obtain ⟨n, D, U, G, p, C, T, hnω, hn, hD, haU, hG, hm⟩ := hc
   obtain ⟨n', D', U', G', p', C', T', _, hn', hD', haU', hG', hm'⟩ := hd
   have e := hn'.domain_eq_l hE hn
   subst n'
@@ -50,6 +53,12 @@ theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Doma
   subst p'
   have ec := hE.eq_of_same_members C' C (fun B => (hm'.map.range B).trans (hm.map.range B).symm)
   subst C'
+  exact ⟨n, D, U, G, p, C, T, T', hnω, hn, hD, haU, hG, hm, hm'⟩
+
+theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Domain}
+    (hF : Em_source_d ω κ L X F) (hc : Ep_component_d I ω κ L X R F a c)
+    (hd : Ep_component_d I ω κ L X R F a d) : c = d := by
+  obtain ⟨_, D, U, G, p, C, T, T', _, _, _, _, _, hm, hm'⟩ := ep_component_pair_l I hE hF hc hd
   have et : T' = T := by
     apply hm'.code.2.2.1.eq_of_pairMember_iff hE hm.code.2.2.1
     intro B E
@@ -67,19 +76,19 @@ local notation "Kp" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_components_l {ω κ K L X R F J : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (hJ : ∀ a, M.mem a J → ∃ n, M.mem n ω ∧ Fn0_d n L a) : ∃ Z Q, Fn0_d J Q Z ∧
-      ∀ a c, Rd_entry_d a c Z → Ep_component_d Kp ω κ L X R F a c := by
-  let ρ := (((((⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push κ).push L).push X).push R).push F
+    (hJ : ∀ a, M.mem a J → ∃ n, M.mem n ω ∧ Fn0_d n L a) (S : M.Domain) : ∃ Z Q, Fn0_d J Q Z ∧
+      ∀ a c, Rd_entry_d a c Z → Ep_component_d Kp ω κ L X S F a c := by
+  let ρ := (((((⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push κ).push L).push X).push S).push F
   let φ : BinarySchema 6 := {
     body := ep_component_m (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest }
-  have sat a c : φ.denote ρ a c ↔ Ep_component_d Kp ω κ L X R F a c := ep_component_sat_l Kp hZF.1 _ _ _ _ _ _ _ _ _
+  have sat a c : φ.denote ρ a c ↔ Ep_component_d Kp ω κ L X S F a c := ep_component_sat_l Kp hZF.1 _ _ _ _ _ _ _ _ _
   have total a (ha : M.mem a J) : ∃ c, φ.denote ρ a c := by
     obtain ⟨n, hn, hna⟩ := hJ a ha
     obtain ⟨U, haU⟩ := hF.total n a hn hna
     obtain ⟨n', D, _, hna', hD, hU⟩ := hF.measure a U haU
     have en := hna'.domain_eq_l hZF.1 hna
     subst n'
-    obtain ⟨G, c, p, C, T, hG, hm⟩ := h.model_l hZF hn hD hU.base
+    obtain ⟨G, c, p, C, T, hG, hm⟩ := h.model_l hZF hn hD hU.base S
     exact ⟨c, (sat a c).mpr ⟨n, D, U, G, p, C, T, hn, hna, hD, haU, hG, hm⟩⟩
   have unique a (_ : M.mem a J) c d hc hd := ep_component_unique_l Kp hZF.1 hF ((sat a c).mp hc) ((sat a d).mp hd)
   obtain ⟨Q, hQ⟩ := ZF.exists_functionalImageOn hZF φ ρ J total unique

@@ -45,23 +45,21 @@ theorem Ep_graph_d.elementary_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p
       (us D y).mpr ⟨hyW, hpy⟩⟩
 
 /-- 原分量类结构到实际极限的完整内部初等嵌入，并保留精确的带标签代表方程。 -/
-theorem ep_stage_embedding_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S q c C V a d D W : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S)
-    (limit : Di_limit_d A p T S q C V) (model : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C V)
-    (had : Rd_entry_d a d Z) (stage : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d D W) :
-    ∃ j, Smap_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω d c D C j ∧
+theorem ep_stage_embedding_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q c C V a d D W : M.Domain}
+    (hω : M.IsOmega ω) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (limit : Di_limit_d A p T S q C V)
+    (elementary : Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S)
+    (model : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V)
+    (had : Rd_entry_d a d Z) (stage : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) d D W) :
+    ∃ j, Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω d c D C j ∧
       ∀ B E, Rd_entry_d B E j ↔ M.mem B D ∧ ∃ u, KPair_d M u a B ∧ Rd_entry_d u E q := by
-  let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨B, hB⟩ := stage.2.1
   obtain ⟨u, hu⟩ := I.total a B
   have huA := (h.nodes u).mpr ⟨a, B, hu, d, D, W, had, stage.1, hB⟩
   obtain ⟨d', D', W', ht⟩ := di_stage_exists_l hZF h.diagram ((h.index u a B hu).mpr huA)
-  obtain ⟨_, e, _, he, _, es⟩ := ep_tag_l hZF source.omega h.toEp_graph_d ht had stage
-  obtain ⟨k, hk, ks⟩ := di_elementary_limit_l hZF source.omega h.diagram limit
-    (h.toEp_graph_d.elementary_l hZFC source hF coherent) ht model
+  obtain ⟨_, e, _, he, _, es⟩ := ep_tag_l hZF hω h.toEp_graph_d ht had stage
+  obtain ⟨k, hk, ks⟩ := di_elementary_limit_l hZF hω h.diagram limit elementary ht model
   obtain ⟨j, hj, js⟩ := smap_comp_l I hZF he hk
   refine ⟨j, hj, fun B E => (js B E).trans (and_congr_right fun hB => ?_)⟩
   apply exists_congr

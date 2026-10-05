@@ -88,10 +88,10 @@ theorem Ep_source_d.skolem_source_sat_l {ω κ K Z W : M.Domain} (source : Ep_so
     exact (output A R U μ f hm).mpr
       (h c A.val R.val U.val μ.val f.val A.property R.property U.property μ.property f.property hm ho hωμ hUA bij)
 
-theorem sh_source_map_l {ω κ K X R μ L Y S c d q : M.Domain}
-    (h : Sh_source_d (ZF.modelsKP hZF) ω X) (source : Ep_source_d hZF ω κ K X R)
+theorem sh_source_iff_l {ω κ K X R μ L Y S c d q : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R)
     (target : Ep_source_d hZF ω μ L Y S) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)
-    (hq : Smap_d I ω c d X Y q) : Sh_source_d (ZF.modelsKP hZF) ω Y := by
+    (hq : Smap_d I ω c d X Y q) : Sh_source_d (ZF.modelsKP hZF) ω X ↔ Sh_source_d (ZF.modelsKP hZF) ω Y := by
   let nx : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
   let ny : Nonempty {x // M.mem x Y} := ⟨⟨ω, target.omega_mem⟩⟩
   let ρ : Env (rt_model_l X nx) 1 := ⟨fun _ => ⟨ω, source.omega_mem⟩, fun _ => ⟨ω, source.omega_mem⟩⟩
@@ -100,7 +100,7 @@ theorem sh_source_map_l {ω κ K X R μ L Y S c d q : M.Domain}
   have tr := spred_source_l I hZF source.omega ⟨c, R, d, S, hm.empty_pred_l I he, hn.empty_pred_l I he, hq⟩
     nx ny (sh_source_m .newest) (by simp -implicitDefEqProofs) ρ η
     (fun _ => hq.omega_l I hZF source.omega source.transitive target.transitive hm hn source.omega_mem)
-  exact (target.skolem_source_sat_l hZF ny η rfl).mp (tr.mp ((source.skolem_source_sat_l hZF nx ρ rfl).mpr h))
+  exact (source.skolem_source_sat_l hZF nx ρ rfl).symm.trans (tr.trans (target.skolem_source_sat_l hZF ny η rfl))
 
 /-- 小壳理论和原源数据一同传给初等后继，并允许换用后继中的新大小参数。 -/
 theorem Ep_source_d.skolem_successor_l {ω κ K X R c d N W j μ : M.Domain}
@@ -109,6 +109,6 @@ theorem Ep_source_d.skolem_successor_l {ω κ K X R c d N W j μ : M.Domain}
     (hj : Smap_d I ω c d X N j) (hμ : M.mem μ N) (hωμ : M.MemberSubset ω μ) (small : Sc_small_d N μ) :
     ∃ L, Ep_source_d hZF ω μ L N W ∧ Sh_source_d (ZF.modelsKP hZF) ω N := by
   obtain ⟨L, target⟩ := source.successor_l hZF hm hn hN hj hμ hωμ small
-  exact ⟨L, target, sh_source_map_l hZF h source target hm hn hj⟩
+  exact ⟨L, target, (sh_source_iff_l hZF source target hm hn hj).mp h⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

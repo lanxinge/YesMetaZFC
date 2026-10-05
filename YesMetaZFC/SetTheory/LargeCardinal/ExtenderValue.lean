@@ -50,7 +50,8 @@ theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q 
   have eU := family.function a U' U haU' haU
   subst U'
   have ultra := family.at_l hZF.1 haU ha hD
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZFC source family coherent h limit model hao md.code
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega h limit
+    (h.toEp_graph_d.elementary_l hZFC source family coherent) model hao md.code
   obtain ⟨t, ht, ts⟩ := smap_comp_l I hZF hv he
   have read i : ∃ B, Rd_entry_d (f i) B r ∧ Rd_entry_d B (ρ.bound i) t := by
     obtain ⟨E, ⟨u, B, hu, hfB, huE⟩, hEx⟩ := values i

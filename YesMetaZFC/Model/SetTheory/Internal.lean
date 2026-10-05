@@ -12,6 +12,8 @@ import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 import YesMetaZFC.Model.SetTheory.Internal.SourceAlgebra
 import YesMetaZFC.Model.SetTheory.Internal.SourceSmall
+import YesMetaZFC.Model.SetTheory.Internal.SourceFunctionSize
+import YesMetaZFC.Model.SetTheory.Internal.SourceEnumeration
 import YesMetaZFC.Model.SetTheory.Internal.SourceCollection
 import YesMetaZFC.Model.SetTheory.Internal.SourceFamily
 import YesMetaZFC.Model.SetTheory.Internal.SourceField
@@ -22,7 +24,15 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
 import YesMetaZFC.Model.SetTheory.Internal.SourceCollapse
 import YesMetaZFC.Model.SetTheory.Internal.SourceOmegaBound
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranchRelation
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranchPull
+import YesMetaZFC.Model.SetTheory.Internal.FormulaRelation
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.SourceFormula
+import YesMetaZFC.Model.SetTheory.Internal.SourceRankClosure
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
+import YesMetaZFC.Model.SetTheory.Internal.RelativeCountable
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingCountable
+import YesMetaZFC.Model.SetTheory.Internal.CollapseCountable
 import YesMetaZFC.Model.SetTheory.Internal.FiniteEvaluation
 import YesMetaZFC.Model.SetTheory.Internal.EmbeddingAttemptRelative
 import YesMetaZFC.Model.SetTheory.Internal.EmbeddingAttemptDecode
@@ -69,18 +79,23 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 同时构造壳与可数传递模型。`Smap_d.models_l` 沿嵌入回拉任意已证明的内部编码理论。
 `sfm_close_l` 用原公式内部归纳构造非标准程序的全称闭包；`Smap_d.valid_l` 保持
 全部赋值上的有效性，`Smap_d.models_forward_l` 据此正向传输同一个内部编码理论。
-`Smap_d.omega_l` 固定背景 ω；`sc_sequences_forward_l` 保持全部字母表的实际有限序列空间，
+`Smap_d.omega_l` 固定背景 ω；`sc_sequences_iff_l` 双向保持全部字母表的实际有限序列空间，
 包括目标中的新参数和全部背景内部有限图。
-`Sc_small_d` 由源内实际单射控制，沿完整初等图保持；小性也随有限序列空间保持。
+`Sc_small_d` 由源内实际单射控制，沿完整初等图保持；有限序列空间保持给定的无限序数编号界。
 `Sc_collapse_d` 仅塌缩源内小的相对良基外延关系；各全称性质覆盖后继中的新参数。
 正则 Hχ 和正则 Vδ 均提供实际源实例。外部枝反射 `Sc_branch_d` 独立于源理论，
 由 Hχ 与极限 Vδ 的实际函数图闭包提供。`Sc_hierarchy_d` 则单独由极限 Vδ 提供，
-并传到初等后继的全部新序数；相对层的传递性与唯一性只用 ZF。
+并沿初等图双向传输；严格相对极限层也保持层级和集合代数。
+`Vr_d.compare_l` 比较不同层号，`Vr_d.ordinal_height_l` 给出精确序数高度；均只用 ZF。
 `ssat_spaces_l` 比较完整与有限赋值空间；`Fb_program_d`、`Fv_eval_d` 保留原程序的
 Δ₀ 检验证书。`At_node_d` 检验全部内部公式；`at_decode_l` 从其总枝恢复完整 `Smap_d`。
 `Fw_cert_d` 以有限赋值检验原 Skolem 见证。`sh_source_of_v_l` 在任意大于 ω 的极限
 秩初段中实际构造选择图、相对最小壳及源内双射枚举，大小参数只须是含 ω 的序数。
-`smap_omega_bound_l` 双向保持模型内的不可数共尾性；实际正则基数由 `sc_regular_bound_l` 给出实例。
+`smap_omega_bound_l` 保持内部不可数共尾性；`Smap_d.regular_l` 进一步双向保持全部较小序数域的界。
+实际正则基数提供 `Sc_regular_d` 实例；`sc_indexed_rank_l` 与 `sc_indexed_transitive_rank_l` 保持原源内编号。
+`sc_countable_function_rank_l` 从源内可数图、传递定义域及内部不可数共尾性，证明图及其
+给定可数性见证属于严格相对秩层。`Smap_d.countable_factor_l` 随后通过反塌缩回收同域
+完整初等图，其可数性见证属于新模型自身，并保持指定传递种子中的值。
 `sfm_sep_l` 直接构造任意内部程序的分离实例代码，支撑外新变量不会捕获旧参数。
 `smap_separation_l` 在目标容纳像集合的全部子集时，回拉源中的实际分离集；
 `v_separation_hull_l` 从极限 V 层及可数种子自动构造具有全内部码分离的可数传递模型。

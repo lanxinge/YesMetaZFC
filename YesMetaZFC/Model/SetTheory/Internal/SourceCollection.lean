@@ -22,6 +22,64 @@ def Sc_uniform_d (ω X R D : M.Domain) : Prop :=
 def Sc_collection_d (ω X R : M.Domain) : Prop :=
   ∀ D, M.mem D X → Sc_small_d X D → Sc_uniform_d I ω X R D
 
+section Pull
+variable (hZF : M.Models ZF)
+local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+
+theorem smap_uniform_l {ω c d X R H S q E F n r i j f D} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hHt : M.TransitiveSet H)
+    (hm : Smem_d I c X R) (hn : Smem_d I d H S) (hq : Smap_d I ω c d X H q)
+    (hE : M.IsFunctionSpace I E ω X) (hF : Sfm_d I ω n F) (hr : M.mem r n)
+    (hi : M.mem i ω) (hj : M.mem j ω) (hij : i ≠ j) (hf : M.mem f E) (hD : M.mem D X)
+    (small : Sc_small_d X D) (target : Sc_collection_d I ω H S)
+    (hh : Scollect_d I X R E F n r i j f D X) :
+    ∃ B C, M.mem B X ∧ M.mem C X ∧ Suniform_d I X R E F n r i j f D C B := by
+  obtain ⟨s, hs, hb, his, hjs⟩ := sbound_above_l I hZF hω hF hi hj
+  obtain ⟨t, ht, htω⟩ := hω.1.2 s hs
+  obtain ⟨u, hu, huω⟩ := hω.1.2 t htω
+  obtain ⟨σ, hσ, hσω⟩ := hω.1.2 u huω
+  have st : M.MemberSubset s t := fun x hx => (ht x).mpr (Or.inl hx)
+  have tu : M.MemberSubset t u := fun x hx => (hu x).mpr (Or.inl hx)
+  have uσ : M.MemberSubset u σ := fun x hx => (hσ x).mpr (Or.inl hx)
+  have ir := KP.mem_irrefl_d (ZF.modelsKP hZF)
+  have hsi : s ≠ i := fun e => ir i (e ▸ his)
+  obtain ⟨n₁, F₁, r₁, h₁, total⟩ := sfm_total_l I hZF hω hF hr hi hj hs hsi
+  obtain ⟨n₂, F₂, r₂, h₂, uniform⟩ := sfm_uniform_l I hZF hω hF hr hσω
+    (uσ i (tu i (st i his))) (uσ j (tu j (st j hjs))) (uσ s (tu s ht.predecessor_mem))
+    (uσ t hu.predecessor_mem) hσ.predecessor_mem hij hsi (fun e => ir i (e ▸ st i his))
+    (fun e => ir j (e ▸ st j hjs)) (fun e => ir t (e ▸ ht.predecessor_mem))
+    (fun e => ir s (e ▸ tu s ht.predecessor_mem)) (fun e => ir t (e ▸ hu.predecessor_mem)) hb (fun h => ir t (st t h))
+  obtain ⟨f', hv, hfv⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hs hD
+  have hf' := (hE f').mpr hfv
+  have hsD := (hv.2 s D).mpr (Or.inl ⟨rfl, rfl⟩)
+  have agree := hv.agree_l I (ir s)
+  have source := (total X R E c f' D hX hm hE hf' hsD).mpr
+    ((scollect_agree_l I hZF hF hb hr hi hj hE hf hf' agree (hX D hD) (fun _ h => h)).mp hh)
+  obtain ⟨g, hg, hfg⟩ := smap_assign_exists_l I hZF hq.1.1 hfv
+  obtain ⟨K, hK⟩ := ZF.exists_functionSpace hZF I ω H
+  obtain ⟨D', hDH, hDD⟩ := hq.1.1.2.2 D hD
+  have hsD' := hfg s hs D D' hsD hDD
+  have image := (hq.ssat_l I hZF.1 hm.1 hn.1 h₁.program h₁.root hE hK hf' ((hK g).mpr hg) hfg).mp source
+  obtain ⟨B, C, hBH, hCH, hu⟩ := target D' hDH
+    ((hq.small_l hZF hω hX hHt hm hn hDD).mp small) K F n r i j g D'
+    hK hF hr hi hj hij ((hK g).mpr hg) hDH (fun _ h => h)
+    ((total H S K d g D' hHt hn hK ((hK g).mpr hg) hsD').mp image)
+  have image := (uniform H S K d g D' hHt hn hK ((hK g).mpr hg) hsD').mpr ⟨B, C, hBH, hCH, hu⟩
+  have source := (hq.ssat_l I hZF.1 hm.1 hn.1 h₂.program h₂.root hE hK hf' ((hK g).mpr hg) hfg).mpr image
+  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := (uniform X R E c f' D hX hm hE hf' hsD).mp source
+  exact ⟨B, C, hBX, hCX, hBC, fun x y hxy =>
+    (sbin_agree_l I hZF hF hb hr hi hj hE hf hf' agree (hX D hD x (hBC.bound_l hxy).1)
+      (hX C hCX y (hBC.bound_l hxy).2)).mpr (select x y hxy)⟩
+
+/-- 小定义域的源内编号随图传输，目标统一函数的存在性再回拉。 -/
+theorem Sc_collection_d.pull_l {ω c d X R Y S q : M.Domain}
+    (hω : M.IsOmega ω) (h : Sc_collection_d I ω Y S) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hq : Smap_d I ω c d X Y q) : Sc_collection_d I ω X R := by
+  intro D _ small E F n r i j f A hE hF hr hi hj hij hf hA hAD total
+  exact smap_uniform_l hZF hω hX hY hm hn hq hE hF hr hi hj hij hf hA (small.mono_l hAD) h total
+end Pull
+
+
 theorem sc_h_collection_l (hZFC : M.Models ZFC) {ω χ H : M.Domain} (hω : M.IsOmega ω)
     (hχ : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) χ) (hωχ : M.mem ω χ)
     (hH : H_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) χ H) (R : M.Domain) :

@@ -54,4 +54,25 @@ theorem smap_omega_bound_l (hZF : M.Models ZF) {ω c d X R Y S j δ ε : M.Domai
     (Fin.cases hδε (fun _ => hj.omega_l _ hZF hω hX hY hm hn hωX))
   simpa only [sc_omega_bound_sat_l hZF.1] using! tr
 
+/-- 模型内正则性所需的全部较小序数域；不要求背景中的正则性。 -/
+def Sc_regular_d (X δ : M.Domain) : Prop := ∀ μ, M.mem μ δ → Sc_omega_bound_d μ X δ
+
+theorem sc_regular_l (hZF : M.Models ZF) {δ : M.Domain}
+    (hr : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP hZF)) δ) (X : M.Domain) : Sc_regular_d X δ :=
+  fun _ hμ => sc_regular_bound_l hZF hr hμ X
+
+theorem Smap_d.regular_l (hZF : M.Models ZF) {ω c d X R Y S j δ ε : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R) (hn : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d Y S)
+    (hj : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y j) (hδε : Rd_entry_d δ ε j) :
+    Sc_regular_d X δ ↔ Sc_regular_d Y ε := by
+  have tr := hj.forall_delta_l hZF hω hX hY hm hn (n := 1)
+    (Formula.forallMem (.bound 1) (sc_omega_bound_m .newest (.bound 2) (.bound 1)))
+    (by simp -implicitDefEqProofs) (.forallMem _ (sc_omega_bound_delta_l ..))
+    ⟨fun _ => δ, fun _ => δ⟩ ⟨fun _ => ε, fun _ => ε⟩ (fun _ => hδε)
+  simp only [Formula.satisfies_forallMem_iff, sc_omega_bound_sat_l hZF.1] at tr
+  change (∀ f, M.mem f X → ∀ μ, M.mem μ δ → _) ↔ (∀ f, M.mem f Y → ∀ μ, M.mem μ ε → _) at tr
+  exact ⟨fun h μ hμ f hf => tr.mp (fun f hf μ hμ => h μ hμ f hf) f hf μ hμ,
+    fun h μ hμ f hf => tr.mpr (fun f hf μ hμ => h μ hμ f hf) f hf μ hμ⟩
+
 end YesMetaZFC.SetTheory.Internal
