@@ -78,7 +78,7 @@ theorem ep_value_constants_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T 
   obtain ⟨_, hz, _⟩ := h.models
   obtain ⟨o, _, hao⟩ := hz.2.1 a haJ
   obtain ⟨b, i, m, D', U, G, r, H, Q, code, hi, _, ha', hD', haU, hG, md, spec⟩ :=
-    ep_constant_limit_l hZFC source family coherent h limit model hao
+    ep_constant_limit_l hZF source family h limit model (h.toEp_graph_d.elementary_l hZFC source family coherent) hao
   have en := ha'.domain_eq_l hZF.1 ha
   subst m
   have eD := hZF.1.eq_of_same_members D' D fun s => (hD' s).trans (hD s).symm

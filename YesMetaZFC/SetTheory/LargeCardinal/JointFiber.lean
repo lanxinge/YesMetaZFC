@@ -66,6 +66,33 @@ theorem ec_late_bound_l (hZF : M.Models ZF) {ω i k : M.Domain} (hω : M.IsOmega
   · exact ⟨s, hsω, hs.predecessor_mem, (hω.members_areOrdinals hZF s hsω).transitive k hks⟩
   · exact ⟨k, hk, (hω.members_areOrdinals hZF k hk).transitive s hsk i hs.predecessor_mem, fun _ => id⟩
 
+/-- 在足够长的共同层读取任意指定约束；只使用已经构造的层族与纤维。 -/
+theorem ec_levels_realize_l (hZF : M.Models ZF) {ω κ L S A B f g H : M.Domain}
+    (hω : M.IsOmega ω) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S) (hA : Fn0_d ω S A)
+    (hf : M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) f ω L)
+    (covered : ∀ i a j x, Rd_entry_d i a A → Rd_entry_d j x a → ∃ n, Rd_entry_d n x f)
+    (fiber : Ef_fiber_d ω κ H g) (read : ∀ n C, Rd_entry_d n C H → Ec_level_d κ L A B f n C) :
+    ∀ i a E, Rd_entry_d i a A → Rd_entry_d i E B → ∃ r, M.mem r E ∧ Ec_eval_d ω κ L f g a r := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  intro i a E hia hiE
+  obtain ⟨m, hm, hma⟩ := (hS a).mp (hA.bound_l hia).2
+  obtain ⟨q, hq, hqa⟩ := ec_factor_l hZF (fn0_of_function_l (ZF.modelsKP hZF) hma) hf (covered i a · · hia)
+  obtain ⟨k, hk, hqk⟩ := ec_finite_bound_l hZF hω hm hq
+  obtain ⟨n, hn, hin, hkn⟩ := ec_late_bound_l hZF hω (hA.bound_l hia).1 hk
+  have hqn := hqk.mono_target_l hkn
+  obtain ⟨c, hc, hcf, _⟩ := Descriptive.ds_prefix_l I hZF hω hf.1 hn
+  have hqc : Cp0_d m n L q c a := ⟨hqa.1, fun j hj => by
+    obtain ⟨k, _, x, hx, hjk, hkx, hjx⟩ := hqa.2 j hj
+    exact ⟨k, (hqn.bound_l hjk).2, x, hx, hjk, (hcf.2 k x).mpr ⟨(hqn.bound_l hjk).2, hkx⟩, hjx⟩⟩
+  obtain ⟨Z, s, hnZ, hsZ, hs, hsg⟩ := fiber.2 n hn
+  have ok := ((read n Z hnZ s).mp hsZ).2 c (fn0_of_function_l (ZF.modelsKP hZF) hc)
+    ((Descriptive.ds_restrict_iff_l I hc hf.1.1).mp hcf) i a E hin hia hiE
+  obtain ⟨r, hrE, hsr⟩ := ok m n q hqn (fn0_of_function_l (ZF.modelsKP hZF) hc) hqc
+  refine ⟨r, hrE, m, q, hq, hqa, hsr.1, fun j hj => ?_⟩
+  obtain ⟨k, hkn, x, hx, hjk, hkx, hjx⟩ := hsr.2 j hj
+  exact ⟨k, hω.transitive hZF n hn k hkn, x, hx, hjk,
+    hkx.elim (fun p hp => ⟨p, hp.1, hsg p hp.2⟩), hjx⟩
+
 /-- 任意实际可数约束族有统一求值；每个约束可以来自不同且任意大的有限支撑。 -/
 theorem es_joint_fiber_l (hZF : M.Models ZF) {ω κ L F S P A B : M.Domain}
     (hω : M.IsOmega ω) (hωL : M.MemberSubset ω L) (hF : Em_family_d ω κ L F)
@@ -77,7 +104,6 @@ theorem es_joint_fiber_l (hZF : M.Models ZF) {ω κ L F S P A B : M.Domain}
     ∃ f g, M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) f ω L ∧ Fn0_d ω κ g ∧
       (∀ i a j x, Rd_entry_d i a A → Rd_entry_d j x a → ∃ n, Rd_entry_d n x f) ∧
       ∀ i a E, Rd_entry_d i a A → Rd_entry_d i E B → ∃ r, M.mem r E ∧ Ec_eval_d ω κ L f g a r := by
-  let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨C, hc, spec⟩ := ec_coordinates_l hZF hω hS hA
   have cl : M.MemberSubset C L := fun x hx => by
     obtain ⟨i, a, j, hia, hjx⟩ := (spec x).mp hx
@@ -87,24 +113,7 @@ theorem es_joint_fiber_l (hZF : M.Models ZF) {ω κ L F S P A B : M.Domain}
   have covered i a j x (hia : Rd_entry_d i a A) (hjx : Rd_entry_d j x a) : ∃ n, Rd_entry_d n x f :=
     cover x ((spec x).mpr ⟨i, a, j, hia, hjx⟩)
   obtain ⟨H, levels, fiber, read⟩ := ec_levels_l hZF hω hF hco hS hA hB large hf
-  obtain ⟨g, hg, hgH⟩ := complete H f levels fiber
-  refine ⟨f, g, hf, hg, covered, fun i a E hia hiE => ?_⟩
-  obtain ⟨m, hm, hma⟩ := (hS a).mp (hA.bound_l hia).2
-  obtain ⟨q, hq, hqa⟩ := ec_factor_l hZF (fn0_of_function_l (ZF.modelsKP hZF) hma) hf (covered i a · · hia)
-  obtain ⟨k, hk, hqk⟩ := ec_finite_bound_l hZF hω hm hq
-  obtain ⟨n, hn, hin, hkn⟩ := ec_late_bound_l hZF hω (hA.bound_l hia).1 hk
-  have hqn := hqk.mono_target_l hkn
-  obtain ⟨c, hc, hcf, _⟩ := Descriptive.ds_prefix_l I hZF hω hf.1 hn
-  have hqc : Cp0_d m n L q c a := ⟨hqa.1, fun j hj => by
-    obtain ⟨k, _, x, hx, hjk, hkx, hjx⟩ := hqa.2 j hj
-    exact ⟨k, (hqn.bound_l hjk).2, x, hx, hjk, (hcf.2 k x).mpr ⟨(hqn.bound_l hjk).2, hkx⟩, hjx⟩⟩
-  obtain ⟨Z, s, hnZ, hsZ, hs, hsg⟩ := hgH n hn
-  have ok := ((read n Z hnZ s).mp hsZ).2 c (fn0_of_function_l (ZF.modelsKP hZF) hc)
-    ((Descriptive.ds_restrict_iff_l I hc hf.1.1).mp hcf) i a E hin hia hiE
-  obtain ⟨r, hrE, hsr⟩ := ok m n q hqn (fn0_of_function_l (ZF.modelsKP hZF) hc) hqc
-  refine ⟨r, hrE, m, q, hq, hqa, hsr.1, fun j hj => ?_⟩
-  obtain ⟨k, hkn, x, hx, hjk, hkx, hjx⟩ := hsr.2 j hj
-  exact ⟨k, hω.transitive hZF n hn k hkn, x, hx, hjk,
-    hkx.elim (fun p hp => ⟨p, hp.1, hsg p hp.2⟩), hjx⟩
+  obtain ⟨g, hg⟩ := complete H f levels fiber
+  exact ⟨f, g, hf, hg.1, covered, ec_levels_realize_l hZF hω hS hA hf covered hg read⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

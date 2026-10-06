@@ -7,6 +7,18 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+/-- 包含 κ 的严格极限秩段与原源具有完全相同的有限 κ 幂子集。 -/
+theorem Ep_source_d.rank_agree_l {ω κ K Z S α V : M.Domain}
+    (source : Ep_source_d hZF ω κ K Z S) (hV : M.mem V Z) (rank : Vr_d Z α V)
+    (hα : M.IsLimitOrdinal α) (hκ : M.mem κ V) : Ea_agree_d ω κ V Z := by
+  have hω := rank.subset_mem_l source.transitive hV hκ source.omega_mem source.below
+  intro n D A hn hd sub
+  have hD := rank.relations_mem_l source.transitive hV hα hω hκ (source.space_mem_l hZF hn hd)
+    (fun f hf p hp => by
+      obtain ⟨i, hi, x, hx, pair⟩ := ((hd f).mp hf).1 p hp
+      exact ⟨i, source.omega.transitive hZF n hn i hi, x, hx, pair⟩)
+  exact ⟨source.transitive V hV A, fun hA => rank.subset_mem_l source.transitive hV hD hA sub⟩
+
 theorem Ep_source_d.rank_sequences_l {ω κ K Z S α V : M.Domain}
     (source : Ep_source_d hZF ω κ K Z S) (hV : M.mem V Z) (rank : Vr_d Z α V)
     (hα : M.IsLimitOrdinal α) (hω : M.mem ω V) : Sc_sequences_d I ω V := by

@@ -8,8 +8,29 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem ep_space_map_l {ω κ κ' K K' X R Y S c d π n D D' : M.Domain}
-    (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω κ' K' Y S)
+/-- 全部有限单射支撑的集合沿初等嵌入传输，包含目标中的新支撑。 -/
+theorem ep_indices_map_l {ω X R Y S c d σ L L' J J' : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hσ : Smap_d I ω c d X Y σ)
+    (theory : Sc_theory_d I ω Y S) (hωX : M.mem ω X)
+    (hL : Rd_entry_d L L' σ) (hJ : Rd_entry_d J J' σ) (indices : ∀ a, M.mem a J ↔ Ei_d ω L a) :
+    ∀ a, M.mem a J' ↔ Ei_d ω L' a := by
+  have ωσ := hσ.omega_l I hZF hω hX hY hm hn hωX
+  let φ : Formula 1 4 := .iff (.mem .newest (.bound 1)) (ei_m (.bound 3) (.bound 2) .newest)
+  have tr := hσ.forall_delta_l hZF hω hX hY hm hn φ
+    (by simp -implicitDefEqProofs [φ, Definitional.Formula.FreeClosed]) (.iff (.mem ..) (ei_delta_l ..))
+    ⟨Fin.cases J (Fin.cases L (fun _ => ω)), fun _ => ω⟩
+    ⟨Fin.cases J' (Fin.cases L' (fun _ => ω)), fun _ => ω⟩ (Fin.cases hJ (Fin.cases hL (fun _ => ωσ)))
+  simp only [φ, Formula.satisfies_iff_iff, Formula.satisfies_mem_iff, ei_sat_l hZF.1] at tr
+  have read := tr.mp (fun a _ => indices a)
+  exact fun a => ⟨fun ha => (read a (hY J' (hσ.1.1.output_mem_of_pairMember hJ) a ha)).mp ha, fun ha => by
+    obtain ⟨n, hnω, fn, inj⟩ := ha
+    have owned := sc_finite_function_l hZF hω hY hn theory (hσ.1.1.output_mem_of_pairMember ωσ)
+      (hY L' (hσ.1.1.output_mem_of_pairMember hL)) hnω fn
+    exact (read a owned).mpr ⟨n, hnω, fn, inj⟩⟩
+
+theorem ep_space_map_l {ω μ μ' κ κ' K K' X R Y S c d π n D D' : M.Domain}
+    (source : Ep_source_d hZF ω μ K X R) (target : Ep_source_d hZF ω μ' K' Y S)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hπ : Smap_d I ω c d X Y π)
     (hκ : M.PairMember I κ κ' π) (hnω : M.mem n ω) (space : Ep_space_d κ n D)
     (hD : M.PairMember I D D' π) : Ep_space_d κ' n D' := by
@@ -24,7 +45,7 @@ theorem ep_space_map_l {ω κ κ' K K' X R Y S c d π n D D' : M.Domain}
   intro f
   exact ⟨fun hf => (read f (target.transitive D' (hπ.1.1.output_mem_of_pairMember hD) f hf)).mp hf,
     fun hf => (read f (sc_finite_function_l hZF target.omega target.transitive hn target.theory target.omega_mem
-      (target.transitive κ' target.cardinal_mem) hnω hf)).mpr hf⟩
+      (target.transitive κ' (hπ.1.1.output_mem_of_pairMember hκ)) hnω hf)).mpr hf⟩
 
 theorem ec_measure_image_l {ω c d N R N' S σ F F' a a' U V A A' : M.Domain}
     (hω : M.IsOmega ω) (hN : M.TransitiveSet N) (hN' : M.TransitiveSet N')

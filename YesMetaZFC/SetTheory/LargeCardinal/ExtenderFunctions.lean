@@ -84,4 +84,10 @@ theorem ep_pull_unique_l (hKP : M.Models KP) {κ X Y m n q f g h : M.Domain} (hq
   obtain ⟨x, _, hsx⟩ := hge.2.1 s hs
   exact ⟨x, hsx, (hh.2.2 s r ((he s).mp hs) hr x).mpr ((hg.2.2 s r ((he s).mp hs) hr x).mp hsx)⟩
 
+/-- 扩大代表的值域界不改变坐标拉回方程。 -/
+theorem Ep_pull_d.mono_l {κ X Y m n q f g : M.Domain} (h : Ep_pull_d κ X m n q f g)
+    (sub : M.MemberSubset X Y) : Ep_pull_d κ Y m n q f g :=
+  ⟨h.1.imp fun _ hh => ⟨hh.1, hh.2.mono_target_l sub⟩,
+    h.2.1.imp fun _ hh => ⟨hh.1, hh.2.mono_target_l sub⟩, h.2.2⟩
+
 end YesMetaZFC.SetTheory.LargeCardinal

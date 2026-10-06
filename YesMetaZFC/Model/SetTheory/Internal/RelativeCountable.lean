@@ -97,8 +97,7 @@ theorem sc_countable_function_rank_l {ω c Z R α V D σ η : M.Domain}
     (bound : Sc_omega_bound_d ω Z α) (hωV : M.MemberSubset ω V) (hDt : M.TransitiveSet D)
     (hσZ : M.mem σ Z) (hηZ : M.mem η Z) (fn : Fn0_d D V σ)
     (countable : M.IsSetInjectionFromTo I η σ ω) : M.mem σ V ∧ M.mem η V := by
-  have hDZ := sc_function_domain_mem_l hZF hω hZ hm theory hσZ fn
-  obtain ⟨ι, hιZ, hι⟩ := sc_domain_numbering_l hZF hω hZ hm theory hωZ hDZ hVZ hηZ hσZ countable fn
+  obtain ⟨hDZ, ι, hιZ, hι⟩ := sc_domain_numbering_l hZF hω hZ hm theory hωZ hηZ hσZ countable fn
   have hDV := sc_indexed_transitive_rank_l hZF hω hZ hm theory hωZ hαZ hne hVZ hv bound hDZ hDt hιZ
     (Sc_index_d.of_injection_l (ZF.modelsKP hZF) (hω.isOrdinal hZF) hι)
   have ht := hv.transitive_l hZF hZ hVZ

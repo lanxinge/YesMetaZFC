@@ -59,10 +59,10 @@ theorem ep_skolem_collapse_l {ω κ K Z W c A R U f : M.Domain}
       exact ⟨v, hv, (comp.value_l qf collapse.function hva).mpr ha⟩
   exact ⟨N, B, F, j, e, S, g, hN, hB, hF, hg.1, hull.1, hull.2.1, ht, collapse, hj, inverse, model, embedding, gb⟩
 
-/-- 给定实际一致的两个源，壳与塌缩均自动构造；结论中的 B 就是新传递模型。 -/
+/-- 只需编码的单向搬运，壳与塌缩即自动属于目标源。 -/
 theorem ep_skolem_step_l {ω κ K Z W L Y V c A R U f : M.Domain}
     (source : Ep_source_d hZF ω κ K Z W) (target : Ep_source_d hZF ω κ L Y V)
-    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (agree : Ea_agree_d ω κ Z Y)
+    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (subsets : Ea_subset_d ω κ Z Y)
     (hA : M.mem A Z) (hU : M.mem U Z) (hf : M.mem f Z) (hm : Smem_d I c A R)
     (hAt : M.TransitiveSet A) (hκ : M.IsOrdinal κ) (hUA : M.MemberSubset U A)
     (bij : M.IsSetBijectionFromTo I f κ U) :
@@ -71,7 +71,7 @@ theorem ep_skolem_step_l {ω κ K Z W L Y V c A R U f : M.Domain}
       (∀ x y, Rd_entry_d y x j ↔ Rd_entry_d x y F) ∧ Smem_d I e B S ∧ Smap_d I ω e c B A j := by
   obtain ⟨N, B, F, j, e, S, g, _, hB, hF, hg, hUN, hNA, ht, collapse, hj, inverse, model, embedding, gb⟩ :=
     ep_skolem_collapse_l hZF source small hA hU hf hm hAt hκ hUA bij
-  exact ⟨N, B, F, j, e, S, agree.transitive_l hZF source target ht hg gb,
+  exact ⟨N, B, F, j, e, S, subsets.transitive_l hZF source target ht hg gb,
     hB, hF, hUN, hNA, ht, collapse, hj, inverse, model, embedding⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

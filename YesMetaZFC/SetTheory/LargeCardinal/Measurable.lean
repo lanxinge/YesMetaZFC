@@ -10,10 +10,10 @@ open Definitional.Project Internal InnerModel
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-theorem ed_cardinal_l (hZF : M.Models ZF) {κ U} (hκ : M.IsOrdinal κ)
-    (hU : FilterZF.Maximal_d (ℳ := M) κ U) (hn : Ed_nonprincipal_d U) (hc : Ed_complete_d κ κ U) :
-    M.IsCardinal I κ := by
-  refine ⟨hκ, fun μ hμ ⟨f, hf⟩ => ?_⟩
+theorem ed_range_complement_l (hZF : M.Models ZF) {κ U μ f : M.Domain}
+    (hU : FilterZF.Maximal_d (ℳ := M) κ U) (hn : Ed_nonprincipal_d U) (hc : Ed_complete_d κ κ U)
+    (hμ : M.mem μ κ) (hf : M.IsSetFunctionFromTo I f μ κ) :
+    ∃ r, M.mem r U ∧ ∀ x, M.mem x r ↔ M.mem x κ ∧ ¬ ∃ i, M.mem i μ ∧ M.PairMember I i x f := by
   let ρ : Env M 2 := ⟨Fin.cases f (fun _ => κ), fun _ => κ⟩
   let φ : BinarySchema 2 := { body := .forallE (.iff (.mem .newest (.bound 1))
     (.conj (.mem .newest (.bound 4)) (.neg (Formula.orderedPairMem 𝒞 (.bound 2) .newest (.bound 3))))) }
@@ -23,11 +23,11 @@ theorem ed_cardinal_l (hZF : M.Models ZF) {κ U} (hκ : M.IsOrdinal κ)
       Formula.satisfies_orderedPairMem_iff I]
     rfl
   have total i (hi : M.mem i μ) : ∃ r, φ.denote ρ i r ∧ M.mem r U := by
-    obtain ⟨x, hx, hix⟩ := hf.1.1.2.2 i hi
+    obtain ⟨x, hx, hix⟩ := hf.2.2 i hi
     obtain ⟨s, hs⟩ := KP.exists_singleton (ZF.modelsKP hZF) x
     obtain ⟨r, hr⟩ := KP.difference_exists_d (ZF.modelsKP hZF) s κ
     have eq y : M.mem y s ↔ M.PairMember I i y f :=
-      (hs y).trans ⟨fun hy => hy.symm ▸ hix, fun hy => hf.1.1.1.2 i y x hy hix⟩
+      (hs y).trans ⟨fun hy => hy.symm ▸ hix, fun hy => hf.1.2 i y x hy hix⟩
     refine ⟨r, (sat i r).mpr (fun y => (hr y).trans (and_congr_right fun _ => not_congr (eq y))), ?_⟩
     exact (FilterZF.maximal_decides_d hZF hU (fun y hy => (hs y).mp hy ▸ hx) hr).elim
       (fun h => (hn x s hs h).elim) id
@@ -39,11 +39,23 @@ theorem ed_cardinal_l (hZF : M.Models ZF) {κ U} (hκ : M.IsOrdinal κ)
       obtain ⟨s, hs, hsU⟩ := total i hi
       exact (unique i s r hs hr) ▸ hsU)
   obtain ⟨r, hrU, hr⟩ := hc μ hμ g (fn0_of_function_l (ZF.modelsKP hZF) hg)
-  obtain ⟨x, hx⟩ := hU.2.1 r hrU
-  obtain ⟨hxκ, hall⟩ := (hr x).mp hx
-  obtain ⟨i, hi, hix⟩ := hf.2 x hxκ
-  obtain ⟨s, hs, his⟩ := hg.2.2 i hi
-  exact (((sat i s).mp ((hgp i s).mp his).2 x).mp (hall i hi s hs his)).2 hix
+  refine ⟨r, hrU, fun x => (hr x).trans ⟨?_, ?_⟩⟩
+  · rintro ⟨hx, hall⟩
+    refine ⟨hx, fun ⟨i, hi, hix⟩ => ?_⟩
+    obtain ⟨s, hs, his⟩ := hg.2.2 i hi
+    exact (((sat i s).mp ((hgp i s).mp his).2 x).mp (hall i hi s hs his)).2 hix
+  · rintro ⟨hx, no⟩
+    exact ⟨hx, fun i hi s _ his => (((sat i s).mp ((hgp i s).mp his).2 x)).mpr
+      ⟨hx, fun hix => no ⟨i, hi, hix⟩⟩⟩
+
+/-- 短枚举的补集仍测度一，故 κ 不可能由较短序数枚举。 -/
+theorem ed_cardinal_l (hZF : M.Models ZF) {κ U} (hκ : M.IsOrdinal κ)
+    (hU : FilterZF.Maximal_d (ℳ := M) κ U) (hn : Ed_nonprincipal_d U) (hc : Ed_complete_d κ κ U) :
+    M.IsCardinal I κ := by
+  refine ⟨hκ, fun μ hμ ⟨f, hf⟩ => ?_⟩
+  obtain ⟨r, hr, rs⟩ := ed_range_complement_l I hZF hU hn hc hμ hf.1.1
+  obtain ⟨x, hx⟩ := hU.2.1 r hr
+  exact ((rs x).mp hx).2 (hf.2 x ((rs x).mp hx).1)
 
 def Measurable_d (κ : M.Domain) : Prop := M.IsCardinal I κ ∧ ∃ ω U, M.IsOmega ω ∧ M.mem ω κ ∧
   FilterZF.Maximal_d (ℳ := M) κ U ∧ Ed_nonprincipal_d U ∧ Ed_complete_d κ κ U

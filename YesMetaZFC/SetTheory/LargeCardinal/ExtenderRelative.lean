@@ -24,6 +24,24 @@ def Ec_source_d (I : kpair_convention_l.Interpretation M) (ω κ L X F : M.Domai
 def Ea_agree_d (ω κ X Y : M.Domain) : Prop := ∀ n D A, M.mem n ω → Ep_space_d κ n D →
   M.MemberSubset A D → (M.mem A X ↔ M.mem A Y)
 
+/-- 编码搬运只需一个方向：源的有限幂子集都属于目标。 -/
+def Ea_subset_d (ω κ X Y : M.Domain) : Prop := ∀ n D A, M.mem n ω → Ep_space_d κ n D →
+  M.MemberSubset A D → M.mem A X → M.mem A Y
+
+theorem Ea_agree_d.subset_l {ω κ X Y : M.Domain} (h : Ea_agree_d ω κ X Y) : Ea_subset_d ω κ X Y :=
+  fun n D A hn hd sub => (h n D A hn hd sub).mp
+
+theorem Ea_subset_d.trans_l {ω κ X Y Z : M.Domain} (h : Ea_subset_d ω κ X Y) (k : Ea_subset_d ω κ Y Z) :
+    Ea_subset_d ω κ X Z := fun n D A hn hd sub hx => k n D A hn hd sub (h n D A hn hd sub hx)
+
+theorem Ea_subset_d.mono_l (hZF : M.Models ZF) {ω κ μ X Y : M.Domain}
+    (h : Ea_subset_d ω κ X Y) (hμ : M.MemberSubset μ κ) : Ea_subset_d ω μ X Y := by
+  intro n D A hn hD sub hA
+  obtain ⟨E, he⟩ := ZF.exists_functionSpace hZF (kp_pair_l (ZF.modelsKP hZF)) n κ
+  have hE : Ep_space_d κ n E := fun s => (he s).trans
+    ⟨fn0_of_function_l (ZF.modelsKP hZF), fn0_function_l (ZF.modelsKP hZF)⟩
+  exact h n E A hn hE (fun s hs => (hE s).mpr (((hD s).mp (sub s hs)).mono_target_l hμ)) hA
+
 /-- 完整字母表上的一致性自动覆盖任意子字母表，包含端点本身。 -/
 theorem Ea_agree_d.mono_l (hZF : M.Models ZF) {ω κ μ X Y : M.Domain}
     (h : Ea_agree_d ω κ X Y) (hμ : M.MemberSubset μ κ) : Ea_agree_d ω μ X Y := by

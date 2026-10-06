@@ -70,11 +70,11 @@ theorem Ep_source_d.square_l {ω κ K X R A : M.Domain} (source : Ep_source_d hZ
     (hA : M.mem A X) : ∃ P, M.mem P X ∧ M.IsCartesianProduct I P A A :=
   source.theory.algebra.product A A hA hA
 
-/-- 有限幂子集一致性搬运源中的实际二元关系。 -/
-theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
-    (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
-    (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
-    (bound : ∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b) : M.mem T Y := by
+/-- 任意源内二元关系在 κ 上的部分，编码为一个实际有限 κ 幂子集。 -/
+theorem ep_relation_code_l {ω κ K X R T : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (hT : M.mem T X) :
+    ∃ n z o D C, M.mem n ω ∧ M.mem z ω ∧ M.mem o ω ∧ Ep_space_d κ n D ∧ M.mem C X ∧ M.MemberSubset C D ∧
+      ∀ a b, M.mem a κ → M.mem b κ → (Rd_entry_d a b T ↔ ∃ s, M.mem s C ∧ Rd_entry_d z a s ∧ Rd_entry_d o b s) := by
   obtain ⟨z, hz, hzω⟩ := source.omega.1.1
   obtain ⟨o, ho, hoω⟩ := source.omega.1.2 z hzω
   obtain ⟨n, hn, hnω⟩ := source.omega.1.2 o hoω
@@ -96,7 +96,22 @@ theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
       (Fin.cases (source.transitive ω source.omega_mem o hoω) (Fin.cases source.cardinal_mem (fun _ => hT)))) hDX
   have code s : M.mem s C ↔ M.mem s D ∧ ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧
       Rd_entry_d z a s ∧ Rd_entry_d o b s ∧ Rd_entry_d a b T := (spec s).trans (and_congr_right fun _ => sat s)
-  have hCY := (agree n D C hnω hD (fun s hs => ((code s).mp hs).1)).mp hCX
+  refine ⟨n, z, o, D, C, hnω, hzω, hoω, hD, hCX, fun s hs => ((code s).mp hs).1, fun a b ha hb => ⟨?_, ?_⟩⟩
+  · intro hab
+    obtain ⟨s, hs, hza, hob⟩ := ep_two_values_l hZF hzo hzn hn.predecessor_mem ha hb
+    exact ⟨s, (code s).mpr ⟨(hD s).mpr hs, a, ha, b, hb, hza, hob, hab⟩, hza, hob⟩
+  · rintro ⟨s, hs, hza, hob⟩
+    obtain ⟨hsD, a', _, b', _, hza', hob', hab⟩ := (code s).mp hs
+    have fn := fn0_function_l (ZF.modelsKP hZF) ((hD s).mp hsD)
+    exact fn.1.2 z a' a hza' hza ▸ fn.1.2 o b' b hob' hob ▸ hab
+
+/-- 有限幂子集的单向包含搬运源中的实际二元关系。 -/
+theorem Ea_subset_d.relation_l {ω κ K X R K' Y S T : M.Domain}
+    (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
+    (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
+    (bound : ∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b) : M.mem T Y := by
+  obtain ⟨n, z, o, D, C, hnω, hzω, hoω, hD, hCX, sub, code⟩ := ep_relation_code_l hZF source hT
+  have hCY := subsets n D C hnω hD sub hCX
   obtain ⟨d, hd⟩ := target.code
   have hzY := target.transitive ω target.omega_mem z hzω
   have hoY := target.transitive ω target.omega_mem o hoω
@@ -119,29 +134,23 @@ theorem Ea_agree_d.relation_l {ω κ K X R K' Y S T : M.Domain}
     rw [qs p, decoded p]
     constructor
     · rintro ⟨_, s, hs, hp⟩
-      obtain ⟨hsD, a, ha, b, hb, hza, hob, hab⟩ := (code s).mp hs
-      obtain ⟨a', ha', b', hb', hza', hob', hp⟩ := (read s p).mp hp
-      have fs := (hD s).mp hsD
-      have ea := fs.2.2 z hzn a ha a' ha' hza hza'
-      have eb := fs.2.2 o hn.predecessor_mem b hb b' hb' hob hob'
-      subst a'; subst b'
-      obtain ⟨q, hq, hqT⟩ := hab
+      obtain ⟨a, ha, b, hb, hza, hob, hp⟩ := (read s p).mp hp
+      obtain ⟨q, hq, hqT⟩ := (code a b ha hb).mpr ⟨s, hs, hza, hob⟩
       exact (kpair_unique_l M hZF.1 hq hp) ▸ hqT
     · intro hpT
       obtain ⟨a, ha, b, hb, hp⟩ := bound p hpT
-      obtain ⟨s, hs, hza, hob⟩ := ep_two_values_l hZF hzo hzn hn.predecessor_mem ha hb
-      have hsC := (code s).mpr ⟨(hD s).mpr hs, a, ha, b, hb, hza, hob, p, hp, hpT⟩
+      obtain ⟨s, hsC, hza, hob⟩ := (code a b ha hb).mp ⟨p, hp, hpT⟩
       exact ⟨(product p).mpr ⟨a, ha, b, hb, hp⟩, s, hsC, (read s p).mpr ⟨a, ha, b, hb, hza, hob, hp⟩⟩)
   exact eq ▸ hQY
 
 /-- 搬运小关系码并在目标源内重新塌缩，得到同一个实际传递集合。 -/
-theorem Ea_agree_d.collapse_l {ω κ K X R K' Y S T B F : M.Domain}
-    (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
+theorem Ea_subset_d.collapse_l {ω κ K X R K' Y S T B F : M.Domain}
+    (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
     (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
     (bound : ∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b)
     (h : Wc_iso_d κ T B F) : M.mem B Y := by
   obtain ⟨C, G, hC, _, g⟩ := target.collapse.collapse_l target.cardinal_mem
-    (agree.relation_l hZF source target hT bound) target.cardinal_small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
+    (subsets.relation_l hZF source target hT bound) target.cardinal_small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
   exact (h.unique_l hZF g).symm ▸ hC
 
 /-- 诱导隶属关系由源内平方中的有界分离得到，无须另假设关系码属于源。 -/

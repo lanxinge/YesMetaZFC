@@ -4,6 +4,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSuccessorApplication
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranchRelation
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSkolemSource
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
+import YesMetaZFC.Model.SetTheory.Internal.SourcePower
+import YesMetaZFC.Model.SetTheory.Internal.SourceCover
 
 /-! # 共同纤维保持超幂后继的枝反射
 
@@ -59,7 +61,8 @@ theorem Ep_successor_d.branch_l (hZFC : M.Models ZFC) {ω κ K L X R F N S : M.D
   obtain ⟨o, _, hao⟩ := hz.2.1 a ha
   have fs := family.source_l hZF X
   have cs := coherent.source_l I X
-  obtain ⟨b, i, _, _, _, _, _, _, _, hm, hi, _⟩ := ep_constant_limit_l hZFC source fs cs h limit model hao
+  obtain ⟨b, i, _, _, _, _, _, _, _, hm, hi, _⟩ := ep_constant_limit_l hZF source fs h limit model
+    (h.toEp_graph_d.elementary_l hZFC source fs cs) hao
   obtain ⟨j, hj, _⟩ := smap_comp_l I hZF hi he
   have hωN := hj.1.1.output_mem_of_pairMember (hj.omega_l I hZF source.omega source.transitive ht hm target source.omega_mem)
   have algebra := (sc_algebra_iff_l I hZF source.omega source.transitive ht hm target hj).mp source.theory.algebra
@@ -71,13 +74,13 @@ theorem Ep_successor_d.branch_l (hZFC : M.Models ZFC) {ω κ K L X R F N S : M.D
 theorem Ex_short_d.node_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     (ex : Ex_short_d (ZFC.models_zf_l hZFC) ω κ L F)
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
-    (branches : Sc_branch_d ω X) (hierarchy : Sc_hierarchy_d X)
+    (branches : Sc_branch_d ω X) (hierarchy : Sc_hierarchy_d X) (power : Sc_power_d X) (cover : Sc_cover_d X)
     (small : Sh_source_d (ZF.modelsKP (ZFC.models_zf_l hZFC)) ω X) :
     let I := kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))
     ∃ N S b d j K', Ep_successor_d (ZFC.models_zf_l hZFC) ω κ L X R F N S ∧
       Smem_d I b X R ∧ Smem_d I d N S ∧ Smap_d I ω b d X N j ∧
       Ep_source_d (ZFC.models_zf_l hZFC) ω ω K' N S ∧ Sc_branch_d ω N ∧
-      Sc_hierarchy_d N ∧ Sh_source_d (ZF.modelsKP (ZFC.models_zf_l hZFC)) ω N := by
+      Sc_hierarchy_d N ∧ Sc_power_d N ∧ Sc_cover_d N ∧ Sh_source_d (ZF.modelsKP (ZFC.models_zf_l hZFC)) ω N := by
   let hZF := ZFC.models_zf_l hZFC
   obtain ⟨J, O, Z, A, p, T, V, q, c, C, W, h, limit, model, _, _, collapse⟩ := ex.limit_l hZFC source
   obtain ⟨_, b, i, N, e, _, d, S, j, hm, _, _, ht, wc, bij, hn, he, _, _, _, hj, _, K', target⟩ := collapse
@@ -86,6 +89,8 @@ theorem Ex_short_d.node_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
   exact ⟨N, S, b, d, j, K', next, hm, hn, hj, target,
     next.branch_l hZFC source branches ex.measures ex.coherent ex.countable hωL,
     (sc_hierarchy_iff_l hZF source.omega source.transitive ht hm hn hj).mp hierarchy,
+    (sc_power_iff_l hZF source.omega source.transitive ht hm hn hj).mp power,
+    (sc_cover_iff_l hZF source.omega source.transitive ht hm hn hj).mp cover,
     (sh_source_iff_l hZF source target hm hn hj).mp small⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

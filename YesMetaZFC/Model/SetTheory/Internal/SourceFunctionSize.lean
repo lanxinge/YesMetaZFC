@@ -41,23 +41,26 @@ theorem sc_graph_numbering_l {ω c Z R μ A B ι j : M.Domain}
 
 theorem sc_domain_numbering_l {ω c Z R μ A B η j : M.Domain}
     (hω : M.IsOmega ω) (hZ : M.TransitiveSet Z) (hm : Smem_d I c Z R)
-    (theory : Sc_theory_d I ω Z R) (hμZ : M.mem μ Z) (hA : M.mem A Z) (hB : M.mem B Z)
+    (theory : Sc_theory_d I ω Z R) (hμZ : M.mem μ Z)
     (hηZ : M.mem η Z) (hjZ : M.mem j Z) (hη : M.IsSetInjectionFromTo I η j μ) (hj : Fn0_d A B j) :
-    ∃ ι, M.mem ι Z ∧ M.IsSetInjectionFromTo I ι A μ := by
-  let ρ : Env M 3 := ⟨Fin.cases j (Fin.cases B (fun _ => η)), fun _ => j⟩
+    M.mem A Z ∧ ∃ ι, M.mem ι Z ∧ M.IsSetInjectionFromTo I ι A μ := by
+  have hA := sc_function_domain_mem_l hZF hω hZ hm theory hjZ hj
+  obtain ⟨C, hC, coords⟩ := theory.algebra.envelope_l hjZ
+  have fn := hj.retarget_l (fun x y hxy => (coords x y hxy).2)
+  let ρ : Env M 3 := ⟨Fin.cases j (Fin.cases C (fun _ => η)), fun _ => j⟩
   let φ : BinarySchema 3 := {
     body := Formula.existsMem (.bound 2) (Formula.existsMem (.bound 4)
       (.conj (kpair0_m (.bound 1) (.bound 3) .newest) (rd_entry0_m (.bound 1) (.bound 2) (.bound 6)))) }
-  have sat x i : φ.denote ρ x i ↔ ∃ p, M.mem p j ∧ ∃ y, M.mem y B ∧ KPair_d M p x y ∧ Rd_entry_d p i η := by
+  have sat x i : φ.denote ρ x i ↔ ∃ p, M.mem p j ∧ ∃ y, M.mem y C ∧ KPair_d M p x y ∧ Rd_entry_d p i η := by
     simp only [φ, BinarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
       kpair0_sat_l hZF.1, rd_entry0_sat_l hZF.1]; rfl
   obtain ⟨ι, hιZ, hf, select⟩ := sc_uniform_source_l hZF hω hZ hm theory φ
     (.existsMem _ (.existsMem _ (.conj (kpair0_delta_l ..) (rd_entry0_delta_l ..))))
-    ρ (Fin.cases hjZ (Fin.cases hB (fun _ => hηZ))) hA hμZ (fun x hx => by
-      obtain ⟨y, hy, p, hp, hpj⟩ := hj.2.1 x hx
+    ρ (Fin.cases hjZ (Fin.cases hC (fun _ => hηZ))) hA hμZ (fun x hx => by
+      obtain ⟨y, hy, p, hp, hpj⟩ := fn.2.1 x hx
       obtain ⟨i, hi, hpi⟩ := hη.1.2.2 p hpj
       exact ⟨i, hi, (sat x i).mpr ⟨p, hpj, y, hy, hp, hpi⟩⟩)
-  refine ⟨ι, hιZ, fn0_function_l (ZF.modelsKP hZF) hf, fun x z i hxi hzi => ?_⟩
+  refine ⟨hA, ι, hιZ, fn0_function_l (ZF.modelsKP hZF) hf, fun x z i hxi hzi => ?_⟩
   obtain ⟨p, _, y, _, hp, hpi⟩ := (sat x i).mp (select x i hxi)
   obtain ⟨q, _, v, _, hq, hqi⟩ := (sat z i).mp (select z i hzi)
   exact (kpair_injective_l M (hη.2 p q i hpi hqi ▸ hp) hq).1

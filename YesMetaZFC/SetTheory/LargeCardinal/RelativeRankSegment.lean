@@ -17,25 +17,25 @@ structure Er_level_d (X κ B : M.Domain) : Prop where
   hierarchy : Vr_d X κ B
   code : ∃ T f, M.mem T X ∧ M.mem f X ∧ Wc_iso_d κ T B f
 
-theorem ep_relative_rank_l (hZFC : M.Models ZFC) {ω κ K X R δ : M.Domain}
+theorem ep_relative_rank_l (hZFC : M.Models ZFC) {ω κ K X R δ L B : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
     (hX : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) (hδ : M.IsLimitOrdinal δ)
-    (hωκ : M.mem ω κ) (hr : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) κ)
-    (hs : M.IsStrongLimitCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) κ) :
-    ∃ B, Er_level_d X κ B := by
+    (hL : M.mem L δ) (hωL : M.mem ω L)
+    (hr : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L)
+    (hs : M.IsStrongLimitCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L)
+    (hB : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L B) : Er_level_d X L B := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  have hκ := ZF.v_ordinal_height_l hZF hX hr.isCardinal.1 source.cardinal_mem
-  obtain ⟨B, hB⟩ := ZF.v_exists_l I hZF hr.isCardinal.1
-  have hBX := ZF.v_mem_l I hZF hB hX hκ
-  obtain ⟨f, hf⟩ := ZFC.inaccessible_enumeration_l I hZFC source.omega hωκ hr hs hB
-  obtain ⟨D, hDX, hκD, hBD⟩ := ZF.v_joint_bound_l I hZF hX source.cardinal_mem hBX
+  have hLX := ZF.v_ordinal_mem_l I hZF hX hL
+  have hBX := ZF.v_mem_l I hZF hB hX hL
+  obtain ⟨f, hf⟩ := ZFC.inaccessible_enumeration_l I hZFC source.omega hωL hr hs hB
+  obtain ⟨D, hDX, hLD, hBD⟩ := ZF.v_joint_bound_l I hZF hX hLX hBX
   have hfX := ZF.v_relation_mem_l I hZF hX hδ hDX (F := f) (fun p hp => by
     obtain ⟨a, ha, b, hb, hab⟩ := (fn0_of_function_l (ZF.modelsKP hZF) hf.1.1).1 p hp
-    exact ⟨a, hκD a ha, b, hBD b hb, hab⟩)
+    exact ⟨a, hLD a ha, b, hBD b hb, hab⟩)
   obtain ⟨T, hTX, _, iso⟩ := ep_transitive_code_l hZF source (ZF.v_transitive_l I hZF hB) hfX hf
-  obtain ⟨C, F, hCX, hFX, cert, _⟩ := vr_source_l hZF hX hδ hκ hB
-  exact ⟨B, hBX, ⟨C, F, hCX, hFX, fun t _ => cert t⟩, T, f, hTX, hfX, iso⟩
+  obtain ⟨C, F, hCX, hFX, cert, _⟩ := vr_source_l hZF hX hδ hL hB
+  exact ⟨hBX, ⟨C, F, hCX, hFX, fun t _ => cert t⟩, T, f, hTX, hfX, iso⟩
 
 /-- 同时传输秩递归历史和实际枚举，保留非标准内部序数上的枚举资格。 -/
 theorem Er_level_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j κ ℓ B C : M.Domain}

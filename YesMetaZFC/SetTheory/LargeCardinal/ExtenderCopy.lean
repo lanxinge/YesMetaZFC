@@ -129,9 +129,9 @@ theorem ep_copy_l
   obtain ⟨a', haa, haJ⟩ := image a (hz.bound_l hao).1
   obtain ⟨o', _, hao'⟩ := hz'.2.1 a' haJ
   obtain ⟨c₀, i, n, D₀, U₀, G₀, r₀, H₀, V₀, mc, hi, hnω, ha, space, haU, hG₀, md₀, is⟩ :=
-    ep_constant_limit_l hZFC source family coherent h limit model hao
+    ep_constant_limit_l hZF source family h limit model (h.toEp_graph_d.elementary_l hZFC source family coherent) hao
   obtain ⟨d₀, i', n', D₁, U₁, G₁, r₁, H₁, V₁, md, hi', _, ha', space', haU', hG₁, md₁, is'⟩ :=
-    ep_constant_limit_l hZFC target family' coherent' h' limit' model' hao'
+    ep_constant_limit_l hZF target family' h' limit' model' (h'.toEp_graph_d.elementary_l hZFC target family' coherent') hao'
   have hi₀ : Smap_d I ω c e X C i := (I).unique mc.1.1 hm.1.1 ▸ hi
   have hi₁ : Smap_d I ω d e' Y C' i' := (I).unique md.1.1 hn.1.1 ▸ hi'
   have hna := (hσ.function_l hZF source.omega owner owner' h₀ h₁

@@ -4,6 +4,7 @@ import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Los
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.ProjectionLaws
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.FullProjection
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.FullEmbedding
+import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.SourceModel
 
 /-! # 实际内部约化幂
 
@@ -13,6 +14,8 @@ ZF 中对指定的实际函数族收集等价类，构造投影与商关系，�
 对具有实际全内部分离与统一化的传递源，`rs_satisfies_l` 已在 ZF 中证明源内部函数族的
 完整内部 Łoś；真值逆像、见证统一化和对角函数均在源中实际构造。
 `rs_los_assignment_l` 从实际 ω→G 图自动构造赋值空间、商赋值和全部公式码。
+`rs_bounded_model_l` 在相对幂集闭包下构造源内有界函数集、类投影和商关系码；
+它只收集源已有的函数，商构造仍使用同一等价类定义。
 `rs_constant_embedding_l` 实际构造 x↦[cₓ] 的完整初等嵌入；`rs_projection_embedding_l`
 从实际测度投影构造 [f]↦[f∘t] 的完整初等单射。恒等、复合和常值交换律均已证明。
 完整函数族的常值与投影初等性也适用于任意关系，包括实际集合谓词的扩张。

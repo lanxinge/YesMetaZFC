@@ -6,13 +6,15 @@ import YesMetaZFC.Model.SetTheory.Internal.RelativeCountable
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderEmbeddingCountable
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranchPull
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSkolemRank
+import YesMetaZFC.Model.SetTheory.Internal.SourcePower
+import YesMetaZFC.Model.SetTheory.Internal.SourceCover
 
 /-! # 指定秩层种子的小壳调整
 
 实际构造 Vκ∪{κ,σ} 的源内 κ 枚举，再取壳和传递塌缩。
 输出模型属于一致的另一源；嵌入图及其可数性见证属于输出模型自身，
 并保持所有值在 Vκ∪{κ} 中的原图条目。内部正则秩段的调整还保留
-完整源证书、枝反射、相对层级和小壳闭包，可继续下一步构造。
+完整源证书、枝反射、相对层级、相对幂集和小壳闭包，可继续下一步构造。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -22,7 +24,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_skolem_adjust_l {ω κ K Z W L Y V a c D A R T σ ι : M.Domain}
     (source : Ep_source_d hZF ω κ K Z W) (target : Ep_source_d hZF ω κ L Y V)
-    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (agree : Ea_agree_d ω κ Z Y)
+    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (subsets : Ea_subset_d ω κ Z Y)
     (level : Er_level_d Z κ T) (hA : M.mem A Z) (hAt : M.TransitiveSet A) (hm : Smem_d I c A R)
     (hTA : M.MemberSubset T A) (hκA : M.mem κ A) (hσA : M.mem σ A) (hιA : M.mem ι A)
     (hD : M.TransitiveSet D) (hσ : Smap_d I ω a c D A σ) (countable : M.IsSetInjectionFromTo I ι σ ω) :
@@ -55,7 +57,7 @@ theorem ep_skolem_adjust_l {ω κ K Z W L Y V a c D A R T σ ι : M.Domain}
     (fun hx => ((us x).mp hx).elim (hTA x) (fun eq => eq ▸ hκA)) (fun eq => eq ▸ hσA)
   obtain ⟨H, B, F, j, e, S, g, _, hB, _, hg, seed, _, hBt, _, bij, _, model, emb, gb⟩ :=
     ep_skolem_collapse_l hZF source small hA hC hq hm hAt hκ hCA cq
-  have hBY := agree.transitive_l hZF source target hBt hg gb
+  have hBY := subsets.transitive_l hZF source target hBt hg gb
   obtain ⟨k, _, hk⟩ := bij.2 σ (seed σ ((cs σ).mpr (Or.inr rfl)))
   obtain ⟨hkB, hDB, hUB, elem, ⟨η, hη, hi⟩, fixed⟩ := emb.countable_factor_l hZF source.omega hBt hAt model hm
     hD hσ hk hιA countable hUt hωU (fun x hx =>
@@ -66,8 +68,8 @@ theorem ep_skolem_adjust_l {ω κ K Z W L Y V a c D A R T σ ι : M.Domain}
 /-- 尝试树回收、严格秩界和小壳调整的直接入口；不预设新嵌入属于秩初段。 -/
 theorem ep_skolem_rank_step_l {ω κ K Z W L Y V α a c D Q A R T τ ι σ : M.Domain}
     (source : Ep_source_d hZF ω κ K Z W) (target : Ep_source_d hZF ω κ L Y V)
-    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (agree : Ea_agree_d ω κ Z Y)
-    (branches : Sc_branch_d ω Z) (hierarchy : Sc_hierarchy_d Z) (level : Er_level_d Z κ T)
+    (small : Sh_source_d (ZF.modelsKP hZF) ω Z) (subsets : Ea_subset_d ω κ Z Y)
+    (branches : Sc_branch_d ω Z) (hierarchy : Sc_hierarchy_d Z) (power : Sc_power_d Z) (level : Er_level_d Z κ T)
     (hA : M.mem A Z) (rank : Vr_d Z α A) (regular : Sc_regular_d Z α)
     (hTA : M.MemberSubset T A) (hκA : M.mem κ A)
     (hD : M.mem D Z) (hDt : M.TransitiveSet D) (hm : Smem_d I a D Q) (hn : Smem_d I c A R)
@@ -75,7 +77,7 @@ theorem ep_skolem_rank_step_l {ω κ K Z W L Y V α a c D Q A R T τ ι σ : M.D
     (hσ : Smap_d I ω a c D A σ) (prescribed : ∀ x y, Rd_entry_d x y τ → Rd_entry_d x y σ) :
     ∃ B e S j k η L, M.mem B Y ∧ M.mem B Z ∧ M.TransitiveSet B ∧ Smem_d I e B S ∧
       M.mem ω B ∧ Smap_d I ω e c B A j ∧ Ep_source_d hZF ω κ L B S ∧
-      Sc_branch_d ω B ∧ Sc_hierarchy_d B ∧ Sh_source_d (ZF.modelsKP hZF) ω B ∧
+      Sc_branch_d ω B ∧ Sc_hierarchy_d B ∧ Sc_power_d B ∧ Sc_cover_d B ∧ Sh_source_d (ZF.modelsKP hZF) ω B ∧
       M.MemberSubset T B ∧ M.mem κ B ∧ M.MemberSubset D B ∧
       M.mem k B ∧ M.mem η B ∧ Smap_d I ω a e D B k ∧ M.IsSetInjectionFromTo I η k ω ∧
       ∀ x y, Rd_entry_d x y τ → (M.mem y T ∨ y = κ) → Rd_entry_d x y k := by
@@ -104,12 +106,14 @@ theorem ep_skolem_rank_step_l {ω κ K Z W L Y V α a c D Q A R T τ ι σ : M.D
   obtain ⟨hjA, hηA⟩ := sc_countable_function_rank_l hZF source.omega source.transitive hb source.theory
     source.omega_mem hα hne hA rank bound (hAt ω hωA) hDt hjZ hηZ (fn0_of_function_l (ZF.modelsKP hZF) hj.1.1) hη
   obtain ⟨C, e, S, q, k, ξ, hCY, hCZ, hCt, model, hωC, back, hTC, hκC, hDC, hk, hξ, elem, hi, fixed⟩ :=
-    ep_skolem_adjust_l hZF source target small agree level hA hAt
+    ep_skolem_adjust_l hZF source target small subsets level hA hAt
       hn hTA hκA hjA hηA hDt hj hη
   obtain ⟨L', next⟩ := cut.pull_l hZF hCt hωC model hn back hκC hκ source.below
   exact ⟨C, e, S, q, k, ξ, L', hCY, hCZ, hCt, model, hωC, back, next,
     ba.pull_l hZF source.omega hCt hAt hωC model hn back,
     (sc_hierarchy_iff_l hZF source.omega hCt hAt model hn back).mpr ha,
+    (sc_power_iff_l hZF source.omega hCt hAt model hn back).mpr (power.rank_l hZF source.transitive hA rank hl),
+    (sc_cover_iff_l hZF source.omega hCt hAt model hn back).mpr (sc_rank_cover_l hZF source.transitive hA rank),
     (sh_source_iff_l hZF next cut model hn back).mpr sa, hTC, hκC, hDC, hk, hξ, elem, hi,
     fun x y hxy hy => fixed x y (res x y hxy) hy⟩
 

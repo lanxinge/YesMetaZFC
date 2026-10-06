@@ -112,6 +112,16 @@ theorem Vr_d.ordinal_height_l {Z α V γ : M.Domain} (hZ : M.TransitiveSet Z) (h
     exact fun W hw ξ hx hv => (sat β).mp proof hβ W hw ξ hv hx
   exact step α V ho hV (fun t ht => (cert t ht).2.2.2) all γ hγ hγV
 
+/-- 同一个实际秩段在不同传递模型中具有同一高度。 -/
+theorem Vr_d.height_unique_l {X Y α β V : M.Domain}
+    (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y) (hV : M.mem V X) (hV' : M.mem V Y)
+    (h : Vr_d X α V) (g : Vr_d Y β V) : α = β := by
+  have ho : M.IsOrdinal α := by obtain ⟨_, _, _, _, cert⟩ := h; exact (cert V hV).1
+  have ho' : M.IsOrdinal β := by obtain ⟨_, _, _, _, cert⟩ := g; exact (cert V hV').1
+  exact hZF.1.eq_of_same_members α β (fun γ =>
+    ⟨fun hγ => g.ordinal_height_l hZF hY hV' (ho.mem hγ) (h.ordinal_subset_l hZF hX hV γ hγ),
+      fun hγ => h.ordinal_height_l hZF hX hV (ho'.mem hγ) (g.ordinal_subset_l hZF hY hV' γ hγ)⟩)
+
 /-- 并集不提高先前见证层；使用同一历史中已经证明的传递性。 -/
 theorem Vr_d.union_mem_l {Z α V A U : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
     (hv : Vr_d Z α V) (hA : M.mem A V) (hU : M.mem U Z) (hu : M.IsUnionOf U A) : M.mem U V := by

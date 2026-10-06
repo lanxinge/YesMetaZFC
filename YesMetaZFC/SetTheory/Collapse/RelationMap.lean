@@ -89,4 +89,24 @@ theorem Wc_map_d.iso_l (hZF : M.Models ZF) {A R B F : M.Domain}
   exact ⟨h.transitive, h.function, h.onto, fun a _ b _ x _ => inj a b x,
     fun a _ b _ x _ y _ => h.graph_l.member_l h.function inj⟩
 
+/-- 重复代表不影响递归唯一性：两个满塌缩的实际像相等。 -/
+theorem Wc_map_d.unique_l (hZF : M.Models ZF) {A R B C F G : M.Domain}
+    (h : Wc_map_d A R B F) (g : Wc_map_d A R C G) : B = C := by
+  have hw := h.well_founded_l (ZF.modelsKP hZF)
+  have sub {B C F G} (h : Wc_map_d A R B F) (g : Wc_map_d A R C G) : M.MemberSubset B C := by
+    intro x hx
+    obtain ⟨a, ha, hax⟩ := h.onto x hx
+    obtain ⟨y, hy, hay⟩ := g.function.2.1 a ha
+    exact (wc_value_unique_l hZF hw ⟨F, h.graph_l, hax⟩ ⟨G, g.graph_l, hay⟩).symm ▸ hy
+  exact hZF.1.eq_of_same_members B C (fun x => ⟨sub h g x, sub g h x⟩)
+
+theorem Wc_map_d.graph_unique_l (hZF : M.Models ZF) {A R B C F G : M.Domain}
+    (h : Wc_map_d A R B F) (g : Wc_map_d A R C G) : F = G := by
+  apply h.function.ext_l hZF.1 g.function
+  intro a ha
+  obtain ⟨x, _, hax⟩ := h.function.2.1 a ha
+  obtain ⟨y, _, hay⟩ := g.function.2.1 a ha
+  exact ⟨x, hax, (wc_value_unique_l hZF (h.well_founded_l (ZF.modelsKP hZF))
+    ⟨F, h.graph_l, hax⟩ ⟨G, g.graph_l, hay⟩).symm ▸ hay⟩
+
 end YesMetaZFC.SetTheory

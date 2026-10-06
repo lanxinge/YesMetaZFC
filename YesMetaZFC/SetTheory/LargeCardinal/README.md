@@ -52,6 +52,10 @@ U 是 κ 上的极大适当滤子，不含单点集，且对全部内部 μ<κ �
 若临界点 κ≤α，则 κ∈β，其像 j(κ) 属于像谓词 B。B 的传递性迫使 β∈B，
 而 ν-强性在 Vν 上给出 β∈β 的矛盾。因此得到 κ>α，整个无界性证明
 使用带谓词语言的初等性，而非预设“武丁基数下方可测基数无界”。
+[MeasureRegularity](MeasureRegularity.lean) 用有界初段补集的短交证明可测基数正则；
+[MeasurePower](MeasurePower.lean) 用逐坐标真假纤维排除 κ→P(μ)（μ<κ）的单射，两者只需 ZF。
+[MeasurableInaccessible](MeasurableInaccessible.lean) 再用对象选择公理取得实际序数编号，
+证明强极限性；`woodin_inaccessible_above_l` 因而实际选择任意给定下界之上的不可达基数。
 
 ## 派生测度族、协调与共同纤维
 
@@ -311,9 +315,52 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 对每个 ω⊆μ、μ∈L 或 μ=L，还自动返回两侧的下一步源证书。
 [ExtenderCopyCollapse](ExtenderCopyCollapse.lean) 在同一原复制图上共轭两侧坍塌，
 证明所得完整初等图 k 满足 k↾L=σ↾L，并保留精确共轭方程。
-[ExtenderCopySuccessor](ExtenderCopySuccessor.lean) 的 `ep_copy_successors_l` 自动构造这些对象；
-原侧只需预扩展器，目标侧的可数共同纤维经复制回传原侧良基性。
-其结果还包含两侧支撑端点的成员资格，以及同一个复制图的小传递域限制恢复结论。
+[ExtenderCopySuccessor](ExtenderCopySuccessor.lean) 的 `ep_copy_successor_l` 固定原树中已有的
+实际超幂，自动构造复制的目标。原所属模型的短扩展器公式由 `It_local_d.map_l` 沿实际 σ
+搬运；目标侧由源内共同纤维得到良基性，原可数模型无需枝反射。给定极限支撑秩段的实际枚举，
+返回的同一复制图满足 k(L)=σ(L)、k↾(j(κ)+1)=σ↾(j(κ)+1)，且原边、目标边与复制严格交换；
+还返回 `Ea_maps_d ω L P k σ`。原超幂 P 中有实际 L 枚举的传递集合及其枚举图均属于所属源，
+两图在该集合上逐点相同；限制图恢复及目标后继的全部闭包不变量同时保留。
+旧图 π、σ 及其可数编号属于各自目标时，同一入口还证明原超幂 P 属于复制目标 P'，
+并在 P' 中实际构造 P 到 ω 的单射。输入图的精确定义域及其编号由图自身自动回收。
+[EmbeddingSetRestriction](EmbeddingSetRestriction.lean) 用源内有限真值表证明实际限制
+`j↾A : A→j(A)` 的全内部初等性，覆盖非标准有限程序；
+`ep_rank_restriction_l` 进一步自动构造严格相对秩段的像、正则性与限制图。
+[ExtenderRankImage](ExtenderRankImage.lean) 的 `it_ultra_rank_l` 在内部正则 α 下实际辨认
+`Ult(Vα,E)=j(Vα)`，新超幂边恰为原 j 的限制；逆向像证明使用源内 κ 编号，
+把任意 Vα 值代表的整张图放回 Vα。复制可直接消费这个已辨认的同一秩段。
+[ExtenderSuccessorUnique](ExtenderSuccessorUnique.lean) 在 ZF 中以相同代表和塌缩唯一性，
+识别同源同扩展器的实际目标及嵌入。
+[ExtenderRankAgreement](ExtenderRankAgreement.lean) 进一步证明：两源共有包含 κ 的内部
+正则秩段时，两次超幂共享同一个像秩段、像高度和限制嵌入；该高度以下所有有限幂子集一致。
+[ExtenderBoundedCollapse](ExtenderBoundedCollapse.lean) 用支撑秩段的实际枚举控制有界代表节点，
+由源内小关系塌缩还原同一个 j(B) 及其求值图；`Eb_collapse_d` 保留原测度图定义的
+节点关系和实际塌缩，供所属模型中的计算沿初等图传输。
+[ExtenderBoundedValue](ExtenderBoundedValue.lean) 在施加源与所属源具有相同有限 κ 幂子集时，
+双向搬运 κ 值代表，直接把原施加超幂的 j(κ) 及求值图放回所属源。
+[ExtenderBoundedTransport](ExtenderBoundedTransport.lean) 搬运完整节点池、测度关系和原求值图；
+目标节点的完整性用有界生成公式证明，递归唯一性辨认目标施加超幂的同一个值。
+[ExtenderFunctionMap](ExtenderFunctionMap.lean) 从追加末坐标的有限幂编码推出 π(f)=σ(f)。
+[ExtenderCopyBounded](ExtenderCopyBounded.lean) 遂证明复制在整个 j(κ)+1 上等于 σ；
+闭区间端点自身使用常值代表，支撑端点由 L⊆j(κ) 得到。
+[ExtenderTrace](ExtenderTrace.lean) 在所属源内实际分离完整支撑迹；
+[ExtenderTraceMap](ExtenderTraceMap.lean) 同时搬运测度、代表、恒等图与分离方程，覆盖目标中的全部新有限列。
+[ExtenderSourceTrace](ExtenderSourceTrace.lean) 可在不同施加源的原超幂中读取这个迹，
+不再要求外围界集合属于原小模型。[ExtenderCopySubsets](ExtenderCopySubsets.lean)
+先用常值 κ 的像正规化任意子集的代表，再由集合值函数编码证明 π(f)=σ(f)，
+最终识别实际集合的两种像；结论覆盖全部有限 L 幂子集。
+[ExtenderModelMap](ExtenderModelMap.lean) 搬运实际二元关系码，以 Mostowski 唯一性识别
+集合像和枚举图像，将上述一致性提升到整个源内已枚举的传递集合。
+集合值函数与二元关系的旧所属搬运证明已直接改用提取后的共同编码，无并行兼容层。
+[ExtenderPresentation](ExtenderPresentation.lean) 用全部有限支撑与原源函数构造内部代表集，
+测度一关系精确读取原超幂隶属关系，满射呈示将原超幂及其可数编号放回包含源。
+[ExtenderProductIndex](ExtenderProductIndex.lean) 用有限列编号证明节点乘积在源内可数；
+`Smap_d.countable_fixed_l` 固定源内可数传递集合，因此复制目标实际包含原施加源与所属源。
+两项构造均由原复制后继直接消费，不假设完整商或原求值图预先属于目标。
+[ExtenderRankLocal](ExtenderRankLocal.lean) 的 `It_local_d.rank_l` 保持严格极限秩段中的
+原短扩展器公式。极大性使用子集回收，可数共同纤维使用 ω→κ 图的有限秩界；
+不假定该秩段满足 ZF。`It_local_d.return_l` 对指定的实际复制目标证明支撑子集回收到
+原所属模型，所需相对幂集由目标性质沿 σ 回拉后实际构造。
 这两个入口产出的条件已接入下面的迭代树后继构造。
 
 ## 已证明：实际迭代树及后继扩张
@@ -386,14 +433,22 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 已接入所有 `Ep_source_d` 构造，因而每次实际后继继续具有内部塌缩能力。
 
 [ExtenderRelationCode](ExtenderRelationCode.lean) 把 κ 上的二元关系编码为二项 κ 值列的集合，
-再由 `Ea_agree_d` 搬运并在目标内还原原关系。
-[ExtenderModelCode](ExtenderModelCode.lean) 的 `Ea_agree_d.transitive_l` 给出自动端点：
-若两源的有限 κ 幂子集一致，B 传递，且源 X 内有实际双射图 F:κ→B，
+再由单向子集包含 `Ea_subset_d` 搬运并在目标内还原原关系。
+[ExtenderModelCode](ExtenderModelCode.lean) 的 `Ea_subset_d.transitive_l` 给出自动端点：
+若 X 的有限 κ 幂子集均属于 Y，B 传递，且源 X 内有实际双射图 F:κ→B，
 则 B 属于另一源 Y。关系码、目标内塌缩及其与原 B 的相等全部在证明中构造；
 不另要求调用者给出关系码、外延性或良基性。该端点及编码只需 ZF，
 初始正则 Hχ 的闭包实例单独使用 ZFC。
 
 这为 Neeman 引理 2.8 最后的小模型编码步骤提供实际还原接口。
+
+[ExtenderSourceSuccessors](ExtenderSourceSuccessors.lean) 的 `It_local_d.successors_l`
+已从嵌套源中的内部所属判断构造两侧实际良基超幂，并证明支撑端点上的子集一致性。
+[ExtenderSourceTrace](ExtenderSourceTrace.lean) 在所属源内部用共同支撑测度判定成员资格，
+有界分离给出自身超幂的完整支撑迹；`It_local_d.subsets_l` 因而把相应子集送回原所属源。
+两步复合直接产生上述编码搬运条件。后继的源理论、枝反射、相对层级、幂集、传递包络
+与小壳不变量均保留；`it_local_apply_agree_l` 将同一节点加入原树。
+整条 Pₙ 递归、复制的秩段装配及弱迭代性尚未完成。
 
 ## 已证明：可数复制的秩段限制恢复
 
@@ -511,15 +566,16 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 论文中的整条 Pₙ 递归仍需把这类相对复制后继、复制嵌入的秩段限制及全部前驱相容性
 接到已证明的单步不变量上；尚未得到完整递降模型反证、Neeman 定理 2.3 或推论 2.4。
 
-## 已证明：按指定秩选长并恢复强性
+## 已证明：不可达支撑的最大强度与所属源证书
 
 [`woodin_rank_strength_l`](WoodinStrength.lean) 在 ZFC 中对每个 A⊆Vδ 固定 κ，
-对每个 ν<δ 自动选择 κ,ν<L<δ 的短扩展器。`Ep_strong_limit_d` 将强性证书
+对每个 ν<δ 自动选择 κ,ν<L<δ 且 L 不可达的短扩展器。`Ep_strong_limit_d` 将强性证书
 绑定到这张 F 的同一个全系统和商投影；其传递实现 N 及嵌入 i 满足：
 
 - i:(Vδ,∈,A)≺(N,∈,B)，初等性覆盖全部内部公式码，包括非标准码。
-- crit(i)=κ，L≤i(κ)，Vν⊆N，A∩Vν=B∩Vν。
-- 原嵌入分解为 j=k∘i；k 的像精确为全部有限支撑求值 j(f)(a)，且 k 逐点固定 Vν。
+- crit(i)=κ，L≤i(κ)，V_L⊆N，A∩V_L=B∩V_L。
+- N 缺少某个 L 的子集，所以最大强度恰为 L。
+- 原嵌入分解为 j=k∘i；k 的像精确为全部有限支撑求值 j(f)(a)，且 k 逐点固定 V_L。
 
 [ExtenderCoordinates](ExtenderCoordinates.lean) 先由坐标代表覆盖所有 α<L，
 [ExtenderLength](ExtenderLength.lean) 据传递坍塌固定性恢复临界点与长度界。
@@ -530,6 +586,28 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 [RankEnumeration](RankEnumeration.lean) 同时构造源中各 Vα 的最小序数枚举。
 其最小性把目标 ν 层所需索引压到 L 以下；[RankCover](RankCover.lean)
 用两个有限坐标表示每个 x∈Vν，并将它送入同一个极限。
+`er_inaccessible_cover_l` 对不可达 L 的每个严格秩层实施同一计算，
+故同一张 F 和同一个极限覆盖整个 V_L。
+[ExtenderStrengthBound](ExtenderStrengthBound.lean) 再从原 P(κ) 的常值像下读取
+全部处处有界代表；其有限支撑节点都属于 V_L。若 N 包含 L 的全部子集，
+原投影与坍缩便从 V_L 的一个子集满射到 P(L)，与 |V_L|=L 及 Cantor 定理矛盾。
+`Ep_realizer_d` 将原常值图和坍缩图保留到长度与强度证书，保证上下界作用于同一个 N。
+
+[ExtenderExactStrength](ExtenderExactStrength.lean) 的 `Ex_strength_d` 将相对幂集、
+实际节点关系、j(P(κ)) 及求值图一同放回所属源。强度条款 `es_strength_m` 使用
+所属模型内部的量词；`map_l` 搬运这些实际数据，`realize_l` 在指定超幂中读出
+同一最大强度。[ExtenderBoundedEvaluation](ExtenderBoundedEvaluation.lean) 的投影与
+坍缩计算同时供源内呈示及求值图识别使用，旧构造已迁移。
+
+[SourceInaccessible](../../Model/SetTheory/Internal/SourceInaccessible.lean) 的 `Sc_inaccessible_d`
+使用原始共尾度和幂集基数公式。在极限 Vδ 中，实际共尾图、值域及幂集单射均由
+秩闭包回收，因而仅用背景 ZF 就能构造这个内部判断，并沿完整初等图传输。
+[SourceInaccessibleRank](../../Model/SetTheory/Internal/SourceInaccessibleRank.lean) 证明它
+在包含原参数的严格极限秩段中保持；单射和共尾图来自原源，不要求背景不可达性。
+[ExtenderInitial](ExtenderInitial.lean) 的 `Ex_short_d.local_l` 直接把原测度图及可数
+共同纤维回收到 Vδ，构造原短扩展器公式的所属判断。武丁入口已经同时返回这些
+内部证书；两项初始构造均不额外假设整个 Vδ 满足 ZF。
+完整 nice 树的装配仍需强度证书的严格秩限制，以及全部前驱的一致性递归。
 
 谓词初等性另由完整 Łoś 证明。[HereditaryFunction](../HereditaryFunction.lean)
 先证明正则 Hδ 对小定义域函数封闭，再以 Hδ=Vδ 核验原代表族确已包含全部所需函数。
@@ -596,7 +674,7 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 通用关系嵌入系统及其极限、有限支撑全系统装配和共同纤维给出的整个极限良基性已完成。
 通用短扩展器运算及武丁测度族的标准短扩展器识别也已完成。
 极限的完整内部初等性、整体 Mostowski 坍塌及原目标关系因子已完成。
-按 ν 选长的 Vν 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
+按 ν 选择不可达 L>ν、整个 V_L 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
 实际迭代树、单根与 pad、任意树前驱上的后继扩张，以及其后继一致性已实现。
 极限处添枝和上述条件下的共尾良基分支已实现；小模型的内部编码与跨源还原也已实现。
 nice 树的弱迭代性、其策略构造与决定性蕴涵仍待证明。

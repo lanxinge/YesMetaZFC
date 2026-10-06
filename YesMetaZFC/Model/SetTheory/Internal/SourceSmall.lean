@@ -61,6 +61,11 @@ theorem Sc_index_d.bound_l (hKP : M.Models KP) {μ A f : M.Domain} (h : Sc_index
   exact ⟨g, fn0_function_l hKP hg, fun a b c ha hb => h.injective a (hg.bound_l ha).1 b (hg.bound_l hb).1
     c (hg.bound_l ha).2 ((sat a c).mp ((spec a c).mp ha).2).2 ((sat b c).mp ((spec b c).mp hb).2).2⟩
 
+theorem Sc_index_d.mono_l {μ A B f : M.Domain} (h : Sc_index_d μ A f)
+    (sub : M.MemberSubset B A) : Sc_index_d μ B f :=
+  ⟨h.ordinal, fun b hb => h.total b (sub b hb), fun b hb => h.functional b (sub b hb),
+    fun b hb c hc => h.injective b (sub b hb) c (sub c hc)⟩
+
 def Sc_small_d (X A : M.Domain) : Prop := ∃ μ f, M.mem μ X ∧ M.mem f X ∧ Sc_index_d μ A f
 
 def sc_small_m {n} (A : Term n) : Formula 1 n :=
@@ -69,8 +74,7 @@ derive_free_closed sc_small_m
 
 theorem Sc_small_d.mono_l {X A B : M.Domain} (h : Sc_small_d X A) (hBA : M.MemberSubset B A) : Sc_small_d X B := by
   obtain ⟨μ, f, hμ, hf, idx⟩ := h
-  exact ⟨μ, f, hμ, hf, idx.ordinal, fun b hb => idx.total b (hBA b hb),
-    fun a ha => idx.functional a (hBA a ha), fun a ha b hb => idx.injective a (hBA a ha) b (hBA b hb)⟩
+  exact ⟨μ, f, hμ, hf, idx.mono_l hBA⟩
 
 theorem sc_small_sat_l (hKP : M.Models KP) {X : M.Domain} (hX : M.TransitiveSet X)
     (hx : Nonempty {x // M.mem x X}) {n} (ρ : Env (rt_model_l X hx) n) (A : Term n) :

@@ -33,31 +33,17 @@ theorem sc_separation_function_l {ω c X R D A : M.Domain} (hω : M.IsOmega ω)
     {p} (φ : BinarySchema p) (hd : φ.body.IsDelta0) (ρ : Env M p) (hρ : ∀ i, M.mem (ρ.bound i) X)
     (hD : M.mem D X) (hA : M.mem A X) : ∃ F C, M.mem F X ∧ M.mem C X ∧ Fn0_d D C F ∧
       ∀ d t, Rd_entry_d d t F → ∀ x, M.mem x t ↔ M.mem x A ∧ φ.denote ρ d x := by
-  obtain ⟨P, hPX, product⟩ := theory.algebra.product A D hA hD
-  let e : Fin (p+2) → Fin (p+5) := Fin.cases 1 (Fin.cases 0 (fun i => i.succ.succ.succ.succ.succ))
-  let η := (ρ.push A).push D
-  let ψ : UnarySchema (p+2) := {
-    body := Formula.existsMem (.bound 2) (Formula.existsMem (.bound 2)
-      (.conj (kpair0_m (.bound 2) (.bound 1) .newest) (φ.body.rename e)))
-    freeClosed := by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed] }
-  have point q x d : Formula.satisfies (((η.push q).push x).push d) (φ.body.rename e) ↔ φ.denote ρ d x :=
+  let e : Fin (p+2) → Fin (p+2) := Fin.cases 1 (Fin.cases 0 (fun i => i.succ.succ))
+  let ψ : BinarySchema p := {
+    body := φ.body.rename e
+    freeClosed := (Definitional.Formula.freeClosed_rename e φ.body).mpr φ.freeClosed }
+  have sat x d : ψ.denote ρ x d ↔ φ.denote ρ d x :=
     (Formula.satisfies_rename ..).trans (Formula.closed_env_l φ.body φ.freeClosed
       (funext (Fin.cases rfl (Fin.cases rfl (fun _ => rfl)))))
-  have sat q : ψ.denote η q ↔ ∃ x, M.mem x A ∧ ∃ d, M.mem d D ∧ KPair_d M q x d ∧ φ.denote ρ d x := by
-    simp only [ψ, UnarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
-      kpair0_sat_l hZF.1, point]; rfl
-  obtain ⟨Q, hQX, spec⟩ := sc_separate_source_l I hZF hω hX hm theory ψ
-    (.existsMem _ (.existsMem _ (.conj (kpair0_delta_l ..) (hd.rename_l e)))) η
-    (Fin.cases hD (Fin.cases hA hρ)) hPX
+  obtain ⟨Q, hQX, _, spec⟩ := sc_relation_source_l hZF hω hX hm theory ψ (hd.rename_l e) ρ hρ hA hD
   obtain ⟨F, C, hF, hC, hf, fibers⟩ := sc_fiber_function_l hZF hω hX hm theory hD hQX
-  refine ⟨F, C, hF, hC, hf, fun d t hdt x => ((fibers d t).mp hdt).2 x |>.trans ⟨?_, ?_⟩⟩
-  · rintro ⟨q, hq, hqQ⟩
-    obtain ⟨a, ha, b, _, code, ht⟩ := (sat q).mp ((spec q).mp hqQ).2
-    obtain ⟨rfl, rfl⟩ := kpair_injective_l M code hq
-    exact ⟨ha, ht⟩
-  · rintro ⟨hx, ht⟩
-    obtain ⟨q, hq⟩ := (kp_pair_l (ZF.modelsKP hZF)).total x d
-    exact ⟨q, hq, (spec q).mpr ⟨(product q).mpr ⟨x, hx, d, (hf.bound_l hdt).1, hq⟩,
-      (sat q).mpr ⟨x, hx, d, (hf.bound_l hdt).1, hq, ht⟩⟩⟩
+  exact ⟨F, C, hF, hC, hf, fun d t hdt x => ((fibers d t).mp hdt).2 x |>.trans ((spec x d).trans
+    ⟨fun ⟨hx, _, h⟩ => ⟨hx, (sat x d).mp h⟩,
+      fun ⟨hx, h⟩ => ⟨hx, (hf.bound_l hdt).1, (sat x d).mpr h⟩⟩)⟩
 
 end YesMetaZFC.SetTheory.Internal

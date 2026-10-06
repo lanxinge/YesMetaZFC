@@ -39,7 +39,7 @@ theorem ep_set_trace_l (hZFC : M.Models ZFC)
   have family' := family.transfer_l agree
   have coherent' := coherent.transfer_l hZF agree
   have haJ' := (h'.indices a).mpr ((h.indices a).mp haJ)
-  have hfY := agree.set_function_l hZF source source' hn hm hD hE hfX hf fb
+  have hfY := agree.subset_l.set_function_l hZF source source' hn hm hD hE hfX hf fb
   have hf' := hf.retarget_l (fun s x hx => (rd_entry_transitive_l source'.transitive hfY hx).2)
   obtain ⟨H', hHC', fh'⟩ := ep_repr_exists_l hZF family' h' limit' haJ' ha hD hfY hf'
   obtain ⟨B', hBN', hHB'⟩ := he'.1.1.2.2 H' hHC'

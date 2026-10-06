@@ -103,17 +103,22 @@ theorem sc_choice_graph_l (hZFC : M.Models ZFC) {A B R : M.Domain}
   obtain ⟨q, hq, hqR⟩ := (sat a b).mp (select a b ⟨p, code, hp⟩)
   exact kpair_unique_l M hZF.1 hq code ▸ hqR
 
+theorem sc_v_pair_l (hZF : M.Models ZF) {δ X : M.Domain} (hδ : M.IsLimitOrdinal δ)
+    (hX : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) :
+    ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  intro a b ha hb
+  obtain ⟨Y, hY, hAY, hBY⟩ := ZF.v_joint_bound_l I hZF hX ha hb
+  obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF Y
+  obtain ⟨p, hp⟩ := KP.exists_pair (ZF.modelsKP hZF) a b
+  exact ⟨p, ZF.v_subset_mem_l I hZF hX (ZF.v_power_mem_l I hZF hX hδ hY hP)
+    (fun t ht => ((hp t).mp ht).elim (fun e => e ▸ (hP a).mpr hAY) (fun e => e ▸ (hP b).mpr hBY)), hp⟩
+
 theorem sc_v_algebra_l (hZFC : M.Models ZFC) {δ X : M.Domain} (hδ : M.IsLimitOrdinal δ)
     (hX : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X) : Sc_algebra_d X := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · intro a b ha hb
-    obtain ⟨Y, hY, hAY, hBY⟩ := ZF.v_joint_bound_l I hZF hX ha hb
-    obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF Y
-    obtain ⟨p, hp⟩ := KP.exists_pair (ZF.modelsKP hZF) a b
-    exact ⟨p, ZF.v_subset_mem_l I hZF hX (ZF.v_power_mem_l I hZF hX hδ hY hP)
-      (fun t ht => ((hp t).mp ht).elim (fun e => e ▸ (hP a).mpr hAY) (fun e => e ▸ (hP b).mpr hBY)), hp⟩
+  refine ⟨sc_v_pair_l hZF hδ hX, ?_, ?_, ?_, ?_⟩
   · intro a ha
     obtain ⟨β, Y, hβ, hY, hAY⟩ := (ZF.v_unfold_l I hZF hX a).mp ha
     obtain ⟨p, hp⟩ := KP.exists_union (ZF.modelsKP hZF) a

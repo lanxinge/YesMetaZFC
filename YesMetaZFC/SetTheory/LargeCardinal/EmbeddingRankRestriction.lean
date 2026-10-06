@@ -1,6 +1,8 @@
 import YesMetaZFC.SetTheory.LargeCardinal.EmbeddingSmallRestriction
 import YesMetaZFC.SetTheory.InaccessibleEnumeration
 import YesMetaZFC.SetTheory.HereditaryFunction
+import YesMetaZFC.SetTheory.LargeCardinal.EmbeddingSetRestriction
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankClosure
 
 /-! # 不可达秩段上的实际限制图
 
@@ -11,6 +13,28 @@ namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
+
+/-- 严格相对秩段的像及其完整初等限制同时构造，目标高度保留内部正则性。 -/
+theorem ep_rank_restriction_l (hZF : M.Models ZF)
+    {ω κ K X R μ K' Y S c d j a A Q α β : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' Y S)
+    (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R) (hn : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d Y S)
+    (hj : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X Y j)
+    (hA : M.mem A X) (rank : Vr_d X α A) (regular : Sc_regular_d X α)
+    (ha : Smem_d (kp_pair_l (ZF.modelsKP hZF)) a A Q) (hαβ : Rd_entry_d α β j) :
+    ∃ B b T p, M.mem B Y ∧ Vr_d Y β B ∧ Sc_regular_d Y β ∧ Rd_entry_d A B j ∧
+      Smem_d (kp_pair_l (ZF.modelsKP hZF)) b B T ∧
+      M.IsRestrictionOf (kp_pair_l (ZF.modelsKP hZF)) p j A ∧ Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω a b A B p := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  obtain ⟨B, hB, hAB⟩ := hj.1.1.2.2 A hA
+  obtain ⟨x, hx⟩ := ha.1.2.1
+  obtain ⟨y, hy, hxy⟩ := hj.1.1.2.2 x (source.transitive A hA x hx)
+  have hyB := ((hn.2 y B).mp ((hj.relation_l I hZF source.omega hm.1 hn.1 hxy hAB).mp
+    ((hm.2 x A).mpr ⟨source.transitive A hA x hx, hA, hx⟩))).2.2
+  obtain ⟨b, T, code⟩ := smdl_membership_l I hZF ⟨y, hyB⟩
+  obtain ⟨p, res, elem⟩ := ep_set_restriction_l hZF source target hm hn hj ha code hAB
+  exact ⟨B, b, T, p, hB, (hj.hierarchy_l hZF source.omega source.transitive target.transitive hm hn hαβ hAB).mp rank,
+    (hj.regular_l hZF source.omega source.transitive target.transitive hm hn hαβ).mp regular, hAB, code, res, elem⟩
 
 theorem ep_h_rank_enumeration_l (hZFC : M.Models ZFC) {ω χ X κ B : M.Domain}
     (hω : M.IsOmega ω) (hχ : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) χ)

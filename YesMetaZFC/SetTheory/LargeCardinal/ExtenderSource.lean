@@ -38,6 +38,20 @@ theorem Ep_source_d.rebase_l (hZF : M.Models ZF) {ω κ K X R μ : M.Domain} (h 
   obtain ⟨K', hk, hs⟩ := h.sequences.space μ hμ
   exact ⟨K', h.omega, hωμ, h.transitive, h.omega_mem, hμ, small, hk, hs, h.code, h.theory, h.collection, h.sequences, h.collapse⟩
 
+/-- 全部内部有限 κ 列具有源内的同一 κ 编号。 -/
+theorem Ep_source_d.finite_index_l (hZF : M.Models ZF) {ω κ K X R : M.Domain} (source : Ep_source_d hZF ω κ K X R)
+    (hκ : M.IsOrdinal κ) : ∃ e, M.mem e X ∧ M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) e K κ := by
+  obtain ⟨c, hc⟩ := source.code
+  let φ : BinarySchema 0 := { body := Formula.extensionalEq (.bound 1) .newest }
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => κ⟩
+  have sat a b : φ.denote ρ a b ↔ a = b := Formula.satisfies_extensionalEq_iff_eq hZF.1 ..
+  obtain ⟨f, hf, fn, eq⟩ := sc_uniform_source_l hZF source.omega source.transitive hc source.theory φ (.atom ..)
+    ρ (fun i => Fin.elim0 i) source.cardinal_mem source.cardinal_mem (fun a ha => ⟨a, ha, (sat a a).mpr rfl⟩)
+  have idx : Sc_index_d κ κ f := Sc_index_d.of_injection_l (ZF.modelsKP hZF) hκ
+    ⟨fn0_function_l (ZF.modelsKP hZF) fn, fun a b x ha hb => ((sat a x).mp (eq a x ha)).trans ((sat b x).mp (eq b x hb)).symm⟩
+  obtain ⟨e, he, index⟩ := source.sequences.index κ K κ f source.cardinal_mem source.finite_mem source.cardinal_mem hf source.finite source.below idx
+  exact index.restrict_l hZF source.omega source.transitive hc source.theory source.finite_mem source.cardinal_mem he
+
 theorem Ep_source_d.space_l (hZF : M.Models ZF) {ω κ K X R n : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) : ∃ D, M.mem D X ∧ Ep_space_d κ n D := by
   let I := kp_pair_l (ZF.modelsKP hZF)

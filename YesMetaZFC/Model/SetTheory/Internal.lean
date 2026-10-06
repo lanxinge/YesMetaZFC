@@ -11,6 +11,9 @@ import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
 import YesMetaZFC.Model.SetTheory.Internal.SourceAlgebra
+import YesMetaZFC.Model.SetTheory.Internal.TransitiveSource
+import YesMetaZFC.Model.SetTheory.Internal.TransitiveCardinal
+import YesMetaZFC.Model.SetTheory.Internal.SourceInaccessibleRank
 import YesMetaZFC.Model.SetTheory.Internal.SourceSmall
 import YesMetaZFC.Model.SetTheory.Internal.SourceFunctionSize
 import YesMetaZFC.Model.SetTheory.Internal.SourceEnumeration
@@ -22,6 +25,7 @@ import YesMetaZFC.Model.SetTheory.Internal.DirectedSystem
 import YesMetaZFC.Model.SetTheory.Internal.RelationCollapse
 import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
 import YesMetaZFC.Model.SetTheory.Internal.SourceCollapse
+import YesMetaZFC.Model.SetTheory.Internal.SourcePresentation
 import YesMetaZFC.Model.SetTheory.Internal.SourceOmegaBound
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranch
 import YesMetaZFC.Model.SetTheory.Internal.SourceBranchRelation
@@ -30,6 +34,12 @@ import YesMetaZFC.Model.SetTheory.Internal.FormulaRelation
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.SourceFormula
 import YesMetaZFC.Model.SetTheory.Internal.SourceRankClosure
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
+import YesMetaZFC.Model.SetTheory.Internal.SourcePower
+import YesMetaZFC.Model.SetTheory.Internal.SourceUltrafilter
+import YesMetaZFC.Model.SetTheory.Internal.SourceCover
+import YesMetaZFC.Model.SetTheory.Internal.SourceCantor
+import YesMetaZFC.Model.SetTheory.Internal.SourceRelation
+import YesMetaZFC.Model.SetTheory.Internal.SourceBranchBound
 import YesMetaZFC.Model.SetTheory.Internal.RelativeCountable
 import YesMetaZFC.Model.SetTheory.Internal.EmbeddingCountable
 import YesMetaZFC.Model.SetTheory.Internal.CollapseCountable
@@ -87,6 +97,10 @@ AST 编译成内部码并证明对全部编码结构的语义对应，`source_sa
 由 Hχ 与极限 Vδ 的实际函数图闭包提供。`Sc_hierarchy_d` 则单独由极限 Vδ 提供，
 并沿初等图双向传输；严格相对极限层也保持层级和集合代数。
 `Vr_d.compare_l` 比较不同层号，`Vr_d.ordinal_height_l` 给出精确序数高度；均只用 ZF。
+`Sc_cover_d` 的源内传递包络有 V 层、H 层及相对秩层的实际实例，并沿初等图保持。
+`sc_cantor_bernstein_l` 在源内用全分离构造实际双射，不增加源模型的 ZF 假设。
+`sc_relation_relative_l` 在源内有界载体上分离任意原公式的相对真值；无枝标签关系
+由此得到源内限制，其前驱封闭包络具有沿初等图传递的有界规格。
 `ssat_spaces_l` 比较完整与有限赋值空间；`Fb_program_d`、`Fv_eval_d` 保留原程序的
 Δ₀ 检验证书。`At_node_d` 检验全部内部公式；`at_decode_l` 从其总枝恢复完整 `Smap_d`。
 `Fw_cert_d` 以有限赋值检验原 Skolem 见证。`sh_source_of_v_l` 在任意大于 ω 的极限

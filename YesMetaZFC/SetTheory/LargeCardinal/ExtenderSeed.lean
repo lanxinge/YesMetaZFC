@@ -33,11 +33,6 @@ theorem ep_seed_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ L q α E : Ter
 variable (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q C W : M.Domain}
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Ep_repr_d.index_l (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
-    (limit : Di_limit_d A p T S q C W) {a f E} (he : Ep_repr_d q a f E) : M.mem a J := by
-  obtain ⟨u, B, hu, _, huE⟩ := he
-  exact (h.projection.bound_l ((h.index u a B hu).mpr (limit.projection.bound_l huE).1)).2
-
 theorem ep_seed_exists_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
     (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {α : M.Domain} (hα : M.mem α L) : ∃ E, M.mem E C ∧ Ep_seed_d κ L q α E := by

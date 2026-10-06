@@ -27,6 +27,11 @@ theorem ep_repr_sat_l (hE : Extensional M) {d} (ρ : Env M d) (q a f E : Term d)
 variable (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C W : M.Domain}
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+theorem Ep_repr_d.index_l (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (limit : Di_limit_d A p T S q C W) {a f E} (he : Ep_repr_d q a f E) : M.mem a J := by
+  obtain ⟨u, B, hu, _, huE⟩ := he
+  exact (h.projection.bound_l ((h.index u a B hu).mpr (limit.projection.bound_l huE).1)).2
+
 theorem ep_repr_exists_l (family : Em_source_d ω κ L X F)
     (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {n D a f : M.Domain} (haJ : M.mem a J) (ha : Fn0_d n L a) (hD : Ep_space_d κ n D)
@@ -113,7 +118,7 @@ theorem ep_repr_pull_l
       m, n, r, f, g, hm, hn, hr, hb, hra, hf, hg, pull⟩) huE hvH
 
 /-- 实际构造拉回代表，并保留它在同一极限中的值。 -/
-theorem ep_repr_reindex_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
+theorem ep_repr_reindex_l {R₀ : M.Domain} (source : Ep_source_d hZF ω κ K X R₀) (family : Em_source_d ω κ L X F)
     (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {n m a b D E r f B : M.Domain} (hn : M.mem n ω) (hm : M.mem m ω)
     (hr : Fn0_d n m r) (hbJ : M.mem b J) (hb : Fn0_d m L b) (hra : Cp0_d n m L r b a)

@@ -44,7 +44,7 @@ theorem ep_limit_exists_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     exact ⟨x, hx, fun y hy hyx => least y hy (((hM.2 y x).mp hyx).2.2)⟩
   have hw := ep_limit_wf_l hZF h.omega (ZFC.dc_l I hZFC h.omega) hωL hF hc complete hs limit wf
   exact ⟨J, O, Z, A, p, T, S, q, c, C, V, hs, limit, model, hw,
-    elem, ep_collapse_l hZFC h family coherent hs limit model hw⟩
+    elem, ep_collapse_l hZF h family hs limit model elem hw⟩
 
 /-- 每个实际短扩展器都可在现有源内部函数族上自动形成良基极限。 -/
 theorem Ex_short_d.limit_l (hZFC : M.Models ZFC) {ω κ L F K X R : M.Domain}

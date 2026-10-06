@@ -61,12 +61,12 @@ theorem ep_function_code_l {ω κ K X R n D f : M.Domain}
     exact et ▸ hs.1.2 n y x hny hnx ▸ hvy
 
 /-- 一致性直接搬运代表函数本身，不要求其定义域上的背景函数全都属于任一源。 -/
-theorem Ea_agree_d.function_l {ω κ K X R K' Y S n D f : M.Domain}
-    (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
+theorem Ea_subset_d.function_l {ω κ K X R K' Y S n D f : M.Domain}
+    (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
     (target : Ep_source_d hZF ω κ K' Y S) (hn : M.mem n ω) (hD : Ep_space_d κ n D)
     (hfX : M.mem f X) (hf : Fn0_d D κ f) : M.mem f Y := by
   obtain ⟨m, E, A, hm, _, hE, hAX, sub, read⟩ := ep_function_code_l hZF source hn hD hfX hf
-  have hAY := (agree m E A hm hE sub).mp hAX
+  have hAY := subsets m E A hm hE sub hAX
   obtain ⟨c, code⟩ := target.code
   let ρ : Env M 3 := ⟨Fin.cases A (Fin.cases n (fun _ => κ)), fun _ => n⟩
   let φ : BinarySchema 3 := {

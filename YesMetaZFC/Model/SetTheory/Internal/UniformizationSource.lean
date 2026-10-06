@@ -12,11 +12,11 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem sc_uniform_source_l {ω c X R D C} (hω : M.IsOmega ω)
+theorem sc_relation_source_l {ω c X R D C} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
     {p} (φ : BinarySchema p) (hd : φ.body.IsDelta0) (ρ : Env M p) (hρ : ∀ i, M.mem (ρ.bound i) X)
-    (hD : M.mem D X) (hC : M.mem C X) (ht : ∀ x, M.mem x D → ∃ y, M.mem y C ∧ φ.denote ρ x y) :
-    ∃ B, M.mem B X ∧ Fn0_d D C B ∧ ∀ x y, Rd_entry_d x y B → φ.denote ρ x y := by
+    (hD : M.mem D X) (hC : M.mem C X) : ∃ Q, M.mem Q X ∧ M.IsSetRelation I Q ∧
+      ∀ x y, Rd_entry_d x y Q ↔ M.mem x D ∧ M.mem y C ∧ φ.denote ρ x y := by
   obtain ⟨P, hPX, product⟩ := theory.algebra.product D C hD hC
   let e : Fin (p+2) → Fin (p+5) := Fin.cases 0 (Fin.cases 1 (fun i => i.succ.succ.succ.succ.succ))
   let η := (ρ.push D).push C
@@ -33,14 +33,42 @@ theorem sc_uniform_source_l {ω c X R D C} (hω : M.IsOmega ω)
   obtain ⟨Q, hQX, spec⟩ := sc_separate_source_l I hZF hω hX hm theory ψ
     (.existsMem _ (.existsMem _ (.conj (kpair0_delta_l ..) (hd.rename_l e)))) η
     (Fin.cases hC (Fin.cases hD hρ)) hPX
-  obtain ⟨B, hBX, hf, sub⟩ := theory.algebra.choice D C Q hD hC hQX (fun x hx => by
-    obtain ⟨y, hy, hxy⟩ := ht x hx
+  refine ⟨Q, hQX, fun q hq => ?_, fun x y => ⟨?_, ?_⟩⟩
+  · obtain ⟨x, _, y, _, h⟩ := (product q).mp ((spec q).mp hq).1
+    exact ⟨x, y, h⟩
+  · rintro ⟨q, code, hq⟩
+    obtain ⟨a, ha, b, hb, pair, h⟩ := (sat q).mp ((spec q).mp hq).2
+    obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair code
+    exact ⟨ha, hb, h⟩
+  · rintro ⟨hx, hy, hxy⟩
     obtain ⟨q, hq⟩ := (kp_pair_l (ZF.modelsKP hZF)).total x y
-    exact ⟨y, hy, q, hq, (spec q).mpr ⟨(product q).mpr ⟨x, hx, y, hy, hq⟩, (sat q).mpr ⟨x, hx, y, hy, hq, hxy⟩⟩⟩)
-  refine ⟨B, hBX, hf, fun x y ⟨q, code, hq⟩ => ?_⟩
-  obtain ⟨a, _, b, _, pair, h⟩ := (sat q).mp ((spec q).mp (sub q hq)).2
-  obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair code
-  exact h
+    exact ⟨q, hq, (spec q).mpr ⟨(product q).mpr ⟨x, hx, y, hy, hq⟩,
+      (sat q).mpr ⟨x, hx, y, hy, hq, hxy⟩⟩⟩
+
+theorem sc_uniform_source_l {ω c X R D C} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    {p} (φ : BinarySchema p) (hd : φ.body.IsDelta0) (ρ : Env M p) (hρ : ∀ i, M.mem (ρ.bound i) X)
+    (hD : M.mem D X) (hC : M.mem C X) (ht : ∀ x, M.mem x D → ∃ y, M.mem y C ∧ φ.denote ρ x y) :
+    ∃ B, M.mem B X ∧ Fn0_d D C B ∧ ∀ x y, Rd_entry_d x y B → φ.denote ρ x y := by
+  obtain ⟨Q, hQ, _, spec⟩ := sc_relation_source_l hZF hω hX hm theory φ hd ρ hρ hD hC
+  obtain ⟨B, hB, hf, sub⟩ := theory.algebra.choice D C Q hD hC hQ (fun x hx => by
+    obtain ⟨y, hy, hxy⟩ := ht x hx
+    exact ⟨y, hy, (spec x y).mpr ⟨hx, hy, hxy⟩⟩)
+  exact ⟨B, hB, hf, fun x y ⟨q, code, hq⟩ => ((spec x y).mp ⟨q, code, sub q hq⟩).2.2⟩
+
+/-- 两次并给出的坐标界内可以分离精确值域；关系无需单值。 -/
+theorem sc_range_source_l {ω c X R F : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (hF : M.mem F X) : ∃ C, M.mem C X ∧ M.IsRangeOf I C F := by
+  obtain ⟨P, hP, coords⟩ := theory.algebra.envelope_l hF
+  let ρ : Env M 2 := ⟨Fin.cases F (fun _ => P), fun _ => F⟩
+  let φ : UnarySchema 2 := { body := Formula.existsMem (.bound 2) (rd_entry0_m .newest (.bound 1) (.bound 2)) }
+  have sat b : φ.denote ρ b ↔ ∃ a, M.mem a P ∧ Rd_entry_d a b F := by
+    simp only [φ, UnarySchema.denote, Formula.satisfies_existsMem_iff, rd_entry0_sat_l hZF.1]; rfl
+  obtain ⟨C, hC, spec⟩ := sc_separate_source_l I hZF hω hX hm theory φ
+    (.existsMem _ (rd_entry0_delta_l ..)) ρ (Fin.cases hF (fun _ => hP)) hP
+  exact ⟨C, hC, fun b => (spec b).trans ((and_congr_right fun _ => sat b).trans
+    ⟨fun ⟨_, a, _, h⟩ => ⟨a, h⟩, fun ⟨a, h⟩ => ⟨(coords a b h).2, a, (coords a b h).1, h⟩⟩)⟩
 
 /-- 每个源对象都有实际源内常值代表，并保留源内值域界。 -/
 theorem sc_constant_l {ω c X R D x} (hω : M.IsOmega ω)

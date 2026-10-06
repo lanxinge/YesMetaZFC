@@ -27,11 +27,14 @@ theorem ep_pair_at_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ n m l q r A
   simp only [ep_pair_at_m, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
     cp0_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
-theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D E f : M.Domain}
-    (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
-    (target : Ep_source_d hZF ω κ K' Y S) (hn : M.mem n ω) (hm : M.mem m ω)
+/-- 两段有限坐标编码集合值函数，解码只使用有界量词。 -/
+theorem ep_set_function_code_l (hZF : M.Models ZF) {ω κ K X R n m D E f : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) (hm : M.mem m ω)
     (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E) (hfX : M.mem f X) (hf : Fn0_d D X f)
-    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) : M.mem f Y := by
+    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) :
+    ∃ l q r H A, M.mem l ω ∧ Fn0_d n l q ∧ Fn0_d m l r ∧ Ep_space_d κ l H ∧
+      M.mem A X ∧ M.MemberSubset A H ∧ ∀ t B, Rd_entry_d t B f → ∀ x,
+        M.mem x B ↔ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨l, q, r, hl, hq, hr, join⟩ := ep_tuple_l hZF (κ := κ) source.omega hn hm
   obtain ⟨H, hHX, hH⟩ := source.space_l hZF hl
@@ -39,10 +42,6 @@ theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D 
   have hqX := source.transitive K source.finite_mem q ((source.finite q).mpr
     ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
   have hrX := source.transitive K source.finite_mem r ((source.finite r).mpr
-    ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
-  have hqY := target.transitive K' target.finite_mem q ((target.finite q).mpr
-    ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
-  have hrY := target.transitive K' target.finite_mem r ((target.finite r).mpr
     ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
   obtain ⟨_, C, hCX, hfC⟩ := source.function_l hZF hfX hf
   obtain ⟨c, code⟩ := source.code
@@ -75,7 +74,21 @@ theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D 
       have et := cp0_unique_l hZF.1 hq ((hH s).mp hsH) hqs' hqs
       have eB := (fn0_function_l (ZF.modelsKP hZF) hf).1.2 t B' B (et ▸ ht'B') htB
       exact eB ▸ cp0_unique_l hZF.1 hr ((hH s).mp hsH) hrs' hrs ▸ hx'
-  have hAY := (agree l H A hl hH (fun s hs => ((read s).mp hs).1)).mp hAX
+  exact ⟨l, q, r, H, A, hl, hq, hr, hH, hAX, fun s hs => ((read s).mp hs).1, decode⟩
+
+theorem Ea_subset_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D E f : M.Domain}
+    (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
+    (target : Ep_source_d hZF ω κ K' Y S) (hn : M.mem n ω) (hm : M.mem m ω)
+    (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E) (hfX : M.mem f X) (hf : Fn0_d D X f)
+    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) : M.mem f Y := by
+  obtain ⟨l, q, r, H, A, hl, hq, hr, hH, hAX, sub, decode⟩ :=
+    ep_set_function_code_l hZF source hn hm hD hE hfX hf bound
+  have lκ := fun i hi => source.below i (source.omega.transitive hZF l hl i hi)
+  have hqY := target.transitive K' target.finite_mem q ((target.finite q).mpr
+    ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
+  have hrY := target.transitive K' target.finite_mem r ((target.finite r).mpr
+    ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
+  have hAY := subsets l H A hl hH sub hAX
   obtain ⟨d, targetCode⟩ := target.code
   let η : Env M 8 := ⟨Fin.cases κ (Fin.cases n (Fin.cases m (Fin.cases l
     (Fin.cases q (Fin.cases r (Fin.cases A (fun _ => E))))))), fun _ => E⟩

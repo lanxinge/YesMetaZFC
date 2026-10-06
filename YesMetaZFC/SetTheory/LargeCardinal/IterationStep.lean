@@ -31,6 +31,16 @@ def It_ultra_d (hZF : M.Models ZF) (ω κ L F c d j : M.Domain) : Prop :=
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+/-- 实际超幂的塌缩证书保证目标传递，无需另加目标源证书。 -/
+theorem It_ultra_d.transitive_l {ω κ L F c d j Y S : M.Domain} (h : It_ultra_d hZF ω κ L F c d j)
+    (hn : Smdl_d I d Y S) : M.TransitiveSet Y := by
+  obtain ⟨_, _, Y', S', _, _, _, _, _, _, _, _, _, _, _, _, _, _, my, _, _, _, wc, bij, _⟩ := h
+  obtain ⟨rfl, rfl⟩ := smdl_unique_l I my.1 hn
+  intro x hx y hy
+  obtain ⟨E, _, hEx⟩ := bij.2 x hx
+  obtain ⟨H, _, _, hHy⟩ := ((wc.2 E x hEx).2.2 y).mp hy
+  exact bij.1.1.output_mem_of_pairMember hHy
+
 theorem It_ultra_d.elementary_l {ω κ L F c d j X R Y S : M.Domain} (h : It_ultra_d hZF ω κ L F c d j)
     (hm : Smdl_d I c X R) (hn : Smdl_d I d Y S) : Smap_d I ω c d X Y j := by
   obtain ⟨X', R', Y', S', _, _, _, _, _, _, _, _, _, _, _, _, _, mx, my, _, _, _, _, _, _, _, _, hj, _⟩ := h
@@ -59,5 +69,27 @@ theorem it_local_short_l {X : M.Domain} (hn : Nonempty {x : M.Domain // M.mem x 
   have hs : Formula.satisfies ρ (ex_short_m (.bound 3) (.bound 2) (.bound 1) (.bound 0)) :=
     (ex_short_sat_l hX ρ (.bound 3) (.bound 2) (.bound 1) (.bound 0)).mpr h
   exact ⟨ω.property, κ.property, L.property, F.property, hs⟩
+
+/-- 原所属公式沿实际全初等图搬运；可数完备性始终只在各自模型内部解释。 -/
+theorem It_local_d.map_l {ω X R Y S c d σ κ κ' L L' F F' : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hσ : Smap_d I ω c d X Y σ)
+    (hκ : Rd_entry_d κ κ' σ) (hL : Rd_entry_d L L' σ) (hF : Rd_entry_d F F' σ)
+    (loc : It_local_d ω X κ L F) : It_local_d ω Y κ' L' F' := by
+  obtain ⟨ωX, κX, LX, FX, hs⟩ := loc
+  have hωσ := hσ.omega_l I hZF hω hX hY hm hn ωX
+  have ωY := hσ.1.1.output_mem_of_pairMember hωσ
+  have κY := hσ.1.1.output_mem_of_pairMember hκ
+  have LY := hσ.1.1.output_mem_of_pairMember hL
+  have FY := hσ.1.1.output_mem_of_pairMember hF
+  let ρ : Env (rt_model_l X ⟨⟨ω, ωX⟩⟩) 4 :=
+    ⟨Fin.cases ⟨F, FX⟩ (Fin.cases ⟨L, LX⟩ (Fin.cases ⟨κ, κX⟩ (fun _ => ⟨ω, ωX⟩))), fun _ => ⟨ω, ωX⟩⟩
+  let η : Env (rt_model_l Y ⟨⟨ω, ωY⟩⟩) 4 :=
+    ⟨Fin.cases ⟨F', FY⟩ (Fin.cases ⟨L', LY⟩ (Fin.cases ⟨κ', κY⟩ (fun _ => ⟨ω, ωY⟩))), fun _ => ⟨ω, ωY⟩⟩
+  let φ : Formula 1 4 := ex_short_m (.bound 3) (.bound 2) (.bound 1) (.bound 0)
+  have image := (smap_source_l I hZF hω hm.1 hn.1 hσ φ (by simp -implicitDefEqProofs [φ])
+    ⟨ρ.bound, ρ.free⟩ ⟨η.bound, η.free⟩ (Fin.cases hF (Fin.cases hL (Fin.cases hκ (fun _ => hωσ))))).mp
+    ((smem_formula_l I hm _ φ ρ).mp hs)
+  exact ⟨ωY, κY, LY, FY, (smem_formula_l I hn _ φ η).mpr image⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

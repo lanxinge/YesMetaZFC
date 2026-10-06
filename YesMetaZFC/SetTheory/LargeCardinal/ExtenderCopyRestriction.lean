@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_copy_restriction_l {ω κ K X R μ K₀ Z V K' Y S c d j σ U ζ B f : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω μ K₀ Z V)
-    (target : Ep_source_d hZF ω μ K' Y S) (agree : Ea_agree_d ω μ Z Y)
+    (target : Ep_source_d hZF ω μ K' Y S) (subsets : Ea_subset_d ω μ Z Y)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
     (hU : M.TransitiveSet U) (hσ : Fn0_d U Z σ) (hσZ : M.mem σ Z) (hκσ : Rd_entry_d κ ζ σ)
     (bounded : ∀ a b, M.mem a κ → Rd_entry_d a b σ → M.mem a μ ∧ M.mem b μ)
@@ -41,7 +41,7 @@ theorem ep_copy_restriction_l {ω κ K X R μ K₀ Z V K' Y S c d j σ U ζ B f 
       exact ⟨ea ▸ ha', q, hq, ((spec q).mp hqp).1⟩
     · rintro ⟨ha, q, hq, hqσ⟩
       exact ⟨q, hq, (spec q).mpr ⟨hqσ, (sat q).mpr ⟨a, ha, v, (bounded a v ha ⟨q, hq, hqσ⟩).2, hq⟩⟩⟩
-  have hpY := agree.relation_l hZF owner target hpZ (fun q hq => by
+  have hpY := subsets.relation_l hZF owner target hpZ (fun q hq => by
     obtain ⟨a, ha, v, hv, hq'⟩ := shape q hq
     exact ⟨a, (bounded a v ha ((entry a v).mp ⟨q, hq', hq⟩).2).1, v, hv, hq'⟩)
   have res : M.IsRestrictionOf I p j κ := by
@@ -58,7 +58,7 @@ theorem ep_copy_restriction_l {ω κ K X R μ K₀ Z V K' Y S c d j σ U ζ B f 
 theorem ep_copy_countable_restriction_l
     {ω κ K X R φ K₀ Z V K' Y S c d j σ U R₀ c₀ d₀ ι B f : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω φ K₀ Z V)
-    (target : Ep_source_d hZF ω φ K' Y S) (agree : ∀ μ, M.mem μ φ → Ea_agree_d ω μ Z Y)
+    (target : Ep_source_d hZF ω φ K' Y S) (subsets : ∀ μ, M.mem μ φ → Ea_subset_d ω μ Z Y)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
     (hU : M.TransitiveSet U) (h₀ : Smem_d I c₀ U R₀) (h₁ : Smem_d I d₀ Z V)
     (hσ : Smap_d I ω c₀ d₀ U Z σ) (hσZ : M.mem σ Z) (hιZ : M.mem ι Z)
@@ -76,7 +76,7 @@ theorem ep_copy_countable_restriction_l
   have hφ := hσ.ordinal_l hZF source.omega hU owner.transitive h₀ h₁ hκφ hκ
   obtain ⟨K₁, owner'⟩ := owner.rebase_l hZF (owner.transitive φ owner.cardinal_mem μ hμ) hωμ (owner.cardinal_small.mono_l (hφ.transitive μ hμ))
   obtain ⟨K₂, target'⟩ := target.rebase_l hZF (target.transitive φ target.cardinal_mem μ hμ) hωμ (target.cardinal_small.mono_l (hφ.transitive μ hμ))
-  exact ep_copy_restriction_l hZF source owner' target' (agree μ hμ) hm hn hj hU
+  exact ep_copy_restriction_l hZF source owner' target' (subsets μ hμ) hm hn hj hU
     (fn0_of_function_l (ZF.modelsKP hZF) hσ.1.1) hσZ hκφ bounded fixed hB hf bij
 
 end YesMetaZFC.SetTheory.LargeCardinal

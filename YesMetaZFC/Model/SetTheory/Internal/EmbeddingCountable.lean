@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.SetTheory.Internal.EmbeddingFinite
 import YesMetaZFC.Model.SetTheory.Internal.SourceSmall
+import YesMetaZFC.SetTheory.Collapse.EmbeddingFixed
 
 /-! # 初等像中可数集合的逐元素回收
 
@@ -103,5 +104,46 @@ theorem Smap_d.kpair_preimage_l {ω c d X R Y S j p q x y : M.Domain}
   have image := (kpair0_sat_l hZF.1 ..).mp (tr.mp ((kpair0_sat_l hZF.1 ..).mpr code))
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M image pair
   exact ⟨a, b, ha, hbX, code, hx, hy⟩
+
+/-- 源内可数的传递集合被逐点固定，目标中也有它到 ω 的实际单射。 -/
+theorem Smap_d.countable_fixed_l {ω c d X R Y S j A ι : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
+    (hωX : M.mem ω X) (hA : M.mem A X) (hAt : M.TransitiveSet A) (hι : M.mem ι X)
+    (inj : M.IsSetInjectionFromTo I ι A ω) :
+    Rd_entry_d A A j ∧ (∀ x, M.mem x A → Rd_entry_d x x j) ∧
+      ∃ η, M.mem η Y ∧ M.IsSetInjectionFromTo I η A ω := by
+  obtain ⟨B, _, hAB⟩ := hj.1.1.2.2 A hA
+  obtain ⟨η, hη, hi⟩ := hj.1.1.2.2 ι hι
+  have fix := hj.omega_l I hZF hω hX hY hm hn hωX
+  let φ : Formula 1 3 := .conj (Formula.forallMem (.bound 1) (Formula.subset .newest (.bound 2)))
+    (.conj (fn0_m (.bound 1) (.bound 2) .newest) (sc_index_m (.bound 2) (.bound 1) .newest))
+  have tr := smap_delta_l I hZF hω hX hY hm hn hj φ
+    (by simp -implicitDefEqProofs [φ, Definitional.Formula.FreeClosed])
+    (.conj (.forallMem _ (.atom ..)) (.conj (fn0_delta_l ..) (sc_index_delta_l ..)))
+    ⟨Fin.cases ι (Fin.cases A (fun _ => ω)), fun _ => ω⟩
+    ⟨Fin.cases η (Fin.cases B (fun _ => ω)), fun _ => ω⟩ (Fin.cases hi (Fin.cases hAB (fun _ => fix)))
+  simp only [φ, Formula.satisfies_conj_iff, Formula.satisfies_forallMem_iff,
+    Formula.satisfies_subset_iff, fn0_sat_l hZF.1, sc_index_sat_l (ZF.modelsKP hZF)] at tr
+  obtain ⟨hBt, fn, idx⟩ := tr.mp ⟨hAt, fn0_of_function_l (ZF.modelsKP hZF) inj.1,
+    Sc_index_d.of_injection_l (ZF.modelsKP hZF) (hω.isOrdinal hZF) inj⟩
+  have count : M.IsSetInjectionFromTo I η B ω := ⟨fn0_function_l (ZF.modelsKP hZF) fn,
+    fun a b n ha hb => idx.injective a (fn.bound_l ha).1 b (fn.bound_l hb).1 n (fn.bound_l ha).2 ha hb⟩
+  obtain ⟨_, _, _, cover⟩ := hj.countable_preimage_l hZF hω hX hY hm hn hωX hAB hη count
+  have rel x y u v (hx : Rd_entry_d x u j) (hy : Rd_entry_d y v j) : M.mem x y ↔ M.mem u v := by
+    have tr := smap_delta_l I hZF hω hX hY hm hn hj (n := 2) (.mem (.bound (Fin.succ 0)) .newest)
+      (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]) (.mem ..)
+      ⟨Fin.cases y (fun _ => x), fun _ => x⟩ ⟨Fin.cases v (fun _ => u), fun _ => u⟩ (Fin.cases hy (fun _ => hx))
+    simpa only [Formula.satisfies_mem_iff, Definitional.Term.newest, Term.eval_bound, Fin.cases_succ, Fin.cases_zero] using tr
+  -- 可数性覆盖整个像；传递性及 Mostowski 唯一性固定其中每个元素。
+  obtain ⟨_, point⟩ := mem_embedding_fixed_l hZF hX hj.1 rel hBt
+    (fun x hx => (cover x hx).imp fun _ h => h.2)
+  have eq : A = B := hZF.1.eq_of_same_members A B (fun x => ⟨fun hx => by
+    obtain ⟨y, _, hxy⟩ := hj.1.1.2.2 x (hX A hA x hx)
+    have hy := (rel x A y B hxy hAB).mp hx
+    exact (hj.1.2 x y y hxy (point y hy)).symm ▸ hy,
+    fun hx => (rel x A x B (point x hx) hAB).mpr hx⟩)
+  subst B
+  exact ⟨hAB, point, η, hη, count⟩
 
 end YesMetaZFC.SetTheory.Internal

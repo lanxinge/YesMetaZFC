@@ -15,6 +15,30 @@ variable {M : Structure.{u}}
 def Wf_desc_d (R f : M.Domain) : Prop := ∀ i j x y, M.SuccessorOf j i →
   Rd_entry_d i x f → Rd_entry_d j y f → Rd_entry_d y x R
 
+/-- 对一条实际下降图作内部归纳，保持由既有关系图编码的不变量。 -/
+theorem wf_desc_invariant_l (hZF : M.Models ZF) {ω C R f W H z x₀ : M.Domain} (hω : M.IsOmega ω)
+    (fn : Fn0_d ω C f) (desc : Wf_desc_d R f) (hz : ∀ x, ¬ M.mem x z)
+    (h₀ : Rd_entry_d z x₀ f) (initial : Rd_entry_d x₀ H W)
+    (closed : ∀ x y, M.mem x C → M.mem y C → Rd_entry_d x y R → Rd_entry_d y H W → Rd_entry_d x H W) :
+    ∀ i x, Rd_entry_d i x f → Rd_entry_d x H W := by
+  let ρ : Env M 3 := ⟨Fin.cases f (Fin.cases H (fun _ => W)), fun _ => f⟩
+  let φ : UnarySchema 3 := { body := .forallE (.imp (rd_entry0_m (.bound 1) .newest (.bound 2))
+    (rd_entry0_m .newest (.bound 3) (.bound 4))) }
+  have sat i : φ.denote ρ i ↔ ∀ x, Rd_entry_d i x f → Rd_entry_d x H W := by
+    simp only [φ, UnarySchema.denote, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff, rd_entry0_sat_l hZF.1]; rfl
+  have all : ∀ i, M.mem i ω → φ.denote ρ i := by
+    apply hω.induction (fun i => φ.denote ρ i) (ZF.separation_exists_d hZF φ ρ ω)
+    · intro z' hz'
+      have eq := hZF.1.eq_of_same_members z' z (fun x => iff_of_false (hz' x) (hz x))
+      subst z'
+      exact (sat z).mpr (fun x hx => (fn0_function_l (ZF.modelsKP hZF) fn).1.2 z x x₀ hx h₀ |>.symm ▸ initial)
+    · intro i hi ih k hik
+      apply (sat k).mpr
+      intro x hkx
+      obtain ⟨y, hy, hiy⟩ := fn.2.1 i hi
+      exact closed x y (fn.bound_l hkx).2 hy (desc i k y x hik hiy hkx) ((sat i).mp ih y hiy)
+  exact fun i x hix => (sat i).mp (all i (fn.bound_l hix).1) x hix
+
 theorem wf_no_desc_l (hZF : M.Models ZF) {ω X R f : M.Domain} (hω : M.IsOmega ω)
     (hw : Wf_rel_d X R) (hf : Fn0_d ω X f) : ¬ Wf_desc_d R f := by
   intro hd

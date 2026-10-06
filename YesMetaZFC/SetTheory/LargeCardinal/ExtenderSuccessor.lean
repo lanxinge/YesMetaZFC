@@ -97,7 +97,7 @@ theorem ep_successor_agree_l (hZFC : M.Models ZFC)
   let hZF := ZFC.models_zf_l hZFC
   have family' := family.transfer_l agree
   have coherent' := coherent.transfer_l hZF agree
-  have normal' := normal.transfer_l hZF source source' agree
+  have normal' := normal.transfer_l hZF source source' (fun n D B hn hd sub => (agree n D B hn hd sub).mpr)
   obtain ⟨_, fixed⟩ := ep_seed_collapse_l hZF source hκ.transitive hL.transitive hωL family coherent atoms normal h limit wc
     (fn0_of_function_l (ZF.modelsKP hZF) he.1.1)
   obtain ⟨_, fixed'⟩ := ep_seed_collapse_l hZF source' hκ.transitive hL.transitive hωL family' coherent' atoms normal' h' limit' wc'

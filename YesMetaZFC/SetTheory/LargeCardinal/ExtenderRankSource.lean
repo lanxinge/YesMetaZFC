@@ -10,6 +10,29 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
+/-- 测度图的支撑与有限 κ 列给出统一秩界，故整张扩展器属于原极限秩层。 -/
+theorem Em_family_d.rank_mem_l (hZF : M.Models ZF) {ω κ L F δ X : M.Domain}
+    (family : Em_family_d ω κ L F) (graph : M.IsSetRelation (kp_pair_l (ZF.modelsKP hZF)) F)
+    (hω : M.IsOmega ω) (hX : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hδ : M.IsLimitOrdinal δ)
+    (hωX : M.mem ω X) (hκX : M.mem κ X) (hLX : M.mem L X) : M.mem F X := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  obtain ⟨K, hK⟩ := ZF.fseq_space_exists_l I hZF hω κ
+  obtain ⟨S, hS⟩ := ZF.fseq_space_exists_l I hZF hω L
+  have hKX := ZF.v_fseq_mem_l I hZF hX hδ hω hωX hκX hK
+  have hSX := ZF.v_fseq_mem_l I hZF hX hδ hω hωX hLX hS
+  obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF K
+  obtain ⟨Q, hQ⟩ := ZF.exists_powerSet hZF P
+  have hQX := ZF.v_power_mem_l I hZF hX hδ (ZF.v_power_mem_l I hZF hX hδ hKX hP) hQ
+  obtain ⟨B, hB, hSB, hQB⟩ := ZF.v_joint_bound_l I hZF hX hSX hQX
+  apply ZF.v_relation_mem_l I hZF hX hδ hB
+  intro p hp
+  obtain ⟨a, U, pair⟩ := graph p hp
+  obtain ⟨n, D, hn, ha, hd, hu⟩ := family.measure a U ⟨p, pair, hp⟩
+  refine ⟨a, hSB a ((hS a).mpr ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) ha⟩), U, hQB U ((hQ U).mpr ?_), pair⟩
+  intro A hA
+  exact (hP A).mpr (fun s hs => (hK s).mpr ⟨n, hn,
+    fn0_function_l (ZF.modelsKP hZF) ((hd s).mp (hu.1.1 A hA s hs))⟩)
+
 theorem ep_regular_source_l (hZFC : M.Models ZFC) {ω δ V κ K : M.Domain}
     (hω : M.IsOmega ω) (hωδ : M.mem ω δ)
     (hr : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ)

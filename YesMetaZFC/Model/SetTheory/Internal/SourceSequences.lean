@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.SourceFinite
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingFinite
 import YesMetaZFC.Model.SetTheory.Internal.SourceSmall
 import YesMetaZFC.SetTheory.HereditarySequences
 import YesMetaZFC.SetTheory.CumulativeFunction
@@ -43,6 +43,31 @@ theorem sc_seq_index_sat_l (hKP : M.Models KP) {Z : M.Domain} (hZ : M.Transitive
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+
+/-- 给定有限列空间的实际像仍是完整有限列空间。 -/
+theorem Smap_d.sequences_l {ω c d X R Y S j A A' K K' : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
+    (theory : Sc_theory_d I ω Y S) (hωX : M.mem ω X)
+    (hA : Rd_entry_d A A' j) (hK : Rd_entry_d K K' j) (space : Fseq_space_d I ω A K) : Fseq_space_d I ω A' K' := by
+  have hωj := hj.omega_l I hZF hω hX hY hm hn hωX
+  let φ : Formula 1 4 := .iff (.mem .newest (.bound 1))
+    (Formula.existsMem (.bound 3) (fn0_m .newest (.bound 3) (.bound 1)))
+  have tr := hj.forall_delta_l hZF hω hX hY hm hn φ
+    (by simp -implicitDefEqProofs [φ, Definitional.Formula.FreeClosed])
+    (.iff (.mem ..) (.existsMem _ (fn0_delta_l ..)))
+    ⟨Fin.cases K (Fin.cases A (fun _ => ω)), fun _ => ω⟩
+    ⟨Fin.cases K' (Fin.cases A' (fun _ => ω)), fun _ => ω⟩ (Fin.cases hK (Fin.cases hA (fun _ => hωj)))
+  simp only [φ, Formula.satisfies_iff_iff, Formula.satisfies_mem_iff, Formula.satisfies_existsMem_iff, fn0_sat_l hZF.1] at tr
+  have read := tr.mp (fun f _ => (space f).trans (exists_congr fun n => and_congr_right fun _ =>
+    ⟨fn0_of_function_l (ZF.modelsKP hZF), fn0_function_l (ZF.modelsKP hZF)⟩))
+  intro f
+  refine ⟨fun hf => ?_, fun ⟨n, hnω, fn⟩ => ?_⟩
+  · obtain ⟨n, hnω, fn⟩ := (read f (hY K' (hj.1.1.output_mem_of_pairMember hK) f hf)).mp hf
+    exact ⟨n, hnω, fn0_function_l (ZF.modelsKP hZF) fn⟩
+  · have fn := fn0_of_function_l (ZF.modelsKP hZF) fn
+    exact (read f (sc_finite_function_l hZF hω hY hn theory (hj.1.1.output_mem_of_pairMember hωj)
+      (hY A' (hj.1.1.output_mem_of_pairMember hA)) hnω fn)).mpr ⟨n, hnω, fn⟩
 
 theorem sc_sequences_iff_l {ω c d X R Y S q : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
