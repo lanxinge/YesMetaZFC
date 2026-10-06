@@ -16,6 +16,7 @@ syntax:max "⌜" term "⌝ₛ" : setTerm
 syntax:max "⊥" : setFormula
 syntax:max "⊤" : setFormula
 syntax:max "⌜" term "⌝ₚ" : setFormula
+syntax:max "⌜" term "⌝ₚ" "(" setTerm,+ ")" : setFormula
 syntax:max "(" setFormula ")" : setFormula
 syntax:55 setTerm:56 " ∈ " "⋃" setTerm:56 : setFormula
 syntax:55 setTerm:56 " ∈ " "𝒫" "(" setTerm ")" : setFormula

@@ -20,6 +20,27 @@ def Sc_inaccessible_d (ω X κ : M.Domain) : Prop :=
     (⟨Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, hω⟩), fun _ => ⟨ω, hω⟩⟩ : Env (rt_model_l X ⟨⟨ω, hω⟩⟩) 2)
     (sc_inaccessible_m (.bound 1) .newest)
 
+theorem sc_inaccessible_sat_l (hE : Extensional M) {X : M.Domain} (hX : M.TransitiveSet X)
+    (hp : ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b)
+    (nx : Nonempty {x // M.mem x X}) {d} (ρ : Env (rt_model_l X nx) d) (ω κ : Term d) :
+    Formula.satisfies ρ (sc_inaccessible_m ω κ) ↔ Sc_inaccessible_d (ω.eval ρ).val X (κ.eval ρ).val := by
+  let J := rt_pair_l hX nx hE hp
+  simp only [Sc_inaccessible_d, sc_inaccessible_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
+    Formula.satisfies_isRegularCardinal_iff J (rt_model_ext_l hE hX nx),
+    Formula.satisfies_isStrongLimitCardinal_iff J (rt_model_ext_l hE hX nx)]
+  exact ⟨fun h => ⟨(ω.eval ρ).property, (κ.eval ρ).property, h⟩, fun ⟨_, _, h⟩ => h⟩
+
+/-- 内部正则性的实际共尾见证保证该序数在背景中也是极限序数。 -/
+theorem Sc_inaccessible_d.limit_l (hKP : M.Models KP) {ω X κ : M.Domain} (hX : M.TransitiveSet X)
+    (hp : ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b)
+    (h : Sc_inaccessible_d ω X κ) : M.IsLimitOrdinal κ := by
+  obtain ⟨hω, hκ, h⟩ := h
+  let nx : Nonempty {x // M.mem x X} := ⟨⟨ω, hω⟩⟩
+  let J := rt_pair_l hX nx hKP.1 hp
+  simp only [sc_inaccessible_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
+    Formula.satisfies_isRegularCardinal_iff J (rt_model_ext_l hKP.1 hX nx)] at h
+  exact (rt_limit_l hX nx hKP ⟨κ, hκ⟩).mp h.2.1.isLimitOrdinal
+
 /-- 完整初等图传输原始公式，不把目标内部不可达性提升为背景不可达性。 -/
 theorem Sc_inaccessible_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j κ κ' : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)

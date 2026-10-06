@@ -56,6 +56,6 @@ theorem Ea_subset_d.transitive_l {ω κ K X R K' Y S B F : M.Domain}
     (target : Ep_source_d hZF ω κ K' Y S) (hB : M.TransitiveSet B)
     (hF : M.mem F X) (bij : M.IsSetBijectionFromTo I F κ B) : M.mem B Y := by
   obtain ⟨T, hT, bound, iso⟩ := ep_transitive_code_l hZF source hB hF bij
-  exact subsets.collapse_l hZF source target hT bound iso
+  exact (subsets.collapse_l hZF source target target.cardinal_mem target.cardinal_small hT bound iso).1
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -121,7 +121,8 @@ theorem ep_exact_strength_l (hZFC : M.Models ZFC) {ω κ K L X R F δ V b d N S 
     (hn : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d N S)
     (ultra : It_ultra_d (ZFC.models_zf_l hZFC) ω κ L F b d i)
     (hκi : Rd_entry_d κ Γ i) (bound : M.MemberSubset L Γ) (cover : M.MemberSubset V N)
-    (missing : ∃ x, M.MemberSubset x L ∧ ¬ M.mem x N) : Ex_strength_d (ZFC.models_zf_l hZFC) ω κ L X F := by
+    (missing : ∃ x, M.MemberSubset x L ∧ ¬ M.mem x N) :
+    Ex_strength_d (ZFC.models_zf_l hZFC) ω κ L X F ∧ Er_level_d X L V := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   have hN := ultra.transitive_l hZF hn.1
@@ -140,8 +141,8 @@ theorem ep_exact_strength_l (hZFC : M.Models ZFC) {ω κ K L X R F δ V b d N S 
   have powers : FilterZF.Source_d X κ P := fun x =>
     ⟨fun hx => ⟨source.transitive P hPX x hx, (hP x).mp hx⟩, fun ⟨_, hx⟩ => (hP x).mpr hx⟩
   have power := hi.power_l hZF source.omega source.transitive hN hm hn hκi hPY powers
-  refine ⟨source.omega_mem, source.cardinal_mem, hLX, hF, hr.isCardinal.1,
-    K, P, A, Q, Y, e, source.finite_mem, hPX, hYX, source.finite, powers, collapse, ?_, ?_⟩
+  refine ⟨⟨source.omega_mem, source.cardinal_mem, hLX, hF, hr.isCardinal.1,
+    K, P, A, Q, Y, e, source.finite_mem, hPX, hYX, source.finite, powers, collapse, ?_, ?_⟩, level⟩
   · intro α hα x _ sub
     have hxN := cover x (ZF.v_subset_mem_l I hZF hV (ZF.v_ordinal_mem_l I hZF hV hα) sub)
     exact (power x).mpr ⟨hxN, fun y hy => bound y (hr.isCardinal.1.transitive α hα y (sub y hy))⟩

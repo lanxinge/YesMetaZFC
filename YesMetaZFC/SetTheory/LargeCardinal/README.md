@@ -448,7 +448,7 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 有界分离给出自身超幂的完整支撑迹；`It_local_d.subsets_l` 因而把相应子集送回原所属源。
 两步复合直接产生上述编码搬运条件。后继的源理论、枝反射、相对层级、幂集、传递包络
 与小壳不变量均保留；`it_local_apply_agree_l` 将同一节点加入原树。
-整条 Pₙ 递归、复制的秩段装配及弱迭代性尚未完成。
+Pₙ 的全前驱历史及内部下降反证已接入，见下文；弱可迭代性的坏枝归约仍待完成。
 
 ## 已证明：可数复制的秩段限制恢复
 
@@ -561,10 +561,30 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 枝反射沿秩段和反塌缩回拉；其余源性质、层级及小壳存在性使用完整初等图的双向传输。
 这些结果已直接进入 `ep_skolem_rank_step_l`，可继续下一次节点构造。
 
-**尚未完成的边界：**上述后继入口消费背景中实际的短扩展器及其共同纤维。
-一般 `It_local_d` 仅给所属模型内的短扩展器判断，不能直接推出该背景条件。
-论文中的整条 Pₙ 递归仍需把这类相对复制后继、复制嵌入的秩段限制及全部前驱相容性
-接到已证明的单步不变量上；尚未得到完整递降模型反证、Neeman 定理 2.3 或推论 2.4。
+所属模型内的 `It_local_d` 已由相对施加入口直接消费；完整下降递归使用该入口。
+Neeman 定理 2.3 的坏枝归约和推论 2.4 的弱迭代策略仍待证明。
+
+## 已证明：Pₙ 全前驱递归与内部下降反证
+
+[ExtenderStrengthReturn](ExtenderStrengthReturn.lean) 从原最大强度证书恢复同一实际
+超幂与所属源的共同秩层；[RelativeRankEnumeration](RelativeRankEnumeration.lean)
+在目标中重新构造支撑到共同秩层的实际双射，不假定支撑在背景中不可达。
+[IterationModel](IterationModel.lean) 将递归需要的源、枝反射、层级、幂集、包络、
+小壳及内部不可达闭包一起编码，并从真正的正则 Vβ 构造初始实例。
+
+[IterationDescentStep](IterationDescentStep.lean) 的 `pn_copy_step_l` 构造 Pₙ₊₁∈Pₙ，
+保留整个旧支撑秩段及端点上的嵌入值。[IterationCutStep](IterationCutStep.lean)
+先由缺失子集推出临界点界，再把原树的指定边限制为实际严格秩段超幂。
+[IterationHistory](IterationHistory.lean) 对所有内部有限长度编码完整历史；
+[IterationCutHistory](IterationCutHistory.lean) 的 `pn_history_extend_l` 从原 nice 树及
+严格下降的正则秩段列延伸任意合法历史，同时保留每个前驱的一致性和缺失子集。
+
+[IterationDescent](IterationDescent.lean) 的 `it_nice_no_drop_l` 用 ZFC 内部依赖选择
+构造 ω 历史列，投影出实际隶属下降图，再由基础公理导出矛盾。其输入是原 nice 树、
+实际正则秩段列和首行；首行由 [IterationInitial](IterationInitial.lean) 从可数传递域
+到正则秩层的给定初等嵌入构造。[IterationNice](IterationNice.lean) 的单根与实际
+超幂添枝已给出 nice 条件的实例。当前尚未从定理 2.3 的失败构造上述输入：联合尝试树、
+复制后的下降秩、正则高度替换和可数 Skolem 回拉仍需接通，不能据此宣称弱可迭代性。
 
 ## 已证明：不可达支撑的最大强度与所属源证书
 
@@ -607,7 +627,20 @@ P 上的派生超滤、精确代表族 G={f∈X:f:D→X}、源隶属结构与分
 [ExtenderInitial](ExtenderInitial.lean) 的 `Ex_short_d.local_l` 直接把原测度图及可数
 共同纤维回收到 Vδ，构造原短扩展器公式的所属判断。武丁入口已经同时返回这些
 内部证书；两项初始构造均不额外假设整个 Vδ 满足 ZF。
-完整 nice 树的装配仍需强度证书的严格秩限制，以及全部前驱的一致性递归。
+
+[CumulativeRelativeRestriction](../CumulativeRelativeRestriction.lean) 将较早层及其原历史
+一同放入严格极限秩段；旧层级闭包证明已直接复用这个接口。
+`Er_level_d.rank_l` 保留同一秩层和枚举图，并在截断中分离实际关系码。
+[ExtenderBoundedRank](ExtenderBoundedRank.lean) 的 `Eb_collapse_d.rank_l` 回收全部原节点和
+关系，再由实际枚举证明节点集小，以截断源的小关系坍塌恢复原来的像及求值图。
+原证书现同时保留求值图完整反映成员关系的证明，两处原构造与初等传输已一并迁移。
+[ExtenderStrengthRank](ExtenderStrengthRank.lean) 的 `Ex_strength_d.rank_l` 因而保留
+原相对幂集、同一个有界超幂及原遗漏子集，证明最大强度在严格截断中保持。
+`Ep_strong_limit_d.rank_l` 直接消费武丁入口返回的实际枚举与证书：当 F,L∈U、
+U 是原源内的严格极限秩段且其高度满足源内正则性时，自动构造 U 的源证书，
+并返回最大强度、同一秩层的枚举、内部不可达性和原短扩展器判断。
+上述保持只需背景 ZF；截断高度不要求强极限，原坍塌像的所属判断也由证明给出。
+这些步骤已接入全前驱历史及内部下降反证；坏枝归约与弱迭代策略仍待完成。
 
 谓词初等性另由完整 Łoś 证明。[HereditaryFunction](../HereditaryFunction.lean)
 先证明正则 Hδ 对小定义域函数封闭，再以 Hδ=Vδ 核验原代表族确已包含全部所需函数。

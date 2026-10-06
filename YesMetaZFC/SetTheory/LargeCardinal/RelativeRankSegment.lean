@@ -1,6 +1,7 @@
 import YesMetaZFC.SetTheory.LargeCardinal.EmbeddingSmallRestriction
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
 import YesMetaZFC.SetTheory.InaccessibleEnumeration
+import YesMetaZFC.SetTheory.CumulativeRelativeRestriction
 
 /-! # 可沿迭代传输的相对秩层枚举
 
@@ -55,6 +56,17 @@ theorem Er_level_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j κ ℓ B C : M.Do
     (Fin.cases hff (Fin.cases hB (Fin.cases hTT (fun _ => hκ))))
   exact ⟨hj.1.1.output_mem_of_pairMember hB, (hj.hierarchy_l hZF hω hX hY hm hn hκ hB).mp h.hierarchy,
     T', f', hT', hf', (wc_iso_sat_l hZF.1 ..).mp (tr.mp ((wc_iso_sat_l hZF.1 ..).mpr iso))⟩
+
+/-- 同一秩层和枚举图进入严格截断；关系码在截断源中由原枚举重新分离。 -/
+theorem Er_level_d.rank_l (hZF : M.Models ZF) {ω μ K X α V R κ B : M.Domain}
+    (source : Ep_source_d hZF ω μ K V R) (hX : M.TransitiveSet X) (hV : M.mem V X)
+    (rank : Vr_d X α V) (hα : M.IsLimitOrdinal α) (hκ : M.mem κ V)
+    (h : Er_level_d X κ B) : Er_level_d V κ B := by
+  obtain ⟨hB, hierarchy⟩ := rank.rank_l hZF hX hV hα hκ h.member h.hierarchy
+  obtain ⟨_, f, _, hf, iso⟩ := h.code
+  have hfV := rank.relation_mem_l hZF hX hV hα hκ hB hf iso.function.1
+  obtain ⟨T, hT, _, code⟩ := ep_transitive_code_l hZF source iso.transitive hfV (iso.bijection_l (ZF.modelsKP hZF))
+  exact ⟨hB, hierarchy, T, f, hT, hfV, code⟩
 
 /-- 自动读取已经装配的相对秩层枚举，将序数限制恢复为整个秩层的限制。 -/
 theorem Er_level_d.restriction_l (hZF : M.Models ZF)

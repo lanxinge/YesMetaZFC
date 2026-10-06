@@ -9,6 +9,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCopySubsets
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderModelMap
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderPresentation
 import YesMetaZFC.Model.SetTheory.Internal.EmbeddingCountable
+import YesMetaZFC.Model.SetTheory.Internal.SourceInaccessibleClosure
 
 /-! # 已有实际超幂的双映射复制与支撑保持
 
@@ -51,6 +52,7 @@ theorem ep_copy_successor_l
       (∃ Γ Γ', M.mem Γ N ∧ Rd_entry_d κ Γ j₀ ∧ Rd_entry_d κ' Γ' j' ∧ Rd_entry_d Γ Γ' σ ∧ Rd_entry_d Γ Γ' k ∧
         ∀ x x', M.mem x Γ → Rd_entry_d x x' σ → Rd_entry_d x x' k) ∧
       Sc_branch_d ω P' ∧ Sc_hierarchy_d P' ∧ Sc_power_d P' ∧ Sc_cover_d P' ∧ Sh_source_d (ZF.modelsKP hZF) ω P' ∧
+      (Sc_inaccessible_closure_d I ω Y → Sc_inaccessible_closure_d I ω P') ∧
       Ea_subset_d ω L' P' N' ∧
       (∀ ι η, M.mem π Y → M.mem ι Y → M.IsSetInjectionFromTo I ι π ω →
         M.mem σ N' → M.mem η N' → M.IsSetInjectionFromTo I η σ ω →
@@ -202,7 +204,9 @@ theorem ep_copy_successor_l
     (sc_power_iff_l hZF target.omega target.transitive hP' hn mdl' hj').mp power,
     (sc_cover_iff_l hZF target.omega target.transitive hP' hn mdl' hj').mp cover,
     (sh_source_iff_l hZF target base' hn mdl' hj').mp small,
-    loc'.return_l hZFC target owner' agree' ob op oc successor,
+    (sc_inaccessible_closure_iff_l hZF target.omega target.transitive hP'
+      target.theory.algebra.pair base'.theory.algebra.pair hn mdl' hj' target.omega_mem).mp,
+    (loc'.return_l hZFC target owner' agree' ob op oc successor).1,
     countable,
     (fun B f hB hf bij => ⟨(models B f hB hf bij).1, (models B f hB hf bij).2.1, (models B f hB hf bij).2.2.2,
       fun p hp res => smap_small_restriction_l hZF ready ready' mdl mdl' hk hp res hB hf bij⟩), ⟨K₂, ready⟩, ⟨K₃, ready'⟩⟩

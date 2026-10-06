@@ -144,14 +144,14 @@ theorem Ea_subset_d.relation_l {ω κ K X R K' Y S T : M.Domain}
   exact eq ▸ hQY
 
 /-- 搬运小关系码并在目标源内重新塌缩，得到同一个实际传递集合。 -/
-theorem Ea_subset_d.collapse_l {ω κ K X R K' Y S T B F : M.Domain}
+theorem Ea_subset_d.collapse_l {ω κ K X R K' Y S A T B F : M.Domain}
     (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
-    (target : Ep_source_d hZF ω κ K' Y S) (hT : M.mem T X)
+    (target : Ep_source_d hZF ω κ K' Y S) (hA : M.mem A Y) (small : Sc_small_d Y A) (hT : M.mem T X)
     (bound : ∀ p, M.mem p T → ∃ a, M.mem a κ ∧ ∃ b, M.mem b κ ∧ KPair_d M p a b)
-    (h : Wc_iso_d κ T B F) : M.mem B Y := by
-  obtain ⟨C, G, hC, _, g⟩ := target.collapse.collapse_l target.cardinal_mem
-    (subsets.relation_l hZF source target hT bound) target.cardinal_small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
-  exact (h.unique_l hZF g).symm ▸ hC
+    (h : Wc_iso_d A T B F) : M.mem B Y ∧ M.mem F Y := by
+  obtain ⟨C, G, hC, hG, g⟩ := target.collapse.collapse_l hA
+    (subsets.relation_l hZF source target hT bound) small (h.well_founded_l (ZF.modelsKP hZF)) (h.extensional_l hZF.1)
+  exact ⟨(h.unique_l hZF g).symm ▸ hC, (h.graph_unique_l hZF g).symm ▸ hG⟩
 
 /-- 诱导隶属关系由源内平方中的有界分离得到，无须另假设关系码属于源。 -/
 theorem Ep_source_d.membership_relation_l {ω κ K Z W c A R : M.Domain}

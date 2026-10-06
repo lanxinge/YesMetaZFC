@@ -33,12 +33,7 @@ theorem it_ultra_rank_l {ω κ K L X R F c d j N S α V : M.Domain}
   obtain ⟨en, es⟩ := smdl_unique_l I nx.1 hn.1
   subst X₀ R₁ N₀ S₀
   have hωV := rank.subset_mem_l source.transitive hV hκV source.omega_mem source.below
-  have hωα := rank.ordinal_height_l hZF source.transitive hV (source.omega.isOrdinal hZF) hωV
-  obtain ⟨A₀, G, hA₀, hG, cert⟩ := rank
-  have hαX := sc_function_domain_mem_l hZF source.omega source.transitive hm source.theory hG (cert V hV).2.1
-  have rank : Vr_d X α V := ⟨A₀, G, hA₀, hG, cert⟩
-  have hα := sc_omega_bound_limit_l hZF source.omega source.transitive hm source.theory source.omega_mem hαX
-    (cert V hV).1 ⟨ω, hωα⟩ (regular ω hωα)
+  obtain ⟨hαX, hα⟩ := source.rank_height_l hZF hV rank regular hωV
   obtain ⟨b, R₀, code⟩ := smdl_membership_l I hZF ⟨ω, hωV⟩
   obtain ⟨K₀, cut⟩ := source.rank_l hZF hV rank hα regular hωV code hκV hκ source.below
   have agree : Ea_agree_d ω κ X V := fun n D A hn hd sub => (source.rank_agree_l hZF hV rank hα hκV n D A hn hd sub).symm

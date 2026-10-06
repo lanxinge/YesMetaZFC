@@ -7,6 +7,17 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+/-- 实际秩历史回收高度；内部正则性排除该高度为后继。 -/
+theorem Ep_source_d.rank_height_l {ω κ K X R α V : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (hV : M.mem V X) (rank : Vr_d X α V)
+    (regular : Sc_regular_d X α) (hω : M.mem ω V) : M.mem α X ∧ M.IsLimitOrdinal α := by
+  obtain ⟨c, hm⟩ := source.code
+  have above := rank.ordinal_height_l hZF source.transitive hV (source.omega.isOrdinal hZF) hω
+  obtain ⟨B, F, hB, hF, cert⟩ := rank
+  have hα := sc_function_domain_mem_l hZF source.omega source.transitive hm source.theory hF (cert V hV).2.1
+  exact ⟨hα, sc_omega_bound_limit_l hZF source.omega source.transitive hm source.theory source.omega_mem hα
+    (cert V hV).1 ⟨ω, above⟩ (regular ω above)⟩
+
 /-- 包含 κ 的严格极限秩段与原源具有完全相同的有限 κ 幂子集。 -/
 theorem Ep_source_d.rank_agree_l {ω κ K Z S α V : M.Domain}
     (source : Ep_source_d hZF ω κ K Z S) (hV : M.mem V Z) (rank : Vr_d Z α V)

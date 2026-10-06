@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.IterationApply
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSourceNode
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderStrengthAgreement
 
 /-! # 内部所属短扩展器直接延长实际迭代树
 
@@ -13,10 +14,10 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem it_local_apply_l {ω c₀ α ξ T Q G E k c d X R Y S κ K K' L F P : M.Domain}
+theorem it_local_apply_l {ω c₀ α ξ T Q G E k c d X R Y S κ μ K K' L F P : M.Domain}
     (tree : It_tree_d hZF ω c₀ α T Q G E) (hα : M.SuccessorOf α ξ)
     (hc : Rd_entry_d ξ c Q) (hd : Rd_entry_d k d Q) (mx : Smem_d I c X R) (my : Smem_d I d Y S)
-    (owner : Ep_source_d hZF ω κ K X R) (source : Ep_source_d hZF ω κ K' Y S)
+    (owner : Ep_source_d hZF ω κ K X R) (source : Ep_source_d hZF ω μ K' Y S)
     (branches : Sc_branch_d ω Y) (hierarchy : Sc_hierarchy_d Y) (power : Sc_power_d Y) (cover : Sc_cover_d Y)
     (small : Sh_source_d (ZF.modelsKP hZF) ω Y) (inside : M.MemberSubset X Y) (agree : Ea_agree_d ω κ X Y)
     (owner_branches : Sc_branch_d ω X) (hP : M.mem P X) (owner_power : FilterZF.Source_d X K P)
@@ -25,6 +26,7 @@ theorem it_local_apply_l {ω c₀ α ξ T Q G E k c d X R Y S κ K K' L F P : M.
       Rd_entry_d α b Q' ∧ It_map_d G' k α j ∧ It_ultra_d hZF ω κ L F d b j ∧
       It_payload_d p κ L F ∧ Rd_entry_d ξ p E' ∧ Smem_d I b N V ∧ Ep_source_d hZF ω ω K₀ N V ∧
       Sc_branch_d ω N ∧ Sc_hierarchy_d N ∧ Sc_power_d N ∧ Sc_cover_d N ∧ Sh_source_d (ZF.modelsKP hZF) ω N := by
+  obtain ⟨_, source⟩ := agree.subset_l.alphabet_l hZF owner source (loc.ordinals_l (ZF.modelsKP hZF) owner.transitive).1
   obtain ⟨N, V, a, b, j, K₀, _, ultra, code, target, _, ready, nb, nh, np, nc, ns⟩ :=
     loc.node_l hZFC source owner branches hierarchy power cover small inside
       (fun n D A hn hd sub => (agree n D A hn hd sub).symm) owner_branches hP owner_power

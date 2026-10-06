@@ -14,10 +14,10 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem it_local_apply_agree_l {ω c₀ α ξ T Q G E k c d X R Y S κ K K' L F : M.Domain}
+theorem it_local_apply_agree_l {ω c₀ α ξ T Q G E k c d X R Y S κ μ K K' L F : M.Domain}
     (tree : It_tree_d hZF ω c₀ α T Q G E) (hα : M.SuccessorOf α ξ)
     (hc : Rd_entry_d ξ c Q) (hd : Rd_entry_d k d Q) (mx : Smem_d I c X R) (my : Smem_d I d Y S)
-    (owner : Ep_source_d hZF ω κ K X R) (source : Ep_source_d hZF ω κ K' Y S)
+    (owner : Ep_source_d hZF ω κ K X R) (source : Ep_source_d hZF ω μ K' Y S)
     (branches : Sc_branch_d ω Y) (hierarchy : Sc_hierarchy_d Y) (power : Sc_power_d Y) (cover : Sc_cover_d Y)
     (small : Sh_source_d (ZF.modelsKP hZF) ω Y) (inside : M.MemberSubset X Y) (agree : Ea_agree_d ω κ X Y)
     (ob : Sc_branch_d ω X) (oh : Sc_hierarchy_d X) (op : Sc_power_d X) (oc : Sc_cover_d X)
@@ -31,6 +31,7 @@ theorem it_local_apply_agree_l {ω c₀ α ξ T Q G E k c d X R Y S κ K K' L F 
       Sc_branch_d ω N ∧ Sc_branch_d ω N' ∧ Sc_hierarchy_d N ∧ Sc_hierarchy_d N' ∧
       Sc_power_d N ∧ Sc_power_d N' ∧ Sc_cover_d N ∧ Sc_cover_d N' ∧
       Sh_source_d (ZF.modelsKP hZF) ω N ∧ Sh_source_d (ZF.modelsKP hZF) ω N' := by
+  obtain ⟨_, source⟩ := agree.subset_l.alphabet_l hZF owner source (loc.ordinals_l (ZF.modelsKP hZF) owner.transitive).1
   obtain ⟨N, V, N', V', a, b, j, a', b', j', K₀, K₁, code, code', target, target', ultra, ultra', hLN, hLN', common,
       back, ready, ready', nb, nb', nh, nh', np, np', nc, nc', ns, ns'⟩ :=
     loc.successors_l hZFC source owner branches hierarchy power cover small inside

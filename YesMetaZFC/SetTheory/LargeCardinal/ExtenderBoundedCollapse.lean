@@ -17,7 +17,7 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-/-- 节点、关系和求值图保留为参数，以便沿嵌入比较同一图的实际像。 -/
+/-- 节点、关系与求值图保持显式，并记录重复代表对成员关系的完整反映。 -/
 def Eb_collapse_d (ω κ L K X B F A Q Y e : M.Domain) : Prop := ∃ J P G U R,
   Eb_pool_d ω κ L X B J K P G A ∧ (∀ a, M.mem a J ↔ Ei_d ω L a) ∧
     M.mem U X ∧ M.mem R X ∧ M.mem Q X ∧ M.mem e X ∧
@@ -25,7 +25,8 @@ def Eb_collapse_d (ω κ L K X B F A Q Y e : M.Domain) : Prop := ∃ J P G U R,
     Rd_fun_d .mem B B B R ∧
     (∀ p, M.mem p Q → ∃ u, M.mem u A ∧ ∃ v, M.mem v A ∧ KPair_d M p u v) ∧
     (∀ u v, Rd_entry_d u v Q ↔ M.mem u A ∧ M.mem v A ∧ Eb_link_d ω κ L B J K U R F G u v) ∧
-    Wc_map_d A Q Y e
+    Wc_map_d A Q Y e ∧
+    ∀ u v x y, Rd_entry_d u x e → Rd_entry_d v y e → (Rd_entry_d u v Q ↔ M.mem x y)
 
 theorem Eb_pool_d.rank_small_l {ω κ K X R L B J P G A V : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (pool : Eb_pool_d ω κ L X B J K P G A)
@@ -103,7 +104,7 @@ theorem it_ultra_owned_image_l {ω κ K L X R F c d j N S V B B' : M.Domain}
   exact ⟨hB', D, Q, t, J, P, G, U₀, R₁, pool, system.indices, hU₀, hR₁, hQ, ht, range, membership₀,
     fun p hp => (graph.1 p hp).elim fun u hu => hu.elim fun v hv =>
       ⟨u, (graph.2 u v ⟨p, hv, hp⟩).1, v, (graph.2 u v ⟨p, hv, hp⟩).2, hv⟩,
-    qs, map⟩
+    qs, map, member⟩
 
 /-- 已有的源内塌缩证书在任意指定实际超幂中恢复同一个集合像。 -/
 theorem Eb_collapse_d.image_l {ω κ K L X R F c d j N S B A Q Y e : M.Domain}
@@ -117,7 +118,7 @@ theorem Eb_collapse_d.image_l {ω κ K L X R F c d j N S B A Q Y e : M.Domain}
   obtain ⟨ex, er⟩ := smdl_unique_l I mx.1 hm.1
   obtain ⟨en, es⟩ := smdl_unique_l I nx.1 hn.1
   subst X₀ R₀ N₀ S₀
-  obtain ⟨J₀, P, G, U₀, R₁, pool, indices, _, _, _, _, range, membership, _, edges, map⟩ := collapse
+  obtain ⟨J₀, P, G, U₀, R₁, pool, indices, _, _, _, _, range, membership, _, edges, map, _⟩ := collapse
   have eq := hZF.1.eq_of_same_members J₀ J (fun a => (indices a).trans (system.indices a).symm)
   subst J₀
   obtain ⟨B', _, hBB⟩ := hj.1.1.2.2 B hB

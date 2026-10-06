@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.SetTheory.Internal.SourceTheory
 import YesMetaZFC.Model.SetTheory.Internal.SourceHierarchy
-import YesMetaZFC.SetTheory.CumulativeRelativeClosure
+import YesMetaZFC.SetTheory.CumulativeRelativeRestriction
 
 /-! # 严格相对秩段的集合代数与层级闭包
 
@@ -39,23 +39,7 @@ theorem Sc_algebra_d.rank_l {Z α V : M.Domain} (h : Sc_algebra_d Z) (hZ : M.Tra
 theorem Sc_hierarchy_d.rank_l {Z α V : M.Domain} (h : Sc_hierarchy_d Z) (hZ : M.TransitiveSet Z)
     (hV : M.mem V Z) (hv : Vr_d Z α V) (hα : M.IsLimitOrdinal α) : Sc_hierarchy_d V := by
   intro β hβ ho
-  have hβα := hv.ordinal_height_l hZF hZ hV ho hβ
   obtain ⟨W, hW, hw⟩ := h β (hZ V hV β hβ) ho
-  have hWV := (hv.compare_l hZF hZ hV hW hw (hα.1.transitive β hβα)).2 hβα
-  obtain ⟨B, F, hB, hF, cert⟩ := hw
-  have fn := (cert W hW).2.1
-  have range δ U (hu : Rd_entry_d δ U F) : M.mem U W :=
-    ((cert U (hZ B hB U (fn.bound_l hu).2)).2.2.2).mpr
-      ⟨δ, (fn.bound_l hu).1, U, (fn.bound_l hu).2, hu, fun _ h => h⟩
-  have fw := fn.retarget_l range
-  have hFV := hv.relation_mem_l hZF hZ hV hα hβ hWV hF fw.1
-  refine ⟨W, hWV, W, F, hWV, hFV, fun t ht => ⟨ho, fw, ?_, ?_⟩⟩
-  · intro δ hδ U _ hu
-    exact ((cert t (hZ V hV t ht)).2.2.1 δ hδ U (fn.bound_l hu).2 hu).trans
-      ⟨fun ⟨γ, hγ, T, _, hg, sub⟩ => ⟨γ, hγ, T, range γ T hg, hg, sub⟩,
-        fun ⟨γ, hγ, T, _, hg, sub⟩ => ⟨γ, hγ, T, (fn.bound_l hg).2, hg, sub⟩⟩
-  · exact ((cert t (hZ V hV t ht)).2.2.2).trans
-      ⟨fun ⟨γ, hγ, T, _, hg, sub⟩ => ⟨γ, hγ, T, range γ T hg, hg, sub⟩,
-        fun ⟨γ, hγ, T, _, hg, sub⟩ => ⟨γ, hγ, T, (fn.bound_l hg).2, hg, sub⟩⟩
+  exact ⟨W, hv.rank_l hZF hZ hV hα hβ hW hw⟩
 
 end YesMetaZFC.SetTheory.Internal

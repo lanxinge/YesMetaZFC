@@ -46,4 +46,18 @@ theorem sc_separation_function_l {ω c X R D A : M.Domain} (hω : M.IsOmega ω)
     ⟨fun ⟨hx, _, h⟩ => ⟨hx, (sat x d).mp h⟩,
       fun ⟨hx, h⟩ => ⟨hx, (hf.bound_l hdt).1, (sat x d).mpr h⟩⟩)⟩
 
+/-- 反向图由已有图在实际乘积中的有界分离恢复，故同一个逆图仍属于源。 -/
+theorem sc_inverse_mem_l {ω c X R A B f g : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (hA : M.mem A X) (hB : M.mem B X) (hf : M.mem f X) (fn : Fn0_d B A g)
+    (inverse : ∀ b a, Rd_entry_d b a g ↔ Rd_entry_d a b f) : M.mem g X := by
+  let ρ : Env M 1 := ⟨fun _ => f, fun _ => f⟩
+  let φ : BinarySchema 1 := { body := rd_entry0_m .newest (.bound 1) (.bound 2) }
+  have sat b a : φ.denote ρ b a ↔ Rd_entry_d a b f := rd_entry0_sat_l hZF.1 ..
+  obtain ⟨G, hG, shape, gs⟩ := sc_relation_source_l hZF hω hX hm theory φ (rd_entry0_delta_l ..) ρ (fun _ => hf) hB hA
+  have eq := (fn0_function_l (ZF.modelsKP hZF) fn).1.1.eq_of_pairMember_iff hZF.1 shape (fun b a =>
+    ⟨fun h => (gs b a).mpr ⟨(fn.bound_l h).1, (fn.bound_l h).2, (sat b a).mpr ((inverse b a).mp h)⟩,
+      fun h => (inverse b a).mpr ((sat b a).mp ((gs b a).mp h).2.2)⟩)
+  exact eq.symm ▸ hG
+
 end YesMetaZFC.SetTheory.Internal

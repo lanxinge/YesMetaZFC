@@ -3,6 +3,9 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationLocalAgreement
 import YesMetaZFC.SetTheory.LargeCardinal.IterationFork
 import YesMetaZFC.SetTheory.LargeCardinal.IterationLimit
 import YesMetaZFC.SetTheory.LargeCardinal.IterationPadding
+import YesMetaZFC.SetTheory.LargeCardinal.IterationDescent
+import YesMetaZFC.SetTheory.LargeCardinal.IterationInitial
+import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 
 /-! # 迭代树、后继扩张与极限添枝的公共入口
 
@@ -15,5 +18,12 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationPadding
 共尾枝的实际直接极限、完整规范初等嵌入、传递坍塌及整树极限扩张均已构造。
 共尾度大于 ω 时用 ZF＋DC 证明枝极限良基；可数共尾长度的可延伸树由最小
 后继递归选枝，实际相容的良基实现保证所得枝良基，只需 ZF。
-任意内部极限长度的 padding 树提供直接实例；一般迭代策略仍未构造。
+任意内部极限长度的 padding 树提供直接实例。
+`pn_copy_step_l` 从指定实际超幂中的严格正则秩段构造下降模型，旧图在整个
+支撑秩段及端点上保持相同，原缺失子集见证和新旧目标的共同秩段一并保留。
+下降模型、嵌入行和全部内部有限历史均有一阶编码；`pn_initial_row_l` 从可数
+传递域的给定初等图自动回收模型内图和可数编号。`pn_history_extend_l` 从原树
+及实际正则秩段列延伸每段历史，保持所有前驱的一致性及缺失子集。
+`it_nice_no_drop_l` 用内部依赖选择构造 ω 历史列，再由基础公理排除末模型下降。
+坏枝到正则秩段列的构造，以及 nice 树弱可迭代性的最终接入仍未完成。
 -/

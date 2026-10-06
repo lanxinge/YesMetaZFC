@@ -68,7 +68,7 @@ theorem ep_copy_bounded_l
     (hΓ' : M.TransitiveSet Γ') (hΓσ : Rd_entry_d Γ Θ σ) (collapse : Eb_collapse_d ω κ L K₀ N κ F D Q Γ e) :
     Θ = Γ' ∧ Rd_entry_d Γ Γ' k ∧ ∀ x x', M.mem x Γ → Rd_entry_d x x' σ → Rd_entry_d x x' k := by
   have data := collapse
-  obtain ⟨J₀, P₀, G₀, U₀, V₀, pool, _, _, _, hQ, he, _, _, _, _, map⟩ := data
+  obtain ⟨J₀, P₀, G₀, U₀, V₀, pool, _, _, _, hQ, he, _, _, _, _, map, _⟩ := data
   have evaluation := (collapse.realize_l hZF source owner agree family system limit wc bij ff constant fv hHΓ map.transitive).2
   obtain ⟨D', _, hDD⟩ := hσ.1.1.2.2 D pool.carrier
   obtain ⟨Q', _, hQQ⟩ := hσ.1.1.2.2 Q hQ

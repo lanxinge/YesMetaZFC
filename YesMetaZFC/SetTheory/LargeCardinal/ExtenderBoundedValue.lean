@@ -103,7 +103,7 @@ theorem Eb_collapse_d.realize_l
     (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ κ f₀) (fv : Ep_repr_d q a₀ f₀ H)
     (hHΓ : Rd_entry_d H Γ g) (hΓ : M.TransitiveSet Γ) (collapse : Eb_collapse_d ω κ L K₀ N κ F D Q B e) :
     B = Γ ∧ ∀ u x, Rd_entry_d u x e ↔ M.mem u D ∧ ∃ a f, KPair_d M u a f ∧ Ep_value_d q g a f x := by
-  obtain ⟨J₀, P, G, U, V, pool, indices, _, _, _, _, range, membership, _, edges, map⟩ := collapse
+  obtain ⟨J₀, P, G, U, V, pool, indices, _, _, _, _, range, membership, _, edges, map, _⟩ := collapse
   have eq := hZF.1.eq_of_same_members J₀ J (fun a => (indices a).trans (system.indices a).symm)
   subst J₀
   obtain ⟨t, map', evaluation, _⟩ := pool.realize_l hZF source owner agree family system limit wc bij ff constant fv hHΓ hΓ range membership edges
@@ -145,6 +145,6 @@ theorem eb_owned_value_l
   exact ⟨hΓN, D, Q, e, ⟨J, P, G, U, V₀, pool, system.indices, hU, hV₀, hQ, he, range, membership,
     fun p hp => (graph.1 p hp).elim fun u hu => hu.elim fun v hv =>
       ⟨u, (graph.2 u v ⟨p, hv, hp⟩).1, v, (graph.2 u v ⟨p, hv, hp⟩).2, hv⟩,
-    edges, map⟩, evaluation⟩
+    edges, map, member⟩, evaluation⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

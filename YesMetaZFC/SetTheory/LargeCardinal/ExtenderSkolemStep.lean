@@ -8,6 +8,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceBranchPull
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSkolemRank
 import YesMetaZFC.Model.SetTheory.Internal.SourcePower
 import YesMetaZFC.Model.SetTheory.Internal.SourceCover
+import YesMetaZFC.Model.SetTheory.Internal.SourceInaccessibleClosure
 
 /-! # 指定秩层种子的小壳调整
 
@@ -78,6 +79,7 @@ theorem ep_skolem_rank_step_l {ω κ K Z W L Y V α a c D Q A R T τ ι σ : M.D
     ∃ B e S j k η L, M.mem B Y ∧ M.mem B Z ∧ M.TransitiveSet B ∧ Smem_d I e B S ∧
       M.mem ω B ∧ Smap_d I ω e c B A j ∧ Ep_source_d hZF ω κ L B S ∧
       Sc_branch_d ω B ∧ Sc_hierarchy_d B ∧ Sc_power_d B ∧ Sc_cover_d B ∧ Sh_source_d (ZF.modelsKP hZF) ω B ∧
+      (Sc_inaccessible_closure_d I ω Z → Sc_inaccessible_closure_d I ω B) ∧
       M.MemberSubset T B ∧ M.mem κ B ∧ M.MemberSubset D B ∧
       M.mem k B ∧ M.mem η B ∧ Smap_d I ω a e D B k ∧ M.IsSetInjectionFromTo I η k ω ∧
       ∀ x y, Rd_entry_d x y τ → (M.mem y T ∨ y = κ) → Rd_entry_d x y k := by
@@ -114,7 +116,11 @@ theorem ep_skolem_rank_step_l {ω κ K Z W L Y V α a c D Q A R T τ ι σ : M.D
     (sc_hierarchy_iff_l hZF source.omega hCt hAt model hn back).mpr ha,
     (sc_power_iff_l hZF source.omega hCt hAt model hn back).mpr (power.rank_l hZF source.transitive hA rank hl),
     (sc_cover_iff_l hZF source.omega hCt hAt model hn back).mpr (sc_rank_cover_l hZF source.transitive hA rank),
-    (sh_source_iff_l hZF next cut model hn back).mpr sa, hTC, hκC, hDC, hk, hξ, elem, hi,
+    (sh_source_iff_l hZF next cut model hn back).mpr sa,
+    fun closure => (sc_inaccessible_closure_iff_l hZF source.omega hCt hAt
+      next.theory.algebra.pair cut.theory.algebra.pair model hn back hωC).mpr
+        (closure.rank_l hZF source.transitive source.theory.algebra.pair hA rank hl),
+    hTC, hκC, hDC, hk, hξ, elem, hi,
     fun x y hxy hy => fixed x y (res x y hxy) hy⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

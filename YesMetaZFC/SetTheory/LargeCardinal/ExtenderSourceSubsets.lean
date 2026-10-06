@@ -39,7 +39,11 @@ theorem It_local_d.subsets_l {ω κ K X R L F P N S : M.Domain}
 theorem It_local_d.return_l {ω κ K X R K' Y S L F N V : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω κ K' Y S)
     (agree : Ea_agree_d ω κ X Y) (branches : Sc_branch_d ω Y) (power : Sc_power_d Y) (cover : Sc_cover_d Y)
-    (loc : It_local_d ω Y κ L F) (next : Ep_successor_d hZF ω κ L X R F N V) : Ea_subset_d ω L N Y := by
+    (loc : It_local_d ω Y κ L F) (next : Ep_successor_d hZF ω κ L X R F N V) :
+    Ea_subset_d ω L N Y ∧ ∃ b d N' V' j K₀,
+      Smem_d I b Y S ∧ Smem_d I d N' V' ∧ It_ultra_d hZF ω κ L F b d j ∧
+      Ep_source_d hZF ω ω K₀ N' V' ∧ M.mem L N ∧ M.mem L N' ∧
+      Ea_agree_d ω L N N' ∧ Ea_subset_d ω L N' Y := by
   obtain ⟨P, hP, subsets⟩ := power K' owner.finite_mem
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
   have family := (loc.measures_l hZF owner hP subsets).transfer_l reverse
@@ -54,15 +58,21 @@ theorem It_local_d.return_l {ω κ K X R K' Y S L F N V : M.Domain}
   obtain ⟨J, O, Z, A, p, T, U, q, c, C, W, d, e, h, limit, model, target, ht, wc, bij, he⟩ := next
   obtain ⟨J', O', Z', A', p', T', U', q', c', C', W', h', limit', model', _, _, collapse⟩ :=
     loc.limit_l hZFC owner owner branches cover power (fun _ h => h) (fun _ _ _ _ _ _ => Iff.rfl) branches hP subsets
-  obtain ⟨_, _, _, N', e', _, d', V', _, _, _, _, ht', wc', bij', target', he', _⟩ := collapse
+  obtain ⟨_, b', i', N', e', _, d', V', j', code', hi', constants', ht', wc', bij', target', he', _, _, _, hj', js', K₀, ready'⟩ := collapse
   have next' : Ep_successor_d hZF ω κ L Y S F N' V' :=
     ⟨J', O', Z', A', p', T', U', q', c', C', W', d', e', h', limit', model', target', ht', wc', bij', he'⟩
   have range : M.IsRangeOf I N e := fun x => ⟨fun hx => (bij.2 x hx).imp fun _ h => h.2,
     fun ⟨_, hx⟩ => bij.1.1.output_mem_of_pairMember hx⟩
   have range' : M.IsRangeOf I N' e' := fun x => ⟨fun hx => (bij'.2 x hx).imp fun _ h => h.2,
     fun ⟨_, hx⟩ => bij'.1.1.output_mem_of_pairMember hx⟩
-  have common := (ep_successor_agree_l hZFC source owner agree family coherent atoms normal ord.1 ord.2 below
-    h limit model ht target he range wc h' limit' model' ht' target' he' range' wc').2.2
-  exact common.subset_l.trans_l (loc.subsets_l hZFC owner hP subsets next')
+  have common := ep_successor_agree_l hZFC source owner agree family coherent atoms normal ord.1 ord.2 below
+    h limit model ht target he range wc h' limit' model' ht' target' he' range' wc'
+  have back := loc.subsets_l hZFC owner hP subsets next'
+  have ultra' : It_ultra_d hZF ω κ L F b' d' j' :=
+    ⟨Y, S, N', V', J', O', Z', A', p', T', U', q', c', C', W', i', e', code', target', h', limit', model',
+      wc', bij', he', hi', constants', hj', hj'.1.1.1.1, fun x y => (js' x y).trans
+        ⟨And.right, fun ⟨z, hxz, hzy⟩ => ⟨hi'.1.1.input_mem_of_pairMember hxz, z, hxz, hzy⟩⟩⟩
+  exact ⟨common.2.2.subset_l.trans_l back, b', d', N', V', j', K₀, code', target', ultra', ready',
+    common.1, common.2.1, common.2.2, back⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal
