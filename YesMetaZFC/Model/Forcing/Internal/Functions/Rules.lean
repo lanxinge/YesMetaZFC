@@ -29,7 +29,7 @@ theorem force_entry_l (hE : Extensional M) {n} (ρ : Env M n) (p : M.Domain) (s 
       Formula.isUnorderedPair, Formula.extensionalEq, Definitional.Formula.bind,
       Definitional.Term.bind, Definitional.Term.liftSubstitution, Definitional.Term.newest,
       Definitional.Term.weaken, Definitional.Term.rename, Definitional.TermVector.bind,
-      Formula.pairArguments, Fin.cases, Fin.induction, Fin.induction.go]
+      Formula.pairArguments, fin_cases, Fin.cases, Fin.induction, Fin.induction.go]
   rw [← h]
   exact force_rel_at_l M hE ρ p s t F
 

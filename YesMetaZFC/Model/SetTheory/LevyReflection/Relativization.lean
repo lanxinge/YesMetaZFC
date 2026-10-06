@@ -73,19 +73,19 @@ theorem lr_reflect_core_l {n d} (φ : Formula 1 n) (hφ : φ.FreeClosed) {X : M.
   induction φ generalizing d <;> intro hφ h ρ θ T e hT he hρ
     <;> simp only [Definitional.Formula.FreeClosed] at hφ
   case falsum | truth => simp only [lr_rel_m, Formula.satisfies_falsum_iff, Formula.satisfies_truth_iff]
-  case mem s t _ => simp only [lr_rel_m, Formula.satisfies_mem_iff, term ρ θ e he s hφ.1, term ρ θ e he t hφ.2]
-  case atom r hr ts _ =>
+  case mem s t => simp only [lr_rel_m, Formula.satisfies_mem_iff, term ρ θ e he s hφ.1, term ρ θ e he t hφ.2]
+  case atom r hr ts =>
     cases r <;> simp only [lr_rel_m, Formula.satisfies_atom_extensionalEq_iff, Formula.satisfies_atom_subset_iff,
       Definitional.TermVector.get_bind, term ρ θ e he (ts 0) (hφ 0), term ρ θ e he (ts 1) (hφ 1)]
-  case neg φ ih _ =>
+  case neg φ ih =>
     rw [lr_rel_m, Formula.satisfies_neg_iff, Formula.satisfies_neg_iff]
     exact not_congr (ih hφ h ρ θ T e hT he hρ)
-  case conj φ ψ ih jh _ | disj φ ψ ih jh _ | imp φ ψ ih jh _ | iff φ ψ ih jh _ =>
+  case conj φ ψ ih jh | disj φ ψ ih jh | imp φ ψ ih jh | iff φ ψ ih jh =>
     have hl := ih hφ.1 (fun q hq => h q (List.mem_append_left _ hq)) ρ θ T e hT he hρ
     have hr := jh hφ.2 (fun q hq => h q (List.mem_append_right _ hq)) ρ θ T e hT he hρ
     simp only [lr_rel_m, Formula.satisfies_conj_iff, Formula.satisfies_disj_iff, Formula.satisfies_imp_iff,
       Formula.satisfies_iff_iff, hl, hr]
-  case existsE φ ih _ =>
+  case existsE φ ih =>
     have hc := h ⟨_, ⟨φ, hφ⟩⟩ (List.mem_cons_self ..)
     have tr x (hx : M.mem x X) := ih hφ (fun q hq => h q (List.mem_cons_of_mem _ hq))
       (ρ.push x) (θ.push x) T.weaken (Fin.cases .newest (fun i => (e i).weaken))
@@ -96,7 +96,7 @@ theorem lr_reflect_core_l {n d} (φ : Formula 1 n) (hφ : φ.FreeClosed) {X : M.
       obtain ⟨x, hxX, hx⟩ := hc ρ hρ hx
       exact ⟨x, hxX, (tr x hxX).mp hx⟩
     · exact fun ⟨x, hxX, hx⟩ => ⟨x, (tr x hxX).mpr hx⟩
-  case forallE φ ih _ =>
+  case forallE φ ih =>
     classical
     have hc := h ⟨_, ({ body := φ, freeClosed := hφ } : UnarySchema _).neg⟩ (List.mem_cons_self ..)
     have tr x (hx : M.mem x X) := ih hφ (fun q hq => h q (List.mem_cons_of_mem _ hq))

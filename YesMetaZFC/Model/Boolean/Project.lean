@@ -116,7 +116,7 @@ theorem closure_valid {s n} (φ : Project.Formula s n) (ρ : Env 𝔹 0)
     change 𝔹.le 𝔹.top (𝔹.iInf (fun G : BV_graph.{u, u} B => value 𝔹 φ ((⟨b, ρ.free⟩ : Env 𝔹 n).push G)))
     apply (𝔹.le_iInf_iff _ _).mpr
     intro G
-    simpa only [SetTheory.Env.push] using h (Fin.cases G b)
+    simpa only [SetTheory.Env.push] using h (fin_cases G b)
 
 theorem mem_value {b} (t t' : Logic.FirstOrder.Term ℒ b [] SetSort.set)
     (ρ : (name_structure 𝔹).Env 𝔹.toBA_alg b []) :
@@ -143,16 +143,20 @@ theorem formula_correct {s n} (φ : Project.Formula s n) (hc : φ.FreeClosed)
         Logic.FirstOrder.Term.eval_weakenBound, Project.FirstOrderSemantics.term_correct ρ f,
         Logic.FirstOrder.Term.eval, value, subset]
       rfl
-  | neg φ ih => simp only [Project.fo_formula, BV_str.value_neg, value, ih]
+  | neg φ ih => exact congrArg 𝔹.neg (ih hc ρ)
   | conj φ ψ ih ik => simp only [Project.fo_formula, BV_str.value_conj, value, ih, ik]
   | disj φ ψ ih ik => simp only [Project.fo_formula, BV_str.value_disj, value, ih, ik]
   | imp φ ψ ih ik => simp only [Project.fo_formula, BV_str.value_imp, value, ih, ik]
   | iff φ ψ ih ik => simp only [Project.fo_formula, BV_str.value_iff, value, ih, ik]
   | forallE φ ih =>
-    simp only [Project.fo_formula, BV_str.value_all, value, ih, Project.FirstOrderSemantics.projectEnv_push]
-    rfl
+    apply congrArg 𝔹.iInf
+    funext G
+    exact (ih hc (ρ.pushBound G)).trans
+      (congrArg (value 𝔹 φ) (Project.FirstOrderSemantics.projectEnv_push ρ f G))
   | existsE φ ih =>
-    simp only [Project.fo_formula, BV_str.value_ex, value, ih, Project.FirstOrderSemantics.projectEnv_push]
-    rfl
+    apply congrArg 𝔹.iSup
+    funext G
+    exact (ih hc (ρ.pushBound G)).trans
+      (congrArg (value 𝔹 φ) (Project.FirstOrderSemantics.projectEnv_push ρ f G))
 
 end YesMetaZFC.Model.Boolean.BV_project

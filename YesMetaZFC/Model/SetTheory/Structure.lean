@@ -18,7 +18,7 @@ structure Env (ℳ : Structure.{u}) (depth : Nat) where
 namespace Env
 /-- 在 de Bruijn 栈顶压入一个新对象。 -/
 def push {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (value : ℳ.Domain) : Env ℳ (depth + 1) where
-  bound := Fin.cases value env.bound
+  bound := fin_cases value env.bound
   free := env.free
 /-- 沿 bound-variable 嵌入重索引环境。 -/
 def reindex {ℳ : Structure.{u}} {sourceDepth targetDepth : Nat} (env : Env ℳ targetDepth) (indexMap : Fin sourceDepth → Fin targetDepth) :

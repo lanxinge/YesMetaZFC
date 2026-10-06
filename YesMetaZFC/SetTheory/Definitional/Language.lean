@@ -40,7 +40,7 @@ def newest {depth : Nat} : Term (depth + 1) :=
 /-- substitution 穿过一个 binder 时的 lifting。 -/
 def liftSubstitution {sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth) :
     Fin (sourceDepth + 1) → Term (targetDepth + 1) :=
-  Fin.cases newest fun entry => (substitution entry).weaken
+  fin_cases newest fun entry => (substitution entry).weaken
 /-- 项中出现的自由变量编号。 -/
 def freeSupport {depth : Nat} : Term depth → List FreeVarId
   | .bound _ => []
@@ -70,9 +70,9 @@ theorem liftSubstitution_closed {sourceDepth targetDepth : Nat} (substitution : 
     (hClosed : ∀ entry, (substitution entry).freeSupport = []) :
     ∀ entry, (liftSubstitution substitution entry).freeSupport = [] := by
   intro entry
-  refine Fin.cases ?_ (fun previous => ?_) entry
+  refine fin_cases ?_ (fun previous => ?_) entry
   · rfl
-  · simpa [liftSubstitution] using hClosed previous
+  · exact (freeSupport_weaken (substitution previous)).trans (hClosed previous)
 end Term
 /-- 固定长度、可结构比较和哈希的定义原子参数。 -/
 structure TermVector (count depth : Nat) where
@@ -88,7 +88,7 @@ def ofFn {count depth : Nat} (terms : Fin count → Term depth) :
   size_eq := by simp only [List.size_toArray, List.length_ofFn]
 /-- 按有界下标读取一个参数。 -/
 def get {count depth : Nat} (terms : TermVector count depth) (entry : Fin count) : Term depth :=
-  terms.terms[entry.val]' (by simp [terms.size_eq, entry.isLt])
+  terms.terms[entry.val]' (terms.size_eq.symm ▸ entry.isLt)
 @[simp] theorem get_ofFn {count depth : Nat} (terms : Fin count → Term depth) (entry : Fin count) : (ofFn terms).get entry = terms entry := by
   simp only [get, ofFn, List.getElem_toArray, List.getElem_ofFn]
 instance {count depth : Nat} : CoeFun (TermVector count depth) (fun _ => Fin count → Term depth) :=
@@ -112,14 +112,31 @@ def boundParameters (parameterCount localCount : Nat) :
     TermVector parameterCount (parameterCount + localCount) :=
   ofFn fun parameter =>
     .bound ⟨parameter.val + localCount, by omega⟩
-/-- 按 substitution 替换参数向量中的 bound 变量。 -/
+/-- 参数遍历的长度证书由结构归纳产生，不调用数组外延性。 -/
+private theorem tv_map_length {α β : Type _} (f : α → β) :
+    ∀ xs : List α, (xs.map f).length = xs.length
+  | [] => rfl
+  | _ :: xs => congrArg Nat.succ (tv_map_length f xs)
+
+private theorem tv_map_get {α β : Type _} (f : α → β) (xs : List α)
+    (i : Nat) (h : i < xs.length) :
+    (xs.map f)[i]' ((tv_map_length f xs).symm ▸ h) = f (xs[i]) := by
+  induction xs generalizing i with
+  | nil => exact (Nat.not_lt_zero i h).elim
+  | cons x xs ih =>
+    cases i with
+    | zero => rfl
+    | succ i => exact ih i (Nat.lt_of_succ_lt_succ h)
+
+/-- 按 substitution 替换参数向量；底层列表遍历仍返回原数组接口。 -/
 def bind {count sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth) (terms : TermVector count sourceDepth) :
     TermVector count targetDepth where
-  terms := terms.terms.map (Term.bind substitution)
-  size_eq := by simpa using terms.size_eq
+  terms := ⟨terms.terms.toList.map (Term.bind substitution)⟩
+  size_eq := (tv_map_length _ _).trans terms.size_eq
 @[simp] theorem get_bind {count sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth)
     (terms : TermVector count sourceDepth) (entry : Fin count) : (terms.bind substitution) entry = (terms entry).bind substitution := by
-  simp [get, bind]
+  exact tv_map_get (Term.bind substitution) terms.terms.toList entry.val
+    (Eq.mp (congrArg (fun n => entry.val < n) terms.size_eq.symm) entry.isLt)
 /-- 按 `Fin` 映射重命名参数向量中的 bound 变量。 -/
 def rename {count sourceDepth targetDepth : Nat} (indexMap : Fin sourceDepth → Fin targetDepth) (terms : TermVector count sourceDepth) :
     TermVector count targetDepth :=
@@ -158,8 +175,9 @@ instance {count depth : Nat} (terms : TermVector count depth) :
 @[simp] theorem freeClosed_bind_iff_of_closed
     {count sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth) (hClosed : ∀ entry, (substitution entry).freeSupport = [])
     (terms : TermVector count sourceDepth) : (terms.bind substitution).FreeClosed ↔ terms.FreeClosed := by
-  simp only [FreeClosed, get_bind,
-    Term.freeSupport_bind_of_closed substitution hClosed]
+  have e i := (congrArg Term.freeSupport (get_bind substitution terms i)).trans
+    (Term.freeSupport_bind_of_closed substitution hClosed (terms i))
+  exact ⟨fun h i => e i ▸ h i, fun h i => (e i).symm ▸ h i⟩
 /-- bound-variable 重命名不改变参数向量的自由闭合性。 -/
 @[simp] theorem freeClosed_rename {count sourceDepth targetDepth : Nat} (indexMap : Fin sourceDepth → Fin targetDepth) (terms : TermVector count sourceDepth) :
     (terms.rename indexMap).FreeClosed ↔ terms.FreeClosed := by
@@ -212,51 +230,52 @@ abbrev OpenFormula (σ : AtomSignature.{u}) :=
   RootFormula σ 0
 namespace Formula
 /-- 新核公式没有自由变量。定义原子的参数必须全部自由闭合。 -/
-def FreeClosed {σ : AtomSignature.{u}} :
-    {availableStage depth : Nat} → Formula σ availableStage depth → Prop
-  | _, _, .falsum => True
-  | _, _, .truth => True
-  | _, _, .mem left right =>
+def FreeClosed {σ : AtomSignature.{u}} {availableStage : Nat} :
+    {depth : Nat} → Formula σ availableStage depth → Prop
+  | _, .falsum => True
+  | _, .truth => True
+  | _, .mem left right =>
       left.freeSupport = [] ∧ right.freeSupport = []
-  | _, _, .atom _ _ arguments =>
+  | _, .atom _ _ arguments =>
       arguments.FreeClosed
-  | _, _, .neg formula => FreeClosed formula
-  | _, _, .conj left right
-  | _, _, .disj left right
-  | _, _, .imp left right
-  | _, _, .iff left right =>
+  | _, .neg formula => FreeClosed formula
+  | _, .conj left right
+  | _, .disj left right
+  | _, .imp left right
+  | _, .iff left right =>
       FreeClosed left ∧ FreeClosed right
-  | _, _, .forallE body
-  | _, _, .existsE body =>
+  | _, .forallE body
+  | _, .existsE body =>
       FreeClosed body
-@[reducible] instance instDecidableFreeClosed {σ : AtomSignature.{u}} :
-    {availableStage depth : Nat} → (formula : Formula σ availableStage depth) →
+termination_by structural _ formula => formula
+@[reducible] instance instDecidableFreeClosed {σ : AtomSignature.{u}} {availableStage : Nat} :
+    {depth : Nat} → (formula : Formula σ availableStage depth) →
         Decidable formula.FreeClosed
-  | _, _, .falsum => by
+  | _, .falsum => by
       simp only [FreeClosed]
       infer_instance
-  | _, _, .truth => by
+  | _, .truth => by
       simp only [FreeClosed]
       infer_instance
-  | _, _, .mem left right => by
+  | _, .mem left right => by
       simp only [FreeClosed]
       infer_instance
-  | _, _, .atom _ _ arguments => by
+  | _, .atom _ _ arguments => by
       simp only [FreeClosed]
       infer_instance
-  | _, _, .neg formula => by
+  | _, .neg formula => by
       simp only [FreeClosed]
       exact instDecidableFreeClosed formula
-  | _, _, .conj left right
-  | _, _, .disj left right
-  | _, _, .imp left right
-  | _, _, .iff left right => by
+  | _, .conj left right
+  | _, .disj left right
+  | _, .imp left right
+  | _, .iff left right => by
       simp only [FreeClosed]
       letI := instDecidableFreeClosed left
       letI := instDecidableFreeClosed right
       exact inferInstance
-  | _, _, .forallE body
-  | _, _, .existsE body => by
+  | _, .forallE body
+  | _, .existsE body => by
       simp only [FreeClosed]
       exact instDecidableFreeClosed body
 /-- 按 substitution 替换公式中的 bound 变量。 -/
@@ -274,34 +293,29 @@ def bind {σ : AtomSignature.{u}} {availableStage sourceDepth targetDepth : Nat}
   | .iff left right => .iff (bind substitution left) (bind substitution right)
   | .forallE body => .forallE (bind (Term.liftSubstitution substitution) body)
   | .existsE body => .existsE (bind (Term.liftSubstitution substitution) body)
+termination_by structural formula => formula
 /-- 不引入自由变量的 substitution 不改变公式的自由闭合性。 -/
 @[simp] theorem freeClosed_bind_iff_of_closed
     {σ : AtomSignature.{u}} {availableStage sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth)
     (hClosed : ∀ entry, (substitution entry).freeSupport = []) (formula : Formula σ availableStage sourceDepth) :
     (formula.bind substitution).FreeClosed ↔ formula.FreeClosed := by
   induction formula generalizing targetDepth with
-  | falsum =>
-      simp [bind, FreeClosed]
-  | truth =>
-      simp [bind, FreeClosed]
+  | falsum | truth => exact Iff.rfl
   | mem left right =>
-      simp [bind, FreeClosed,
-        Term.freeSupport_bind_of_closed substitution hClosed]
+      have h := Term.freeSupport_bind_of_closed substitution hClosed left
+      have k := Term.freeSupport_bind_of_closed substitution hClosed right
+      exact ⟨fun e => ⟨h ▸ e.1, k ▸ e.2⟩, fun e => ⟨h.symm ▸ e.1, k.symm ▸ e.2⟩⟩
   | atom symbol hStage arguments =>
-      simp [bind, FreeClosed,
-        TermVector.freeClosed_bind_iff_of_closed substitution hClosed]
-  | neg formula ih =>
-      simp [bind, FreeClosed, ih substitution hClosed]
+      exact TermVector.freeClosed_bind_iff_of_closed substitution hClosed arguments
+  | neg formula ih => exact ih substitution hClosed
   | conj left right ihLeft ihRight
   | disj left right ihLeft ihRight
   | imp left right ihLeft ihRight
   | iff left right ihLeft ihRight =>
-      simp [bind, FreeClosed, ihLeft substitution hClosed,
-        ihRight substitution hClosed]
+      exact and_congr (ihLeft substitution hClosed) (ihRight substitution hClosed)
   | forallE body ih
   | existsE body ih =>
-      simpa [bind, FreeClosed] using
-        ih (Term.liftSubstitution substitution) (Term.liftSubstitution_closed substitution hClosed)
+      exact ih (Term.liftSubstitution substitution) (Term.liftSubstitution_closed substitution hClosed)
 /-- 按 `Fin` 映射重命名公式中的 bound 变量。 -/
 def rename {σ : AtomSignature.{u}}
     {availableStage sourceDepth targetDepth : Nat} (indexMap : Fin sourceDepth → Fin targetDepth) (formula : Formula σ availableStage sourceDepth) :
@@ -331,16 +345,14 @@ def instantiateTop {σ : AtomSignature.{u}} {availableStage depth : Nat} (replac
 def forallClosure {σ : AtomSignature.{u}} {availableStage : Nat} : (depth : Nat) → Formula σ availableStage depth → Formula σ availableStage 0
   | 0, formula => formula
   | depth + 1, formula => forallClosure depth (.forallE formula)
+termination_by structural depth _ => depth
 /-- 全称闭合不改变公式的自由闭合性。 -/
 @[simp] theorem freeClosed_forallClosure {σ : AtomSignature.{u}}
     {availableStage depth : Nat} (formula : Formula σ availableStage depth) : (forallClosure depth formula).FreeClosed ↔ formula.FreeClosed := by
   induction depth with
   | zero =>
       rfl
-  | succ depth ih =>
-      rw [forallClosure]
-      rw [ih (.forallE formula)]
-      simp only [FreeClosed]
+  | succ depth ih => exact ih (.forallE formula)
 /-- 公式的粗略节点数；定义原子只计自身和参数，不展开定义体。 -/
 def size {σ : AtomSignature.{u}} :
     {availableStage depth : Nat} → Formula σ availableStage depth → Nat

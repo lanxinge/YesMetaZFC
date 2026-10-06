@@ -178,30 +178,30 @@ private theorem atomEnv_bind {σ : AtomSignature.{u}}
     simp [atomEnv, TermVector.eval, TermVector.bind, TermVector.get]
   · rfl
 /-- 新核的原生满足关系；原子是不可见内部定义体的语义叶节点。 -/
-def satisfies {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ) :
-    {ℳ : SetTheory.Structure.{v}} →
-      {availableStage depth : Nat} →
-        SetTheory.Env ℳ depth → Formula σ availableStage depth → Prop
-  | _, _, _, _, .falsum => False
-  | _, _, _, _, .truth => True
-  | ℳ, _, _, env, .mem left right =>
+def satisfies {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ)
+    {ℳ : SetTheory.Structure.{v}} {availableStage : Nat} :
+      {depth : Nat} → SetTheory.Env ℳ depth → Formula σ availableStage depth → Prop
+  | _, _, .falsum => False
+  | _, _, .truth => True
+  | _, env, .mem left right =>
       ℳ.mem (Term.eval env left) (Term.eval env right)
-  | _, _, _, env, .atom symbol _ arguments =>
+  | _, env, .atom symbol _ arguments =>
       interpretation.atom symbol (arguments.eval env) env.free
-  | _, _, _, env, .neg formula =>
+  | _, env, .neg formula =>
       ¬ satisfies interpretation env formula
-  | _, _, _, env, .conj left right =>
+  | _, env, .conj left right =>
       satisfies interpretation env left ∧ satisfies interpretation env right
-  | _, _, _, env, .disj left right =>
+  | _, env, .disj left right =>
       satisfies interpretation env left ∨ satisfies interpretation env right
-  | _, _, _, env, .imp left right =>
+  | _, env, .imp left right =>
       satisfies interpretation env left → satisfies interpretation env right
-  | _, _, _, env, .iff left right =>
+  | _, env, .iff left right =>
       satisfies interpretation env left ↔ satisfies interpretation env right
-  | _, _, _, env, .forallE body =>
+  | _, env, .forallE body =>
       ∀ value, satisfies interpretation (env.push value) body
-  | _, _, _, env, .existsE body =>
+  | _, env, .existsE body =>
       ∃ value, satisfies interpretation (env.push value) body
+termination_by structural _ _ φ => φ
 /-- 新核公式 substitution 等价于先拉回环境再解释原公式。 -/
 @[simp] theorem satisfies_bind {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ)
     {ℳ : SetTheory.Structure.{v}}
@@ -306,7 +306,7 @@ theorem satisfies_forallClosure_iff {σ : AtomSignature.{u}} (interpretation : I
         simpa only [hEnv] using hBody
       · intro h bound value
         let extended : Fin (depth + 1) → ℳ.Domain :=
-          Fin.cases value bound
+          fin_cases value bound
         have hBody := h extended
         have hEnv : ({ bound := bound, free := free } :
                 SetTheory.Env ℳ depth).push value = ({ bound := extended, free := free } :

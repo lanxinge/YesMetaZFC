@@ -124,7 +124,7 @@ theorem rd_step_unique_l (hE : Extensional M) {U V W : M.Domain}
 def rd_all_m {n} (f : Rd_sym → Formula 1 n) : Formula 1 n := .neg (rd_any_m rd_menu_l (fun k => .neg (f k)))
 
 @[simp] theorem rd_all_closed_l {n} (f : Rd_sym → Formula 1 n) (h : ∀ k, (f k).FreeClosed) :
-    (rd_all_m f).FreeClosed := by simp -implicitDefEqProofs [rd_all_m, Definitional.Formula.FreeClosed, h]
+    (rd_all_m f).FreeClosed := rd_any_closed_l _ (fun k => .neg (f k)) h
 
 theorem rd_all_delta_l {n} (f : Rd_sym → Formula 1 n) (h : ∀ k, (f k).IsDelta0) :
     (rd_all_m f).IsDelta0 := .neg (rd_any_delta_l _ _ (fun k => .neg (h k)))

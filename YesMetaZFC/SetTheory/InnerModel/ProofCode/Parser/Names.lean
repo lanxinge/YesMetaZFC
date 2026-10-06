@@ -51,7 +51,9 @@ def pg_dec_s (b : Bool) : Delta0BinarySchema 1 where
           .conj (rd_closure_s.matrix_m Fin.elim0 (.bound 6) (.bound 3) (.bound 1)) <|
             .conj (pg_wit_m (.bound 9) (.bound 5) (.bound 2) .newest)
               (pg_bit_m b (.conj (.mem (.bound 4) (.bound 3)) (.mem (.bound 4) (.bound 2))))
-  freeClosed := by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]
+  freeClosed := by
+    simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]
+    exact pg_bit_closed_l b _ ⟨⟨rfl, rfl⟩, ⟨rfl, rfl⟩⟩
   delta0 := .existsMem _ (.existsMem _ (.existsMem _ (.existsMem _ (.existsMem _ (.existsMem _ (.existsMem _
     (.conj (rd_triple0_delta_l ..) (.conj (KP.ord0_delta_l _) (.conj (KP.n0_delta_l _)
       (.conj (rd_closure_s.matrix.delta0.bind_l _) (.conj ((rc_value_s pg_op_s).matrix.delta0.bind_l _)

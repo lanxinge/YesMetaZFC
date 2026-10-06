@@ -99,7 +99,7 @@ def project_lift_index_map
     {sourceDepth targetDepth : Nat}
     (indexMap : Fin sourceDepth → Fin targetDepth) :
     Fin (sourceDepth + 1) → Fin (targetDepth + 1) :=
-  Fin.cases 0 fun entry => (indexMap entry).succ
+  _root_.YesMetaZFC.SetTheory.BoundEmbedding.lift indexMap
 
 theorem project_lift_substitution_eq
     {sourceDepth targetDepth : Nat}
@@ -129,11 +129,11 @@ theorem project_bound_renaming_lift
   cases entry with
   | here =>
       simp [project_bound_renaming, project_bound_index,
-        project_lift_index_map,
+        project_lift_index_map, _root_.YesMetaZFC.SetTheory.BoundEmbedding.lift,
         VariableRenaming.lift, Variable.index]
   | there previous =>
       simp [project_bound_renaming, project_bound_index,
-        project_lift_index_map,
+        project_lift_index_map, _root_.YesMetaZFC.SetTheory.BoundEmbedding.lift,
         VariableRenaming.lift, Variable.index]
 
 /-- 自由闭合 Project 项的内在翻译。 -/
@@ -194,59 +194,60 @@ def project_mem {bound : SetContext}
     (.cons left (.cons right .nil))
 
 /-- 自由闭合 Project 公式的内在翻译。 -/
-def project_formula :
-    {availableStage depth : Nat} →
+def project_formula {availableStage : Nat} :
+    {depth : Nat} →
       (formula : Project.Formula availableStage depth) →
       formula.FreeClosed →
         SetFormula (project_bound_context depth) []
-  | _, _, .falsum, _ =>
+  | _, .falsum, _ =>
       .falsum
-  | _, _, .truth, _ =>
+  | _, .truth, _ =>
       .truth
-  | _, _, .mem left right, hClosed => by
+  | _, .mem left right, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact project_mem
         (project_term left hClosed.1)
         (project_term right hClosed.2)
-  | _, _, .atom .extensionalEq _ arguments, hClosed => by
+  | _, .atom .extensionalEq _ arguments, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .equal
         (project_term (arguments 0) (hClosed 0))
         (project_term (arguments 1) (hClosed 1))
-  | _, _, .atom .subset _ arguments, hClosed => by
+  | _, .atom .subset _ arguments, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact subset_formula
         (project_term (arguments 0) (hClosed 0))
         (project_term (arguments 1) (hClosed 1))
-  | _, _, .neg body, hClosed => by
+  | _, .neg body, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .neg (project_formula body hClosed)
-  | _, _, .conj left right, hClosed => by
+  | _, .conj left right, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .conj
         (project_formula left hClosed.1)
         (project_formula right hClosed.2)
-  | _, _, .disj left right, hClosed => by
+  | _, .disj left right, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .disj
         (project_formula left hClosed.1)
         (project_formula right hClosed.2)
-  | _, _, .imp left right, hClosed => by
+  | _, .imp left right, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .imp
         (project_formula left hClosed.1)
         (project_formula right hClosed.2)
-  | _, _, .iff left right, hClosed => by
+  | _, .iff left right, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .iff
         (project_formula left hClosed.1)
         (project_formula right hClosed.2)
-  | _, _, .forallE body, hClosed => by
+  | _, .forallE body, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .forallE SetSort.set (project_formula body hClosed)
-  | _, _, .existsE body, hClosed => by
+  | _, .existsE body, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .existsE SetSort.set (project_formula body hClosed)
+termination_by structural _ formula _ => formula
 
 theorem project_formula_rename
     {availableStage sourceDepth targetDepth : Nat}
@@ -256,24 +257,41 @@ theorem project_formula_rename
     project_formula (formula.rename indexMap) (by simpa using hClosed) =
     (project_formula formula hClosed).renameMapped
         (project_bound_renaming indexMap) VariableRenaming.id := by
-  induction formula generalizing targetDepth <;>
-    simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
-  all_goals simp only [
-    _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-    _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
-    project_formula, project_mem, Formula.renameMapped]
-  case atom symbol hStage arguments hClosed =>
+  induction formula generalizing targetDepth with
+  | falsum | truth => rfl
+  | mem left right =>
+    simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+      _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind, project_formula,
+      project_mem, Formula.renameMapped, Arguments.renameMapped]
+    rw [project_term_bind_bound indexMap left hClosed.1,
+      project_term_bind_bound indexMap right hClosed.2]
+  | atom symbol hStage arguments =>
     cases symbol <;>
       have hLeft := project_term_bind_bound indexMap (arguments 0) (hClosed 0) <;>
       have hRight := project_term_bind_bound indexMap (arguments 1) (hClosed 1) <;>
-      simp [project_formula,
+      simp [project_formula, _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+        _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind,
         _root_.YesMetaZFC.SetTheory.Definitional.TermVector.get_bind,
         Formula.renameMapped, Arguments.renameMapped, hLeft, hRight]
-  all_goals simp_all [
-    _root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
-    Arguments.renameMapped, project_term_bind_bound,
-    project_lift_substitution_eq, project_bound_renaming_lift]
-
+  | neg φ ih => exact congrArg Formula.neg (ih indexMap hClosed)
+  | conj φ ψ ih ik => exact congr (congrArg Formula.conj (ih indexMap hClosed.1)) (ik indexMap hClosed.2)
+  | disj φ ψ ih ik => exact congr (congrArg Formula.disj (ih indexMap hClosed.1)) (ik indexMap hClosed.2)
+  | imp φ ψ ih ik => exact congr (congrArg Formula.imp (ih indexMap hClosed.1)) (ik indexMap hClosed.2)
+  | iff φ ψ ih ik => exact congr (congrArg Formula.iff (ih indexMap hClosed.1)) (ik indexMap hClosed.2)
+  | forallE φ ih =>
+    simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+      _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind, project_formula,
+      project_lift_substitution_eq, Formula.renameMapped]
+    apply congrArg (Formula.forallE _)
+    simpa only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+      project_bound_renaming_lift] using ih (project_lift_index_map indexMap) hClosed
+  | existsE φ ih =>
+    simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+      _root_.YesMetaZFC.SetTheory.Definitional.Formula.bind, project_formula,
+      project_lift_substitution_eq, Formula.renameMapped]
+    apply congrArg (Formula.existsE _)
+    simpa only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.rename,
+      project_bound_renaming_lift] using ih (project_lift_index_map indexMap) hClosed
 /-- Project 句子的 FormalSystem 闭句像。 -/
 def project_sentence (sentence : Project.Sentence) : SetSentence :=
   project_formula sentence.formula sentence.freeClosed

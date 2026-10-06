@@ -30,7 +30,7 @@ def fo_bound_variable :
       FirstOrder.Variable (fo_bound_context depth) SetSort.set
   | 0, entry => Fin.elim0 entry
   | _ + 1, entry =>
-      Fin.cases FirstOrder.Variable.here
+      fin_cases FirstOrder.Variable.here
         (fun previous =>
           FirstOrder.Variable.there (fo_bound_variable previous)) entry
 
@@ -53,26 +53,26 @@ def fo_mem {bound : FirstOrder.SortContext ℒ}
     (.cons left (.cons right .nil))
 
 /-- 自由闭合的 Project 公式直接翻译为纯集合论内在公式。 -/
-def fo_formula :
-    {availableStage depth : Nat} →
+def fo_formula {availableStage : Nat} :
+    {depth : Nat} →
       (formula : Formula availableStage depth) →
       formula.FreeClosed →
         FirstOrder.Formula ℒ (fo_bound_context depth) []
-  | _, _, .falsum, _ =>
+  | _, .falsum, _ =>
       .falsum
-  | _, _, .truth, _ =>
+  | _, .truth, _ =>
       .truth
-  | _, _, .mem left right, hClosed => by
+  | _, .mem left right, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact fo_mem
         (fo_term left hClosed.1)
         (fo_term right hClosed.2)
-  | _, _, .atom .extensionalEq _ arguments, hClosed => by
+  | _, .atom .extensionalEq _ arguments, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .equal
         (fo_term (arguments 0) (hClosed 0))
         (fo_term (arguments 1) (hClosed 1))
-  | _, _, .atom .subset _ arguments, hClosed => by
+  | _, .atom .subset _ arguments, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .forallE SetSort.set <|
         .imp
@@ -84,35 +84,36 @@ def fo_formula :
             (.bvar .here)
             ((fo_term (arguments 1) (hClosed 1)).weakenBound
               SetSort.set))
-  | _, _, .neg body, hClosed => by
+  | _, .neg body, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .neg (fo_formula body hClosed)
-  | _, _, .conj left right, hClosed => by
+  | _, .conj left right, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .conj
         (fo_formula left hClosed.1)
         (fo_formula right hClosed.2)
-  | _, _, .disj left right, hClosed => by
+  | _, .disj left right, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .disj
         (fo_formula left hClosed.1)
         (fo_formula right hClosed.2)
-  | _, _, .imp left right, hClosed => by
+  | _, .imp left right, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .imp
         (fo_formula left hClosed.1)
         (fo_formula right hClosed.2)
-  | _, _, .iff left right, hClosed => by
+  | _, .iff left right, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .iff
         (fo_formula left hClosed.1)
         (fo_formula right hClosed.2)
-  | _, _, .forallE body, hClosed => by
+  | _, .forallE body, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .forallE SetSort.set (fo_formula body hClosed)
-  | _, _, .existsE body, hClosed => by
+  | _, .existsE body, hClosed => by
       simp only [Formula.FreeClosed] at hClosed
       exact .existsE SetSort.set (fo_formula body hClosed)
+termination_by structural _ formula _ => formula
 
 /-- Project 句子的纯集合论闭句像。 -/
 def fo_sentence (sentence : Sentence) :

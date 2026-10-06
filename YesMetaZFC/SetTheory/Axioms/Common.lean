@@ -48,12 +48,15 @@ def separationCore {parameterCount : Nat} (schema : Definitional.Project.UnarySc
   .forallE <| .existsE <| .forallE <|
     .iff (.mem (.bound 0) (.bound 1)) <|
       .conj (.mem (.bound 0) (.bound 2)) (schema.body.rename BoundEmbedding.unaryUnderTwo)
+/-- 分离核心的自由闭合证书。 -/
+theorem separation_core_closed {n : Nat} (schema : Definitional.Project.UnarySchema n) :
+    (separationCore schema).FreeClosed :=
+  ⟨⟨rfl, rfl⟩, ⟨⟨rfl, rfl⟩,
+    (Definitional.Formula.freeClosed_rename _ schema.body).mpr schema.freeClosed⟩⟩
 /-- 分离模式实例。 -/
 def separation {parameterCount : Nat} (schema : Definitional.Project.UnarySchema parameterCount) :
     Definitional.Project.Sentence :=
-  Definitional.Project.Sentence.forallClosure (separationCore schema) <| by
-    simp [Definitional.Formula.FreeClosed, separationCore,
-      schema.freeClosed]
+  Definitional.Project.Sentence.forallClosure (separationCore schema) (separation_core_closed schema)
 /-- 收集模式在参数上下文中的核心公式。 -/
 def collectionCore {parameterCount : Nat} (schema : Definitional.Project.BinarySchema parameterCount) :
     Definitional.Project.Formula 1 parameterCount :=
@@ -63,15 +66,16 @@ def collectionCore {parameterCount : Nat} (schema : Definitional.Project.BinaryS
         Definitional.Project.Formula.forallMem (.bound 1) <|
           Definitional.Project.Formula.existsMem (.bound 1) <|
             schema.body.rename BoundEmbedding.binaryUnderTwo)
-/-- 收集模式实例。 -/
+/-- 收集核心的自由闭合证书。 -/
+theorem collection_core_closed {n : Nat} (schema : Definitional.Project.BinarySchema n) :
+    (collectionCore schema).FreeClosed :=
+  ⟨⟨⟨rfl, rfl⟩, (Definitional.Formula.freeClosed_rename _ schema.body).mpr schema.freeClosed⟩,
+    ⟨⟨rfl, rfl⟩, ⟨⟨rfl, rfl⟩,
+      (Definitional.Formula.freeClosed_rename _ schema.body).mpr schema.freeClosed⟩⟩⟩
+/-- 收集模式实例；闭合证书由公式结构直接给出。 -/
 def collection {parameterCount : Nat} (schema : Definitional.Project.BinarySchema parameterCount) :
     Definitional.Project.Sentence :=
-  Definitional.Project.Sentence.forallClosure (collectionCore schema) <| by
-    simp [Definitional.Formula.FreeClosed, collectionCore,
-      Definitional.Project.Formula.forallMem,
-      Definitional.Project.Formula.existsMem,
-      Definitional.Project.Term.newest,
-      schema.freeClosed]
+  Definitional.Project.Sentence.forallClosure (collectionCore schema) (collection_core_closed schema)
 namespace ReplacementEmbedding
 /-- 替换模式唯一性前件中的第一个输出。 -/
 def firstOutput {parameterCount : Nat} :

@@ -107,7 +107,7 @@ theorem collapse_names_closed_l (O : Cond_order_d M B R z) (hZFC : M.Models ZFC)
         Formula.extensionalEq, Formula.subset, Definitional.Formula.bind, Definitional.Term.bind,
         Definitional.Term.liftSubstitution, Definitional.Term.newest, Definitional.Term.weaken,
         Definitional.Term.rename, Definitional.TermVector.bind, Formula.pairArguments,
-        Fin.cases, Fin.induction, Fin.induction.go]
+        fin_cases]
     have hh := (forces_bind_l hZF.1 (Formula.isOmega .newest) (fun _ : Fin 1 => (.bound 2 : Term 3)) ρ p).mpr
       ((forces_env_l hZF.1 (Formula.isOmega .newest) (Formula.isOmega_freeClosed _ rfl)
         (⟨fun _ => w, fun _ => w⟩ : Env M 1)

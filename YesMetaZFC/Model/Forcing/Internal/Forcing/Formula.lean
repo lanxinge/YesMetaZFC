@@ -26,7 +26,9 @@ derive_free_closed neg_code_m
 
 def imp_code_m {n} (φ ψ : Formula 1 (n + 4)) : Formula 1 (n + 4) :=
   neg_code_m (.conj φ (neg_code_m ψ))
-derive_free_closed imp_code_m
+@[simp] theorem imp_code_m_freeClosed {n} (φ ψ : Formula 1 (n+4))
+    (h : φ.FreeClosed) (k : ψ.FreeClosed) : (imp_code_m φ ψ).FreeClosed :=
+  neg_code_m_freeClosed _ ⟨h, neg_code_m_freeClosed _ k⟩
 
 def all_code_m {n} (φ : Formula 1 (n + 5)) : Formula 1 (n + 4) :=
   .forallE (.imp (name_m (.bound 4) .newest) (φ.rename name_shift_l))

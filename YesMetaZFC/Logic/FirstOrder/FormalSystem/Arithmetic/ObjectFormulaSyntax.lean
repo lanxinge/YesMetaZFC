@@ -68,6 +68,7 @@ theorem descending : Descending rules rank := by
   all_goals try obtain ⟨symbol, _, rfl⟩ := List.mem_map.mp hRule
   all_goals dsimp only [variableRule, applicationRule, nilRule, consRule,
     constantRule, relationRule, equalityRule, unaryRule, binaryRule] at values premise hPremise ⊢
+  -- 先按项的外形匹配原始配数界，避免失败分支展开配数算法。
   all_goals first
     | exact False.elim (List.not_mem_nil hPremise)
     | have h := List.mem_cons.mp hPremise
@@ -80,10 +81,10 @@ theorem descending : Descending rules rank := by
     ObjectCodeProjection.get, ObjectCodeProjection.head, ObjectCodeProjection.tail,
     nodeValue, listValue, ProofCode.godel_unpair_value_pair]
   all_goals first
-    | exact Nat.lt_trans (ObjectCodeProjection.tail_lt_cons _ _)
-        (Nat.lt_succ_of_le (ProofCode.right_le_godel_pair_value _ _))
-    | exact ObjectCodeProjection.head_lt_cons _ _
-    | exact ObjectCodeProjection.tail_lt_cons _ _
+    | with_reducible exact (Nat.lt_trans (ObjectCodeProjection.tail_lt_cons _ _)
+        (Nat.lt_succ_of_le (ProofCode.right_le_godel_pair_value _ _)))
+    | with_reducible exact ObjectCodeProjection.head_lt_cons _ _
+    | with_reducible exact ObjectCodeProjection.tail_lt_cons _ _
     | exact ObjectCodeProjection.node_field_lt _ [values 2] _ List.mem_cons_self
     | exact ObjectCodeProjection.node_field_lt _ [values 2, values 3] _ List.mem_cons_self
     | exact ObjectCodeProjection.node_field_lt _ [values 2, values 3] _ (List.mem_cons_of_mem _ List.mem_cons_self)

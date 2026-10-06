@@ -72,25 +72,7 @@ def kernel : Kernel.{0, v} coreSignature where
   interpretation := Semantics.interpretation
   atom_iff := by
     intro ℳ symbol hExtensional arguments free
-    cases symbol with
-    | extensionalEq =>
-        change (Fin 2 → ℳ.Domain) at arguments
-        simp only [Semantics.interpretation, definitions,
-          Semantics.satisfies, Term.eval, Env.push]
-        change (∀ value, ℳ.mem value (arguments 0) ↔
-            ℳ.mem value (arguments 1)) ↔
-          ∀ value, ℳ.mem value (arguments 0) ↔
-            ℳ.mem value (arguments 1)
-        rfl
-    | subset =>
-        change (Fin 2 → ℳ.Domain) at arguments
-        simp only [Semantics.interpretation, definitions,
-          Semantics.satisfies, Term.eval, Env.push]
-        change (∀ value, ℳ.mem value (arguments 0) →
-            ℳ.mem value (arguments 1)) ↔
-          ∀ value, ℳ.mem value (arguments 0) →
-            ℳ.mem value (arguments 1)
-        rfl
+    cases symbol <;> exact ⟨(fun h => h), (fun h => h)⟩
 namespace Formula
 def satisfies {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (formula : Formula 1 depth) : Prop :=
   Definitional.Semantics.satisfies Semantics.interpretation env formula
