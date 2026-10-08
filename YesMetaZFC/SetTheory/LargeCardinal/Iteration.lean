@@ -5,6 +5,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationLimit
 import YesMetaZFC.SetTheory.LargeCardinal.IterationPadding
 import YesMetaZFC.SetTheory.LargeCardinal.IterationDescent
 import YesMetaZFC.SetTheory.LargeCardinal.IterationInitial
+import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular
 import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 
 /-! # 迭代树、后继扩张与极限添枝的公共入口
@@ -25,5 +26,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 传递域的给定初等图自动回收模型内图和可数编号。`pn_history_extend_l` 从原树
 及实际正则秩段列延伸每段历史，保持所有前驱的一致性及缺失子集。
 `it_nice_no_drop_l` 用内部依赖选择构造 ω 历史列，再由基础公理排除末模型下降。
-坏枝到正则秩段列的构造，以及 nice 树弱可迭代性的最终接入仍未完成。
+`ja_failure_l` 从返回嵌入的失败实际构造联合尝试关系及正则基数值下降秩。
+尝试链解码得到共尾枝、完整初等腿和实际传递直接极限，根复合式精确保留。
+复制整树中的移位秩、正则秩段的 Skolem 回拉及 nice 树弱迭代策略仍未完成。
 -/

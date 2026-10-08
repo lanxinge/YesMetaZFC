@@ -58,7 +58,7 @@ theorem Ep_source_d.countable_embedding_l {ω κ K Z W c d A R B S τ ι j : M.D
   obtain ⟨k, hkZ, comp⟩ := sc_compose_l hZF source.omega source.transitive hc source.theory
     hA source.omega_mem hιZ hgZ (fn0_of_function_l (ZF.modelsKP hZF) hι.1) (hg.mono_target_l (source.transitive B hB))
   have comp := comp.retarget_l hg
-  obtain ⟨hk, prescribed⟩ := at_decode_l hZF source.omega hm hn he
+  obtain ⟨hk, prescribed, _⟩ := at_decode_l hZF source.omega hm hn he
     (fn0_of_function_l (ZF.modelsKP hZF) hι.1) hsect hg comp branch
   obtain ⟨η, hηZ, hη⟩ := sc_graph_numbering_l hZF source.omega source.transitive hc source.theory
     source.omega_mem hA hB hιZ hkZ.1 hι comp.1

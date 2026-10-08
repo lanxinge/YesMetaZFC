@@ -16,6 +16,17 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+theorem It_local_d.function_l {ω X κ L F : M.Domain} (ht : M.TransitiveSet X)
+    (pair : ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b)
+    (loc : It_local_d ω X κ L F) : M.IsSetFunction I F := by
+  obtain ⟨hw, hk, hl, hf, loc⟩ := loc
+  let nx : Nonempty {x // M.mem x X} := ⟨⟨ω, hw⟩⟩
+  let J := rt_pair_l ht nx hZF.1 pair
+  have he := rt_model_ext_l hZF.1 ht nx
+  simp only [ex_short_m, ex_pre_m, Formula.satisfies_conj_iff] at loc
+  have graph := (Formula.satisfies_isFunction_iff J he _ _).mp loc.1.2.2.2.2.2.1
+  exact (rt_function_l ht nx hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) pair ⟨F, hf⟩).mp graph
+
 theorem em_family_relative_l {ω κ K X R L F P : M.Domain} (source : Ep_source_d hZF ω κ K X R)
     (hP : M.mem P X) (power : Source_d X K P) (hL : M.mem L X) (hF : M.mem F X)
     (family : Formula.satisfies

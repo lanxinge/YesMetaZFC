@@ -48,9 +48,18 @@ theorem at_decode_l {ω c d A R B S e τ ι g j : M.Domain}
     (hsect : ∀ x i, Rd_entry_d x i ι → Rd_entry_d i x e)
     (hg : Fn0_d ω B g) (hj : Cp0_d A ω B ι g j)
     (branch : ∀ n, M.mem n ω → ∃ p, At_node_d I ω A R B S e τ n p ∧ M.IsRestrictionOf I p g n) :
-    Smap_d I ω c d A B j ∧ ∀ x y, M.mem x A → M.mem y B → Rd_entry_d x y τ → Rd_entry_d x y j := by
+    Smap_d I ω c d A B j ∧
+      (∀ x y, M.mem x A → M.mem y B → Rd_entry_d x y τ → Rd_entry_d x y j) ∧
+      ∀ i x y, Rd_entry_d i x e → Rd_entry_d i y g → Rd_entry_d x y j := by
   have ef := fn0_function_l (ZF.modelsKP hZF) he
   have jf := fn0_function_l (ZF.modelsKP hZF) hj.1
+  have maps i x y (hix : Rd_entry_d i x e) (hiy : Rd_entry_d i y g) : Rd_entry_d x y j := by
+    obtain ⟨k, hk, hxk⟩ := hι.2.1 x (he.bound_l hix).2
+    obtain ⟨n, hn, hin, hkn⟩ := at_upper_l hZF hω (he.bound_l hix).1 hk
+    obtain ⟨p, node, res⟩ := branch n hn
+    obtain ⟨v, _, hip, hkp⟩ := (node.coherent i hin k hkn).mp ⟨x, (he.bound_l hix).2, hix, hsect x k hxk⟩
+    have eq := (fn0_function_l (ZF.modelsKP hZF) hg).1.2 i v y ((res.2 i v).mp hip).2 hiy
+    exact (hj.value_l hι hg hxk).mpr (eq ▸ ((res.2 k v).mp hkp).2)
   have inject : M.IsSetInjective I j := by
     intro x z y hxy hzy
     obtain ⟨i, hi, hxi⟩ := hι.2.1 x (hj.1.bound_l hxy).1
@@ -61,7 +70,7 @@ theorem at_decode_l {ω c d A R B S e τ ι g j : M.Domain}
     have hkp := (res.2 k y).mpr ⟨hkn, (hj.value_l hι hg hzk).mp hzy⟩
     obtain ⟨a, _, hia, hka⟩ := (node.coherent i hin k hkn).mpr ⟨y, (hj.1.bound_l hxy).2, hip, hkp⟩
     exact (ef.1.2 i x a (hsect x i hxi) hia).trans (ef.1.2 k z a (hsect z k hzk) hka).symm
-  refine ⟨⟨⟨jf, inject⟩, ?_⟩, fun x y hx hy hτ => ?_⟩
+  refine ⟨⟨⟨jf, inject⟩, ?_⟩, (fun x y hx hy hτ => ?_), maps⟩
   · obtain ⟨C, hC⟩ := scode_exists_l I hZF hω
     refine ⟨C, hC, fun a f v ha hf hv assign => ?_⟩
     obtain ⟨l, F, r, code⟩ := (hC a).mp ha

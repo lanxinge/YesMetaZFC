@@ -89,7 +89,28 @@ theorem ef_fiber_relative_l (hE : Extensional M) {X : M.Domain} (hX : M.Transiti
     have hA := (rd_entry_transitive_l hX (H.eval ρ).property ha).2
     exact ⟨⟨A, hA⟩, ⟨s, hX A hA s hs⟩, ha, hs, fn, sub⟩
 
-/-- 原可数完备公式只作用于源内层族；外部像纤维先经实际尝试树回收。 -/
+/-- 已有源内层族与像纤维时，原公式直接给出源内共同纤维。 -/
+theorem ex_owned_fiber_l (hZF : M.Models ZF) {ω X κ L F H f : M.Domain}
+    (ht : M.TransitiveSet X) (algebra : Sc_algebra_d X) (hw : M.mem ω X)
+    (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X)
+    (countable : Formula.satisfies
+      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, hw⟩))), fun _ => ⟨ω, hw⟩⟩ :
+        Env (rt_model_l X ⟨⟨ω, hw⟩⟩) 4) (ex_countable_m (.bound 3) (.bound 2) (.bound 1) .newest))
+    (hH : M.mem H X) (hf : M.mem f X) (levels : Ef_levels_d ω κ H) (fiber : Es_fiber_d (kp_pair_l (ZF.modelsKP hZF)) ω L F H f) :
+    ∃ g, M.mem g X ∧ Ef_fiber_d ω κ H g := by
+  let hn : Nonempty {x // M.mem x X} := ⟨⟨ω, hw⟩⟩
+  let ρ : Env (rt_model_l X hn) 4 :=
+    ⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, hw⟩))), fun _ => ⟨ω, hw⟩⟩
+  have bound := (ef_levels_relative_l hZF.1 ht algebra hn
+    ((ρ.push ⟨H, hH⟩).push ⟨f, hf⟩) (.bound 5) (.bound 4) (.bound 1)).mpr levels
+  have image := (es_fiber_relative_l (ZF.modelsKP hZF) ht hn
+    ((ρ.push ⟨H, hH⟩).push ⟨f, hf⟩) (.bound 5) (.bound 3) (.bound 2) (.bound 1) .newest).mpr fiber
+  simp only [ex_countable_m, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff, Formula.satisfies_exists_iff] at countable
+  obtain ⟨g, hg⟩ := countable ⟨H, hH⟩ ⟨f, hf⟩ bound image
+  exact ⟨g.val, g.property, (ef_fiber_relative_l hZF.1 ht hn
+    (((ρ.push ⟨H, hH⟩).push ⟨f, hf⟩).push g) (.bound 6) (.bound 5) (.bound 2) .newest).mp hg⟩
+
+/-- 外部像纤维先经实际尝试树回收，然后调用同一个源内存在步骤。 -/
 theorem Ep_source_d.internal_fiber_l (hZF : M.Models ZF) {ω μ K X R κ L F H f : M.Domain}
     (source : Ep_source_d hZF ω μ K X R) (branches : Sc_branch_d ω X)
     (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X)
@@ -99,17 +120,7 @@ theorem Ep_source_d.internal_fiber_l (hZF : M.Models ZF) {ω μ K X R κ L F H f
     (hH : M.mem H X) (levels : Ef_levels_d ω κ H) (fiber : Es_fiber_d (kp_pair_l (ZF.modelsKP hZF)) ω L F H f) :
     ∃ g, M.mem g X ∧ Ef_fiber_d ω κ H g := by
   obtain ⟨v, hv, vf⟩ := source.fiber_branch_l hZF branches hL hF hH fiber
-  let hn : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
-  let ρ : Env (rt_model_l X hn) 4 :=
-    ⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, source.omega_mem⟩))), fun _ => ⟨ω, source.omega_mem⟩⟩
-  have bound := (ef_levels_relative_l hZF.1 source.transitive source.theory.algebra hn
-    ((ρ.push ⟨H, hH⟩).push ⟨v, hv⟩) (.bound 5) (.bound 4) (.bound 1)).mpr levels
-  have image := (es_fiber_relative_l (ZF.modelsKP hZF) source.transitive hn
-    ((ρ.push ⟨H, hH⟩).push ⟨v, hv⟩) (.bound 5) (.bound 3) (.bound 2) (.bound 1) .newest).mpr vf
-  simp only [ex_countable_m, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff, Formula.satisfies_exists_iff] at countable
-  obtain ⟨g, hg⟩ := countable ⟨H, hH⟩ ⟨v, hv⟩ bound image
-  exact ⟨g.val, g.property, (ef_fiber_relative_l hZF.1 source.transitive hn
-    (((ρ.push ⟨H, hH⟩).push ⟨v, hv⟩).push g) (.bound 6) (.bound 5) (.bound 2) .newest).mp hg⟩
+  exact ex_owned_fiber_l hZF source.transitive source.theory.algebra source.omega_mem hκ hL hF countable hH hv levels vf
 
 theorem It_local_d.fiber_l (hZF : M.Models ZF) {ω μ K X R κ L F H f : M.Domain}
     (source : Ep_source_d hZF ω μ K X R) (branches : Sc_branch_d ω X) (loc : It_local_d ω X κ L F)

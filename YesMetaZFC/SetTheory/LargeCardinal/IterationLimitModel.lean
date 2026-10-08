@@ -51,7 +51,7 @@ theorem it_limit_cone_l {ω α T Q G B L A p H R q c C V d N W e : M.Domain}
     obtain ⟨f, hf⟩ := (pd i).mp hi
     exact ⟨i, f, x, hf, (((ps i f).mp hf).2.2 x y).mpr
       ⟨a, hp, (rs a y).mpr ⟨(limit.projection.bound_l haz).1, z, haz, hzy⟩⟩⟩
-  exact ⟨P, r, ⟨target, pf, pd, typed, commute, cover⟩, fn0_of_function_l (ZF.modelsKP hZF) hr, rs, ps⟩
+  exact ⟨P, r, ⟨⟨target, pf, pd, typed, commute⟩, cover⟩, fn0_of_function_l (ZF.modelsKP hZF) hr, rs, ps⟩
 
 theorem it_limit_model_l {ω α T Q G B L A p H R q c C V i b X S K : M.Domain}
     (h : It_diagram_d hZF ω α T Q G) (inside : M.MemberSubset B α)

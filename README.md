@@ -31,6 +31,11 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
 集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
 
+[迭代树](YesMetaZFC/SetTheory/LargeCardinal/Iteration.lean) 已完成 Pₙ 全前驱递归、内部下降反证，
+以及返回嵌入失败时的联合尝试树和正则下降秩。nice 后继的背景可数闭性、
+[到 j(A) 的完整初等复制](YesMetaZFC/SetTheory/LargeCardinal/ExtenderSetCopy.lean) 已构造，保留常值方块和支撑上的映射。
+整树复制的移位秩、Skolem 回拉与 nice 树弱迭代策略仍待完成，L(R) 的 AD 尚未证明。
+
 ## 描述集合论基础
 
 [Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) 在任意 ZF 模型内构造 Baire、Cantor

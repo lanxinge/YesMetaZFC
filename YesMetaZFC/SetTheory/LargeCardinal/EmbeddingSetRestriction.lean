@@ -77,13 +77,16 @@ private theorem er_membership_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Dom
       fun hp => (image p (target.transitive T hT p hp)).mpr ((read hb p).mp hp)⟩)
   exact eq ▸ hQQ
 
-private theorem er_truth_l {ω κ K X R μ K' Y S c d j a A Q a' B T b n F r f g : M.Domain}
+/-- 搬运整张有限真值表，目标表同时解释不在 j 像中的赋值。 -/
+theorem ep_set_tables_l {ω κ K X R μ K' Y S c d j a A Q a' B T b n F : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' Y S)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
     (ha : Smem_d I a A Q) (hb : Smem_d I a' B T) (hAB : Rd_entry_d A B j)
-    (hF : Sfm_d I ω n F) (hbo : M.mem b ω) (bound : Sbound_d I F b) (hr : M.mem r n)
-    (hfg : Rd_entry_d f g j) : ∃ E D, M.IsFunctionSpace I E b A ∧ M.IsFunctionSpace I D b B ∧
-      (Ssat_d I A Q E F n r f ↔ Ssat_d I B T D F n r g) := by
+    (hF : Sfm_d I ω n F) (hbo : M.mem b ω) (bound : Sbound_d I F b) :
+    ∃ E D C H C' H', M.IsFunctionSpace I E b A ∧ M.IsFunctionSpace I D b B ∧
+      Rd_entry_d E D j ∧ Rd_entry_d C C' j ∧ Rd_entry_d H H' j ∧
+      (∀ r, M.mem r n → ∀ f, Fv_at_d C H r f ↔ Ssat_d I A Q E F n r f) ∧
+      (∀ r, M.mem r n → ∀ f, Fv_at_d C' H' r f ↔ Ssat_d I B T D F n r f) := by
   have hA := hj.1.1.input_mem_of_pairMember hAB
   have hQ := source.membership_relation_l hZF hA ha
   have hQT := er_membership_l hZF source target hm hn hj ha hb hAB
@@ -117,14 +120,27 @@ private theorem er_truth_l {ω κ K X R μ K' Y S c d j a A Q a' B T b n F r f g
     (Fin.cases hHH (Fin.cases hCC (Fin.cases hFF (Fin.cases hLL (Fin.cases (nat n hF.1)
       (Fin.cases hED (Fin.cases hQT (Fin.cases hAB (fun _ => nat b hbo)))))))))
   have table' := (fv_eval_sat_l (ZF.modelsKP hZF) ..).mp (ev.mp ((fv_eval_sat_l (ZF.modelsKP hZF) ..).mpr table))
+  exact ⟨E, D, C, H, C', H', space, space', hED, hCC, hHH,
+    fun r hr f => table.truth_l hZF source.omega program space hr (f := f),
+    fun r hr f => table'.truth_l hZF target.omega program' space' hr (f := f)⟩
+
+private theorem er_truth_l {ω κ K X R μ K' Y S c d j a A Q a' B T b n F r f g : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' Y S)
+    (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
+    (ha : Smem_d I a A Q) (hb : Smem_d I a' B T) (hAB : Rd_entry_d A B j)
+    (hF : Sfm_d I ω n F) (hbo : M.mem b ω) (bound : Sbound_d I F b) (hr : M.mem r n)
+    (hfg : Rd_entry_d f g j) : ∃ E D, M.IsFunctionSpace I E b A ∧ M.IsFunctionSpace I D b B ∧
+      (Ssat_d I A Q E F n r f ↔ Ssat_d I B T D F n r g) := by
+  obtain ⟨E, D, C, H, C', H', space, space', _, hCC, hHH, left, right⟩ :=
+    ep_set_tables_l hZF source target hm hn hj ha hb hAB hF hbo bound
+  have nat := hj.natural_l hZF source.omega source.transitive target.transitive hm hn source.omega_mem
   have value := smap_delta_l I hZF source.omega source.transitive target.transitive hm hn hj (n := 4)
     (fv_at_m (.bound 3) (.bound 2) (.bound 1) .newest) (by simp -implicitDefEqProofs) (fv_at_delta_l ..)
     ⟨Fin.cases f (Fin.cases r (Fin.cases H (fun _ => C))), fun _ => C⟩
     ⟨Fin.cases g (Fin.cases r (Fin.cases H' (fun _ => C'))), fun _ => C'⟩
     (Fin.cases hfg (Fin.cases (nat r (source.omega.transitive hZF n hF.1 r hr)) (Fin.cases hHH (fun _ => hCC))))
   simp only [fv_at_sat_l hZF.1] at value
-  exact ⟨E, D, space, space', (table.truth_l hZF source.omega program space hr).symm.trans
-    (value.trans (table'.truth_l hZF target.omega program' space' hr))⟩
+  exact ⟨E, D, space, space', (left r hr f).symm.trans (value.trans (right r hr g))⟩
 
 /-- 任意源内非空集合 A 的实际限制 j↾A，在 A 与 j(A) 之间保持完整内部初等性。 -/
 theorem ep_set_restriction_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Domain}

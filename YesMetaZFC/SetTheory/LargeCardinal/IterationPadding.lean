@@ -126,8 +126,8 @@ theorem it_padding_l {ω c α : M.Domain} (ready : It_source_d hZF ω c)
       have hiδ := (ts i δ).mpr ⟨hiα, hδ, Or.inr hi⟩
       exact ⟨i, hi, hiδ, e, (maps i δ e).mpr ⟨hiδ, rfl⟩, y, (es y y).mpr ⟨hy, rfl⟩⟩
   have cone : It_cone_d hZF ω α Q G c X R P := by
-    refine ⟨code.1, pf.1, pf.2.1,
-      fun i f b Y S hf => elem i f b Y S ((ps i f).mp hf).2, ?_, ?_⟩
+    refine ⟨⟨code.1, pf.1, pf.2.1,
+      fun i f b Y S hf => elem i f b Y S ((ps i f).mp hf).2, ?_⟩, ?_⟩
     · intro i j f u v hf hu hv x y z hxy hyz
       have eq := ((ps j v).mp hv).2.trans ((ps i u).mp hu).2.symm
       exact eq ▸ (ident f ((maps i j f).mp hf).2 x y hxy).symm ▸ hyz
@@ -150,7 +150,7 @@ theorem it_padding_limit_l {ω c α : M.Domain} (ready : It_source_d hZF ω c) (
   have wf : Wf_rel_d X R := fun Y _ ne => by
     obtain ⟨x, hx, minimal⟩ := KP.mem_minimal_exists_d (ZF.modelsKP hZF) ne
     exact ⟨x, hx, fun y hy hr => minimal y hy ((code.2 y x).mp hr).2.2⟩
-  have built := it_realized_branch_l hZF tree.omega tree.diagram b hl.2.1 (cone.realizer_l hZF tree.omega) wf
+  have built := it_realized_branch_l hZF tree.omega tree.diagram b hl.2.1 (cone.toIt_embedding_d.realizer_l hZF tree.omega) wf
   obtain ⟨β, U, Q', G', ext⟩ := it_wf_branch_extend_l hZF tree hl built
   exact ⟨T, Q, G, E, β, U, Q', G', tree, built, ext⟩
 
@@ -168,7 +168,7 @@ theorem it_padding_pruned_l {ω c α F a : M.Domain} (ready : It_source_d hZF ω
   have wf : Wf_rel_d X R := fun Y _ ne => by
     obtain ⟨x, hx, minimal⟩ := KP.mem_minimal_exists_d (ZF.modelsKP hZF) ne
     exact ⟨x, hx, fun y hy hr => minimal y hy ((code.2 y x).mp hr).2.2⟩
-  obtain ⟨B, β, U, Q', G', built, haB, ext⟩ := it_pruned_extend_l hZF tree cf ha pruned (cone.realizer_l hZF tree.omega) wf
+  obtain ⟨B, β, U, Q', G', built, haB, ext⟩ := it_pruned_extend_l hZF tree cf ha pruned (cone.toIt_embedding_d.realizer_l hZF tree.omega) wf
   exact ⟨T, Q, G, E, B, β, U, Q', G', tree, haB, built, ext⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

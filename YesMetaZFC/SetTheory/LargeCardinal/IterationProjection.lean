@@ -34,7 +34,7 @@ theorem It_project_d.unique_l (hE : Extensional M) {r i f g : M.Domain}
     exact kpair_unique_l M hE hq hx ▸ hqg
   exact hE.eq_of_same_members f g fun p => ⟨sub f g hf hg p, sub g f hg hf p⟩
 
-structure It_cone_d (hZF : M.Models ZF) (ω B Q G d N W P : M.Domain) : Prop where
+structure It_embedding_d (hZF : M.Models ZF) (ω B Q G d N W P : M.Domain) : Prop where
   model : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) d N W
   function : M.IsSetFunction (kp_pair_l (ZF.modelsKP hZF)) P
   domain : M.IsDomainOf (kp_pair_l (ZF.modelsKP hZF)) B P
@@ -42,6 +42,9 @@ structure It_cone_d (hZF : M.Models ZF) (ω B Q G d N W P : M.Domain) : Prop whe
     Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c X R → Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X N f
   commute : ∀ i j f u v, It_map_d G i j f → Rd_entry_d i u P → Rd_entry_d j v P →
     ∀ x y z, Rd_entry_d x y f → Rd_entry_d y z v → Rd_entry_d x z u
+
+structure It_cone_d (hZF : M.Models ZF) (ω B Q G d N W P : M.Domain) : Prop
+    extends It_embedding_d hZF ω B Q G d N W P where
   cover : ∀ y, M.mem y N → ∃ i f x, Rd_entry_d i f P ∧ Rd_entry_d x y f
 
 variable (hZF : M.Models ZF)

@@ -34,8 +34,8 @@ theorem it_value_sat_l (hE : Extensional M) {d} (ρ : Env M d) (P a y : Term d) 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem It_cone_d.realizer_l {ω B Q G d Y V P : M.Domain} (hω : M.IsOmega ω)
-    (h : It_cone_d hZF ω B Q G d Y V P) : It_realizer_d hZF B Q G Y V P :=
+theorem It_embedding_d.realizer_l {ω B Q G d Y V P : M.Domain} (hω : M.IsOmega ω)
+    (h : It_embedding_d hZF ω B Q G d Y V P) : It_realizer_d hZF B Q G Y V P :=
   ⟨h.function, h.domain, fun i f c X R hf hc mx =>
     ⟨fn0_of_function_l (ZF.modelsKP hZF) (h.elementary i f c X R hf hc mx).1.1,
       fun _ _ _ _ hx hy hr => ((h.elementary i f c X R hf hc mx).relation_l I hZF hω mx h.model hx hy).mp hr⟩,
@@ -52,9 +52,11 @@ theorem It_realizer_d.restrict_l {B D Q G Y V P : M.Domain} (h : It_realizer_d h
     obtain ⟨f, hf⟩ := (h.domain i).mp (sub i hi)
     exact ⟨f, (hp.2 i f).mpr ⟨hi, hf⟩⟩, fun ⟨f, hf⟩ => ((hp.2 i f).mp hf).1⟩
 
-theorem it_realizer_wf_l {ω α T Q G B L A p H R q C S Y V P : M.Domain}
-    (h : It_diagram_d hZF ω α T Q G) (inside : M.MemberSubset B α) (s : It_system_d B L Q G A p H R)
-    (limit : Di_limit_d A p H R q C S) (realizer : It_realizer_d hZF B Q G Y V P) (wf : Wf_rel_d Y V) : Wf_rel_d C S := by
+theorem It_realizer_d.map_l {ω α T Q G B L A p H R Y V P : M.Domain}
+    (realizer : It_realizer_d hZF B Q G Y V P) (h : It_diagram_d hZF ω α T Q G)
+    (inside : M.MemberSubset B α) (s : It_system_d B L Q G A p H R) :
+    ∃ r, Fn0_d A Y r ∧ (∀ a y, Rd_entry_d a y r ↔ M.mem a A ∧ It_value_d P a y) ∧
+      ∀ a b u v, Rd_entry_d a b H → Rd_entry_d a u r → Rd_entry_d b v r → u = v := by
   obtain ⟨D, hq⟩ := h.family_l hZF
   have map i f (hf : Rd_entry_d i f P) : ∃ c X R, Rd_entry_d i c Q ∧ Smdl_d I c X R ∧ Fn0_d X Y f := by
     obtain ⟨c, X, R, hc, mx⟩ := h.model_l hZF (inside i ((realizer.domain i).mpr ⟨f, hf⟩))
@@ -80,25 +82,33 @@ theorem it_realizer_wf_l {ω α T Q G B L A p H R q C S Y V P : M.Domain}
       obtain ⟨i, x, f, _, hf, hxy⟩ := (sat a y).mp hy
       obtain ⟨_, _, _, _, _, ff⟩ := map i f hf
       exact (ff.bound_l hxy).2)
-  have read a i x f y (hp : KPair_d M a i x) (hf : Rd_entry_d i f P) (hy : Rd_entry_d a y r) : Rd_entry_d x y f := by
-    obtain ⟨j, z, g, hp', hg, hzy⟩ := (sat a y).mp ((rs a y).mp hy).2
-    obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp hp'
-    exact realizer.function.2 i g f hg hf ▸ hzy
   have compatible a b u v (hab : Rd_entry_d a b H) (hau : Rd_entry_d a u r) (hbv : Rd_entry_d b v r) : u = v := by
     obtain ⟨i, x, f, hp, hf, hxu⟩ := (sat a u).mp ((rs a u).mp hau).2
     obtain ⟨j, y, g, hp', hg, hyv⟩ := (sat b v).mp ((rs b v).mp hbv).2
     obtain ⟨k, hk, hxy⟩ := ((s.arrows a b i j x y hp hp').mp hab).2.2
     obtain ⟨_, _, _, _, _, ff⟩ := map i f hf
     exact (fn0_function_l (ZF.modelsKP hZF) ff).1.2 x u v hxu (realizer.commute i j k f g hk hf hg x y v hxy hyv)
+  exact ⟨r, fn0_of_function_l (ZF.modelsKP hZF) hr,
+    fun a y => (rs a y).trans (and_congr_right fun _ => sat a y), compatible⟩
+
+theorem it_realizer_wf_l {ω α T Q G B L A p H R q C S Y V P : M.Domain}
+    (h : It_diagram_d hZF ω α T Q G) (inside : M.MemberSubset B α) (s : It_system_d B L Q G A p H R)
+    (limit : Di_limit_d A p H R q C S) (realizer : It_realizer_d hZF B Q G Y V P) (wf : Wf_rel_d Y V) : Wf_rel_d C S := by
+  obtain ⟨D, hq⟩ := h.family_l hZF
+  obtain ⟨r, hr, rs, compatible⟩ := realizer.map_l hZF h inside s
+  have read a i x f y (hp : KPair_d M a i x) (hf : Rd_entry_d i f P) (hy : Rd_entry_d a y r) : Rd_entry_d x y f := by
+    obtain ⟨j, z, g, hp', hg, hzy⟩ := ((rs a y).mp hy).2
+    obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp hp'
+    exact realizer.function.2 i g f hg hf ▸ hzy
   have preserve a b i u v (_ : Rd_entry_d a i p) (_ : Rd_entry_d b i p)
       (hau : Rd_entry_d a u r) (hbv : Rd_entry_d b v r) (hab : Rd_entry_d a b R) : Rd_entry_d u v V := by
     obtain ⟨_, _, k, x, y, hp, hp', hxy⟩ := (s.tags.relations a b).mp hab
-    obtain ⟨j, z, f, hpa, hf, _⟩ := (sat a u).mp ((rs a u).mp hau).2
+    obtain ⟨j, z, f, hpa, hf, _⟩ := ((rs a u).mp hau).2
     obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp hpa
-    obtain ⟨c, X, R₀, hc, mx, _⟩ := map k f hf
+    obtain ⟨c, X, R₀, hc, mx⟩ := h.model_l hZF (inside k ((realizer.domain k).mpr ⟨f, hf⟩))
     exact (realizer.maps k f c X R₀ hf hc mx).2 x y u v (read a k x f u hp hf hau)
       (read b k y f v hp' hf hbv) ((ep_rel_read_l hq hc mx.1).mp hxy)
-  exact (di_cone_wf_l hZF s.system limit (fn0_of_function_l (ZF.modelsKP hZF) hr) wf compatible preserve).elim
+  exact (di_cone_wf_l hZF s.system limit hr wf compatible preserve).elim
     fun _ hh => hh.2.2
 
 theorem it_realized_branch_l {ω α T Q G B Y V P : M.Domain} (hω : M.IsOmega ω)
