@@ -33,8 +33,10 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 
 [迭代树](YesMetaZFC/SetTheory/LargeCardinal/Iteration.lean) 已完成 Pₙ 全前驱递归、内部下降反证，
 以及返回嵌入失败时的联合尝试树和正则下降秩。nice 后继的背景可数闭性、
-[到 j(A) 的完整初等复制](YesMetaZFC/SetTheory/LargeCardinal/ExtenderSetCopy.lean) 已构造，保留常值方块和支撑上的映射。
-整树复制的移位秩、Skolem 回拉与 nice 树弱迭代策略仍待完成，L(R) 的 AD 尚未证明。
+[到 j(A) 的完整初等复制](YesMetaZFC/SetTheory/LargeCardinal/ExtenderSetCopy.lean) 已构造，保留支撑端点及有限幂子集上的一致性。
+[整棵 nice 树的复制](YesMetaZFC/SetTheory/LargeCardinal/IterationCopyTree.lean) 已通过内部类依赖选择与相容图列取并完成，保留原根嵌入和所有交换方块。
+[联合尝试树的完整像](YesMetaZFC/SetTheory/LargeCardinal/IterationAttemptMember.lean) 已由有限真值证书的绝对性及实际有限节点拥有性证明，原节点公式和调用方已迁移。
+联合尝试树的移位秩、Skolem 回拉与 nice 树弱迭代策略仍待完成，L(R) 的 AD 尚未证明。
 
 ## 描述集合论基础
 

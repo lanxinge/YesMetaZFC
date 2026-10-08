@@ -19,31 +19,35 @@ local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_copy_subsets_l
-    {ω κ κ' K K' K₀ K₁ L L' X R Y S N R₀ N' R₁ c d b b' π σ F F'
-      J O Z A p T V q c₀ C W J' O' Z' A' p' T' V' q' c₁ C' W' τ P Rₚ o P' Rₚ' o' g g' k : M.Domain}
+    {ω κ κ' K K' K₂ K₀ K₁ L L' X R Y S X' R' N R₀ N' R₁ c d b b' π σ F F'
+      J O Z A p T V q c₀ C W J' O' Z' A' p' T' V' q' c₁ C' W' P Rₚ o P' Rₚ' o' B₁ R₁' b₁ g g' k : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω κ' K' Y S)
+    (ambient : Ep_source_d hZF ω κ' K₂ X' R') (inside : M.MemberSubset Y X')
     (owner : Ep_source_d hZF ω κ K₀ N R₀) (owner' : Ep_source_d hZF ω κ' K₁ N' R₁)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hπ : Smap_d I ω c d X Y π)
     (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁) (hσ : Smap_d I ω b b' N N' σ)
     (hκπ : Rd_entry_d κ κ' π) (hκσ : Rd_entry_d κ κ' σ) (hLσ : Rd_entry_d L L' σ) (hFσ : Rd_entry_d F F' σ)
     (maps : Ea_maps_d ω κ X π σ)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (family' : Em_source_d ω κ' L' Y F') (coherent' : Ec_source_d I ω κ' L' Y F')
+    (family' : Em_source_d ω κ' L' X' F') (coherent' : Ec_source_d I ω κ' L' X' F')
     (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d I c₀ C W) (hP : M.TransitiveSet P) (mdl : Smem_d I o P Rₚ)
     (hg : Smap_d I ω c₀ o C P g) (range : M.IsRangeOf I P g)
     (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α g)
-    (system' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
-    (model' : Smdl_d I c₁ C' W') (hP' : M.TransitiveSet P') (mdl' : Smem_d I o' P' Rₚ')
-    (hg' : Smap_d I ω c₁ o' C' P' g') (fixed' : ∀ α H, Ep_seed_d κ' L' q' α H → Rd_entry_d H α g')
+    (system' : Ep_system_d hZF ω κ' L' X' R' F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (model' : Smdl_d I c₁ C' W') (hB : M.TransitiveSet B₁) (mb : Smem_d I b₁ B₁ R₁')
+    (hg' : Smap_d I ω c₁ b₁ C' B₁ g') (fixed' : ∀ α H, Ep_seed_d κ' L' q' α H → Rd_entry_d H α g')
+    (hP' : M.TransitiveSet P') (mdl' : Smem_d I o' P' Rₚ')
     (hωL : M.MemberSubset ω L) (hk : Smap_d I ω o o' P P' k) (hLk : Rd_entry_d L L' k)
-    (copy : ∀ E E', Rd_entry_d E E' τ ↔ M.mem E C ∧ ∃ u, Rd_entry_d u E q ∧ Ec_node_d π σ q' u E')
-    (square : ∀ E E' x y, Rd_entry_d E x g → Rd_entry_d E' y g' → (Rd_entry_d x y k ↔ Rd_entry_d E E' τ)) :
+    (copied : ∀ a a' f f' x y, Rd_entry_d a a' σ → Rd_entry_d f f' π →
+      Ep_value_d q g a f x → Ep_value_d q' g' a' f' y → Rd_entry_d x y k) :
     Ea_maps_d ω L P k σ := by
   have eq := hZF.1.eq_of_same_members K₀ K (fun f => (owner.finite f).trans (source.finite f).symm)
   subst K₀
   have eq := hZF.1.eq_of_same_members K₁ K' (fun f => (owner'.finite f).trans (target.finite f).symm)
   subst K₁
+  have eq := hZF.1.eq_of_same_members K₂ K' (fun f => (ambient.finite f).trans (target.finite f).symm)
+  subst K₂
   obtain ⟨K₂, _, hKK⟩ := hσ.1.1.2.2 K owner.finite_mem
   have finite := hσ.sequences_l hZF source.omega owner.transitive owner'.transitive h₀ h₁ owner'.theory
     owner.omega_mem hκσ hKK owner.finite
@@ -86,11 +90,11 @@ theorem ep_copy_subsets_l
     h₀ h₁ hσ owner.omega_mem hLσ haa ((system.indices a).mp haJ))
   have fn' := (hπ.sfun_l hZF source.omega source.transitive target.transitive hm hn hDD hff
     (source.function_l hZF hf₀X fn)).function_l target.transitive
-  obtain ⟨H', hHC', fv'⟩ := ep_repr_exists_l hZF family' system' limit' haJ' ha' hd' hfY fn'
+  obtain ⟨H', hHC', fv'⟩ := ep_repr_exists_l hZF family' system' limit' haJ' ha' hd' (inside f' hfY) (fn'.mono_target_l inside)
   obtain ⟨B'', _, hHB'⟩ := hg'.1.1.2.2 H' hHC'
   obtain ⟨H₀, fv₀, hH₀B⟩ := value
-  have copied := (square H₀ H' B B'' hH₀B hHB').mpr (ep_copy_repr_l limit.projection copy haa hff fv₀ fv')
-  have eq := hk.1.1.1.2 B B'' B' copied hBB
+  have mapped := copied a a' f₀ f' B B'' haa hff ⟨H₀, fv₀, hH₀B⟩ ⟨H', fv', hHB'⟩
+  have eq := hk.1.1.1.2 B B'' B' mapped hBB
   subst B''
   -- 所属源内实际分离出的迹先辨认为 B，再沿 σ 搬运。
   have fnN := fn.retarget_l (fun s x hsx => (rd_entry_transitive_l owner.transitive hfN hsx).2)
@@ -103,8 +107,8 @@ theorem ep_copy_subsets_l
   obtain ⟨B₁, _, hBσ⟩ := hσ.1.1.2.2 B hB₀
   have trace' := trace.map_l hZF source.omega owner.transitive owner'.transitive h₀ h₁ hσ owner'.theory
     owner.omega_mem hmω hκσ hLσ hKK hFσ hDσ hEσ haa hfσ hBσ
-  have read' := trace'.read_l hZFC target family' coherent' system' limit' model' hP' mdl' hg' fixed' hωL'
-    hnω hmω ha' hd' he' hfY ⟨H', fv', hHB'⟩
+  have read' := trace'.read_l hZFC ambient family' coherent' system' limit' model' hB mb hg' fixed' hωL'
+    hnω hmω ha' hd' he' (inside f' hfY) ⟨H', fv', hHB'⟩
   have hωP := hj.1.1.output_mem_of_pairMember (hj.omega_l I hZF source.omega source.transitive hP code mdl source.omega_mem)
   have mσ := hk.natural_l hZF source.omega hP hP' mdl mdl' hωP m hmω
   have tr := smap_delta_l I hZF source.omega hP hP' mdl mdl' hk (n := 3)

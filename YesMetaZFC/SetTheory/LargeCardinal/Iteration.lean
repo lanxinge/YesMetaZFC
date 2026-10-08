@@ -6,6 +6,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationPadding
 import YesMetaZFC.SetTheory.LargeCardinal.IterationDescent
 import YesMetaZFC.SetTheory.LargeCardinal.IterationInitial
 import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular
+import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptMember
+import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyTree
 import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 
 /-! # 迭代树、后继扩张与极限添枝的公共入口
@@ -28,5 +30,11 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 `it_nice_no_drop_l` 用内部依赖选择构造 ω 历史列，再由基础公理排除末模型下降。
 `ja_failure_l` 从返回嵌入的失败实际构造联合尝试关系及正则基数值下降秩。
 尝试链解码得到共尾枝、完整初等腿和实际传递直接极限，根复合式精确保留。
-复制整树中的移位秩、正则秩段的 Skolem 回拉及 nice 树弱迭代策略仍未完成。
+`Ic_model_d` 编码可数闭工作模型，正规秩层提供实际初值；`rank_apply_l` 将拥有
+秩段中的 nice 扩展器向上读取，构造完整工作源上的同一超幂、可数闭后继及共同强度秩段。
+`Ic_row_d.copy_l` 用实际类依赖选择及相容图列取并构造长度 ω 的整棵 nice 复制树；
+保持同一树序、全部前驱一致性、常值方块、原根嵌入及每个可数闭工作模型中的拥有目标秩段。
+联合节点的完整初等性已迁移到实际有限真值证书；`Ja_space_d.full_image_l` 用源内
+绝对性及有限部分图闭性证明像树包含全部背景联合节点，并保持原严格扩展关系。
+联合尝试树的移位秩、正则秩段的 Skolem 回拉及 nice 树弱迭代策略仍未完成。
 -/

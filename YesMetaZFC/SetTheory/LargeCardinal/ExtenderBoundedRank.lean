@@ -63,4 +63,26 @@ theorem Eb_collapse_d.rank_l {ω κ K X α V R L B A Q Y e F W : M.Domain}
     relation wc.transitive wc.function wc.onto member
   exact ⟨hY, J, P, G, U, T, pool', indices, hUV, hTV, hQV, he, range, membership, shape, edges, wc, member⟩
 
+/-- 原坐标界属于截断时，大源没有额外的有界代表或有限幂子集。 -/
+theorem Eb_pool_d.of_rank_l {ω κ K X α V L B J P G A : M.Domain}
+    (hX : M.TransitiveSet X) (hV : M.mem V X) (rank : Vr_d X α V) (hα : M.IsLimitOrdinal α)
+    (hK : M.mem K V) (hB : M.mem B V) (pool : Eb_pool_d ω κ L V B J K P G A) :
+    Eb_pool_d ω κ L X B J K P G A := by
+  have inside := hX V hV
+  refine ⟨inside J pool.indices, inside P pool.powers, inside G pool.functions, inside A pool.carrier,
+    fun x => ?_, fun f => ?_, pool.nodes⟩
+  · exact ⟨fun hx => ⟨inside x ((pool.subsets x).mp hx).1, ((pool.subsets x).mp hx).2⟩,
+      fun ⟨hx, sub⟩ => (pool.subsets x).mpr ⟨rank.subset_mem_l hX hV hK hx sub, sub⟩⟩
+  · exact ⟨fun hf => ⟨inside f ((pool.graphs f).mp hf).1, ((pool.graphs f).mp hf).2⟩,
+      fun ⟨hf, bound⟩ => (pool.graphs f).mpr ⟨rank.relation_mem_l hZF hX hV hα hK hB hf bound, bound⟩⟩
+
+/-- 同一个有界呈示及塌缩在大源中保持；无需再次构造商或选择新的求值图。 -/
+theorem Eb_collapse_d.of_rank_l {ω κ K X α V L B A Q Y e F : M.Domain}
+    (hX : M.TransitiveSet X) (hV : M.mem V X) (rank : Vr_d X α V) (hα : M.IsLimitOrdinal α)
+    (hK : M.mem K V) (hB : M.mem B V) (collapse : Eb_collapse_d ω κ L K V B F A Q Y e) :
+    Eb_collapse_d ω κ L K X B F A Q Y e := by
+  obtain ⟨J, P, G, U, R, pool, indices, hU, hR, hQ, he, rest⟩ := collapse
+  exact ⟨J, P, G, U, R, pool.of_rank_l hZF hX hV rank hα hK hB, indices,
+    hX V hV U hU, hX V hV R hR, hX V hV Q hQ, hX V hV e he, rest⟩
+
 end YesMetaZFC.SetTheory.LargeCardinal

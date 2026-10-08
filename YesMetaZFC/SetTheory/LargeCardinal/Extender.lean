@@ -18,6 +18,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderLocalRead
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSourceSuccessors
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderOmegaClosed
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSetCopy
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankLift
 
 /-! # 扩展器理论的公共入口
 
@@ -66,7 +67,8 @@ woodin_rank_strength_l 按 ν 选择实际不可达 L>ν，恢复整个 V_L 覆�
 `ep_set_value_l` 搬运整张有限真值表，在 j(A) 中读取任意代表赋值的全部内部
 公式；不要求 A 的高度正则，也不要求目标赋值属于常值嵌入的像。
 `ep_set_copy_l` 将 π:M→A 复制为原实际后继到 j(A) 的完整初等图，保持常值
-交换方块及支撑上的 σ；包含因子通过有限代表矩阵直接证明全部内部公式的保持。
+交换方块、长度端点及全部有限 L 幂子集上的 σ；包含因子通过有限代表矩阵
+直接证明全部内部公式的保持，代表求值的外层目标与复制图的小目标分别保留。
 `atoms_l` 和 `normal_l` 直接读取内部原子条件与源内正规性；`successors_l` 构造两侧
 后继并证明支撑端点上的子集一致性。`subsets_l` 通过源内有界迹将自身超幂的子集
 送回所属模型，复合后直接给出小模型编码所需的 `Ea_subset_d`；全部单向搬运接口已迁移。
@@ -78,7 +80,7 @@ woodin_rank_strength_l 按 ν 选择实际不可达 L>ν，恢复整个 V_L 覆�
 `eb_owned_value_l` 双向搬运 κ 值代表，直接把施加超幂的实际 j(κ) 及求值图放回所属源；
 `Eb_collapse_d.map_l` 传输全部节点及原求值图，`realize_l` 辨认为目标施加超幂的同一值。
 `Ea_maps_d.function_l` 从有限幂编码推出两图在 κ 值函数上一致；`ep_copy_bounded_l`
-由此证明复制与 σ 在整个 j(κ)+1 上相同，并已接入 `ep_copy_successor_l` 的支撑端点结论。
+由此证明复制与 σ 在 j(κ) 以下相同，常值方块处理端点；普通后继复制和集合像复制均使用同一接口。
 `Ea_maps_d.set_function_l` 进一步搬运集合值代表的完整成员编码；`Eb_trace_d` 保留所属源
 实际分离出的完整支撑迹。其传输和跨源读取证明 `ep_copy_subsets_l`，得到有限 L 幂子集上的映射一致性。
 `Ea_maps_d.transitive_l` 再以源内实际枚举的关系码和塌缩唯一性，证明整个被枚举传递集合上逐点一致；
@@ -88,6 +90,8 @@ woodin_rank_strength_l 按 ν 选择实际不可达 L>ν，恢复整个 V_L 覆�
 原超幂的成员资格、定义域和编号均由实际构造给出。
 `ep_set_restriction_l` 以有限真值表证明集合限制的完整内部初等性。
 `It_local_d.rank_l` 保持严格极限秩段中的原短扩展器公式，包括内部极大性及可数共同纤维。
+`It_local_d.of_rank_l` 将同一原公式向上读取；`Ex_strength_d.of_rank_l` 保留同一个
+有界坍塌和最大强度证书，均只要求拥有的极限秩段。
 `It_local_d.return_l` 将指定实际后继的支撑子集送回原所属模型，复制入口同步返回这一性质。
 Pₙ 全前驱递归与递降模型反证已完成；整树复制、移位秩及 Skolem 回拉仍待接通，
 nice 树弱迭代策略、一般迭代策略与 L(R) 的 AD 尚未证明。

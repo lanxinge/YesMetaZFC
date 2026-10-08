@@ -138,8 +138,14 @@ theorem ep_copy_successor_l
     (sf.function_l source.transitive) fc fv hHΓ hΓ.transitive old_power
     (hσ.1.1.input_mem_of_pairMember hLσ) (hσ.1.1.input_mem_of_pairMember hFσ) hlim level hκV
   obtain ⟨Θ, _, hΓΘ⟩ := hσ.1.1.2.2 Γ hΓN
-  obtain ⟨same, endpoint, below⟩ := ep_copy_bounded_l hZF source target owner owner' agree agree' hm hn hπ h₀ h₁ hσ
-    hκπ hκσ hLσ hFσ maps family family' h limit h' limit' wc bij wc' bij' copy square
+  have copied a a' f f' x y (haa : Rd_entry_d a a' σ) (hff : Rd_entry_d f f' π)
+      (fv : Ep_value_d q g a f x) (fv' : Ep_value_d q' g' a' f' y) : Rd_entry_d x y k := by
+    obtain ⟨E, ev, hEx⟩ := fv
+    obtain ⟨E', ev', hE'y⟩ := fv'
+    exact (square E E' x y hEx hE'y).mpr (ep_copy_repr_l limit.projection copy haa hff ev ev')
+  have endpoint := commute κ κ' Γ Γ' hκπ hκΓ hκΓ'
+  obtain ⟨same, below⟩ := ep_copy_bounded_l hZF source target target.transitive owner owner' agree agree' hm hn hπ h₀ h₁ hσ
+    hκπ hκσ hLσ hFσ maps family family' h limit h' limit' wc bij wc' bij' copied
     (sf.function_l source.transitive) fc fv hHΓ (sf'.function_l target.transitive) fc' fv' hHΓ' hΓ'.transitive hΓΘ eval
   have hΓσ : Rd_entry_d Γ Γ' σ := same ▸ hΓΘ
   obtain ⟨hfX, n, hnω, ha, D₃, space, fn⟩ := fv.source_l hZF family h limit
@@ -155,10 +161,10 @@ theorem ep_copy_successor_l
       simpa only [eqL, eqL'] using endpoint
     · exact below L L' lt hLσ
     · exact (KP.mem_irrefl_d (ZF.modelsKP hZF) Γ (bound Γ gt)).elim
-  have subset_maps := ep_copy_subsets_l hZFC source target owner owner' hm hn hπ h₀ h₁ hσ
+  have subset_maps := ep_copy_subsets_l hZFC source target target (fun _ h => h) owner owner' hm hn hπ h₀ h₁ hσ
     hκπ hκσ hLσ hFσ maps family coherent family' coherent' h limit model hP mdl hg
     (fun x => ⟨fun hx => (bij.2 x hx).imp fun _ h => h.2, fun ⟨_, hx⟩ => bij.1.1.output_mem_of_pairMember hx⟩)
-    seed h' limit' model' hP' mdl' hg' seed' hωL hk support copy square
+    seed h' limit' model' hP' mdl' hg' seed' hP' mdl' hωL hk support copied
   have fix := hj.omega_l I hZF source.omega source.transitive hP hm mdl source.omega_mem
   obtain ⟨_, base⟩ := source.successor_l hZF hm mdl hP hj (hj.1.1.output_mem_of_pairMember fix) (fun _ h => h)
     ((hj.small_l hZF source.omega source.transitive hP hm mdl fix).mp (source.cardinal_small.mono_l source.below))

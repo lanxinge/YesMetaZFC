@@ -15,16 +15,17 @@ def Ja_cell_d (ω T Q G E Y W z π s : M.Domain) : Prop :=
   ∃ k P, KPair_d M s k P ∧ Ja_node_d I ω T Q G E Y W z π k P
 
 def ja_cell_m {d} (ω T Q G E Y W z π s : Term d) : Formula 1 d := set[d] ⟪
-  ∃ k P, ⌜kpair_m⌝ₚ(⌜s⌝ₛ, k, P) ∧
+  ∃ k P, ⌜kpair0_m⌝ₚ(⌜s⌝ₛ, k, P) ∧
     ⌜ja_node_m⌝ₚ(⌜ω⌝ₛ, ⌜T⌝ₛ, ⌜Q⌝ₛ, ⌜G⌝ₛ, ⌜E⌝ₛ, ⌜Y⌝ₛ, ⌜W⌝ₛ, ⌜z⌝ₛ, ⌜π⌝ₛ, k, P)⟫
 derive_free_closed ja_cell_m
 
-theorem ja_cell_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω T Q G E Y W z π s : Term d) :
+theorem ja_cell_sat_l (hZF : M.Models ZF) {d} (ρ : Env M d) (ω T Q G E Y W z π s : Term d)
+    (hω : M.IsOmega (ω.eval ρ)) :
     Formula.satisfies ρ (ja_cell_m ω T Q G E Y W z π s) ↔
-      Ja_cell_d I (ω.eval ρ) (T.eval ρ) (Q.eval ρ) (G.eval ρ) (E.eval ρ) (Y.eval ρ) (W.eval ρ)
+      Ja_cell_d (kp_pair_l (ZF.modelsKP hZF)) (ω.eval ρ) (T.eval ρ) (Q.eval ρ) (G.eval ρ) (E.eval ρ) (Y.eval ρ) (W.eval ρ)
         (z.eval ρ) (π.eval ρ) (s.eval ρ) := by
   simp only [ja_cell_m, Ja_cell_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-    kpair_sat_l M hE, ja_node_sat_l I hE, Definitional.Term.eval_weaken]; rfl
+    kpair0_sat_l hZF.1, ja_node_sat_l hZF, Definitional.Term.eval_weaken, hω]; rfl
 
 structure Ja_space_d (ω T Q G E Y W z π A R : M.Domain) : Prop where
   nodes : ∀ s, M.mem s A ↔ Ja_cell_d I ω T Q G E Y W z π s
@@ -62,7 +63,7 @@ theorem ja_space_l {ω T Q G E Y W z π : M.Domain}
     (.bound 5) (.bound 6) (.bound 7) (.bound 8) (.bound 9) .newest) }
   let ρ : Env M 9 := ⟨Fin.cases ω (Fin.cases T (Fin.cases Q (Fin.cases G (Fin.cases E
     (Fin.cases Y (Fin.cases W (Fin.cases z (fun _ => π)))))))), fun _ => ω⟩
-  have sat s : φ.denote ρ s ↔ Ja_cell_d I₀ ω T Q G E Y W z π s := ja_cell_sat_l I₀ hZF.1 ..
+  have sat s : φ.denote ρ s ↔ Ja_cell_d I₀ ω T Q G E Y W z π s := ja_cell_sat_l hZF _ _ _ _ _ _ _ _ _ _ _ hω
   have bound s (snode : Ja_cell_d I₀ ω T Q G E Y W z π s) : M.mem s U := by
     obtain ⟨k, P, hp, node⟩ := snode
     refine (hu s).mpr ⟨k, node.length, P, (hv P).mpr ?_, hp⟩

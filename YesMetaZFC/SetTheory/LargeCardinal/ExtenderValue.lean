@@ -26,6 +26,20 @@ theorem ep_value_sat_l (hE : Extensional M) {d} (ρ : Env M d) (q e a f x : Term
   simp only [ep_value_m, Ep_value_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     ep_repr_sat_l hE, rd_entry_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
+/-- 同一实际代表的值唯一；只用原商的等号核和实现图的函数性。 -/
+theorem Ep_value_d.unique_l (hZF : M.Models ZF)
+    {ω κ L X R F J O Z A p T V q C W N e a f x y : M.Domain}
+    (family : Em_source_d ω κ L X F)
+    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (he : Fn0_d C N e) (hx : Ep_value_d q e a f x) (hy : Ep_value_d q e a f y) : x = y := by
+  obtain ⟨E, fv, hEx⟩ := hx
+  obtain ⟨H, fw, hHy⟩ := hy
+  obtain ⟨_, n, hn, ha, _⟩ := fv.source_l hZF family system limit
+  obtain ⟨U, haU⟩ := family.total n a hn ha
+  have eq := (ep_repr_atoms_l hZF family system limit haU fv fw).1.mpr
+    ((ep_repr_atoms_l hZF family system limit haU fv fv).1.mp rfl)
+  exact (fn0_function_l (ZF.modelsKP hZF) he).1.2 H x y (eq ▸ hEx) hHy
+
 theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N S e n D a U : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)

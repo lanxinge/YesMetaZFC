@@ -3,10 +3,11 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedValue
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderFunctionMap
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCopySeed
 
-/-! # 复制图在临界点像以下及端点处等于所属嵌入
+/-! # 复制图在临界点像以下等于所属嵌入
 
 所属源中的完整求值图沿 σ 传输，再由原代表辨认复制目标中的同一个图。
-κ 值函数的两种像已由有限幂编码证明相同；端点自身由常值代表处理。
+κ 值函数的两种像已由有限幂编码证明相同。源映射可落入较小的拥有集合；
+代表方程仍在指定外层超幂中读取，端点由调用处的常值交换方块处理。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -47,26 +48,27 @@ theorem ep_copy_constant_l
   exact ep_copy_repr_l limit.projection copy haa hff fv (eq ▸ ev)
 
 theorem ep_copy_bounded_l
-    {ω κ κ' K K' K₀ K₁ L L' X R Y S N R₀ N' R₁ c d b b' π σ F F'
-      J O Z A p T V q C W J' O' Z' A' p' T' V' q' C' W' τ P P' g g' k
+    {ω κ κ' K K' K₀ K₁ L L' X R Y S X' R' N R₀ N' R₁ c d b b' π σ F F'
+      J O Z A p T V q C W J' O' Z' A' p' T' V' q' C' W' P P' g g' k
       D₀ a₀ f₀ H D₁ a₁ f₁ H' Γ Γ' Θ D Q e : M.Domain}
-    (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω κ' K' Y S)
+    (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω κ' K' X' R')
+    (hY : M.TransitiveSet Y)
     (owner : Ep_source_d hZF ω κ K₀ N R₀) (owner' : Ep_source_d hZF ω κ' K₁ N' R₁)
-    (agree : Ea_agree_d ω κ X N) (agree' : Ea_agree_d ω κ' Y N')
+    (agree : Ea_agree_d ω κ X N) (agree' : Ea_agree_d ω κ' X' N')
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hπ : Smap_d I ω c d X Y π)
     (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁) (hσ : Smap_d I ω b b' N N' σ)
     (hκπ : Rd_entry_d κ κ' π) (hκσ : Rd_entry_d κ κ' σ) (hLσ : Rd_entry_d L L' σ) (hFσ : Rd_entry_d F F' σ)
-    (maps : Ea_maps_d ω κ X π σ) (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
+    (maps : Ea_maps_d ω κ X π σ) (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' X' F')
     (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (system' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (system' : Ep_system_d hZF ω κ' L' X' R' F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C P)
     (wc' : Wc_graph_d C' W' g') (bij' : M.IsSetBijectionFromTo I g' C' P')
-    (copy : ∀ E E', Rd_entry_d E E' τ ↔ M.mem E C ∧ ∃ u, Rd_entry_d u E q ∧ Ec_node_d π σ q' u E')
-    (square : ∀ E E' x y, Rd_entry_d E x g → Rd_entry_d E' y g' → (Rd_entry_d x y k ↔ Rd_entry_d E E' τ))
+    (copied : ∀ a a' f f' x y, Rd_entry_d a a' σ → Rd_entry_d f f' π →
+      Ep_value_d q g a f x → Ep_value_d q' g' a' f' y → Rd_entry_d x y k)
     (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ κ f₀) (fv : Ep_repr_d q a₀ f₀ H) (hHΓ : Rd_entry_d H Γ g)
-    (ff' : Fn0_d D₁ Y f₁) (constant' : Rs_const_d D₁ κ' f₁) (fv' : Ep_repr_d q' a₁ f₁ H') (hHΓ' : Rd_entry_d H' Γ' g')
+    (ff' : Fn0_d D₁ X' f₁) (constant' : Rs_const_d D₁ κ' f₁) (fv' : Ep_repr_d q' a₁ f₁ H') (hHΓ' : Rd_entry_d H' Γ' g')
     (hΓ' : M.TransitiveSet Γ') (hΓσ : Rd_entry_d Γ Θ σ) (collapse : Eb_collapse_d ω κ L K₀ N κ F D Q Γ e) :
-    Θ = Γ' ∧ Rd_entry_d Γ Γ' k ∧ ∀ x x', M.mem x Γ → Rd_entry_d x x' σ → Rd_entry_d x x' k := by
+    Θ = Γ' ∧ ∀ x x', M.mem x Γ → Rd_entry_d x x' σ → Rd_entry_d x x' k := by
   have data := collapse
   obtain ⟨J₀, P₀, G₀, U₀, V₀, pool, _, _, _, hQ, he, _, _, _, _, map, _⟩ := data
   have evaluation := (collapse.realize_l hZF source owner agree family system limit wc bij ff constant fv hHΓ map.transitive).2
@@ -80,32 +82,28 @@ theorem ep_copy_bounded_l
   have collapse' := collapse.map_l hZF source.omega owner.transitive owner'.transitive h₀ h₁ hσ owner'.theory
     owner.omega_mem hκσ hLσ hKK hκσ hFσ hDD hQQ hΓσ hee
   obtain ⟨same, evaluation'⟩ := collapse'.realize_l hZF target owner' agree' family' system' limit' wc' bij' ff' constant' fv' hHΓ' hΓ'
-  refine ⟨same, ?_, ?_⟩
-  · -- 常值 κ 的代表单独给出闭区间端点；这里不使用支撑上的连续性。
-    exact (square H H' Γ Γ' hHΓ hHΓ').mpr (ep_copy_constant_l hZF source target hm hn hπ hκπ
-      owner.transitive owner'.transitive h₀ h₁ hσ owner.omega_mem hLσ hFσ family family' system limit system' limit' copy
-      hκπ ff constant fv ff' constant' fv')
-  · intro x x' hx hxx
-    obtain ⟨u, hu, hux⟩ := map.onto x hx
-    obtain ⟨_, a, f, pair, E, ev, hEx⟩ := (evaluation u x).mp hux
-    obtain ⟨n, a', D₃, f', hnω, haJ, ha, space, hfN, fn, pair'⟩ := pool.read_l hZF owner hu
-    obtain ⟨ea, ef⟩ := kpair_injective_l M pair' pair
-    subst a' f'
-    have hfX := (ev.source_l hZF family system limit).1
-    obtain ⟨f', _, hff⟩ := hπ.1.1.2.2 f hfX
-    have hffσ := maps.function_l hZF source owner target.transitive owner'.transitive hm hn hπ h₀ h₁ hσ hκπ hκσ hnω space hfX fn hff
-    obtain ⟨a', _, haa⟩ := hσ.1.1.2.2 a (owner.transitive J₀ pool.indices a haJ)
-    obtain ⟨u', _, huu⟩ := hσ.1.1.2.2 u (owner.transitive D pool.carrier u hu)
-    have tr := smap_delta_l I hZF source.omega owner.transitive owner'.transitive h₀ h₁ hσ (n := 3)
-      (kpair0_m (.bound 2) (.bound 1) .newest) (by simp -implicitDefEqProofs) (kpair0_delta_l ..)
-      ⟨Fin.cases f (Fin.cases a (fun _ => u)), fun _ => u⟩ ⟨Fin.cases f' (Fin.cases a' (fun _ => u')), fun _ => u'⟩
-      (Fin.cases hffσ (Fin.cases haa (fun _ => huu)))
-    simp only [kpair0_sat_l hZF.1] at tr
-    have pair' := tr.mp pair
-    have hux' := (hσ.entry_l hZF source.omega owner.transitive owner'.transitive h₀ h₁ huu hxx hee).mp hux
-    obtain ⟨_, a'', f'', pair'', E', ev', hE'x'⟩ := (evaluation' u' x').mp hux'
-    obtain ⟨ea, ef⟩ := kpair_injective_l M pair'' pair'
-    subst a'' f''
-    exact (square E E' x x' hEx hE'x').mpr (ep_copy_repr_l limit.projection copy haa hff ev ev')
+  refine ⟨same, ?_⟩
+  intro x x' hx hxx
+  obtain ⟨u, hu, hux⟩ := map.onto x hx
+  obtain ⟨_, a, f, pair, E, ev, hEx⟩ := (evaluation u x).mp hux
+  obtain ⟨n, a', D₃, f', hnω, haJ, ha, space, hfN, fn, pair'⟩ := pool.read_l hZF owner hu
+  obtain ⟨ea, ef⟩ := kpair_injective_l M pair' pair
+  subst a' f'
+  have hfX := (ev.source_l hZF family system limit).1
+  obtain ⟨f', _, hff⟩ := hπ.1.1.2.2 f hfX
+  have hffσ := maps.function_l hZF source owner hY owner'.transitive hm hn hπ h₀ h₁ hσ hκπ hκσ hnω space hfX fn hff
+  obtain ⟨a', _, haa⟩ := hσ.1.1.2.2 a (owner.transitive J₀ pool.indices a haJ)
+  obtain ⟨u', _, huu⟩ := hσ.1.1.2.2 u (owner.transitive D pool.carrier u hu)
+  have tr := smap_delta_l I hZF source.omega owner.transitive owner'.transitive h₀ h₁ hσ (n := 3)
+    (kpair0_m (.bound 2) (.bound 1) .newest) (by simp -implicitDefEqProofs) (kpair0_delta_l ..)
+    ⟨Fin.cases f (Fin.cases a (fun _ => u)), fun _ => u⟩ ⟨Fin.cases f' (Fin.cases a' (fun _ => u')), fun _ => u'⟩
+    (Fin.cases hffσ (Fin.cases haa (fun _ => huu)))
+  simp only [kpair0_sat_l hZF.1] at tr
+  have pair' := tr.mp pair
+  have hux' := (hσ.entry_l hZF source.omega owner.transitive owner'.transitive h₀ h₁ huu hxx hee).mp hux
+  obtain ⟨_, a'', f'', pair'', E', ev', hE'x'⟩ := (evaluation' u' x').mp hux'
+  obtain ⟨ea, ef⟩ := kpair_injective_l M pair'' pair'
+  subst a'' f''
+  exact copied a a' f f' x x' haa hff ⟨E, ev, hEx⟩ ⟨E', ev', hE'x'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

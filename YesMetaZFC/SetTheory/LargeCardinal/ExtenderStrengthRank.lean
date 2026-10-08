@@ -32,4 +32,20 @@ theorem Ex_strength_d.rank_l (hZF : M.Models ZF) {ω κ K X α V R L F W : M.Dom
   · obtain ⟨x, hx, sub, missing⟩ := strength.2
     exact ⟨x, rank.subset_mem_l hX hV hL hx sub, sub, missing⟩
 
+/-- 大源已有的 L 以下子集及有界代表全部属于截断，所以最大强度反向保持。 -/
+theorem Ex_strength_d.of_rank_l (hZF : M.Models ZF) {ω κ X α V L F : M.Domain}
+    (hX : M.TransitiveSet X) (hV : M.mem V X) (rank : Vr_d X α V) (hα : M.IsLimitOrdinal α)
+    (h : Ex_strength_d hZF ω κ L V F) : Ex_strength_d hZF ω κ L X F := by
+  obtain ⟨hw, hk, hl, hf, ho, K, P, A, Q, Y, e, hK, hP, hY, seq, power, collapse, strength⟩ := h
+  have ht := rank.transitive_l hZF hX hV
+  have inside := hX V hV
+  refine ⟨inside ω hw, inside κ hk, inside L hl, inside F hf, ho, K, P, A, Q, Y, e,
+    inside K hK, inside P hP, inside Y hY, seq, fun x => ?_,
+    collapse.of_rank_l hZF hX hV rank hα hK hP, ?_, ?_⟩
+  · exact ⟨fun hx => ⟨inside x ((power x).mp hx).1, ((power x).mp hx).2⟩,
+      fun ⟨hx, sub⟩ => (power x).mpr ⟨rank.subset_mem_l hX hV hk hx sub, sub⟩⟩
+  · exact fun β hβ x hx sub => strength.1 β hβ x (rank.subset_mem_l hX hV (ht L hl β hβ) hx sub) sub
+  · obtain ⟨x, hx, sub, missing⟩ := strength.2
+    exact ⟨x, inside x hx, sub, missing⟩
+
 end YesMetaZFC.SetTheory.LargeCardinal
