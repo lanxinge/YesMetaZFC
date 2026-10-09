@@ -3,6 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
+import YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -27,6 +28,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 严格正则秩截断自动保留同一扩展器的最大强度、实际秩层枚举与全部所属判断。
 完整类型的实际伸展已实现：任意 Vη 中的内部有限元组有无界多个 κ，
 其 κ 型沿合适的实际强扩展器伸展后，精确投影为同一元组的 τ 型。
+前驱类型由同一元组在前一秩层实现，并与同一实际扩展器的伸展交换。
 实际迭代树、pad、任意树前驱上的
 超幂后继扩张及后继子集一致性已经构造。实际树枝极限、传递坍塌与极限添枝已完成；
 非可数共尾度及相容良基实现给出良基分支判据，可数共尾可延伸树已有实际选枝。

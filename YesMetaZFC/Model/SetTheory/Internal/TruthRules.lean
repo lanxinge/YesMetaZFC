@@ -11,19 +11,19 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-private def Ref_d (k : Nat) (ω r i j : M.Domain) : Prop :=
+def Sref_d (k : Nat) (ω r i j : M.Domain) : Prop :=
   match k with
   | 0 | 1 => M.mem i ω ∧ M.mem j ω
   | 2 => M.mem i r ∧ M.mem j r
   | _ => M.mem i ω ∧ M.mem j r
 
-private theorem refs_l (hKP : M.Models KP) {ω r c k i j}
-    (hc : Sfm_node_d I ω r c) (hs : Sop_d I k c i j) : Ref_d k ω r i j := by
+theorem Sfm_node_d.refs_l (hKP : M.Models KP) {ω r c k i j}
+    (hc : Sfm_node_d I ω r c) (hs : Sop_d I k c i j) : Sref_d k ω r i j := by
   rcases hc with ⟨a, b, ht, ha, hb⟩ | ⟨a, b, ht, ha, hb⟩ | ⟨a, b, ht, ha, hb⟩ | ⟨a, b, ht, ha, hb⟩ <;>
     obtain ⟨rfl, rfl, rfl⟩ := sop_injective_l I hKP hs ht <;> exact ⟨ha, hb⟩
 
 private theorem arg_restrict_l {k X R H P ω r f i j} (hP : M.IsRestrictionOf I P H r)
-    (hr : Ref_d k ω r i j) : Sarg_d I k X R P f i j ↔ Sarg_d I k X R H f i j := by
+    (hr : Sref_d k ω r i j) : Sarg_d I k X R P f i j ↔ Sarg_d I k X R H f i j := by
   have hp a A (ha : M.mem a r) : M.PairMember I a A P ↔ M.PairMember I a A H :=
     (hP.2 a A).trans ⟨And.right, fun h => ⟨ha, h⟩⟩
   rcases k with _ | (_ | (_ | k))
@@ -38,7 +38,7 @@ theorem snode_restrict_l (hKP : M.Models KP) {ω X R H P r c : M.Domain}
     (hc : Sfm_node_d I ω r c) (hP : M.IsRestrictionOf I P H r) (f : M.Domain) :
     Snode_d I X R P c f ↔ Snode_d I X R H c f :=
   exists_congr fun _ => exists_congr fun _ => exists_congr fun _ => and_congr_right fun hs =>
-    arg_restrict_l I hP (refs_l I hKP hc hs)
+    arg_restrict_l I hP (hc.refs_l I hKP hs)
 
 theorem seval_row_l (hZF : M.Models ZF) {ω X R E F n H r c Y}
     (hF : Sfm_d I ω n F) (hH : Seval_d I X R E F n H)
@@ -88,7 +88,7 @@ theorem ssat_nor_l (hZF : M.Models ZF) {ω X R E F n H r c i j f}
     (hs : Sop_d I 2 c i j) (hf : M.mem f E) :
     Ssat_d I X R E F n r f ↔ ¬ (Ssat_d I X R E F n i f ∨ Ssat_d I X R E F n j f) := by
   have hr := (hF.2.1.2.2 r).mpr ⟨c, hc⟩
-  obtain ⟨hi, hj⟩ := refs_l I (ZF.modelsKP hZF) (hF.2.2 r c hc) hs
+  obtain ⟨hi, hj⟩ := (hF.2.2 r c hc).refs_l I (ZF.modelsKP hZF) hs
   obtain ⟨A, hA⟩ := (hH.1.2.2 i).mp (hH.1.1.transitive r hr i hi)
   obtain ⟨B, hB⟩ := (hH.1.2.2 j).mp (hH.1.1.transitive r hr j hj)
   rw [ssat_op_l I hZF hF hH hc 2 hs f, ssat_value_l I hZF hH hA, ssat_value_l I hZF hH hB]
@@ -105,7 +105,7 @@ theorem ssat_exists_l (hZF : M.Models ZF) {ω X R E F n H r c i j f}
     (hs : Sop_d I 3 c i j) (hf : M.mem f E) :
     Ssat_d I X R E F n r f ↔ ∃ x g, M.mem x X ∧ Senv_update_d I f i x g ∧ Ssat_d I X R E F n j g := by
   have hr := (hF.2.1.2.2 r).mpr ⟨c, hc⟩
-  have hj := (refs_l I (ZF.modelsKP hZF) (hF.2.2 r c hc) hs).2
+  have hj := ((hF.2.2 r c hc).refs_l I (ZF.modelsKP hZF) hs).2
   obtain ⟨A, hA⟩ := (hH.1.2.2 j).mp (hH.1.1.transitive r hr j hj)
   rw [ssat_op_l I hZF hF hH hc 3 hs f]
   constructor

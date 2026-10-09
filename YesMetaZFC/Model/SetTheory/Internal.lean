@@ -11,6 +11,7 @@ import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateTrace
 import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
+import YesMetaZFC.Model.SetTheory.Internal.TypeMinusEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull

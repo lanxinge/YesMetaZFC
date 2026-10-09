@@ -26,6 +26,12 @@ MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
              "Functions", "SequenceSource", "AssignmentSource")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("FlatProgram", "FlatTruthSyntax", "FlatTruth", "FlatTruthSource", "FlatSatisfaction", "RankSatisfaction")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("RelativizationRule", "RelativizationSyntax", "InstructionAppend", "RelativizationSteps",
+             "Relativization", "RelativizationCorrect", "LargestSetCode", "LargestSet",
+             "TypeMinusCode", "TypeMinusSemantics", "TypeMinusSyntax", "TypeQueryClosure",
+             "TypeMinus", "TypeMinusMatrix", "TypeMinusEmbedding")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch"]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
@@ -565,6 +571,12 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                 ("Ft_arg_d", "ft_arg_m", "Ft_node_d", "ft_node_m", "Ft_eval_d", "ft_eval_m",
                  "Ft_sat_d", "ft_sat_m", "ft_local_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Sref_d", "Sr_at_d", "sr_at_m", "Sr_rule_d", "sr_rule_m",
+                 "Sr_context_d", "sr_context_m", "Sr_row_d", "sr_row_m", "Sr_state_d", "sr_state_m",
+                 "Sr_and_d", "sr_and_m", "Sr_top_d", "Sr_top_code_d", "sr_top_code_m",
+                 "Sr_minus_d", "sr_minus_m", "Tm_code_d", "tm_code_m", "Tm_query_d", "tm_query_m",
+                 "Tm_minus_d", "tm_minus_m", "Tt_slots_d", "tt_slots_m", "Tm_table_d", "tm_link0_m", "tm_cut0_m")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
