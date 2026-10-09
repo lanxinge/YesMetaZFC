@@ -20,6 +20,12 @@ MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection." + name for name in
             ("Parameters", "WitnessSyntax", "Collection", "Step", "Chain", "Closure", "Relativization", "Decode", "Bounded")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection", "YesMetaZFC.SetTheory.CumulativeUnion"]
 MODULES += ["YesMetaZFC.SetTheory.RelationChain"]
+MODULES += ["YesMetaZFC.SetTheory.FlatPairing"]
+MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
+            ("Shift", "Tag", "Pair", "Rank", "Source", "Sequence", "Finite", "RankObjects",
+             "Functions", "SequenceSource", "AssignmentSource")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("FlatProgram", "FlatTruthSyntax", "FlatTruth", "FlatTruthSource", "FlatSatisfaction", "RankSatisfaction")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
@@ -553,6 +559,12 @@ LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Wi_winning_d"]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                 ("Tn_name_d", "tn_name_m", "Tn_names_d", "Tn_value_d", "tn_value_m", "Tn_assign_d", "tn_assign_m",
                  "Tt_query_d", "tt_query_m", "Tt_pool_d", "Tt_truth_d", "Tt_realized_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in
+                ("Fp_shift_d", "fp_shift0_m", "Fp_tag_d", "fp_tag0_m", "Fp_pair_d", "fp_pair0_m", "Fp_d",
+                 "Fs_trace_d", "fs_trace_m", "Fs_code_d", "fs_code_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Ft_arg_d", "ft_arg_m", "Ft_node_d", "ft_node_m", "Ft_eval_d", "ft_eval_m",
+                 "Ft_sat_d", "ft_sat_m", "ft_local_m")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]

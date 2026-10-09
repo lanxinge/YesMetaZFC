@@ -5,6 +5,7 @@ import YesMetaZFC.Model.SetTheory.Internal.Membership
 import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
+import YesMetaZFC.Model.SetTheory.Internal.RankSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateTrace
@@ -60,6 +61,9 @@ import YesMetaZFC.Model.SetTheory.Internal.RankSkolem
 `Tt_realized_d` 用实际有限元组和名字列记录完整内部类型；`tt_source_l` 把任意原公式
 编译为同一类型中的查询。`spred_trace_l` 保持谓词截面的完整定义，
 `Smap_d.type_pool_cover_l` 与 `type_constants_cover_l` 证明像查询域包含目标中的新低秩参数。
+`ft_rank_satisfaction_l` 用单一公式在 V(ν+1) 中表达 Vν 上的完整内部满足关系；
+ν 只需至少为 ω。原平坦配对、内部有限前缀及四条真值方程给出实际见证与秩界，
+`rt_ft_eval_l` 证明源内外双向一致，不假定该后继秩层满足 ZF。
 `rp_model_exists_l` 对有共同细化的实际集合族与非空合法代表函数族，在 ZF 中构造等价类集合、
 投影和商关系的内部结构码；`rp_kernel_l` 识别投影核，商关系与代表元无关。
 `rp_family_model_l` 先在指定候选集合内分离合法函数；大基数层的 `ed_source_model_l`
