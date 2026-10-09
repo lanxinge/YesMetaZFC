@@ -16,7 +16,7 @@ def Ep_constants_d (X q i : M.Domain) : Prop := ∀ x E, Rd_entry_d x E i →
 
 theorem ep_constant_limit_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q c C V a d : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C V) (model : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V)
     (elementary : Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S)
     (had : Rd_entry_d a d Z) :

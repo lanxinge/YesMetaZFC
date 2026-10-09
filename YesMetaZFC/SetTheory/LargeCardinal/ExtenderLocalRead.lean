@@ -231,7 +231,7 @@ theorem It_local_d.apply_l (hZFC : M.Models ZFC) {ω κ K K' X R Y S L F P : M.D
     (owner : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K' Y S)
     (hP : M.mem P Y) (power : Source_d Y K' P) (agree : Ea_agree_d ω κ Y X)
     (locality : It_local_d ω Y κ L F) : ∃ J O Z A p T V q c C W,
-      Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T V ∧ Di_limit_d A p T V q C W ∧
+      Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T V ∧ Di_limit_d A p T V q C W ∧
       Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W ∧
       Di_elementary_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω O A p T V := by
   let hZF := ZFC.models_zf_l hZFC

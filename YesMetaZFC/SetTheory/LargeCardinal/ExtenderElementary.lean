@@ -10,7 +10,7 @@ universe u
 variable {M : Structure.{u}}
 
 theorem Ep_graph_d.elementary_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S : M.Domain}
-    (h : Ep_graph_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S)
+    (h : Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S)
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F) :
     Di_elementary_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω O A p T S := by
@@ -46,7 +46,7 @@ theorem Ep_graph_d.elementary_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p
 
 /-- 原分量类结构到实际极限的完整内部初等嵌入，并保留精确的带标签代表方程。 -/
 theorem ep_stage_embedding_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q c C V a d D W : M.Domain}
-    (hω : M.IsOmega ω) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (hω : M.IsOmega ω) (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C V)
     (elementary : Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S)
     (model : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V)

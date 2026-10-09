@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_desc_bound_l {ω κ K L X R F J O Z A p T S q c C W g : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (cover : Sc_cover_d X) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (elementary : Di_elementary_d I ω O A p T S)
     (fn : Fn0_d ω C g) (desc : Wf_desc_d W g) : ∃ B, M.mem B X ∧ M.TransitiveSet B ∧
       ∀ i E, Rd_entry_d i E g → ∃ n a D f, M.mem n ω ∧ M.mem a J ∧ Fn0_d n L a ∧

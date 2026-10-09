@@ -63,7 +63,7 @@ theorem ic_copy_step_l
   have ra : Vr_d Z α A := ⟨C, f, hC, hf, cert⟩
   obtain ⟨α', _, hαα⟩ := hj.1.1.2.2 α hαZ
   have ra' := (hj.hierarchy_l hZF source.omega ambient.source.transitive ht hz hn hαα hAA).mp ra
-  have hl := hj.limit_l hZF source.omega ambient.source.transitive ht hz hn hαα hα
+  have hl := (hj.limit_l hZF source.omega ambient.source.transitive ht hz hn hαα).mp hα
   have ta := ra'.transitive_l hZF ht hA'
   have hw := hj.omega_l I hZF source.omega ambient.source.transitive ht hz hn ambient.source.omega_mem
   have hwA' := ((hn.2 ω A').mp ((hj.relation_l I hZF source.omega hz.1 hn.1 hw hAA).mp

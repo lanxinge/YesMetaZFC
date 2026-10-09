@@ -50,7 +50,7 @@ def Pn_past_d (L i X P π Y N σ : M.Domain) : Prop := ∃ ρ φ, Rd_entry_d i �
 
 def pn_past_m {d} (L i X P π Y N σ : Term d) : Formula 1 d := set[d] ⟪
   ∃ ρ φ, ⌜rd_entry0_m⌝ₚ(⌜i⌝ₛ, ρ, ⌜L⌝ₛ) ∧ ⌜N⌝ₛ ∈ ⌜P⌝ₛ ∧
-    ⌜pn_agree_m⌝ₚ(⌜X⌝ₛ, ⌜P⌝ₛ, ⌜π⌝ₛ, ⌜Y⌝ₛ, ⌜N⌝ₛ, ⌜σ⌝ₛ, ρ, φ) ∧ ⌜pn_strength_m⌝ₚ(⌜X⌝ₛ, ρ, ⌜Y⌝ₛ)⟫
+    ⌜pn_agree_m⌝ₚ(⌜X⌝ₛ, ⌜P⌝ₛ, ⌜π⌝ₛ, ⌜Y⌝ₛ, ⌜N⌝ₛ, ⌜σ⌝ₛ, ρ, φ) ∧ ⌜es_strength0_m⌝ₚ(⌜X⌝ₛ, ρ, ⌜Y⌝ₛ)⟫
 derive_free_closed pn_past_m
 
 theorem pn_past_sat_l (hKP : M.Models KP) {d} (η : Env M d) (L i X P π Y N σ : Term d) :
@@ -58,7 +58,7 @@ theorem pn_past_sat_l (hKP : M.Models KP) {d} (η : Env M d) (L i X P π Y N σ 
       Pn_past_d (L.eval η) (i.eval η) (X.eval η) (P.eval η) (π.eval η) (Y.eval η) (N.eval η) (σ.eval η) := by
   simp only [pn_past_m, Pn_past_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     Formula.satisfies_mem_iff, rd_entry0_sat_l hKP.1, pn_agree_sat_l hKP,
-    pn_strength_sat_l, Definitional.Term.eval_weaken]; rfl
+    es_strength0_sat_l, Definitional.Term.eval_weaken]; rfl
 
 structure Pn_history_d (ω Q L C n H : M.Domain) : Prop where
   function : Fn0_d n C H

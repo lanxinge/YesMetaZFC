@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem ep_seed_down_l {ω κ K L X R F J O Z A p T S q C W α E H : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (hκ : M.TransitiveSet κ) (hωL : M.MemberSubset ω L)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (normal : En_source_d ω κ L X F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (normal : En_source_d ω κ L X F) (h : Ep_system_d I ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C W) (seed : Ep_seed_d κ L q α E) (hHE : Rd_entry_d H E W) :
     ∃ β, M.mem β α ∧ Ep_seed_d κ L q β H := by
   obtain ⟨n₀, a, i₀, D₀, f₀, ha, hi₀, hD₀, hf₀, value₀⟩ := seed

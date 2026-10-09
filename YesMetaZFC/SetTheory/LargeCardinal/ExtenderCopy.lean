@@ -27,8 +27,8 @@ theorem ep_copy_l
     (hL : Rd_entry_d L L' σ) (hF : Rd_entry_d F F' σ)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
     (coherent : Ec_source_d I ω κ L X F) (coherent' : Ec_source_d I ω κ' L' Y F') (agree : Ea_maps_d ω κ X π σ)
-    (h : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W) (model : Smdl_d I e C W)
-    (h' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' D' p' T' V') (limit' : Di_limit_d D' p' T' V' q' C' W')
+    (h : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W) (model : Smdl_d I e C W)
+    (h' : Ep_system_d I ω κ' L' Y S F' J' O' Z' D' p' T' V') (limit' : Di_limit_d D' p' T' V' q' C' W')
     (model' : Smdl_d I e' C' W') : Ec_limit_d hZF ω c X d Y π σ q q' e C W e' C' W' := by
   obtain ⟨Q, hz, models⟩ := h.models
   obtain ⟨Q', hz', models'⟩ := h'.models
@@ -176,7 +176,7 @@ theorem ep_copy_l
 /-- 两张原图固定各自的代表和支撑时，同一超幂上的复制图就是恒等图。 -/
 theorem ep_copy_identity_l (hZ : M.Models ZF)
     {ω κ L X R F J O Z D p T V q C W π σ τ : M.Domain}
-    (family : Em_source_d ω κ L X F) (h : Ep_system_d hZ ω κ L X R F J O Z D p T V)
+    (family : Em_source_d ω κ L X F) (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZ)) ω κ L X R F J O Z D p T V)
     (limit : Di_limit_d D p T V q C W) (hτ : Fn0_d C C τ)
     (hπ : ∀ f, M.mem f X → Rd_entry_d f f π) (hσ : ∀ a, M.mem a J → Rd_entry_d a a σ)
     (copy : ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q u E) :

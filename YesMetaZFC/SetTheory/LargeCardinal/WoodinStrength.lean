@@ -21,7 +21,7 @@ variable {M : Structure.{u}}
 
 /-- 强性证书与同一张 F、同一全系统及其实际商投影绑定。 -/
 def Ep_strong_limit_d (hZF : M.Models ZF) (ω κ L X R A V F j Y : M.Domain) : Prop :=
-  ∃ J O Z D p T S q c C W, Ep_system_d hZF ω κ L X R F J O Z D p T S ∧
+  ∃ J O Z D p T S q c C W, Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T S ∧
     Di_limit_d D p T S q C W ∧ Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C W ∧ Wf_rel_d C W ∧
     Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O D p T S ∧ Ep_collapse_d hZF ω X R q c C W ∧
     Ee_factor_d hZF j Y q C W ∧ Ep_strength_d hZF ω κ L X R A V j Y q c C W ∧

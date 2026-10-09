@@ -19,13 +19,13 @@ theorem ep_set_inclusion_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' N S)
     (small : Ep_source_d hZF ω κ K₀ A₀ R₀)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d I c C W) (hm : Smem_d I c₀ X R) (hn : Smem_d I d N S)
     (he : Smap_d I ω c d C N e) (hj : Smap_d I ω c₀ d X N j)
     (constants : Ep_constants_d X q i) (comp : It_comp_d i e j)
     (h₀ : Smem_d I a₀ A₀ R₀) (h₁ : Smem_d I a₁ A₁ R₁) (hA : Rd_entry_d A₀ A₁ j)
     (cover : Ea_subset_d ω κ X A₀)
-    (system₀ : Ep_system_d hZF ω κ L A₀ R₀ F J₀ O₀ Z₀ D₀ p₀ T₀ V₀)
+    (system₀ : Ep_system_d I ω κ L A₀ R₀ F J₀ O₀ Z₀ D₀ p₀ T₀ V₀)
     (limit₀ : Di_limit_d D₀ p₀ T₀ V₀ q₀ C₀ W₀) (model₀ : Smdl_d I c₁ C₀ W₀) :
     ∃ g, Smap_d I ω c₁ a₁ C₀ A₁ g ∧
       ∀ a f E x, Ep_repr_d q₀ a f E → Rd_entry_d E x g → Ep_value_d q e a f x := by

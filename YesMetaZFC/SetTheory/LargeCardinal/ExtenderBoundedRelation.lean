@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem eb_edge_iff_l {ω κ K L X R₀ R F J O Z A p T S q C W B V R' a f b g D Q E H : M.Domain}
     (source : Ep_source_d hZF ω κ K X R₀) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hB : M.MemberSubset B X) (measures : ∀ a U, Rd_entry_d a U F → M.mem U V)
     (relation : ∀ x y, M.mem x B → M.mem y B → (Rd_entry_d x y R' ↔ Rd_entry_d x y R))
     (ff : Fn0_d D B f) (gg : Fn0_d Q B g) (fv : Ep_repr_d q a f E) (gv : Ep_repr_d q b g H) :

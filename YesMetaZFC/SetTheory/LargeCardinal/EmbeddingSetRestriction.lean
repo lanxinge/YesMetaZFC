@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderFiniteEvaluation
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderTransport
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingComposition
 
 /-! # 全内部初等图在源内集合上的限制
 
@@ -49,7 +50,8 @@ private theorem er_program_l {ω κ K X R Y S c d j n F : M.Domain}
     exact ⟨a, (hj.entry_l hZF source.omega source.transitive hY hm hn (nat r hrω) keep hFF).mp hra, hra⟩)
   exact eq ▸ hFF
 
-private theorem er_membership_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Domain}
+/-- 源内集合的实际隶属关系随集合一起搬运。 -/
+theorem ep_set_membership_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' Y S)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
     (ha : Smem_d I a A Q) (hb : Smem_d I b B T) (hAB : Rd_entry_d A B j) : Rd_entry_d Q T j := by
@@ -89,7 +91,7 @@ theorem ep_set_tables_l {ω κ K X R μ K' Y S c d j a A Q a' B T b n F : M.Doma
       (∀ r, M.mem r n → ∀ f, Fv_at_d C' H' r f ↔ Ssat_d I B T D F n r f) := by
   have hA := hj.1.1.input_mem_of_pairMember hAB
   have hQ := source.membership_relation_l hZF hA ha
-  have hQT := er_membership_l hZF source target hm hn hj ha hb hAB
+  have hQT := ep_set_membership_l hZF source target hm hn hj ha hb hAB
   obtain ⟨E, hE, space⟩ := source.finite_space_l hZF hA hbo
   obtain ⟨D, _, hED⟩ := hj.1.1.2.2 E hE
   have space' : M.IsFunctionSpace I D b B := fun g =>
@@ -188,5 +190,25 @@ theorem ep_set_restriction_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Domain
     (fun i x hi => ((gt.2 i x).trans (and_iff_right hi)).symm)
   exact (satisfies_decode_l I hZF.1 ha.1 code hE₀).trans
     (left.trans (truth.trans (right.symm.trans (satisfies_decode_l I hZF.1 hb.1 code hD₀).symm)))
+
+/-- 拥有的函数图可沿外层初等嵌入反射完整初等性；证明使用两端集合上的实际限制。 -/
+theorem ep_set_map_pull_l {ω κ K V R μ K' W S c d j a A P a' A' P' b B Q b' B' Q' f g : M.Domain}
+    (source : Ep_source_d hZF ω κ K V R) (target : Ep_source_d hZF ω μ K' W S)
+    (mv : Smem_d I c V R) (mw : Smem_d I d W S) (hj : Smap_d I ω c d V W j)
+    (ma : Smem_d I a A P) (ma' : Smem_d I a' A' P')
+    (mb : Smem_d I b B Q) (mb' : Smem_d I b' B' Q')
+    (hA : Rd_entry_d A A' j) (hB : Rd_entry_d B B' j) (hf : Rd_entry_d f g j)
+    (hg : Smap_d I ω a' b' A' B' g) : Smap_d I ω a b A B f := by
+  obtain ⟨p, rp, hp⟩ := ep_set_restriction_l hZF source target mv mw hj ma ma' hA
+  obtain ⟨q, rq, hq⟩ := ep_set_restriction_l hZF source target mv mw hj mb mb' hB
+  have fn := (hj.function_l hZF source.omega source.transitive target.transitive mv mw hA hB hf).mpr
+    (fn0_of_function_l (ZF.modelsKP hZF) hg.1.1)
+  obtain ⟨s, hs, comp⟩ := smap_comp_l I hZF hp hg
+  apply smap_factor_l I hZF hs hq (fn0_function_l (ZF.modelsKP hZF) fn)
+  intro x y z hxy hyz
+  obtain ⟨x', _, hxx⟩ := hp.1.1.2.2 x (fn.bound_l hxy).1
+  exact (comp x z).mpr ⟨(fn.bound_l hxy).1, x', hxx,
+    (hj.entry_l hZF source.omega source.transitive target.transitive mv mw
+      ((rp.2 x x').mp hxx).2 ((rq.2 y z).mp hyz).2 hf).mp hxy⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

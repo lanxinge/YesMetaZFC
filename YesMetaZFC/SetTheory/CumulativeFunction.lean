@@ -16,21 +16,22 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (modelsKP hZF)
 
+include hZF in
 /-- Vδ 中的序数恰在 δ 以下；这里先给出装配初始层级所需的反向界。 -/
-theorem v_ordinal_height_l {δ X α : M.Domain}
-    (hX : V_d (kp_pair_l (ZF.modelsKP hZF)) δ X) (hα : M.IsOrdinal α) (ha : M.mem α X) : M.mem α δ := by
+theorem v_ordinal_height_l {𝒞 : OrderedPairConvention} {J : 𝒞.Interpretation M} {δ X α : M.Domain}
+    (hX : V_d J δ X) (hα : M.IsOrdinal α) (ha : M.mem α X) : M.mem α δ := by
   let ρ : Env M 0 := ⟨Fin.elim0, fun _ => δ⟩
-  let φ : UnarySchema 0 := { body := .forallE (.imp (v_m kpair_convention_l (.bound 1) .newest)
+  let φ : UnarySchema 0 := { body := .forallE (.imp (v_m 𝒞 (.bound 1) .newest)
     (.forallE (.imp (KP.ord0_m .newest) (.imp (.mem .newest (.bound 1)) (.mem .newest (.bound 2)))))) }
-  have sat β : φ.denote ρ β ↔ ∀ V, V_d I β V → ∀ γ, M.IsOrdinal γ → M.mem γ V → M.mem γ β := by
+  have sat β : φ.denote ρ β ↔ ∀ V, V_d J β V → ∀ γ, M.IsOrdinal γ → M.mem γ V → M.mem γ β := by
     simp only [φ, UnarySchema.denote, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
-      v_sat_l I hZF.1, KP.ord0_sat_l (ZF.modelsKP hZF), Formula.satisfies_mem_iff]; rfl
+      v_sat_l J hZF.1, KP.ord0_sat_l (ZF.modelsKP hZF), Formula.satisfies_mem_iff]; rfl
   apply (sat δ).mp (ZF.mem_ind_l M hZF I φ ρ ?_ δ) X hX α hα ha
   intro β ih
   apply (sat β).mpr
   intro V hV γ hγ hγV
-  obtain ⟨η, W, hη, hW, sub⟩ := (ZF.v_unfold_l I hZF hV γ).mp hγV
-  exact ordinal_down_l (ZF.modelsKP hZF) hγ (v_ordinal_l I hV)
+  obtain ⟨η, W, hη, hW, sub⟩ := (ZF.v_unfold_l J hZF hV γ).mp hγV
+  exact ordinal_down_l (ZF.modelsKP hZF) hγ (v_ordinal_l J hV)
     (fun x hx => (sat η).mp (ih η hη) W hW x (hγ.mem hx) (sub x hx)) hη
 
 theorem v_small_function_l {δ ν Z D F μ : M.Domain} (hcf : M.IsCofinality I ν δ)

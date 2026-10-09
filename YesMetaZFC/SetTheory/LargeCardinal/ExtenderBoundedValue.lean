@@ -17,7 +17,7 @@ theorem Eb_pool_d.realize_l
     {ω κ K K₀ L X R N R₀ F J O Z A p T S q C W Y g D₀ a₀ f₀ H Γ D Q P G U V : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω κ K₀ N R₀)
     (agree : Ea_agree_d ω κ X N) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C Y)
     (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ κ f₀) (fv : Ep_repr_d q a₀ f₀ H)
     (hHΓ : Rd_entry_d H Γ g) (hΓ : M.TransitiveSet Γ) (pool : Eb_pool_d ω κ L N κ J K₀ P G D)
@@ -98,7 +98,7 @@ theorem Eb_collapse_d.realize_l
     {ω κ K K₀ L X R N R₀ F J O Z A p T S q C W Y g D₀ a₀ f₀ H Γ B D Q e : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω κ K₀ N R₀)
     (agree : Ea_agree_d ω κ X N) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C Y)
     (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ κ f₀) (fv : Ep_repr_d q a₀ f₀ H)
     (hHΓ : Rd_entry_d H Γ g) (hΓ : M.TransitiveSet Γ) (collapse : Eb_collapse_d ω κ L K₀ N κ F D Q B e) :
@@ -114,7 +114,7 @@ theorem eb_owned_value_l
     {ω κ K K₀ L X R N R₀ F J O Z A p T S q C W Y g D₀ a₀ f₀ H Γ V : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (owner : Ep_source_d hZF ω κ K₀ N R₀)
     (agree : Ea_agree_d ω κ X N) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C Y)
     (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ κ f₀) (fv : Ep_repr_d q a₀ f₀ H)
     (hHΓ : Rd_entry_d H Γ g) (hΓ : M.TransitiveSet Γ)

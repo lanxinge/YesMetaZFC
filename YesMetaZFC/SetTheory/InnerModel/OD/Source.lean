@@ -37,7 +37,7 @@ theorem od_source_l (hZF : M.Models ZF) {d} (φ : UnarySchema d) (ρ : Env M d)
   obtain ⟨z, hz⟩ := sc_num_exists_l I hZF hω ha
   -- 只反射给定的原公式；同层的全部参数赋值均保持其真值。
   obtain ⟨A, hA⟩ := KP.exists_insert (ZF.modelsKP hZF) B x
-  obtain ⟨θ, X, hX, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
+  obtain ⟨θ, X, hX, _, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
   have ht := ZF.v_transitive_l I hZF hX
   have hBX : M.MemberSubset B X := fun b hb => ht A hAX b ((hA b).mpr (Or.inl hb))
   have hxX : M.mem x X := ht A hAX x ((hA x).mpr (Or.inr rfl))

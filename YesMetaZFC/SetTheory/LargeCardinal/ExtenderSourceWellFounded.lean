@@ -42,7 +42,7 @@ theorem It_local_d.source_wf_l {ω κ K X R K' Y R' L F V J O Z A p T S q c C W 
     (inside : M.MemberSubset Y X) (agree : Ea_agree_d ω κ X Y)
     (owner_branches : Sc_branch_d ω Y) (hV : M.mem V Y) (owner_power : FilterZF.Source_d Y K' V)
     (loc : It_local_d ω Y κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (elementary : Di_elementary_d I ω O A p T S) : Wf_rel_d C W := by
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
   have family := (loc.measures_l hZF owner hV owner_power).transfer_l reverse

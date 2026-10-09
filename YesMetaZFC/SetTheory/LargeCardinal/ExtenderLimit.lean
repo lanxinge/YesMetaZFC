@@ -14,13 +14,13 @@ universe u
 variable {M : Structure.{u}}
 
 def Ep_limit_d (hZF : M.Models ZF) (ω κ L X R F : M.Domain) : Prop := ∃ J O Z A p T S q c C V,
-  Ep_system_d hZF ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
+  Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
   Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V ∧
   Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S ∧ Ep_collapse_d hZF ω X R q c C V
 
 /-- 单射列索引覆盖每一个有限坐标列，包括带重复坐标的原始表示。 -/
 theorem ep_support_cover_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S m a : M.Domain}
-    (hω : M.IsOmega ω) (hωL : M.MemberSubset ω L) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (hω : M.IsOmega ω) (hωL : M.MemberSubset ω L) (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
     (hm : M.mem m ω) (ha : Fn0_d m L a) : ∃ b q, M.mem b J ∧ Ei_map_d ω L a b q := by
   obtain ⟨n, b, q, _, hn, hb, hq, hqa, _⟩ := ec_join_l hZF hω hωL hm hm ha ha
   exact ⟨b, q, (h.indices b).mpr ⟨n, hn, fn0_of_function_l (ZF.modelsKP hZF) hb.1, hb.2⟩,

@@ -20,7 +20,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     (hY : M.TransitiveSet Y) (hc : Wd_crit_d I X j κ k) (hL : M.MemberSubset L k)
     (hSY : M.MemberSubset S Y) (family : Es_family_d I j κ L S F)
     (hF : Em_family_d ω κ L F) (coherent : Es_coherent_d I ω κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (model : Smdl_d I c C W) (hg : M.IsSetInjectionFromTo I g C Y)
     (any : ∀ u a H f E y, Rd_entry_d u E q → KPair_d M u a H → M.mem f H →
       Rd_entry_d E y g → Ee_value_d j a f y)

@@ -13,7 +13,7 @@ universe u
 variable {M : Structure.{u}}
 
 def Ep_derived_limit_d (hZF : M.Models ZF) (ω κ L X R F j Y : M.Domain) : Prop := ∃ J O Z A p T S q c C V,
-  Ep_system_d hZF ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
+  Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
   Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V ∧
   Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S ∧ Ep_collapse_d hZF ω X R q c C V ∧
   Ee_factor_d hZF j Y q C V ∧ Ep_length_d hZF ω κ L X R j Y q c C V

@@ -34,7 +34,7 @@ variable (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q C W : M.Domain}
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_seed_exists_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {α : M.Domain} (hα : M.mem α L) : ∃ E, M.mem E C ∧ Ep_seed_d κ L q α E := by
   obtain ⟨n, ⟨z, hz, hzn⟩, hn⟩ := source.omega.exists_ordinalOne_mem
   obtain ⟨a, ha, spec⟩ := ZF.exists_constantFunction hZF I (source := n) hα
@@ -51,7 +51,7 @@ theorem ep_seed_exists_l (source : Ep_source_d hZF ω κ K X R) (family : Em_sou
 
 /-- 把指定坐标代表送到任意包含原支撑的分量；坐标值不变。 -/
 theorem ep_seed_move_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {a b n D i α f E : M.Domain} (ha : Fn0_d n L a) (hi : Rd_entry_d i α a)
     (hD : Ep_space_d κ n D) (hf : Ep_coord_d κ D i f) (value : Ep_repr_d q a f E)
     (hab : Rd_entry_d a b O) : ∃ m D' j g, M.mem m ω ∧ Fn0_d m L b ∧ Rd_entry_d j α b ∧
@@ -69,7 +69,7 @@ theorem ep_seed_move_l (source : Ep_source_d hZF ω κ K X R) (family : Em_sourc
   exact ⟨m, D', j, g, hm, hb, (hra.value_l hr hb hij).mp hi, hD', hgX, hg, eq.symm ▸ hv⟩
 
 theorem ep_seed_atoms_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (atoms : Ea_atoms_d ω κ L F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (atoms : Ea_atoms_d ω κ L F) (h : Ep_system_d I ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C W) {α β E H : M.Domain}
     (he : Ep_seed_d κ L q α E) (hh : Ep_seed_d κ L q β H) :
     (E = H ↔ α = β) ∧ (Rd_entry_d E H W ↔ M.mem α β) := by

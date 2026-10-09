@@ -55,7 +55,7 @@ theorem od_rank_complete_l (hZF : M.Models ZF) {x : M.Domain} (h : Od_d x) :
   obtain ⟨q, hq⟩ := (od_code_range_l I hZF).mp h
   obtain ⟨A, hA⟩ := KP.exists_pair (ZF.modelsKP hZF) q x
   let φ := od_eval_s kpair_convention_l
-  obtain ⟨a, X, hX, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
+  obtain ⟨a, X, hX, _, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
   have ht := ZF.v_transitive_l I hZF hX
   have hqX := ht A hAX q ((hA q).mpr (Or.inl rfl))
   have hxX := ht A hAX x ((hA x).mpr (Or.inr rfl))

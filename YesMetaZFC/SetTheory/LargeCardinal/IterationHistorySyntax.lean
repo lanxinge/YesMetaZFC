@@ -47,17 +47,6 @@ theorem pn_agree_sat_l (hKP : M.Models KP) {d} (η : Env M d) (X Y π N Z σ ρ 
     exact ⟨h.source_left, h.target_left, h.source_right, h.target_right, h.source_limit, h.target_limit,
       ⟨W, wx, wn, w, w', fun x hx y => p x y hx⟩, h.target_rank, h.left_end, h.right_end⟩
 
-def pn_strength_m {d} (X L Y : Term d) : Formula 1 d := set[d] ⟪
-  (∀ α ∈ ⌜L⌝ₛ, ∀ x ∈ ⌜X⌝ₛ, x ⊆ α → x ∈ ⌜Y⌝ₛ) ∧
-  (∃ x ∈ ⌜X⌝ₛ, x ⊆ ⌜L⌝ₛ ∧ x ∉ ⌜Y⌝ₛ)⟫
-derive_free_closed pn_strength_m
-
-theorem pn_strength_sat_l {d} (ρ : Env M d) (X L Y : Term d) :
-    Formula.satisfies ρ (pn_strength_m X L Y) ↔ Es_strength_d (X.eval ρ) (L.eval ρ) (Y.eval ρ) := by
-  simp only [pn_strength_m, Es_strength_d, Formula.satisfies_conj_iff, Formula.satisfies_forallMem_iff,
-    Formula.satisfies_imp_iff, Formula.satisfies_existsMem_iff, Formula.satisfies_subset_iff,
-    Formula.satisfies_mem_iff, Formula.satisfies_neg_iff, Definitional.Term.eval_weaken]; rfl
-
 def Pn_row_d (ω a X P π ι : M.Domain) : Prop := M.TransitiveSet X ∧ ∃ R S c μ K,
   Smem_d I a X R ∧ Smem_d I c P S ∧ Pn_model_d hZF ω μ K P S ∧ M.mem π P ∧ M.mem ι P ∧
     Smap_d I ω a c X P π ∧ M.IsSetInjectionFromTo I ι π ω

@@ -57,7 +57,7 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.IterationCoherence"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.IterationNice"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("IterationAttempt", "IterationAttemptNode", "IterationAttemptSpace", "IterationAttemptRelative",
-             "IterationAttemptImage", "IterationAttemptMember", "IterationAttemptPath",
+             "IterationAttemptImage", "IterationAttemptMember", "IterationAttemptLift", "IterationAttemptPath",
              "IterationAttemptRow", "IterationAttemptDecode", "IterationAttemptRank", "IterationEnumeration", "IterationEmbedding",
              "ExtenderCountable", "IterationCountable")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal.SourceClosureSyntax", "YesMetaZFC.Model.SetTheory.Internal.SourceOmegaClosed"]
@@ -169,7 +169,10 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderFiniteSyntax", "ExtenderFiniteEvaluation", "ExtenderEmbeddingTree", "ExtenderEmbeddingCountable")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("FiniteWitness", "SmallSkolemSyntax")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
-            ("EmbeddingCountable", "CollapseCountable", "SourceEnumeration", "SourceFunctionSize", "RelativeCountable")]
+            ("EmbeddingCountable", "EmbeddingFixed", "RegularRankImage", "CollapseCountable", "SourceEnumeration", "SourceFunctionSize", "RelativeCountable")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("IterationCountableFixed", "IterationCopyAttempt", "IterationAttemptShift", "IterationRankValue",
+             "IterationCopyRank", "IterationCopyCut")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderFiniteWitness", "ExtenderSkolemCode", "ExtenderSkolemRead", "ExtenderSkolemSource", "ExtenderSkolemCollapse", "ExtenderSkolemStep")]
 
@@ -196,6 +199,14 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "ExtenderTrace", "ExtenderTraceMap", "ExtenderModelMap", "ExtenderProductIndex", "ExtenderPresentation", "ExtenderRankLift",
              "ExtenderSystemCode", "IterationDiagramSyntax", "IterationStepSyntax")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal.DirectedSystem.Syntax"]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TransitiveStructure", "TransitiveCollapse", "ReducedPower.Relative", "DirectedSystem.Relative")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("ExtenderReadSource", "ExtenderComponentRead", "ExtenderRepresentativeRead", "ExtenderSystemRead")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.EmbeddingRelative"]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("ExtenderSetPull", "ExtenderBoundedCode", "ExtenderStrengthPull", "IterationColumnPull",
+             "IterationDiagramPull", "IterationOwnerPull", "IterationCutPull")]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Num_d", "num_m", "num_unique_l", "Smdl_d", "smdl_m", "smdl_structure_l",
@@ -378,6 +389,7 @@ ZFC_BASELINE = BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_de
 SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial"]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory.Collapse.RegularRank", "YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular",
                    "YesMetaZFC.SetTheory.LargeCardinal.IterationCountableCover"]
+SKOLEM_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.ExtenderReflectHull", "YesMetaZFC.SetTheory.LargeCardinal.IterationDiagramHull"]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Rr_d", "YesMetaZFC.SetTheory.rr_m"]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("It_embedding_d", "It_return_d", "Ja_enum_d", "Ja_rows_d", "Ja_commute_d", "Ja_node_d",
@@ -418,14 +430,23 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("Itera
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("IterationModel", "IterationInitial", "IterationCopyModel", "IterationCopyApply", "IterationCopyStep",
                 "IterationCopyRow", "IterationCopyHistory", "IterationCopyExtend", "IterationCopySequence", "IterationCopyUnion", "IterationCopyTree")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.CumulativeRegularCover", "YesMetaZFC.SetTheory.LargeCardinal.IterationFailureCopy"]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("ExtenderUltraCertificate", "IterationUltraRead")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("IterationUltraPull", "IterationInitialPull", "IterationNicePull", "IterationNiceReturn")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("eb_pool_m", "ep_indices0_m", "eb_collapse_m", "es_strength0_m", "ex_strength0_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Pn_agree_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Fs_read_d"]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("ep_source_m", "Pn_model_d", "pn_model_m", "Pn_row_d", "pn_row_m", "pn_agree_m",
                  "Pn_cell_d", "pn_cell_m", "Pn_past_d", "pn_past_m", "Pn_history_d", "pn_history_m", "It_nice_d", "It_cut_d",
                  "Ic_model_d", "ic_model_m", "Ic_row_d", "ic_row_m", "Ic_cell_d", "ic_cell_m", "Ic_at_d", "ic_at_m",
                  "Ic_edge_d", "ic_edge_m", "Ic_history_d", "ic_history_m", "Ic_pack_d", "ic_pack_m", "Ic_state_d", "ic_state_m",
                  "Ic_extend_d", "ic_extend_m", "Ic_move_d", "ic_move_m", "it_pred_m", "it_order_m", "it_diagram_m",
-                 "ea_agree_m", "ep_graph_m", "ep_lift_m", "ep_system_m", "ep_constants_m", "it_ultra_m", "it_source_m", "it_payload_m")]
+                 "ea_agree_m", "ep_graph_m", "ep_lift_m", "ep_system_m", "ep_constants_m", "it_ultra_m", "it_source_m", "it_payload_m",
+                 "Ja_lift_d", "ja_lift_m", "Jr_value_d", "jr_value_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in ("di_order_m", "di_system_m", "di_limit_m")]
 LOS_CHOICE_FREE = ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                    ("Ep_source_d", "Ep_component_d", "ep_component_m", "Ep_arrow_d", "ep_arrow_m", "Ep_limit_d",

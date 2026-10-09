@@ -1,3 +1,4 @@
+import YesMetaZFC.SetTheory.Notation
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedTransport
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankSource
 
@@ -59,6 +60,21 @@ def Ex_strength_d (hZF : M.Models ZF) (ω κ L X F : M.Domain) : Prop :=
     ∃ K P A Q Y e, M.mem K X ∧ M.mem P X ∧ M.mem Y X ∧
       Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω κ K ∧ FilterZF.Source_d X κ P ∧
       Eb_collapse_d ω κ L K X P F A Q Y e ∧ Es_strength_d X L Y
+
+def es_strength0_m {d} (X L Y : Term d) : Formula 1 d := set[d] ⟪
+  (∀ α ∈ ⌜L⌝ₛ, ∀ x ∈ ⌜X⌝ₛ, x ⊆ α → x ∈ ⌜Y⌝ₛ) ∧
+  (∃ x ∈ ⌜X⌝ₛ, x ⊆ ⌜L⌝ₛ ∧ x ∉ ⌜Y⌝ₛ)⟫
+derive_free_closed es_strength0_m
+
+theorem es_strength0_delta_l {d} (X L Y : Term d) : (es_strength0_m X L Y).IsDelta0 :=
+  .conj (.forallMem _ (.forallMem _ (.imp (.atom ..) (.mem ..))))
+    (.existsMem _ (.conj (.atom ..) (.neg (.mem ..))))
+
+theorem es_strength0_sat_l {d} (ρ : Env M d) (X L Y : Term d) :
+    Formula.satisfies ρ (es_strength0_m X L Y) ↔ Es_strength_d (X.eval ρ) (L.eval ρ) (Y.eval ρ) := by
+  simp only [es_strength0_m, Es_strength_d, Formula.satisfies_conj_iff, Formula.satisfies_forallMem_iff,
+    Formula.satisfies_imp_iff, Formula.satisfies_existsMem_iff, Formula.satisfies_subset_iff,
+    Formula.satisfies_mem_iff, Formula.satisfies_neg_iff, Definitional.Term.eval_weaken]; rfl
 
 /-- 传输实际有界超幂、求值图以及相对最大强度，保留目标扩展器的全部证据。 -/
 theorem Ex_strength_d.map_l (hZF : M.Models ZF) {ω c d X R Y S j κ κ' L L' F F' : M.Domain}

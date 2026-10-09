@@ -42,7 +42,7 @@ theorem eb_value_sat_l (hE : Extensional M) {d} (ρ : Env M d) (q u E : Term d) 
 
 theorem eb_projection_l {ω κ K X R₀ R L F J O Z A p T S q C W B D : M.Domain}
     (source : Ep_source_d hZF ω κ K X R₀) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hB : M.MemberSubset B X) (nodes : ∀ u, M.mem u D → Eb_node_d ω κ L K B J X X u) : ∃ e, Fn0_d D C e ∧
       ∀ u E, Rd_entry_d u E e ↔ M.mem u D ∧ Eb_value_d q u E := by
   let ρ : Env M 1 := ⟨fun _ => q, fun _ => q⟩
@@ -69,7 +69,7 @@ theorem eb_projection_l {ω κ K X R₀ R L F J O Z A p T S q C W B D : M.Domain
 /-- 给定实际节点池的投影覆盖全部 B 值代表，并精确读取原极限关系。 -/
 theorem Eb_pool_d.projection_l {ω κ K X R₀ R L F J O Z A p T S q C W B R' P G D V Q : M.Domain}
     (source : Ep_source_d hZF ω κ K X R₀) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (pool : Eb_pool_d ω κ L X B J K P G D) (hB : M.MemberSubset B X)
     (range : M.IsRangeOf I V F) (relation : ∀ x y, M.mem x B → M.mem y B → (Rd_entry_d x y R' ↔ Rd_entry_d x y R))
     (edges : ∀ u v, Rd_entry_d u v Q ↔ M.mem u D ∧ M.mem v D ∧ Eb_link_d ω κ L B J K V R' F G u v) :
@@ -106,7 +106,7 @@ theorem Eb_pool_d.projection_l {ω κ K X R₀ R L F J O Z A p T S q C W B R' P 
 /-- 分离构造源内有界代表图，再使用它在同一极限中的原投影。 -/
 theorem eb_graph_l {ω κ K X R₀ R L F J O Z A p T S q C W B R' : M.Domain}
     (source : Ep_source_d hZF ω κ K X R₀) (power : Sc_power_d X) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hL : M.mem L X) (hF : M.mem F X) (hB : M.mem B X) (hR : M.mem R' X)
     (relation : ∀ x y, M.mem x B → M.mem y B → (Rd_entry_d x y R' ↔ Rd_entry_d x y R)) :
     ∃ P G D V Q e, Eb_pool_d ω κ L X B J K P G D ∧ M.mem V X ∧ M.mem Q X ∧ M.IsRangeOf I V F ∧

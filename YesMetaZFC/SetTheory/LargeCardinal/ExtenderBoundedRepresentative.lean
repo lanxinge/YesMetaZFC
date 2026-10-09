@@ -17,7 +17,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 /-- 常值代表与支撑选择无关，直接比较同一极限中的实际商元素。 -/
 theorem ep_repr_constant_l {ω κ K L X R F J O Z A p T S q C W D E x a b f g H P : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hf : Fn0_d D X f) (hg : Fn0_d E X g) (fc : Rs_const_d D x f) (gc : Rs_const_d E x g)
     (fv : Ep_repr_d q a f H) (gv : Ep_repr_d q b g P) : H = P := by
   obtain ⟨hfX, n, hn, ha, D', hd, hf'⟩ := fv.source_l hZF family system limit
@@ -52,7 +52,7 @@ theorem ep_repr_constant_l {ω κ K L X R F J O Z A p T S q C W D E x a b f g H 
 /-- 处处落入 B 的代表，其极限值属于 B 的常值像。 -/
 theorem ep_repr_bound_mem_l {ω κ K L X R F J O Z A p T S q C W D B a f H m b Q g E : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hf : Fn0_d D X f) (constant : Rs_const_d D B f) (fv : Ep_repr_d q a f H) (hB : M.mem B X)
     (hm : M.mem m ω) (hb : Fn0_d m L b) (hQ : Ep_space_d κ m Q) (hg : Fn0_d Q B g)
     (gv : Ep_repr_d q b g E) : Rd_entry_d E H W := by
@@ -73,7 +73,7 @@ theorem ep_repr_bound_mem_l {ω κ K L X R F J O Z A p T S q C W D B a f H m b Q
 
 theorem ep_repr_bounded_l {ω κ K L X R F J O Z A p T S q C W n a D f B H E : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hn : M.mem n ω) (ha : Fn0_d n L a) (hD : Ep_space_d κ n D) (hf : Fn0_d D X f)
     (constant : Rs_const_d D B f) (value : Ep_repr_d q a f H) (hB : M.mem B X) (edge : Rd_entry_d E H W) :
     ∃ m b Q g, M.mem m ω ∧ M.mem b J ∧ Fn0_d m L b ∧ Ep_space_d κ m Q ∧

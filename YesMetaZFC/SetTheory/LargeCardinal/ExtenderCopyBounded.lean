@@ -24,8 +24,8 @@ theorem ep_copy_constant_l
     (hN : M.TransitiveSet N) (hN' : M.TransitiveSet N') (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁)
     (hσ : Smap_d I ω b b' N N' σ) (hωN : M.mem ω N) (hLσ : Rd_entry_d L L' σ) (hFσ : Rd_entry_d F F' σ)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (system' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system' : Ep_system_d I ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
     (copy : ∀ E E', Rd_entry_d E E' τ ↔ M.mem E C ∧ ∃ u, Rd_entry_d u E q ∧ Ec_node_d π σ q' u E')
     (hxx : Rd_entry_d x x' π) (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ x f₀) (fv : Ep_repr_d q a₀ f₀ H)
     (ff' : Fn0_d D₁ Y f₁) (constant' : Rs_const_d D₁ x' f₁) (fv' : Ep_repr_d q' a₁ f₁ H') : Rd_entry_d H H' τ := by
@@ -59,8 +59,8 @@ theorem ep_copy_bounded_l
     (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁) (hσ : Smap_d I ω b b' N N' σ)
     (hκπ : Rd_entry_d κ κ' π) (hκσ : Rd_entry_d κ κ' σ) (hLσ : Rd_entry_d L L' σ) (hFσ : Rd_entry_d F F' σ)
     (maps : Ea_maps_d ω κ X π σ) (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' X' F')
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (system' : Ep_system_d hZF ω κ' L' X' R' F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system' : Ep_system_d I ω κ' L' X' R' F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C P)
     (wc' : Wc_graph_d C' W' g') (bij' : M.IsSetBijectionFromTo I g' C' P')
     (copied : ∀ a a' f f' x y, Rd_entry_d a a' σ → Rd_entry_d f f' π →

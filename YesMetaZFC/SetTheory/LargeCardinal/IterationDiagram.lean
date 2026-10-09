@@ -27,11 +27,12 @@ def it_comp_m {d} (f g h : Term d) : Formula 1 d := .conj
   (Formula.isRelation kpair_convention_l h) (Formula.isComposition kpair_convention_l h g f)
 derive_free_closed it_comp_m
 
-theorem it_comp_sat_l (hKP : M.Models KP) {d} (ρ : Env M d) (f g h : Term d) :
+theorem it_comp_sat_l (hE : Extensional M) {d} (ρ : Env M d) (f g h : Term d) :
     Formula.satisfies ρ (it_comp_m f g h) ↔ It_comp_d (f.eval ρ) (g.eval ρ) (h.eval ρ) := by
   simp only [it_comp_m, It_comp_d, Formula.isComposition, Formula.satisfies_conj_iff,
-    Formula.satisfies_isRelation_iff (kp_pair_l hKP), Formula.satisfies_forall_iff,
-    Formula.satisfies_iff_iff, Formula.satisfies_exists_iff, Formula.satisfies_orderedPairMem_iff (kp_pair_l hKP),
+    Formula.isRelation, Formula.orderedPairMem, kpair_convention_l,
+    Formula.satisfies_forallMem_iff, kpair_sat_l M hE, Formula.satisfies_mem_iff, Formula.satisfies_forall_iff,
+    Formula.satisfies_iff_iff, Formula.satisfies_exists_iff, Rd_entry_d,
     Definitional.Term.eval_weaken]; rfl
 
 theorem It_comp_d.unique_l (hE : Extensional M) {f g h k : M.Domain} (hh : It_comp_d f g h) (hk : It_comp_d f g k) : h = k := by

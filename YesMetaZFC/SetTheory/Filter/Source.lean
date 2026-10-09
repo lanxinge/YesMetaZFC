@@ -14,15 +14,20 @@ variable {M : Structure.{u}}
 
 def Source_d (X D B : M.Domain) : Prop := ∀ A, M.mem A B ↔ M.mem A X ∧ M.MemberSubset A D
 
-def source_m {n} (X D B : Term n) : Formula 1 n := .forallE (.iff (.mem .newest B.weaken)
-  (.conj (.mem .newest X.weaken) (Formula.subset .newest D.weaken)))
+def source_m {n} (X D B : Term n) : Formula 1 n := .conj (Formula.subset B X)
+  (Formula.forallMem X (.iff (.mem .newest B.weaken) (Formula.subset .newest D.weaken)))
 derive_free_closed source_m
+
+theorem source_delta_l {n} (X D B : Term n) : (source_m X D B).IsDelta0 :=
+  .conj (.atom ..) (.forallMem _ (.iff (.mem ..) (.atom ..)))
 
 theorem source_sat_l {n} (ρ : Env M n) (X D B : Term n) : Formula.satisfies ρ (source_m X D B) ↔
     Source_d (X.eval ρ) (D.eval ρ) (B.eval ρ) := by
-  simp only [source_m, Source_d, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff,
+  simp only [source_m, Formula.satisfies_forallMem_iff, Formula.satisfies_iff_iff,
     Formula.satisfies_mem_iff, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff, Definitional.Term.eval_weaken]
-  rfl
+  exact ⟨fun ⟨sub, h⟩ A => ⟨fun ha => ⟨sub A ha, (h A (sub A ha)).mp ha⟩,
+    fun ⟨ha, hd⟩ => (h A ha).mpr hd⟩,
+    fun h => ⟨fun A ha => ((h A).mp ha).1, fun A ha => (h A).trans (and_iff_right ha)⟩⟩
 
 theorem source_field_exists_l (hKP : M.Models KP) {X D} (hc : Rd_closed_d X) (hD : M.mem D X) :
     ∃ B, Source_d X D B ∧ Field_d D B := by

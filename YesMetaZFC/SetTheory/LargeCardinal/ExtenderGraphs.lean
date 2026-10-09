@@ -12,7 +12,7 @@ variable {M : Structure.{u}}
 
 theorem ep_graphs_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S, Ep_graph_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S := by
+    (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S, Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨J, O, hj, ho, os⟩ := ei_order_l hZF h.omega hωL

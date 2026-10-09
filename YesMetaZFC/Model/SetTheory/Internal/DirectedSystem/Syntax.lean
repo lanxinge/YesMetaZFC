@@ -64,13 +64,14 @@ def di_limit_m {d} (A p T R q C S : Term d) : Formula 1 d := set[d] ⟪
   ⌜Formula.isRelation kpair_convention_l⌝ₚ(⌜S⌝ₛ)⟫
 derive_free_closed di_limit_m
 
-theorem di_limit_sat_l (hKP : M.Models KP) {d} (η : Env M d) (A p T R q C S : Term d) :
+theorem di_limit_sat_l (hE : Extensional M) {d} (η : Env M d) (A p T R q C S : Term d) :
     Formula.satisfies η (di_limit_m A p T R q C S) ↔
       Di_limit_d (A.eval η) (p.eval η) (T.eval η) (R.eval η) (q.eval η) (C.eval η) (S.eval η) := by
   simp only [di_limit_m, Formula.satisfies_conj_iff, Formula.satisfies_forall_iff,
     Formula.satisfies_exists_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff, Formula.satisfies_iff_iff,
-    Formula.satisfies_extensionalEq_iff_eq hKP.1, Formula.satisfies_isRelation_iff (kp_pair_l hKP),
-    rd_entry0_sat_l hKP.1, fn0_sat_l hKP.1, di_eq_sat_l hKP.1, di_rel_sat_l hKP.1, Definitional.Term.eval_weaken]
+    Formula.satisfies_extensionalEq_iff_eq hE, Formula.isRelation, kpair_convention_l,
+    Formula.satisfies_forallMem_iff, kpair_sat_l M hE,
+    rd_entry0_sat_l hE, fn0_sat_l hE, di_eq_sat_l hE, di_rel_sat_l hE, Definitional.Term.eval_weaken]
   exact ⟨fun ⟨a, b, c, d, e, f⟩ => ⟨a, b, c, d, e, f⟩,
     fun h => ⟨h.projection, h.range, h.kernel, h.relation, h.bounded, h.graph⟩⟩
 

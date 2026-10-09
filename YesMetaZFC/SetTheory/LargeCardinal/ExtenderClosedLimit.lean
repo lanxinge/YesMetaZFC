@@ -16,7 +16,7 @@ theorem It_local_d.closed_wf_l {ω κ K Y R' L F V X R J O Z A p T S q C W : M.D
     (owner : Ep_source_d hZF ω κ K Y R') (closed : Sc_bounded_omega_closed_d ω Y)
     (hDC : Dc_d (kp_pair_l (ZF.modelsKP hZF)) ω) (agree : Ea_agree_d ω κ X Y)
     (hV : M.mem V Y) (power : FilterZF.Source_d Y K V) (loc : It_local_d ω Y κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (wf : Wf_rel_d X R) : Wf_rel_d C W := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   have reverse : Ea_agree_d ω κ Y X := fun n D E hn hd sub => (agree n D E hn hd sub).symm

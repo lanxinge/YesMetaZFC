@@ -19,7 +19,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_inaccessible_bound_l {ω κ K L X R F J O Z A p T S q C W b d N V i t e P Γ : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (hm : Smem_d I b X R) (hn : Smem_d I d N V) (hN : M.TransitiveSet N) (hi : Smap_d I ω b d X N i)
     (constants : Ep_constants_d X q t) (wc : Wc_graph_d C W e) (bij : M.IsSetBijectionFromTo I e C N)
     (comp : ∀ x y, Rd_entry_d x y i ↔ M.mem x X ∧ ∃ E, Rd_entry_d x E t ∧ Rd_entry_d E y e)

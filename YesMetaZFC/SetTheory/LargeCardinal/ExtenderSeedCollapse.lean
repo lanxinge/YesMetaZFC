@@ -16,7 +16,7 @@ theorem ep_seed_collapse_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q 
     (hωL : M.MemberSubset ω L) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X F)
     (atoms : Ea_atoms_d ω κ L F) (normal : En_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (collapse : Wc_graph_d C W e) (he : Fn0_d C N e) :
     M.MemberSubset L N ∧ ∀ α E, Ep_seed_d κ L q α E → Rd_entry_d E α e := by
   let I := kp_pair_l (ZF.modelsKP hZF)

@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem eb_trace_read_l {ω κ K L X R F J O Z A p T S q c C W d N V e B R₀ U₀ n m D E a f ι H t : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
     (hN : M.TransitiveSet N) (target : Smem_d I d N V) (he : Smap_d I ω c d C N e)
     (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α e) (hωL : M.MemberSubset ω L)
     (kb : M.MemberSubset K B)
@@ -84,7 +84,7 @@ theorem eb_trace_read_l {ω κ K L X R F J O Z A p T S q c C W d N V e B R₀ U�
 /-- 所属源计算的迹也在原小模型的实际超幂中读取，无需另造所属源的超幂。 -/
 theorem Eb_trace_d.read_l {ω κ K L X R F J O Z A p T S q c C W d N V e Y n m D E a f H B : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
     (hN : M.TransitiveSet N) (target : Smem_d I d N V) (he : Smap_d I ω c d C N e)
     (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α e) (hωL : M.MemberSubset ω L)
     (hn : M.mem n ω) (hm : M.mem m ω) (ha : Fn0_d n L a) (hd : Ep_space_d κ n D) (hE : Ep_space_d κ m E)
@@ -109,7 +109,7 @@ theorem Eb_trace_d.read_l {ω κ K L X R F J O Z A p T S q c C W d N V e Y n m D
 theorem ep_source_trace_l {ω κ K L X R F J O Z A p T S q c C W d N V e n m D E a f H : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
     (hL : M.mem L X) (hF : M.mem F X)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
     (hN : M.TransitiveSet N) (target : Smem_d I d N V) (he : Smap_d I ω c d C N e)
     (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α e) (hωL : M.MemberSubset ω L)
     (hn : M.mem n ω) (hm : M.mem m ω) (ha : Fn0_d n L a) (hd : Ep_space_d κ n D) (hE : Ep_space_d κ m E)
@@ -124,7 +124,7 @@ theorem ep_source_trace_l {ω κ K L X R F J O Z A p T S q c C W d N V e n m D E
 theorem ep_set_source_l {ω κ K L X R F J O Z A p T S q c C W d N V e m B : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
     (hL : M.mem L X) (hF : M.mem F X)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
     (hN : M.TransitiveSet N) (target : Smem_d I d N V) (he : Smap_d I ω c d C N e)
     (range : M.IsRangeOf I N e) (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α e)
     (hωL : M.MemberSubset ω L) (hm : M.mem m ω) (hB : M.mem B N) (bound : ∀ t, M.mem t B → Fn0_d m L t) : M.mem B X := by

@@ -18,7 +18,7 @@ theorem ep_countable_ultra_l {ω κ K X R μ K' Z R' L F ι η J O V A p T S q C
     (source : Ep_source_d hZF ω κ K X R) (store : Ep_source_d hZF ω μ K' Z R')
     (hX : M.mem X Z) (hL : M.mem L Z) (hF : M.mem F Z) (hι : M.mem ι Z) (hη : M.mem η Z)
     (ix : M.IsSetInjectionFromTo I ι X ω) (il : M.IsSetInjectionFromTo I η L ω)
-    (family : Em_source_d ω κ L X F) (system : Ep_system_d hZF ω κ L X R F J O V A p T S)
+    (family : Em_source_d ω κ L X F) (system : Ep_system_d I ω κ L X R F J O V A p T S)
     (limit : Di_limit_d A p T S q C W)
     (wc : Wc_graph_d C W g) (bij : M.IsSetBijectionFromTo I g C P) :
     M.mem P Z ∧ ∃ ξ, M.mem ξ Z ∧ M.IsSetInjectionFromTo I ξ P ω := by

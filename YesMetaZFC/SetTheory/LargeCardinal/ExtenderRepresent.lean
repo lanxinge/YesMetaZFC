@@ -19,7 +19,7 @@ theorem ee_represent_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z
     (hL : M.MemberSubset L k) (hωL : M.MemberSubset ω L)
     (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S) (hSY : M.MemberSubset S Y)
     (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (hn : M.mem n ω) (hH : Ep_space_d κ n H) (ha : Fn0_d n L a)
     (hfX : M.mem f X) (hf : Fn0_d H X f) (hx : Ee_value_d j a f x) :
     ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x := by

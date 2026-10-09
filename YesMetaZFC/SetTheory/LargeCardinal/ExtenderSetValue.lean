@@ -17,7 +17,7 @@ theorem ep_set_value_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e i j 
     a₀ A₀ R₀ a₁ A₁ R₁ n D a U b l P r g t : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω μ K' N S)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d I c C W) (hm : Smem_d I c₀ X R) (hn : Smem_d I d N S)
     (he : Smap_d I ω c d C N e) (hj : Smap_d I ω c₀ d X N j)
     (constants : Ep_constants_d X q i) (comp : It_comp_d i e j)

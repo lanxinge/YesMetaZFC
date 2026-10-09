@@ -42,7 +42,7 @@ theorem ep_strength_l {ω δ κ κ₀ K L X R A Y B j S F J O Z D p T V₀ q c C
     (hκL : M.mem κ L) (hωL : M.mem ω L) (rL : M.IsRegularCardinal I L) (sL : M.IsStrongLimitCardinal I L)
     (hSY : M.MemberSubset S Y) (family : Es_family_d I j κ L S F)
     (hF : Em_family_d ω κ L F) (coherent : Es_coherent_d I ω κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V₀) (limit : Di_limit_d D p T V₀ q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z D p T V₀) (limit : Di_limit_d D p T V₀ q C W)
     (model : Smdl_d I c C W) (collapse : Ep_collapse_d hZF ω X R q c C W) (factor : Ee_factor_d hZF j Y q C W)
     (hV : V_d I ν V) (length : Ep_length_d hZF ω κ L X R j Y q c C W)
     (cover : ∀ x, M.mem x V → ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x)

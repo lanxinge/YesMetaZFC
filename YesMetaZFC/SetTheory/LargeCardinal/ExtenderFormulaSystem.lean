@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (hm : Smem_d I b X R)
-    (family : Em_source_d ω κ L X F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (family : Em_source_d ω κ L X F) (h : Ep_system_d I ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
     (elementary : Di_elementary_d I ω O A p T S) (hY : M.TransitiveSet Y) (hn : Smem_d I d Y V)
     (hj : Smap_d I ω c d C Y j) (φ : Formula 1 2) (hc : φ.FreeClosed) :
@@ -24,7 +24,7 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
         Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := R) hm.1.2.1) x y) φ) ∧
       (∀ x y : (smdl_structure_l I (R := V) hn.1.2.1).Domain, Rd_entry_d x.val y.val U ↔
         Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := V) hn.1.2.1) x y) φ) ∧
-      Ep_system_d hZF ω κ L X Q F J O Z' A p T S' ∧ Di_limit_d A p T S' q C W' ∧ Smdl_d I e C W' ∧
+      Ep_system_d I ω κ L X Q F J O Z' A p T S' ∧ Di_limit_d A p T S' q C W' ∧ Smdl_d I e C W' ∧
       ∀ E H x y, Rd_entry_d E x j → Rd_entry_d H y j → (Rd_entry_d E H W' ↔ Rd_entry_d x y U) := by
   obtain ⟨Q, hQ, qs⟩ := smem_formula_relation_l hZF hm source.transitive φ hc
   obtain ⟨U, hU, us⟩ := smem_formula_relation_l hZF hn hY φ hc
@@ -81,7 +81,7 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
       (us ⟨x, hj.1.1.output_mem_of_pairMember hEx⟩ ⟨y, hj.1.1.output_mem_of_pairMember hHy⟩).symm))
     exact (sr u v a E H hua hva huE hvH).trans ((jr E H x y hEx hHy).trans
       (eq.symm.trans (ep_rel_read_l hz' had new.code.1).symm))
-  have graph : Ep_graph_d hZF ω κ L X Q F J O Z' A p T S' := {
+  have graph : Ep_graph_d I ω κ L X Q F J O Z' A p T S' := {
     order := h.order, order_spec := h.order_spec, projection := h.projection, indices := h.indices
     models := ⟨Q₁, hz', models'⟩, nodes := nodes, index := h.index, arrows := h.arrows
     relations := fun u v => ⟨fun huv => by

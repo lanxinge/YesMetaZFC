@@ -19,7 +19,7 @@ theorem It_local_d.branch_l {ω κ K X R K' Y R' L F P J O Z A p T S q c C W d N
     (inside : M.MemberSubset Y X) (agree : Ea_agree_d ω κ X Y)
     (owner_branches : Sc_branch_d ω Y) (hP : M.mem P Y) (owner_power : FilterZF.Source_d Y K' P)
     (loc : It_local_d ω Y κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (elementary : Di_elementary_d I ω O A p T S)
     (hN : M.TransitiveSet N) (hωN : M.mem ω N) (algebra : Sc_algebra_d N)
     (target : Smem_d I d N V) (hj : Smap_d I ω c d C N j)

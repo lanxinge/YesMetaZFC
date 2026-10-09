@@ -16,8 +16,8 @@ theorem ep_inclusion_l {ω κ L X R Y S F c d
     J O Z A p T V q C W J' O' Z' A' p' T' V' q' C' W' : M.Domain}
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (inside : M.MemberSubset X Y)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ L Y F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (h' : Ep_system_d hZF ω κ L Y S F J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W') :
+    (h : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h' : Ep_system_d I ω κ L Y S F J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W') :
     ∃ g, M.IsSetInjectionFromTo I g C C' ∧
       (∀ E H E' H', Rd_entry_d E E' g → Rd_entry_d H H' g → (Rd_entry_d E H W ↔ Rd_entry_d E' H' W')) ∧
       ∀ a f E E', Ep_repr_d q a f E → (Rd_entry_d E E' g ↔ Ep_repr_d q' a f E') := by

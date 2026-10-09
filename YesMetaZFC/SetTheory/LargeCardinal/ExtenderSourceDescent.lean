@@ -19,7 +19,7 @@ theorem ep_bounded_desc_l {ω κ K L X R₀ R F J O Z A p T S q C W g B R' : M.D
     (branches : Sc_branch_d ω X) (power : Sc_power_d X) (family : Em_source_d ω κ L X F)
     (hL : M.mem L X) (hF : M.mem F X) (hB : M.mem B X) (hR : M.mem R' X)
     (relation : ∀ x y, M.mem x B → M.mem y B → (Rd_entry_d x y R' ↔ Rd_entry_d x y R))
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (fn : Fn0_d ω C g) (desc : Wf_desc_d W g)
     (bounded : ∀ i E, Rd_entry_d i E g → ∃ n a D f, M.mem n ω ∧ M.mem a J ∧ Fn0_d n L a ∧
       Ep_space_d κ n D ∧ M.mem f X ∧ Fn0_d D B f ∧ Ep_repr_d q a f E) : ∃ P G D V Q s,
@@ -50,7 +50,7 @@ theorem ep_source_desc_l {ω κ K L X R F J O Z A p T S q c C W g : M.Domain}
     (hDC : Dc_d I ω) (source : Ep_source_d hZF ω κ K X R)
     (branches : Sc_branch_d ω X) (cover : Sc_cover_d X) (power : Sc_power_d X)
     (family : Em_source_d ω κ L X F) (hL : M.mem L X) (hF : M.mem F X)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (elementary : Di_elementary_d I ω O A p T S)
     (fn : Fn0_d ω C g) (desc : Wf_desc_d W g) : ∃ B R' P G D V Q s,
       M.mem B X ∧ M.mem R' X ∧ (∀ x y, Rd_entry_d x y R' ↔ M.mem x B ∧ M.mem y B ∧ M.mem x y) ∧

@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem ep_matrix_value_l {ω κ K L X R F J O Z A p T V q c C W d N S e n D a b B E H G t : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d I c C W) (hN : M.TransitiveSet N) (target : Smem_d I d N S) (he : Smap_d I ω c d C N e)
     (haJ : M.mem a J) (ha : Fn0_d n L a) (space : Ep_space_d κ n D)
     (hb : M.mem b ω) (hB : M.mem B X) (hE : M.mem E X) (hH : M.mem H X)

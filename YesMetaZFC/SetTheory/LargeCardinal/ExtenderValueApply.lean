@@ -18,7 +18,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem ep_value_constant_l (hZ : M.Models ZF)
     {ω κ K L X R F J O Z A p T V q C W e i j n D a x y : M.Domain}
     (source : Ep_source_d hZ ω κ K X R) (family : Em_source_d ω κ L X F)
-    (system : Ep_system_d hZ ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZ)) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (constants : Ep_constants_d X q i) (comp : It_comp_d i e j)
     (hn : M.mem n ω) (haJ : M.mem a J) (ha : Fn0_d n L a) (space : Ep_space_d κ n D)
     (hx : M.mem x X) (image : Rd_entry_d x y j) :
@@ -38,7 +38,7 @@ theorem ep_value_constant_l (hZ : M.Models ZF)
 theorem ep_value_apply_l {ω κ K L X R F J O Z A p T V q c C W d N S e i j a f x f' : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d I ω κ L X F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d I c C W) (hN : M.TransitiveSet N) (target : Smem_d I d N S)
     (he : Smap_d I ω c d C N e) (fixed : ∀ α H, Ep_seed_d κ L q α H → Rd_entry_d H α e)
     (constants : Ep_constants_d X q i) (comp : It_comp_d i e j)

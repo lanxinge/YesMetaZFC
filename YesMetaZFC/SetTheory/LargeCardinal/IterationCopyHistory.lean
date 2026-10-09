@@ -100,7 +100,7 @@ def ic_history_m {d} (ω T Q G E L n H S Q' G' : Term d) : Formula 1 d := set[d]
     ⌜rd_entry0_m⌝ₚ(i, c, ⌜Q⌝ₛ) ∧ ⌜rd_entry0_m⌝ₚ(i, z, ⌜Q'⌝ₛ) ∧ ⌜ic_row_m⌝ₚ(⌜ω⌝ₛ, c, X, A, π, z, Z, α)) ∧
   (∀ i j X A π z Z α Y B σ u U β,
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, i, X, A, π, z, Z, α) → ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, j, Y, B, σ, u, U, β) → i ∈ j →
-    ∃ ρ φ, ⌜rd_entry0_m⌝ₚ(i, ρ, ⌜L⌝ₛ) ∧ ⌜pn_agree_m⌝ₚ(X, A, π, Y, B, σ, ρ, φ) ∧ ⌜pn_strength_m⌝ₚ(X, ρ, Y)) ∧
+    ∃ ρ φ, ⌜rd_entry0_m⌝ₚ(i, ρ, ⌜L⌝ₛ) ∧ ⌜pn_agree_m⌝ₚ(X, A, π, Y, B, σ, ρ, φ) ∧ ⌜es_strength0_m⌝ₚ(X, ρ, Y)) ∧
   (∀ i j X A π z Z α Y B σ u U β g,
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, i, X, A, π, z, Z, α) → ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, j, Y, B, σ, u, U, β) →
     ⌜it_map_m⌝ₚ(⌜G'⌝ₛ, i, j, g) → ⌜rd_entry0_m⌝ₚ(A, B, g)) ∧
@@ -123,7 +123,7 @@ theorem ic_history_sat_l {d} (η : Env M d) (ω T Q G E L n H S Q' G' : Term d) 
     Formula.satisfies_exists_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff,
     Formula.satisfies_isFunction_iff I hZF.1, Formula.satisfies_isDomain_iff I, KP.succ0_sat_l hZF.1,
     rd_entry0_sat_l hZF.1, it_diagram_sat_l hZF, ic_cell_sat_l hZF.1, ic_row_sat_l hZF, ic_at_sat_l hZF.1,
-    pn_agree_sat_l (ZF.modelsKP hZF), pn_strength_sat_l, it_map_sat_l hZF.1, it_pred_sat_l hZF.1,
+    pn_agree_sat_l (ZF.modelsKP hZF), es_strength0_sat_l, it_map_sat_l hZF.1, it_pred_sat_l hZF.1,
     it_payload_sat_l hZF.1, ic_edge_sat_l hZF, Definitional.Term.eval_weaken]
   exact ⟨fun ⟨a, b, c, d, e, f, g, h, i⟩ => ⟨a, b, c, d, e, f, g, h, i⟩,
     fun h => ⟨h.diagram, h.order, h.function, h.domain, h.rows, h.past, h.cuts, h.squares, h.steps⟩⟩

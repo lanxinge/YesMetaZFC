@@ -24,7 +24,7 @@ def It_ultra_d (hZF : M.Models ZF) (ω κ L F c d j : M.Domain) : Prop :=
   let I := kp_pair_l (ZF.modelsKP hZF)
   ∃ X R Y S J O Z A p T V q b C W i e,
     Smem_d I c X R ∧ Smem_d I d Y S ∧
-    Ep_system_d hZF ω κ L X R F J O Z A p T V ∧ Di_limit_d A p T V q C W ∧ Smdl_d I b C W ∧
+    Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T V ∧ Di_limit_d A p T V q C W ∧ Smdl_d I b C W ∧
     Wc_graph_d C W e ∧ M.IsSetBijectionFromTo I e C Y ∧ Smap_d I ω b d C Y e ∧
     Smap_d I ω c b X C i ∧ Ep_constants_d X q i ∧ Smap_d I ω c d X Y j ∧ It_comp_d i e j
 

@@ -47,9 +47,9 @@ theorem it_ultra_sat_l {d} (η : Env M d) (ω κ L F c d' j : Term d) :
     Formula.satisfies η (it_ultra_m ω κ L F c d' j) ↔
       It_ultra_d hZF (ω.eval η) (κ.eval η) (L.eval η) (F.eval η) (c.eval η) (d'.eval η) (j.eval η) := by
   simp only [it_ultra_m, It_ultra_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-    smem_sat_l I, smdl_sat_l I, ep_system_sat_l hZF, di_limit_sat_l (ZF.modelsKP hZF), wc_graph_sat_l hZF.1,
+    smem_sat_l I, smdl_sat_l I, ep_system_sat_l I hZF.1, di_limit_sat_l hZF.1, wc_graph_sat_l hZF.1,
     Formula.satisfies_isBijectionFromTo_iff I hZF.1, smap_sat_l I hZF.1, ep_constants_sat_l hZF.1,
-    it_comp_sat_l (ZF.modelsKP hZF), Definitional.Term.eval_weaken]; rfl
+    it_comp_sat_l hZF.1, Definitional.Term.eval_weaken]; rfl
 
 def it_source_m {d} (ω c : Term d) : Formula 1 d := set[d] ⟪
   ∃ X R K, ⌜smem_m (𝒞 := kpair_convention_l)⌝ₚ(⌜c⌝ₛ, X, R) ∧ ⌜ep_source_m⌝ₚ(⌜ω⌝ₛ, ⌜ω⌝ₛ, K, X, R)⟫

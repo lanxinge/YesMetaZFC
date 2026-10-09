@@ -22,7 +22,7 @@ theorem it_next_sat_l (hKP : M.Models KP) {d} (ρ : Env M d) (α k G e t i j f :
       It_next_d (α.eval ρ) (k.eval ρ) (G.eval ρ) (e.eval ρ) (t.eval ρ) (i.eval ρ) (j.eval ρ) (f.eval ρ) := by
   simp only [it_next_m, It_next_d, Formula.satisfies_disj_iff, Formula.satisfies_conj_iff,
     Formula.satisfies_extensionalEq_iff_eq hKP.1, Formula.satisfies_exists_iff,
-    it_map_sat_l hKP.1, it_comp_sat_l hKP, Definitional.Term.eval_weaken]; rfl
+    it_map_sat_l hKP.1, it_comp_sat_l hKP.1, Definitional.Term.eval_weaken]; rfl
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)

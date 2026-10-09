@@ -8,6 +8,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationInitial
 import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular
 import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptMember
 import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyTree
+import YesMetaZFC.SetTheory.LargeCardinal.IterationNiceReturn
 import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 
 /-! # 迭代树、后继扩张与极限添枝的公共入口
@@ -36,5 +37,15 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 保持同一树序、全部前驱一致性、常值方块、原根嵌入及每个可数闭工作模型中的拥有目标秩段。
 联合节点的完整初等性已迁移到实际有限真值证书；`Ja_space_d.full_image_l` 用源内
 绝对性及有限部分图闭性证明像树包含全部背景联合节点，并保持原严格扩展关系。
-联合尝试树的移位秩、正则秩段的 Skolem 回拉及 nice 树弱迭代策略仍未完成。
+`it_countable_fixed_l` 固定原树序、模型列、嵌入列及枚举列；`Ic_history_d.rank_l`
+构造定义域恰为内部 ω 的移位高度列，在每条严格树边上证明新高度小于旧高度的像。
+高度在所属模型内正则；`rank_cut_l` 构造包含同一扩展器与支撑的实际秩段列。
+`it_nice_failure_copy_l` 从可数 nice 树的返回失败自动装配正规根上的完整下降反例。
+`it_ultra_read_l` 从传递有限闭源中的相对超幂证书恢复原指定超幂边；有限幂、商类、
+直接极限、常值图、坍塌和复合图全部保留，完整初等性由原 Łoś 定理重新证明。
+`rank_read_source_l` 为任意包含 ω 的拥有极限秩段提供读取闭性，不要求高度正则。
+`it_nice_return_l` 对整棵反例取有限反射层与可数壳，恢复原 nice 树和实际下降秩段，
+由原正则根构造 Pₙ 初始行，最后调用下降反证。因而任意可数 nice ω 树的给定
+根嵌入都沿某条共尾良基枝返回原 Vθ，根复合式精确保留，无需额外高度假设。
+长度 ω₁ 的弱迭代博弈策略仍待实现。
 -/

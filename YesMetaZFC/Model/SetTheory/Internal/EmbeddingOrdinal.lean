@@ -25,7 +25,7 @@ theorem Smap_d.ordinal_l {ω c d X R Y S j a b : M.Domain} (hω : M.IsOmega ω)
 /-- 极限性在两侧传递模型中绝对，故随同一实际初等图保持。 -/
 theorem Smap_d.limit_l {ω c d X R Y S j a b : M.Domain} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)
-    (hj : Smap_d I ω c d X Y j) (hab : Rd_entry_d a b j) (ha : M.IsLimitOrdinal a) : M.IsLimitOrdinal b := by
+    (hj : Smap_d I ω c d X Y j) (hab : Rd_entry_d a b j) : M.IsLimitOrdinal a ↔ M.IsLimitOrdinal b := by
   have hx := hj.1.1.input_mem_of_pairMember hab
   have hy := hj.1.1.output_mem_of_pairMember hab
   let nx : Nonempty {x // M.mem x X} := ⟨⟨a, hx⟩⟩
@@ -36,8 +36,8 @@ theorem Smap_d.limit_l {ω c d X R Y S j a b : M.Domain} (hω : M.IsOmega ω)
   have tr := spred_source_l I hZF hω ⟨c, R, d, S, hm.empty_pred_l _ hz, hn.empty_pred_l _ hz, hj⟩
     nx ny (Formula.isLimitOrdinal .newest) (by simp -implicitDefEqProofs) ρ η (fun _ => hab)
   simp only [Formula.satisfies_isLimitOrdinal_iff] at tr
-  exact (rt_limit_l hY ny (ZF.modelsKP hZF) ⟨b, hy⟩).mp
-    (tr.mp ((rt_limit_l hX nx (ZF.modelsKP hZF) ⟨a, hx⟩).mpr ha))
+  exact (rt_limit_l hX nx (ZF.modelsKP hZF) ⟨a, hx⟩).symm.trans
+    (tr.trans (rt_limit_l hY ny (ZF.modelsKP hZF) ⟨b, hy⟩))
 
 theorem Smap_d.ordinal_le_l {ω c d X R Y S j a b : M.Domain} (hω : M.IsOmega ω)
     (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)

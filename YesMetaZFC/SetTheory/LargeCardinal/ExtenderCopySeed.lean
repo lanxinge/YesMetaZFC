@@ -49,8 +49,8 @@ theorem ep_copy_seed_l
     (owner : M.TransitiveSet N) (owner' : M.TransitiveSet N') (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁)
     (hσ : Smap_d I ω b b' N N' σ) (hωN : M.mem ω N) (hL : Rd_entry_d L L' σ) (hF : Rd_entry_d F F' σ)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (h' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (h : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h' : Ep_system_d I ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
     (hτ : Fn0_d C C' τ)
     (copy : ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q' u E)
     (hα : Rd_entry_d α α' σ) (seed : Ep_seed_d κ L q α E) (hEE : Rd_entry_d E E' τ) : Ep_seed_d κ' L' q' α' E' := by

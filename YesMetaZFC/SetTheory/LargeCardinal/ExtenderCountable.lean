@@ -54,7 +54,7 @@ derive_free_closed ec_count_image_m
 
 theorem ep_countable_l {ω κ L X R F J O Z A p T S q C W : M.Domain}
     (hω : M.IsOmega ω) (ff : M.IsSetFunction I F) (cx : M.CardinalLessOrEqual I X ω) (cl : M.CardinalLessOrEqual I L ω)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) :
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W) :
     M.CardinalLessOrEqual I C ω := by
   have small {B D} (sub : M.MemberSubset B D) (hd : M.CardinalLessOrEqual I D ω) : M.CardinalLessOrEqual I B ω := by
     obtain ⟨f, hf⟩ := ZF.exists_inclusionInjection hZF I sub

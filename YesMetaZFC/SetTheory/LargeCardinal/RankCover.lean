@@ -24,7 +24,7 @@ theorem er_cover_l (hZFC : M.Models ZFC)
     (hL : M.MemberSubset L k) (hLo : M.IsOrdinal L) (hωL : M.MemberSubset ω L)
     (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S) (hSY : M.MemberSubset S Y)
     (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (hνL : M.mem ν L) (hVν : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ν Vν)
     (hVY : M.MemberSubset Vν Y) (hμL : M.mem μ₀ L) (hgY : M.mem g₀ Y) (hg : Su0_d μ₀ Vν g₀) :
     ∀ x, M.mem x Vν → ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x := by
@@ -113,7 +113,7 @@ theorem er_inaccessible_cover_l (hZFC : M.Models ZFC)
     (sL : M.IsStrongLimitCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L)
     (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S) (hSY : M.MemberSubset S Y)
     (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (hU : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L U) (hUY : M.MemberSubset U Y) :
     ∀ x, M.mem x U → ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x := by
   let hZF := ZFC.models_zf_l hZFC
