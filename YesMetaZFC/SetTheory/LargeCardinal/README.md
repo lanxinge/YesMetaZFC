@@ -717,6 +717,36 @@ U 是原源内的严格极限秩段且其高度满足源内正则性时，自动
 [Truth](../../Model/SetTheory/Internal/ReducedPower/Truth.lean) 的相对否定律明确要求
 所用真值逆像在容许子集代数中；完整幂集版本已直接迁移为它的实例。
 
+## 完整类型的实际伸展
+
+[WoodinTypes](WoodinTypes.lean) 的 `woodin_type_stretch_l` 完成 Neeman 引理 3.22
+中类型保持的核心论证。给定武丁基数 δ、η>δ 和 Vη 中任意内部有限元组 s，
+对每个 α<δ 实际构造 α<κ<δ，使每个 τ<δ 都有同一临界点的短扩展器 E∈Vδ，
+其支撑与最大强度同为不可达 L>max(κ,τ)，并且
+
+\[
+\operatorname{proj}_\tau\bigl(j_E(\operatorname{tp}^{V_\eta}_\kappa(s;\delta))\bigr)
+=\operatorname{tp}^{V_\eta}_\tau(s;\delta).
+\]
+
+这里 j_E 是所构造的 Vδ 源超幂嵌入，κ 型自身已证明属于该源。
+
+[TypeTruth](../../Model/SetTheory/Internal/TypeTruth.lean) 的 `Tt_realized_d` 包含实际模型码、
+有限元组、指定常量和完整真值集合；常量域恰为 Vκ∪{κ}。查询量化全部内部自然数公式码，
+不把内部有限序列限制为外部标准长度。[TypeSource](../../Model/SetTheory/Internal/TypeSource.lean)
+将任意原公式编译为这种类型的实际查询。[TypeRank](../../Model/SetTheory/Internal/TypeRank.lean)
+证明查询域与类型属于 Vδ。
+
+[PredicateTrace](../../Model/SetTheory/Internal/PredicateTrace.lean) 证明 j(A∩D)=B∩j(D)，
+全称定义覆盖目标中不在 j 像内的元素。[WoodinTrace](WoodinTrace.lean) 给真值码谓词加入序数标记 α，
+用同一截面定理及低秩一致性迫使 α 固定，得到 κ>α。
+[TypeEmbedding](../../Model/SetTheory/Internal/TypeEmbedding.lean) 进一步证明 j(Vκ) 包含共同 V_L，
+并逐层搬运名字域、有限列空间和查询对，保证全部新低秩查询进入像类型的查询域。
+`Et_stretch_d` 将投影与同一张 E 的实际超幂图绑定。
+
+尚未完成引理 3.22 的完整弹性结论：`u⁻`、弹性条件的单一内部公式及其绝对性仍待建立；
+第 3.23 引理的单步伸展及后续指定分叉构造也未完成。
+
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf)
 的短扩展器、迭代树、齐性树与泛型迭代路线推进。有限支撑测度图及任意有限坐标投影已构造；
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
@@ -730,7 +760,8 @@ U 是原源内的严格极限秩段且其高度满足源内正则性时，自动
 按 ν 选择不可达 L>ν、整个 V_L 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
 实际迭代树、单根与 pad、任意树前驱上的后继扩张，以及其后继一致性已实现。
 极限处添枝和上述条件下的共尾良基分支已实现；小模型的内部编码与跨源还原也已实现。
-nice 树的 ω₁ 弱迭代策略已完成；齐性树、泛型迭代及最终 L(ℝ) 的 AD 蕴涵仍待证明。
+nice 树的 ω₁ 弱迭代策略及上述完整类型伸展等式已完成；弹性公式、单步伸展、
+齐性树、泛型迭代及最终 L(ℝ) 的 AD 蕴涵仍待证明。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；

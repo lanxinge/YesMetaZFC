@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSyntax
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderProduct
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderTruncation
 import YesMetaZFC.SetTheory.LargeCardinal.WoodinStrength
+import YesMetaZFC.SetTheory.LargeCardinal.WoodinTypes
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCopyApplication
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderCopySuccessor
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderModelCode
@@ -30,6 +31,9 @@ woodin_rank_strength_l 按 ν 选择实际不可达 L>ν，恢复整个 V_L 覆�
 `Ex_strength_d` 保留源内实际有界超幂及求值图；原强度公式随完整初等图搬运，
 `realize_l` 在指定超幂中读出相对最大强度，未把像支撑当作背景不可达基数。
 同一入口还构造所属模型中的原始不可达性与短扩展器判断；不可达性沿完整初等图及严格极限秩截断保持。
+`woodin_type_stretch_l` 对实际 Vη 中任意内部有限元组构造无界多个临界点；
+同一 κ 型由不可达强度的实际扩展器伸展后，投影恰为同一元组的 τ 型。
+类型量化全部内部公式码，像查询域覆盖目标中的新名字列；弹性条件的内部公式及单步伸展仍待证明。
 `Ep_strong_limit_d.rank_l` 用实际秩层枚举自动构造严格正则截断的源，并保留原扩展器的最大强度、
 秩层枚举、内部不可达性及短扩展器判断；有界超幂保留同一节点、传递像和求值图。
 相对测度族可跨模型施加；双映射复制自动构造两侧超幂、唯一初等复制及常值交换方块。

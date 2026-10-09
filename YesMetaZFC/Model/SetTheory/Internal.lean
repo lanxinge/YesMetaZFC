@@ -7,6 +7,9 @@ import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
+import YesMetaZFC.Model.SetTheory.Internal.PredicateTrace
+import YesMetaZFC.Model.SetTheory.Internal.TypeSource
+import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
@@ -54,6 +57,9 @@ import YesMetaZFC.Model.SetTheory.Internal.RankSkolem
 `spred_exists_l`、`spred_identity_l` 在 ZF 内构造谓词结构码及实际恒等嵌入。
 `smap_source_l` 沿实际嵌入复合内部赋值；`spred_source_l` 恢复原隶属语言的
 完整初等性，`spred_delta_l` 在传递载体上直接传输背景中的原 Δ₀ 公式。
+`Tt_realized_d` 用实际有限元组和名字列记录完整内部类型；`tt_source_l` 把任意原公式
+编译为同一类型中的查询。`spred_trace_l` 保持谓词截面的完整定义，
+`Smap_d.type_pool_cover_l` 与 `type_constants_cover_l` 证明像查询域包含目标中的新低秩参数。
 `rp_model_exists_l` 对有共同细化的实际集合族与非空合法代表函数族，在 ZF 中构造等价类集合、
 投影和商关系的内部结构码；`rp_kernel_l` 识别投影核，商关系与代表元无关。
 `rp_family_model_l` 先在指定候选集合内分离合法函数；大基数层的 `ed_source_model_l`

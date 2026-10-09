@@ -13,6 +13,7 @@ MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             "TruthRules", "FormulaCode", "Satisfaction", "Theory", "Prefix", "Source",
             "Builder", "CompileSemantics", "Compiler", "Countable", "FiniteAssignment", "FiniteSource", "SkolemSyntax",
             "CanonicalRows", "CanonicalCode", "CanonicalSatisfaction",
+            "PredicateTrace", "TypeNames", "TypeTruth", "TypeSource", "TypeRank", "TypeEmbedding",
             "SupportSyntax", "SupportBound", "Support", "Induction", "TarskiVaughtSyntax",
             "FullWitness", "ElementarySyntax", "TarskiVaught", "Elementary", "SourceElementary", "Membership", "MembershipSkolem", "Hereditary")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection." + name for name in
@@ -420,7 +421,7 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("IterationApply", "IterationAgreement", "IterationFork")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("RankEnumeration", "RankCover", "RankLength", "MeasurableInaccessible",
-                "ExtenderPredicateComponent", "ExtenderPredicateLimit", "ExtenderStrengthBound", "ExtenderExactStrength", "ExtenderStrength", "WoodinStrength")]
+                "ExtenderPredicateComponent", "ExtenderPredicateLimit", "ExtenderStrengthBound", "ExtenderExactStrength", "ExtenderStrength", "WoodinStrength", "WoodinTrace", "WoodinTypes")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("ExtenderBranch", "ExtenderLocalRead")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderSourceLimit", "ExtenderSourceNode", "IterationLocalApply", "IterationLocalAgreement",
@@ -464,6 +465,8 @@ LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                    ("Ep_constants_d", "Ep_realizer_d", "Ep_strength_d", "Ep_strong_limit_d", "Es_strength_d", "es_strength_m", "Ex_strength_d")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.rp_change_filter_l", "YesMetaZFC.SetTheory.Internal.rp_lift_unique_l"]
 LOS_ZF_BOUNDS = {"YesMetaZFC.SetTheory.LargeCardinal.ep_branch_reflection_l": BASELINE, "YesMetaZFC.SetTheory.Internal.rp_lift_exists_l": BASELINE}
+LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for name in
+                     ("Ep_strength_d.above_l", "Ep_strong_limit_d.type_image_l")})
 LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for name in
                      ("Em_family_d.rank_mem_l", "es_strength_relative_l", "es_strength_map_l", "Ex_strength_d.map_l", "Ex_strength_d.realize_l",
                       "Ep_strong_limit_d.rank_l")})
@@ -547,6 +550,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                  "wi_drive_schema", "Wi_run_d", "wi_run_m", "Wi_legal_d", "Wi_reply_d",
                  "Wi_position_d", "wi_position_m", "Wi_public_d", "wi_public_m", "Wi_strategy_d", "Wi_play_d")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Wi_winning_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Tn_name_d", "tn_name_m", "Tn_names_d", "Tn_value_d", "tn_value_m", "Tn_assign_d", "tn_assign_m",
+                 "Tt_query_d", "tt_query_m", "Tt_pool_d", "Tt_truth_d", "Tt_realized_d")]
+LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in

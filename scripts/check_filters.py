@@ -51,7 +51,7 @@ def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
     """复用声明级审计；各数学切片显式传入模块及其可信边界。"""
     files = [ROOT / (m.replace(".", "/") + ".lean") for m in modules]
     hashes = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
-    env = {**os.environ, "LEAN_NUM_THREADS": "1"}
+    env = {**os.environ, "LEAN_NUM_THREADS": os.environ.get("LEAN_NUM_THREADS", "1")}
     result = subprocess.run(["lake", "--wfail", "build", *modules], cwd=ROOT, env=env)
     if result.returncode:
         return result.returncode
