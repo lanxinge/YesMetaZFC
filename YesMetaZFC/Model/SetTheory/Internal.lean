@@ -6,12 +6,14 @@ import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.RankSatisfaction
+import YesMetaZFC.Model.SetTheory.Internal.FlatPredecessor
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateTrace
 import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeMinusEmbedding
+import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull

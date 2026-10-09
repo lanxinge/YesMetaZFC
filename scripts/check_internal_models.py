@@ -32,6 +32,11 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
              "TypeMinusCode", "TypeMinusSemantics", "TypeMinusSyntax", "TypeQueryClosure",
              "TypeMinus", "TypeMinusMatrix", "TypeMinusEmbedding")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch"]
+MODULES += ["YesMetaZFC.SetTheory.FunctionRecoding", "YesMetaZFC.SetTheory.CumulativePairing"]
+MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
+            ("RecursionSource", "CumulativeSource", "StructureSource")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("RankLargest", "FlatPredecessor", "FiniteConjunction", "TypeGuardCode", "TypeGuardColumn", "TypeGuard")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
@@ -577,6 +582,8 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                  "Sr_and_d", "sr_and_m", "Sr_top_d", "Sr_top_code_d", "sr_top_code_m",
                  "Sr_minus_d", "sr_minus_m", "Tm_code_d", "tm_code_m", "Tm_query_d", "tm_query_m",
                  "Tm_minus_d", "tm_minus_m", "Tt_slots_d", "tt_slots_m", "Tm_table_d", "tm_link0_m", "tm_cut0_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Sv_max_d", "sv_max_m", "sv_last_m", "Ft_prev_d", "ft_prev_m", "ft_prev_local_m", "Sg_all_d", "sg_all_m")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]

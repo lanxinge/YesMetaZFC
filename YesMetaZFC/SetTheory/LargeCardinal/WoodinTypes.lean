@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.WoodinTrace
 import YesMetaZFC.Model.SetTheory.Internal.TypeRank
 import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
+import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
 
 /-! # 强扩展器中的完整类型像
 
@@ -69,17 +70,19 @@ def Et_stretch_d (hZF : M.Models ZF) (ω κ L F X R t D v : M.Domain) : Prop :=
   ∃ b d N S i t', Smem_d I b X R ∧ Smem_d I d N S ∧ It_ultra_d hZF ω κ L F b d i ∧
     Rd_entry_d t t' i ∧ ∀ p, M.mem p v ↔ M.mem p D ∧ M.mem p t'
 
-/-- 任意完整实现类型都有无界多个临界点，且每个 τ<θ 都可由实际强扩展器伸展。
-    原类型与伸展类型使用同一元组、同一指定常量 θ 和全部内部公式码。 -/
+/-- 任意内部有限元组都有无界多个 κ；同时给出 V(η+1) 中的完整类型及其 Vη 前驱。
+    前驱对每个 τ<θ 都可由实际强扩展器伸展，保留同一元组及指定常量 θ。 -/
 theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
     (hd : Woodin_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) θ)
     (hη : M.IsOrdinal η) (hθη : M.mem θ η) :
     let hZF := ZFC.models_zf_l hZFC
     let I := kp_pair_l (ZF.modelsKP hZF)
-    ∃ ω X Z c Q, M.IsOmega ω ∧ V_d I θ X ∧ V_d I η Z ∧ Smem_d I c Z Q ∧
+    ∃ ω X Z μ W c Q d S, M.IsOmega ω ∧ V_d I θ X ∧ V_d I η Z ∧
+      M.SuccessorOf μ η ∧ V_d I μ W ∧ Smem_d I c Z Q ∧ Smem_d I d W S ∧
       ∀ n s, M.mem n ω → Fn0_d n Z s → ∀ α, M.mem α θ →
-      ∃ κ B U D t, M.mem α κ ∧ M.mem κ θ ∧ V_d I κ B ∧
+      ∃ κ B U D t u, M.mem α κ ∧ M.mem κ θ ∧ V_d I κ B ∧
         (∀ x, M.mem x U ↔ M.mem x B ∨ x = κ) ∧ Tt_realized_d I ω c Z Q n s θ U D t ∧
+        Tt_realized_d I ω d W S n s θ U D u ∧ Tm_minus_d I ω D u t ∧
         ∀ τ, M.mem τ θ → ∃ L K F R V B₀ U₀ D₀ v,
           M.mem L θ ∧ M.mem κ L ∧ M.mem τ L ∧ M.mem ω L ∧
           M.IsRegularCardinal I L ∧ M.IsStrongLimitCardinal I L ∧ V_d I L V ∧
@@ -100,14 +103,34 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
   have hθZ := ZF.v_ordinal_mem_l I hZF hZ hθη
   have hXZ := ZF.v_mono_l I hZF hX hZ (hη.transitive θ hθη)
   obtain ⟨c, Q, code⟩ := smdl_membership_l I hZF ⟨θ, hθZ⟩
-  refine ⟨ω, X, Z, c, Q, hω, hX, hZ, code, fun n s hn hs α hα => ?_⟩
+  obtain ⟨μ, hμ⟩ := KP.exists_successor (ZF.modelsKP hZF) η
+  obtain ⟨W, hW⟩ := ZF.v_exists_l I hZF (KP.successor_isOrdinal (ZF.modelsKP hZF) hη hμ)
+  have hZW := ZF.v_mono_l I hZF hZ hW (fun x hx => (hμ x).mpr (Or.inl hx))
+  obtain ⟨d, S, upper⟩ := smdl_membership_l I hZF ⟨θ, hZW θ hθZ⟩
+  have hωη := hη.transitive θ hθη ω hωθ
+  refine ⟨ω, X, Z, μ, W, c, Q, d, S, hω, hX, hZ, hμ, hW, code, upper, fun n s hn hs α hα => ?_⟩
   obtain ⟨A, truth, relation⟩ := tt_truth_exists_l I hZF ω c n s θ X
   obtain ⟨C, κ, marker, above, hκ, family⟩ := all A (fun p hp => ((truth p).mp hp).1) relation α hα
   obtain ⟨B, U, hB, hUX, constants⟩ := tt_constants_exists_l hZF hX hθ hκ
   obtain ⟨D, t, pool, type, _⟩ := tt_type_exists_l I hZF hω c n s θ U
   have hDX := pool.rank_mem_l hZF hω hX hθ hωX hn hUX
-  refine ⟨κ, B, U, D, t, above, hκ, hB, constants,
-    ⟨code.1, hn, hs, hθZ, fun x hx => hXZ x (ht U hUX x hx), pool, type⟩, fun τ hτ => ?_⟩
+  have lower : Tt_realized_d I ω c Z Q n s θ U D t :=
+    ⟨code.1, hn, hs, hθZ, fun x hx => hXZ x (ht U hUX x hx), pool, type⟩
+  obtain ⟨u, truthU, _⟩ := tt_truth_exists_l I hZF ω d n s θ D
+  have fs := fn0_function_l (ZF.modelsKP hZF) hs
+  have lifted : Tt_realized_d I ω d W S n s θ U D u :=
+    ⟨upper.1, hn, fn0_of_function_l (ZF.modelsKP hZF) ⟨fs.1, fs.2.1, fun i hi =>
+      (fs.2.2 i hi).imp fun x hx => ⟨hZW x hx.1, hx.2⟩⟩, hZW θ hθZ,
+      fun x hx => hZW x (lower.constants x hx), pool, truthU⟩
+  -- 定义域由实际公式查询核验，再把构造所得前驱与原低层类型逐查询识别。
+  obtain ⟨p, _, read, defined⟩ := tt_minus_guarded_l hZF hω hZ hW hμ (hη.transitive ω hωη) hB constants upper lifted
+  obtain ⟨c', Q', t', code', minus, realized⟩ := defined.mp
+    (read.mpr ⟨hs, hθZ, lower.constants κ ((constants κ).mpr (Or.inr rfl))⟩)
+  obtain ⟨ec, eQ⟩ := smem_unique_l I hZF.1 code' code
+  subst c' Q'
+  have et := hZF.1.eq_of_same_members t' t (fun p => (realized.truth p).trans (type p).symm)
+  subst t'
+  refine ⟨κ, B, U, D, t, u, above, hκ, hB, constants, lower, lifted, minus, fun τ hτ => ?_⟩
   obtain ⟨L, K, F, R, V, Y, j, hL, hκL, hτL, hωL, rL, sL, hV, short, source, strong⟩ := family τ hτ
   have hVX := ZF.v_mono_l I hZF hV hX (hθ.1.transitive L hL)
   obtain ⟨b, d, N, S, i, κ', D', t₀, t', hm, hm', ultra, crit, bound, cover, hDD, htt, type₀, image⟩ :=
