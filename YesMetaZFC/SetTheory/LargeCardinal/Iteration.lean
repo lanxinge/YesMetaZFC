@@ -9,6 +9,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular
 import YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptMember
 import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyTree
 import YesMetaZFC.SetTheory.LargeCardinal.IterationNiceReturn
+import YesMetaZFC.SetTheory.LargeCardinal.IterationWeak
 import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 
 /-! # 迭代树、后继扩张与极限添枝的公共入口
@@ -47,5 +48,8 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 `it_nice_return_l` 对整棵反例取有限反射层与可数壳，恢复原 nice 树和实际下降秩段，
 由原正则根构造 Pₙ 初始行，最后调用下降反证。因而任意可数 nice ω 树的给定
 根嵌入都沿某条共尾良基枝返回原 Vθ，根复合式精确保留，无需额外高度假设。
-长度 ω₁ 的弱迭代博弈策略仍待实现。
+`it_nice_weakly_iterable_l` 自动构造实际 ω₁ 及公开枝策略。后继应答使用原 nice 树返回定理，
+可数极限先取全部相容旧图的并，再构造同一商投影的传递极限与规范腿。
+内部选择函数产生唯一超限运行，合法历史的原公式归纳排除失败；唯一重放把内部
+返回列消去，得到只读公开走法历史的集合函数。获胜证书覆盖直到 ω₁ 的所有初始对局。
 -/

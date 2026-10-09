@@ -1,3 +1,4 @@
+import YesMetaZFC.SetTheory.InnerModel.Rudimentary.Tuple
 import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyExtend
 import YesMetaZFC.Model.SetTheory.ClassChoice
 
@@ -70,52 +71,31 @@ theorem Ic_row_d.start_l {ω c X A π z Z α o T Q G E L : M.Domain}
   · intro i j k _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ succ _ _ _ aj
     exact (ho i (index aj ▸ succ.predecessor_mem)).elim
 
-def Ic_pack_d (s H S Q G : M.Domain) : Prop := ∃ p, KPair_d M p Q G ∧ Rd_triple_d s H S p
-def ic_pack_m {d} (s H S Q G : Term d) : Formula 1 d := set[d] ⟪
-  ∃ p, ⌜kpair0_m⌝ₚ(p, ⌜Q⌝ₛ, ⌜G⌝ₛ) ∧ ⌜rd_triple0_m⌝ₚ(⌜s⌝ₛ, ⌜H⌝ₛ, ⌜S⌝ₛ, p)⟫
-derive_free_closed ic_pack_m
-theorem ic_pack_sat_l (hE : Extensional M) {d} (η : Env M d) (s H S Q G : Term d) :
-    Formula.satisfies η (ic_pack_m s H S Q G) ↔ Ic_pack_d (s.eval η) (H.eval η) (S.eval η) (Q.eval η) (G.eval η) := by
-  simp only [ic_pack_m, Ic_pack_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-    kpair0_sat_l hE, rd_triple0_sat_l hE, Definitional.Term.eval_weaken]; rfl
-theorem ic_pack_exists_l (hKP : M.Models KP) (H S Q G : M.Domain) : ∃ s, Ic_pack_d s H S Q G := by
-  obtain ⟨p, hp⟩ := (kp_pair_l hKP).total Q G
-  obtain ⟨q, hq⟩ := (kp_pair_l hKP).total S p
-  obtain ⟨s, hs⟩ := (kp_pair_l hKP).total H q
-  exact ⟨s, p, hp, q, hq, hs⟩
-theorem Ic_pack_d.unique_l {s H S Q G H' S' Q' G' : M.Domain}
-    (h : Ic_pack_d s H S Q G) (g : Ic_pack_d s H' S' Q' G') : H = H' ∧ S = S' ∧ Q = Q' ∧ G = G' := by
-  obtain ⟨p, hp, hs⟩ := h
-  obtain ⟨q, hq, ht⟩ := g
-  obtain ⟨rfl, rfl, rfl⟩ := pc_triple_inj_l hs ht
-  obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp hq
-  exact ⟨rfl, rfl, rfl, rfl⟩
-
 def Ic_state_d (ω T Q G E L i s : M.Domain) : Prop := ∃ m H S Q' G',
-  M.SuccessorOf m i ∧ Ic_pack_d s H S Q' G' ∧ Ic_history_d hZF ω T Q G E L m H S Q' G'
+  M.SuccessorOf m i ∧ Rd_quad_d s H S Q' G' ∧ Ic_history_d hZF ω T Q G E L m H S Q' G'
 def ic_state_m {d} (ω T Q G E L i s : Term d) : Formula 1 d := set[d] ⟪
-  ∃ m H S Q' G', ⌜KP.succ0_m⌝ₚ(m, ⌜i⌝ₛ) ∧ ⌜ic_pack_m⌝ₚ(⌜s⌝ₛ, H, S, Q', G') ∧
+  ∃ m H S Q' G', ⌜KP.succ0_m⌝ₚ(m, ⌜i⌝ₛ) ∧ ⌜rd_quad_m⌝ₚ(⌜s⌝ₛ, H, S, Q', G') ∧
     ⌜ic_history_m⌝ₚ(⌜ω⌝ₛ, ⌜T⌝ₛ, ⌜Q⌝ₛ, ⌜G⌝ₛ, ⌜E⌝ₛ, ⌜L⌝ₛ, m, H, S, Q', G')⟫
 derive_free_closed ic_state_m
 theorem ic_state_sat_l {d} (η : Env M d) (ω T Q G E L i s : Term d) :
     Formula.satisfies η (ic_state_m ω T Q G E L i s) ↔ Ic_state_d hZF
       (ω.eval η) (T.eval η) (Q.eval η) (G.eval η) (E.eval η) (L.eval η) (i.eval η) (s.eval η) := by
   simp only [ic_state_m, Ic_state_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-    KP.succ0_sat_l hZF.1, ic_pack_sat_l hZF.1, ic_history_sat_l hZF, Definitional.Term.eval_weaken]; rfl
+    KP.succ0_sat_l hZF.1, rd_quad_sat_l hZF.1, ic_history_sat_l hZF, Definitional.Term.eval_weaken]; rfl
 
-def Ic_extend_d (s t : M.Domain) : Prop := ∃ H S Q G H' S' Q' G', Ic_pack_d s H S Q G ∧ Ic_pack_d t H' S' Q' G' ∧
+def Ic_extend_d (s t : M.Domain) : Prop := ∃ H S Q G H' S' Q' G', Rd_quad_d s H S Q G ∧ Rd_quad_d t H' S' Q' G' ∧
   M.MemberSubset H H' ∧ M.MemberSubset Q Q' ∧ M.MemberSubset G G'
 def ic_extend_m {d} (s t : Term d) : Formula 1 d := set[d] ⟪
-  ∃ H S Q G H' S' Q' G', ⌜ic_pack_m⌝ₚ(⌜s⌝ₛ, H, S, Q, G) ∧ ⌜ic_pack_m⌝ₚ(⌜t⌝ₛ, H', S', Q', G') ∧
+  ∃ H S Q G H' S' Q' G', ⌜rd_quad_m⌝ₚ(⌜s⌝ₛ, H, S, Q, G) ∧ ⌜rd_quad_m⌝ₚ(⌜t⌝ₛ, H', S', Q', G') ∧
     H ⊆ H' ∧ Q ⊆ Q' ∧ G ⊆ G'⟫
 derive_free_closed ic_extend_m
 theorem ic_extend_sat_l (hE : Extensional M) {d} (η : Env M d) (s t : Term d) :
     Formula.satisfies η (ic_extend_m s t) ↔ Ic_extend_d (s.eval η) (t.eval η) := by
   simp only [ic_extend_m, Ic_extend_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
-    Formula.satisfies_subset_iff, ic_pack_sat_l hE, Definitional.Term.eval_weaken]; rfl
+    Formula.satisfies_subset_iff, rd_quad_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
 theorem Ic_extend_d.read_l {s t H S Q G H' S' Q' G' : M.Domain} (h : Ic_extend_d s t)
-    (hs : Ic_pack_d s H S Q G) (ht : Ic_pack_d t H' S' Q' G') :
+    (hs : Rd_quad_d s H S Q G) (ht : Rd_quad_d t H' S' Q' G') :
     M.MemberSubset H H' ∧ M.MemberSubset Q Q' ∧ M.MemberSubset G G' := by
   obtain ⟨A, B, C, D, A', B', C', D', hp, hq, keep⟩ := h
   obtain ⟨rfl, rfl, rfl, rfl⟩ := hp.unique_l hs
@@ -138,11 +118,11 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 /-- 类选择的转移见证由实际复制定理提供；所得序列从指定首行出发。 -/
 theorem Ic_row_d.sequence_l {ω c X A π z Z α o T Q G E L : M.Domain}
     (nice : It_nice_d hZF ω c ω T Q G E L) (row : Ic_row_d hZF ω c X A π z Z α) (ho : ∀ x, ¬ M.mem x o) :
-    ∃ D f s₀ H₀ S₀ Q₀ G₀, Fn0_d ω D f ∧ Rd_entry_d o s₀ f ∧ Ic_pack_d s₀ H₀ S₀ Q₀ G₀ ∧
+    ∃ D f s₀ H₀ S₀ Q₀ G₀, Fn0_d ω D f ∧ Rd_entry_d o s₀ f ∧ Rd_quad_d s₀ H₀ S₀ Q₀ G₀ ∧
       Ic_at_d H₀ o X A π z Z α ∧ (∀ i s, Rd_entry_d i s f → Ic_state_d hZF ω T Q G E L i s) ∧
       ∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s f → Rd_entry_d j t f → Ic_extend_d s t := by
   obtain ⟨m, H, S, Q', G', hm, hist, first⟩ := row.start_l hZF nice.tree.diagram ho (nice.tree.root o ho)
-  obtain ⟨s₀, pack⟩ := ic_pack_exists_l (ZF.modelsKP hZF) H S Q' G'
+  obtain ⟨s₀, pack⟩ := rd_quad_exists_l (ZF.modelsKP hZF) H S Q' G'
   let η : Env M 6 := ⟨Fin.cases L (Fin.cases E (Fin.cases G (Fin.cases Q (Fin.cases T (fun _ => ω))))), fun _ => ω⟩
   let V : BinarySchema 6 := { body := ic_state_m (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest }
   let φ : UnarySchema 8 := { body := ic_extend_m (.bound 1) .newest }
@@ -155,7 +135,7 @@ theorem Ic_row_d.sequence_l {ω c X A π z Z α o T Q G E L : M.Domain}
       have eq := hm.eq hZF.1 hij
       subst m
       obtain ⟨l, J, S', Q'', G'', hl, hist', rows, codes, maps⟩ := hist.extend_l hZFC nice hi hij
-      obtain ⟨t, pack'⟩ := ic_pack_exists_l (ZF.modelsKP hZF) J S' Q'' G''
+      obtain ⟨t, pack'⟩ := rd_quad_exists_l (ZF.modelsKP hZF) J S' Q'' G''
       exact ⟨t, (valid j t).mpr ⟨l, J, S', Q'', G'', hl, pack', hist'⟩,
         (step i s t).mpr ⟨H, S, Q', G', J, S', Q'', G'', pack, pack', rows, codes, maps⟩⟩)
   exact ⟨D, f, s₀, H, S, Q', G', fn0_of_function_l (ZF.modelsKP hZF) hf, hs, pack, first,

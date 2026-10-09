@@ -13,9 +13,9 @@ variable {M : Structure.{u}}
 
 private def ic_pick {A : Type u} (H Q G : A) : Fin 3 → A := Fin.cases H (Fin.cases Q (fun _ => G))
 private def Ic_union_d (a : Fin 3) (f x : M.Domain) : Prop := ∃ i s H S Q G,
-  Rd_entry_d i s f ∧ Ic_pack_d s H S Q G ∧ M.mem x (ic_pick H Q G a)
+  Rd_entry_d i s f ∧ Rd_quad_d s H S Q G ∧ M.mem x (ic_pick H Q G a)
 private def ic_union_m (a : Fin 3) {d} (f x : Term d) : Formula 1 d := set[d] ⟪
-  ∃ i s H S Q G, ⌜rd_entry0_m⌝ₚ(i, s, ⌜f⌝ₛ) ∧ ⌜ic_pack_m⌝ₚ(s, H, S, Q, G) ∧
+  ∃ i s H S Q G, ⌜rd_entry0_m⌝ₚ(i, s, ⌜f⌝ₛ) ∧ ⌜rd_quad_m⌝ₚ(s, H, S, Q, G) ∧
     ⌜(fun H Q G x => (Definitional.Formula.mem x (ic_pick H Q G a) : Formula 1 _))⌝ₚ(H, Q, G, ⌜x⌝ₛ)⟫
 @[simp] private theorem ic_union_closed_l (a : Fin 3) {d} (f x : Term d)
     (hf : f.freeSupport = []) (hx : x.freeSupport = []) : (ic_union_m a f x).FreeClosed := by
@@ -26,7 +26,7 @@ private theorem ic_union_sat_l (hE : Extensional M) (a : Fin 3) {d} (η : Env M 
   refine Fin.cases ?_ (Fin.cases ?_ (fun _ => ?_)) a <;>
     simp only [ic_union_m, Ic_union_d, ic_pick, Fin.cases_zero, Fin.cases_succ,
       Formula.satisfies_exists_iff, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
-      rd_entry0_sat_l hE, ic_pack_sat_l hE, Definitional.Term.eval_weaken] <;> rfl
+      rd_entry0_sat_l hE, rd_quad_sat_l hE, Definitional.Term.eval_weaken] <;> rfl
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
@@ -36,10 +36,10 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
     (valid : ∀ i s, Rd_entry_d i s f → Ic_state_d hZF ω T Q G E L i s)
     (chain : ∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s f → Rd_entry_d j t f → Ic_extend_d s t) :
     ∃ H Q' G', Ic_history_d hZF ω T Q G E L ω H T Q' G' ∧
-      ∀ i s H₀ S₀ Q₀ G₀, Rd_entry_d i s f → Ic_pack_d s H₀ S₀ Q₀ G₀ →
+      ∀ i s H₀ S₀ Q₀ G₀, Rd_entry_d i s f → Rd_quad_d s H₀ S₀ Q₀ G₀ →
         M.MemberSubset H₀ H ∧ M.MemberSubset Q₀ Q' ∧ M.MemberSubset G₀ G' := by
   have ff := fn0_function_l (ZF.modelsKP hZF) fn
-  have read {i s H S Q' G'} (hs : Rd_entry_d i s f) (hp : Ic_pack_d s H S Q' G') :
+  have read {i s H S Q' G'} (hs : Rd_entry_d i s f) (hp : Rd_quad_d s H S Q' G') :
       ∃ m, M.SuccessorOf m i ∧ Ic_history_d hZF ω T Q G E L m H S Q' G' := by
     obtain ⟨m, A, B, C, D, hm, pack, hist⟩ := valid i s hs
     obtain ⟨e₁, e₂, e₃, e₄⟩ := pack.unique_l hp
@@ -68,13 +68,13 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
       M.IsSetFunction I (ic_pick H Q' G' a) :=
     Fin.cases hist.function (Fin.cases hist.diagram.model_function (fun _ => hist.diagram.map_function)) a
   have keep {s t H S Q' G' H' S' Q'' G''} (ext : Ic_extend_d s t)
-      (hs : Ic_pack_d s H S Q' G') (ht : Ic_pack_d t H' S' Q'' G'') (a : Fin 3) :
+      (hs : Rd_quad_d s H S Q' G') (ht : Rd_quad_d t H' S' Q'' G'') (a : Fin 3) :
       M.MemberSubset (ic_pick H Q' G' a) (ic_pick H' Q'' G'' a) := by
     obtain ⟨hh, hq, hg⟩ := ext.read_l hs ht
     exact Fin.cases hh (Fin.cases hq (fun _ => hg)) a
   -- 传递闭包只给本次分离提供集合界；它不限制复制模型的高度。
   obtain ⟨U, tu, hDU, _⟩ := ZF.tc_exists_l I hZF D
-  have owned {i s H S Q' G'} (hs : Rd_entry_d i s f) (pack : Ic_pack_d s H S Q' G') (a : Fin 3) :
+  have owned {i s H S Q' G'} (hs : Rd_entry_d i s f) (pack : Rd_quad_d s H S Q' G') (a : Fin 3) :
       M.mem (ic_pick H Q' G' a) U := by
     obtain ⟨p, hp, q, hq, hr⟩ := pack
     obtain ⟨hH, hqU⟩ := hr.mem_l M tu (tu D hDU s (fn.bound_l hs).2)
@@ -91,9 +91,9 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
     exact ⟨And.right, fun h => ⟨by obtain ⟨i, s, H, S, Q', G', hs, hp, hx⟩ := h; exact tu _ (owned hs hp a) x hx, h⟩⟩
   have graphs (a : Fin 3) {B} (bs : ∀ x, M.mem x B ↔ Ic_union_d a f x) :
       M.IsSetFunction I B ∧ ∀ x y, Rd_entry_d x y B ↔ ∃ i s H S Q' G',
-        Rd_entry_d i s f ∧ Ic_pack_d s H S Q' G' ∧ Rd_entry_d x y (ic_pick H Q' G' a) := by
+        Rd_entry_d i s f ∧ Rd_quad_d s H S Q' G' ∧ Rd_entry_d x y (ic_pick H Q' G' a) := by
     have entries x y : Rd_entry_d x y B ↔ ∃ i s H S Q' G',
-        Rd_entry_d i s f ∧ Ic_pack_d s H S Q' G' ∧ Rd_entry_d x y (ic_pick H Q' G' a) := by
+        Rd_entry_d i s f ∧ Rd_quad_d s H S Q' G' ∧ Rd_entry_d x y (ic_pick H Q' G' a) := by
       refine ⟨fun ⟨p, pair, hp⟩ => ?_, fun ⟨i, s, H, S, Q', G', hs, pack, p, pair, hp⟩ => ?_⟩
       · obtain ⟨i, s, H, S, Q', G', hs, pack, hp⟩ := (bs p).mp hp
         exact ⟨i, s, H, S, Q', G', hs, pack, p, pair, hp⟩
@@ -115,7 +115,7 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
   obtain ⟨hf, he⟩ := graphs 0 hs
   obtain ⟨qf, qe⟩ := graphs 1 qs
   obtain ⟨gf, ge⟩ := graphs 2 gs
-  have inside {i s H₀ S₀ Q₀ G₀} (h : Rd_entry_d i s f) (hp : Ic_pack_d s H₀ S₀ Q₀ G₀) :
+  have inside {i s H₀ S₀ Q₀ G₀} (h : Rd_entry_d i s f) (hp : Rd_quad_d s H₀ S₀ Q₀ G₀) :
       M.MemberSubset H₀ H ∧ M.MemberSubset Q₀ Q' ∧ M.MemberSubset G₀ G' :=
     ⟨fun x hx => (hs x).mpr ⟨i, s, H₀, S₀, Q₀, G₀, h, hp, hx⟩,
       fun x hx => (qs x).mpr ⟨i, s, H₀, S₀, Q₀, G₀, h, hp, hx⟩,

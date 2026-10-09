@@ -38,5 +38,6 @@ J^S_0=S,\qquad J^S_{\alpha+1}=\operatorname{Rud}(J^S_\alpha\cup\{J^S_\alpha\}),
 
 下一阶段的结论已固定为 `Axioms.lr_ad`，前提句子为
 [`Axioms.woodin_proper`](../../LargeCardinal/Woodin.lean)。本层没有证明两者之间的
-蕴涵，也没有建立 extender 超幂、迭代树、齐性树或相应决定性定理。
+蕴涵。源内部 extender 超幂、迭代树及 nice 树弱可迭代性的已证接口见
+[LargeCardinal](../../LargeCardinal/README.md)；齐性树、泛型迭代及相应决定性定理仍待完成。
 L(ℝ) 的 ZF 模型性与“大基数推出其中 AD”分别是已完成和待完成的数学内容。

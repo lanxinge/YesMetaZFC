@@ -207,6 +207,11 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal.EmbeddingRelative"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderSetPull", "ExtenderBoundedCode", "ExtenderStrengthPull", "IterationColumnPull",
              "IterationDiagramPull", "IterationOwnerPull", "IterationCutPull")]
+MODULES += ["YesMetaZFC.SetTheory.Ord.Recursion", "YesMetaZFC.SetTheory.InnerModel.Rudimentary.Tuple"]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("IterationEmbeddingLaws", "IterationLinearOrder", "IterationLimitSyntax", "IterationWeakState",
+             "IterationWeakAppend", "IterationWeakHistory", "IterationWeakUnion", "IterationWeakSyntax",
+             "IterationWeakAnswerSyntax", "IterationWeakReplay", "IterationWeakPublicWinning")]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Num_d", "num_m", "num_unique_l", "Smdl_d", "smdl_m", "smdl_structure_l",
@@ -435,6 +440,10 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderUltraCertificate", "IterationUltraRead")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("IterationUltraPull", "IterationInitialPull", "IterationNicePull", "IterationNiceReturn")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("IterationCountableLimit", "IterationWeakLimit", "IterationWeakSuccessor", "IterationWeakAnswer",
+                "IterationWeakBound", "IterationWeakChoice", "IterationWeakRun", "IterationWeakWinning",
+                "IterationWeakPublic", "IterationWeak")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("eb_pool_m", "ep_indices0_m", "eb_collapse_m", "es_strength0_m", "ex_strength0_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Pn_agree_d"]
@@ -443,7 +452,7 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("ep_source_m", "Pn_model_d", "pn_model_m", "Pn_row_d", "pn_row_m", "pn_agree_m",
                  "Pn_cell_d", "pn_cell_m", "Pn_past_d", "pn_past_m", "Pn_history_d", "pn_history_m", "It_nice_d", "It_cut_d",
                  "Ic_model_d", "ic_model_m", "Ic_row_d", "ic_row_m", "Ic_cell_d", "ic_cell_m", "Ic_at_d", "ic_at_m",
-                 "Ic_edge_d", "ic_edge_m", "Ic_history_d", "ic_history_m", "Ic_pack_d", "ic_pack_m", "Ic_state_d", "ic_state_m",
+                 "Ic_edge_d", "ic_edge_m", "Ic_history_d", "ic_history_m", "Ic_state_d", "ic_state_m",
                  "Ic_extend_d", "ic_extend_m", "Ic_move_d", "ic_move_m", "it_pred_m", "it_order_m", "it_diagram_m",
                  "ea_agree_m", "ep_graph_m", "ep_lift_m", "ep_system_m", "ep_constants_m", "it_ultra_m", "it_source_m", "it_payload_m",
                  "Ja_lift_d", "ja_lift_m", "Jr_value_d", "jr_value_m")]
@@ -477,6 +486,9 @@ LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for
                      ("em_family_relative_l", "ec_coherent_relative_l", "It_local_d.measures_l",
                       "It_local_d.coherent_l", "It_local_d.bounded_model_l", "ea_atoms_relative_l", "en_normal_relative_l",
                       "It_local_d.atoms_l", "It_local_d.normal_l")})
+LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for name in
+                     ("Wi_history_d.last_keep_l", "wi_answer_root_l", "Wi_selector_d.answer_l",
+                      "Wi_input_d.unique_l", "Wi_drive_d.unique_l", "Wi_public_d.unique_l")})
 ZF_BOUNDS = {"YesMetaZFC.SetTheory.Internal.Ssk_d." + name: BASELINE for name in
              ("value_l", "closed_l", "point_mem_l")}
 ZF_BOUNDS["YesMetaZFC.SetTheory.InnerModel.jc_internal_l"] = BASELINE
@@ -524,6 +536,17 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("It_branch_d", "It_tag_d", "It_arrow_d", "it_arrow_m", "It_system_d",
                  "It_project_d", "it_project_m", "It_cone_d", "It_finish_d", "it_finish_m",
                  "It_wf_branch_d", "It_realizer_d", "It_value_d", "it_value_m", "It_limit_extension_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.InnerModel.Rd_quad_d", "YesMetaZFC.SetTheory.InnerModel.rd_quad_m"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("it_branch_m", "it_tag_m", "it_system_m", "it_embedding_m", "it_cone_m", "wi_limit_m",
+                 "Wi_state_d", "Wi_extension_d", "Wi_limit_d", "Wi_keep_d", "Wi_at_d", "Wi_history_d",
+                 "Wi_tree_d", "Wi_past_d", "Wi_success_d", "Wi_continuous_d", "Wi_answer_d",
+                 "wi_state_m", "wi_keep_m", "wi_at_m", "wi_past_m", "wi_history_m", "wi_tree_m",
+                 "wi_success_m", "wi_continuous_m", "wi_answer_m", "Wi_request_d", "wi_request_m",
+                 "Wi_selector_d", "wi_select_m", "Wi_input_d", "wi_input_m", "Wi_drive_d", "wi_drive_m",
+                 "wi_drive_schema", "Wi_run_d", "wi_run_m", "Wi_legal_d", "Wi_reply_d",
+                 "Wi_position_d", "wi_position_m", "Wi_public_d", "wi_public_m", "Wi_strategy_d", "Wi_play_d")]
+LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Wi_winning_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in

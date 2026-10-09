@@ -47,15 +47,19 @@ theorem it_embedding_factor_l {ω α T Q G B L A p H R q c C V d Y W P : M.Domai
 def It_return_d (ω z T Q G d Y π : M.Domain) : Prop := ∃ B L A p H R r c N V P σ,
   It_branch_d ω T B ∧ It_system_d B L Q G A p H R ∧ Di_limit_d A p H R r N V ∧
     Smem_d I c N V ∧ It_cone_d hZF ω B Q G c N V P ∧ It_source_d hZF ω c ∧
-    Smap_d I ω c d N Y σ ∧ ∃ j, Rd_entry_d z j P ∧ It_comp_d j σ π
+    Smap_d I ω c d N Y σ ∧ (∀ i f, Rd_entry_d i f P ↔ M.mem i B ∧ It_project_d r i f) ∧
+    ∃ j, Rd_entry_d z j P ∧ It_comp_d j σ π
 
-theorem it_embedding_return_l {ω T Q G B z c₀ d Y W P π : M.Domain}
-    (hω : M.IsOmega ω) (h : It_diagram_d hZF ω ω T Q G) (b : It_branch_d ω T B)
+/-- 任意长度的相容初等列都有实际传递极限，返回因子与每一条腿交换。 -/
+theorem it_embedding_limit_l {ω α T Q G B z c₀ d Y W P : M.Domain}
+    (hω : M.IsOmega ω) (h : It_diagram_d hZF ω α T Q G) (b : It_branch_d α T B)
     (hz : M.mem z B) (hc : Rd_entry_d z c₀ Q) (source : It_source_d hZF ω c₀)
-    (my : Smem_d I d Y W) (maps : It_embedding_d hZF ω B Q G d Y W P) (root : Rd_entry_d z π P) :
-    It_return_d hZF ω z T Q G d Y π := by
+    (my : Smem_d I d Y W) (maps : It_embedding_d hZF ω B Q G d Y W P) :
+    ∃ L A p H R r c N V P' σ, It_system_d B L Q G A p H R ∧ Di_limit_d A p H R r N V ∧
+      Smem_d I c N V ∧ It_cone_d hZF ω B Q G c N V P' ∧ It_source_d hZF ω c ∧
+      Smap_d I ω c d N Y σ ∧ (∀ i f, Rd_entry_d i f P' ↔ M.mem i B ∧ It_project_d r i f) ∧
+      ∀ i f j, Rd_entry_d i f P → Rd_entry_d i j P' → It_comp_d j σ f := by
   obtain ⟨X₀, V₀, K₀, mx, source⟩ := source
-  have pi := maps.elementary z π c₀ X₀ V₀ root hc mx.1
   have wf : Wf_rel_d Y W := fun Z _ ne => by
     obtain ⟨x, hx, least⟩ := KP.mem_minimal_exists_d (ZF.modelsKP hZF) ne
     exact ⟨x, hx, fun y hy hr => least y hy ((my.2 y x).mp hr).2.2⟩
@@ -66,18 +70,30 @@ theorem it_embedding_return_l {ω T Q G B z c₀ d Y W P π : M.Domain}
   have next := di_limit_iso_l (ZF.modelsKP hZF) limit bij fr rs mn.1.2.2
     (fun _ _ _ _ hx hy => hv.relation_l I hZF hω model mn.1 hx hy)
   obtain ⟨σ, hs, law⟩ := it_embedding_factor_l hZF hω h b.subset s elem next mn.1 maps
-  obtain ⟨j, hj⟩ := (cone.domain z).mp hz
-  have jj := cone.elementary z j c₀ X₀ V₀ hj hc mx.1
+  refine ⟨L, A, p, H, R, r, e, N, S, P', σ, s, next, mn, cone, ready, hs, ps, ?_⟩
+  intro i π j root hj
+  obtain ⟨a, X, U, ha, mdl⟩ := h.model_l hZF (b.subset i ((cone.domain i).mpr ⟨j, hj⟩))
+  have pi := maps.elementary i π a X U root ha mdl
+  have jj := cone.elementary i j a X U hj ha mdl
   have factor x v y (hxv : Rd_entry_d x v j) (hxy : Rd_entry_d x y π) : Rd_entry_d v y σ := by
-    obtain ⟨a, hp, hav⟩ := (((ps z j).mp hj).2.2 x v).mp hxv
-    exact law a z x π v y hp root hav hxy
-  refine ⟨B, L, A, p, H, R, r, e, N, S, P', σ, b, s, next, mn, cone, ready, hs,
-    j, hj, pi.1.1.1.1, fun x y => ⟨?_, ?_⟩⟩
+    obtain ⟨a, hp, hav⟩ := (((ps i j).mp hj).2.2 x v).mp hxv
+    exact law a i x π v y hp root hav hxy
+  refine ⟨pi.1.1.1.1, fun x y => ⟨?_, ?_⟩⟩
   · intro hxy
     obtain ⟨v, _, hxv⟩ := jj.1.1.2.2 x (pi.1.1.input_mem_of_pairMember hxy)
     exact ⟨v, hxv, factor x v y hxv hxy⟩
   · rintro ⟨v, hxv, hvy⟩
     obtain ⟨u, _, hxu⟩ := pi.1.1.2.2 x (jj.1.1.input_mem_of_pairMember hxv)
     exact hs.1.1.1.2 v u y (factor x v u hxv hxu) hvy ▸ hxu
+
+theorem it_embedding_return_l {ω T Q G B z c₀ d Y W P π : M.Domain}
+    (hω : M.IsOmega ω) (h : It_diagram_d hZF ω ω T Q G) (b : It_branch_d ω T B)
+    (hz : M.mem z B) (hc : Rd_entry_d z c₀ Q) (source : It_source_d hZF ω c₀)
+    (my : Smem_d I d Y W) (maps : It_embedding_d hZF ω B Q G d Y W P) (root : Rd_entry_d z π P) :
+    It_return_d hZF ω z T Q G d Y π := by
+  obtain ⟨L, A, p, H, R, r, c, N, V, P', σ, s, limit, mn, cone, ready, hs, ps, law⟩ :=
+    it_embedding_limit_l hZF hω h b hz hc source my maps
+  obtain ⟨j, hj⟩ := (cone.domain z).mp hz
+  exact ⟨B, L, A, p, H, R, r, c, N, V, P', σ, b, s, limit, mn, cone, ready, hs, ps, j, hj, law z π j root hj⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

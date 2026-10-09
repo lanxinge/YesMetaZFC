@@ -82,4 +82,11 @@ theorem h_fibers_l {R B T} (hR : M.mem R H) (hB : M.mem B H)
   exact (hH t).mpr (ZF.hmem_of_subset_l I hZF hχ.isLimitOrdinal hs.1
     (fun x hx => (InnerModel.rd_entry_transitive_l hs.1 hs.2.1 ((fiber x).mp hx)).1) hν bound)
 
+/-- 拥有集合之间的任意关系图属于同一 Hχ。 -/
+theorem h_relation_l {X Y R} (hX : M.mem X H) (hY : M.mem Y H)
+    (bound : ∀ p, M.mem p R → ∃ x, M.mem x X ∧ ∃ y, M.mem y Y ∧ KPair_d M p x y) : M.mem R H := by
+  obtain ⟨D, hd⟩ := ZF.exists_cartesianProduct hZF I X Y
+  exact ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH (h_product_l hZFC hω hχ hωχ hH hX hY hd) R
+    (fun p hp => (hd p).mpr (bound p hp))
+
 end YesMetaZFC.SetTheory.ZFC
