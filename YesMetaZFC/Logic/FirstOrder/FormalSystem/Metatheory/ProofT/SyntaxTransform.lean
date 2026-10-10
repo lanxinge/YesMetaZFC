@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SyntaxSubstitution
-import YesMetaZFC.Automation.ObjectCodeProjection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeProjection
 
 /-! # 局部证明规则共用的数值语法变换
 

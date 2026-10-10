@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralComparison
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralComparison
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralEqualityRules
 
 /-! # 任意两个内部自然数的相等与不等反射

@@ -77,8 +77,18 @@ jobs:
         run: cygpath -w "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build all modules and native targets
         run: python scripts/lean_cache.py build --native
-      - name: Check scanner
-        run: lake --no-build exe prove_auto_sweep --help
+      - name: Audit arithmetic axioms and data boundary
+        run: |
+          python scripts/test_arithmetic_guard.py
+          python scripts/check_arithmetic.py
+      - name: Audit filters and Boolean completion
+        run: python scripts/check_filters.py
+      - name: Audit elementary substructures
+        run: python scripts/check_elementary.py
+      - name: Audit ultrapowers and Los witness boundary
+        run: python scripts/check_ultrapower.py
+      - name: Audit forcing orders and constructive data
+        run: python scripts/check_forcing.py
       - name: Pack Lean and full caches
         run: |
           python scripts/lean_cache.py pack --kind lean

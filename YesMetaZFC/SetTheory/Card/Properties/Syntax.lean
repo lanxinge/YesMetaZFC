@@ -24,6 +24,7 @@ def isLimitCardinal (𝒞 : OrderedPairConvention)
 def isRegularCardinal (𝒞 : OrderedPairConvention)
     {depth : Nat} (κ : Term depth) : Formula 1 depth :=
   isCofinality 𝒞 κ κ
+derive_free_closed isRegularCardinal
 /-- `κ` 是奇异基数，即其共尾度严格小于自身。 -/
 def isSingularCardinal (𝒞 : OrderedPairConvention)
     {depth : Nat} (κ : Term depth) : Formula 1 depth :=

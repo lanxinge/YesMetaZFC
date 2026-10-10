@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedAxiomPacket
-import YesMetaZFC.Automation.ObjectBinaryTest
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectBinaryTest
 
 /-! # 完整等价公理基的任意数值输出表示
 

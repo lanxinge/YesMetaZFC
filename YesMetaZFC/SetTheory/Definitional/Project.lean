@@ -72,25 +72,7 @@ def kernel : Kernel.{0, v} coreSignature where
   interpretation := Semantics.interpretation
   atom_iff := by
     intro ℳ symbol hExtensional arguments free
-    cases symbol with
-    | extensionalEq =>
-        change (Fin 2 → ℳ.Domain) at arguments
-        simp only [Semantics.interpretation, definitions,
-          Semantics.satisfies, Term.eval, Env.push]
-        change (∀ value, ℳ.mem value (arguments 0) ↔
-            ℳ.mem value (arguments 1)) ↔
-          ∀ value, ℳ.mem value (arguments 0) ↔
-            ℳ.mem value (arguments 1)
-        rfl
-    | subset =>
-        change (Fin 2 → ℳ.Domain) at arguments
-        simp only [Semantics.interpretation, definitions,
-          Semantics.satisfies, Term.eval, Env.push]
-        change (∀ value, ℳ.mem value (arguments 0) →
-            ℳ.mem value (arguments 1)) ↔
-          ∀ value, ℳ.mem value (arguments 0) →
-            ℳ.mem value (arguments 1)
-        rfl
+    cases symbol <;> exact ⟨(fun h => h), (fun h => h)⟩
 namespace Formula
 def satisfies {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (formula : Formula 1 depth) : Prop :=
   Definitional.Semantics.satisfies Semantics.interpretation env formula
@@ -139,21 +121,21 @@ def satisfies {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (formula
     satisfies env (.existsE body) ↔
       ∃ value, satisfies (env.push value) body := by
   simp only [satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_forallMem_iff
     {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (set : Term depth) (body : Formula 1 (depth + 1)) :
     satisfies env (forallMem set body) ↔
       ∀ value, ℳ.mem value (Definitional.Term.eval env set) →
         satisfies (env.push value) body := by
   simp [forallMem, satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_existsMem_iff
     {ℳ : Structure.{v}} {depth : Nat} (env : Env ℳ depth) (set : Term depth) (body : Formula 1 (depth + 1)) :
     satisfies env (existsMem set body) ↔
       ∃ value, ℳ.mem value (Definitional.Term.eval env set) ∧
         satisfies (env.push value) body := by
   simp [existsMem, satisfies, Definitional.Semantics.satisfies]
-@[simp, prove_auto_norm semantic]
+@[simp]
 theorem satisfies_rename
     {ℳ : Structure.{v}} {sourceDepth targetDepth : Nat} (env : Env ℳ targetDepth) (indexMap : Fin sourceDepth → Fin targetDepth)
     (formula : Formula 1 sourceDepth) :

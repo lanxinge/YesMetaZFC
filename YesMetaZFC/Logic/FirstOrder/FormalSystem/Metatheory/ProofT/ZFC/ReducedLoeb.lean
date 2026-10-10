@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.Loeb
-import YesMetaZFC.Automation.ObjectLoebFixedPoint
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectLoebFixedPoint
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedIntrospection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedRosser
 

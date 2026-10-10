@@ -141,12 +141,18 @@ theorem no_legacy_nat_representation
     (negative : ∀ n φ, intrinsic_zfc_nat_check n φ = false →
       Derives intrinsic_zfc_theory [] (.neg (condition (finite_numeral_term n) (QuineEncoding.quote φ)))) :
     False := by
-  let schema : Project.UnarySchema 0 := ⟨.truth, by simp [Formula.FreeClosed]⟩
+  -- 先保留模式为变量，避免类型检查提前计算具体证明码的巨大自然数。
+  suffices ∀ schema : Project.UnarySchema 0, False from this ⟨.truth, trivial⟩
+  intro schema
   let certificate := axiomCertificate (.separation schema)
-  let formula := certificate.conclusion
   let code := intrinsic_zfc_nat_encode certificate
   have hPair := separation_check_collision schema
-  exact inconsistent_of_quote_collision condition (quote_hilbertize formula).symm
+  change intrinsic_zfc_nat_check code certificate.conclusion = true ∧
+    intrinsic_zfc_nat_check code (Formula.hilbertize SetSort.set certificate.conclusion) = false at hPair
+  generalize hFormula : certificate.conclusion = formula at hPair
+  exact inconsistent_of_quote_collision (T := intrinsic_zfc_theory) (code := code)
+    (left := formula) (right := Formula.hilbertize SetSort.set formula)
+    condition (quote_hilbertize formula).symm
     (positive code formula hPair.1)
     (negative code (Formula.hilbertize SetSort.set formula) hPair.2) hConsistent
 

@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofTree
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedAxiomNumber
-import YesMetaZFC.Automation.ObjectProofNodePresentation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectProofNodePresentation
 
 /-! # 原支撑理论上的具体完整证明树 Δ₁ 表示
 

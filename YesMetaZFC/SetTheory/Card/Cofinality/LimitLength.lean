@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Card.Cofinality.Basic
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 共尾序列长度
 本层证明严格递增共尾序列的长度必为非零极限序数，并构造任意极限序数上的恒等共尾
@@ -38,7 +37,7 @@ theorem length_isLimitOrdinal
       ⟨predecessor, _, hLengthSuccessor⟩
     have hPredecessor :
         ℳ.mem predecessor length :=
-      by prove_auto
+      hLengthSuccessor.predecessor_mem
     rcases (hCofinal.isIncreasing.1.1.2.2 predecessor).mp
           hPredecessor with
       ⟨last, hLastValue⟩

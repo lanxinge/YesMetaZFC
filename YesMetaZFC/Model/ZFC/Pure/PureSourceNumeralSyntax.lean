@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralSyntax
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralSyntax
 import YesMetaZFC.Model.ZFC.Pure.PureSourceProjection
 import YesMetaZFC.Model.ZFC.Pure.PureSourceCodingInversion
 

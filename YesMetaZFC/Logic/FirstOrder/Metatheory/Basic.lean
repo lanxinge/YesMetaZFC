@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.FirstOrderDerives
+import YesMetaZFC.Tactic.FirstOrderDerives
 import YesMetaZFC.Logic.FirstOrder.Metatheory.Notation
 
 /-!

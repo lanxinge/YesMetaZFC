@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceInduction
-import YesMetaZFC.Automation.ObjectBoundedReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectBoundedReflection
 
 /-! # 实际源公式的内部强归纳
 

@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Ord.PrimePower
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Noncommutative
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 模型内部自然数的素数算术
 本文件承接自然数闭包和序数算术递归，先整理自然数范围内的交换律与整除代数，

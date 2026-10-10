@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Normal
 import YesMetaZFC.SetTheory.Ord.Natural
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数正规函数的不动点
 本模块构造从零开始的超限迭代，证明正规序数函数在 `ω` 次迭代的极限处
@@ -81,7 +80,7 @@ def epsilonNumber (𝒞 : OrderedPairConvention) : UnarySchema 1 where
     Formula.isEpsilonNumber 𝒞 (.bound 1) (.bound 0)
 end UnarySchema
 namespace BinarySchema
-@[prove_auto_norm semantic]
+
 theorem denote_ordinalIterationOperator_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (sequence output : ℳ.Domain) :
     (function.ordinalIterationOperator 𝒞).denote
@@ -106,7 +105,7 @@ theorem denote_ordinalIterationOperator_iff (𝕀 : 𝒞.Interpretation ℳ) (hE
     TermVector.evalEnv_boundParameters_three,
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Term.eval_bound_two_push, Definitional.Term.eval_newest]
-@[prove_auto_norm semantic]
+
 theorem denote_ordinalIteration_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α value : ℳ.Domain) :
     (function.ordinalIteration 𝒞).denote env α value ↔
@@ -124,7 +123,7 @@ theorem denote_ordinalIteration_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Ext
   rfl
 end BinarySchema
 namespace Formula
-@[prove_auto_norm semantic]
+
 theorem satisfies_isOrdinalIteration_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {parameterCount depth : Nat} (env : Env ℳ depth) (function : BinarySchema parameterCount) (parameters : TermVector parameterCount depth)
     (α value : Term depth) :
@@ -135,7 +134,7 @@ theorem satisfies_isOrdinalIteration_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt 
   exact BinarySchema.denote_ordinalIteration_iff
     𝕀 hExt (parameters.evalEnv env) function (α.eval env) (value.eval env)
 /-- epsilon 数公式与纸面不动点定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isEpsilonNumber_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω α : Term depth) :
     satisfies env (isEpsilonNumber 𝒞 ω α) ↔
@@ -145,7 +144,7 @@ theorem satisfies_isEpsilonNumber_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : E
     satisfies_isOrdinal_iff,
     satisfies_isOrdinalExponentiation_iff 𝕀 hExt]
 /-- 最小 epsilon 数公式与纸面最小性定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isEpsilonZero_iff (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (ω epsilon : Term depth) :
     satisfies env (isEpsilonZero 𝒞 ω epsilon) ↔
@@ -509,7 +508,7 @@ theorem ordinalIteration_limit_iff (hZF : ℳ.Models SetTheory.ZF) (𝕀 : 𝒞.
       rw [hRange member, hSelectedRange member]
     subst selectedRange
     have hValueEq : value = selected := by
-      prove_auto
+      exact Structure.IsUnionOf.eq hZF.1 hUnion hSelectedUnion
     simpa [hValueEq] using hSelected
 /--
 若零序数严格小于它的首个函数值，则从零序数开始的迭代在 `ω` 上严格递增。
@@ -947,7 +946,7 @@ theorem epsilonZero_unique (𝕀 : 𝒞.Interpretation ℳ)
     first = second := by
   rcases hFirst.2 second hSecond.1 with
     hEq | hFirstSecond
-  · prove_auto
+  · exact hEq
   · rcases hSecond.2 first hFirst.1 with
       hEq | hSecondFirst
     · exact hEq.symm

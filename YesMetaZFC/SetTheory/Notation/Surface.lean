@@ -264,7 +264,7 @@ elab (name := elaborateSetTheorySentence)
   let compiledTerm : TSyntax `term := ⟨compiled⟩
   let result ←
     `((SetTheory.Definitional.Project.Sentence.ofFormula ($compiledTerm : SetTheory.Definitional.Project.OpenFormula)
-        (by native_decide) : SetTheory.Definitional.Project.Sentence))
+        (by decide) : SetTheory.Definitional.Project.Sentence))
   elabTerm result none
 private def elaborateClass (depth : Syntax) (identifier : Syntax) (body : Syntax) : TermElabM Expr := do
   let compiled ← compileUnderBinder [] 0 identifier body

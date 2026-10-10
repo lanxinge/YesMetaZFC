@@ -42,7 +42,7 @@ def agreeAt {parameterCount : Nat} (first second : BinarySchema parameterCount) 
 end BinarySchema
 namespace Formula
 /-- 序数值闭包模式的语义正是“该输入处的全部函数值都是序数”。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_ordinalValueClosure_iff
     {ℳ : Structure.{u}} {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α : ℳ.Domain) :
     satisfies (env.push α) function.ordinalValueClosure.body ↔
@@ -55,7 +55,7 @@ theorem satisfies_ordinalValueClosure_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest]
 /-- 严格递增归纳模式的语义。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_ordinalIncreasingAt_iff
     {ℳ : Structure.{u}} {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α : ℳ.Domain) :
     satisfies (env.push α) function.ordinalIncreasingAt.body ↔
@@ -73,7 +73,7 @@ theorem satisfies_ordinalIncreasingAt_iff
     Term.eval_bound_two_push, Term.eval_bound_three_push,
     Definitional.Term.eval_newest, and_imp]
 /-- 空值归纳模式的语义。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_emptyValueAt_iff
     {ℳ : Structure.{u}} {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α : ℳ.Domain) :
     satisfies (env.push α) function.emptyValueAt.body ↔
@@ -86,7 +86,7 @@ theorem satisfies_emptyValueAt_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest]
 /-- 非空值归纳模式的语义。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_nonemptyValueAt_iff
     {ℳ : Structure.{u}} {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α : ℳ.Domain) :
     satisfies (env.push α) function.nonemptyValueAt.body ↔
@@ -100,7 +100,7 @@ theorem satisfies_nonemptyValueAt_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest]
 /-- 输入不大于函数值模式的语义。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_inputLeValueAt_iff
     {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     {parameterCount : Nat} (env : Env ℳ parameterCount) (function : BinarySchema parameterCount) (α : ℳ.Domain) :
@@ -116,7 +116,7 @@ theorem satisfies_inputLeValueAt_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Definitional.Term.eval_newest]
 /-- 类关系逐点一致归纳模式的语义。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_agreeAt_iff
     {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     {parameterCount : Nat} (env : Env ℳ parameterCount) (first second : BinarySchema parameterCount) (α : ℳ.Domain) :

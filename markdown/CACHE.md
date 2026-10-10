@@ -8,7 +8,7 @@
 | 类型 | 内容 | 适用场景 |
 | --- | --- | --- |
 | `lean`（默认） | 全部独立模块的 `.olean`、`.ilean`、Lake 跟踪文件，以及默认 `leanArts` 要求的生成 C/LLVM 文件和元数据 | 编辑器、阅读证明、继续形式化开发 |
-| `full` | `lean` 的内容，加原生对象文件、静态库、共享库及 `prove_auto_sweep` 可执行程序 | 运行扫描工具、原生链接及完整开发环境 |
+| `full` | `lean` 的内容，加原生对象文件、静态库、共享库 | 原生链接及完整开发环境 |
 
 两个类型都包含本项目的 `LICENSE` 和 `NOTICE`，以及 `share/YesMetaZFC/third-party/lean4/`
 下的工具链 `LICENSE`、`LICENSES`，保留相应第三方组件的许可说明。
@@ -65,8 +65,8 @@ python scripts/lean_cache.py restore --kind lean /path/to/YesMetaZFC-<target>-le
 python scripts/lean_cache.py restore --kind full /path/to/YesMetaZFC-<target>.tar.gz
 ```
 
-源码仍须与清单一致。恢复成功后可以直接打开项目，或用 `lake exe prove_auto_sweep --help`
-检查完整包中的扫描工具。
+源码仍须与清单一致。恢复后使用 `lake --no-build build YesMetaZFC:static YesMetaZFC:shared`
+检查完整包中的原生库。
 
 `lakefile.toml` 已配置 `releaseRepo` 和 `preferReleaseBuild`。其他项目将本库作为依赖时，
 如果对应提交的缓存标签在本地可见，Lake 可以按其原生 Release 机制获取完整包；例如依赖
@@ -77,7 +77,7 @@ python scripts/lean_cache.py restore --kind full /path/to/YesMetaZFC-<target>.ta
 `.github/workflows/lean_action_ci.yml` 对推送、PR 和手动运行构建五个平台。流程为：
 
 1. 检查缓存脚本，并按平台、工具链和 Lake 配置恢复 CI 增量缓存。
-2. 使用 `lake --wfail build` 检查全部独立模块，并构建原生静态库、共享库和扫描工具。
+2. 使用 `lake --wfail build` 检查全部独立模块，并构建原生静态库和共享库。
 3. 生成两类归档和 JSON 清单，分别实际恢复，并通过 `--no-build` 检查。
 4. 保存 CI 增量缓存，上传保留 30 天的 Actions 下载包。
 5. 原仓库 `main` 的全部平台通过后，将十个归档、对应清单及 `SHA256SUMS` 发布到同一
@@ -92,13 +92,10 @@ CI 增量缓存可能被 GitHub 淘汰，Actions 下载包有保留期限。公�
 ## 本地构建与制作缓存
 
 ```bash
-# 全部独立模块与扫描工具，与原 check-all.sh 的默认范围一致。
+# 全部独立模块，与原 check-all.sh 的默认范围一致。
 python scripts/lean_cache.py build
 
-# 只构建 Lean 模块。
-python scripts/lean_cache.py build --library-only
-
-# 加上静态库、共享库和扫描工具。
+# 加上静态库和共享库。
 python scripts/lean_cache.py build --native
 
 # 在干净源码上生成可发布的归档；默认输出到 tmp/lean-cache。
@@ -106,7 +103,7 @@ python scripts/lean_cache.py pack --kind lean
 python scripts/lean_cache.py pack --kind full
 ```
 
-`bash scripts/check-all.sh` 仍是全源检查入口，调用同一实现；支持 `--library-only`、
+`bash scripts/check-all.sh` 仍是全源检查入口，调用同一实现；支持
 `--native` 和 `--no-build`。默认 `LEAN_NUM_THREADS=4`，可以显式覆盖。
 
 在未提交的开发副本中试验本地打包，可额外传入 `--allow-dirty`。这样的包会标记源码未提交，

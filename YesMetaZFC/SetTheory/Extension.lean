@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Axioms.ZFC
 import YesMetaZFC.Model.SetTheory.Theory
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 公理系统扩张与定理继承
 `strong.Extends weak` 不要求弱理论公理在强理论中逐字出现；只要求强理论能证明弱理论

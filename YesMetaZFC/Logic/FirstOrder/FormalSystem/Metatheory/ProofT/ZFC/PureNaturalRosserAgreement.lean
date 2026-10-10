@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.RosserDomainBoundary
 import YesMetaZFC.Model.ZFC.Pure.PureSourceCoding
-import YesMetaZFC.Automation.NaturalRosserSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.NaturalRosserSemantics
 
 /-! # 当前 Rosser 对应的内部自然数归约
 

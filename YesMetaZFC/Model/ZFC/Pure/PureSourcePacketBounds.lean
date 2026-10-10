@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectPacketRanking
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPacketRanking
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornRanking
 
 /-! # 原传输包仿射图的内部增长界

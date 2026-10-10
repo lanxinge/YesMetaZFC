@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Definitional.Theory.Basic
-import YesMetaZFC.Automation.DeriveFreeClosed
+import YesMetaZFC.Tactic.DeriveFreeClosed
 
 /-!
 # 项目定义原子核的纯语法层
@@ -196,8 +196,7 @@ def definitions : Definitions coreSignature where
             (.mem (.bound 0) (.bound 2))
   bodyFreeClosed := by
     intro symbol
-    cases symbol <;>
-      simp [Formula.FreeClosed]
+    cases symbol <;> exact ⟨⟨rfl, rfl⟩, ⟨rfl, rfl⟩⟩
 
 abbrev Theory :=
   YesMetaZFC.SetTheory.Definitional.Theory coreSignature

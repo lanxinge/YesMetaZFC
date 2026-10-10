@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralSyntaxSpecifications
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralSyntaxSpecifications
 import YesMetaZFC.Model.ZFC.Pure.PureSourceNumeralSyntax
 import YesMetaZFC.Model.ZFC.Pure.PureSourceInduction
 

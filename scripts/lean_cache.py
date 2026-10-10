@@ -21,7 +21,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = "lanxinge/YesMetaZFC"
 FORMAT = 1
-NATIVE_TARGETS = ["YesMetaZFC:static", "YesMetaZFC:shared", "prove_auto_sweep"]
+NATIVE_TARGETS = ["YesMetaZFC:static", "YesMetaZFC:shared"]
 SOURCE_CONFIG = ["lean-toolchain", "lakefile.toml", "lake-manifest.json"]
 
 
@@ -51,8 +51,8 @@ def build_all(root: Path, kind: str, *, no_build: bool = False) -> None:
         run(root, "lake", *options, *batch)
         if kind == "full":
             run(root, "lake", *options, *(f"+{module}:o" for module in batch))
-    if kind != "lean":
-        run(root, "lake", *options, *(NATIVE_TARGETS if kind == "full" else ["prove_auto_sweep"]))
+    if kind == "full":
+        run(root, "lake", *options, *NATIVE_TARGETS)
 
 
 def identity(root: Path) -> dict:
@@ -280,10 +280,8 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=ROOT, help="项目根目录")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("info", help="显示当前缓存标识")
-    build = commands.add_parser("build", help="检查全部独立模块，默认包含扫描工具")
-    profiles = build.add_mutually_exclusive_group()
-    profiles.add_argument("--library-only", action="store_true")
-    profiles.add_argument("--native", action="store_true", help="另构建静态库、共享库及扫描工具")
+    build = commands.add_parser("build", help="检查全部独立模块")
+    build.add_argument("--native", action="store_true", help="另构建静态库与共享库")
     build.add_argument("--no-build", action="store_true", help="只验证目标已存在，不允许重编译")
     for command in ("pack", "get", "restore"):
         subparser = commands.add_parser(command)
@@ -300,7 +298,7 @@ def main() -> None:
     if args.command == "info":
         print(json.dumps(identity(root), ensure_ascii=False, indent=2))
     elif args.command == "build":
-        kind = "lean" if args.library_only else "full" if args.native else "tools"
+        kind = "full" if args.native else "lean"
         build_all(root, kind, no_build=args.no_build)
     elif args.command == "pack":
         pack_cache(root, args.output or root / "tmp/lean-cache", args.kind, allow_dirty=args.allow_dirty)

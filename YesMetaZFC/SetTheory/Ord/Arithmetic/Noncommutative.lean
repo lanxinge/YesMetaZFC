@@ -1,6 +1,5 @@
 import YesMetaZFC.SetTheory.Ord.Natural
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Algebra
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数加法与乘法的非交换性实例
 本文件形式化文献中的两个标准实例：
@@ -29,7 +28,7 @@ theorem nonempty {ℳ : Structure.{u}}
     ∃ value, ℳ.mem value two := by
   rcases hTwo with ⟨one, _, hSuccessor⟩
   refine ⟨one, ?_⟩
-  prove_auto
+  exact (hSuccessor one).mpr (.inr (fun _ => Iff.rfl))
 end IsOrdinalTwo
 end Structure
 namespace KP
@@ -211,7 +210,7 @@ theorem ordinalAddition_one_omega
     rcases hω.1.2 index hIndex with
       ⟨successor, hSuccessor, hSuccessorOmega⟩
     have hRangeEq : rangeValue = successor := by
-      prove_auto
+      exact Structure.SuccessorOf.eq hZF.1 hRangeSuccessor hSuccessor
     subst rangeValue
     exact (hω.transitive hZF)
       successor hSuccessorOmega value hValueRange

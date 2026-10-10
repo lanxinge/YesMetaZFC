@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralQuantifiers
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralQuantifiers
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralEqualityReflection
 
 /-! # 数码量词语义与开放源定理的公共入口 -/

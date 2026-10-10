@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralOrder
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralOrder
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralQuantifiers
 
 /-! # 隶属空集及隶属后继的实际数码证明构造 -/

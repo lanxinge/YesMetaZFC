@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectBoundedReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectBoundedReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalQuantifierReflection
 
 /-! # 有界全称证明的零点与后继组合 -/

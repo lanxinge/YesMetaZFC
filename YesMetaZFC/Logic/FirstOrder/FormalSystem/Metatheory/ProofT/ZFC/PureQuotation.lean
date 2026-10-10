@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureOpenTransfer
-import YesMetaZFC.Automation.ObjectExpressionIteration
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectExpressionIteration
 
 /-! # 纯隶属公式自身的完整 AST 编码
 

@@ -1,5 +1,7 @@
 import YesMetaZFC.Model.Boolean.ZFC
 import YesMetaZFC.Model.Boolean.Native
+import YesMetaZFC.Model.Boolean.Completion
+import YesMetaZFC.Model.Boolean.Ultrafilter
 
 /-! # 布尔值模型
 

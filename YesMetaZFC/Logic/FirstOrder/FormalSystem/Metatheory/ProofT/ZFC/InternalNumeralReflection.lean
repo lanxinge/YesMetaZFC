@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectNumeralReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectNumeralReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalNumeralSpecialization
 import YesMetaZFC.Model.ZFC.Pure.PureSourceLocalTests
 

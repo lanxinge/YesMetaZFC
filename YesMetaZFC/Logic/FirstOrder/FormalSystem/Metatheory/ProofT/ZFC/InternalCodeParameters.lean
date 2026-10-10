@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectCodeParameters
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeParameters
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalBoundedInduction
 
 /-! # 数码参数环境的实际公式表示与最终阶段对应 -/

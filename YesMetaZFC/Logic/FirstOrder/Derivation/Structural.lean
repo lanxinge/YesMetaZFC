@@ -147,9 +147,11 @@ theorem assumption_of_mem {σ : Signature.{u, v, w}}
   | nil =>
       cases hMem
   | cons head rest ih =>
-      rcases List.mem_cons.mp hMem with rfl | hRest
-      · exact Context.lift rest (Provable.self_implication formula)
-      · have hTail : Provable T (Context.discharge rest formula) :=
+      -- 直接消去成员构造子，不经库中的命题等式转换。
+      cases hMem with
+      | head => exact Context.lift rest (Provable.self_implication formula)
+      | tail _ hRest =>
+        have hTail : Provable T (Context.discharge rest formula) :=
           ih hRest
         have hWeakening :
             Provable T (.imp formula (.imp head formula)) :=
@@ -157,6 +159,10 @@ theorem assumption_of_mem {σ : Signature.{u, v, w}}
             (.weakening formula head)
         exact Provable.modus_ponens hTail
           (Context.consequence rest hWeakening)
+
+/-- info: 'YesMetaZFC.Logic.FirstOrder.Derives.assumption_of_mem' does not depend on any axioms -/
+#guard_msgs in
+#print axioms assumption_of_mem
 
 /-- 上下文编码下的 modus ponens。 -/
 theorem modus_ponens {σ : Signature.{u, v, w}}

@@ -1,29 +1,21 @@
 import YesMetaZFC.Logic.Signature
-
 /-!
 # 内在良构的一阶语法核
-
 本模块只允许构造排序正确、元数正确且作用域正确的项和公式。
-
 * bound 与 free 变量分别由有限排序上下文索引；
 * 函数和关系的参数由签名中的排序列表索引；
 * 等式两端在类型上具有同一排序；
 * 量词体直接处于扩展后的 bound 上下文；
 * 重命名与替换统一表达为上下文之间的保排序映射。
-
 因此本层不存在 raw AST、良构谓词、作用域谓词、合法性 Bool 检查器或 checked
 包装。稳定自然数变量编号属于后续序列化层，不进入语法核。
 -/
-
 namespace YesMetaZFC
 namespace Logic
 namespace FirstOrder
-
 universe u v w
-
 /-- 排序上下文。列表头表示最近引入的变量。 -/
 abbrev SortContext (σ : Signature.{u, v, w}) := List σ.SortSymbol
-
 /--
 排序上下文中的变量。构造子同时证明变量存在于上下文并具有指定排序。
 -/

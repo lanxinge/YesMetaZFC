@@ -21,14 +21,12 @@ abbrev S := Nonlogical.BasicSetTheory.signature
 abbrev s := SetSort.set
 variable {ℳ : Structure.{0,0,0,x} ℒ}
 
-def interpretation : Interpretation S ℒ where
-  sort := fun _ => setSort
-  function := PureStructureStage.interpretation.function
-  relation symbol := match symbol with
+def interpretation : Interpretation S ℒ := { PureStructureStage.interpretation with
+  relation := fun symbol => match symbol with
     | .isRelatedTermCodeAt => graph2 .term
     | .isRelatedTermListCodeAt => graph3
     | .isRelatedFormulaCodeAt => graph2 .formula
-    | symbol => PureStructureStage.interpretation.relation symbol
+    | symbol => PureStructureStage.interpretation.relation symbol }
 
 def functionCovered := PureStructureStage.functionCovered
 def relationCovered : RelationSymbol → Bool
@@ -36,7 +34,7 @@ def relationCovered : RelationSymbol → Bool
   | symbol => PureStructureStage.relationCovered symbol
 
 theorem functional (hℳ : Theory.Models ℳ theory) : Functional interpretation ℳ := by
-  exact PureStructureStage.functional hℳ
+  exact PureStructureStage.functional (ℳ := ℳ) hℳ
 
 noncomputable def expansion (hℳ : Theory.Models ℳ theory) : Expansion interpretation ℳ where
   function symbol args := match symbol,args with
@@ -53,9 +51,9 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
     cases symbol
     case relatedNonlogicalSymbolSet =>
       cases args
-      exact (PureRoundTwoStage.realizes hℳ).function .omega .nil output
+      exact (PureRoundTwoStage.realizes (ℳ := ℳ) hℳ).function .omega .nil output
     all_goals
-      exact (PureRoundTwoStage.realizes hℳ).function _ args output
+      exact (PureRoundTwoStage.realizes (ℳ := ℳ) hℳ).function _ args output
   relation symbol args := by
     cases symbol
     case isRelatedTermCodeAt =>
@@ -63,22 +61,22 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
       cases tail with | cons depth tail =>
       cases tail with | cons code tail =>
       cases tail
-      exact graph2_correct hℳ .term symbols depth code
+      exact graph2_correct (ℳ := ℳ) hℳ .term symbols depth code
     case isRelatedTermListCodeAt =>
       cases args with | cons symbols tail =>
       cases tail with | cons depth tail =>
       cases tail with | cons length tail =>
       cases tail with | cons code tail =>
       cases tail
-      exact graph3_correct hℳ symbols depth length code
+      exact graph3_correct (ℳ := ℳ) hℳ symbols depth length code
     case isRelatedFormulaCodeAt =>
       cases args with | cons symbols tail =>
       cases tail with | cons depth tail =>
       cases tail with | cons code tail =>
       cases tail
-      exact graph2_correct hℳ .formula symbols depth code
+      exact graph2_correct (ℳ := ℳ) hℳ .formula symbols depth code
     all_goals
-      exact (PureStructureStage.realizes hℳ).relation _ args
+      exact (PureStructureStage.realizes (ℳ := ℳ) hℳ).relation _ args
 
 /-- 原递归正文中所有递归调用均携带当前符号集，故逐参数不动点可装配为整个关系解释。 -/
 theorem condition_satisfaction (hℳ : Theory.Models ℳ theory) (kind : Kind) (symbols depth length code : Carrier ℳ) :
@@ -90,10 +88,10 @@ theorem term_definition (hℳ : Theory.Models ℳ theory) (symbols depth code : 
     (FormalSystem.related_term_code_at_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))).satisfies
       (templateEnv (.cons symbols (.cons depth (.cons code .nil))) : Env (expansion hℳ).model [] [s,s,s]) := by
   change membership ℳ (tuple hℳ .term depth (zero hℳ) code) (state hℳ symbols) ↔ _
-  apply (equation hℳ .term symbols depth (zero hℳ) code).trans
-  rw [← condition_satisfaction hℳ]
+  apply (equation (ℳ := ℳ) hℳ .term symbols depth (zero hℳ) code).trans
+  rw [← condition_satisfaction (ℳ := ℳ) hℳ]
   change (zero hℳ = (E hℳ).function .emptySet .nil ∧ _) ↔ _
-  rw [zero_eq hℳ]
+  rw [zero_eq (ℳ := ℳ) hℳ]
   exact ⟨And.right,fun h => ⟨rfl,h⟩⟩
 
 theorem term_list_definition (hℳ : Theory.Models ℳ theory) (symbols depth length code : Carrier ℳ) :
@@ -101,16 +99,16 @@ theorem term_list_definition (hℳ : Theory.Models ℳ theory) (symbols depth le
       (.fvar (.there (.there .here))) (.fvar (.there (.there (.there .here))))).satisfies
       (templateEnv (.cons symbols (.cons depth (.cons length (.cons code .nil)))) : Env (expansion hℳ).model [] [s,s,s,s]) := by
   change membership ℳ (tuple hℳ .termList depth length code) (state hℳ symbols) ↔ _
-  exact (equation hℳ .termList symbols depth length code).trans (condition_satisfaction hℳ .termList symbols depth length code).symm
+  exact (equation (ℳ := ℳ) hℳ .termList symbols depth length code).trans (condition_satisfaction (ℳ := ℳ) hℳ .termList symbols depth length code).symm
 
 theorem formula_definition (hℳ : Theory.Models ℳ theory) (symbols depth code : Carrier ℳ) :
     (FormalSystem.related_formula_code_at_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))).satisfies
       (templateEnv (.cons symbols (.cons depth (.cons code .nil))) : Env (expansion hℳ).model [] [s,s,s]) := by
   change membership ℳ (tuple hℳ .formula depth (zero hℳ) code) (state hℳ symbols) ↔ _
-  apply (equation hℳ .formula symbols depth (zero hℳ) code).trans
-  rw [← condition_satisfaction hℳ]
+  apply (equation (ℳ := ℳ) hℳ .formula symbols depth (zero hℳ) code).trans
+  rw [← condition_satisfaction (ℳ := ℳ) hℳ]
   change (zero hℳ = (E hℳ).function .emptySet .nil ∧ _) ↔ _
-  rw [zero_eq hℳ]
+  rw [zero_eq (ℳ := ℳ) hℳ]
   exact ⟨And.right,fun h => ⟨rfl,h⟩⟩
 
 theorem dependencies_covered (kind : Kind) : formulaCovered functionCovered relationCovered (condition kind) = true := by cases kind <;> rfl
@@ -121,6 +119,8 @@ theorem transfer (hℳ : Theory.Models ℳ theory) {parameters : SortContext S} 
     (args : Values (expansion hℳ).model.Carrier parameters) :
     body.satisfies (templateEnv args : Env (PureStructureStage.expansion hℳ).model [] parameters) ↔
       body.satisfies (templateEnv args : Env (expansion hℳ).model [] parameters) := by
-  exact transfer_regraph _ _ _ _ (PureStructureStage.realizes hℳ) _ (realizes hℳ) body hTranslate args
+  exact transfer_regraph (ℳ := ℳ) PureStructureStage.interpretation interpretation.function interpretation.relation
+    (PureStructureStage.expansion (ℳ := ℳ) hℳ) (PureStructureStage.realizes (ℳ := ℳ) hℳ)
+    (expansion (ℳ := ℳ) hℳ) (realizes (ℳ := ℳ) hℳ) body hTranslate args
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureRelatedSyntaxStage

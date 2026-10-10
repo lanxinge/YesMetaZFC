@@ -1,7 +1,6 @@
 import YesMetaZFC.SetTheory.Card.Properties.Basic
 import YesMetaZFC.SetTheory.Card.Cofinality.Boundedness
 import YesMetaZFC.SetTheory.Card.OrdinalCardinality
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 奇异基数的族并刻画
 本层形式化定理 3.10：一个具有共尾度见证的无限基数是奇异的，当且仅当它能写成少于

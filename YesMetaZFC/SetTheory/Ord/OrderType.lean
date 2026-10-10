@@ -2,7 +2,6 @@ import YesMetaZFC.SetTheory.Card.CantorBernstein
 import YesMetaZFC.SetTheory.Foundation
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Recursion
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Semantics
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 良序的序型
 本文件为集合编码良序建立 Mostowski 坍缩所需的对象语言谓词与纸面语义。最终得到的

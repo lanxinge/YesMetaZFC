@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPositiveQuantifiers
-import YesMetaZFC.Automation.ObjectPositiveReflection
-import YesMetaZFC.Automation.ObjectBinaryTest
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPositiveReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectBinaryTest
 
 /-! # 模板正反射到原查询项及统一源推导的接口 -/
 namespace YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.InternalPositiveFormula

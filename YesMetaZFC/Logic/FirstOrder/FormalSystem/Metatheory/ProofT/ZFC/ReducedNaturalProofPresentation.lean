@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedProofPresentation
-import YesMetaZFC.Automation.NaturalProofPresentation
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.NaturalProofPresentation
 
 /-! # 模型内部自然数上的完整证明表示
 

@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.FiniteBasisModels
+import YesMetaZFC.Tactic.FiniteBasisModels
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SupportAxiomBasis
 import YesMetaZFC.Model.ZFC.Pure.PureFinalOperations
 import YesMetaZFC.Model.ZFC.Pure.PureFinalInfinity

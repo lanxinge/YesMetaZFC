@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Ord.OrderType
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数对的典范次序
 本层形式化基数论中使用的典范序数对次序：先比较两个坐标的最大值，最大值相同时
@@ -164,8 +163,8 @@ theorem mem
     ℳ.mem maximum α := by
   rcases hMaximum with
     ⟨rfl, _⟩ | ⟨rfl, _⟩
-  · prove_auto
-  · prove_auto
+  · exact hLeft
+  · exact hRight
 /-- 第一坐标严格小于最大值，或就是最大值。 -/
 theorem left_mem_or_eq
     {ℳ : Structure.{u}} {left right maximum : ℳ.Domain} (hMaximum : ℳ.IsOrdinalMaximum left right maximum) :

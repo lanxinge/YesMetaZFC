@@ -1,5 +1,7 @@
 # 证明命名迁移基线
 
+> 本表的旧规模统计属于历史基点；当前模块迁移与轻量策略入口见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
+
 本文件记录证明命名迁移前的源码规模，用于比较新命名规范对源码字节量和信息密度的影响。
 
 规范正文见 [ProofNaming.md](ProofNaming.md)。
@@ -91,7 +93,7 @@ YesMetaZFC/Logic/HigherOrder/Signature.lean
 当前最小的证明接口候选为：
 
 ```text
-YesMetaZFC/Automation/HostNormalization/CoreRules.lean
+YesMetaZFC/Tactic/FirstOrderDerives.lean
 ```
 
 当前规模：
@@ -102,7 +104,7 @@ YesMetaZFC/Automation/HostNormalization/CoreRules.lean
 1 个 theorem
 ```
 
-该文件属于 Lean 宿主层，适合作为 `_l` 命名迁移的第一枚试点。迁移时必须同步检查 `prove_auto` 注册表和全部调用点。
+该文件属于 Lean 宿主层，适合作为 `_l` 命名迁移的第一枚试点。迁移时必须同步检查数学接口及全部调用点。
 
 ### 4.3 后续低层接口
 

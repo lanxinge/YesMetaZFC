@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPositiveFormula
-import YesMetaZFC.Automation.ObjectPositiveBinder
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPositiveBinder
 
 /-! # 任意有限有界见证块的内部正反射
 

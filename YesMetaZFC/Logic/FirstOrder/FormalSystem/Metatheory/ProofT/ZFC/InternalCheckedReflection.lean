@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectCheckedReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCheckedReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPositiveQueries
 import YesMetaZFC.Model.ZFC.Pure.PureSourceCheckedConstruction
 

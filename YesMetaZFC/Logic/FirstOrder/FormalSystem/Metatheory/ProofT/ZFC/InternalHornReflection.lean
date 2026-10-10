@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectHornReflection
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornReflection
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalPredicateTransport
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalTraceReflection
 import YesMetaZFC.Model.ZFC.Pure.PureSourceHornElimination

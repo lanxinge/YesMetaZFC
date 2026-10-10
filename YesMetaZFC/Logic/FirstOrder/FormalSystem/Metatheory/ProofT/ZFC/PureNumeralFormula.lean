@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureQuotation
-import YesMetaZFC.Automation.ObjectHornSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornSemantics
 
 /-! # 纯数码公式在任意原 ZFC 模型中的唯一求值
 

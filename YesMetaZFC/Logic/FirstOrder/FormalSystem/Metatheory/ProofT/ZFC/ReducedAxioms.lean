@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.SupportAxiomBasis
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.BaseAxiomPacketSpec
-import YesMetaZFC.Automation.ObjectFiniteAxioms
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectFiniteAxioms
 
 /-! # 与原支撑理论推导等价的完整公理对象表示
 

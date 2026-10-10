@@ -1,7 +1,6 @@
 import YesMetaZFC.SetTheory.Card.Cofinality.Basic
 import YesMetaZFC.SetTheory.Card.CantorBernstein
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Recursion
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 共尾序列的复合
 本层证明严格或非递减共尾序列可由模型内部函数复合，并由此得到共尾度的幂等性。
@@ -21,7 +20,7 @@ theorem eq_or_mem_of_cardinalLessOrEqual
       hκ.1 hμ.1 (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF) κ μ) with
     hSame | hκμ | hμκ
   · exact Or.inl <| hZF.1.eq_of_same_members κ μ hSame
-  · prove_auto
+  · exact Or.inr hκμ
   · rcases hLessOrEqual with ⟨forward, hForward⟩
     rcases ZF.exists_inclusionInjection hZF 𝕀 (hκ.1.transitive μ hμκ) with
       ⟨reverse, hReverse⟩

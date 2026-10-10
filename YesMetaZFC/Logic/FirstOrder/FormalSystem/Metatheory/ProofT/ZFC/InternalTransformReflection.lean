@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectTransformRanking
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTransformRanking
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalHornRanking
 
 /-! # 原四种语法变换的内部正反射

@@ -1,6 +1,6 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.ReducedNaturalProofPresentation
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.IntrinsicGraph
-import YesMetaZFC.Automation.ObjectDiagonalFixedPoint
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectDiagonalFixedPoint
 
 /-! # 原支撑理论上的具体 Rosser 不完备实例
 

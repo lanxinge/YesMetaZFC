@@ -20,6 +20,13 @@
 | [可选谓词域](Semantics/Predicates.lean) | `Predicate_domain` 分离关系对象与背景谓词。`Full` 相对于该谓词域，`Formula_closed` 只要求覆盖标准公式像；两者都不属于基础模型的必填条件。Native 实例直接消费原 Henkin 关系域。 |
 | [完整二阶默认实例](SecondOrder/Full.lean) | `Full.structure_of` 使用原载体上的全部谓词，关系域保持 `Type (max u x)`；`predicate_full` 证明其满性，`satisfies_iff` 对所有对象量词、关系量词及联结词连接原 Full 语义。 |
 | [普通结构映射](FirstOrder/Morphism.lean) | `Env.map` 只要载体映射，`Fn_map` 只要函数保持，`Str_emb` 另要求单射与关系双向保持；`formula_iff`、`models_iff` 只另消费满射。`Str_iso` 携带显式逆映射，不通过不可计算选择构造逆。 |
+| [初等嵌入](FirstOrder/Elementary.lean) | `Str_emb.Elementary_m` 保持任意有限参数下的全部公式；`tarski_vaught_m` 等价于目标见证可取在像中。无需满射、可数性、模型论完备性或选择函数。 |
+| [子结构](FirstOrder/Substructure.lean) | `Substructure_m` 给出各排序非空且函数封闭的子集；`structure_m`、`incl_m` 实际构造限制结构和包含映射。其 `tarski_vaught_m` 使用原模型环境及参数归属，直接供 hull 的见证封闭证明调用。 |
+| [任意指标闭包](Closure.lean) | `RuleFamily_l` 不依赖逻辑语言，支持任意排序、载体、规则及输入指标 universe；`Closure_l` 是实际归纳闭包。给出最小性、单调性、幂等性、重编号、任意规则族合并及任意生成族的闭包公式。 |
+| [Skolem 壳](FirstOrder/Skolem.lean) | `Skolem_m` 显式携带存在成立时的见证函数；`hull_m` 对任意多排序签名、原结构及生成子集构造同层初等子结构。`hull_with_m` 还可同时封闭任意额外规则族，不要求其运算属于原语言。 |
+| [约化积与 Łoś](ReducedProduct/Los.lean) | 任意签名及同层结构族的截面商，有限参数无选择地下降。`los_m` 明确消费见证拼接条件，`los_iff_witness_m` 证明此条件恰好必要充分。 |
+| [同层超幂](Ultrapower.lean) | 恒定结构族的实际超幂，输入与输出 `Structure` 层级相同；对角嵌入、条件初等性、理论保持及主超幂的显式同构，不限于隶属语言。 |
+| [力迫与名称解释](Forcing/README.md) · [目录索引](Forcing/INDEX.md) | 同 universe 的内部名称泛型商，允许外部非良基地模型；参数化 `Add(ω,κ)` 保持旧无限基数并构造互异新实数。自动装配 CH 与 ¬CH 两侧扩张，`ch_independent_l` 在原推导核中给出 CH 独立性。 |
 
 原 `LevyEmbedding` 已直接扩展 `Str_emb`，仅额外保留有界见证回拉；旧层的环境映射、
 项与参数列证明已迁走，全部绝对性消费者使用新接口，没有转发证明层。
@@ -31,8 +38,8 @@
 公理。`Sem_map.models_iff` 将它连接到 `ℳ.models`，只比较标准像，不增加内部码反射。
 
 `Proof_view.has_proof` 明确表示“给出一个被检查接受的码”的外部存在性；它不冒充背景
-内部量词所表达的证明存在判断。当前内部码接口的实际默认实例是原 AST／证明树，尚未
-构造非标准码背景的全域满足关系。相对模型性也不自动反射为外部模型性。
+内部量词所表达的证明存在判断。`Semantics.SyntaxView` 的实际默认实例仍是原 AST／证明树，
+尚未接入下述集合结构的内部指令码满足关系。相对模型性也不自动反射为外部模型性。
 
 以上数据构造没有新增 `noncomputable`、选择实例、`sorry` 或自定义公理。对象载体与原生
 谓词域保持既定 universe；打包这些类型的元层记录不是新的模型载体。
@@ -55,20 +62,213 @@
 
 `import YesMetaZFC.Model` 只汇集通用语义入口；Henkin、解释消去和具体集合论层按需导入。
 纯 Rosser、Löb、第二不完备与 Tarski 的元数学终点仍由原元数学入口提供，并直接
-消费这里的实际模型模块。证明搜索 tactic、语法编码和集合论领域定理按其职责保留。
+消费这里的实际模型模块。轻量派生策略、语法编码和集合论领域定理按其职责保留。
 
-验证使用 `lake --wfail build`；`bash scripts/check-all.sh --library-only` 覆盖包含本目录在内
+验证使用 `lake --wfail build`；`bash scripts/check-all.sh` 覆盖包含本目录在内
 的全部独立模块，且不生成或运行扫描器可执行程序。全源检查分批传递同一组模块名，以适配
 Windows 的命令行长度限制。
 全源脚本默认使用 4 线程，并保留显式设置的 `LEAN_NUM_THREADS`。
 
 已迁移的 185 个模型模块最长为 1,132 行，没有旧模块路径或循环导入残留。
-既有四个超长模块及历史构建性能的边界见 [工程指南](../../markdown/ENGINEERING.md)。
+模块规模及历史构建性能的边界见 [工程指南](../../markdown/ENGINEERING.md)。
+
+## 原 ZF 中的有限公式反射
+
+通用 Lévy 反射入口是 [LevyReflection](SetTheory/LevyReflection.lean)，与
+`ProjectReflection` 的外部可数初等反射分开。`ZF.lr_finite_l` 接收任意有限原
+公式族及集合 A，实际构造包含 A 的累积层 V_α；同一个 V_α 对各公式的全部
+层内参数都保持真值。`ZF.lr_reflect_l` 是单公式入口，自动处理其全部量词
+子公式及全称反例。`lr_model_l` 将量词相对化真值接到实际内部隶属结构码。
+
+```lean
+obtain ⟨α, X, hLayer, hA, hReflect⟩ := SetTheory.ZF.lr_reflect_l I hZF φ hClosed A
+-- hReflect 量化 X 中的所有参数赋值；不是只反射预先选定的一组参数。
+```
+
+统一见证界先在实际赋值空间上收集；最早累积层给出唯一增长步，沿内部 ω
+递归后取并。整个证明只用 ZF，无额外反射公理或全局选择函数，也不要求模型
+外部良基或 ω 外部标准。这里的有限公式族由给定原 AST 索引；不宣称某一个
+V_α 初等于整个宇宙，也不把它等同于全部非标准内部公式码的统一反射。
+
+## 模型内部的集合结构与满足关系
+
+入口为 `YesMetaZFC.Model.SetTheory.Internal`，声明位于
+`YesMetaZFC.SetTheory.Internal`。地模型中的结构码为有序对 `(X,R)`，其中 X 非空，
+R 是 X 上的实际二元关系图。`smdl_structure_l` 用子类型解码同层结构，不选择基点。
+`smdl_membership_l` 自动构造任意非空内部集合上的隶属结构码，供后续 H(χ) 使用。
+
+公式是模型内有限指令序列及根行号。四类指令为二元关系、等号、或非、存在量词；
+或非的两个子公式及量词的子公式均引用更早行，变量编号和程序长度属于模型自身 ω。
+`scode_exists_l` 在一个显式幂集乘积界上分离全部合法公式码，没有把内部有限序列
+变成宿主 `List`，也没有要求非标准码可以在外部解码。
+
+赋值空间 E 是模型内的 X^ω。每行真值是 E 的子集；一步算子由实际原公式分离，
+整张表由原内部序数递归构造。`seval_exists_l`、`seval_unique_l` 证明其存在与唯一性；
+`ssat_rel_l`、`ssat_eq_l`、`ssat_nor_l`、`ssat_exists_l` 给出四类精确 Tarski 方程。
+`Satisfies_d ω c a f` 与原公式 `satisfies_m` 只接收结构码、公式码及赋值，解码证书
+和真值表都在内部量词下，且 `satisfies_decode_l` 证明中间见证不改变真值。
+
+```lean
+obtain ⟨c, R, hModel, hRelation⟩ :=
+  SetTheory.Internal.smdl_membership_l I hZF hX
+obtain ⟨C, E, S, hCodes, hAssignments, hGraph, hSat⟩ :=
+  SetTheory.Internal.smdl_satisfaction_l I hZF hω hModel
+-- C、E、S 都是地模型集合；S 记录全部合法内部公式与赋值的满足关系。
+
+obtain ⟨E, H, Y, hE, hH, hY, hSubset, hTruth, hUnique⟩ :=
+  SetTheory.Internal.smdl_table_l I hZF hModel hFormula
+-- hTruth 将结构码对指定公式的满足关系精确化为 f∈Y。
+```
+
+`Smodels_d`、`smodels_m` 描述实际内部理论集合的模型性，开放公式按全称闭包解释。
+`smodels_theory_l` 构造给定结构的全部有效公式集合并证明其模型性。全部存在性仅用
+ZF，允许地模型外部非良基；这里的满足关系针对集合结构，不是地模型全宇宙的真谓词。
+
+原 Project AST 的编译见 [Compiler](SetTheory/Internal/Compiler.lean)：`source_compile_l`
+接收任意有限参数上下文中的 `FreeClosed` 公式，返回实际程序码、规范变量编号及
+对全部编码结构的语义对应。定义原子先展开为原正文，因而解码结构不需外延性；
+量词在内部取得新编号并更新赋值。`source_satisfaction_l` 自动装配参数赋值与满足等价式。
+[FiniteSource](SetTheory/Internal/FiniteSource.lean) 的 `source_finite_compile_l` 进一步把
+有限参数装入模型内函数图；零号变量留给候选对象，列外取空集，同一份程序和参数列
+对全部包含参数的集合结构、全部候选对象有效。内部 OD 使用这一接口传递唯一性。
+
+```lean
+obtain ⟨a, E, f, hFormula, hSpace, hf, hTruth⟩ :=
+  SetTheory.Internal.source_satisfaction_l I hZF hω hModel φ hFreeClosed ρ
+obtain ⟨C, N, hCodes, hNumbering⟩ :=
+  SetTheory.Internal.scode_numbering_l I hZF hω
+-- N 是全部内部公式码到内部 ω 的实际单射，不限于原 AST 的标准像。
+```
+
+[FiniteSequenceCountable](../SetTheory/Card/FiniteSequenceCountable.lean) 的
+`ZF.fseq_countable_space_l` 对任意内部可数字母表构造全部内部有限序列及单射；
+编号层沿内部 ω 统一递归，最终把长度与层内编号配对，只需 ZF。
+[Countable](SetTheory/Internal/Countable.lean) 将它用于完整公式码集合。
+
+规范编码入口为 [CanonicalCode](SetTheory/Internal/CanonicalCode.lean) 与
+[Ord/Code](../SetTheory/Ord/Code.lean)。固定有序对约定后，序数配对 `Oc_pair_d a b c`
+取 `(a,b)` 在“最大坐标、第一坐标、第二坐标”典范良序中的位置；端延拓证明
+计算结果与方块界无关。它在全部序数上有唯一输出，单射，且将内部自然数对编码为自然数。
+
+有限序数列 `F:n→Ord` 按内部递归计算 `b₀=0`、`bᵢ₊₁=pair(bᵢ,F(i))`，
+最终编码为 `pair(n,bₙ)`。`oc_fold_injective_l` 用实际分离公式的 ω 归纳恢复
+整个前缀，所以支持模型内部的非标准有限长度。空参数列的代码是内部零。
+
+| 接口 | 已证明的内容 |
+| --- | --- |
+| `oc_pair_exists_l`、`oc_pair_unique_l`、`oc_pair_injective_l` | 规范序数配对的总性、唯一性及解码唯一性 |
+| `oc_seq_exists_l`、`oc_seq_injective_l`、`oc_seq_natural_l` | 全部内部有限序数列的编码与恢复；自然数列的代码仍在 ω 内 |
+| `oc_seq_tables_l` | 任意序数字母表的全部有限列与其合法序数码之间，实际存在双向集合编码表 |
+| `sc_num_exists_l`、`sc_num_unique_l`、`sc_num_injective_l` | 原内部公式码 `(程序,根)` 的固定自然数编号，无额外编号图参数 |
+| `sc_num_tables_l` | 自动构造全部原公式码、合法自然数码集及精确互逆图 |
+| [CanonicalSatisfaction](SetTheory/Internal/CanonicalSatisfaction.lean) 的 `sc_sat_decode_l` | 自然数码上的满足关系精确还原为原内部满足关系 |
+| `source_nat_satisfaction_l` | 从原 Project 公式与实际模型参数自动取得自然数码、内部赋值和真值等价 |
+
+上述结果均在背景 ZF 中证明，未使用背景选择公理。原 `scode_numbering_l` 与
+`scode_countable_l` 已直接调用规范编码。非标准公式的逆解码结果仍是模型内部的
+程序与根行号；标准 Project AST 通过已有编译接口进入这套编码。
+目前已提供全部原公式图及语义对应。[内部 OD](../SetTheory/InnerModel/OD.lean) 已完成
+以 V 层满足关系为基础的无参数定义、标准原公式唯一可定义性对应及单序数解码；
+OD 的 Σ₂ 正规形已由 [Complexity](../SetTheory/InnerModel/OD/Complexity.lean) 证明：
+有界化固定解码公式，用真实累积层的全称递归证书核验幂集，直接连接既有 OD 定义。
+这一结论不自动给出原编码图或原解码图的 Δ₂ 证书。
+
+[内模型进度总览](../SetTheory/InnerModel/README.md) 统一列出其后的 J/L、OD/HOD
+研究接口：ZF 背景下 L 满足 ZFC＋GCH，HOD[A] 满足 ZFC，HOD(A) 满足 ZF。
+同一套规范码还用于 HOD 的有界序数关系呈现和内部坍塌；
+[弱齐性比较](Forcing/Internal/Homogeneous/HOD.lean) 因而恢复扩张 HOD 的地模型 HOD 原像。
+这些结论继续使用内部语法与模型自身序数，允许外部非良基及非标准有限长度。
+
+[Skolem](SetTheory/Internal/Skolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
+函数图 K 及任意内部可数种子 A 的最小闭包 N。规则域为全部内部公式码与变量编号
+的积，输入是内部有限参数列；列外取基点 u，再在被量化变量处更新。存在见证时
+K 返回真见证，否则精确返回 u。假公式的零元运算保证每个闭集包含 u，因此空种子
+也得到非空闭包。最小性针对固定的 K，不把不同选择图的闭包宣称为同一个集合。
+
+```lean
+obtain ⟨u, C, S, T, D, K, N, hSkolem, hHull, hCountable, hu, hWitness⟩ :=
+  SetTheory.Internal.ssk_hull_l I hZFC hω hModel hSeedSubset hSeedCountable
+-- hHull 给出 A⊆N⊆X、对 K 的闭性及最小性；hWitness 是所有内部有限参数下的见证闭性。
+```
+
+通用有限元闭包见 [FinitaryHull](../SetTheory/FinitaryHull.lean)：`ZF.fc_hull_chain_l`
+沿内部 ω 构造最小闭包，`ZF.cc_fseq_bound_l` 证明链并中的内部有限参数列落在某个
+阶段，因而实际取并保持闭性。`ZF.fc_step_countable_l` 的单步可数性用最小原像
+编号证明，保留 ZF 强度；自动司寇伦选择及完整可数闭包装配使用 ZFC。
+
+[SupportBound](SetTheory/Internal/SupportBound.lean) 的 `sbound_exists_l` 证明每个内部
+有限程序的全部坐标都有内部自然数界；[Support](SetTheory/Internal/Support.lean)
+的 `ssat_agree_l` 证明界内赋值一致就保持真值。`ssk_full_l` 据此把有限参数见证
+闭性提升到全部内部 ω→N 赋值。归纳性质均为实际原公式，允许非标准有限程序。
+
+[TarskiVaught](SetTheory/Internal/TarskiVaught.lean) 的 `selem_iff_tv_l` 已证明完整
+内部 Tarski–Vaught 等价，只需 ZF。`Selem_d ω c d` 与 `selem_m` 同时量化全部内部
+公式码和完整内部赋值，比较大结构码 c 与子结构码 d 的满足关系。`Selem_d.trans_l`
+给出复合，`Selem_d.models_l` 保持任意内部编码理论的模型性。
+[ElementaryHull](SetTheory/Internal/ElementaryHull.lean) 从实际司寇伦构造自动取得
+内部可数初等子模型，输入无需额外闭性或初等性证书。
+
+```lean
+obtain ⟨N, d, S, hSubstructure, hSeed, hCountable, hElementary⟩ :=
+  SetTheory.Internal.selem_hull_l I hZFC hω hModel hSeedSubset hSeedCountable
+-- hSubstructure.target 是实际子模型码，hSubstructure.subset 给出 N⊆X。
+-- hElementary 比较全部内部公式与赋值，包含非标准公式码。
+```
+
+一般无限基数版本为 `ssk_hull_bound_l`、`selem_hull_bound_l`：额外输入 κ 的
+`IsInfiniteCardinal` 证书及种子到 κ 的实际单射，输出的内部初等壳仍可单射到 κ。
+原可数入口已经成为 κ=ω 的实例。有限参数列的 `ZF.fseq_bound_l` 与单步闭包的
+`ZF.fc_step_bound_l` 仍只需 ZF；完整 Skolem 选择及小并装配使用 ZFC。
+[SmallHull](SetTheory/Internal/SmallHull.lean) 的 `s1_hull_l` 将这套实际构造接到
+Σ₁ 隶属子结构接口，供 Mostowski 坍塌和 Jensen 凝聚直接调用。
+
+[SourceElementary](SetTheory/Internal/SourceElementary.lean) 的 `selem_source_l` 与
+`selem_witness_l` 把完整内部初等性用于原公式保持及实际见证回拉。力迫层已构造
+实际可数 `N[G]`，并由主条件和内部初等性提升指定原公式在所有 N 名称参数下的存在见证；
+`selem_club_hull_l` 在指定内部 club 中构造初等模型，`ng_witness_hull_l` 据此从
+properness 自动取得同一个 N 与主加强 q，见证池闭性由上述有限反射统一证明。
+`ng_elementary_hull_l` 已进一步装配整个 `N[G]≺X[G]`：内部有限名称列及公式码精确回拉，
+两张实际运算图在 proper club 中同时闭合，再调用内部 Tarski–Vaught。
+结论包含全部内部公式码和赋值，允许外部非良基地模型；`X[G]` 传递且 `N[G]` 内部可数。
+`ng_hchi_hull_l` 已把环境识别为实际 `H(eχ)`；小名称定理给出双向对应并保持 χ 的正则性。
+`ng_next_master_l` 进一步自动选择同一个 N、地阶段主加强及每个泛型中的 N[G] 后继主加强。
+二步主条件完整双向分解及全阶段共用的内部初等 N 已完成；原生多排序 AST
+仍待完成；完整 proper 迭代引理及可数支撑保持已完成，见 [迭代接口](Forcing/ITERATION.md)。
+审计入口为 `python scripts/check_internal_models.py`：ZF 基础逐声明限制在原七条
+证书，司寇伦及初等模型装配另允许原选择公理证书，并收紧其中的 ZF 端点；全部数据定义
+严格排除 `Classical.choice`，没有新增不可计算数据。
 
 ## 后续路线
 
-小图 ZFC 模型、布尔值可靠性及标准布尔名称 ZFC 模型已经落地。真类超幂与泛型扩张
-仍需各自的实际证明。
+小图 ZFC 模型、布尔值可靠性、标准布尔名称及任意地模型的内部泛型扩张已经落地。
+支撑迭代已完成共同的二步条件构造、泛型双向分解、内部混合与最大值，以及全局
+Cohen 后继名称装配，以及阶段名称搬运的存在、唯一性、严格复合与恒等性；
+原子力迫双向传输、泛型回拉及扩张间的成员满覆盖嵌入也已证明。
+二步名称到第一阶段名称的唯一转换、第二阶段名称性及其全局力迫证书已有证明。
+双重求值已具总性、唯一性和组合滤子下的成员递归方程，二步等号与嵌套等号
+精确对应。原模型内的名称摊平已补齐满射，`two_step_iso_l` 给出单次二步扩张与
+双重扩张的成员结构同构。第二阶段关系的规范化保留所有原公式的力迫。
+ZF 反射与全局判据只消费原 ZF；ZFC 消费者另保留自身理论。
+零阶段及任意名称后继已有共同的部分函数条件格式，旧条件按原对象完全嵌入，
+顶与前缀保持；限制投影保序，旧前缀的任意加强可保留尾部提升，且阶段链接能复合。
+有限／可数支撑的限制、追加及拼接保持和参数化 Cohen 坐标后继均已构造。
+阶段族已由模型内实际序列编码；`row_limit_l` 构造支撑极限及各旧阶段完全嵌入，
+`row_system_limit_l` 可把极限写回序列后继续名称后继。
+给定实际输入名称后，混合闭名称库、二步序、坐标后继与支撑极限均有唯一性证明及
+原公式构造规格；语义名称的规范化与整个内部递归由后续层统一处理。
+`name_pool_represent_l` 仅用 ZF 构造同条件的库内等值代表；有界存在见证使用 ZFC。
+`row_next_witness_l` 精确保留指定前缀，`row_next_lower_name_l` 在 ZF 下提升第二坐标加强。
+内部累积层级及覆盖定理已给出全局力迫等号类的唯一规范名称；最大值与全部
+Cohen 名称入口直接返回规范固定点。规范化仅用 ZF，一般最大值仍保留 ZFC 前提。
+唯一见证通过原收集与混合在 ZF 内统一装配；Cohen 规格的完整关系图及唯一性
+已经核验，Cohen 名称、坐标后继和系统后继也已降低到 ZF。
+完整规范三元组以 `Cohen_names_d` 表示并已证明字面唯一性；`Row_cohen_d` 进一步
+唯一确定整个坐标后继，两者均有实际原公式，构造入口直接返回相应证书。
+`row_iteration_l` 已从可读取全部历史的原公式后继规则构造任意内部序数长度的
+有限／可数支撑迭代；存在性、唯一性和精确前缀方程仅需 ZF。归纳对象为实际
+原公式，`cohen_iteration_l` 提供完整的参数化实例。
+内部序数索引的阶段系统、极限与保持证明的依赖见
+[迭代设施清单](Forcing/ITERATION.md)。真类超幂仍需实际证明。
 
 ## 基础边界
 
@@ -126,8 +326,75 @@ universe 必须区别核对；不能把所有同层小集合或名称的总类�
 已落地 `Fn_map`、`Str_emb`、`Str_iso`，并整层迁移 `LevyEmbedding` 的对应消费者。
 正向关系同态、专门的无量词片段接口仍可按实际使用需求添加；不把这些未来接口计为已实现。
 
-初等嵌入、子结构与 Tarski–Vaught 等通用工具可在该层上发展，但不作为图模型或
-布尔值一致性证明的强制前置。尤其不把一般模型存在问题改道到可数 Henkin 枚举。
+初等嵌入及子结构的 Tarski–Vaught 判据已落地。Skolem hull 先通过规则闭包给出实际
+非空、函数封闭子结构，再证明 `Substructure_m.WitnessClosed_m`：对该子集内的任意有限
+参数，原模型满足的存在公式在子集中有指定见证。`tarski_vaught_m` 即给出初等性；
+`term_mem_m` 提供项闭包，`elementary_inclusion_m` 处理同一模型中嵌套的初等子结构。
+判据证明中的经典反证只留在 Prop；限制结构、环境和包含映射均不选择数据。
+本接口针对原 AST 与默认 Tarski 语义，不声称非标准内部公式码的初等性。
+它不作为图模型、布尔值一致性或一般模型存在问题的强制前置。
+
+### Skolem 壳的调用与选择边界
+
+最小导入为 `YesMetaZFC.Model.FirstOrder.Skolem`，数学接口位于
+`YesMetaZFC.Logic.FirstOrder.Skolem_m`；底层闭包只需导入 `YesMetaZFC.Model.Closure`，
+不依赖 Mathlib、集合论或一阶语法。
+
+- 调用方给出 `F : Skolem_m ℳ`，以及任意生成谓词 `A : ∀ s, ℳ.Carrier s → Prop`。
+  `F.hull_m A` 是实际 `Substructure_m ℳ`，`F.hull_elementary_m A` 证明初等性；
+  `hull_models_iff_m` 对任意理论传输模型性，不限于 ZF 或 ZFC。
+- `F.witness φ ρ h` 只在 `h : ∃ a, ...` 时返回数据；正确性由 `F.satisfies` 认证。
+  不从原结构非空性选择默认对象。即使 `A` 为空，各排序仍有真公式的指定见证。
+- `seed_mem_m`、`hull_le_m`、`hull_mono_m`、`hull_idem_m` 给出闭包公理；最小性
+  针对同一套指定 Skolem 规则，不是说原结构有一个与见证选择无关的最小初等子模型。
+- 任意索引生成族可取 `fun s a => ∃ i, A i s a`，`hull_union_iff_m` 连接逐项闭包。
+  任意额外运算族先用 `RuleFamily_l.of_operations_l` 装配，再交给 `hull_with_m`；
+  `hull_with_closed_m`、`hull_with_le_m`、`hull_with_elementary_m` 分别证明双重封闭、
+  最小性和初等性。规则族也可用 `union_l` 任意合并或用 `reindex_l` 重编号。
+- 签名的三个 universe、结构载体 universe、额外指标及输入指标 universe 独立多态。
+  载体始终是原载体的子类型；合并不同大小的输入族只提升输入指标，不提升模型域。
+  底层允许无限元规则，因此没有无条件声称 ω 步闭包或 Löwenheim–Skolem 基数界。
+- 没有无条件证明每个结构都有 `Skolem_m`，也没有把该见证数据从 Prop 选择出来。
+  调用方需提供显式/可定义的见证系统，或另行证明所需选择原则及存在性。
+  此处尚不是任意非标准 ZF 模型内部集合编码的壳构造；内部化须另有内部语法和满足关系。
+
+`python scripts/check_elementary.py` 检查整个闭包、初等子结构与 Skolem 切片的实际声明，
+并对闭包及壳的数据定义严格排除 `Classical.choice`；初等性继承 Tarski–Vaught 的 Prop
+经典推理。没有新增公理、`noncomputable` 或原生计算可信依赖。
+
+### 超幂与 Łoś 的调用边界
+
+最小导入为 `YesMetaZFC.Model.Ultrapower`；公开接口位于
+`YesMetaZFC.Logic.FirstOrder.Ultrapower` 和 `ReducedProduct`。任意签名的排序、函数
+和关系均使用原生类型化 AST，模型不要求满足 ZF、可数、传递或外部良基。
+
+- 固定 `I : Type x` 与 `ℳ : Structure.{u,v,w,max x y} σ` 后，
+  `Ultrapower.structure_m ℳ U` 的结果仍是同一个 `Structure.{u,v,w,max x y} σ`。
+  输入已处于该层，并非输出时才升层；同层指标和较小指标都可直接调用。
+  无 `ULift`、`Shrink` 或提高模型载体的隐式包装。任意更高 universe 的指标不在
+  此固定域内：其全函数空间通常更大，不能同时无条件承诺“任意更大指标”和“不升层”。
+- 只给滤子即可构造约化积，真滤子给出 `diagonal_m`。超滤加 `Witness_m` 给出
+  `diagonal_elementary_m` 与 `models_iff_m`。理论可以是任意闭句集合。
+- 一般结构族 `ℳ : I → Structure ...` 使用 `ReducedProduct.structure_m`，并显式
+  提供 `Nonempty_m ℳ`（逐排序的截面空间非空）。逐点非空在无选择背景下不足以
+  自动取得该条件；恒定结构族的超幂已无选择地证明该条件。
+- `Germ_l` 以滤子意义下相等为等价关系。有限参数列通过 `map₂_l` 递归装配，函数
+  和关系直接商消去；`env_surjective_m` 仅在 Prop 中逐项回拉有限环境，不定义
+  全商的代表元函数。因此 `los_m` 的截面环境形式覆盖所有有限商参数。
+- `Witness_m` 只要求原公式在大集上逐点存在时，有一个截面在大集上见证。
+  `los_iff_witness_m` 证明它与完整 Łoś 等价，不自动从超滤性推出。
+  可以传入 `WitnessData_m` 的显式全域见证运算，经 `witness_of_data_m` 获得条件；
+  或显式假定本指标及载体上的 `Choice_m`，经 `witness_of_choice_m` 使用。
+  未用宿主 `Classical.choose` 或全局选择公理自动填充这些前提。
+- 指定点的主超滤 `Filter.point_l i` 无需额外选择条件：`principal_witness_m`
+  已证明见证拼接；`principal_iso_m` 实际构造原模型与主超幂的同构，其逆由指定点
+  的商求值 `evaluation_m` 给出，不从满射选逆。
+- 当前是原 AST 与宿主 Tarski 语义的同层超幂，不宣称完成任意非标准 ZF 模型内部
+  编码的超幂，也没有声称任意非主超幂外部良基或自动存在 Mostowski 坍缩。
+
+`python scripts/check_ultrapower.py` 审计全部五个新模块的实际声明与构造性端点，已接入
+CI。商数据使用 `propext` / `Quot.sound`，不使用选择；Łoś 和对角嵌入的 Prop 证书
+使用经典逻辑，单看整个含证明结构的公理列表不能误判为选择了 Type 数据。
 
 ## 可选的二阶接口
 
@@ -261,7 +528,49 @@ bv_models_zfc {B : Type u} (𝔹 : CB_alg B) : (name_model 𝔹).models PureMode
 构造不因接口规划而自动获得许可。
 
 普通结构接口及其消费者迁移、二阶可选接口、小图 ZFC、布尔值可靠性和标准名称 ZFC
-模型均已完成。真类超幂及泛型扩张仍是独立构造任务。
+模型均已完成。内部泛型扩张与 CH 两侧模型亦已实现；有限支撑直接并、任意名称
+二步 CCC 及完整内部有限支撑迭代 CCC 保持已经证明，参数化 Cohen 规则有一键实例。
+内部主条件、club 版 properness、CCC 实例、可数支撑精确融合及 N[G]≺H(eχ) 全内部初等提升已完成；
+`two_step_master_extension_l` 自动装配实际二步主加强；`ng_family_hull_l` 一次构造
+同一个 N 对全部成员阶段的内部 H(χ) 泛型初等提升。完整可数支撑 properness
+保持已通过实际交集 club 装配。`ng_family_forcing_l`
+已将共同提升编码为内部力迫证书，`row_step_proper_name_l` 已处理随泛型变化的
+后继商条件名称，`row_step_proper_l` 已迁移为其规范名称特例。`row_dense_name_l`
+在任意阶段间选择进入指定稠密集的商加强名称，保留原主前缀；`ng_ground_trace_l`
+给出 N[G] 中旧阶段条件的精确回拉。`row_step_pil_l` 已完成相邻后继的内部
+`Row_pil_d`，`row_pil_value_l` 构造 `τ∈G∩check(N)` 结论所需的实际名称；
+`row_pil_comp_l` 复合已证明区间，`row_pil_dense_l` 保留实际尾部比较并满足指定
+稠密集。名称不改写的阶段传输保持原子、
+有界公式和旧关系力迫。通用 Δ₀ 绝对性位于 `Model.SetTheory.ProjectBounded`，
+适用于任意成员满单射，不额外要求两边满足集合论公理。
+实际阶段链接已包含规范拼接的最大下界性质及固定尾部比较的稠密闭性；商名称前缀投影、换段后的商成员
+力迫及实际尾部加强的复合只用 ZF。`row_model_sequence_l` 已构造内部共尾阶段列
+和全部 N 稠密集的枚举，并证明原 N 条件的支撑位于 `sup(N∩β)` 以下；
+这些指标列上的相容主前缀递归、整列比较及融合主性已经实现。
+`row_iteration_pr_prepare_l` 已从实际 proper 后继规则自动构造统一辅助图、共同 N
+和其全部成员后继的迭代引理，包含所需名称属于 N 的证明；Cohen 规则有实际实例。
+该入口同时返回全部内部有限区间的迭代引理，使用原公式的内部 ω 归纳。
+变动前缀对旧名称的限制比较已经证明延长保持、共尾融合保持及支撑界下的完整还原；
+`row_pr_omega_thread_l` 现从共同 N 和真实 proper 后继图自动构造首个内部极限的
+相容主前缀列。通用 `class_indexed_choice_l` 使用实际反射闭包界定名称候选，
+`row_pr_coherent_l` 以内部 ω 归纳证明所有前缀一致。`row_pr_bound_l` 保持任意早期名称
+的全部后期比较；`row_pr_master_fusion_l` 自动构造满足这些比较的实际主融合。
+`row_iteration_pr_omega_l` 已从实际 proper 规则、可数支撑迭代与种子自动完成内部 ω
+终点的全部区间迭代引理。通用极限构造保留 γ=sup(N∩β)，原公式的内部超限归纳
+已由 `row_pr_induction_l` 完成；`row_iteration_pr_l` 自动返回共同 N 上的全部区间，
+`row_iteration_pr_exists_l` 同时构造任意内部长度的可数支撑迭代。
+`cohen_iteration_pil_l` 给出仅参数化添加量与长度的直接实例。
+`fc_trace_club_l` 用最小闭包及内部递增链的并构造实际交集 club；三张闭包图的
+共同闭性给出每个指定 N 的内部提升。`row_iteration_proper_l` 已证明全部阶段的
+完整 `Proper_d`，`row_iteration_proper_exists_l` 和 `cohen_iteration_proper_l` 自动
+构造整个 proper 迭代。`two_step_master_decompose_l` 已自动构造 N[G] 名称并给出
+二步主条件的完整双向分解；反向第二坐标证书保持原首阶段泛型。
+`proper_countable_l` 进一步对全部旧集合反射可数性，`proper_omega_one_l` 精确保留
+第一不可数序数。`row_iteration_preserves_l` 与 `cohen_iteration_preserves_l` 已把
+各阶段的 ZFC、内部 ω、ω₁ 及旧可数性对应接入自动装配。
+`proper_set_cover_l` 进一步给出旧集合的新可数子集的实际旧可数覆盖；相同规范
+嵌入及所有迭代阶段的自动入口均已包含此结论。旧可数性反射已迁移为通用覆盖的推论。
+真类超幂亦待构造。
 
 每次交付都须满足：实际实例与消费者存在、没有加强数学前提、原接口迁移完整、
 无占位公理或隐藏缺口。沿用单模块低于 2,000 行、未提交增量不超过 3,000 行、

@@ -1,5 +1,4 @@
 import YesMetaZFC.SetTheory.Card.Arithmetic.Equinumerosity
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 基数加法
 本层证明基数加法与不交代表元的选择无关，并导出交换律与结合律。
@@ -49,7 +48,7 @@ theorem commutative {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
   apply IsCardinalAddition.eq hZF 𝕀 (first := first) (second := second)
   · exact ⟨rightSet, leftSet, union,
       hRight, hLeft, hDisjoint.symm, hUnion.swap, hCardinal⟩
-  · prove_auto
+  · exact hSecond
 /-- `(3.3)`：基数加法满足结合律。 -/
 theorem associative {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)

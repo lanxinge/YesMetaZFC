@@ -39,7 +39,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 基数加法公式与纸面代表元定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinalAddition_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (sum left right : Term depth) :
@@ -52,7 +52,7 @@ theorem satisfies_isCardinalAddition_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Term.eval_bound_two_push, Definitional.Term.eval_weaken]
 /-- 基数乘法公式与纸面笛卡尔积定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinalMultiplication_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (product left right : Term depth) :
@@ -66,7 +66,7 @@ theorem satisfies_isCardinalMultiplication_iff
     Term.eval_bound_zero_push, Term.eval_bound_one_push,
     Term.eval_bound_two_push, Definitional.Term.eval_weaken]
 /-- 基数指数公式与纸面函数集定义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isCardinalExponentiation_iff
     {ℳ : Structure.{u}} {𝒞 : OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ) (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (power base exponent : Term depth) :

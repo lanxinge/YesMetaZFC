@@ -38,7 +38,7 @@ private theorem reindex_binaryImageBody {ℳ : Structure.{u}}
     · refine Fin.cases ?_ (fun parameter => ?_) previous <;> rfl
   · rfl
 /-- 关系像成员模式与纸面的“存在源元素映到该输出”一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_imageMembership_iff {ℳ : Structure.{u}}
     {parameterCount : Nat} (env : Env ℳ parameterCount) (schema : Definitional.Project.BinarySchema parameterCount) (source output : ℳ.Domain) :
     satisfies ((env.push source).push output)

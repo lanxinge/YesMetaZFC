@@ -593,7 +593,7 @@ namespace Definitional
 namespace Project
 namespace Formula
 /-- 序数内有界子集公式与显式序数上界语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isBoundedSubsetOfOrdinal_iff
     {ℳ : Structure.{u}} (hExt : Extensional ℳ)
     {depth : Nat} (env : Env ℳ depth) (set α : Term depth) :

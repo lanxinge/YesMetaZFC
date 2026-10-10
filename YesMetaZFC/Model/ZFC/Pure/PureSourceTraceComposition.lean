@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceBounds
-import YesMetaZFC.Automation.ObjectTraceComposition
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectTraceComposition
 
 /-! # 任意源模型中的轨迹集合构造
 

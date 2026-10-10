@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectCodeSubstitution
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectCodeSubstitution
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.InternalArithmeticEvaluation
 
 /-! # 固定复合项的内部求值组合

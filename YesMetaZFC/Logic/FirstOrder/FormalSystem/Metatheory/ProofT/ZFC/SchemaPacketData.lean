@@ -1,7 +1,7 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaKernelJoin
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaEnvelopeLink
-import YesMetaZFC.Automation.ObjectPacketNumeric
-import YesMetaZFC.Automation.ObjectRawTreeBounds
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPacketNumeric
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectRawTreeBounds
 
 /-! # 实际 ZFC 两种模式证书包的端到端计算规格 -/
 namespace YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.SchemaPacket

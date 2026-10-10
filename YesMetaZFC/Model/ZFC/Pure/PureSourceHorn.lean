@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.ZFC.Pure.PureSourceCoding
-import YesMetaZFC.Automation.ObjectHornSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHornSemantics
 
 /-! # 有界 Horn 轨迹与局部规则的对应
 

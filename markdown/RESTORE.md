@@ -19,15 +19,19 @@
 恢复源码应得到 `lakefile.toml`、`lean-toolchain`、`YesMetaZFC.lean` 和 `YesMetaZFC/`。
 当前规范源码保留 D1–D3、任意内部 checked 轨迹反射、支撑理论及裸 ZFC 的
 Löb 与哥二、带参数 Tarski，以及最终纯公式自身编码的固定点和 Tarski 定理。
-本轮证明减负基于 Git 提交 `7195271ee67fcdb46c2e744a8e6b717c1e01c926`，
+历史证明减负基于 Git 提交 `7195271ee67fcdb46c2e744a8e6b717c1e01c926`，
 规范 Drive 包和 Git 仓库用于保存稳定减负节点；恢复时应核对减负记录中的源码指纹。
 恢复这份工作可从上表的 Git 仓库或 Drive 包取得源码，再以 [TROPHIES.md](TROPHIES.md)、
 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md) 核对数学成果；以
 [PROOF_REDUCTION.md](PROOF_REDUCTION.md) 核对减量、当前验证和测量范围。
 
-当前共有 955 个 Lean 模块。当前构建结果在减负记录中维护；原源码节点的 530 个入口
+当前主项目共有 1750 个 Lean 模块；拆分边界及当前验证见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。原源码节点的 530 个入口
 可信依赖审计仍见 UNIFIED_VERIFICATION，不把原节点审计数冒称为本次重新审计的结果。
 规范源码包不包含 `.git/`；继续开发时保留减负记录中的 Git 基点和源码指纹。
+
+本次证明器拆分的基点为 `60d081445e7f9616f666b5ddc9f35407ce959a88`。拆分前完整源码
+留存在仓库上一层的 `YesMetaZFC-prove-auto-archive`；本次未回写 Drive 备用包。
+恢复时按所选源码基点核对构建目标与缓存清单。
 
 ## 已有的 Lean Linux 运行时
 

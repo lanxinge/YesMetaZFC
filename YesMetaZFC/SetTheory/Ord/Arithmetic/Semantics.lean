@@ -191,7 +191,7 @@ theorem satisfies_isLimitLengthSequenceWithUnion_iff
     satisfies_isUnion_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 序数一公式与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isOrdinalOne_iff
     {ℳ : Structure.{u}} {depth : Nat} (env : Env ℳ depth) (one : Term depth) :
     satisfies env (isOrdinalOne one) ↔

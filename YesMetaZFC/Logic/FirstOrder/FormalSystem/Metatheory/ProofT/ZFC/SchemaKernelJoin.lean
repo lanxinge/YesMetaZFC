@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.KernelQuotation
-import YesMetaZFC.Automation.ObjectProjectQuotationBounds
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectProjectQuotationBounds
 
 /-! # 模式闭句的 Project 中间码与内核 quotation 的对象连接
 

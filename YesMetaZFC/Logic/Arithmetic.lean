@@ -1,0 +1,23 @@
+import YesMetaZFC.Logic.Arithmetic.Q.Numeral
+import YesMetaZFC.Logic.Arithmetic.Division
+import YesMetaZFC.Logic.Arithmetic.Divisibility
+import YesMetaZFC.Logic.Arithmetic.Beta
+import YesMetaZFC.Logic.Arithmetic.BetaSequence
+import YesMetaZFC.Logic.Arithmetic.Sequence
+import YesMetaZFC.Logic.Arithmetic.Pairing
+import YesMetaZFC.Logic.Arithmetic.FiniteRange
+import YesMetaZFC.Logic.Arithmetic.PA.Multiplication
+import YesMetaZFC.Logic.Arithmetic.PA.Order
+import YesMetaZFC.Logic.Arithmetic.PA.Cancellation
+import YesMetaZFC.Logic.Arithmetic.PA.StrictOrder
+import YesMetaZFC.Logic.Arithmetic.Z2.Induction
+import YesMetaZFC.Logic.Arithmetic.Z2.Order
+import YesMetaZFC.Logic.Arithmetic.Z2.Beta
+import YesMetaZFC.Logic.Arithmetic.PA.Interpretation
+import YesMetaZFC.Logic.Arithmetic.PrimitiveRecursive.Formula
+import YesMetaZFC.Logic.Arithmetic.PrimitiveRecursive.Closure
+
+/-! # 算术理论入口：Q、PA、Z₂ 及其对象推导
+
+模型语义单独由 `YesMetaZFC.Model.Arithmetic` 提供。
+-/

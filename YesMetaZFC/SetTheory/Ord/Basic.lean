@@ -2,8 +2,6 @@ import YesMetaZFC.SetTheory.Ord.Notation
 import YesMetaZFC.Model.SetTheory.OrderSemantics
 import YesMetaZFC.SetTheory.Separation
 import YesMetaZFC.SetTheory.SetConstruction
-import YesMetaZFC.SetTheory.Automation.Context
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 序数的基础定理
 本文件在纸面语义视图上证明序数的基础闭包、包含与比较定理；对象公式定义独立放在
@@ -38,7 +36,7 @@ theorem of_transitive_subset {ℳ : SetTheory.Structure.{u}}
       hNonempty
 /--
 没有成员的对象满足序数定义。
-`prove_auto` 可直接利用全称无成员前提关闭传递性、线性序和最小元义务。
+全称无成员前提通过现有结构接口关闭传递性、线性序和最小元义务。
 -/
 theorem of_no_members {ℳ : SetTheory.Structure.{u}} {empty : ℳ.Domain} (hEmpty : ∀ value, ¬ ℳ.mem value empty) :
     IsOrdinal ℳ empty := by
@@ -69,8 +67,6 @@ theorem mem {ℳ : SetTheory.Structure.{u}} {α β : ℳ.Domain} (hα : IsOrdina
   intro middle hMiddle value hValue
   exact hα.wellOrder.linear.trans value (hα.transitive middle (hSubset middle hMiddle) value hValue)
     middle (hSubset middle hMiddle) β hβ hValue hMiddle
-register_prove_auto_hr_rule IsOrdinal.mem PRIORITY 200
-register_prove_auto_hr_rule TransitiveSet.memberSubset PRIORITY 200
 /-- 两个序数之间的真包含可由差集的最小元识别为隶属。 -/
 theorem mem_of_properSubset {ℳ : SetTheory.Structure.{u}}
     {α β : ℳ.Domain} (hExt : Extensional ℳ) (hα : IsOrdinal ℳ α) (hβ : IsOrdinal ℳ β) (hProper : ℳ.MemberSubset α β ∧
@@ -284,7 +280,7 @@ theorem satisfies_isTransitive_iff {ℳ : SetTheory.Structure.{u}}
     satisfies_mem_iff, SetTheory.Structure.TransitiveSet,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken]
 /-- 对象公式中的序数定义与纸面语义一致。 -/
-@[prove_auto_norm semantic]
+
 theorem satisfies_isOrdinal_iff {ℳ : SetTheory.Structure.{u}}
     {depth : Nat} (env : Env ℳ depth) (α : Term depth) :
     satisfies env (isOrdinal α) ↔
@@ -299,7 +295,7 @@ theorem satisfies_isOrdinal_iff {ℳ : SetTheory.Structure.{u}}
 end Definitional.Project.Formula
 namespace Ordinal
 /-- 每个序数都是传递集。 -/
-@[prove_auto_unfold setTheory.ordinal.transitive]
+
 def transitiveSentence : Definitional.Project.Sentence :=
   sentence! ⟪∀ α, Ord(α) → Trans(α)⟫
 theorem transitive :
@@ -315,7 +311,7 @@ theorem transitive :
   rw [Definitional.Project.Formula.satisfies_isTransitive_iff]
   exact hα.transitive
 /-- 没有成员的对象是序数。 -/
-@[prove_auto_unfold setTheory.ordinal.empty]
+
 def emptyOrdSentence : Definitional.Project.Sentence :=
   sentence! ⟪∀ empty, (∀ element, element ∉ empty) → Ord(empty)⟫
 theorem emptyOrd :
@@ -334,7 +330,7 @@ theorem emptyOrd :
   rw [Definitional.Project.Formula.satisfies_isOrdinal_iff]
   exact Structure.IsOrdinal.of_no_members hEmpty
 /-- 序数的任意成员仍然是序数。 -/
-@[prove_auto_unfold setTheory.ordinal.membership]
+
 def memOrdSentence : Definitional.Project.Sentence :=
   sentence! ⟪∀ α β, (Ord(α) ∧ β <ₒ α) → Ord(β)⟫
 theorem memOrd :
@@ -350,9 +346,9 @@ theorem memOrd :
     Definitional.Project.Formula.satisfies_mem_iff,
     Definitional.Term.eval_newest, Definitional.Term.eval_weaken] at hαβ
   rw [Definitional.Project.Formula.satisfies_isOrdinal_iff] at hαβ ⊢
-  prove_auto
+  exact hαβ.1.mem hαβ.2
 /-- 对序数而言，真包含等价于严格隶属的正向部分。 -/
-@[prove_auto_unfold setTheory.ordinal.comparison]
+
 def subsetMemSentence : Definitional.Project.Sentence :=
   sentence! ⟪∀ α β, (Ord(α) ∧ Ord(β) ∧ α ⊊ β) → α <ₒ β⟫
 theorem subsetMem :
@@ -373,7 +369,7 @@ theorem subsetMem :
   exact Structure.IsOrdinal.mem_of_properSubset hKP.1
     h.1 h.2.1 h.2.2 (KP.difference_exists_d hKP α β)
 /-- 任意两个序数满足相等或严格隶属的三歧律。 -/
-@[prove_auto_unfold setTheory.ordinal.comparison]
+
 def trichotomySentence : Definitional.Project.Sentence :=
   sentence! ⟪∀ α β, (Ord(α) ∧ Ord(β)) → (α = β ∨ α <ₒ β ∨ β <ₒ α)⟫
 theorem trichotomy :

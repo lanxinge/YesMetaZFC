@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectHorn
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectHorn
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaRenameInstances
 
 /-!

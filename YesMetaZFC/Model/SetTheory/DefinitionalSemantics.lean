@@ -32,12 +32,12 @@ def eval {ℳ : SetTheory.Structure.{v}} {depth : Nat} (env : SetTheory.Env ℳ 
       eval (SetTheory.Env.reindex env indexMap) term := by
   cases term <;> rfl
 /-- 当前环境栈顶最新 bound 变量的解释。 -/
-@[simp, prove_auto_norm index]
+@[simp]
 theorem eval_newest {ℳ : SetTheory.Structure.{v}} {depth : Nat} (env : SetTheory.Env ℳ depth) (value : ℳ.Domain) :
     eval (env.push value) (newest : Term (depth + 1)) = value :=
   rfl
 /-- weakening 不改变项的解释。 -/
-@[simp, prove_auto_norm index]
+@[simp]
 theorem eval_weaken {ℳ : SetTheory.Structure.{v}} {depth : Nat} (env : SetTheory.Env ℳ depth) (value : ℳ.Domain) (term : Term depth) :
     eval (env.push value) term.weaken = eval env term := by
   cases term <;> rfl
@@ -59,7 +59,7 @@ def evalEnv {ℳ : SetTheory.Structure.{v}} {count depth : Nat} (parameters : Te
   bound := parameters.eval env
   free := env.free
 /-- 参数向量穿过一个新 binder 后仍解释为原参数环境。 -/
-@[simp, prove_auto_norm index]
+@[simp]
 theorem evalEnv_weaken {ℳ : SetTheory.Structure.{v}}
     {count depth : Nat} (parameters : TermVector count depth) (env : SetTheory.Env ℳ depth) (value : ℳ.Domain) :
     parameters.weaken.evalEnv (env.push value) =
@@ -70,12 +70,12 @@ theorem evalEnv_weaken {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval]
   · rfl
 /-- 单参数向量解释后的唯一 bound 参数就是原项的解释。 -/
-@[simp, prove_auto_norm index]
+@[simp]
 theorem evalEnv_singleton_bound {ℳ : SetTheory.Structure.{v}}
     {depth : Nat} (term : Term depth) (env : SetTheory.Env ℳ depth) : ((singleton term).evalEnv env).bound 0 = term.eval env := by
   rfl
 /-- 没有局部 binder 时，bound 参数向量直接解释为当前参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_zero {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) : (boundParameters parameterCount 0).evalEnv env = env := by
   rw [SetTheory.Env.mk.injEq]
@@ -84,7 +84,7 @@ theorem evalEnv_boundParameters_zero {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval, boundParameters, Term.eval]
   · rfl
 /-- 一个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_one {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) (first : ℳ.Domain) : (boundParameters parameterCount 1).evalEnv (env.push first) = env := by
   rw [SetTheory.Env.mk.injEq]
@@ -93,7 +93,7 @@ theorem evalEnv_boundParameters_one {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval, boundParameters, SetTheory.Env.push, Term.eval]
   · rfl
 /-- 两个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_two {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) (first second : ℳ.Domain) : (boundParameters parameterCount 2).evalEnv
         ((env.push first).push second) = env := by
@@ -103,7 +103,7 @@ theorem evalEnv_boundParameters_two {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval, boundParameters, SetTheory.Env.push, Term.eval]
   · rfl
 /-- 三个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_three {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) (first second third : ℳ.Domain) : (boundParameters parameterCount 3).evalEnv
         (((env.push first).push second).push third) = env := by
@@ -113,7 +113,7 @@ theorem evalEnv_boundParameters_three {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval, boundParameters, SetTheory.Env.push, Term.eval]
   · rfl
 /-- 四个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_four {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) (first second third fourth : ℳ.Domain) : (boundParameters parameterCount 4).evalEnv
         ((((env.push first).push second).push third).push fourth) =
@@ -124,7 +124,7 @@ theorem evalEnv_boundParameters_four {ℳ : SetTheory.Structure.{v}}
     simp [evalEnv, eval, boundParameters, SetTheory.Env.push, Term.eval]
   · rfl
 /-- 五个局部 binder 下，bound 参数向量仍解释为外层参数环境。 -/
-@[prove_auto_norm index]
+
 theorem evalEnv_boundParameters_five {ℳ : SetTheory.Structure.{v}}
     {parameterCount : Nat} (env : SetTheory.Env ℳ parameterCount) (first second third fourth fifth : ℳ.Domain) : (boundParameters parameterCount 5).evalEnv
         (((((env.push first).push second).push third).push fourth).push
@@ -178,30 +178,30 @@ private theorem atomEnv_bind {σ : AtomSignature.{u}}
     simp [atomEnv, TermVector.eval, TermVector.bind, TermVector.get]
   · rfl
 /-- 新核的原生满足关系；原子是不可见内部定义体的语义叶节点。 -/
-def satisfies {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ) :
-    {ℳ : SetTheory.Structure.{v}} →
-      {availableStage depth : Nat} →
-        SetTheory.Env ℳ depth → Formula σ availableStage depth → Prop
-  | _, _, _, _, .falsum => False
-  | _, _, _, _, .truth => True
-  | ℳ, _, _, env, .mem left right =>
+def satisfies {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ)
+    {ℳ : SetTheory.Structure.{v}} {availableStage : Nat} :
+      {depth : Nat} → SetTheory.Env ℳ depth → Formula σ availableStage depth → Prop
+  | _, _, .falsum => False
+  | _, _, .truth => True
+  | _, env, .mem left right =>
       ℳ.mem (Term.eval env left) (Term.eval env right)
-  | _, _, _, env, .atom symbol _ arguments =>
+  | _, env, .atom symbol _ arguments =>
       interpretation.atom symbol (arguments.eval env) env.free
-  | _, _, _, env, .neg formula =>
+  | _, env, .neg formula =>
       ¬ satisfies interpretation env formula
-  | _, _, _, env, .conj left right =>
+  | _, env, .conj left right =>
       satisfies interpretation env left ∧ satisfies interpretation env right
-  | _, _, _, env, .disj left right =>
+  | _, env, .disj left right =>
       satisfies interpretation env left ∨ satisfies interpretation env right
-  | _, _, _, env, .imp left right =>
+  | _, env, .imp left right =>
       satisfies interpretation env left → satisfies interpretation env right
-  | _, _, _, env, .iff left right =>
+  | _, env, .iff left right =>
       satisfies interpretation env left ↔ satisfies interpretation env right
-  | _, _, _, env, .forallE body =>
+  | _, env, .forallE body =>
       ∀ value, satisfies interpretation (env.push value) body
-  | _, _, _, env, .existsE body =>
+  | _, env, .existsE body =>
       ∃ value, satisfies interpretation (env.push value) body
+termination_by structural _ _ φ => φ
 /-- 新核公式 substitution 等价于先拉回环境再解释原公式。 -/
 @[simp] theorem satisfies_bind {σ : AtomSignature.{u}} (interpretation : Interpretation.{u, v} σ)
     {ℳ : SetTheory.Structure.{v}}
@@ -306,7 +306,7 @@ theorem satisfies_forallClosure_iff {σ : AtomSignature.{u}} (interpretation : I
         simpa only [hEnv] using hBody
       · intro h bound value
         let extended : Fin (depth + 1) → ℳ.Domain :=
-          Fin.cases value bound
+          fin_cases value bound
         have hBody := h extended
         have hEnv : ({ bound := bound, free := free } :
                 SetTheory.Env ℳ depth).push value = ({ bound := extended, free := free } :

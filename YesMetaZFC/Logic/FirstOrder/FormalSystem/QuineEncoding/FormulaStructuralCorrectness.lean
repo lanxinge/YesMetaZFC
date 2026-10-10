@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.QuotationInduction
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.Induction
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.QuineEncoding.StructuralCorrectness
 
 /-!

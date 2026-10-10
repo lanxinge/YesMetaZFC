@@ -3,7 +3,6 @@ import YesMetaZFC.SetTheory.Card.Arithmetic.Multiplication
 import YesMetaZFC.SetTheory.Card.OrdinalCardinality
 import YesMetaZFC.SetTheory.Ord.CanonicalPairing
 import YesMetaZFC.SetTheory.Ord.Natural
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # Aleph 数的乘法
 本层沿定理 3.5 的典范序数对良序路线，先补齐良序集取基数所需的初始序数接口，
@@ -316,7 +315,7 @@ theorem omega_selfMultiplication
   apply cartesianSquare_bounded_in_omega
     hZF 𝕀 hω
   · simpa [hSelectedEq] using hSelectedOmega
-  · prove_auto
+  · exact hSquare
 /--
 定理 3.5 的最小反例递推步。
 若 `κ` 以下每个坐标最大值的后继都有一个严格小于 `κ`、且已对自乘闭合的基数代表，

@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.FunctionFreeDelta0
+import YesMetaZFC.Logic.FirstOrder.FunctionFreeDelta0
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureRosserComplete
 import YesMetaZFC.Model.ZFC.Pure.PureSeparation
 

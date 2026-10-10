@@ -1,6 +1,5 @@
 import YesMetaZFC.Model.SetTheory.DefinitionalTheory
 import YesMetaZFC.SetTheory.Definitional.Audit.Pure
-import YesMetaZFC.Automation.HostAvatar.Dispatch
 /-!
 # 带定义原子核的旧核审计
 本模块是新核唯一接触旧纯 `∈` 公式 AST 的位置。它提供完全展开、语义等价和旧语言

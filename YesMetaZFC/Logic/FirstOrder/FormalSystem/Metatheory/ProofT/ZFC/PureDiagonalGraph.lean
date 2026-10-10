@@ -1,5 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.PureNumeralFormula
-import YesMetaZFC.Automation.ObjectMinimumSemantics
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectMinimumSemantics
 
 /-! # 最终纯公式的自编码图
 

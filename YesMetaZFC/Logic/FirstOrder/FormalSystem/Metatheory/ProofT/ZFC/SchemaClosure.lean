@@ -1,4 +1,4 @@
-import YesMetaZFC.Automation.ObjectUnaryIteration
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectUnaryIteration
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.ZFC.SchemaTemplateDerives
 
 /-!
