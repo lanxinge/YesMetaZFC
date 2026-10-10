@@ -59,7 +59,7 @@ theorem rs_restrict_model_l (hZF : M.Models ZF) {ω c X R D U o G p C T : M.Doma
       Rp_model_d (kp_pair_l (ZF.modelsKP hZF)) D X V R o G p C T := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨P, V, hP, hV, hv⟩ := sc_source_ultrafilter_l I hZF hω hX hm theory hD hU
-  have sf f (hf : M.mem f G) := sc_function_domain_l hZF hω hX hm theory hD ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sf f (hf : M.mem f G) := sc_function_domain_l theory.algebra ((hG f).mp hf).1 ((hG f).mp hf).2
   have transfer (ψ : M.Domain → Prop) A (hAX : M.mem A X) (ha : ∀ v, M.mem v A ↔ M.mem v D ∧ ψ v) :
       (∃ B, M.mem B U ∧ ∀ v, M.mem v B → ψ v) ↔ ∃ B, M.mem B V ∧ ∀ v, M.mem v B → ψ v := by
     refine ⟨fun ⟨B, hb, ht⟩ => ?_, fun ⟨B, hb, ht⟩ => ⟨B, ((hv B).mp hb).2, ht⟩⟩

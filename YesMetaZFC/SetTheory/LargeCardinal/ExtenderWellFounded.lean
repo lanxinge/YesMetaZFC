@@ -14,7 +14,7 @@ theorem ep_limit_wf_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C V : M
     (hω : M.IsOmega ω) (hDC : Dc_d (kp_pair_l (ZF.modelsKP hZF)) ω) (hωL : M.MemberSubset ω L)
     (hF : Em_family_d ω κ L F) (coherent : Es_coherent_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L F)
     (complete : ∀ H f, Ef_levels_d ω κ H → Es_fiber_d (kp_pair_l (ZF.modelsKP hZF)) ω L F H f → ∃ g, Ef_fiber_d ω κ H g)
-    (system : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C V)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C V)
     (wf : Wf_rel_d X R) : Wf_rel_d C V := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   have h := system.toEp_graph_d

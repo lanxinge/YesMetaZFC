@@ -70,6 +70,12 @@ private partial def compileFormula (binders : List Binder) (binderDepth : Nat) (
       `(SetTheory.Definitional.Formula.falsum)
   | `(setFormula| ⊤) =>
       `(SetTheory.Definitional.Formula.truth)
+  | `(setFormula| ⌜$predicate:term⌝ₚ($arguments:setTerm,*)) =>
+      let mut result := predicate.raw
+      for argument in arguments.getElems do
+        let argument ← compileTerm binders binderDepth argument
+        result ← `($(asTerm result) $(asTerm argument))
+      pure result
   | `(setFormula| ⌜$formula:term⌝ₚ) =>
       weakenFormulaN binderDepth formula.raw
   | `(setFormula| ($formula:setFormula)) =>

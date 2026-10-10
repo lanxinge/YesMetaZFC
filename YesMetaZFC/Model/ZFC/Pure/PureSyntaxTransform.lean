@@ -41,6 +41,9 @@ theorem replace_correct (hℳ : Theory.Models ℳ theory) {bound free : SortCont
     (env : Env (E hℳ).model bound free) (state : Term S bound free s) (symbol : RelationSymbol)
     (args : Arguments S bound free (S.relDomain symbol)) :
     (replace state symbol args).satisfies env ↔ relations hℳ (state.eval env) symbol (args.eval env) := by
+  -- 普通关系的原子解释只核验一次，避免每个符号分支重复展开整个模型。
+  have atom (r : RelationSymbol) (a : Arguments S bound free (S.relDomain r)) :
+      (Formula.rel r a).satisfies env ↔ (E hℳ).relation r (a.eval env) := Iff.rfl
   cases symbol
   case syntaxTransform =>
     match args with
@@ -48,7 +51,7 @@ theorem replace_correct (hℳ : Theory.Models ℳ theory) {bound free : SortCont
       change membership ℳ ((PureNaturalTuple.term [a0,a1,a2,a3,a4,a5,a6]).eval env) (state.eval env) ↔ _
       rw [PureNaturalTuple.eval hℳ]
       rfl
-  all_goals rfl
+  all_goals exact atom _ _
 
 def condition : Formula S [] [s,s,s,s,s,s,s] := FormalSystem.syntax_transform_condition (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here))) (.fvar (.there (.there (.there .here)))) (.fvar (.there (.there (.there (.there .here))))) (.fvar (.there (.there (.there (.there (.there .here)))))) (.fvar (.there (.there (.there (.there (.there (.there .here)))))))
 noncomputable def Condition (hℳ : Theory.Models ℳ theory) (state a0 a1 a2 a3 a4 a5 a6 : Carrier ℳ) : Prop :=
@@ -182,5 +185,7 @@ theorem graph_correct (hℳ : Theory.Models ℳ theory) (a0 a1 a2 a3 a4 a5 a6 : 
     · exact (applyTemplate_satisfies _ _ _).mpr (state_graph hℳ)
     · exact (applyTemplate_satisfies _ _ _).mpr ((query_correct hℳ _ a0 a1 a2 a3 a4 a5 a6).mpr h)
 
-theorem dependencies_covered : formulaCovered PureSyntaxStage.functionCovered PureSyntaxStage.relationCovered step = true := rfl
+theorem dependencies_covered : formulaCovered PureSyntaxStage.functionCovered PureSyntaxStage.relationCovered step = true := by
+  -- 交给内核计算有限布尔检查，避免 elaborator 重复展开整张变换语法。
+  decide +kernel
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureSyntaxTransform

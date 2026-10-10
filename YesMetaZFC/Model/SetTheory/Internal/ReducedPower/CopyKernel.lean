@@ -24,7 +24,7 @@ theorem rs_copy_family_l {ω c d X R Y S π D D' G H : M.Domain}
   have hf := hk.isSetFunctionFromTo hπ.1.1 (fun f hf => ((hG f).mp hf).1)
   have bound f g (hfg : M.PairMember I f g K) : M.mem g H := by
     obtain ⟨hf, hfg⟩ := (hk.2 f g).mp hfg
-    have sf := sc_function_domain_l hZF hω hX hm theory (hπ.1.1.input_mem_of_pairMember hD)
+    have sf := sc_function_domain_l theory.algebra
       ((hG f).mp hf).1 ((hG f).mp hf).2
     have sg := hπ.sfun_l hZF hω hX hY hm hn hD hfg sf
     exact (hH g).mpr ⟨sg.1, sg.function_l hY⟩

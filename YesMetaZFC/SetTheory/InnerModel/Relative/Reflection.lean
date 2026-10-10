@@ -88,7 +88,7 @@ theorem ja_closed_layer_l (hZF : M.Models ZF) (hS : M.TransitiveSet S) (Φ : Lr_
   obtain ⟨ω, hω⟩ := ZF.exists_omega hZF
   obtain ⟨e, he⟩ := KP.exists_empty hKP
   obtain ⟨P, hp⟩ := kp_finite_cover_l hKP [A.val, S, e]
-  obtain ⟨_, V, hv, hpV, hc⟩ := ZF.lr_closed_layer_l (kp_pair_l hKP) hZF hω
+  obtain ⟨_, V, hv, _, hpV, hc⟩ := ZF.lr_closed_layer_l (kp_pair_l hKP) hZF hω
     (ja_cut_queries_l ++ ja_queries_l Φ) P
   have ht := ZF.v_transitive_l (kp_pair_l hKP) hZF hv
   have hSV := ht P hpV S (hp S (by simp)).2

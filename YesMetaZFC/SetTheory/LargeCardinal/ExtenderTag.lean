@@ -12,7 +12,7 @@ universe u
 variable {M : Structure.{u}}
 
 theorem ep_tag_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S a c C V d Y W : M.Domain}
-    (hω : M.IsOmega ω) (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
+    (hω : M.IsOmega ω) (h : Ep_graph_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
     (stage : Di_stage_d (kp_pair_l (ZF.modelsKP hZF)) A p S a d Y W)
     (hac : Rd_entry_d a c Z) (hm : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V) :
     ∃ e u, Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω d c Y C e ∧
@@ -60,7 +60,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 /-- 更换关系后复用原标签双射，仅需 ZF。 -/
 theorem ep_tag_change_l {ω κ L X R F J O Z D p T V V' q C W a b H U e U' d Q S v : M.Domain}
-    (hω : M.IsOmega ω) (system : Ep_system_d hZF ω κ L X R F J O Z D p T V)
+    (hω : M.IsOmega ω) (system : Ep_system_d I ω κ L X R F J O Z D p T V)
     (changed : Di_system_d J O D p T V') (limit : Di_limit_d D p T V' q C W)
     (stage : Di_stage_d I D p V' a d Q S) (hab : Rd_entry_d a b Z)
     (old : Smdl_d I b H U) (new : Smdl_d I e H U')

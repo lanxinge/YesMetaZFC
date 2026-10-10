@@ -447,8 +447,8 @@ theorem eq_of_predecessor_uniqueness {ℳ : Structure.{u}}
     {𝕀 : 𝒞.Interpretation ℳ}
     {operator : ℳ.Domain → ℳ.Domain → Prop} (hExt : Extensional ℳ)
     {bound target current left right : ℳ.Domain} (hBound : ℳ.IsOrdinal bound) (hCurrentWithin : current = bound ∨ ℳ.mem current bound) (hOperator :
-      ℳ.IsClassFunctionOnSequencesInBelow 𝕀
-        operator bound target) (hLeft :
+      ∀ sequence, ℳ.IsSequenceInBelow 𝕀 sequence bound target →
+        ∀ x y, operator sequence x → operator sequence y → x = y) (hLeft :
       ℳ.IsRecursiveSequenceIn 𝕀
         operator left current target) (hRight :
       ℳ.IsRecursiveSequenceIn 𝕀
@@ -489,12 +489,8 @@ theorem eq_of_predecessor_uniqueness {ℳ : Structure.{u}}
       hPrevious index hIndex firstRestriction secondRestriction
         hFirstRecursive hSecondRecursive
     subst secondRestriction
-    rcases hOperator firstRestriction
-        ⟨hBound, index, hIndexBound hIndex, hFirstRecursive.1⟩ with
-      ⟨selected, _, hUnique⟩
-    have hValueEq : value = secondValue := by
-      rw [hUnique value hFirstOperator,
-        hUnique secondValue hSecondOperator]
+    have hValueEq := hOperator firstRestriction
+      ⟨hBound, index, hIndexBound hIndex, hFirstRecursive.1⟩ value secondValue hFirstOperator hSecondOperator
     simpa [hValueEq] using hValueSecond
   exact ⟨transfer hLeft hRight, transfer hRight hLeft⟩
 end IsRecursiveSequenceIn
@@ -802,7 +798,8 @@ theorem recursiveSequenceIn_unique {ℳ : Structure.{u}} (hZF : ℳ.Models SetTh
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)
     {parameterCount : Nat} (env : Env ℳ parameterCount) (operator : Definitional.Project.BinarySchema parameterCount)
     {bound target α left right : ℳ.Domain} (hBound : ℳ.IsOrdinal bound) (hOrdinalWithin : α = bound ∨ ℳ.mem α bound) (hOperator :
-      ℳ.IsClassFunctionOnSequencesInBelow 𝕀 (operator.denote env) bound target) (hLeft :
+      ∀ sequence, ℳ.IsSequenceInBelow 𝕀 sequence bound target →
+        ∀ x y, operator.denote env sequence x → operator.denote env sequence y → x = y) (hLeft :
       ℳ.IsRecursiveSequenceIn 𝕀 (operator.denote env) left α target) (hRight :
       ℳ.IsRecursiveSequenceIn 𝕀 (operator.denote env) right α target) :
     left = right := by
@@ -859,7 +856,8 @@ theorem recursionValueIn_unique {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheor
     ⟨secondSequence, hSecondSequence, hSecondOperator, _⟩
   have hSequenceEq :=
     recursiveSequenceIn_unique hZF 𝕀 env operator
-      hBound (Or.inr hOrdinalBound) hOperator
+      hBound (Or.inr hOrdinalBound) (fun H hH x y hx hy =>
+        (hOperator H hH).elim fun _ hh => (hh.2 x hx).trans (hh.2 y hy).symm)
       hFirstSequence hSecondSequence
   subst secondSequence
   rcases hOperator firstSequence
@@ -1157,7 +1155,8 @@ theorem recursiveSequenceIn_existsUnique {ℳ : Structure.{u}} (hZF : ℳ.Models
   intro other hOther
   exact
     recursiveSequenceIn_unique hZF 𝕀 env operator
-      hBound (Or.inl rfl) hOperator hOther hSequence
+      hBound (Or.inl rfl) (fun H hH x y hx hy =>
+        (hOperator H hH).elim fun _ hh => (hh.2 x hx).trans (hh.2 y hy).symm) hOther hSequence
 /--
 若每个真前段长度上都已有递归序列，则可由函数式替换构造当前长度的递归序列。
 -/

@@ -41,7 +41,7 @@ theorem ee_nodes_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z D p
     (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
     (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
     (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) :
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T V) :
     ∃ e, Fn0_d D Y e ∧ (∀ u y, Rd_entry_d u y e ↔ M.mem u D ∧ Ee_node_d j u y) ∧
       (∀ u v y z, Rd_entry_d u v T → Rd_entry_d u y e → Rd_entry_d v z e → y = z) ∧
       (∀ u v a y z, Rd_entry_d u a p → Rd_entry_d v a p → Rd_entry_d u y e → Rd_entry_d v z e →
@@ -114,7 +114,7 @@ theorem ee_factor_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z D 
     (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k)
     (hL : M.MemberSubset L k) (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S)
     (hSY : M.MemberSubset S Y) (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T V)
     (limit : Di_limit_d D p T V q C W) : Ee_factor_d hZF j Y q C W := by
   obtain ⟨e, he, es, comm, fiber, any⟩ := ee_nodes_l hZF source hV hδ h hY hc hL hS hSY hF system
   obtain ⟨g, hg, law, rel, _⟩ := di_factor_embedding_l hZF system.diagram limit he comm fiber

@@ -26,10 +26,24 @@ theorem ep_value_sat_l (hE : Extensional M) {d} (ρ : Env M d) (q e a f x : Term
   simp only [ep_value_m, Ep_value_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     ep_repr_sat_l hE, rd_entry_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
+/-- 同一实际代表的值唯一；只用原商的等号核和实现图的函数性。 -/
+theorem Ep_value_d.unique_l (hZF : M.Models ZF)
+    {ω κ L X R F J O Z A p T V q C W N e a f x y : M.Domain}
+    (family : Em_source_d ω κ L X F)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (he : Fn0_d C N e) (hx : Ep_value_d q e a f x) (hy : Ep_value_d q e a f y) : x = y := by
+  obtain ⟨E, fv, hEx⟩ := hx
+  obtain ⟨H, fw, hHy⟩ := hy
+  obtain ⟨_, n, hn, ha, _⟩ := fv.source_l hZF family system limit
+  obtain ⟨U, haU⟩ := family.total n a hn ha
+  have eq := (ep_repr_atoms_l hZF family system limit haU fv fw).1.mpr
+    ((ep_repr_atoms_l hZF family system limit haU fv fv).1.mp rfl)
+  exact (fn0_function_l (ZF.modelsKP hZF) he).1.2 H x y (eq ▸ hEx) hHy
+
 theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N S e n D a U : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W)
     (hN : M.TransitiveSet N) (target : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d N S)
     (he : Smap_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω c d C N e)
@@ -50,7 +64,8 @@ theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q 
   have eU := family.function a U' U haU' haU
   subst U'
   have ultra := family.at_l hZF.1 haU ha hD
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZFC source family coherent h limit model hao md.code
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega h limit
+    (h.toEp_graph_d.elementary_l hZFC source family coherent) model hao md.code
   obtain ⟨t, ht, ts⟩ := smap_comp_l I hZF hv he
   have read i : ∃ B, Rd_entry_d (f i) B r ∧ Rd_entry_d B (ρ.bound i) t := by
     obtain ⟨E, ⟨u, B, hu, hfB, huE⟩, hEx⟩ := values i
@@ -58,14 +73,14 @@ theorem ep_delta_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q 
     exact ⟨B, md.map.member_l I hZF.1 ultra.base hBH hfB,
       (ts B (ρ.bound i)).mpr ⟨hBH, E, (vs B E).mpr ⟨hBH, u, hu, huE⟩, hEx⟩⟩
   obtain ⟨b, code⟩ := source.code
-  exact rs_delta_image_l hZF source.omega source.transitive code source.theory (source.space_mem_l hZF hn hD)
+  exact rs_delta_image_l hZF source.omega source.transitive code source.theory (source.uniform_l hZF hn hD) (source.space_mem_l hZF hn hD)
     ultra hG md hN target ht φ hφ hd f (fun i => (read i).elim fun _ h => md.map.projection.input_mem_of_pairMember h.1) ρ read
 
 /-- 在指定支撑上取常值初等嵌入，保留每个像的实际常值代表。 -/
 theorem ep_value_constants_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N e n D a : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W)
     (he : Smap_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω c d C N e)
     (haJ : M.mem a J) (ha : Fn0_d n L a) (hD : Ep_space_d κ n D) :
@@ -77,7 +92,7 @@ theorem ep_value_constants_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T 
   obtain ⟨_, hz, _⟩ := h.models
   obtain ⟨o, _, hao⟩ := hz.2.1 a haJ
   obtain ⟨b, i, m, D', U, G, r, H, Q, code, hi, _, ha', hD', haU, hG, md, spec⟩ :=
-    ep_constant_limit_l hZFC source family coherent h limit model hao
+    ep_constant_limit_l hZF source family h limit model (h.toEp_graph_d.elementary_l hZFC source family coherent) hao
   have en := ha'.domain_eq_l hZF.1 ha
   subst m
   have eD := hZF.1.eq_of_same_members D' D fun s => (hD' s).trans (hD s).symm
@@ -93,7 +108,7 @@ theorem ep_value_constants_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T 
 theorem ep_value_natural_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N S e n D a m f : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W)
     (hN : M.TransitiveSet N) (target : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d N S)
     (he : Smap_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω c d C N e)

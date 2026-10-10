@@ -33,13 +33,19 @@ theorem sc_diagonal_l {ω c X R D A B C} (hω : M.IsOmega ω)
     rfl
   have hd : φ.body.IsDelta0 := .disj (.conj (.mem _ _) (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))))
     (.conj (.neg (.mem _ _)) (.atom _ _ _))
-  obtain ⟨f, L, hf, hL, hFL, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ hd ρ
-    (Fin.cases hA (Fin.cases hB (Fin.cases hC (fun _ => hz)))) hD (fun p hp => by
+  obtain ⟨U, hUX, hu⟩ := theory.algebra.union C hC
+  obtain ⟨V, hVX, coords⟩ := theory.algebra.envelope_l hUX
+  obtain ⟨L, hL, hl⟩ := theory.algebra.insert_l hVX hz
+  have bound p g x (hgc : M.mem g C) (hpx : Rd_entry_d p x g) : M.mem x L := by
+    obtain ⟨q, code, hqg⟩ := hpx
+    exact (hl x).mpr (Or.inl (coords p x ⟨q, code, (hu q).mpr ⟨g, hgc, hqg⟩⟩).2)
+  obtain ⟨f, hf, hFL, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ hd ρ
+    (Fin.cases hA (Fin.cases hB (Fin.cases hC (fun _ => hz)))) hD hL (fun p hp => by
       by_cases ha : M.mem p A
       · obtain ⟨g, hgc, hpg⟩ := hBC.2.1 p ha
-        obtain ⟨x, hx, hpx⟩ := ((hg p g hpg).function_l hX).2.1 p hp
-        exact ⟨x, hx, (sat p x).mpr (Or.inl ⟨ha, g, hgc, hpg, hpx⟩)⟩
-      · exact ⟨z, hz, (sat p z).mpr (Or.inr ⟨ha, rfl⟩)⟩)
+        obtain ⟨x, _, hpx⟩ := ((hg p g hpg).function_l hX).2.1 p hp
+        exact ⟨x, bound p g x hgc hpx, (sat p x).mpr (Or.inl ⟨ha, g, hgc, hpg, hpx⟩)⟩
+      · exact ⟨z, (hl z).mpr (Or.inr rfl), (sat p z).mpr (Or.inr ⟨ha, rfl⟩)⟩)
   have value p g x (hpg : Rd_entry_d p g B) (hpx : Rd_entry_d p x f) : Rd_entry_d p x g := by
     rcases (sat p x).mp (hs p x hpx) with ⟨_, g', _, hpg', hx⟩ | ⟨ha, _⟩
     · exact (fn0_function_l (ZF.modelsKP hZF) hBC).1.2 p g' g hpg' hpg ▸ hx

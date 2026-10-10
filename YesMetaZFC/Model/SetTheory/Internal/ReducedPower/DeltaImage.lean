@@ -14,7 +14,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem rs_delta_image_l {ω a X R D U c G p C T d Y S j : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I a X R)
-    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hU : Sf_ultra_d X D U)
+    (theory : Sc_theory_d I ω X R) (uniform : Sc_uniform_d I ω X R D) (hD : M.mem D X) (hU : Sf_ultra_d X D U)
     (hG : ∀ f, M.mem f G ↔ M.mem f X ∧ Fn0_d D X f) (model : Rp_model_d I D X U R c G p C T)
     (hY : M.TransitiveSet Y) (target : Smem_d I d Y S) (hj : Smap_d I ω c d C Y j)
     {n} (φ : Formula 1 n) (hφ : φ.FreeClosed) (hd : φ.IsDelta0)
@@ -31,7 +31,7 @@ theorem rs_delta_image_l {ω a X R D U c G p C T d Y S j : M.Domain}
   obtain ⟨E₀, hE₀⟩ := ZF.exists_functionSpace hZF I ω G
   obtain ⟨u, hu₀, params⟩ := senv_params_l I hZF hE₀ ⟨f₀, model.map.projection.input_mem_of_pairMember hf₀⟩ w f inj hωw hf
   have huf := (hE₀ u).mp hu₀
-  obtain ⟨E, v, Z, hE, hv, eval, hZ, los⟩ := rs_los_assignment_l hZF hω hX hm theory hD hp hu hG md huf
+  obtain ⟨E, v, Z, hE, hv, eval, hZ, los⟩ := rs_los_assignment_l hZF hω hX hm theory uniform hD hp hu hG md huf
   obtain ⟨v', hv', transport⟩ := smap_assign_exists_l I hZF hj.1.1 hv
   obtain ⟨E', hE'⟩ := ZF.exists_functionSpace hZF I ω Y
   have out i : Rd_entry_d (w i) (ρ.bound i) v' := by

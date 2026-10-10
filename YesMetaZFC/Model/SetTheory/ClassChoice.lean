@@ -39,7 +39,7 @@ theorem ZFC.class_indexed_choice_l (hZFC : M.Models ZFC) {n}
   let t : Fin (n+2) → M.Domain := Fin.cases a (Fin.cases ω ρ.bound)
   obtain ⟨A, _, h⟩ := ZF.finite_params_l I hZF hω t
   have hA i : M.mem (t i) A := (h _).mpr ⟨i, rfl⟩
-  obtain ⟨α, X, hX, hAX, hc⟩ := ZF.lr_closed_layer_l I hZF hω [⟨n+2, ψ⟩] A
+  obtain ⟨α, X, hX, _, hAX, hc⟩ := ZF.lr_closed_layer_l I hZF hω [⟨n+2, ψ⟩] A
   have htr := ZF.v_transitive_l I hZF hX
   have haX : M.mem a X := htr A hAX a (hA 0)
   have hωX : M.mem ω X := htr A hAX ω (hA 1)

@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem ep_seed_down_l {ω κ K L X R F J O Z A p T S q C W α E H : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (hκ : M.TransitiveSet κ) (hωL : M.MemberSubset ω L)
     (family : Em_source_d ω κ L X F) (coherent : Ec_source_d I ω κ L X F)
-    (normal : En_source_d ω κ L X F) (h : Ep_system_d hZF ω κ L X R F J O Z A p T S)
+    (normal : En_source_d ω κ L X F) (h : Ep_system_d I ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C W) (seed : Ep_seed_d κ L q α E) (hHE : Rd_entry_d H E W) :
     ∃ β, M.mem β α ∧ Ep_seed_d κ L q β H := by
   obtain ⟨n₀, a, i₀, D₀, f₀, ha, hi₀, hD₀, hf₀, value₀⟩ := seed
@@ -57,8 +57,8 @@ theorem ep_seed_down_l {ω κ K L X R F J O Z A p T S q C W α E H : M.Domain}
   -- 回归关系的精确真值集属于源，因而可以继续施加源内协调律。
   obtain ⟨B₀, hB₀X, bs₀⟩ := sc_member_trace_l hZF source.omega source.transitive code source.theory
     (source.space_mem_l hZF hn hD)
-    (source.function_l hZF (source.space_mem_l hZF hn hD) hg'X (hg'.mono_target_l (source.transitive κ source.cardinal_mem)))
-    (source.function_l hZF (source.space_mem_l hZF hn hD) hfX (hf.1.mono_target_l (source.transitive κ source.cardinal_mem)))
+    (source.function_l hZF hg'X (hg'.mono_target_l (source.transitive κ source.cardinal_mem)))
+    (source.function_l hZF hfX (hf.1.mono_target_l (source.transitive κ source.cardinal_mem)))
   have below := (ep_repr_atoms_l hZF family h limit hcU repr value).2.mp hHE
   have hB₀U : M.mem B₀ U := by
     obtain ⟨B, hBU, bound⟩ := below

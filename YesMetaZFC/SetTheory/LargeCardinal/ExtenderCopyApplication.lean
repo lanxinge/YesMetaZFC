@@ -12,9 +12,9 @@ variable {M : Structure.{u}}
 
 def Ec_ultrapowers_d (hZF : M.Models ZF) (ω κ L X R F κ' L' Y S F' c d π σ : M.Domain) : Prop :=
   ∃ J O Z D p T V q e C W J' O' Z' D' p' T' V' q' e' C' W',
-    Ep_system_d hZF ω κ L X R F J O Z D p T V ∧ Di_limit_d D p T V q C W ∧
+    Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T V ∧ Di_limit_d D p T V q C W ∧
     Smdl_d (kp_pair_l (ZF.modelsKP hZF)) e C W ∧
-    Ep_system_d hZF ω κ' L' Y S F' J' O' Z' D' p' T' V' ∧ Di_limit_d D' p' T' V' q' C' W' ∧
+    Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ' L' Y S F' J' O' Z' D' p' T' V' ∧ Di_limit_d D' p' T' V' q' C' W' ∧
     Smdl_d (kp_pair_l (ZF.modelsKP hZF)) e' C' W' ∧ Ec_limit_d hZF ω c X d Y π σ q q' e C W e' C' W'
 
 variable (hZFC : M.Models ZFC)

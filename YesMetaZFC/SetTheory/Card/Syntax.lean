@@ -38,6 +38,7 @@ def cardinalLess (𝒞 : OrderedPairConvention)
     {depth : Nat} (left right : Term depth) : Formula 1 depth :=
   .conj (cardinalLessOrEqual 𝒞 left right) <|
     .neg (equinumerous 𝒞 left right)
+derive_free_closed cardinalLess
 /-- `κ` 是初始序数，即不与任何更小序数等势。 -/
 def isCardinal (𝒞 : OrderedPairConvention)
     {depth : Nat} (κ : Term depth) : Formula 1 depth :=

@@ -49,15 +49,17 @@ theorem sc_finite_function_l {ω c X R A n f : M.Domain} (hω : M.IsOmega ω)
         simp only [ψ, BinarySchema.denote, Formula.satisfies_disj_iff, Formula.satisfies_conj_iff,
           Formula.satisfies_mem_iff, Formula.satisfies_neg_iff, rd_entry0_sat_l hZF.1,
           Formula.satisfies_extensionalEq_iff_eq hZF.1]; rfl
-      obtain ⟨f', C, hfX, _, hfn, choose⟩ := sc_uniform_source_l hZF hω hX hm theory ψ
+      obtain ⟨B, hBX, bound⟩ := theory.algebra.envelope_l hgX
+      obtain ⟨C, hCX, hc⟩ := theory.algebra.insert_l hBX (hA x hx)
+      obtain ⟨f', hfX, hfn, choose⟩ := sc_uniform_source_l hZF hω hX hm theory ψ
         (.disj (.conj (.mem _ _) (rd_entry0_delta_l ..)) (.conj (.neg (.mem _ _)) (.atom _ _ _))) η
         (Fin.cases (hA x hx) (Fin.cases hgX (fun _ => hX ω hωX n hn))) (hX ω hωX m hmω)
-        (fun i _ => by
+        hCX (fun i _ => by
           classical
           by_cases hi : M.mem i n
-          · obtain ⟨y, hy, hiy⟩ := hgn.2.2 i hi
-            exact ⟨y, hA y hy, (read i y).mpr (Or.inl ⟨hi, hiy⟩)⟩
-          · exact ⟨x, hA x hx, (read i x).mpr (Or.inr ⟨hi, rfl⟩)⟩)
+          · obtain ⟨y, _, hiy⟩ := hgn.2.2 i hi
+            exact ⟨y, (hc y).mpr (Or.inl (bound i y hiy).2), (read i y).mpr (Or.inl ⟨hi, hiy⟩)⟩
+          · exact ⟨x, (hc x).mpr (Or.inr rfl), (read i x).mpr (Or.inr ⟨hi, rfl⟩)⟩)
       have eq : f' = f := hfn.ext_l hZF.1 hf (fun i hi => by
         obtain ⟨y, _, hiy⟩ := hfn.2.1 i hi
         refine ⟨y, hiy, ?_⟩

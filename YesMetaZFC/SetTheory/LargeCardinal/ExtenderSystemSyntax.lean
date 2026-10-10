@@ -51,12 +51,12 @@ theorem ep_at_model_l (hZF : M.Models ZF) {ω κ L X R F Z a B : M.Domain}
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hc hp.code.1
   exact ⟨c, C, S, hac, models a c hac, hp.code, hB⟩
 
-structure Ep_graph_d (hZF : M.Models ZF) (ω κ L X R F J O Z A p T S : M.Domain) : Prop where
+structure Ep_graph_d (I : kpair_convention_l.Interpretation M) (ω κ L X R F J O Z A p T S : M.Domain) : Prop where
   order : Di_order_d J O
   order_spec : ∀ a b, Rd_entry_d a b O ↔ M.mem a J ∧ M.mem b J ∧ ∃ q, Ei_map_d ω L a b q
   projection : Fn0_d A J p
   indices : ∀ a, M.mem a J ↔ Ei_d ω L a
-  models : ∃ Q, Fn0_d J Q Z ∧ ∀ a c, Rd_entry_d a c Z → Ep_component_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F a c
+  models : ∃ Q, Fn0_d J Q Z ∧ ∀ a c, Rd_entry_d a c Z → Ep_component_d I ω κ L X R F a c
   nodes : ∀ u, M.mem u A ↔ ∃ a B, KPair_d M u a B ∧ Ep_at_d Z a B
   index : ∀ u a B, KPair_d M u a B → (Rd_entry_d u a p ↔ M.mem u A)
   arrows : ∀ u v, Rd_entry_d u v T ↔ M.mem u A ∧ M.mem v A ∧
@@ -68,21 +68,21 @@ def Ep_lift_d (ω κ L X a b B C : M.Domain) : Prop := ∀ f, M.mem f B → ∃ 
   M.mem m ω ∧ M.mem n ω ∧ Fn0_d m n q ∧ Fn0_d n L b ∧ Cp0_d m n L q b a ∧
     M.mem g C ∧ Ep_pull_d κ X m n q f g
 
-structure Ep_system_d (hZF : M.Models ZF) (ω κ L X R F J O Z A p T S : M.Domain) : Prop
-    extends Ep_graph_d hZF ω κ L X R F J O Z A p T S where
+structure Ep_system_d (I : kpair_convention_l.Interpretation M) (ω κ L X R F J O Z A p T S : M.Domain) : Prop
+    extends Ep_graph_d I ω κ L X R F J O Z A p T S where
   diagram : Di_system_d J O A p T S
   representatives : ∀ u v a b B C, KPair_d M u a B → KPair_d M v b C → Rd_entry_d u v T →
     Ep_lift_d ω κ L X a b B C
 
-variable {hZF : M.Models ZF} {ω κ L X R F J O Z A p T S : M.Domain}
+variable {I : kpair_convention_l.Interpretation M} {ω κ L X R F J O Z A p T S : M.Domain}
 
-theorem Ep_graph_d.at_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
+theorem Ep_graph_d.at_l (h : Ep_graph_d I ω κ L X R F J O Z A p T S)
     {u a B} (hu : M.mem u A) (hc : KPair_d M u a B) : Ep_at_d Z a B := by
   obtain ⟨b, C, hc', hb⟩ := (h.nodes u).mp hu
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hc hc'
   exact hb
 
-theorem Ep_graph_d.label_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
+theorem Ep_graph_d.label_l (h : Ep_graph_d I ω κ L X R F J O Z A p T S)
     {u a} (hua : Rd_entry_d u a p) : ∃ B, KPair_d M u a B ∧ Ep_at_d Z a B := by
   obtain ⟨b, B, hu, hat⟩ := (h.nodes u).mp (h.projection.bound_l hua).1
   have hub := (h.index u b B hu).mpr (h.projection.bound_l hua).1
@@ -90,7 +90,7 @@ theorem Ep_graph_d.label_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
     a (h.projection.bound_l hua).2 hub hua
   exact ⟨B, e ▸ hu, e ▸ hat⟩
 
-theorem Ep_graph_d.arrow_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
+theorem Ep_graph_d.arrow_l (h : Ep_graph_d I ω κ L X R F J O Z A p T S)
     {u v a b B C} (hu : KPair_d M u a B) (hv : KPair_d M v b C) :
     Rd_entry_d u v T ↔ M.mem u A ∧ M.mem v A ∧ Ep_arrow_d ω κ L X a b B C := by
   refine (h.arrows u v).trans ⟨?_, fun ⟨huA, hvA, hab⟩ => ⟨huA, hvA, a, b, B, C, hu, hv, hab⟩⟩
@@ -99,7 +99,7 @@ theorem Ep_graph_d.arrow_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hv hv'
   exact ⟨huA, hvA, hab⟩
 
-theorem Ep_graph_d.relation_l (h : Ep_graph_d hZF ω κ L X R F J O Z A p T S)
+theorem Ep_graph_d.relation_l (h : Ep_graph_d I ω κ L X R F J O Z A p T S)
     {u v a B C} (hu : KPair_d M u a B) (hv : KPair_d M v a C) :
     Rd_entry_d u v S ↔ M.mem u A ∧ M.mem v A ∧ Ep_rel_d Z a B C := by
   refine (h.relations u v).trans ⟨?_, fun ⟨huA, hvA, hab⟩ => ⟨huA, hvA, a, B, C, hu, hv, hab⟩⟩

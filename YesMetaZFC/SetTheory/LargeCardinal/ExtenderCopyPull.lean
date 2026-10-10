@@ -22,7 +22,7 @@ theorem ep_function_image_l {ω κ κ' K K' X R Y S c d π n f f' : M.Domain}
   obtain ⟨D', _, hDD⟩ := hπ.1.1.2.2 D hDX
   exact ⟨D', ep_space_map_l hZF source target hm hn hπ hκ hnω hd hDD,
     (hπ.sfun_l hZF source.omega source.transitive target.transitive hm hn hDD hff
-      (source.function_l hZF hDX (hπ.1.1.input_mem_of_pairMember hff) hf)).function_l target.transitive⟩
+      (source.function_l hZF (hπ.1.1.input_mem_of_pairMember hff) hf)).function_l target.transitive⟩
 
 theorem ep_pull_image_l {ω κ κ' K K' X R Y S c d π m n q f f' g g' : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (target : Ep_source_d hZF ω κ' K' Y S)

@@ -1,6 +1,7 @@
 import YesMetaZFC.Model.SetTheory.LevyReflection.Chain
 import YesMetaZFC.SetTheory.CumulativeUnion
 import YesMetaZFC.SetTheory.CountableChain
+import YesMetaZFC.SetTheory.CumulativeFunction
 
 /-! # 有限反射族在任意高累积层中的见证闭包
 
@@ -32,7 +33,7 @@ theorem lr_params_bound_l (hZF : M.Models ZF) {ω P Q X} (hω : M.IsOmega ω)
 
 /-- 任意有限见证族都有任意高的实际 V 层，对其中全部参数统一闭合。 -/
 theorem ZF.lr_closed_layer_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω)
-    (Φ : Lr_family) (A : M.Domain) : ∃ α X, V_d I α X ∧ M.mem A X ∧ Lr_step_d Φ X X := by
+    (Φ : Lr_family) (A : M.Domain) : ∃ α X, V_d I α X ∧ M.IsLimitOrdinal α ∧ M.mem A X ∧ Lr_step_d Φ X X := by
   obtain ⟨β, B, hB, hAB⟩ := v_cover_l I hZF A
   obtain ⟨P, Q, hQ, hz, hs⟩ := lr_chain_l I hZF hω Φ B
   have ascend {i j Y Z} (hij : M.SuccessorOf j i) (hi : M.PairMember I i Y Q)
@@ -56,7 +57,16 @@ theorem ZF.lr_closed_layer_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω)
   obtain ⟨α, hV⟩ := v_union_l I hZF hX (fun Y hY => (hC Y).mp hY |>.elim fun _ hi => layers hi)
   obtain ⟨e, he, _⟩ := hω.1.1
   have hAX := (hu A).mpr ⟨e, B, hz e he, hAB⟩
-  refine ⟨α, X, hV, hAX, fun q hq ρ hρ hx => ?_⟩
+  have limit : M.IsLimitOrdinal α := by
+    obtain ⟨β, _, hβ, _⟩ := (v_unfold_l I hZF hV A).mp hAX
+    refine ⟨v_ordinal_l I hV, ⟨β, hβ⟩, fun γ hγ => ?_⟩
+    obtain ⟨i, Y, hi, hγY⟩ := (hu γ).mp (v_ordinal_mem_l I hZF hV hγ)
+    obtain ⟨j, hij, hjω⟩ := hω.1.2 i (hQ.input_mem_of_pairMember hi)
+    obtain ⟨Z, _, hj⟩ := hQ.2.2 j hjω
+    have hYX := (hu Y).mpr ⟨j, Z, hj, ((hs i j Y Z hij hi hj).cover_l I hZF).2.1⟩
+    obtain ⟨δ, W, hδ, hW, sub⟩ := (v_unfold_l I hZF hV Y).mp hYX
+    exact ⟨δ, hδ, v_ordinal_height_l hZF hW ((v_ordinal_l I hV).mem hγ) (sub γ hγY)⟩
+  refine ⟨α, X, hV, limit, hAX, fun q hq ρ hρ hx => ?_⟩
   obtain ⟨i, Y, hi, hy⟩ := lr_params_bound_l I hZF hω hQ inc hu ⟨A, hAX⟩ ρ.bound hρ
   obtain ⟨j, hij, hjω⟩ := hω.1.2 i (hQ.input_mem_of_pairMember hi)
   obtain ⟨Z, _, hj⟩ := hQ.2.2 j hjω

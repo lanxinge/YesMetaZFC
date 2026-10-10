@@ -27,8 +27,13 @@ theorem ep_repr_sat_l (hE : Extensional M) {d} (ρ : Env M d) (q a f E : Term d)
 variable (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C W : M.Domain}
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+theorem Ep_repr_d.index_l (h : Ep_system_d I ω κ L X R F J O Z A p T S)
+    (limit : Di_limit_d A p T S q C W) {a f E} (he : Ep_repr_d q a f E) : M.mem a J := by
+  obtain ⟨u, B, hu, _, huE⟩ := he
+  exact (h.projection.bound_l ((h.index u a B hu).mpr (limit.projection.bound_l huE).1)).2
+
 theorem ep_repr_exists_l (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {n D a f : M.Domain} (haJ : M.mem a J) (ha : Fn0_d n L a) (hD : Ep_space_d κ n D)
     (hfX : M.mem f X) (hf : Fn0_d D X f) : ∃ E, M.mem E C ∧ Ep_repr_d q a f E := by
   obtain ⟨_, hz, models⟩ := h.models
@@ -46,7 +51,7 @@ theorem ep_repr_exists_l (family : Em_source_d ω κ L X F)
 
 /-- 极限的每个元素都有实际源内代表。 -/
 theorem ep_repr_surjective_l (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {E : M.Domain} (hEC : M.mem E C) : ∃ n a D f, M.mem n ω ∧ M.mem a J ∧ Fn0_d n L a ∧
       Ep_space_d κ n D ∧ M.mem f X ∧ Fn0_d D X f ∧ Ep_repr_d q a f E := by
   obtain ⟨u, huE⟩ := (limit.range E).mp hEC
@@ -61,7 +66,7 @@ theorem ep_repr_surjective_l (family : Em_source_d ω κ L X F)
 
 /-- 代表所属的实际源和内部有限定义域，可由商证书直接读回。 -/
 theorem Ep_repr_d.source_l (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {a f E : M.Domain} (he : Ep_repr_d q a f E) : M.mem f X ∧ ∃ n, M.mem n ω ∧ Fn0_d n L a ∧ Ep_fun_d κ X n f := by
   obtain ⟨u, B, hu, hf, huE⟩ := he
   obtain ⟨_, _, models⟩ := h.models
@@ -72,7 +77,7 @@ theorem Ep_repr_d.source_l (family : Em_source_d ω κ L X F)
 
 /-- 固定分量中，极限上的等号和隶属恰好由原代表的测度一关系判定。 -/
 theorem ep_repr_atoms_l (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {a f g E H U : M.Domain} (haU : Rd_entry_d a U F) (he : Ep_repr_d q a f E) (hh : Ep_repr_d q a g H) :
     (E = H ↔ Rp_eq_d X U f g) ∧ (Rd_entry_d E H W ↔ Rp_rel_d I X U R f g) := by
   obtain ⟨u, B, hu, hf, huE⟩ := he
@@ -102,7 +107,7 @@ theorem ep_repr_atoms_l (family : Em_source_d ω κ L X F)
       (Iff.trans ⟨And.right ∘ And.right, fun hr => ⟨huA, hvA, hr⟩⟩ relation))
 
 theorem ep_repr_pull_l
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {m n a b r f g E H : M.Domain} (hm : M.mem m ω) (hn : M.mem n ω)
     (hr : Fn0_d m n r) (hb : Fn0_d n L b) (hra : Cp0_d m n L r b a)
     (pull : Ep_pull_d κ X m n r f g) (he : Ep_repr_d q a f E) (hh : Ep_repr_d q b g H) : E = H := by
@@ -113,8 +118,8 @@ theorem ep_repr_pull_l
       m, n, r, f, g, hm, hn, hr, hb, hra, hf, hg, pull⟩) huE hvH
 
 /-- 实际构造拉回代表，并保留它在同一极限中的值。 -/
-theorem ep_repr_reindex_l (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
+theorem ep_repr_reindex_l {R₀ : M.Domain} (source : Ep_source_d hZF ω κ K X R₀) (family : Em_source_d ω κ L X F)
+    (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {n m a b D E r f B : M.Domain} (hn : M.mem n ω) (hm : M.mem m ω)
     (hr : Fn0_d n m r) (hbJ : M.mem b J) (hb : Fn0_d m L b) (hra : Cp0_d n m L r b a)
     (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E) (hfX : M.mem f X) (hf : Fn0_d D X f)

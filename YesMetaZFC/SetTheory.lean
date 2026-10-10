@@ -1,6 +1,7 @@
 import YesMetaZFC.SetTheory.Language
 import YesMetaZFC.Model.SetTheory.Theory
 import YesMetaZFC.SetTheory.Definitional
+import YesMetaZFC.SetTheory.FlatPairing
 import YesMetaZFC.Model.SetTheory.FunctionSemantics
 import YesMetaZFC.SetTheory.InnerModel
 import YesMetaZFC.SetTheory.Collapse

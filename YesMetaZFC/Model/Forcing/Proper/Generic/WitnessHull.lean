@@ -38,7 +38,7 @@ theorem ng_witness_hull_l {ω A p} (hω : M.IsOmega ω) (hP : Proper_d I ω B R 
   have hn := ZF.countable_insert_l I hZF hω (ZF.countable_insert_l I hZF hω
     (ZF.countable_insert_l I hZF hω (ZF.countable_insert_l I hZF hω hA ha) hb) hc) hd'
   let F : List Lr_formula := [⟨n+5, ng_data_m φ, ng_data_closed_l φ⟩, ⟨n+3, ng_exists_m φ, ng_exists_closed_l φ⟩]
-  obtain ⟨α, X, hV, hAX, hr⟩ := ZF.lr_finite_l I hZF F A₄
+  obtain ⟨α, X, hV, _, hAX, hr⟩ := ZF.lr_finite_l I hZF F A₄
   have hData := hr ⟨n+5, ng_data_m φ, ng_data_closed_l φ⟩ (List.mem_cons_self ..)
   have hExists := hr ⟨n+3, ng_exists_m φ, ng_exists_closed_l φ⟩ (List.mem_cons_of_mem _ (List.mem_cons_self ..))
   have hX := ZF.v_transitive_l I hZF hV

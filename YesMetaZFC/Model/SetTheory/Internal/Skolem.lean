@@ -1,6 +1,7 @@
 import YesMetaZFC.Model.SetTheory.Internal.SkolemSyntax
 import YesMetaZFC.Model.SetTheory.Internal.Compiler
 import YesMetaZFC.SetTheory.FinitaryHull
+import YesMetaZFC.SetTheory.Card.OrdinalCardinality
 
 /-! # 实际内部司寇伦函数与最小闭包
 
@@ -121,6 +122,27 @@ theorem ssk_hull_bound_l (hZFC : M.Models ZFC) {ω κ c X R A} (hω : M.IsOmega 
     exact count i (hQ.input_mem_of_pairMember hi) B hi)
   exact ⟨u, C, S, T, D, K, N, hK, hN, hn, hK.point_mem_l I hZF hω hM hN.2.2.1,
     hK.closed_l I hN.2.1 hN.2.2.1⟩
+
+/-- 大小参数只须是含 ω 的序数；种子的双射延长为最小壳上的实际双射。 -/
+theorem ssk_hull_enum_l (hZFC : M.Models ZFC) {ω κ c X R A f} (hω : M.IsOmega ω)
+    (hκ : M.IsOrdinal κ) (hωκ : M.MemberSubset ω κ) (hM : Smdl_d I c X R)
+    (hA : M.MemberSubset A X) (hf : M.IsSetBijectionFromTo I f κ A) :
+    ∃ u C S T D K N g, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
+      M.IsSetBijectionFromTo I g κ N := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨μ, hμ, _⟩ := ZF.ordinalCardinal_existsUnique hZF I hκ
+  obtain ⟨q, hq⟩ := hμ.2.symm hZF I
+  obtain ⟨r, hr⟩ := (show M.Equinumerous I κ A from ⟨f, hf⟩).symm hZF I
+  have hμinf : M.IsInfiniteCardinal I ω μ := ⟨hμ.1,
+    (ZF.exists_inclusionInjection hZF I hωκ).elim fun p hp => ZF.exists_compositionInjection hZF I hp hq.1⟩
+  obtain ⟨u, C, S, T, D, K, N, skolem, hull, small, _, _⟩ := ssk_hull_bound_l I hZFC hω hμinf hM hA
+    (ZF.exists_compositionInjection hZF I hr.1 hq.1)
+  obtain ⟨p, hp⟩ := small
+  obtain ⟨q', hq'⟩ := hμ.2
+  obtain ⟨g, hg⟩ := ZF.equinumerous_of_cardinalLessOrEqual hZF I
+    ((ZF.exists_inclusionInjection hZF I hull.1).elim fun j hj => ZF.exists_compositionInjection hZF I hf.1 hj)
+    (ZF.exists_compositionInjection hZF I hp hq'.1)
+  exact ⟨u, C, S, T, D, K, N, g, skolem, hull, hg⟩
 
 /-- 可数 Skolem 壳是一般 κ 小闭包的实例。 -/
 theorem ssk_hull_l (hZFC : M.Models ZFC) {ω c X R A} (hω : M.IsOmega ω)

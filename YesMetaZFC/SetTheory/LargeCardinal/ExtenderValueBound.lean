@@ -2,8 +2,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderValueAgreement
 
 /-! # 后继中的有限幂子集具有处处有界的源内代表
 
-对 A⊆μᵐ 读有界 Łoś，坐标 μ 的逐点值属于 κ，因此原代表几乎处处
-是 κᵐ 的子集。逐点取交给出可跨源编码的代表，并保留同一坍塌值。
+对 A⊆μᵐ 读有界 Łoś，界代表的逐点值包含于 κ，因此原代表几乎处处
+是 κᵐ 的子集。既容许坐标界，也容许常值 κ；逐点取交保留同一坍塌值。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -22,17 +22,17 @@ theorem ep_subspace_sat_l (hE : Extensional M) {d} (ρ : Env M d) (m μ A : Term
       ∀ t, M.mem t (A.eval ρ) → Fn0_d (m.eval ρ) (μ.eval ρ) t := by
   simp only [ep_subspace_m, Formula.satisfies_forallMem_iff, fn0_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
-theorem ep_value_bound_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N S e n m D E a f u i μ B : M.Domain}
+theorem ep_value_bound_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q c C W d N S e n m D E a f u μ B : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (family : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
     (model : Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W)
     (hN : M.TransitiveSet N) (target : Smem_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) d N S)
     (he : Smap_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω c d C N e)
-    (hκ : M.TransitiveSet κ) (haJ : M.mem a J) (hn : M.mem n ω) (hm : M.mem m ω)
+    (haJ : M.mem a J) (hn : M.mem n ω) (hm : M.mem m ω)
     (ha : Fn0_d n L a) (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E)
     (hfX : M.mem f X) (hf : Fn0_d D X f) (fv : Ep_value_d q e a f B)
-    (hu : Ep_coord_d κ D i u) (uv : Ep_value_d q e a u μ)
+    (hu : Fn0_d D X u) (small : ∀ s x, Rd_entry_d s x u → M.MemberSubset x κ) (uv : Ep_value_d q e a u μ)
     (bound : ∀ t, M.mem t B → Fn0_d m μ t) :
     ∃ g, M.mem g X ∧ Fn0_d D X g ∧ (∀ s x, Rd_entry_d s x g → M.MemberSubset x E) ∧ Ep_value_d q e a g B := by
   let hZF := ZFC.models_zf_l hZFC
@@ -49,10 +49,10 @@ theorem ep_value_bound_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V q 
   obtain ⟨H, _, hHU, sub, good⟩ := los.mp ((ep_subspace_sat_l hZF.1 ..).mpr bound)
   obtain ⟨g, hgX, hg, gb, eq⟩ := rs_cap_l hZF source.omega source.transitive code source.theory
     (source.space_mem_l hZF hn hD) (source.space_mem_l hZF hm hE) hfX hf ultra.base.bounds ⟨H, hHU, fun s x hs hsx => by
-      obtain ⟨y, hyκ, hsy⟩ := hu.1.2.1 s (sub s hs)
+      obtain ⟨y, _, hsy⟩ := hu.2.1 s (sub s hs)
       have point := (ep_subspace_sat_l hZF.1 ..).mp (good s hs
         ⟨Fin.cases x (Fin.cases y (fun _ => m)), fun _ => m⟩ (Fin.cases hsx (Fin.cases hsy (fun _ => vc s (sub s hs)))))
-      exact fun t ht => (hE t).mpr ((point t ht).mono_target_l (hκ y hyκ))⟩
+      exact fun t ht => (hE t).mpr ((point t ht).mono_target_l (small s y hsy))⟩
   obtain ⟨H', _, gv⟩ := ep_repr_exists_l hZF family h limit haJ ha hD hgX hg
   obtain ⟨H, fh, hHB⟩ := fv
   exact ⟨g, hgX, hg, gb, H', gv, (ep_repr_atoms_l hZF family h limit haU fh gv).1.mpr eq ▸ hHB⟩

@@ -3,12 +3,13 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceReindex
 import YesMetaZFC.Model.SetTheory.Internal.SeparationSource
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.Constant
 import YesMetaZFC.Model.SetTheory.Internal.SourceSequences
+import YesMetaZFC.Model.SetTheory.Internal.SourceCollapse
 import YesMetaZFC.SetTheory.HereditaryCover
 import YesMetaZFC.SetTheory.HereditarySequences
 
 /-! # 有限支撑系统的实际源数据
 
-正则 Hχ 实际满足全内部分离、统一化及有限序列空间存在性；这些性质
+分离与集合代数适用于任意源内集合；统一化与塌缩只作用于源内小集合。这些性质
 沿完整初等嵌入传递到后继模型。全部函数空间、投影与代表拉回由此构造。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
@@ -22,11 +23,34 @@ structure Ep_source_d (hZF : M.Models ZF) (ω κ K X R : M.Domain) : Prop where
   transitive : M.TransitiveSet X
   omega_mem : M.mem ω X
   cardinal_mem : M.mem κ X
+  cardinal_small : Sc_small_d X κ
   finite_mem : M.mem K X
   finite : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω κ K
   code : ∃ c, Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R
   theory : Sc_theory_d (kp_pair_l (ZF.modelsKP hZF)) ω X R
+  collection : Sc_collection_d (kp_pair_l (ZF.modelsKP hZF)) ω X R
   sequences : Sc_sequences_d (kp_pair_l (ZF.modelsKP hZF)) ω X
+  collapse : Sc_collapse_d X
+
+/-- 新字母表的小性由源内实际单射给出。 -/
+theorem Ep_source_d.rebase_l (hZF : M.Models ZF) {ω κ K X R μ : M.Domain} (h : Ep_source_d hZF ω κ K X R)
+    (hμ : M.mem μ X) (hωμ : M.MemberSubset ω μ) (small : Sc_small_d X μ) : ∃ K', Ep_source_d hZF ω μ K' X R := by
+  obtain ⟨K', hk, hs⟩ := h.sequences.space μ hμ
+  exact ⟨K', h.omega, hωμ, h.transitive, h.omega_mem, hμ, small, hk, hs, h.code, h.theory, h.collection, h.sequences, h.collapse⟩
+
+/-- 全部内部有限 κ 列具有源内的同一 κ 编号。 -/
+theorem Ep_source_d.finite_index_l (hZF : M.Models ZF) {ω κ K X R : M.Domain} (source : Ep_source_d hZF ω κ K X R)
+    (hκ : M.IsOrdinal κ) : ∃ e, M.mem e X ∧ M.IsSetInjectionFromTo (kp_pair_l (ZF.modelsKP hZF)) e K κ := by
+  obtain ⟨c, hc⟩ := source.code
+  let φ : BinarySchema 0 := { body := Formula.extensionalEq (.bound 1) .newest }
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => κ⟩
+  have sat a b : φ.denote ρ a b ↔ a = b := Formula.satisfies_extensionalEq_iff_eq hZF.1 ..
+  obtain ⟨f, hf, fn, eq⟩ := sc_uniform_source_l hZF source.omega source.transitive hc source.theory φ (.atom ..)
+    ρ (fun i => Fin.elim0 i) source.cardinal_mem source.cardinal_mem (fun a ha => ⟨a, ha, (sat a a).mpr rfl⟩)
+  have idx : Sc_index_d κ κ f := Sc_index_d.of_injection_l (ZF.modelsKP hZF) hκ
+    ⟨fn0_function_l (ZF.modelsKP hZF) fn, fun a b x ha hb => ((sat a x).mp (eq a x ha)).trans ((sat b x).mp (eq b x hb)).symm⟩
+  obtain ⟨e, he, index⟩ := source.sequences.index κ K κ f source.cardinal_mem source.finite_mem source.cardinal_mem hf source.finite source.below idx
+  exact index.restrict_l hZF source.omega source.transitive hc source.theory source.finite_mem source.cardinal_mem he
 
 theorem Ep_source_d.space_l (hZF : M.Models ZF) {ω κ K X R n : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) : ∃ D, M.mem D X ∧ Ep_space_d κ n D := by
@@ -46,11 +70,17 @@ theorem Ep_source_d.space_mem_l (hZF : M.Models ZF) {ω κ K X R n D : M.Domain}
   obtain ⟨E, he, hs⟩ := h.space_l hZF hn
   exact hZF.1.eq_of_same_members E D (fun s => (hs s).trans (hD s).symm) ▸ he
 
+theorem Ep_source_d.uniform_l (hZF : M.Models ZF) {ω κ K X R n D : M.Domain}
+    (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) (hD : Ep_space_d κ n D) :
+    Sc_uniform_d (kp_pair_l (ZF.modelsKP hZF)) ω X R D := by
+  obtain ⟨c, hc⟩ := h.code
+  exact h.collection D (h.space_mem_l hZF hn hD)
+    ((h.sequences.small_l hZF h.omega h.transitive hc h.theory h.omega_mem h.cardinal_mem h.finite_mem h.finite h.cardinal_small).mono_l
+      (fun s hs => (h.finite s).mpr ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) ((hD s).mp hs)⟩))
+
 theorem Ep_source_d.function_l (hZF : M.Models ZF) {ω κ K X R D f : M.Domain}
-    (h : Ep_source_d hZF ω κ K X R) (hD : M.mem D X) (hf : M.mem f X)
-    (hF : Fn0_d D X f) : Sfun_d X D f := by
-  obtain ⟨c, hm⟩ := h.code
-  exact sc_function_domain_l hZF h.omega h.transitive hm h.theory hD hf hF
+    (h : Ep_source_d hZF ω κ K X R) (hf : M.mem f X)
+    (hF : Fn0_d D X f) : Sfun_d X D f := sc_function_domain_l h.theory.algebra hf hF
 
 theorem Ep_source_d.projection_l (hZF : M.Models ZF) {ω κ K X R m n q D E : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hm : M.mem m ω) (hn : M.mem n ω)
@@ -79,14 +109,14 @@ theorem Ep_source_d.family_l (hZF : M.Models ZF) {ω κ K X R m n q D E F G : M.
 
 theorem Ep_source_d.model_l (hZF : M.Models ZF) {ω κ K X R n D U : M.Domain}
     (h : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω)
-    (hD : Ep_space_d κ n D) (hU : FilterZF.Base_d (ℳ := M) D U) : ∃ G c p C T,
+    (hD : Ep_space_d κ n D) (hU : FilterZF.Base_d (ℳ := M) D U) (S : M.Domain) : ∃ G c p C T,
       (∀ f, M.mem f G ↔ M.mem f X ∧ Fn0_d D X f) ∧
-      Rp_model_d (kp_pair_l (ZF.modelsKP hZF)) D X U R c G p C T := by
+      Rp_model_d (kp_pair_l (ZF.modelsKP hZF)) D X U S c G p C T := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨c, hM⟩ := h.code
   obtain ⟨f, A, hfX, hAX, hf, _⟩ := sc_constant_l hZF h.omega h.transitive hM h.theory
     (h.space_mem_l hZF hn hD) h.cardinal_mem
-  exact rp_family_model_l I hZF hU hfX (hf.mono_target_l (h.transitive A hAX)) R
+  exact rp_family_model_l I hZF hU hfX (hf.mono_target_l (h.transitive A hAX)) S
 
 /-- 正则 Hχ 给出初始源理论及全部字母表的实际有限序列空间。 -/
 theorem ep_source_of_h_l (hZFC : M.Models ZFC) {ω κ K χ X : M.Domain}
@@ -99,23 +129,26 @@ theorem ep_source_of_h_l (hZFC : M.Models ZFC) {ω κ K χ X : M.Domain}
   let I := kp_pair_l (ZF.modelsKP hZF)
   have ht := ZF.h_transitive_l I hZF hX
   obtain ⟨c, R, hc, hr⟩ := smdl_membership_l I hZF ⟨κ, hκX⟩
-  exact ⟨R, hω, hωκ, ht, hωX, hκX, hKX, hK, ⟨c, hc, hr⟩,
-    sc_h_theory_l hZFC hω hχ hωχ hX R, fun _ hA => ZFC.h_fseq_l hZFC hω hχ hωχ hX hA⟩
+  exact ⟨R, hω, hωκ, ht, hωX, hκX, sc_h_small_l hZFC hω hχ hωχ hX hκX, hKX, hK, ⟨c, hc, hr⟩,
+    sc_h_theory_l hZFC hω hχ hωχ hX R, sc_h_collection_l hZFC hω hχ hωχ hX R,
+    sc_h_sequences_l hZFC hω hχ hωχ hX, sc_h_collapse_l hZFC hω hχ hωχ hX⟩
 
-/-- 传递初等后继在任意新参数 κ′ 上重新成为源；无需 κ′ 在旧嵌入的像中。 -/
+/-- 传递初等后继在任意源内小参数 κ′ 上重新成为源；无需 κ′ 在旧嵌入的像中。 -/
 theorem Ep_source_d.successor_l (hZF : M.Models ZF) {ω κ K X R c d N W j κ' : M.Domain}
     (source : Ep_source_d hZF ω κ K X R)
     (hm : Smem_d (kp_pair_l (ZF.modelsKP hZF)) c X R)
     (hn : Smem_d (kp_pair_l (ZF.modelsKP hZF)) d N W) (hN : M.TransitiveSet N)
     (hj : Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω c d X N j)
-    (hκ : M.mem κ' N) (hωκ : M.MemberSubset ω κ') : ∃ K', Ep_source_d hZF ω κ' K' N W := by
+    (hκ : M.mem κ' N) (hωκ : M.MemberSubset ω κ') (small : Sc_small_d N κ') : ∃ K', Ep_source_d hZF ω κ' K' N W := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   have theory := source.theory.map_l I hZF source.omega source.transitive hN hm hn hj
-  have seq := sc_sequences_forward_l hZF source.omega source.transitive hN hm hn hj
-    source.omega_mem source.sequences theory
-  obtain ⟨K', hK, hs⟩ := seq κ' hκ
+  have seq := (sc_sequences_iff_l hZF source.omega source.transitive hN hm hn hj
+    source.omega_mem source.theory theory).mp source.sequences
+  obtain ⟨K', hK, hs⟩ := seq.space κ' hκ
   have hωN := hj.1.1.output_mem_of_pairMember (hj.omega_l I hZF source.omega source.transitive hN hm hn source.omega_mem)
-  exact ⟨K', source.omega, hωκ, hN, hωN, hκ, hK, hs, ⟨d, hn⟩, theory, seq⟩
+  exact ⟨K', source.omega, hωκ, hN, hωN, hκ, small, hK, hs, ⟨d, hn⟩, theory,
+    source.collection.map_l _ hZF source.omega source.transitive hN hm hn hj, seq,
+    (sc_collapse_iff_l hZF source.omega source.transitive hN hm hn hj).mp source.collapse⟩
 
 /-- 自动覆盖指定参数，并包含有限 κ 幂的全部子集；可分别用作所属模型与施加源。 -/
 theorem ep_source_exists_l (hZFC : M.Models ZFC) (A : M.Domain) {ω κ : M.Domain}

@@ -27,8 +27,8 @@ theorem ep_copy_l
     (hL : Rd_entry_d L L' σ) (hF : Rd_entry_d F F' σ)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
     (coherent : Ec_source_d I ω κ L X F) (coherent' : Ec_source_d I ω κ' L' Y F') (agree : Ea_maps_d ω κ X π σ)
-    (h : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W) (model : Smdl_d I e C W)
-    (h' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' D' p' T' V') (limit' : Di_limit_d D' p' T' V' q' C' W')
+    (h : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W) (model : Smdl_d I e C W)
+    (h' : Ep_system_d I ω κ' L' Y S F' J' O' Z' D' p' T' V') (limit' : Di_limit_d D' p' T' V' q' C' W')
     (model' : Smdl_d I e' C' W') : Ec_limit_d hZF ω c X d Y π σ q q' e C W e' C' W' := by
   obtain ⟨Q, hz, models⟩ := h.models
   obtain ⟨Q', hz', models'⟩ := h'.models
@@ -46,7 +46,8 @@ theorem ep_copy_l
     obtain ⟨a', haa, haJ⟩ := image a (hz.bound_l hao).1
     obtain ⟨o', _, hao'⟩ := hz'.2.1 a' haJ
     obtain ⟨A, R, A', R', s, ma, ma', hs, ss, _⟩ := component a a' o o' haa hao hao'
-    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZFC target family' coherent' h' limit' model' hao' ma'
+    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF target.omega h' limit'
+      (h'.toEp_graph_d.elementary_l hZFC target family' coherent') model' hao' ma'
     obtain ⟨k, hk, ks⟩ := smap_comp_l I hZF hs ht
     refine ⟨A, R, k, ma, hk, fun u B E hu => (ks B E).trans ?_⟩
     apply and_congr_right
@@ -128,9 +129,9 @@ theorem ep_copy_l
   obtain ⟨a', haa, haJ⟩ := image a (hz.bound_l hao).1
   obtain ⟨o', _, hao'⟩ := hz'.2.1 a' haJ
   obtain ⟨c₀, i, n, D₀, U₀, G₀, r₀, H₀, V₀, mc, hi, hnω, ha, space, haU, hG₀, md₀, is⟩ :=
-    ep_constant_limit_l hZFC source family coherent h limit model hao
+    ep_constant_limit_l hZF source family h limit model (h.toEp_graph_d.elementary_l hZFC source family coherent) hao
   obtain ⟨d₀, i', n', D₁, U₁, G₁, r₁, H₁, V₁, md, hi', _, ha', space', haU', hG₁, md₁, is'⟩ :=
-    ep_constant_limit_l hZFC target family' coherent' h' limit' model' hao'
+    ep_constant_limit_l hZF target family' h' limit' model' (h'.toEp_graph_d.elementary_l hZFC target family' coherent') hao'
   have hi₀ : Smap_d I ω c e X C i := (I).unique mc.1.1 hm.1.1 ▸ hi
   have hi₁ : Smap_d I ω d e' Y C' i' := (I).unique md.1.1 hn.1.1 ▸ hi'
   have hna := (hσ.function_l hZF source.omega owner owner' h₀ h₁
@@ -146,7 +147,7 @@ theorem ep_copy_l
       Rd_entry_d B E τ ↔ Rd_entry_d x' E i' := by
     obtain ⟨_, f₀, A₀, v₀, hf₀, hc₀, hfA₀, hv₀, hv₀B⟩ := (is x B).mp hxB
     obtain ⟨f₁, hfY, hff⟩ := hπ.1.1.2.2 f₀ ((hG₀ f₀).mp hf₀).1
-    have sf := source.function_l hZF hD₀X ((hG₀ f₀).mp hf₀).1 ((hG₀ f₀).mp hf₀).2
+    have sf := source.function_l hZF ((hG₀ f₀).mp hf₀).1 ((hG₀ f₀).mp hf₀).2
     have hGf := (hG₁ f₁).mpr ⟨hfY, (hπ.sfun_l hZF source.omega source.transitive target.transitive hm hn hDD hff sf).function_l target.transitive⟩
     have hc₁ := rs_constant_image_l hZF source.omega source.transitive target.transitive hm hn hπ hDD hxx hff hc₀
     obtain ⟨A₁, hA₁, hfA₁⟩ := md₁.map.projection.2.2 f₁ hGf
@@ -175,7 +176,7 @@ theorem ep_copy_l
 /-- 两张原图固定各自的代表和支撑时，同一超幂上的复制图就是恒等图。 -/
 theorem ep_copy_identity_l (hZ : M.Models ZF)
     {ω κ L X R F J O Z D p T V q C W π σ τ : M.Domain}
-    (family : Em_source_d ω κ L X F) (h : Ep_system_d hZ ω κ L X R F J O Z D p T V)
+    (family : Em_source_d ω κ L X F) (h : Ep_system_d (kp_pair_l (ZF.modelsKP hZ)) ω κ L X R F J O Z D p T V)
     (limit : Di_limit_d D p T V q C W) (hτ : Fn0_d C C τ)
     (hπ : ∀ f, M.mem f X → Rd_entry_d f f π) (hσ : ∀ a, M.mem a J → Rd_entry_d a a σ)
     (copy : ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q u E) :

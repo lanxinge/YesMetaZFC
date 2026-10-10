@@ -16,19 +16,19 @@ abbrev Lr_formula := Σ n, {φ : Formula 1 n // φ.FreeClosed}
 
 include I in
 theorem ZF.lr_finite_l (hZF : M.Models ZF) (Φ : List Lr_formula) (A : M.Domain) :
-    ∃ α X, V_d I α X ∧ M.mem A X ∧ ∀ q ∈ Φ, Lr_reflect_d q.2.val X := by
+    ∃ α X, V_d I α X ∧ M.IsLimitOrdinal α ∧ M.mem A X ∧ ∀ q ∈ Φ, Lr_reflect_d q.2.val X := by
   obtain ⟨ω, hω⟩ := exists_omega hZF
-  obtain ⟨α, X, hV, hAX, hc⟩ := lr_closed_layer_l I hZF hω
+  obtain ⟨α, X, hV, hα, hAX, hc⟩ := lr_closed_layer_l I hZF hω
     (Φ.flatMap (fun q : Lr_formula => @lr_queries_l q.1 q.2.val q.2.property)) A
-  refine ⟨α, X, hV, hAX, fun q hq ρ hρ => ?_⟩
+  refine ⟨α, X, hV, hα, hAX, fun q hq ρ hρ => ?_⟩
   exact lr_reflect_core_l q.2.val q.2.property
     (fun r hr => hc r (List.mem_flatMap.mpr ⟨q, hq, hr⟩))
     ρ (ρ.push X) .newest (fun i => .bound i.succ) rfl (fun _ => rfl) hρ
 
 /-- 单公式调用自动处理其全部量词子公式与反例，无须调用者提供子公式闭包。 -/
 theorem ZF.lr_reflect_l (hZF : M.Models ZF) {n} (φ : Formula 1 n) (hφ : φ.FreeClosed) (A : M.Domain) :
-    ∃ α X, V_d I α X ∧ M.mem A X ∧ Lr_reflect_d φ X := by
-  obtain ⟨α, X, hV, hAX, h⟩ := lr_finite_l I hZF [⟨n, φ, hφ⟩] A
-  exact ⟨α, X, hV, hAX, h ⟨n, φ, hφ⟩ (List.mem_cons_self ..)⟩
+    ∃ α X, V_d I α X ∧ M.IsLimitOrdinal α ∧ M.mem A X ∧ Lr_reflect_d φ X := by
+  obtain ⟨α, X, hV, hα, hAX, h⟩ := lr_finite_l I hZF [⟨n, φ, hφ⟩] A
+  exact ⟨α, X, hV, hα, hAX, h ⟨n, φ, hφ⟩ (List.mem_cons_self ..)⟩
 
 end YesMetaZFC.SetTheory

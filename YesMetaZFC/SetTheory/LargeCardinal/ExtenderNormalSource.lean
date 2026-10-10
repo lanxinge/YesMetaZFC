@@ -25,9 +25,9 @@ theorem En_normal_d.source_l {ω κ L F : M.Domain} (h : En_normal_d ω κ L F) 
 
 theorem En_source_d.transfer_l (hZF : M.Models ZF) {ω κ K N R K' X S L F : M.Domain}
     (h : En_source_d ω κ L N F) (owner : Ep_source_d hZF ω κ K N R)
-    (source : Ep_source_d hZF ω κ K' X S) (agree : Ea_agree_d ω κ N X) : En_source_d ω κ L X F := by
+    (source : Ep_source_d hZF ω κ K' X S) (subsets : Ea_subset_d ω κ X N) : En_source_d ω κ L X F := by
   intro n a U D f i α A hn ha hu hd hf hfn
   exact h n a U D f i α A hn ha hu hd
-    (Ea_agree_d.function_l hZF (fun n D B hn hd hb => (agree n D B hn hd hb).symm) source owner hn hd hf hfn) hfn
+    (subsets.function_l hZF source owner hn hd hf hfn) hfn
 
 end YesMetaZFC.SetTheory.LargeCardinal

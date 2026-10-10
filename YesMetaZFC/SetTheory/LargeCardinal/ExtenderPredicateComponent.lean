@@ -24,7 +24,7 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
     (hY : M.TransitiveSet Y) (hc : Wd_crit_d I X j κ k) (hL : M.MemberSubset L k)
     (hSY : M.MemberSubset S Y) (family : Es_family_d I j κ L S F)
     (hF : Em_family_d ω κ L F) (coherent : Es_coherent_d I ω κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (model : Smdl_d I c C W) (hg : M.IsSetInjectionFromTo I g C Y)
     (rel : ∀ E H y z, Rd_entry_d E y g → Rd_entry_d H z g → (Rd_entry_d E H W' ↔ Rd_entry_d y z R₁))
     (any : ∀ u a H f E y, Rd_entry_d u E q → KPair_d M u a H → M.mem f H →
@@ -38,7 +38,8 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
   have embed : Spred_emb_d I ω X A Y B j := ⟨c₀, R₀, c₁, R₁, hx, hy, hj⟩
   obtain ⟨_, _, models⟩ := system.models
   obtain ⟨n, Q, U, G, r, H, V₀, hn, ha, hQ, haU, hG, hm⟩ := models a b hab
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZFC source (hF.source_l hZF X) (coherent.source_l I X) system limit model hab hm.code
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega system limit
+    (system.toEp_graph_d.elementary_l hZFC source (hF.source_l hZF X) (coherent.source_l I X)) model hab hm.code
   obtain ⟨e, V₁, code, vr⟩ := smdl_pull_l hZF hm.code.2.1 hv.1.1 W'
   obtain ⟨haS, m, Q₀, ha₀, hQ₀, hu⟩ := (family.2.2 a U).mp haU
   have eq := ha₀.domain_eq_l hZF.1 ha
@@ -52,7 +53,7 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
     (hc.fixed n (hc.ordinal.transitive ω hωκ n hn)) hc.image hjQ hQ hL (hSY a haS) ha
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF Q
   have hPX := source.transitive P (ZF.v_power_mem_l I hZF hV hδ.isLimitOrdinal hQX hP)
-  have sf f (hf : M.mem f G) := source.function_l hZF hQX ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sf f (hf : M.mem f G) := source.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2
   have ultra := hF.at_l hZF.1 haU ha hQ
   have newModel : Rp_model_d I Q X U R₀ e G r H V₁ := ⟨hm.map, code, by
     intro f f' E E' hf hf'

@@ -23,7 +23,7 @@ theorem Scompile_d.delta_l {d ω n F k v X R E c f} {φ : Formula 1 d}
     fun _ => ⟨x, hx⟩⟩
   let θ : Env (smdl_structure_l I (R := R) hm.1.2.1) d := ⟨η.bound, η.free⟩
   have hh : Formula.satisfies θ φ ↔ Formula.satisfies ρ φ :=
-    (smem_delta_l I hm hn hd η).symm.trans ((rt_model_delta_l hX hn hd η).trans (Formula.closed_env_l φ hφ rfl))
+    (smem_formula_l I hm hn φ η).symm.trans ((rt_model_delta_l hX hn hd η).trans (Formula.closed_env_l φ hφ rfl))
   exact (h X R hm.1.2.1 E hE f hf θ hp).trans hh
 
 theorem sfm_delta_l (hZF : M.Models ZF) {ω n F σ} (hω : M.IsOmega ω)

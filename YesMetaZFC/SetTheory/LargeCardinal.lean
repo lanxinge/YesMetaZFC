@@ -3,10 +3,13 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
+import YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch
+import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
 
 武丁定义量化全部内部公式码。ZF 中已证明武丁基数下方的可测基数无界，
+可测基数的正则性及小幂集无反向单射也在 ZF 中证明；ZFC 中据此实际选择不可达支撑。
 并从其强嵌入构造全部有限支撑 κ 完备测度图、任意有限坐标投影及其协调律与共同纤维完备性。
 分量内部商与全背景函数版本的内部 Łoś 已完成。源内部子集代数、相对派生超滤和
 源内部函数族的商也已构造。对实际初等嵌入正则 H(χ) 的传递源，完整内部 Łoś、
@@ -19,5 +22,16 @@ import YesMetaZFC.SetTheory.LargeCardinal.Extender
 并用共同纤维证明整个极限内部良基；返回完整内部初等嵌入、传递坍塌和到原目标的关系因子。
 武丁实例由 Hδ＝Vδ 采用原 Vδ 源；通用装配保留正则 H(χ) 初等源，背景为 ZFC。
 通用初等极限与外延坍塌只需 ZF，良基性核心只需 ZF＋DC。
-原强性的恢复、迭代及 AD 蕴涵仍待证明。
+按 ν 选择不可达 L>ν，恢复整个 V_L 覆盖与谓词强性，并用原代表计数证明最大强度恰为 L。
+所属源中的实际有界超幂及求值图记录这一强度，可沿完整初等图传输并由指定实际超幂读取。
+源内原始不可达性及初始短扩展器判断已构造；不可达性随完整初等图和严格极限秩截断保持。
+严格正则秩截断自动保留同一扩展器的最大强度、实际秩层枚举与全部所属判断。
+完整类型的实际伸展已实现：任意 Vη 中的内部有限元组有无界多个 κ，
+自动给出 V(η+1) 中的完整 κ 型及其 Vη 前驱；前驱的定义域由实际查询核验。
+其前驱沿合适的实际强扩展器伸展后，精确投影为同一元组的 τ 型。
+前驱类型由同一元组在前一秩层实现，并与同一实际扩展器的伸展交换。
+实际迭代树、pad、任意树前驱上的
+超幂后继扩张及后继子集一致性已经构造。实际树枝极限、传递坍塌与极限添枝已完成；
+非可数共尾度及相容良基实现给出良基分支判据，可数共尾可延伸树已有实际选枝。
+nice 树的 ω₁ 弱迭代策略已完成；弹性公式、单步伸展、齐性树及 AD 蕴涵仍待证明。
 -/

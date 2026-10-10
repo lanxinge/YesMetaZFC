@@ -96,30 +96,42 @@ def Ei_d (ω L a : M.Domain) : Prop := ∃ n, M.mem n ω ∧ Fn0_d n L a ∧
   ∀ i j x, Rd_entry_d i x a → Rd_entry_d j x a → i = j
 
 def ei_m {d} (ω L a : Term d) : Formula 1 d := Formula.existsMem ω
-  (Formula.isInjectionFromTo kpair_convention_l a.weaken .newest L.weaken)
+  (.conj (fn0_m .newest L.weaken a.weaken) (Formula.forallMem .newest (Formula.forallMem (.bound 1)
+    (Formula.forallMem L.weaken.weaken.weaken (.imp
+      (rd_entry0_m (.bound 2) .newest a.weaken.weaken.weaken.weaken) (.imp
+        (rd_entry0_m (.bound 1) .newest a.weaken.weaken.weaken.weaken) (Formula.extensionalEq (.bound 2) (.bound 1))))))))
 derive_free_closed ei_m
 
-theorem ei_sat_l (hKP : M.Models KP) {d} (ρ : Env M d) (ω L a : Term d) :
+theorem ei_delta_l {d} (ω L a : Term d) : (ei_m ω L a).IsDelta0 :=
+  .existsMem _ (.conj (fn0_delta_l ..) (.forallMem _ (.forallMem _ (.forallMem _
+    (.imp (rd_entry0_delta_l ..) (.imp (rd_entry0_delta_l ..) (.atom ..)))))))
+
+theorem ei_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω L a : Term d) :
     Formula.satisfies ρ (ei_m ω L a) ↔ Ei_d (ω.eval ρ) (L.eval ρ) (a.eval ρ) := by
-  simp only [ei_m, Ei_d, Formula.satisfies_existsMem_iff,
-    Formula.satisfies_isInjectionFromTo_iff (kp_pair_l hKP) hKP.1, Definitional.Term.eval_weaken]
+  simp only [ei_m, Ei_d, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, fn0_sat_l hE,
+    Formula.satisfies_forallMem_iff, Formula.satisfies_imp_iff, rd_entry0_sat_l hE,
+    Formula.satisfies_extensionalEq_iff_eq hE, Definitional.Term.eval_weaken]
   exact exists_congr fun n => and_congr_right fun _ =>
-    ⟨fun h => ⟨fn0_of_function_l hKP h.1, h.2⟩, fun h => ⟨fn0_function_l hKP h.1, h.2⟩⟩
+    ⟨fun ⟨fn, inj⟩ => ⟨fn, fun i j x hi hj => inj i (fn.bound_l hi).1 j (fn.bound_l hj).1 x (fn.bound_l hi).2 hi hj⟩,
+      fun ⟨fn, inj⟩ => ⟨fn, fun i _ j _ x _ => inj i j x⟩⟩
 
 def Ei_map_d (ω L a b q : M.Domain) : Prop := ∃ m n, M.mem m ω ∧ M.mem n ω ∧
   Fn0_d m n q ∧ Fn0_d n L b ∧ Cp0_d m n L q b a
 
-def ei_map_m {d} (ω L a b q : Term d) : Formula 1 d := .existsE (.existsE
-  (.conj (.mem (.bound 1) ω.weaken.weaken) (.conj (.mem .newest ω.weaken.weaken)
-    (.conj (fn0_m (.bound 1) .newest q.weaken.weaken) (.conj (fn0_m .newest L.weaken.weaken b.weaken.weaken)
-      (cp0_m (.bound 1) .newest L.weaken.weaken q.weaken.weaken b.weaken.weaken a.weaken.weaken))))))
+def ei_map_m {d} (ω L a b q : Term d) : Formula 1 d := Formula.existsMem ω (Formula.existsMem ω.weaken
+  (.conj (fn0_m (.bound 1) .newest q.weaken.weaken) (.conj (fn0_m .newest L.weaken.weaken b.weaken.weaken)
+    (cp0_m (.bound 1) .newest L.weaken.weaken q.weaken.weaken b.weaken.weaken a.weaken.weaken))))
 derive_free_closed ei_map_m
+
+theorem ei_map_delta_l {d} (ω L a b q : Term d) : (ei_map_m ω L a b q).IsDelta0 :=
+  .existsMem _ (.existsMem _ (.conj (fn0_delta_l ..) (.conj (fn0_delta_l ..) (cp0_delta_l ..))))
 
 theorem ei_map_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω L a b q : Term d) :
     Formula.satisfies ρ (ei_map_m ω L a b q) ↔
       Ei_map_d (ω.eval ρ) (L.eval ρ) (a.eval ρ) (b.eval ρ) (q.eval ρ) := by
-  simp only [ei_map_m, Ei_map_d, Formula.satisfies_exists_iff, Formula.satisfies_mem_iff, Formula.satisfies_conj_iff,
-    fn0_sat_l hE, cp0_sat_l hE, Definitional.Term.eval_weaken]; rfl
+  simp only [ei_map_m, Ei_map_d, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
+    fn0_sat_l hE, cp0_sat_l hE, Definitional.Term.eval_weaken]
+  exact ⟨fun ⟨m, hm, n, hn, h⟩ => ⟨m, n, hm, hn, h⟩, fun ⟨m, n, hm, hn, h⟩ => ⟨m, hm, n, hn, h⟩⟩
 
 theorem ei_order_l (hZF : M.Models ZF) {ω L : M.Domain} (hω : M.IsOmega ω) (hωL : M.MemberSubset ω L) :
     ∃ J O, (∀ a, M.mem a J ↔ Ei_d ω L a) ∧ Di_order_d J O ∧
@@ -130,7 +142,7 @@ theorem ei_order_l (hZF : M.Models ZF) {ω L : M.Domain} (hω : M.IsOmega ω) (h
   let φ : UnarySchema 2 := { body := ei_m (.bound 2) (.bound 1) .newest }
   obtain ⟨J, hj⟩ := ZF.separation_exists_d hZF φ ρ S
   have hJ a : M.mem a J ↔ Ei_d ω L a := (hj a).trans
-    ((and_congr_right fun _ => ei_sat_l (ZF.modelsKP hZF) _ _ _ _).trans
+    ((and_congr_right fun _ => ei_sat_l hZF.1 _ _ _ _).trans
       ⟨And.right, fun h => ⟨(hS a).mpr (h.elim fun n hn => ⟨n, hn.1, fn0_function_l (ZF.modelsKP hZF) hn.2.1⟩), h⟩⟩)
   let ψ : BinarySchema 2 := { body := .existsE (ei_map_m (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest) }
   obtain ⟨O, _, ho⟩ := ZF.exists_setRelationOn_of_denote hZF I ψ ρ J

@@ -14,7 +14,7 @@ theorem ep_ultrapower_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
     (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S q c C V,
-      Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
+      Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
       Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C V ∧
       Di_elementary_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω O A p T S := by
   let hZF := ZFC.models_zf_l hZFC
@@ -37,7 +37,7 @@ theorem ep_apply_l (hZFC : M.Models ZFC) {ω κ K L N X R F : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (owner : Em_source_d ω κ L N F)
     (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L N F)
     (agree : Ea_agree_d ω κ N X) (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S q c C V,
-      Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
+      Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
       Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C V ∧
       Di_elementary_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω O A p T S :=
   ep_ultrapower_l hZFC source (owner.transfer_l agree) (coherent.transfer_l (ZFC.models_zf_l hZFC) agree) hωL

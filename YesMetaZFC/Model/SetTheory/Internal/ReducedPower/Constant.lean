@@ -50,7 +50,7 @@ theorem rs_constants_l {ω c X R D G} (hω : M.IsOmega ω)
 
 theorem rs_constant_embedding_l {ω c X R D P U o G p C T}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
+    (theory : Sc_theory_d I ω X R) (uniform : Sc_uniform_d I ω X R D) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
     (hU : FilterZF.Rel_ultra_d D P U) (hG : ∀ g, M.mem g G ↔ M.mem g X ∧ Fn0_d D X g)
     (hM : Rp_model_d I D X U R o G p C T) : ∃ j, Smap_d I ω c o X C j ∧
       ∀ x B, M.PairMember I x B j ↔ M.mem x X ∧ ∃ f, M.mem f G ∧ Rs_const_d D x f ∧ M.PairMember I f B p := by
@@ -75,7 +75,7 @@ theorem rs_constant_embedding_l {ω c X R D P U o G p C T}
   · obtain ⟨a, ha, hfa⟩ := ZF.exists_compositionFunction hZF I hf hK
     have haX : M.IsSetFunctionFromTo I a ω X := ⟨ha.1, ha.2.1, fun i hi =>
       (ha.2.2 i hi).imp fun g hg => ⟨((hG g).mp hg.1).1, hg.2⟩⟩
-    have sfun g (hg : M.mem g G) := sc_function_domain_l hZF hω hX hm theory hD
+    have sfun g (hg : M.mem g G) := sc_function_domain_l theory.algebra
       ((hG g).mp hg).1 ((hG g).mp hg).2
     have eval : Rs_eval_d I ω D X p a e := by
       intro i hi
@@ -89,7 +89,7 @@ theorem rs_constant_embedding_l {ω c X R D P U o G p C T}
       obtain ⟨x, hx, hix⟩ := hf.2.2 i hi
       obtain ⟨g, hg, hxg⟩ := hK.2.2 x hx
       exact ⟨g, x, (hfa i g).mpr ⟨hi, x, hix, hxg⟩, sfun g hg, value x g hxg v hv, hix⟩
-    have los := rs_satisfies_l hZF hω hX hm theory hD hP hU hG hM hE hA ((hE a).mpr haX) he eval hz
+    have los := rs_satisfies_l hZF hω hX hm theory uniform hD hP hU hG hM hE hA ((hE a).mpr haX) he eval hz
     refine ⟨fun hs => los.mpr ⟨D, hU.base.top, fun v hv => ⟨f, (hE f).mpr hf, point v hv, hs⟩⟩, fun hs => ?_⟩
     obtain ⟨B, hB, hb⟩ := los.mp hs
     obtain ⟨v, hv⟩ := hU.proper B hB

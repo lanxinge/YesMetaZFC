@@ -15,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
+    (theory : Sc_theory_d I ω X R) (uniform : Sc_uniform_d I ω X R D) (hD : M.mem D X) (hP : FilterZF.Source_d X D P)
     (hU : FilterZF.Rel_ultra_d D P U) (hG : ∀ g, M.mem g G ↔ M.mem g X ∧ Fn0_d D X g)
     (hM : Rp_model_d I D X U R o G p C T) (hE : M.IsFunctionSpace I E ω X)
     (hK : M.IsFunctionSpace I K ω C) (hF : Sfm_d I ω n F)
@@ -96,7 +96,7 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
     rw [ssat_exists_l I hZF hF hJ hz hs he]
     constructor
     · rintro ⟨A, hA, ht⟩
-      obtain ⟨g, a', hg, ha', hs'⟩ := sc_pe_witness_l hZF hω hX hm theory hD hE hF hV hz hs hjn hb hB
+      obtain ⟨g, a', hg, ha', hs'⟩ := sc_pe_witness_l hZF hω hX hm theory uniform hD hE hF hV hz hs hjn hb hB
         ha ((hP A).mp (hU.admissible A hA)).1 (hU.base.bounds A hA) ht
       obtain ⟨B, hBC, hgp⟩ := hM.map.projection.2.2 g ((hG g).mpr ⟨hg.1, hg.function_l hX⟩)
       obtain ⟨e', he', heK⟩ := senv_update_exists_l I hZF ((hK e).mp he) hi hBC
@@ -106,7 +106,7 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
     · rintro ⟨B, e', hBC, he', ht⟩
       obtain ⟨g, hgp⟩ := (hM.map.range B).mp hBC
       obtain ⟨hgX, hgD⟩ := (hG g).mp (hM.map.projection.input_mem_of_pairMember hgp)
-      have hg := sc_function_domain_l hZF hω hX hm theory hD hgX hgD
+      have hg := sc_function_domain_l theory.algebra hgX hgD
       obtain ⟨a', ha', haE⟩ := senv_update_exists_l I hZF ((hE a).mp ha) hi hgX
       obtain ⟨A, hA, hA'⟩ := ((sat j).mp (ih j hj) a' e' ((hE a').mpr haE)
         ((hK e').mpr (he'.function_l I ((hK e).mp he) hi hBC)) (hv.update_l I hg hgp ha' he')).mpr ht

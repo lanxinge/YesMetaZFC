@@ -99,6 +99,16 @@ theorem KPair_d.mem_l {p a b T : M.Domain} (h : KPair_d M p a b) (hT : M.Transit
   have htT := hT p hp t ((hpair t).mpr (Or.inr rfl))
   exact ⟨hT t htT a ((ht a).mpr (Or.inl rfl)), hT t htT b ((ht b).mpr (Or.inr rfl))⟩
 
+/-- 有序对不传递：传递性会迫使左坐标成为自身的成员。 -/
+theorem KPair_d.not_transitive_l (hirr : ∀ x, ¬ M.mem x x) {p a b : M.Domain}
+    (h : KPair_d M p a b) : ¬ M.TransitiveSet p := by
+  rintro hp
+  obtain ⟨s, t, hs, ht, pair⟩ := h
+  have ha := hp s ((pair s).mpr (Or.inl rfl)) a ((hs a).mpr rfl)
+  rcases (pair a).mp ha with eq | eq
+  · exact hirr a (eq.symm ▸ (hs a).mpr rfl)
+  · exact hirr a (eq.symm ▸ (ht a).mpr (Or.inl rfl))
+
 /-- 左坐标 a ∈ {a} ∈ (a,b) ∈ τ，严格下降由实际成员路径给出。 -/
 theorem kpair_descent_l {p a b t} (h : KPair_d M p a b) (hp : M.mem p t) :
     Relation.TransGen M.mem a t := by

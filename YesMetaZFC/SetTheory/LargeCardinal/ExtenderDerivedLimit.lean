@@ -13,10 +13,10 @@ universe u
 variable {M : Structure.{u}}
 
 def Ep_derived_limit_d (hZF : M.Models ZF) (ω κ L X R F j Y : M.Domain) : Prop := ∃ J O Z A p T S q c C V,
-  Ep_system_d hZF ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
+  Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S ∧ Di_limit_d A p T S q C V ∧
   Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V ∧
   Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S ∧ Ep_collapse_d hZF ω X R q c C V ∧
-  Ee_factor_d hZF j Y q C V ∧ Ep_length_d hZF ω κ L X R j Y q C
+  Ee_factor_d hZF j Y q C V ∧ Ep_length_d hZF ω κ L X R j Y q c C V
 
 theorem Ep_limit_d.factor_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F : M.Domain}
     (source : Ep_source_d hZF ω κ K X R)
@@ -55,7 +55,7 @@ theorem woodin_extender_l (hZFC : M.Models ZFC) {δ : M.Domain}
   obtain ⟨κ, hκ, family⟩ := all A hA
   refine ⟨κ, hκ, fun L hL hκL => ?_⟩
   obtain ⟨ν, N, B, j, W, k, S, F, K, E, hw, hLν, hLk, hS, hSN, hK, hF, short, he, derived⟩ := family L hL hκL
-  obtain ⟨R, source⟩ := ep_inaccessible_source_l hZFC hω hωδ hr hstrong hV hκ
+  obtain ⟨R, source⟩ := ep_regular_source_l hZFC hω hωδ hr hV hκ
     (short.critical.1.transitive ω short.uncountable) hK
   exact ⟨ν, N, B, j, W, k, S, F, K, E, R, hw, hLν, hLk, hS, hSN, hF, short, he, derived, source,
     Ep_limit_d.factor_l hZF source hV hr.isLimitOrdinal hw.2.2.2.2.2.1 hw.1 hw.2.2.2.2.2.2.1

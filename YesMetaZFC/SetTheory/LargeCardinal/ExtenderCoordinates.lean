@@ -59,7 +59,7 @@ theorem ee_ordinal_node_l (hZF : M.Models ZF) {ω δ X A Y B j κ k L S F R J O 
     (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP hZF)) X j κ k) (hL : M.MemberSubset L k)
     (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP hZF)) ω L S) (hSY : M.MemberSubset S Y)
     (hF : Es_family_d (kp_pair_l (ZF.modelsKP hZF)) j κ L S F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (hα : M.mem α L) : ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u α := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨one, ⟨zero, hz, hs⟩, h1ω⟩ := hω.exists_ordinalOne_mem

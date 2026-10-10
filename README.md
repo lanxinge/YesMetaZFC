@@ -31,6 +31,15 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
 集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
 
+[迭代树](YesMetaZFC/SetTheory/LargeCardinal/Iteration.lean) 已完成 Pₙ 全前驱递归、内部下降反证，
+以及返回嵌入失败时的联合尝试树和正则下降秩。nice 后继的背景可数闭性、
+[到 j(A) 的完整初等复制](YesMetaZFC/SetTheory/LargeCardinal/ExtenderSetCopy.lean) 已构造，保留支撑端点及有限幂子集上的一致性。
+[整棵 nice 树的复制](YesMetaZFC/SetTheory/LargeCardinal/IterationCopyTree.lean) 已通过内部类依赖选择与相容图列取并完成，保留原根嵌入和所有交换方块。
+[联合尝试树的完整像](YesMetaZFC/SetTheory/LargeCardinal/IterationAttemptMember.lean) 已由有限真值证书的绝对性及实际有限节点拥有性证明，原节点公式和调用方已迁移。
+[移位秩与下降复制树](YesMetaZFC/SetTheory/LargeCardinal/IterationFailureCopy.lean) 已从返回失败自动构造：高度列覆盖内部 ω，每条严格树边上新高度小于旧高度的像，实际正则秩段包含相应扩展器。
+[指定超幂证书的读取](YesMetaZFC/SetTheory/LargeCardinal/IterationUltraRead.lean) 已保留原商、常值图、坍塌与复合图，并重新证明完整初等性；容器只需有限闭性，拥有极限秩段提供不要求正则性的实例。
+[nice 树返回定理](YesMetaZFC/SetTheory/LargeCardinal/IterationNiceReturn.lean) 已由整树 Skolem 回拉及 Pₙ 下降反证完成：可数 nice ω 树有共尾良基枝，返回原 Vθ 的初等因子保持根复合式。ω₁ 长弱迭代博弈策略及 L(R) 的 AD 尚未证明。
+
 ## 描述集合论基础
 
 [Descriptive](YesMetaZFC/SetTheory/Descriptive.lean) 在任意 ZF 模型内构造 Baire、Cantor

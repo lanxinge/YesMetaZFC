@@ -69,4 +69,12 @@ theorem KPi.ordinal_bound_l (hM : M.Models KPi) (B : M.Domain) :
   exact ⟨a, KP.ordinal_of_transitive_l hKP ht (fun b hb => ((ha b).mp hb).2),
     fun T hT b hb ho => (ha b).mpr ⟨hu T (hu B hBU T hT) b hb, ho⟩⟩
 
+theorem ordinal_down_l (hKP : M.Models KP) {a b c : M.Domain} (ha : M.IsOrdinal a) (hc : M.IsOrdinal c)
+    (hab : M.MemberSubset a b) (hbc : M.mem b c) : M.mem a c := by
+  rcases ha.trichotomy hKP.1 (hc.mem hbc) (KP.difference_exists_d hKP)
+    (KP.intersection_exists_d hKP a b) with eq | lt | gt
+  · exact (hKP.1.eq_of_same_members a b eq).symm ▸ hbc
+  · exact hc.transitive b hbc a lt
+  · exact (KP.mem_irrefl_d hKP b (hab b gt)).elim
+
 end YesMetaZFC.SetTheory

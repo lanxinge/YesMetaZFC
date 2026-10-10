@@ -29,18 +29,16 @@ theorem er_lookup_l (hZF : M.Models ZF) {ω κ K X R T G n D i r : M.Domain}
       Formula.satisfies_existsMem_iff]; rfl
   have hinX a (ha : M.mem a n) := source.transitive ω source.omega_mem a (source.omega.transitive hZF n hn a ha)
   obtain ⟨c, hm⟩ := source.code
-  obtain ⟨f, C, hfX, hCX, hf, fs⟩ := sc_uniform_source_l hZF source.omega source.transitive hm source.theory φ
+  obtain ⟨f, hfX, hf, fs⟩ := sc_uniform_source_l hZF source.omega source.transitive hm source.theory φ
     (.disj (er_hit_delta_l ..) (.conj (.atom _ _ _) (.neg (.existsMem _ (er_hit_delta_l ..))))) ρ
     (Fin.cases source.cardinal_mem (Fin.cases (hinX r hr) (Fin.cases (hinX i hi) (Fin.cases hGX (fun _ => hTX)))))
-    (source.space_mem_l hZF hn hD) (fun s _ => by
+    (source.space_mem_l hZF hn hD) hTX (fun s _ => by
       classical
       by_cases hit : ∃ x, M.mem x T ∧ Er_hit_d T G i r s x
       · obtain ⟨x, hx, hit⟩ := hit
-        exact ⟨x, source.transitive T hTX x hx, (sat s x).mpr (Or.inl hit)⟩
-      · exact ⟨κ, source.cardinal_mem, (sat s κ).mpr (Or.inr ⟨rfl, hit⟩)⟩)
-  have bound s x (hsx : Rd_entry_d s x f) : M.mem x T :=
-    ((sat s x).mp (fs s x hsx)).elim (Er_hit_d.bound_l hT) (fun hh => hh.1.symm ▸ hκT)
-  refine ⟨f, hfX, hf.retarget_l bound, fun s x hs hit => ?_⟩
+        exact ⟨x, hx, (sat s x).mpr (Or.inl hit)⟩
+      · exact ⟨κ, hκT, (sat s κ).mpr (Or.inr ⟨rfl, hit⟩)⟩)
+  refine ⟨f, hfX, hf, fun s x hs hit => ?_⟩
   obtain ⟨y, _, hsy⟩ := hf.2.1 s hs
   rcases (sat s y).mp (fs s y hsy) with hy | ⟨_, impossible⟩
   · exact er_hit_unique_l (ZF.modelsKP hZF) ((hD s).mp hs) hG enums hy hit ▸ hsy

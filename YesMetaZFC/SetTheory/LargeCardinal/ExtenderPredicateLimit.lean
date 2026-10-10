@@ -20,7 +20,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     (hY : M.TransitiveSet Y) (hc : Wd_crit_d I X j κ k) (hL : M.MemberSubset L k)
     (hSY : M.MemberSubset S Y) (family : Es_family_d I j κ L S F)
     (hF : Em_family_d ω κ L F) (coherent : Es_coherent_d I ω κ L F)
-    (system : Ep_system_d hZF ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (model : Smdl_d I c C W) (hg : M.IsSetInjectionFromTo I g C Y)
     (any : ∀ u a H f E y, Rd_entry_d u E q → KPair_d M u a H → M.mem f H →
       Rd_entry_d E y g → Ee_value_d j a f y)
@@ -92,7 +92,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
   obtain ⟨b₀, hm₀⟩ := source.code
   have ultra := hF.at_l hZF.1 haU ha hQ
   obtain ⟨P, U', hP, hU', _, restricted⟩ := rs_restrict_model_l hZF source.omega source.transitive hm₀ source.theory (source.space_mem_l hZF hn hQ) (ultra.source_l hZF X) hG old
-  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hm₀ source.theory
+  obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hm₀ source.theory (source.uniform_l hZF hn hQ)
     (source.space_mem_l hZF hn hQ) hP hU' hG restricted
   have hi' := rp_full_constant_l hZFC source.omega ultra hx.1 new full hi.1 is
   obtain ⟨t', ht', ts⟩ := smap_comp_l I hZF hi' he'
@@ -113,7 +113,7 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
     obtain ⟨_, u, hp, huE⟩ := (vs B E).mp hBE
     have value := any u a B f E y huE hp (old.map.representative_l I ultra.1.base_l hfr) hEy
     have eyz := ed_constant_value_l hZF source.omega ⟨c₀, R₀, c₁, R₁, hx, hy, hj⟩ source.transitive hY
-      (source.space_mem_l hZF hn hQ) (source.function_l hZF (source.space_mem_l hZF hn hQ) ((hG f).mp hf).1 ((hG f).mp hf).2)
+      (source.space_mem_l hZF hn hQ) (source.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2)
       hs (constant x H' z hxH hHz) value
     exact ⟨E, hxE, (hg.2 E H' z (eyz ▸ hEy) hHz).symm ▸ hxH⟩
   exact ⟨d, W', md, eqt ▸ ht', rel⟩

@@ -1,6 +1,7 @@
 import YesMetaZFC.SetTheory.LargeCardinal.RankEnumeration
 import YesMetaZFC.SetTheory.LargeCardinal.RankLookup
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRepresent
+import YesMetaZFC.SetTheory.LargeCardinal.RankLength
 
 /-! # 足够长的派生扩展器覆盖原强嵌入的指定秩层
 
@@ -23,7 +24,7 @@ theorem er_cover_l (hZFC : M.Models ZFC)
     (hL : M.MemberSubset L k) (hLo : M.IsOrdinal L) (hωL : M.MemberSubset ω L)
     (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S) (hSY : M.MemberSubset S Y)
     (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
-    (system : Ep_system_d (ZFC.models_zf_l hZFC) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
     (hνL : M.mem ν L) (hVν : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ν Vν)
     (hVY : M.MemberSubset Vν Y) (hμL : M.mem μ₀ L) (hgY : M.mem g₀ Y) (hg : Su0_d μ₀ Vν g₀) :
     ∀ x, M.mem x Vν → ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x := by
@@ -97,5 +98,33 @@ theorem er_cover_l (hZFC : M.Models ZFC)
   exact ee_represent_l hZF source hX hr.isLimitOrdinal h hY hc hL hωL hS hSY hF system limit
     h2ω hD₀ (fn0_of_function_l (ZF.modelsKP hZF) ha) hfX (hf.mono_target_l (source.transitive Q hQX))
     ⟨f', hjf, eval a haD x (hit.bound_l hQ') hit⟩
+
+/-- 不可达支撑的每个严格秩层都有短枚举，故同一系统覆盖整个 V_L。 -/
+theorem er_inaccessible_cover_l (hZFC : M.Models ZFC)
+    {ω δ X A Y B j κ k K R L S F J O Z D p T V q C W U : M.Domain}
+    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
+    (hX : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ X)
+    (hr : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ)
+    (hs : M.IsStrongLimitCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ) (hκ : M.mem κ δ)
+    (h : Spred_emb_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω X A Y B j) (hY : M.TransitiveSet Y)
+    (hc : Wd_crit_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) X j κ k)
+    (hL : M.MemberSubset L k) (hκL : M.mem κ L) (hωL : M.mem ω L)
+    (rL : M.IsRegularCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L)
+    (sL : M.IsStrongLimitCardinal (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L)
+    (hS : Fseq_space_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω L S) (hSY : M.MemberSubset S Y)
+    (hF : Es_family_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) j κ L S F)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W)
+    (hU : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) L U) (hUY : M.MemberSubset U Y) :
+    ∀ x, M.mem x U → ∃ E u, M.mem E C ∧ Rd_entry_d u E q ∧ Ee_node_d j u x := by
+  let hZF := ZFC.models_zf_l hZFC
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  intro x hx
+  obtain ⟨ν, Vν, hν, hv, hxν⟩ := (ZF.v_limit_mem_l I hZF hU rL.isLimitOrdinal.2.2 x).mp hx
+  obtain ⟨ℓ, V₀, μ, g, U₀, hℓ, _, _, hμ, hv₀, hu₀, hg, onto⟩ := er_length_l hZFC source.omega hωL rL sL hU hκL hν
+  have vl := ZF.v_mono_l I hZF hv₀ hU (rL.isCardinal.1.transitive ν hν)
+  have ul := ZF.v_mono_l I hZF hu₀ hU (rL.isCardinal.1.transitive ℓ hℓ)
+  exact er_cover_l hZFC source hX hr hs hκ h hY hc hL rL.isCardinal.1 (rL.isCardinal.1.transitive ω hωL)
+    hS hSY hF system limit hν hv₀ (fun y hy => hUY y (vl y hy)) (rL.isCardinal.1.transitive ℓ hℓ μ hμ)
+    (hUY g (ul g hg)) onto x (ZF.v_unique_l I hZF hv hv₀ ▸ hxν)
 
 end YesMetaZFC.SetTheory.LargeCardinal

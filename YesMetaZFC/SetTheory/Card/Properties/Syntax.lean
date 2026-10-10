@@ -37,6 +37,7 @@ def isStrongLimitCardinal (𝒞 : OrderedPairConvention)
   .conj (isCardinal 𝒞 κ) <|
     Formula.forallMem κ <| .forallE <|
       .imp (isPowerSet Term.newest (.bound 1)) (cardinalLess 𝒞 Term.newest κ.weaken.weaken)
+derive_free_closed isStrongLimitCardinal
 end Formula
 end Project
 end Definitional

@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.Uniformization
+import YesMetaZFC.Model.SetTheory.Internal.SourceCollection
 import YesMetaZFC.Model.SetTheory.Internal.ElementaryHull
 import YesMetaZFC.SetTheory.HereditaryCover
 
@@ -35,9 +35,10 @@ theorem h_uniform_hull_l (hZFC : M.Models ZFC) {ω A} (hω : M.IsOmega ω)
     obtain ⟨b, hb, hf⟩ := hf.function.2.1 x (hAX x hx)
     exact ⟨b, hb, (hp x b).mpr hf⟩
   · intro E F n r i f D hE hF hrF hi hf hD
-    refine ⟨?_, fun j hj hh => ⟨smap_collection_l I hZFC hω hχ hωχ hH hB hs ⟨hm, hr⟩ hq hE hF hrF hi hj hf hD hh,
-      fun hij => smap_uniform_l hZFC hω hχ hωχ hH hB hs ⟨hm, hr⟩ hq hE hF hrF hi hj hij hf hD hh⟩⟩
     obtain ⟨D', hDH, hDD⟩ := hq.1.1.2.2 D hD
+    have small := (hq.small_l hZF hω hB hHt hs ⟨hm, hr⟩ hDD).mpr (sc_h_small_l hZFC hω hχ hωχ hH hDH)
+    refine ⟨?_, fun j hj hh => ⟨smap_collection_l I hZFC hω hχ hωχ hH hB hs ⟨hm, hr⟩ hq hE hF hrF hi hj hf hD hh,
+      fun hij => smap_uniform_l hZF hω hB hHt hs ⟨hm, hr⟩ hq hE hF hrF hi hj hij hf hD small (sc_h_collection_l hZFC hω hχ hωχ hH R) hh⟩⟩
     obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF D'
     exact smap_separation_l I hZF hω hB hHt hs ⟨hm, hr⟩ hq hP
       (fun C hCP => ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH hDH C ((hP C).mp hCP)) hE hF hrF hi hf hDD

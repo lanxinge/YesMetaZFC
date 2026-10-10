@@ -1,3 +1,4 @@
+import YesMetaZFC.Model.SetTheory.Internal.SourceFamily
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderTuple
 
 /-! # 集合值代表的共同编码
@@ -26,11 +27,14 @@ theorem ep_pair_at_sat_l (hE : Extensional M) {d} (ρ : Env M d) (κ n m l q r A
   simp only [ep_pair_at_m, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
     cp0_sat_l hE, Definitional.Term.eval_weaken]; rfl
 
-theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D E f : M.Domain}
-    (agree : Ea_agree_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
-    (target : Ep_source_d hZF ω κ K' Y S) (hn : M.mem n ω) (hm : M.mem m ω)
+/-- 两段有限坐标编码集合值函数，解码只使用有界量词。 -/
+theorem ep_set_function_code_l (hZF : M.Models ZF) {ω κ K X R n m D E f : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (hn : M.mem n ω) (hm : M.mem m ω)
     (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E) (hfX : M.mem f X) (hf : Fn0_d D X f)
-    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) : M.mem f Y := by
+    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) :
+    ∃ l q r H A, M.mem l ω ∧ Fn0_d n l q ∧ Fn0_d m l r ∧ Ep_space_d κ l H ∧
+      M.mem A X ∧ M.MemberSubset A H ∧ ∀ t B, Rd_entry_d t B f → ∀ x,
+        M.mem x B ↔ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨l, q, r, hl, hq, hr, join⟩ := ep_tuple_l hZF (κ := κ) source.omega hn hm
   obtain ⟨H, hHX, hH⟩ := source.space_l hZF hl
@@ -39,11 +43,7 @@ theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D 
     ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
   have hrX := source.transitive K source.finite_mem r ((source.finite r).mpr
     ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
-  have hqY := target.transitive K' target.finite_mem q ((target.finite q).mpr
-    ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
-  have hrY := target.transitive K' target.finite_mem r ((target.finite r).mpr
-    ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
-  obtain ⟨_, C, hCX, hfC⟩ := source.function_l hZF (source.space_mem_l hZF hn hD) hfX hf
+  obtain ⟨_, C, hCX, hfC⟩ := source.function_l hZF hfX hf
   obtain ⟨c, code⟩ := source.code
   let ρ : Env M 9 := ⟨Fin.cases κ (Fin.cases n (Fin.cases m (Fin.cases l (Fin.cases q
     (Fin.cases r (Fin.cases D (Fin.cases C (fun _ => f)))))))), fun _ => f⟩
@@ -74,7 +74,21 @@ theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D 
       have et := cp0_unique_l hZF.1 hq ((hH s).mp hsH) hqs' hqs
       have eB := (fn0_function_l (ZF.modelsKP hZF) hf).1.2 t B' B (et ▸ ht'B') htB
       exact eB ▸ cp0_unique_l hZF.1 hr ((hH s).mp hsH) hrs' hrs ▸ hx'
-  have hAY := (agree l H A hl hH (fun s hs => ((read s).mp hs).1)).mp hAX
+  exact ⟨l, q, r, H, A, hl, hq, hr, hH, hAX, fun s hs => ((read s).mp hs).1, decode⟩
+
+theorem Ea_subset_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D E f : M.Domain}
+    (subsets : Ea_subset_d ω κ X Y) (source : Ep_source_d hZF ω κ K X R)
+    (target : Ep_source_d hZF ω κ K' Y S) (hn : M.mem n ω) (hm : M.mem m ω)
+    (hD : Ep_space_d κ n D) (hE : Ep_space_d κ m E) (hfX : M.mem f X) (hf : Fn0_d D X f)
+    (bound : ∀ t B, Rd_entry_d t B f → M.MemberSubset B E) : M.mem f Y := by
+  obtain ⟨l, q, r, H, A, hl, hq, hr, hH, hAX, sub, decode⟩ :=
+    ep_set_function_code_l hZF source hn hm hD hE hfX hf bound
+  have lκ := fun i hi => source.below i (source.omega.transitive hZF l hl i hi)
+  have hqY := target.transitive K' target.finite_mem q ((target.finite q).mpr
+    ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) (hq.mono_target_l lκ)⟩)
+  have hrY := target.transitive K' target.finite_mem r ((target.finite r).mpr
+    ⟨m, hm, fn0_function_l (ZF.modelsKP hZF) (hr.mono_target_l lκ)⟩)
+  have hAY := subsets l H A hl hH sub hAX
   obtain ⟨d, targetCode⟩ := target.code
   let η : Env M 8 := ⟨Fin.cases κ (Fin.cases n (Fin.cases m (Fin.cases l
     (Fin.cases q (Fin.cases r (Fin.cases A (fun _ => E))))))), fun _ => E⟩
@@ -83,28 +97,18 @@ theorem Ea_agree_d.set_function_l (hZF : M.Models ZF) {ω κ K X R K' Y S n m D 
     (Fin.cases (natY m hm) (Fin.cases (natY l hl) (Fin.cases hqY (Fin.cases hrY
       (Fin.cases hAY (fun _ => target.space_mem_l hZF hm hE)))))))
   let ψ : BinarySchema 8 := {
-    body := .conj (Formula.subset .newest (.bound 9)) (Formula.forallMem (.bound 9)
-      (.iff (.mem .newest (.bound 1))
-        (ep_pair_at_m (.bound 3) (.bound 4) (.bound 5) (.bound 6) (.bound 7) (.bound 8) (.bound 9) (.bound 2) .newest))) }
-  have fiber t B : ψ.denote η t B ↔ M.MemberSubset B E ∧ ∀ x, M.mem x E →
-      (M.mem x B ↔ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x) := by
-    simp only [ψ, BinarySchema.denote, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
-      Formula.satisfies_forallMem_iff, Formula.satisfies_iff_iff, Formula.satisfies_mem_iff, ep_pair_at_sat_l hZF.1]; rfl
-  obtain ⟨g, B, hgY, _, hg, select⟩ := sc_uniform_source_l hZF target.omega target.transitive targetCode target.theory
-    ψ (.conj (.atom _ _ _) (.forallMem _ (.iff (.mem _ _) (ep_pair_at_delta_l ..)))) η params
-    (target.space_mem_l hZF hn hD) (fun t ht => by
-      let θ : UnarySchema 9 := {
-        body := ep_pair_at_m (.bound 2) (.bound 3) (.bound 4) (.bound 5)
-          (.bound 6) (.bound 7) (.bound 8) (.bound 1) .newest }
-      obtain ⟨B, hBY, bs⟩ := sc_separate_source_l I hZF target.omega target.transitive targetCode target.theory
-        θ (ep_pair_at_delta_l ..) (η.push t) (Fin.cases (target.transitive D (target.space_mem_l hZF hn hD) t ht) params)
-        (target.space_mem_l hZF hm hE)
-      have spec x : M.mem x B ↔ M.mem x E ∧ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x :=
-        (bs x).trans (and_congr_right fun _ => ep_pair_at_sat_l hZF.1 ..)
-      exact ⟨B, hBY, (fiber t B).mpr ⟨fun x hx => ((spec x).mp hx).1,
-        fun x hx => (spec x).trans ⟨And.right, fun h => ⟨hx, h⟩⟩⟩⟩)
+    body := ep_pair_at_m (.bound 2) (.bound 3) (.bound 4) (.bound 5)
+      (.bound 6) (.bound 7) (.bound 8) (.bound 1) .newest }
+  have fiber t x : ψ.denote η t x ↔ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x :=
+    ep_pair_at_sat_l hZF.1 ..
+  obtain ⟨g, B, hgY, _, hg, row⟩ := sc_separation_function_l hZF target.omega target.transitive targetCode target.theory
+    ψ (ep_pair_at_delta_l ..) η params (target.space_mem_l hZF hn hD) (target.space_mem_l hZF hm hE)
+  have select t C (htC : Rd_entry_d t C g) : M.MemberSubset C E ∧ ∀ x, M.mem x E →
+      (M.mem x C ↔ ∃ s, M.mem s A ∧ Cp0_d n l κ q s t ∧ Cp0_d m l κ r s x) := by
+    refine ⟨fun x hx => ((row t C htC x).mp hx).1, fun x hx => ?_⟩
+    exact (row t C htC x).trans ((and_iff_right hx).trans (fiber t x))
   have same t B C (htB : Rd_entry_d t B g) (htC : Rd_entry_d t C f) : B = C := by
-    obtain ⟨sub, spec⟩ := (fiber t B).mp (select t B htB)
+    obtain ⟨sub, spec⟩ := select t B htB
     exact hZF.1.eq_of_same_members B C fun x => ⟨fun hx => (decode t C htC x).mpr ((spec x (sub x hx)).mp hx),
       fun hx => (spec x (bound t C htC x hx)).mpr ((decode t C htC x).mp hx)⟩
   have eq : g = f := hg.ext_l hZF.1 hf fun t ht => by

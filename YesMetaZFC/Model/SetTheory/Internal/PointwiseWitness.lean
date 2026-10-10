@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.SetTheory.Internal.PointwiseTrace
 import YesMetaZFC.Model.SetTheory.Internal.PointwiseDiagonal
+import YesMetaZFC.Model.SetTheory.Internal.SourceCollection
 
 /-! # 存在行在源中具有统一代表见证
 
@@ -14,7 +15,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem sc_pe_witness_l {ω c X R D E F n V r z i j b a A}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (theory : Sc_theory_d I ω X R) (hD : M.mem D X) (hE : M.IsFunctionSpace I E ω X)
+    (theory : Sc_theory_d I ω X R) (uniform : Sc_uniform_d I ω X R D) (hD : M.mem D X) (hE : M.IsFunctionSpace I E ω X)
     (hF : Sfm_d I ω n F) (hV : Seval_d I X R E F n V) (hc : M.PairMember I r z F)
     (hs : Sop_d I 3 z i j) (hj : M.mem j n) (hb : M.mem b ω) (hB : Sbound_d I F b)
     (ha : M.mem a E) (hA : M.mem A X) (hAD : M.MemberSubset A D)
@@ -60,8 +61,8 @@ theorem sc_pe_witness_l {ω c X R D E F n V r z i j b a A}
         (Or.inr ⟨hbt, (hDa.2 b D).mpr (Or.inl ⟨rfl, rfl⟩)⟩)⟩))
       ((hG.2 t p).mpr (Or.inr ⟨hti, (hT.2 t p).mpr (Or.inl ⟨rfl, rfl⟩)⟩))
       ((he.congr_left_l I (agree p aT hT)).update_l I hg hx hG hff)
-  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := theory.uniformization E F₂ n₂ r₂ t i aD A hE h₂.program
-    h₂.root htω hiω hti ((hE aD).mpr haD) hA (fun p hp => by
+  obtain ⟨B, C, hBX, hCX, hBC, select⟩ := uniform E F₂ n₂ r₂ t i aD A hE h₂.program
+    h₂.root htω hiω hti ((hE aD).mpr haD) hA hAD (fun p hp => by
       obtain ⟨f, hf, he, hsat⟩ := htot p hp
       obtain ⟨x, f', hx, hff, hsat⟩ := (ssat_exists_l I hZF hF hV hc hs hf).mp hsat
       obtain ⟨g, L, hg, hL, hfL, hcst⟩ := sc_constant_l hZF hω hX hm theory hD hx

@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.Descriptive.Normal.Witness
+import YesMetaZFC.SetTheory.Descriptive.TreeBounded
 
 /-! # 可数前缀树的内部良基性
 
@@ -98,22 +99,7 @@ theorem tree_wf_iff_l (hZF : M.Models ZF) {ω A B T R} (hB : Baire_d I ω B)
     (hA : Fseq_space_d I ω ω A) (ha : M.CardinalLessOrEqual I A ω) (ht : Tree_d A T) (hr : Edge_d I ω T R) :
     Wf_rel_d T R ↔ ∀ f, M.mem f B → ¬ Branch_d A T f := by
   refine ⟨fun hw f hf hb => ?_, tree_wf_of_no_branch_l I hZF hB hA ha ht hr⟩
-  let φ : UnarySchema 1 := { body := Formula.subset .newest (.bound 1) }
-  obtain ⟨Q, hQ'⟩ := ZF.separation_exists_d hZF φ ⟨fun _ => f, fun _ => f⟩ A
-  have hQ s : M.mem s Q ↔ M.mem s A ∧ M.MemberSubset s f := by
-    simpa only [φ, Formula.satisfies_subset_iff] using! hQ' s
-  obtain ⟨z, hz, hzω⟩ := hB.1.1.1
-  have hzQ := (hQ z).mpr ⟨(hA z).mpr ⟨z, hzω, ds_empty_fun_l I hz⟩, fun p hp => (hz p hp).elim⟩
-  obtain ⟨s, hs, hmin⟩ := hw Q (fun s hs => hb s ((hQ s).mp hs).1 ((hQ s).mp hs).2) ⟨z, hzQ⟩
-  obtain ⟨hsA, hsf⟩ := (hQ s).mp hs
-  obtain ⟨n, hn, hsfn⟩ := (hA s).mp hsA
-  obtain ⟨m, hm, hmω⟩ := hB.1.1.2 n hn
-  obtain ⟨t, htf, htr, _⟩ := ds_prefix_l I hZF hB.1 ((hB.2 f).mp hf) hmω
-  have htA := (hA t).mpr ⟨m, hmω, htf⟩
-  have hts := (ds_restrict_iff_l I htf ((hB.2 f).mp hf).1).mp htr
-  have hst := ds_prefix_mono_l I hsfn htf.1 ((ds_restrict_iff_l I hsfn ((hB.2 f).mp hf).1).mpr hsf)
-    htr (fun i hi => (hm i).mpr (Or.inl hi))
-  exact hmin t ((hQ t).mpr ⟨htA, hts⟩) ((hr.2 s t).mpr
-    ⟨hb s hsA hsf, hb t htA hts, (tree_step_iff_l I hZF hB.1 hn hmω hsfn htf).mpr ⟨hm, hst⟩⟩)
+  obtain ⟨G, hg, desc⟩ := tree_branch_desc_l I hZF hB.1 hA ((hB.2 f).mp hf) hb hr
+  exact wf_no_desc_l hZF hB.1 hw hg desc
 
 end YesMetaZFC.SetTheory.Descriptive

@@ -12,6 +12,17 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+/-- 同时给定支撑像和代表像时，复制节点方程直接给出两个原商元素之间的条目。 -/
+theorem ep_copy_repr_l {A C q q' π σ τ a a' f f' E E' : M.Domain}
+    (projection : Fn0_d A C q)
+    (copy : ∀ B H, Rd_entry_d B H τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q' u H)
+    (haa : Rd_entry_d a a' σ) (hff : Rd_entry_d f f' π) (fv : Ep_repr_d q a f E) (fv' : Ep_repr_d q' a' f' E') :
+    Rd_entry_d E E' τ := by
+  obtain ⟨u, B, pair, hf, huE⟩ := fv
+  obtain ⟨v, B', pair', hf', hvE⟩ := fv'
+  exact (copy E E').mpr ⟨(projection.bound_l huE).2, u, huE,
+    a, B, a', B', v, pair, haa, ⟨f, f', hf, hf', hff⟩, pair', hvE⟩
+
 theorem ep_coord_image_l {ω c d X R Y S π κ κ' D D' i i' f f' n : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hπ : Smap_d I ω c d X Y π)
@@ -38,8 +49,8 @@ theorem ep_copy_seed_l
     (owner : M.TransitiveSet N) (owner' : M.TransitiveSet N') (h₀ : Smem_d I b N R₀) (h₁ : Smem_d I b' N' R₁)
     (hσ : Smap_d I ω b b' N N' σ) (hωN : M.mem ω N) (hL : Rd_entry_d L L' σ) (hF : Rd_entry_d F F' σ)
     (family : Em_source_d ω κ L X F) (family' : Em_source_d ω κ' L' Y F')
-    (h : Ep_system_d hZF ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
-    (h' : Ep_system_d hZF ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
+    (h : Ep_system_d I ω κ L X R F J O Z A p T V) (limit : Di_limit_d A p T V q C W)
+    (h' : Ep_system_d I ω κ' L' Y S F' J' O' Z' A' p' T' V') (limit' : Di_limit_d A' p' T' V' q' C' W')
     (hτ : Fn0_d C C' τ)
     (copy : ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q' u E)
     (hα : Rd_entry_d α α' σ) (seed : Ep_seed_d κ L q α E) (hEE : Rd_entry_d E E' τ) : Ep_seed_d κ' L' q' α' E' := by
@@ -64,11 +75,8 @@ theorem ep_copy_seed_l
       (source.omega.transitive hZF n hnω i (ha.bound_l hi).1)) hff hD' hf
   obtain ⟨E₀, _, value'⟩ := ep_repr_exists_l hZF family' h' limit' haJ' ha' hD' hfY
     (hf'.1.mono_target_l (target.transitive κ' target.cardinal_mem))
-  obtain ⟨u, B, hu, hfB, huE⟩ := value
-  obtain ⟨v, B', hv, hfB', hvE⟩ := value'
-  have hE₀ := (copy E E₀).mpr ⟨(limit.projection.bound_l huE).2, u, huE,
-    a, B, a', B', v, hu, haa, ⟨f, f', hfB, hfB', hff⟩, hv, hvE⟩
+  have hE₀ := ep_copy_repr_l limit.projection copy haa hff value value'
   have eq := (fn0_function_l (ZF.modelsKP hZF) hτ).1.2 E E₀ E' hE₀ hEE
-  exact ⟨n, a', i, D', f', ha', hi', hD', hf', v, B', hv, hfB', eq ▸ hvE⟩
+  exact ⟨n, a', i, D', f', ha', hi', hD', hf', eq ▸ value'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

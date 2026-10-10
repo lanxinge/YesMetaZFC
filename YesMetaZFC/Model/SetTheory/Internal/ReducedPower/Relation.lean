@@ -19,6 +19,9 @@ def rp_eq_m {d} (Q U f g : Term d) : Formula 1 d := Formula.existsMem U (Formula
     (rd_entry0_m (.bound 1) .newest g.weaken.weaken.weaken))))
 derive_free_closed rp_eq_m
 
+theorem rp_eq_delta_l {d} (Q U f g : Term d) : (rp_eq_m Q U f g).IsDelta0 :=
+  .existsMem _ (.forallMem _ (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))))
+
 theorem rp_eq_sat_l (hE : Extensional M) {d} (ρ : Env M d) (Q U f g : Term d) :
     Formula.satisfies ρ (rp_eq_m Q U f g) ↔ Rp_eq_d (Q.eval ρ) (U.eval ρ) (f.eval ρ) (g.eval ρ) := by
   simp only [rp_eq_m, Rp_eq_d, Formula.satisfies_existsMem_iff, Formula.satisfies_forallMem_iff,

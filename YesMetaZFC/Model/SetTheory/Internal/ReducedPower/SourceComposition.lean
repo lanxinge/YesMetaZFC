@@ -24,12 +24,13 @@ theorem sc_compose_l {ω c X R A B t f} (hω : M.IsOmega ω)
   have sat v x : φ.denote ρ v x ↔ ∃ w, M.mem w B ∧ Rd_entry_d v w t ∧ Rd_entry_d w x f := by
     simp only [φ, BinarySchema.denote, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff, rd_entry0_sat_l hZF.1]
     rfl
-  obtain ⟨g, C, hg, hC, hgf, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ
-    (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))) ρ (Fin.cases hfX (Fin.cases htX (fun _ => hB))) hA
+  obtain ⟨C, hC, bound⟩ := theory.algebra.envelope_l hfX
+  obtain ⟨g, hg, hgf, hs⟩ := sc_uniform_source_l hZF hω hX hm theory φ
+    (.existsMem _ (.conj (rd_entry0_delta_l ..) (rd_entry0_delta_l ..))) ρ (Fin.cases hfX (Fin.cases htX (fun _ => hB))) hA hC
     (fun v hv => by
       obtain ⟨w, hw, hvw⟩ := ht.2.1 v hv
-      obtain ⟨x, hx, hwx⟩ := hf.2.1 w hw
-      exact ⟨x, hx, (sat v x).mpr ⟨w, hw, hvw, hwx⟩⟩)
+      obtain ⟨x, _, hwx⟩ := hf.2.1 w hw
+      exact ⟨x, (bound w x hwx).2, (sat v x).mpr ⟨w, hw, hvw, hwx⟩⟩)
   refine ⟨g, ⟨hg, C, hC, hgf⟩, hgf.mono_target_l (hX C hC), fun v hv => ?_⟩
   obtain ⟨x, hx, hvx⟩ := hgf.2.1 v hv
   obtain ⟨w, hw, hvw, hwx⟩ := (sat v x).mp (hs v x hvx)

@@ -1,6 +1,8 @@
 import YesMetaZFC.SetTheory.Cumulative
 import YesMetaZFC.SetTheory.Kuratowski
 import YesMetaZFC.SetTheory.MembershipInduction
+import YesMetaZFC.SetTheory.Card.FiniteSequenceSyntax
+import YesMetaZFC.SetTheory.InnerModel.Rudimentary.Construction
 
 /-! # 极限累积层中的实际幂集封闭
 
@@ -90,5 +92,62 @@ theorem ZF.v_function_space_mem_l (hZF : M.Models ZF) {δ V D Y G} (hV : V_d I �
   obtain ⟨a, b, hab⟩ := hf.1.1 p hp
   exact ⟨a, hD a (hf.input_mem_of_pairMember ⟨p, hab, hp⟩), b,
     hf.output_mem_of_pairMember ⟨p, hab, hp⟩, hab⟩
+
+theorem ZF.v_subset_mem_l (hZF : M.Models ZF) {δ V A B} (hV : V_d I δ V)
+    (hA : M.mem A V) (hB : M.MemberSubset B A) : M.mem B V := by
+  obtain ⟨β, W, hβ, hW, sub⟩ := (v_unfold_l I hZF hV A).mp hA
+  exact (v_unfold_l I hZF hV B).mpr ⟨β, W, hβ, hW, fun x hx => sub x (hB x hx)⟩
+
+theorem ZF.v_product_mem_l (hZF : M.Models ZF) {δ V A B P} (hV : V_d I δ V)
+    (hδ : M.IsLimitOrdinal δ) (hA : M.mem A V) (hB : M.mem B V)
+    (hP : M.IsCartesianProduct (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) P A B) : M.mem P V := by
+  obtain ⟨Y, hY, hAY, hBY⟩ := v_joint_bound_l I hZF hV hA hB
+  exact v_relation_mem_l I hZF hV hδ hY fun p hp =>
+    (hP p).mp hp |>.elim fun a ha => ha.2.elim fun b hb => ⟨a, hAY a ha.1, b, hBY b hb.1, hb.2⟩
+
+/-- Kuratowski 图的定义域不增加秩；无需极限层假设。 -/
+theorem ZF.v_domain_mem_l (hZF : M.Models ZF) {δ V D F} (hV : V_d I δ V)
+    (hF : M.mem F V)
+    (hD : M.IsDomainOf (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) D F) :
+    M.mem D V := by
+  obtain ⟨β, W, hβ, hW, sub⟩ := (v_unfold_l I hZF hV F).mp hF
+  refine (v_unfold_l I hZF hV D).mpr ⟨β, W, hβ, hW, fun x hx => ?_⟩
+  obtain ⟨y, p, code, hp⟩ := (hD x).mp hx
+  exact (code.mem_l M (v_transitive_l I hZF hW) (sub p hp)).1
+
+theorem ZF.v_restriction_mem_l (hZF : M.Models ZF) {δ V D F H} (hV : V_d I δ V)
+    (hF : M.mem F V)
+    (hH : M.IsRestrictionOf (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) H F D) :
+    M.mem H V := by
+  apply v_subset_mem_l I hZF hV hF
+  intro p hp
+  obtain ⟨x, y, code⟩ := hH.1 p hp
+  obtain ⟨q, hq, hqF⟩ := ((hH.2 x y).mp ⟨p, code, hp⟩).2
+  exact kpair_unique_l M hZF.1 hq code ▸ hqF
+
+theorem ZF.v_fseq_mem_l (hZF : M.Models ZF) {δ V ω A J} (hV : V_d I δ V)
+    (hδ : M.IsLimitOrdinal δ) (hω : M.IsOmega ω) (hωV : M.mem ω V) (hA : M.mem A V)
+    (hJ : Fseq_space_d (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) ω A J) : M.mem J V := by
+  obtain ⟨Y, hY, hωY, hAY⟩ := v_joint_bound_l I hZF hV hωV hA
+  apply v_relations_mem_l I hZF hV hδ hY
+  intro f hf p hp
+  obtain ⟨n, hn, fn⟩ := (hJ f).mp hf
+  obtain ⟨a, b, code⟩ := fn.1.1 p hp
+  exact ⟨a, hωY a (hω.transitive hZF n hn a (fn.input_mem_of_pairMember ⟨p, code, hp⟩)),
+    b, hAY b (fn.output_mem_of_pairMember ⟨p, code, hp⟩), code⟩
+
+theorem ZF.v_fibers_mem_l (hZF : M.Models ZF) {δ V R B T} (hV : V_d I δ V)
+    (hδ : M.IsLimitOrdinal δ) (hR : M.mem R V) (hT : InnerModel.Rd_fun_d .fibers R B R T) : M.mem T V := by
+  obtain ⟨β, Y, hβ, hy, hRY⟩ := (v_unfold_l I hZF hV R).mp hR
+  have ht := v_transitive_l I hZF hy
+  obtain ⟨P, hp⟩ := exists_powerSet hZF Y
+  apply v_subset_mem_l I hZF hV (v_power_mem_l I hZF hV hδ (v_mem_l I hZF hy hV hβ) hp)
+  intro t h
+  obtain ⟨b, _, fiber⟩ := (hT t).mp h
+  apply (hp t).mpr
+  intro x hx
+  obtain ⟨p, code, hpr⟩ := (fiber x).mp hx
+  obtain ⟨s, hs, hxs⟩ := (kpair_union_l M code x).mpr (Or.inl rfl)
+  exact ht s (ht p (hRY p hpr) s hs) x hxs
 
 end YesMetaZFC.SetTheory

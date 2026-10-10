@@ -1,5 +1,6 @@
 import YesMetaZFC.Model.SetTheory.Internal.PredicateEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.Compiler
+import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 
 /-! # 内部嵌入对原公式的实际作用
 
@@ -41,5 +42,15 @@ theorem Smap_d.relation_l (hZF : M.Models ZF) {ω c d X R Y S j x y x' y' : M.Do
       fun _ => ⟨x, hj.1.1.input_mem_of_pairMember hx⟩⟩
     ⟨Fin.cases ⟨y', hj.1.1.output_mem_of_pairMember hy⟩ (fun _ => ⟨x', hj.1.1.output_mem_of_pairMember hx⟩),
       fun _ => ⟨x', hj.1.1.output_mem_of_pairMember hx⟩⟩ (Fin.cases hy (fun _ => hx))
+
+/-- 隶属结构之间的完整初等图反映实际隶属关系。 -/
+theorem Smap_d.member_l (hZF : M.Models ZF) {ω c d X R Y S j x y x' y' : M.Domain}
+    (hω : M.IsOmega ω) (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hj : Smap_d I ω c d X Y j)
+    (hx : M.PairMember I x x' j) (hy : M.PairMember I y y' j) : M.mem x y ↔ M.mem x' y' := by
+  have tr := hj.relation_l I hZF hω hm.1 hn.1 hx hy
+  exact ⟨fun h => ((hn.2 x' y').mp (tr.mp ((hm.2 x y).mpr
+    ⟨hj.1.1.input_mem_of_pairMember hx, hj.1.1.input_mem_of_pairMember hy, h⟩))).2.2,
+    fun h => ((hm.2 x y).mp (tr.mpr ((hn.2 x' y').mpr
+      ⟨hj.1.1.output_mem_of_pairMember hx, hj.1.1.output_mem_of_pairMember hy, h⟩))).2.2⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -41,8 +41,7 @@ theorem ee_component_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F a c :
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF D
   have hPX := source.transitive P (ZF.v_power_mem_l I hZF hV hδ hDX hP)
   obtain ⟨b, hX⟩ := source.code
-  have sf f (hf : M.mem f G) := sc_function_domain_l hZF source.omega source.transitive hX source.theory
-    hDX ((hG f).mp hf).1 ((hG f).mp hf).2
+  have sf f (hf : M.mem f G) := sc_function_domain_l source.theory.algebra ((hG f).mp hf).1 ((hG f).mp hf).2
   have eval f (hf : M.mem f G) := ed_evaluation_l hZF source.omega h source.transitive hY hjD haD (sf f hf)
   have atoms f g y z (hf : M.mem f G) (hg : M.mem g G) (hy : Ee_value_d j a f y) (hz : Ee_value_d j a g z) :=
     ed_evaluation_atoms_l hZF source.omega h source.transitive hY hjD haD hP hPX hu hX (sf f hf) (sf g hg) hy hz
