@@ -15,7 +15,7 @@ private theorem rt_ep_at_l (hKP : M.Models KP) {V : M.Domain} (hv : M.Transitive
     (pair : ∀ a b, M.mem a V → M.mem b V → ∃ p, M.mem p V ∧ Pair_d M p a b)
     (Z a B : (rt_model_l V nv).Domain) : Ep_at_d Z a B ↔ Ep_at_d Z.val a.val B.val := by
   have ent := rt_entry_l hv nv hKP.1
-  have kp := rt_kpair_l hKP hv nv pair
+  have kp := rt_kpair_l hKP.1 (KP.exists_pair hKP) hv nv pair
   constructor
   · rintro ⟨c, C, S, hc, hp, hb⟩
     exact ⟨c.val, C.val, S.val, (ent ..).mp hc, (kp ..).mp hp, hb⟩
@@ -28,7 +28,7 @@ private theorem rt_ep_rel_l (hKP : M.Models KP) {V : M.Domain} (hv : M.Transitiv
     (pair : ∀ a b, M.mem a V → M.mem b V → ∃ p, M.mem p V ∧ Pair_d M p a b)
     (Z a B D : (rt_model_l V nv).Domain) : Ep_rel_d Z a B D ↔ Ep_rel_d Z.val a.val B.val D.val := by
   have ent := rt_entry_l hv nv hKP.1
-  have kp := rt_kpair_l hKP hv nv pair
+  have kp := rt_kpair_l hKP.1 (KP.exists_pair hKP) hv nv pair
   constructor
   · rintro ⟨c, C, S, hc, hp, hd⟩
     exact ⟨c.val, C.val, S.val, (ent ..).mp hc, (kp ..).mp hp, (ent ..).mp hd⟩
@@ -44,7 +44,7 @@ theorem Fs_read_d.graph_read_l (hZF : M.Models ZF) {ω V : M.Domain}
     Ep_graph_d (kp_pair_l (ZF.modelsKP hZF)) ω μ.val L.val X.val R.val F.val J.val O.val Z.val A.val p.val T.val S.val := by
   have vt := source.transitive
   have ent := rt_entry_l vt nv hZF.1
-  have kp := rt_kpair_l (ZF.modelsKP hZF) vt nv source.pair
+  have kp := rt_kpair_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) vt nv source.pair
   have node := rt_ep_at_l (ZF.modelsKP hZF) vt nv source.pair
   have rel := rt_ep_rel_l (ZF.modelsKP hZF) vt nv source.pair
   have arrow := source.arrow_read_l hZF nv w μ L X
@@ -138,7 +138,7 @@ theorem Fs_read_d.system_read_l (hZF : M.Models ZF) {ω V : M.Domain}
     Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω μ.val L.val X.val R.val F.val J.val O.val Z.val A.val p.val T.val S.val := by
   have vt := source.transitive
   have ent := rt_entry_l vt nv hZF.1
-  have kp := rt_kpair_l (ZF.modelsKP hZF) vt nv source.pair
+  have kp := rt_kpair_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) vt nv source.pair
   refine ⟨source.graph_read_l hZF nv w μ L X R F J O Z A p T S hw h.toEp_graph_d,
     rt_di_system_l (ZF.modelsKP hZF) vt nv J O A p T S h.diagram, ?_⟩
   intro u v a b B C hu hv huv f hf

@@ -12,21 +12,6 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}}
 
-theorem jl_rel_delta_l {n d} (φ : Formula 1 n) (U : Term d) (e : Fin n → Term d) :
-    (lr_rel_m φ U e).IsDelta0 := by
-  induction φ generalizing d with
-  | falsum => exact .falsum
-  | truth => exact .truth
-  | mem s t => exact .mem _ _
-  | atom r hr ts => exact .atom _ _ _
-  | neg φ ih => exact .neg (ih U e)
-  | conj φ ψ ih jh => exact .conj (ih U e) (jh U e)
-  | disj φ ψ ih jh => exact .disj (ih U e) (jh U e)
-  | imp φ ψ ih jh => exact .imp (ih U e) (jh U e)
-  | iff φ ψ ih jh => exact .iff (ih U e) (jh U e)
-  | forallE φ ih => exact .forallMem _ (ih _ _)
-  | existsE φ ih => exact .existsMem _ (ih _ _)
-
 theorem l_model_full_separation_l (hZF : M.Models ZF) {n} (φ : UnarySchema n)
     (ρ : Env (l_model_l (ZF.models_kpi_l hZF)) n)
     (X : (l_model_l (ZF.models_kpi_l hZF)).Domain) :
@@ -46,7 +31,7 @@ theorem l_model_full_separation_l (hZF : M.Models ZF) {n} (φ : UnarySchema n)
   let ψ : Delta0UnarySchema (n + 1) := {
     body := lr_rel_m φ.body (.bound 1) e
     freeClosed := lr_rel_closed_l _ φ.freeClosed _ _ rfl (Fin.cases rfl (fun _ => rfl))
-    delta0 := jl_rel_delta_l .. }
+    delta0 := lr_rel_delta_l .. }
   have tr x (hx : N.mem x X) : φ.denote ρ x ↔ ψ.toUnarySchema.denote (ρ.push U) x :=
     lr_reflect_core_l φ.body φ.freeClosed hc (ρ.push x) ((ρ.push U).push x) (.bound 1) e
       rfl (Fin.cases rfl (fun _ => rfl)) (Fin.cases (ht X hX x hx) hρ)

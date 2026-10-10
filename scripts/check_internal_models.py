@@ -37,6 +37,16 @@ MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
             ("RecursionSource", "CumulativeSource", "StructureSource")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("RankLargest", "FlatPredecessor", "FiniteConjunction", "TypeGuardCode", "TypeGuardColumn", "TypeGuard")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TransitiveRecursion", "TransitiveOrderCollapse", "OrdinalPairOrderSource", "OrdinalPairSource",
+             "TransitiveSequence", "OrdinalFoldStepSource", "OrdinalFoldSource", "SyntaxSource",
+             "CanonicalNodeSource", "CanonicalSource", "CanonicalLocal", "ProgramRecode",
+             "ProgramRecodeSemantics", "ProgramRecodeSource", "CanonicalFlat",
+             "TypeRolesSyntax", "TypeRolesCode", "TypeRoles")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("CanonicalPredecessor", "FlatTypeNames", "FlatTypeQuery", "FlatTypePredecessor", "FlatTypeRead")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TuplePackSyntax", "TuplePackStep", "TuplePackCode", "TupleUnpack", "TupleCode", "TypePredecessorCode")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
@@ -584,6 +594,15 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                  "Tm_minus_d", "tm_minus_m", "Tt_slots_d", "tt_slots_m", "Tm_table_d", "tm_link0_m", "tm_cut0_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                 ("Sv_max_d", "sv_max_m", "sv_last_m", "Ft_prev_d", "ft_prev_m", "ft_prev_local_m", "Sg_all_d", "sg_all_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Sx_node_d", "sx_node_m", "Sx_program_d", "sx_program_m", "Sx_graph_d", "sx_graph_m",
+                 "Sx_row_d", "sx_row_m", "Sc_flat_d", "sc_flat_m", "sc_flat_local_m", "sc_num_local_m",
+                 "Tr_tag_d", "tr_tag_m", "Tr_zero_d", "Tr_step_d", "tr_zero_m", "tr_step_m",
+                 "Tr_roles_d", "tr_roles_m", "Tr_prog_d", "tr_prog_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("sc_prev_s", "sc_prev_m", "sc_prev_local_m", "fp_entry0_m", "Tf_value_d", "tf_value0_m",
+                 "Tf_fill_d", "tf_fill0_m", "Tf_dom_d", "tf_dom0_m", "tf_query_s", "tf_query_m",
+                 "tf_prev_s", "tf_prev_m", "tf_type_m", "tf_type_local_m", "St_pack_d", "st_pack_m", "st_unpack_s")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
 # HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]

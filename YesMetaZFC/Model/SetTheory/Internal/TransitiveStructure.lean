@@ -9,52 +9,53 @@ import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 namespace YesMetaZFC.SetTheory.Internal
 open Definitional.Project InnerModel
 universe u
-variable {M : Structure.{u}} (hKP : M.Models KP) {Z : M.Domain}
+variable {M : Structure.{u}} (hE : Extensional M)
+  (hP : ∀ a b : M.Domain, ∃ p, Pair_d M p a b) {Z : M.Domain}
   (hZ : M.TransitiveSet Z) (nz : Nonempty {x // M.mem x Z})
   (pair : ∀ a b, M.mem a Z → M.mem b Z → ∃ p, M.mem p Z ∧ Pair_d M p a b)
-include hKP hZ
+include hE hZ
 local notation "N" => rt_model_l Z nz
-local notation "I" => kp_pair_l hKP
-local notation "J" => rt_pair_l hZ nz (And.left hKP) pair
+local notation "I" => kpair_interpretation_l M hE hP
+local notation "J" => rt_pair_l hZ nz hE pair
 
 theorem rt_kpair_l (p a b : (N).Domain) : (J).Codes p a b ↔ (I).Codes p.val a.val b.val := by
   let ρ : Env N 3 := ⟨Fin.cases p (Fin.cases a (fun _ => b)), fun _ => p⟩
-  exact (kpair0_sat_l (rt_model_ext_l hKP.1 hZ nz) ρ .newest (.bound 1) (.bound 2)).symm.trans
-    ((rt_model_delta_l hZ nz (kpair0_delta_l ..) ρ).trans (kpair0_sat_l hKP.1 ..))
+  exact (kpair0_sat_l (rt_model_ext_l hE hZ nz) ρ .newest (.bound 1) (.bound 2)).symm.trans
+    ((rt_model_delta_l hZ nz (kpair0_delta_l ..) ρ).trans (kpair0_sat_l hE ..))
 
 theorem rt_relation_l (R : (N).Domain) : (N).IsSetRelation J R ↔ M.IsSetRelation I R.val := by
   constructor
   · intro h p hp
     obtain ⟨a, b, code⟩ := h ⟨p, hZ R.val R.property p hp⟩ hp
-    exact ⟨a.val, b.val, (rt_kpair_l hKP hZ nz pair ..).mp code⟩
+    exact ⟨a.val, b.val, (rt_kpair_l hE hP hZ nz pair ..).mp code⟩
   · intro h p hp
     obtain ⟨a, b, code⟩ := h p.val hp
     have mem := code.mem_l M hZ p.property
-    exact ⟨⟨a, mem.1⟩, ⟨b, mem.2⟩, (rt_kpair_l hKP hZ nz pair ..).mpr code⟩
+    exact ⟨⟨a, mem.1⟩, ⟨b, mem.2⟩, (rt_kpair_l hE hP hZ nz pair ..).mpr code⟩
 
 theorem rt_smdl_l (c A R : (N).Domain) : Smdl_d J c A R ↔ Smdl_d I c.val A.val R.val := by
-  refine and_congr (rt_kpair_l hKP hZ nz pair c A R) (and_congr ?_ ?_)
+  refine and_congr (rt_kpair_l hE hP hZ nz pair c A R) (and_congr ?_ ?_)
   · exact ⟨fun ⟨x, hx⟩ => ⟨x.val, hx⟩, fun ⟨x, hx⟩ => ⟨⟨x, hZ A.val A.property x hx⟩, hx⟩⟩
-  · refine and_congr (rt_relation_l hKP hZ nz pair R) ?_
+  · refine and_congr (rt_relation_l hE hP hZ nz pair R) ?_
     constructor
     · intro h x y hxy
       have xy := rd_entry_transitive_l hZ R.property hxy
-      exact h ⟨x, xy.1⟩ ⟨y, xy.2⟩ ((rt_entry_l hZ nz hKP.1 ..).mpr hxy)
+      exact h ⟨x, xy.1⟩ ⟨y, xy.2⟩ ((rt_entry_l hZ nz hE ..).mpr hxy)
     · intro h x y hxy
-      exact h x.val y.val ((rt_entry_l hZ nz hKP.1 ..).mp hxy)
+      exact h x.val y.val ((rt_entry_l hZ nz hE ..).mp hxy)
 
 theorem rt_smem_l (c A R : (N).Domain) : Smem_d J c A R ↔ Smem_d I c.val A.val R.val := by
-  refine and_congr (rt_smdl_l hKP hZ nz pair c A R) ?_
+  refine and_congr (rt_smdl_l hE hP hZ nz pair c A R) ?_
   constructor
   · intro h x y
     constructor
     · intro hxy
       have xy := rd_entry_transitive_l hZ R.property hxy
-      exact (h ⟨x, xy.1⟩ ⟨y, xy.2⟩).mp ((rt_entry_l hZ nz hKP.1 ..).mpr hxy)
+      exact (h ⟨x, xy.1⟩ ⟨y, xy.2⟩).mp ((rt_entry_l hZ nz hE ..).mpr hxy)
     · intro hxy
-      exact (rt_entry_l hZ nz hKP.1 ..).mp ((h ⟨x, hZ A.val A.property x hxy.1⟩
+      exact (rt_entry_l hZ nz hE ..).mp ((h ⟨x, hZ A.val A.property x hxy.1⟩
         ⟨y, hZ A.val A.property y hxy.2.1⟩).mpr hxy)
   · intro h x y
-    exact (rt_entry_l hZ nz hKP.1 ..).trans (h x.val y.val)
+    exact (rt_entry_l hZ nz hE ..).trans (h x.val y.val)
 
 end YesMetaZFC.SetTheory.Internal

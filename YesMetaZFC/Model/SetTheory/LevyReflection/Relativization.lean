@@ -37,6 +37,21 @@ def lr_rel_m : {n d : Nat} → Formula 1 n → Term d → (Fin n → Term d) →
   | _, _, .existsE φ, X, e => Formula.existsMem X (lr_rel_m φ X.weaken (Fin.cases .newest (fun i => (e i).weaken)))
   | _, _, .forallE φ, X, e => Formula.forallMem X (lr_rel_m φ X.weaken (Fin.cases .newest (fun i => (e i).weaken)))
 
+theorem lr_rel_delta_l {n d} (φ : Formula 1 n) (U : Term d) (e : Fin n → Term d) :
+    (lr_rel_m φ U e).IsDelta0 := by
+  induction φ generalizing d with
+  | falsum => exact .falsum
+  | truth => exact .truth
+  | mem s t => exact .mem _ _
+  | atom r hr ts => exact .atom _ _ _
+  | neg φ ih => exact .neg (ih U e)
+  | conj φ ψ ih jh => exact .conj (ih U e) (jh U e)
+  | disj φ ψ ih jh => exact .disj (ih U e) (jh U e)
+  | imp φ ψ ih jh => exact .imp (ih U e) (jh U e)
+  | iff φ ψ ih jh => exact .iff (ih U e) (jh U e)
+  | forallE φ ih => exact .forallMem _ (ih _ _)
+  | existsE φ ih => exact .existsMem _ (ih _ _)
+
 @[simp] theorem lr_rel_closed_l {n d} (φ : Formula 1 n) (hφ : φ.FreeClosed) (X : Term d) (e : Fin n → Term d)
     (hX : X.freeSupport = []) (he : ∀ i, (e i).freeSupport = []) : (lr_rel_m φ X e).FreeClosed := by
   induction φ generalizing d <;> simp only [Definitional.Formula.FreeClosed] at hφ

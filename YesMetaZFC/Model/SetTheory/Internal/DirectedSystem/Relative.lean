@@ -87,7 +87,7 @@ theorem rt_di_limit_l
   have ent := rt_entry_l hZ nz hKP.1
   refine ⟨(rt_fn_l hZ nz hKP.1 ..).mp h.projection,
     (rt_range_l hZ nz hKP.1 (KP.exists_pair hKP) pair C q).mp h.range, ?_, ?_, ?_,
-    (rt_relation_l hKP hZ nz pair S).mp h.graph⟩
+    (rt_relation_l hKP.1 (KP.exists_pair hKP) hZ nz pair S).mp h.graph⟩
   · intro x y B D hx hy
     have xb := rd_entry_transitive_l hZ q.property hx
     have yd := rd_entry_transitive_l hZ q.property hy

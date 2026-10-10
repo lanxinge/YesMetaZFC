@@ -5,6 +5,7 @@ import YesMetaZFC.Model.SetTheory.Internal.Membership
 import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
+import YesMetaZFC.Model.SetTheory.Internal.TypePredecessorCode
 import YesMetaZFC.Model.SetTheory.Internal.RankSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.FlatPredecessor
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
@@ -14,6 +15,7 @@ import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeMinusEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
+import YesMetaZFC.Model.SetTheory.Internal.TypeRoles
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
@@ -64,6 +66,13 @@ import YesMetaZFC.Model.SetTheory.Internal.RankSkolem
 `Tt_realized_d` 用实际有限元组和名字列记录完整内部类型；`tt_source_l` 把任意原公式
 编译为同一类型中的查询。`spred_trace_l` 保持谓词截面的完整定义，
 `Smap_d.type_pool_cover_l` 与 `type_constants_cover_l` 证明像查询域包含目标中的新低秩参数。
+`tt_roles_query_l` 对任意内部长度实际编译坐标标签条件：第 i+1 项是首坐标为 i 的
+Kuratowski 对。查询使用原元组的恒等名字列，类型成员性恰等价于全部标签约束。
+`rt_sc_num_l` 在含 ω 的极限秩层中双向保持原规范自然数编码；`sc_flat_local_m`
+以 Δ₀ 公式恢复等义的平坦程序，`Sx_program_d.satisfies_l` 保持全部内部码的真值。
+`tt_predecessor_formula_l` 自动重编码原实现元组，在 V(ν+1) 中以同一原公式识别
+Vν 上全部原完整类型候选。查询域与候选保持原编码，候选秩界由子集条件自动给出；
+ν 不必是极限序数，也不要求该后继秩层满足 ZF。
 `ft_rank_satisfaction_l` 用单一公式在 V(ν+1) 中表达 Vν 上的完整内部满足关系；
 ν 只需至少为 ω。原平坦配对、内部有限前缀及四条真值方程给出实际见证与秩界，
 `rt_ft_eval_l` 证明源内外双向一致，不假定该后继秩层满足 ZF。

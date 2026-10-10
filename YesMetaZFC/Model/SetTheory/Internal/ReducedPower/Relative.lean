@@ -80,7 +80,7 @@ theorem rt_rp_model_l (D Q U R c G p C T : (N).Domain) :
     Rp_model_d J D Q U R c G p C T ↔ Rp_model_d I D.val Q.val U.val R.val c.val G.val p.val C.val T.val := by
   constructor
   · intro h
-    refine ⟨(rt_rp_map_l hKP hZ nz pair ..).mp h.map, (rt_smdl_l hKP hZ nz pair ..).mp h.code, ?_⟩
+    refine ⟨(rt_rp_map_l hKP hZ nz pair ..).mp h.map, (rt_smdl_l hKP.1 (KP.exists_pair hKP) hZ nz pair ..).mp h.code, ?_⟩
     intro f g B E hf hg
     have fb := rd_entry_transitive_l hZ p.property hf
     have ge := rd_entry_transitive_l hZ p.property hg
@@ -88,7 +88,7 @@ theorem rt_rp_model_l (D Q U R c G p C T : (N).Domain) :
       ((h.relation ⟨f, fb.1⟩ ⟨g, ge.1⟩ ⟨B, fb.2⟩ ⟨E, ge.2⟩ ((rt_entry_l hZ nz hKP.1 ..).mpr hf)
         ((rt_entry_l hZ nz hKP.1 ..).mpr hg)).trans (rt_rp_rel_l hKP hZ nz pair ..))
   · intro h
-    refine ⟨(rt_rp_map_l hKP hZ nz pair ..).mpr h.map, (rt_smdl_l hKP hZ nz pair ..).mpr h.code, ?_⟩
+    refine ⟨(rt_rp_map_l hKP hZ nz pair ..).mpr h.map, (rt_smdl_l hKP.1 (KP.exists_pair hKP) hZ nz pair ..).mpr h.code, ?_⟩
     intro f g B E hf hg
     exact (rt_entry_l hZ nz hKP.1 B E T).trans
       ((h.relation f.val g.val B.val E.val ((rt_entry_l hZ nz hKP.1 ..).mp hf)

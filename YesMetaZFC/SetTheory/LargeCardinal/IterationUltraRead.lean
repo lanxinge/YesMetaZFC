@@ -17,7 +17,7 @@ private theorem rt_it_comp_l (hKP : M.Models KP) {V : M.Domain} (hv : M.Transiti
     (pair : ∀ a b, M.mem a V → M.mem b V → ∃ p, M.mem p V ∧ Pair_d M p a b)
     (f g j : (rt_model_l V nv).Domain) (h : It_comp_d f g j) : It_comp_d f.val g.val j.val := by
   have ent := rt_entry_l hv nv hKP.1
-  refine ⟨(rt_relation_l hKP hv nv pair j).mp h.1, fun x z => ⟨?_, ?_⟩⟩
+  refine ⟨(rt_relation_l hKP.1 (KP.exists_pair hKP) hv nv pair j).mp h.1, fun x z => ⟨?_, ?_⟩⟩
   · intro hxz
     have xz := rd_entry_transitive_l hv j.property hxz
     obtain ⟨y, hxy, hyz⟩ := (h.2 ⟨x, xz.1⟩ ⟨z, xz.2⟩).mp ((ent ..).mpr hxz)
@@ -38,7 +38,7 @@ private theorem rt_ep_constants_l (hKP : M.Models KP) {V : M.Domain} (hv : M.Tra
     h ⟨x, xe.1⟩ ⟨E, xe.2⟩ ((ent ..).mpr hxE)
   exact ⟨u.val, a.val, B.val, f.val, D.val, hd, ⟨hf, C.val, hc, (rt_fn_l hv nv hKP.1 ..).mp fn⟩,
     fun v hvD => (ent ..).mp (constant ⟨v, hv D.val D.property v hvD⟩ hvD), hfb,
-    (rt_kpair_l hKP hv nv pair ..).mp hp, (ent ..).mp huE⟩
+    (rt_kpair_l hKP.1 (KP.exists_pair hKP) hv nv pair ..).mp hp, (ent ..).mp huE⟩
 
 theorem it_ultra_read_l (hZFC : M.Models ZFC) {ω V X R K' : M.Domain}
     (ambient : Fs_read_d ω V) (nv : Nonempty {x // M.mem x V})
@@ -60,8 +60,8 @@ theorem it_ultra_read_l (hZFC : M.Models ZFC) {ω V X R K' : M.Domain}
     it_comp_sat_l ext, Definitional.Term.eval_weaken, Definitional.Term.eval_newest] at h
   obtain ⟨x, r, y, s, O, P, Z, A, p, T, U, q, b, C, S, i, e,
     hx, hy, system, limit, model, collapse, bij, _, hi, constants, _, comp⟩ := h
-  have hx := (rt_smem_l (ZF.modelsKP hZF) ambient.transitive nv ambient.pair ..).mp hx
-  have hy := (rt_smem_l (ZF.modelsKP hZF) ambient.transitive nv ambient.pair ..).mp hy
+  have hx := (rt_smem_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) ambient.transitive nv ambient.pair ..).mp hx
+  have hy := (rt_smem_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) ambient.transitive nv ambient.pair ..).mp hy
   obtain ⟨eqx, eqr⟩ := smdl_unique_l (kp_pair_l (ZF.modelsKP hZF)) hx.1 mx.1
   have source' : Ep_source_d hZF ω (μ.eval η).val K' x.val r.val := by simpa only [eqx, eqr] using source
   have family' : Em_source_d ω (μ.eval η).val (L.eval η).val x.val (F.eval η).val := by simpa only [eqx] using family
@@ -70,7 +70,7 @@ theorem it_ultra_read_l (hZFC : M.Models ZFC) {ω V X R K' : M.Domain}
   exact it_ultra_of_certificate_l hZFC source' family' coherent' hx hy
     (ambient.system_read_l hZF nv (w.eval η) (μ.eval η) (L.eval η) x r (F.eval η) O P Z A p T U hw system)
     (rt_di_limit_l (ZF.modelsKP hZF) ambient.transitive nv ambient.pair A p T U q C S limit)
-    ((rt_smdl_l (ZF.modelsKP hZF) ambient.transitive nv ambient.pair ..).mp model)
+    ((rt_smdl_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) ambient.transitive nv ambient.pair ..).mp model)
     (rt_wc_graph_l (ZF.modelsKP hZF) ambient.transitive nv ambient.pair C S e collapse)
     ((rt_bijection_l ambient.transitive nv hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) ambient.pair ..).mp bij)
     (fn0_of_function_l (ZF.modelsKP hZF)

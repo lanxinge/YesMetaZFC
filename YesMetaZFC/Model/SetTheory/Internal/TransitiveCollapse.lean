@@ -15,7 +15,7 @@ theorem rt_wc_graph_l (hKP : M.Models KP) {Z : M.Domain} (hZ : M.TransitiveSet Z
     (pair : ∀ a b, M.mem a Z → M.mem b Z → ∃ p, M.mem p Z ∧ Pair_d M p a b)
     (X R F : (rt_model_l Z nz).Domain) (h : Wc_graph_d X R F) : Wc_graph_d X.val R.val F.val := by
   have ent := rt_entry_l hZ nz hKP.1
-  refine ⟨(rt_relation_l hKP hZ nz pair F).mp h.1, fun a x hax => ?_⟩
+  refine ⟨(rt_relation_l hKP.1 (KP.exists_pair hKP) hZ nz pair F).mp h.1, fun a x hax => ?_⟩
   have ax := rd_entry_transitive_l hZ F.property hax
   obtain ⟨ha, total, values⟩ := h.2 ⟨a, ax.1⟩ ⟨x, ax.2⟩ ((ent ..).mpr hax)
   refine ⟨ha, (fun b hb hba => ?_), fun y => ⟨?_, ?_⟩⟩

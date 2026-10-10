@@ -24,7 +24,7 @@ theorem la_full_separation_l {n} (φ : UnarySchema n) (ρ : Env Nₛ n) (X : (N�
   let ψ : Delta0UnarySchema (n+1) := {
     body := lr_rel_m φ.body (.bound 1) e
     freeClosed := lr_rel_closed_l _ φ.freeClosed _ _ rfl (Fin.cases rfl (fun _ => rfl))
-    delta0 := jl_rel_delta_l .. }
+    delta0 := lr_rel_delta_l .. }
   have tr x (hx : (Nₛ).mem x X) : φ.denote ρ x ↔ ψ.toUnarySchema.denote (ρ.push U) x :=
     lr_reflect_core_l φ.body φ.freeClosed hc (ρ.push x) ((ρ.push U).push x) (.bound 1) e
       rfl (Fin.cases rfl (fun _ => rfl)) (Fin.cases (ht X hX x hx) hρ)

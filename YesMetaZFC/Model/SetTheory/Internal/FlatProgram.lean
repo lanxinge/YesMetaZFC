@@ -21,6 +21,18 @@ theorem sfm_node_naturals_l (hZF : M.Models ZF) {ω r c i j : M.Domain} {k : Nat
   · exact ⟨hω.transitive hZF r hr i ha, hω.transitive hZF r hr j hb⟩
   · exact ⟨ha, hω.transitive hZF r hr j hb⟩
 
+/-- 任一合法指令的三项坐标均为自然数，结论与配对约定无关。 -/
+theorem sfm_node_components_l (hZF : M.Models ZF) {ω r c k p i j : M.Domain}
+    (hω : M.IsOmega ω) (hr : M.mem r ω) (h : Sfm_node_d I ω r c)
+    (hc : I.Codes c k p) (hp : I.Codes p i j) : M.mem k ω ∧ M.mem i ω ∧ M.mem j ω := by
+  have read {l a b} (hs : Sop_d I l c a b) : M.mem k ω ∧ M.mem i ω ∧ M.mem j ω := by
+    have ij := sfm_node_naturals_l I hZF hω hr h hs
+    obtain ⟨q, o, ho, hq, ht⟩ := hs
+    obtain ⟨rfl, rfl⟩ := I.injective hc ht
+    obtain ⟨rfl, rfl⟩ := I.injective hp hq
+    exact ⟨num_mem_l hZF.1 hω ho, ij⟩
+  rcases h with ⟨_, _, hs, _, _⟩ | ⟨_, _, hs, _, _⟩ | ⟨_, _, hs, _, _⟩ | ⟨_, _, hs, _, _⟩ <;> exact read hs
+
 variable (hZF : M.Models ZF)
 local notation "K" => fp_interpretation_l (ZF.models_kpi_l hZF)
 
@@ -39,6 +51,14 @@ theorem fp_program_rank_l {ω ν X n F : M.Domain} (hω : M.IsOmega ω)
     exact pair cc (natural o (num_mem_l hZF.1 hω ho)) (pair ca (natural i ij.1) (natural j ij.2))
   apply pair code (natural r hr)
   rcases hF.2.2 r c hc with ⟨_, _, h, _, _⟩ | ⟨_, _, h, _, _⟩ | ⟨_, _, h, _, _⟩ | ⟨_, _, h, _, _⟩ <;> exact op h
+
+/-- 包含 ω 的秩层已经容纳全部平坦程序，不要求该层为极限层。 -/
+theorem fp_program_mem_l {ω μ Y n F : M.Domain} (hω : M.IsOmega ω)
+    (hW : V_d I μ Y) (hωY : M.mem ω Y) (hf : Sfm_d K ω n F) : M.mem F Y := by
+  obtain ⟨W, hw⟩ := ZF.v_exists_l I hZF (hω.isOrdinal hZF)
+  exact ZF.v_subset_mem_l I hZF hW
+    (ZF.v_mem_l I hZF hw hW (ZF.v_ordinal_height_l hZF hW (hω.isOrdinal hZF) hωY))
+    (fp_program_rank_l I hZF hω hw (fun _ h => h) hf)
 
 theorem rt_num_l {Y : M.Domain} (hY : M.TransitiveSet Y) (ny : Nonempty {y // M.mem y Y})
     (hE : Extensional M) (k : Nat) (x : (rt_model_l Y ny).Domain) :

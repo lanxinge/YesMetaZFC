@@ -105,6 +105,26 @@ theorem ZF.v_product_mem_l (hZF : M.Models ZF) {δ V A B P} (hV : V_d I δ V)
   exact v_relation_mem_l I hZF hV hδ hY fun p hp =>
     (hP p).mp hp |>.elim fun a ha => ha.2.elim fun b hb => ⟨a, hAY a ha.1, b, hBY b hb.1, hb.2⟩
 
+/-- Kuratowski 图的定义域不增加秩；无需极限层假设。 -/
+theorem ZF.v_domain_mem_l (hZF : M.Models ZF) {δ V D F} (hV : V_d I δ V)
+    (hF : M.mem F V)
+    (hD : M.IsDomainOf (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) D F) :
+    M.mem D V := by
+  obtain ⟨β, W, hβ, hW, sub⟩ := (v_unfold_l I hZF hV F).mp hF
+  refine (v_unfold_l I hZF hV D).mpr ⟨β, W, hβ, hW, fun x hx => ?_⟩
+  obtain ⟨y, p, code, hp⟩ := (hD x).mp hx
+  exact (code.mem_l M (v_transitive_l I hZF hW) (sub p hp)).1
+
+theorem ZF.v_restriction_mem_l (hZF : M.Models ZF) {δ V D F H} (hV : V_d I δ V)
+    (hF : M.mem F V)
+    (hH : M.IsRestrictionOf (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) H F D) :
+    M.mem H V := by
+  apply v_subset_mem_l I hZF hV hF
+  intro p hp
+  obtain ⟨x, y, code⟩ := hH.1 p hp
+  obtain ⟨q, hq, hqF⟩ := ((hH.2 x y).mp ⟨p, code, hp⟩).2
+  exact kpair_unique_l M hZF.1 hq code ▸ hqF
+
 theorem ZF.v_fseq_mem_l (hZF : M.Models ZF) {δ V ω A J} (hV : V_d I δ V)
     (hδ : M.IsLimitOrdinal δ) (hω : M.IsOmega ω) (hωV : M.mem ω V) (hA : M.mem A V)
     (hJ : Fseq_space_d (kpair_interpretation_l M hZF.1 (KP.exists_pair (ZF.modelsKP hZF))) ω A J) : M.mem J V := by

@@ -3,6 +3,7 @@ import YesMetaZFC.Model.SetTheory.Internal.TypeRank
 import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
+import YesMetaZFC.Model.SetTheory.Internal.FlatTypeRead
 
 /-! # 强扩展器中的完整类型像
 
@@ -71,7 +72,7 @@ def Et_stretch_d (hZF : M.Models ZF) (ω κ L F X R t D v : M.Domain) : Prop :=
     Rd_entry_d t t' i ∧ ∀ p, M.mem p v ↔ M.mem p D ∧ M.mem p t'
 
 /-- 任意内部有限元组都有无界多个 κ；同时给出 V(η+1) 中的完整类型及其 Vη 前驱。
-    前驱对每个 τ<θ 都可由实际强扩展器伸展，保留同一元组及指定常量 θ。 -/
+    单一原公式识别全部前驱候选；每个 τ<θ 的伸展保留同一元组及指定常量 θ。 -/
 theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
     (hd : Woodin_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) θ)
     (hη : M.IsOrdinal η) (hθη : M.mem θ η) :
@@ -83,6 +84,12 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
       ∃ κ B U D t u, M.mem α κ ∧ M.mem κ θ ∧ V_d I κ B ∧
         (∀ x, M.mem x U ↔ M.mem x B ∨ x = κ) ∧ Tt_realized_d I ω c Z Q n s θ U D t ∧
         Tt_realized_d I ω d W S n s θ U D u ∧ Tm_minus_d I ω D u t ∧
+        (∃ h, M.IsSetFunctionFromTo (fp_interpretation_l (ZF.models_kpi_l hZF)) h n Z ∧
+          Sx_graph_d I (fp_interpretation_l (ZF.models_kpi_l hZF)) s h ∧ ∀ v,
+            (Formula.satisfies (⟨Fin.cases v (Fin.cases D (Fin.cases h (Fin.cases n
+              (Fin.cases θ (Fin.cases ω (fun _ => W)))))), fun _ => h⟩ : Env M 7)
+                (tf_type_local_m (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest) ↔
+              Tm_minus_d I ω D u v)) ∧
         ∀ τ, M.mem τ θ → ∃ L K F R V B₀ U₀ D₀ v,
           M.mem L θ ∧ M.mem κ L ∧ M.mem τ L ∧ M.mem ω L ∧
           M.IsRegularCardinal I L ∧ M.IsStrongLimitCardinal I L ∧ V_d I L V ∧
@@ -130,7 +137,17 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
   subst c' Q'
   have et := hZF.1.eq_of_same_members t' t (fun p => (realized.truth p).trans (type p).symm)
   subst t'
-  refine ⟨κ, B, U, D, t, u, above, hκ, hB, constants, lower, lifted, minus, fun τ hτ => ?_⟩
+  -- 同一公式识别全部候选；唯一性把低层完整类型与原语法前驱算子精确接合。
+  obtain ⟨h, hh, graph, formula⟩ := tt_predecessor_formula_l hZF hω hZ hW hμ hX hθ hωθ
+    code hn hs hθZ lower.constants pool hUX
+  have read v := (formula v).trans (show Tt_truth_d I ω c n s θ D v ↔ Tm_minus_d I ω D u v from by
+    constructor
+    · intro truth
+      have eq := hZF.1.eq_of_same_members v t (fun p => (truth p).trans (type p).symm)
+      exact eq.symm ▸ minus
+    · intro hv
+      exact (hv.unique_l I hZF.1 minus).symm ▸ type)
+  refine ⟨κ, B, U, D, t, u, above, hκ, hB, constants, lower, lifted, minus, ⟨h, hh, graph, read⟩, fun τ hτ => ?_⟩
   obtain ⟨L, K, F, R, V, Y, j, hL, hκL, hτL, hωL, rL, sL, hV, short, source, strong⟩ := family τ hτ
   have hVX := ZF.v_mono_l I hZF hV hX (hθ.1.transitive L hL)
   obtain ⟨b, d, N, S, i, κ', D', t₀, t', hm, hm', ultra, crit, bound, cover, hDD, htt, type₀, image⟩ :=

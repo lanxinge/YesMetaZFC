@@ -7,21 +7,6 @@ import YesMetaZFC.SetTheory.Definitional.Project.Hierarchy.Substitution
 namespace YesMetaZFC.SetTheory
 open Definitional.Project
 
-theorem lr_rel_delta_l {n d} (φ : Formula 1 n) (X : Term d) (e : Fin n → Term d) :
-    (lr_rel_m φ X e).IsDelta0 := by
-  induction φ generalizing d with
-  | falsum => exact .falsum
-  | truth => exact .truth
-  | mem _ _ => exact .mem _ _
-  | atom _ _ _ => exact .atom _ _ _
-  | neg _ ih => exact .neg (ih X e)
-  | conj _ _ ih jh => exact .conj (ih X e) (jh X e)
-  | disj _ _ ih jh => exact .disj (ih X e) (jh X e)
-  | imp _ _ ih jh => exact .imp (ih X e) (jh X e)
-  | iff _ _ ih jh => exact .iff (ih X e) (jh X e)
-  | existsE _ ih => exact .existsMem _ (ih _ _)
-  | forallE _ ih => exact .forallMem _ (ih _ _)
-
 def lr_truth_s (φ : UnarySchema 1) : BinarySchema 1 where
   body := lr_rel_m φ.body (.bound 2) (Fin.cases .newest (fun _ => .bound 1))
   freeClosed := lr_rel_closed_l φ.body φ.freeClosed _ _ rfl (Fin.cases rfl (fun _ => rfl))
