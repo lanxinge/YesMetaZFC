@@ -4,6 +4,7 @@ import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
 import YesMetaZFC.Model.SetTheory.Internal.FlatTypeRead
+import YesMetaZFC.SetTheory.LargeCardinal.TypeStretchFormula
 
 /-! # 强扩展器中的完整类型像
 
@@ -65,14 +66,8 @@ theorem Ep_strong_limit_d.type_image_l (hZF : M.Models ZF)
     ⟨fun hh => hh.elim (fun ha => ((truth p).mp ha).2) (fun eq => (no_ordinal' p hD' (eq ▸ hα)).elim),
       fun hq => Or.inl ((truth p).mpr ⟨hVX p hp, hq⟩)⟩))
 
-/-- 由同一实际 E-超幂计算的像类型，再按给定查询域投影。 -/
-def Et_stretch_d (hZF : M.Models ZF) (ω κ L F X R t D v : M.Domain) : Prop :=
-  let I := kp_pair_l (ZF.modelsKP hZF)
-  ∃ b d N S i t', Smem_d I b X R ∧ Smem_d I d N S ∧ It_ultra_d hZF ω κ L F b d i ∧
-    Rd_entry_d t t' i ∧ ∀ p, M.mem p v ↔ M.mem p D ∧ M.mem p t'
-
 /-- 任意内部有限元组都有无界多个 κ；同时给出 V(η+1) 中的完整类型及其 Vη 前驱。
-    单一原公式识别全部前驱候选；每个 τ<θ 的伸展保留同一元组及指定常量 θ。 -/
+    原公式识别全部前驱及伸展候选；每个 τ<θ 的伸展保留同一元组及指定常量 θ。 -/
 theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
     (hd : Woodin_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) θ)
     (hη : M.IsOrdinal η) (hθη : M.mem θ η) :
@@ -96,7 +91,11 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
           Ex_short_d hZF ω κ L F ∧ Ep_source_d hZF ω κ K X R ∧ Ex_strength_d hZF ω κ L X F ∧
           Sc_inaccessible_d ω X L ∧ It_local_d ω X κ L F ∧ V_d I τ B₀ ∧
           (∀ x, M.mem x U₀ ↔ M.mem x B₀ ∨ x = τ) ∧
-          Tt_realized_d I ω c Z Q n s θ U₀ D₀ v ∧ Et_stretch_d hZF ω κ L F X R t D₀ v := by
+          Tt_realized_d I ω c Z Q n s θ U₀ D₀ v ∧ Et_stretch_d hZF ω κ L F X R t D₀ v ∧
+          ∀ z, Formula.satisfies (⟨Fin.cases z (Fin.cases D₀ (Fin.cases t (Fin.cases F
+            (Fin.cases X (Fin.cases L (Fin.cases κ (fun _ => ω))))))), fun _ => t⟩ : Env M 8)
+              (et_stretch_m (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest) ↔
+            Et_stretch_d hZF ω κ L F X R t D₀ z := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨ω, X, hω, hX, all⟩ := woodin_marked_strength_l hZFC hd
@@ -170,10 +169,25 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
   have projection p : M.mem p v ↔ M.mem p D₀ ∧ M.mem p t' := (type₀ p).trans
     ⟨fun hh => ⟨hh.1, (image p (vt D₀ hD₀V p hh.1)).mpr ⟨domain_cover p hh.1, hh.2⟩⟩,
       fun hh => ⟨hh.1, ((image p (vt D₀ hD₀V p hh.1)).mp hh.2).2⟩⟩
-  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, strength, _, inaccessible, locality⟩ := strong
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, strength, level, inaccessible, locality⟩ := strong
+  -- 原 κ 型低于不可达支撑层；同一有界矩阵因此识别全部候选伸展。
+  obtain ⟨B₁, U₁, hB₁, hU₁, constants₁⟩ := tt_constants_exists_l hZF hV rL.isLimitOrdinal hκL
+  have eqB := ZF.v_unique_l I hZF hB₁ hB
+  subst B₁
+  have eqU := hZF.1.eq_of_same_members U₁ U (fun x => (constants₁ x).trans (constants x).symm)
+  have hUV : M.mem U V := eqU ▸ hU₁
+  have hDV := pool.rank_mem_l hZF hω hV rL.isLimitOrdinal (ZF.v_ordinal_mem_l I hZF hV hωL) hn hUV
+  have htV := ZF.v_subset_mem_l I hZF hV hDV (fun p hp => ((type p).mp hp).1)
+  let ξ (z : M.Domain) : Env M 8 := ⟨Fin.cases z (Fin.cases D₀ (Fin.cases t (Fin.cases F
+    (Fin.cases X (Fin.cases L (Fin.cases κ (fun _ => ω))))))), fun _ => t⟩
+  have read (z : M.Domain) := et_stretch_sat_l hZF (ξ z)
+    (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest
+    source (sc_v_power_l hZF hθ hX) (short.measures.source_l hZF X) hm hm' ultra
+    (ZF.v_ordinal_mem_l I hZF hX hL) strength.2.2.2.1 rL.isLimitOrdinal level
+    (ZF.v_ordinal_mem_l I hZF hV hκL) htV
   exact ⟨L, K, F, R, V, B₀, U₀, D₀, v, hL, hκL, hτL, hωL, rL, sL, hV, short, source, strength,
     inaccessible, locality, hB₀, constants₀,
     ⟨code.1, hn, hs, hθZ, fun x hx => hXZ x (hVX x (vt U₀ hU₀V x hx)), pool₀, type₀⟩,
-    b, d, N, S, i, t', hm, hm', ultra, htt, projection⟩
+    ⟨b, d, N, S, i, t', hm, hm', ultra, htt, projection⟩, read⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

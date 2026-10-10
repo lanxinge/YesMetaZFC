@@ -117,7 +117,7 @@ theorem Ex_strength_d.realize_l (hZF : M.Models ZF) {ω κ K L X R F c d N S j �
     intro x hx y hy
     have hyκ := ((power x).mp hx).2 y hy
     exact (power y).mpr ⟨source.transitive κ source.cardinal_mem y hyκ, hκ y hyκ⟩
-  have hPY := collapse.image_l hZF source family hm hn ultra hP trans
+  have hPY := (collapse.image_l hZF source family hm hn ultra hP trans).1
   have hj := ultra.elementary_l hZF hm.1 hn.1
   have hN := ultra.transitive_l hZF hn.1
   have target := hj.power_l hZF source.omega source.transitive hN hm hn hκj hPY power

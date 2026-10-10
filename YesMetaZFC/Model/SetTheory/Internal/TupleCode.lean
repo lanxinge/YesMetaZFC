@@ -98,4 +98,51 @@ theorem st_tuple_build_l {ω w v b n : M.Domain} (hω : M.IsOmega ω) (hb : M.me
     exact ⟨q, f₁, hq, update, (read q hq f₁ update g₁ hg₁ fg₁).mpr
       ⟨(lift cg).transport_l K hZF hω (widen hg) hg₁ trace agree, ht, g, hg, cg, cut⟩⟩
 
+/-- 任意固定原公式都可在内部元组上求值；编译结果只绑定实际元组图。 -/
+theorem st_tuple_bind_l {ω w v b n : M.Domain} (hω : M.IsOmega ω) (hb : M.mem b ω)
+    (hw : M.mem w b) (hv : M.mem v b) (hn : M.mem n ω) (hnb : M.MemberSubset n b)
+    {k : Nat} (φ : Formula 1 (k+1)) (hφ : φ.FreeClosed) (σ : Fin k → M.Domain) (hσ : ∀ i, M.mem (σ i) b) :
+    ∃ a m G u, Sformula_d Q ω a m G u ∧ ∀ ν μ X Y c R f (hm : Smem_d Q c Y R)
+      (ρ : Env (smdl_structure_l Q (R := R) hm.1.2.1) k),
+      V_d Q ν X → V_d Q μ Y → M.SuccessorOf μ ν → M.mem ω Y → M.IsSetFunctionFromTo Q f ω Y →
+      M.PairMember Q w ω f → M.PairMember Q v n f → (∀ i, M.PairMember Q (σ i) (ρ.bound i).val f) →
+        (Satisfies_d Q ω c a f ↔ ∃ h : (smdl_structure_l Q (R := R) hm.1.2.1).Domain,
+          M.IsSetFunctionFromTo K h.val n X ∧
+            (∀ i x, M.mem i n → (M.PairMember K i x h.val ↔ M.PairMember Q i x f)) ∧ Formula.satisfies (ρ.push h) φ) := by
+  obtain ⟨a₀, m₀, G₀, u₀, form₀, tuple⟩ := st_tuple_build_l hZF hω hb hw hv hn hnb
+  obtain ⟨j, hj, hjω⟩ := hω.1.2 b hb
+  obtain ⟨m₁, G₁, u₁, add, compile⟩ := source_compile_core_l Q hZF hω (source_core_l φ)
+    (source_core_closed_l φ hφ) (Fin.cases b σ) hjω
+    (Fin.cases hj.predecessor_mem (fun i => (hj (σ i)).mpr (Or.inl (hσ i)))) form₀.2.1
+  obtain ⟨m₂, G₂, u₂, a₂, both⟩ := sfm_and_l Q hZF hω add.program (add.span u₀ form₀.2.2) add.root
+  obtain ⟨m, G, u, a₃, ex⟩ := sfm_ex_l Q hZF hω a₂.program hb a₂.root
+  obtain ⟨a, ha⟩ := (Q).total G u
+  have form : Sformula_d Q ω a m G u := ⟨ha, a₃.program, a₃.root⟩
+  refine ⟨a, m, G, u, form, fun ν μ X Y c R f hm ρ hV hW hs hωY fn fw fv values => ?_⟩
+  obtain ⟨E, hE⟩ := ZF.exists_functionSpace hZF Q ω Y
+  have hf := (hE f).mpr fn
+  have body (h : (smdl_structure_l Q (R := R) hm.1.2.1).Domain) f₁ (update : Senv_update_d Q f b h.val f₁) :
+      Ssat_d Q Y R E G₂ m₂ u₂ f₁ ↔ M.IsSetFunctionFromTo K h.val n X ∧
+        (∀ i x, M.mem i n → (M.PairMember K i x h.val ↔ M.PairMember Q i x f)) ∧ Formula.satisfies (ρ.push h) φ := by
+    have fn₁ := update.function_l Q fn hb h.property
+    have hf₁ := (hE f₁).mpr fn₁
+    have old := update.agree_l Q (KP.mem_irrefl_d (ZF.modelsKP hZF) b)
+    have fh := (update.2 b h.val).mpr (Or.inl ⟨rfl, rfl⟩)
+    have tuples := (add.sat_l Q hZF form₀.2.1 form₀.2.2 Y R E f₁).symm.trans
+      ((satisfies_decode_l Q hZF.1 hm.1 form₀ hE).symm.trans
+        (tuple ν μ X Y c R f₁ h.val hV hW hs hωY hm fn₁ ((old w ω hw).mp fw) ((old v n hv).mp fv) fh))
+    have atom := (compile Y R hm.1.2.1 E hE f₁ hf₁ (ρ.push h)
+      (Fin.cases fh (fun i => (old (σ i) (ρ.bound i).val (hσ i)).mp (values i)))).trans (source_core_sat_l φ (ρ.push h))
+    refine (both Y R E f₁ hf₁).trans ((and_congr tuples atom).trans ⟨?_, ?_⟩)
+    · rintro ⟨⟨fn, same⟩, truth⟩
+      exact ⟨fn, fun i x hi => (same i x hi).trans (old i x (hnb i hi)).symm, truth⟩
+    · rintro ⟨fn, same, truth⟩
+      exact ⟨⟨fn, fun i x hi => (same i x hi).trans (old i x (hnb i hi))⟩, truth⟩
+  refine (satisfies_decode_l Q hZF.1 hm.1 form hE).trans ((ex Y R E f hf).trans ⟨?_, ?_⟩)
+  · rintro ⟨h, f₁, hh, update, truth⟩
+    exact ⟨⟨h, hh⟩, (body ⟨h, hh⟩ f₁ update).mp truth⟩
+  · rintro ⟨h, truth⟩
+    obtain ⟨f₁, update, _⟩ := senv_update_exists_l Q hZF fn hb h.property
+    exact ⟨h.val, f₁, h.property, update, (body h f₁ update).mpr truth⟩
+
 end YesMetaZFC.SetTheory.Internal

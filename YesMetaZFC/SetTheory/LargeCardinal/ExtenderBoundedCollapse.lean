@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedEvaluation
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedConst
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRankClosure
 import YesMetaZFC.SetTheory.LargeCardinal.RelativeRankSegment
 import YesMetaZFC.SetTheory.LargeCardinal.IterationStep
@@ -106,12 +106,12 @@ theorem it_ultra_owned_image_l {ω κ K L X R F c d j N S V B B' : M.Domain}
       ⟨u, (graph.2 u v ⟨p, hv, hp⟩).1, v, (graph.2 u v ⟨p, hv, hp⟩).2, hv⟩,
     qs, map, member⟩
 
-/-- 已有的源内塌缩证书在任意指定实际超幂中恢复同一个集合像。 -/
+/-- 同一有界塌缩既恢复容器的像，也逐点恢复容器中每个集合的常值像。 -/
 theorem Eb_collapse_d.image_l {ω κ K L X R F c d j N S B A Q Y e : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
     (hm : Smem_d I c X R) (hn : Smem_d I d N S) (ultra : It_ultra_d hZF ω κ L F c d j)
     (hB : M.mem B X) (trans : M.TransitiveSet B) (collapse : Eb_collapse_d ω κ L K X B F A Q Y e) :
-    Rd_entry_d B Y j := by
+    Rd_entry_d B Y j ∧ ∀ x y, M.mem x B → (Eb_const_d X B A e x y ↔ Rd_entry_d x y j) := by
   have hN := ultra.transitive_l hZF hn.1
   obtain ⟨X₀, R₀, N₀, S₀, J, O, Z, D, p, T, U, q, b, C, W, i, g,
     mx, nx, system, limit, _, wc, bij, _, _, constants, hj, js⟩ := ultra
@@ -133,8 +133,34 @@ theorem Eb_collapse_d.image_l {ω κ K L X R F c d j N S B A Q Y e : M.Domain}
   obtain ⟨H, hBH, hHB⟩ := (js.2 B B').mp hBB
   obtain ⟨u, a, E, f, D₀, _, sf, fc, hfE, pair, huH⟩ := constants B H hBH
   have fv : Ep_repr_d q a f H := ⟨u, E, pair, hfE, huH⟩
-  obtain ⟨t, evaluation, _⟩ := pool.evaluation_l hZF source family system limit hB range relation edges wc bij
+  obtain ⟨t, evaluation, values, _⟩ := pool.evaluation_l hZF source family system limit hB range relation edges wc bij
     (sf.function_l source.transitive) fc fv hHB (tr.mp trans)
-  exact (map.unique_l hZF evaluation).symm ▸ hBB
+  have values : ∀ u x, Rd_entry_d u x e ↔ M.mem u A ∧ ∃ E, Eb_value_d q u E ∧ Rd_entry_d E x g :=
+    (map.graph_unique_l hZF evaluation).symm ▸ values
+  refine ⟨(map.unique_l hZF evaluation).symm ▸ hBB, fun x y hx => ⟨?_, ?_⟩⟩
+  · rintro ⟨u, _, a, _, f, _, D₁, _, pair, ff, constant, hux⟩
+    obtain ⟨_, E, ⟨a', f', pair', ev⟩, hEy⟩ := (values u y).mp hux
+    obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair' pair
+    obtain ⟨y', _, hxy⟩ := hj.1.1.2.2 x (source.transitive B hB x hx)
+    obtain ⟨H', hxH, hHy⟩ := (js.2 x y').mp hxy
+    obtain ⟨u', a', B₀, f', D₂, _, sf', constant', hfB, pair', huH'⟩ := constants x H' hxH
+    have eq := ep_repr_constant_l hZF source family system limit
+      (ff.mono_target_l (source.transitive B hB)) (sf'.function_l source.transitive)
+      constant constant' ev ⟨u', B₀, pair', hfB, huH'⟩
+    exact (bij.1.1.1.2 E y y' hEy (eq.symm ▸ hHy)).symm ▸ hxy
+  · intro hxy
+    obtain ⟨H', hxH, hHy⟩ := (js.2 x y).mp hxy
+    obtain ⟨u', a', B₀, f', D₁, _, sf', constant, hfB, pair', huH'⟩ := constants x H' hxH
+    have ev : Ep_repr_d q a' f' H' := ⟨u', B₀, pair', hfB, huH'⟩
+    obtain ⟨hfX, n, hnω, ha, D₂, space, ff⟩ := ev.source_l hZF family system limit
+    have eq := ff.domain_eq_l hZF.1 (sf'.function_l source.transitive)
+    subst D₂
+    have fb : Fn0_d D₁ B f' := ff.retarget_l fun i z hiz =>
+      (fn0_function_l (ZF.modelsKP hZF) ff).1.2 i z x hiz (constant i (ff.bound_l hiz).1) ▸ hx
+    obtain ⟨v, pair⟩ := (I).total a' f'
+    have haJ := ev.index_l hZF system limit
+    have hv := pool.node_l hZF source hnω haJ ha space hfX fb pair
+    exact ⟨v, hv, a', source.transitive J pool.indices a' haJ, f', hfX, D₁,
+      source.space_mem_l hZF hnω space, pair, fb, constant, (values v y).mpr ⟨hv, H', ⟨a', f', pair, ev⟩, hHy⟩⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal
