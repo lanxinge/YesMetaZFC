@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameControl
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameResetControl
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameControlAnswer
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameControlDigit
+import YesMetaZFC.SetTheory.Descriptive.GameAttemptRank
 
 /-! # 原策略自动产生下一辅助走法
 
@@ -161,7 +162,8 @@ def tg_control0_m : Formula 1 19 :=
     (.conj (tg_rules_m p (v 12) (v 13) (v 14) (v 16))
       (.conj (tg_aux_control_m p (v 12) (v 17) (v 18))
         (.conj (tg_reset_control_m p) (.conj (tg_start_control_m p (v 12) (v 17) (v 18))
-          (.conj (tg_answer_control_m p (v 12) (v 18)) (tg_digit_control_m p (v 12) (v 17) (v 18))))))))
+          (.conj (tg_answer_control_m p (v 12) (v 18))
+            (.conj (tg_digit_control_m p (v 12) (v 17) (v 18)) (cg_rank_m p.ω (v 12) (v 18)))))))))
 
 theorem tg_control0_closed_l : tg_control0_m.FreeClosed := by
   simp -implicitDefEqProofs [tg_control0_m, tg_control_params_d, Definitional.Formula.FreeClosed]
@@ -192,6 +194,11 @@ theorem Tg_game_d.control_l (hZFC : M.Models ZFC)
     [p.ω, p.e, p.a, p.b, p.c, p.δ, p.A, p.S, p.ν, p.E, p.P, p.Q, X, F, L, G, J, σ, R].get i
   let ρ : Env M 19 := ⟨v, fun _ => p.ω⟩
   obtain ⟨r, tuple⟩ := rt_tuple_exists_l (ZF.modelsKP hZF) v
+  obtain ⟨α, H, rank⟩ := control.rank_l hZF game.setup.omega (ZFC.dc_l I hZFC game.setup.omega)
+    game.runs game.payoff win
+  have ranked : Formula.satisfies ρ (cg_rank_m (.bound 0) (.bound 12) (.bound 18)) := by
+    simp only [cg_rank_m, Formula.satisfies_exists_iff]
+    exact ⟨α, H, (cg_rank0_sat_l (ZF.modelsKP hZF) ..).mpr rank⟩
   have valid : Formula.satisfies ρ tg_control0_m := by
     apply (Formula.satisfies_conj_iff ..).mpr
     refine ⟨game.setup.tables_l hZFC ρ (.bound 0) (.bound 1) (.bound 5) (.bound 9) (.bound 10) (.bound 11)
@@ -209,7 +216,9 @@ theorem Tg_game_d.control_l (hZFC : M.Models ZFC)
               ⟨tg_start_control_l hZFC ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) _ _ game.setup rules control,
                 (Formula.satisfies_conj_iff ..).mpr
                   ⟨tg_answer_control_l hZFC ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) (.bound 17) _ game.setup rules control,
-                    tg_digit_control_l hZF ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) _ _ rules control⟩⟩⟩⟩⟩
+                    (Formula.satisfies_conj_iff ..).mpr
+                      ⟨tg_digit_control_l hZF ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) _ _ rules control,
+                        ranked⟩⟩⟩⟩⟩⟩
   exact ⟨R, r, tuple, valid, (rt_record_sat_l hZF.1 _ _ _ tg_control0_closed_l).mpr ⟨v, tuple, valid⟩⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

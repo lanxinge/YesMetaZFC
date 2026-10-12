@@ -21,7 +21,11 @@ def Tg_aux_d (p : Tg_params_d M.Domain) (n h v : M.Domain) : Prop :=
     ((t = p.e ∧ Tg_reset_d hZF p.ω p.e p.δ p.S p.ν l N U D u) ∨
       (t ≠ p.e ∧ Tg_continue_d hZF p.ω p.e p.a p.c p.δ n h ℓ t κ k N U D u))
 
-def tg_aux_m {d} (p : Tg_params_d (Term d)) (n h v : Term d) : Formula 1 d := set[d] ⟪
+def tg_aux0_m : Formula 1 15 :=
+  let p : Tg_params_d (Term 15) := ⟨.bound 0, .bound 1, .bound 2, .bound 3, .bound 4, .bound 5,
+    .bound 6, .bound 7, .bound 8, .bound 9, .bound 10, .bound 11⟩
+  let n : Term 15 := .bound 12; let h : Term 15 := .bound 13; let v : Term 15 := .bound 14
+  set[15] ⟪
   ∃ ℓ t κ u k l N x s B U D r m b q f C V W g₀ g₁ g₂ g₃,
   ⌜tg_aux_data_m⌝ₚ(⌜v⌝ₛ, ℓ, t, κ, u) ∧ κ ∈ ⌜p.δ⌝ₛ ∧ ⌜fn0_m⌝ₚ(k, ⌜p.ω⌝ₛ, t) ∧
   ⌜Formula.isSuccessor⌝ₚ(l, k) ∧ ⌜Formula.isSuccessor⌝ₚ(N, l) ∧
@@ -34,15 +38,23 @@ def tg_aux_m {d} (p : Tg_params_d (Term d)) (n h v : Term d) : Formula 1 d := se
     (¬ (t = ⌜p.e⌝ₛ) ∧ ⌜tg_continue_m⌝ₚ(⌜p.ω⌝ₛ, ⌜p.e⌝ₛ, ⌜p.a⌝ₛ, ⌜p.c⌝ₛ, ⌜p.δ⌝ₛ,
       ⌜n⌝ₛ, ⌜h⌝ₛ, ℓ, t, κ, k, N, U, D, u)))⟫
 
+theorem tg_aux0_closed_l : tg_aux0_m.FreeClosed := by
+  simp -implicitDefEqProofs [tg_aux0_m, Definitional.Formula.FreeClosed]
+
+def tg_aux_m {d} (p : Tg_params_d (Term d)) (n h v : Term d) : Formula 1 d :=
+  tg_aux0_m.bind (fun i => [p.ω, p.e, p.a, p.b, p.c, p.δ, p.A, p.S, p.ν, p.E, p.P, p.Q, n, h, v].get i)
+
 @[simp] theorem tg_aux_closed_l {d} (p : Tg_params_d (Term d)) (n h v : Term d)
     (hp : p.closed_l) (hn : n.freeSupport = []) (hh : h.freeSupport = []) (hv : v.freeSupport = []) :
     (tg_aux_m p n h v).FreeClosed := by
-  rcases hp with ⟨hω, he, ha, hb, hc, hδ, hA, hS, hν, hE, _, hQ⟩
-  simp -implicitDefEqProofs [tg_aux_m, Definitional.Formula.FreeClosed, hω, he, ha, hb, hc, hδ, hA, hS, hν, hE, hQ, hn, hh, hv]
+  apply (Definitional.Formula.freeClosed_bind_iff_of_closed _ ?_ _).mpr tg_aux0_closed_l
+  rcases hp with ⟨hω, he, ha, hb, hc, hδ, hA, hS, hν, hE, hP, hQ⟩
+  simp only [Fin.forall_fin_succ]
+  exact ⟨hω, he, ha, hb, hc, hδ, hA, hS, hν, hE, hP, hQ, hn, hh, hv, fun i => Fin.elim0 i⟩
 
 theorem tg_aux_sat_l {d} (ρ : Env M d) (p : Tg_params_d (Term d)) (n h v : Term d) :
     Formula.satisfies ρ (tg_aux_m p n h v) ↔ Tg_aux_d hZF (p.map_l (fun t => t.eval ρ)) (n.eval ρ) (h.eval ρ) (v.eval ρ) := by
-  simp only [tg_aux_m, Tg_aux_d, Tg_params_d.map_l, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
+  simp only [tg_aux_m, Formula.satisfies_bind, tg_aux0_m, Tg_aux_d, Tg_params_d.map_l, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     tg_aux_data_sat_l hZF.1, Formula.satisfies_mem_iff, fn0_sat_l hZF.1, Formula.satisfies_isSuccessor_iff,
     tg_digits_sat_l hZF, Formula.satisfies_isRestriction_iff I, tg_query_request_sat_l hZF,
     tg_query_data_sat_l hZF.1, Formula.satisfies_subset_iff, tg_ee_data_sat_l hZF.1, tg_elastic_sat_l I hZF.1,

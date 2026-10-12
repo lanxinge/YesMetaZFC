@@ -6,7 +6,8 @@ import YesMetaZFC.SetTheory.DependentChoice
 /-! # 内部逐项延拓的分支
 
 在实际后继函数图上沿内部 ω 迭代，再取前缀图的并。长度归纳使用原公式，
-递增性复用内部关系链；不把非标准长度转成外部递归，也不使用依赖选择。
+递增性复用内部关系链；不把非标准长度转成外部递归。取并本身无需选择，
+既可消费实际后继函数的迭代，也可消费依赖选择已经给出的内部链。
 -/
 namespace YesMetaZFC.SetTheory.Descriptive
 open Definitional.Project
@@ -48,14 +49,15 @@ theorem ds_append_sub_l (hE : Extensional M) {ω s t n X f a}
   obtain ⟨q, hq, hqf⟩ := hfx
   exact (I.unique hc hq).symm ▸ hqf
 
-/-- 从空列出发的内部后继函数实际产生一条贯穿全部阶段的分支。 -/
-theorem ds_path_l (hZF : M.Models ZF) {ω X T F e} (hω : M.IsOmega ω)
+/-- 从空列出发的内部逐项延长链取并，得到贯穿全部内部长度的分支。 -/
+theorem ds_path_run_l (hZF : M.Models ZF) {ω X T H e} (hω : M.IsOmega ω)
     (hT : ∀ s, M.mem s T → ∃ n, M.mem n ω ∧ M.IsSetFunctionFromTo I s n X)
-    (hF : M.IsSetFunctionFromTo I F T T) (he : ∀ x, ¬ M.mem x e) (het : M.mem e T)
-    (hstep : ∀ s t, M.PairMember I s t F → Step_d I ω s t) :
+    (hH : M.IsSetFunctionFromTo I H ω T) (he : ∀ x, ¬ M.mem x e)
+    (hz : ∀ o, (∀ x, ¬ M.mem x o) → M.PairMember I o e H)
+    (hnext : ∀ i j s t, M.SuccessorOf j i → M.PairMember I i s H →
+      M.PairMember I j t H → Step_d I ω s t) :
     ∃ f, M.IsSetFunctionFromTo I f ω X ∧ ∀ n, M.mem n ω →
       ∃ s, M.mem s T ∧ M.IsSetFunctionFromTo I s n X ∧ M.MemberSubset s f := by
-  obtain ⟨H, hH, hz, hnext⟩ := ZFC.iterate_l I hZF hω hF het
   have len : ∀ n, M.mem n ω → ∀ s, M.PairMember I n s H → M.IsSetFunctionFromTo I s n X := by
     let ρ : Env M 2 := (⟨fun _ => X, fun _ => X⟩ : Env M 1).push H
     let φ : UnarySchema 2 := { body := .forallE (.imp
@@ -74,7 +76,7 @@ theorem ds_path_l (hZF : M.Models ZF) {ω X T F e} (hω : M.IsOmega ω)
       exact ds_empty_fun_l I he
     · intro n hn ih j hj t ht
       obtain ⟨s, _, hs⟩ := hH.2.2 n hn
-      obtain ⟨a, k, m, h⟩ := hstep s t (hnext n j s t hj hs ht)
+      obtain ⟨a, k, m, h⟩ := hnext n j s t hj hs ht
       have em := h.prefix_sequence.2.2.2.eq hZF.1 (ih s hs).2.1
       subst m
       have ek := Structure.SuccessorOf.eq hZF.1 h.length_successor hj
@@ -83,7 +85,7 @@ theorem ds_path_l (hZF : M.Models ZF) {ω X T F e} (hω : M.IsOmega ω)
       have er := hr.2.1.eq hZF.1 h.source.2.2.2
       exact er ▸ hr
   have inc := ZF.cc_increasing_of_successor_l I hZF hω hH (fun i j s t hij hs ht => by
-    obtain ⟨a, n, m, h⟩ := hstep s t (hnext i j s t hij hs ht)
+    obtain ⟨a, n, m, h⟩ := hnext i j s t hij hs ht
     have em := h.prefix_sequence.2.2.2.eq hZF.1 (len i (hH.input_mem_of_pairMember hs) s hs).2.1
     subst m
     exact (ds_restrict_iff_l I (len i (hH.input_mem_of_pairMember hs) s hs)
@@ -129,6 +131,16 @@ theorem ds_path_l (hZF : M.Models ZF) {ω X T F e} (hω : M.IsOmega ω)
     obtain ⟨n, s, hs, hx⟩ := (pair i x).mp hx
     have hn := hH.input_mem_of_pairMember hs
     exact hω.transitive hZF n hn i ((len n hn s hs).input_mem_of_pairMember hx)
+
+/-- 给定实际后继函数时，用 ZF 内部迭代构造上述链。 -/
+theorem ds_path_l (hZF : M.Models ZF) {ω X T F e} (hω : M.IsOmega ω)
+    (hT : ∀ s, M.mem s T → ∃ n, M.mem n ω ∧ M.IsSetFunctionFromTo I s n X)
+    (hF : M.IsSetFunctionFromTo I F T T) (he : ∀ x, ¬ M.mem x e) (het : M.mem e T)
+    (hstep : ∀ s t, M.PairMember I s t F → Step_d I ω s t) :
+    ∃ f, M.IsSetFunctionFromTo I f ω X ∧ ∀ n, M.mem n ω →
+      ∃ s, M.mem s T ∧ M.IsSetFunctionFromTo I s n X ∧ M.MemberSubset s f := by
+  obtain ⟨H, hH, hz, hnext⟩ := ZFC.iterate_l I hZF hω hF het
+  exact ds_path_run_l I hZF hω hT hH he hz (fun i j s t hj hs ht => hstep s t (hnext i j s t hj hs ht))
 
 /-- 二分后继优先取第一项；这在 ZF 内给出实际选择图，不使用 DC。 -/
 theorem ds_binary_path_l (hZF : M.Models ZF) {ω X T e a b} (hω : M.IsOmega ω)

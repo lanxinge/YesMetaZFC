@@ -55,7 +55,13 @@ def Tg_continue_d (ω e a c δ n h ℓ t κ k N U D u : M.Domain) : Prop :=
     M.IsLimitOrdinal τ ∧ V_d I τ B ∧ (∀ x, M.mem x V ↔ M.mem x B ∨ x = τ) ∧ Tt_pool_d I ω m V W ∧
     Tx_exceeds_d hZF ω δ τ m V W T κ N U D u
 
-def tg_continue_m {d} (ω e a c δ n h ℓ t κ k N U D u : Term d) : Formula 1 d := set[d] ⟪⌜ℓ⌝ₛ ∈ ⌜n⌝ₛ ∧
+def tg_continue0_m : Formula 1 15 :=
+  let ω : Term 15 := .bound 0; let e : Term 15 := .bound 1; let a : Term 15 := .bound 2
+  let c : Term 15 := .bound 3; let δ : Term 15 := .bound 4; let n : Term 15 := .bound 5
+  let h : Term 15 := .bound 6; let ℓ : Term 15 := .bound 7; let t : Term 15 := .bound 8
+  let κ : Term 15 := .bound 9; let k : Term 15 := .bound 10; let N : Term 15 := .bound 11
+  let U : Term 15 := .bound 12; let D : Term 15 := .bound 13; let u : Term 15 := .bound 14
+  set[15] ⟪⌜ℓ⌝ₛ ∈ ⌜n⌝ₛ ∧
   (∃ v w ℓ₀ t₀ κ₀ u₀ τ T j l m B V W,
     ⌜tg_event_m⌝ₚ(⌜c⌝ₛ, ⌜ℓ⌝ₛ, ⌜e⌝ₛ, ⌜h⌝ₛ, v) ∧ ⌜tg_aux_data_m⌝ₚ(v, ℓ₀, t₀, κ₀, u₀) ∧
     ⌜tg_event_m⌝ₚ(⌜c⌝ₛ, ⌜ℓ⌝ₛ, ⌜a⌝ₛ, ⌜h⌝ₛ, w) ∧ ⌜kpair0_m⌝ₚ(w, τ, T) ∧
@@ -64,13 +70,28 @@ def tg_continue_m {d} (ω e a c δ n h ℓ t κ k N U D u : Term d) : Formula 1 
     ⌜Formula.isSuccessor⌝ₚ(l, j) ∧ ⌜Formula.isSuccessor⌝ₚ(m, l) ∧ ⌜Formula.isLimitOrdinal⌝ₚ(τ) ∧
     ⌜v_sigma_m⌝ₚ(τ, B) ∧ ⌜tt_constants0_m⌝ₚ(τ, B, V) ∧ ⌜tt_pool_m⌝ₚ(⌜ω⌝ₛ, m, V, W) ∧
     ⌜tx_exceeds_m⌝ₚ(⌜ω⌝ₛ, ⌜δ⌝ₛ, τ, m, V, W, T, ⌜κ⌝ₛ, ⌜N⌝ₛ, ⌜U⌝ₛ, ⌜D⌝ₛ, ⌜u⌝ₛ))⟫
-derive_free_closed tg_continue_m
+theorem tg_continue0_closed_l : tg_continue0_m.FreeClosed := by
+  simp -implicitDefEqProofs [tg_continue0_m, Definitional.Formula.FreeClosed]
+
+def tg_continue_m {d} (ω e a c δ n h ℓ t κ k N U D u : Term d) : Formula 1 d :=
+  tg_continue0_m.bind (fun i => [ω, e, a, c, δ, n, h, ℓ, t, κ, k, N, U, D, u].get i)
+
+@[simp] theorem tg_continue_m_freeClosed {d} (ω e a c δ n h ℓ t κ k N U D u : Term d)
+    (hw : ω.freeSupport = []) (he : e.freeSupport = []) (ha : a.freeSupport = [])
+    (hc : c.freeSupport = []) (hd : δ.freeSupport = []) (hn : n.freeSupport = [])
+    (hh : h.freeSupport = []) (hl : ℓ.freeSupport = []) (ht : t.freeSupport = [])
+    (hk : κ.freeSupport = []) (hj : k.freeSupport = []) (hN : N.freeSupport = [])
+    (hU : U.freeSupport = []) (hD : D.freeSupport = []) (hu : u.freeSupport = []) :
+    (tg_continue_m ω e a c δ n h ℓ t κ k N U D u).FreeClosed := by
+  apply (Definitional.Formula.freeClosed_bind_iff_of_closed _ ?_ _).mpr tg_continue0_closed_l
+  simp only [Fin.forall_fin_succ]
+  exact ⟨hw, he, ha, hc, hd, hn, hh, hl, ht, hk, hj, hN, hU, hD, hu, fun i => Fin.elim0 i⟩
 
 theorem tg_continue_sat_l {d} (ρ : Env M d) (ω e a c δ n h ℓ t κ k N U D u : Term d) :
     Formula.satisfies ρ (tg_continue_m ω e a c δ n h ℓ t κ k N U D u) ↔ Tg_continue_d hZF
       (ω.eval ρ) (e.eval ρ) (a.eval ρ) (c.eval ρ) (δ.eval ρ) (n.eval ρ) (h.eval ρ) (ℓ.eval ρ) (t.eval ρ)
       (κ.eval ρ) (k.eval ρ) (N.eval ρ) (U.eval ρ) (D.eval ρ) (u.eval ρ) := by
-  simp only [tg_continue_m, Tg_continue_d, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
+  simp only [tg_continue_m, Formula.satisfies_bind, tg_continue0_m, Tg_continue_d, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
     Formula.satisfies_exists_iff, tg_event_sat_l I hZF.1, tg_aux_data_sat_l hZF.1, kpair0_sat_l hZF.1,
     fn0_sat_l hZF.1, Formula.satisfies_isSuccessor_iff, Formula.satisfies_isRestriction_iff I,
     Formula.satisfies_isLimitOrdinal_iff, v_sigma_sat_l (ZF.modelsKP hZF), tt_constants0_sat_l hZF.1,

@@ -91,10 +91,14 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("LocalIndiscerniblesGap", "TypeRenewal", "TypeGameRenewal", "ExtenderCriticalPoint",
              "TypeOneStepImage", "TypeGameStepImage", "IterationWorkingApply",
-             "TypeGameTreeStep", "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
+             "TypeGameTreeStep", "TypeGameIssuedAnswer", "TypeGameAnswerHistory",
+             "TypeGameControlMove", "TypeGamePositionIssue", "TypeGamePositionNext", "TypeGameRank",
+             "TypeGameIssuedReset", "TypeGameIssuedQuery", "TypeGameIssuedLow",
+             "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
-            ("FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
+            ("Path", "TreeDependentChoice", "GameAttemptRank",
+             "FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
              "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
@@ -709,7 +713,8 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 "ee_language_m", "ee_packet_m", "tg_program_packet_m", "tg_reply_language_m", "tg_query_request_m",
                 "tg_query_packet_m", "tg_query_key_m", "tg_aux_data_m", "tg_ee_data_m", "tg_query_data_m",
                 "tg_program_data_m", "tg_event_m", "tg_digits_m", "tg_reset_m", "tg_growth_m", "tg_continue_m",
-                "tg_aux_m", "tg_reply_m", "tg_answer_m", "tg_step_m", "tg_check_m", "Tg_aux_data_d",
+                "tg_aux_m", "tg_aux0_m", "tg_continue0_m", "tg_issued_aux0_m", "tg_issued0_m",
+                "tg_reply_m", "tg_answer_m", "tg_step_m", "tg_check_m", "Tg_aux_data_d",
                 "Tg_ee_data_d", "Tg_query_data_d", "Tg_program_data_d", "Tg_params_d", "Tg_params_d.map_l", "Tg_params_d.closed_l")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
                ("Cg_first_d", "cg_first_m", "Cg_bad_d", "Cg_safe_d", "Cg_payoff_d", "Cg_legal_d",
@@ -732,6 +737,8 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 "ee_domain_pack0_m", "ee_domain_pack_m", "tc_rigid_seed0_m", "tc_rigid_m",
                 "tc_recover_seed0_m", "tc_recovered_m", "tc_recovered0_m", "tc_recover_result0_m", "tc_recover_m",
                 "tg_restart_env_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
+               ("Cg_rank_d", "cg_rank0_m", "cg_rank_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Ts_column_d", "ts_column_m", "Ts_rebound_d", "ts_rebound_m", "Tt_program_d", "Tt_code_d",
                 "Tg_guard_program_d", "Tg_guard_code_d", "tt_code0_m", "tt_code2_m", "tg_guard_code_m",

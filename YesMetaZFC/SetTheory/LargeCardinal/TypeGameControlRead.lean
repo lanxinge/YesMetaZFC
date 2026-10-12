@@ -33,7 +33,7 @@ theorem tg_control_start_l (ρ : Env M 19) (valid : Formula.satisfies ρ tg_cont
     Formula.satisfies_mem_iff, rd_entry0_sat_l hE, fseq_end_sat_l I hE, Formula.satisfies_isSuccessor_iff,
     Formula.satisfies_isOrdinalDivision_iff I hE,
     fn0_sat_l hE, tg_event_sat_l I hE, tg_reset_result_m, Formula.satisfies_bind, Definitional.Term.eval_weaken] at start
-  obtain ⟨a, h, j, ha, value, endt, hj, succ, fn, next, clock, _, event, prepared⟩ := start
+  obtain ⟨a, h, j, ha, value, endt, hj, succ, fn, next, clock, aux, event, prepared⟩ := start
   let ε : Env M 10 := ⟨fun i => [ρ.bound 0, ρ.bound 1, ρ.bound 5, ρ.bound 7, ρ.bound 8, ρ.bound 9, ρ.bound 10,
     a, ρ.bound 1, ρ.bound 6].get i, ρ.free⟩
   have prepared : Formula.satisfies ε tg_reset_result0_m := by
@@ -51,8 +51,14 @@ theorem tg_control_start_l (ρ : Env M 19) (valid : Formula.satisfies ρ tg_cont
     Formula.satisfies_imp_iff, Formula.satisfies_mem_iff, Definitional.Term.eval_weaken] at links
   obtain ⟨hw, he, hd, hS, hν, hk, hb, hs, ht, hg, move, elastic, program, letters⟩ := links
   obtain ⟨ℓ, move⟩ := move
-  exact ⟨a, h, j, ha, value, endt, hj, succ, fn, next, clock, event, v, seed,
+  refine ⟨a, h, j, ha, value, endt, hj, succ, fn, next, clock, event, v, seed,
     hw, he, hd, hS, hν, hk, hb, hs, ht, hg, ⟨ℓ, move⟩, elastic, program, letters rfl,
-    ℓ, tg_issued_start_l I hE ρ ⟨v, ρ.free⟩ a h ℓ j control hj fn next clock event seed hw he hd hk ht move elastic program⟩
+    ℓ, tg_issued_start_l I hE ρ ⟨v, ρ.free⟩ a h ℓ j control hj fn next clock event endt ?_ seed hw he hd hk ht move elastic program⟩
+  simp only [tg_aux_m, Formula.satisfies_bind] at aux
+  apply (Formula.closed_env_l tg_aux0_m tg_aux0_closed_l (ρ := _) (η := _) ?_).mp aux
+  funext i
+  exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+    (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun k => Fin.elim0 k))))))))))))))) i
 
 end YesMetaZFC.SetTheory.LargeCardinal

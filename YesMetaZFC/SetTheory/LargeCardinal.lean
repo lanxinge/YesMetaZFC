@@ -13,6 +13,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTreeStep
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameContinue
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssuedReset
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -65,7 +66,12 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 `Tg_low_d.step_l` 从原节点构造弹性回答及满足规则 (7) 的真实超幂像；
 `Tg_context_d.round_l` 把给定回答的原扩展器加入当前完整模型的 nice 树，
 从原武丁公式和回答支撑自动取得所需正则性、共同秩段及原类型成员性；目标层内的同一规则 (7) 已验证。
-`Tg_game_d.tree_step_l` 从原 II 获胜策略自动提取首轮，添加 padding 后沿实际偶数边搬运策略控制记录与历史。
+`Tg_game_d.tree_step_l` 从原 II 获胜策略自动提取首轮，添加 padding 后沿实际偶数边搬运策略控制记录与历史，
+再用同一个超幂回答追加历史，进入实数落子阶段。`Tg_context_d.answer_history_l` 对一般内部轮号读取
+后继模型的原查询表，经共同根图核验完整回答，构造实际回答有序对及下一控制位置，
+再由原策略完成实数落子并生成下一份辅助记录，保留原程序表及原内部轮号。
+`Cg_control_d.rank_l` 从原 II 获胜策略在 ZF＋DC 中构造合法尝试树的实际序数秩；
+秩已进入同一控制记录，`tg_control_no_chain_l` 在传递目标中排除背景内部的无限合法延长链。
 `tg_context_l` 保存回答更新、继续伸展、语言重建、子类型实现、高度刚性及图恢复六个已证句子，沿完整初等图覆盖目标层的新参数；
 `Tg_context_d.continue_tree_l` 将继续分支的扩展器施加到指定较早节点，
 识别实际旧类型像及新子类型，并把旧轮的完整实现与节点事实一并搬运到目标层。

@@ -891,7 +891,36 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 首轮已直接迁移到同一接口。`continue_tree_l` 也已接上这一奇数树边，
 保留偶数边与奇数边的原回答、根图复合及原字母表的逐点固定性。
 实际 nice 树的末项界住整列支撑，下一轮的下界允许等号，回答高度仍严格增长。
-有限历史递归、padding、偶数枝良基性矛盾和奇数返回分支仍待接合。
+[TypeGameAnswerHistory](TypeGameAnswerHistory.lean) 的 `Tg_context_d.answer_history_l`
+已将同一个完整回答接入后继模型的原查询表。查询沿共同根图回到实际实现所在层核验，
+再在后继反射层内构造回答有序对并追加原策略历史，得到实数落子阶段的控制位置。
+该接口允许任意内部轮号；反射层只使用已有闭包和控制记录，不假定其满足 ZF。
+[TypeGameTreeStep](TypeGameTreeStep.lean) 的 `Tg_game_d.tree_step_l` 已从原 II 获胜策略
+自动产生实际首轮实例，包括 padding、超幂及回答后的历史。
+[TypeGamePositionNext](TypeGamePositionNext.lean) 和 [TypeGamePositionIssue](TypeGamePositionIssue.lean)
+已对任意内部轮号继续完成实数落子、轮号递增、原策略的下一辅助走法及原程序表读取；
+这些结果直接由 `answer_history_l` 和 `tree_step_l` 返回，不要求下一轮额外给定合法走法。
+已发出记录同时保存产生该走法的原前缀及完整辅助合法性，仍使用四十六个坐标。
+[TypeGameIssuedReset](TypeGameIssuedReset.lean) 对任意轮的空标签走法直接构造完整重置输入。
+[TypeGameIssuedQuery](TypeGameIssuedQuery.lean) 由同一原表项恢复节点查询、实数前缀、
+域增长、所选旧轮的继续条件及当前候选的 dcp 弹性。
+[TypeGameIssuedLow](TypeGameIssuedLow.lean) 用相对极限秩层的关系闭包证明实数前缀和标签图
+属于原字母表所在低层；`continue_tree_l` 已直接消费此构造，调用方不再另给节点查询、
+候选合法性或七个低层参数的成员证明。继续分支的旧回答弹性、共同秩段和支撑界
+仍须由统一历史不变量提供，尚不能从一个孤立的已发出记录推出。
+
+[GameAttemptRank](../Descriptive/GameAttemptRank.lean) 的 `Cg_control_d.rank_l` 在 ZF＋DC 中
+从原 II 获胜策略证明合法尝试树无枝，实际构造序数值秩函数。任意集合字母表上的
+无枝性到良基性由 [TreeDependentChoice](../Descriptive/TreeDependentChoice.lean) 完成，
+链取并复用内部 ω 上的 `ds_path_run_l`；没有假定 ω 外部标准。
+原控制记录已包含这份秩的存在性，并随原初等图搬运。
+[TypeGameRank](TypeGameRank.lean) 在 KP 背景下读取其 Δ₀ 证书，ZF 中排除传递目标内
+控制树的背景内部无限合法延长链；不对反射层附加 ZF 或 DC。
+这完成了 5.19 所需的尝试树秩与绝对性步骤，但仍须构造统一历史并把它送入偶数极限。
+有限历史的统一递归、偶数分支非良基性的完整应用及奇数返回分支仍未完成。
+统一历史还须编码并保持各旧回答在全部后续模型中的固定性和共同秩段。
+奇数返回部分还须处理重置产生的 padding；当前 `it_nice_return_l` 接受的是每一步
+都有实际扩展器的 `It_nice_d`，不能直接用于此处的 `It_pnice_d`。
 
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
 及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，

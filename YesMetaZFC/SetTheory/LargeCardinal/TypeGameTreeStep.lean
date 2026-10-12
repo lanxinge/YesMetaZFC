@@ -1,10 +1,14 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameControlRoot
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePadding
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnswerHistory
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRank
 
 /-! # 原获胜策略产生带 padding 的实际首轮
 
 原策略的首个合法走法自动给出重置输入。先加恒等边 0→1，再从原偶数根
-作超幂 0→2；原控制记录与已经走出的历史也沿这条实际边进入新反射层。
+作超幂 0→2；原控制记录与已经走出的历史也沿这条实际边进入新反射层，
+并用同一个完整回答推进到实数落子及下一辅助阶段。后继控制记录的实际
+尝试秩由原获胜策略自动提供，反射层无需满足 ZF。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive
@@ -61,20 +65,47 @@ theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
             ∃ r', Rd_entry_d r r' j ∧ Rt_record_in_d tg_control0_m C' r' ∧
             ∃ nv : Nonempty {x // M.mem x C'}, ∃ ρ' : Env (rt_model_l C' nv) 19,
               (∀ i, Rd_entry_d (ρ.bound i).val (ρ'.bound i).val j) ∧ Formula.satisfies ρ' tg_control0_m ∧
+              (∃ θ' f, M.mem θ' C' ∧ M.mem f C' ∧ Cg_rank_d (ρ'.bound 0).val (ρ'.bound 12).val (ρ'.bound 18).val θ' f) ∧
               ∃ h' : (rt_model_l C' nv).Domain, Rd_entry_d h.val h'.val j ∧
                 Fn0_d p.a (ρ'.bound 12).val h'.val ∧ M.mem h'.val (ρ'.bound 18).val ∧
                 ∃ ζ : Env (rt_model_l C' nv) 46,
                   (∀ i, Rd_entry_d ((tg_issued_start_env_d ρ ε a h ℓ₀ (ρ.bound 2)).bound i).val (ζ.bound i).val j) ∧
-                  Formula.satisfies ζ tg_issued0_m := by
+                  Formula.satisfies ζ tg_issued0_m ∧
+                  ∃ v t q : (rt_model_l C' nv).Domain, KPair_d M v.val (w 15).val (w 11).val ∧
+                    Formula.satisfies (tg_position_env_d
+                      ⟨fun i => ζ.bound (i.castAdd 27), fun _ => ζ.bound 0⟩ (ζ.bound 19) t q) (tg_position0_m 2) ∧
+                    Formula.satisfies (⟨fun i => [ζ.bound 0, t, ζ.bound 20, v].get i, fun _ => v⟩ :
+                      Env (rt_model_l C' nv) 4)
+                      (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
+                    let ψ := tg_position_env_d
+                      (⟨fun i => ζ.bound (i.castAdd 27), fun _ => ζ.bound 0⟩ : Env (rt_model_l C' nv) 19) (ζ.bound 19) t q
+                    ∀ x, (rt_model_l C' nv).mem x (ψ.bound 6) → ∃ v' t' j' n',
+                      (rt_model_l C' nv).mem v' (ψ.bound 6) ∧
+                      (Formula.satisfies ψ (gm_even_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 19)) → v' = x) ∧
+                      (¬ Formula.satisfies ψ (gm_even_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 19)) →
+                        Rd_entry_d (ψ.bound 20) v' (ψ.bound 17)) ∧
+                      Formula.satisfies (⟨fun i => [ψ.bound 0, t', ψ.bound 20, v'].get i, fun _ => v'⟩ : Env (rt_model_l C' nv) 4)
+                        (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
+                      (rt_model_l C' nv).SuccessorOf n' (ψ.bound 19) ∧
+                      Formula.satisfies (tg_position_env_d ⟨fun i => ψ.bound (i.castAdd 3), fun _ => ψ.bound 0⟩ n' t' j')
+                        (tg_position0_m 0) ∧
+                      ∃ ε' : Env (rt_model_l C' nv) 46, (∀ i : Fin 19, ε'.bound (i.castAdd 27) = ψ.bound (i.castAdd 3)) ∧
+                        ε'.bound 19 = n' ∧ Formula.satisfies ε' tg_issued0_m ∧ Rd_entry_d t' (ε'.bound 21) (ψ.bound 17) ∧
+                        Formula.satisfies (⟨fun i => [ψ.bound 0, ε'.bound 20, t', ε'.bound 21].get i,
+                          fun _ => ε'.bound 21⟩ : Env (rt_model_l C' nv) 4)
+                          (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) := by
   obtain ⟨H, r, θ, X, R, c, K, η, C, regular, rank, code, source, context, record, nc, ρ, valid, eqρ,
     a, h, value, fn, next, event, ε, seed, hw, he, hd, hS, hν, hk, hb, hs, ht, hg, move, elastic, program, limit₀, letters,
     α, T, Q, D, π, hα, tree, hc, self, iRoot, anchor, ℓ₀, issued⟩ := game.root_l hZFC woodin root win
+  -- 初始支撑列为空；先固定这两个小前提，避免在整份后继证书中反复推断。
+  have lower : M.MemberSubset (ε.bound 5).val (ε.bound 5).val := fun _ hx => hx
+  have above : ∀ i ν, Rd_entry_d i ν p.e → M.mem ν (ε.bound 23).val ∨ ν = (ε.bound 23).val :=
+    fun _ _ hh => (hh.elim fun z hz => game.setup.empty z hz.2).elim
+  have step := context.pad_round_l hZFC nc ε source tree hα hc code hw game.setup.empty self iRoot anchor lower above seed
   obtain ⟨w, round, β, T₁, Q₁, D₁, E₁, id, π₁, padded, pad, hc₁, edge₁, idFixed, empty,
     root₁, iRoot₁, anchor₁, γ, T', Q', D', E', L', c', j, N, R', K', ℓ, F, κ, U', D'', u', η', C', W,
     result, ext, target, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
-    hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, _, π₂, root₂, _, anchor₂⟩ :=
-    context.pad_round_l hZFC nc ε source tree hα hc code hw game.setup.empty self iRoot anchor
-      (fun _ hx => hx) (fun _ _ hh => (hh.elim fun z hz => game.setup.empty z hz.2).elim) seed
+    hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, _, π₂, root₂, _, anchor₂⟩ := step
   have eq₁ := padded.tree.diagram.map_unique_l hZF root₁ edge₁
   subst π₁
   have eq₂ := result.tree.diagram.map_unique_l hZF root₂ edge
@@ -106,6 +137,62 @@ theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
   obtain ⟨ζ, carried, issued'⟩ := hj.relative_image_l hZF game.setup.omega source.source.transitive ready.source.transitive code mn
     (context.read_l hZF source.source).1.transitive (context'.read_l hZF ready.source).1.transitive
     nc nv iC tg_issued0_m tg_issued0_closed_l (tg_issued_start_env_d ρ ε a h ℓ₀ (ρ.bound 2))
+  -- 内部自然数及原程序沿实际嵌入固定；大类型和常量域则使用同一超幂的像。
+  let ξ := tg_round_env_d ε w
+  have natural := hj.natural_l hZF game.setup.omega source.source.transitive ready.source.transitive
+    code mn source.source.omega_mem
+  have fixed {x y : M.Domain} (hx : M.mem x p.ω) (xy : Rd_entry_d x y j) : y = x :=
+    hj.1.1.1.2 x y x xy (natural x hx)
+  have iω : Rd_entry_d p.ω (ζ.bound 0).val j :=
+    (show (ρ.bound 0).val = p.ω from eqρ 0) ▸
+      (show Rd_entry_d (ρ.bound 0).val (ζ.bound 0).val j from carried 0)
+  have zω := hj.1.1.1.2 p.ω (ζ.bound 0).val p.ω iω
+    (hj.omega_l I hZF game.setup.omega source.source.transitive ready.source.transitive code mn source.source.omega_mem)
+  have heω := num_mem_l hZF.1 game.setup.omega (show Num_d 0 p.e from game.setup.empty)
+  have ie : Rd_entry_d p.e (ζ.bound 1).val j :=
+    (show (ρ.bound 1).val = p.e from eqρ 1) ▸
+      (show Rd_entry_d (ρ.bound 1).val (ζ.bound 1).val j from carried 1)
+  have ze := fixed heω ie
+  have data := (Formula.satisfies_conj_iff ..).mp round |>.2
+  simp only [tg_witness0_m, tg_round_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at data
+  obtain ⟨_, _, _, _, _, _, _, _, _, language, _, _, _, hbω, hzω, hs₀, hs₁, hs₂, hs₃, hs₄, hs₅, hs₆, _⟩ := data
+  simp only [tg_reply_language_m, Formula.satisfies_bind, tg_reply_language0_m,
+    Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at language
+  have hnω : M.mem (ε.bound 8).val p.ω := hw ▸ language.1
+  have hlω : M.mem (ε.bound 7).val p.ω := source.source.omega.transitive hZF _ hnω _ language.2.2.1
+  have same : ∀ i : Fin 14, (ζ.bound ([0, 1, 26, 27, 28, 36, 37, 38, 39, 40, 41, 42, 43, 44].get i)).val =
+      (ξ.bound ([16, 17, 22, 23, 24, 36, 38, 47, 48, 49, 50, 51, 52, 53].get i)).val := by
+    intro i
+    exact Fin.cases (zω.trans hw.symm) (Fin.cases (ze.trans he.symm)
+      (Fin.cases (fixed (hk.symm ▸ heω) (carried 26))
+      (Fin.cases (fixed hlω (carried 27)) (Fin.cases (fixed hnω (carried 28))
+      (Fin.cases (fixed (hw ▸ hbω) (carried 36)) (Fin.cases (fixed (hw ▸ hzω) (carried 37))
+      (Fin.cases (fixed (hw ▸ hs₀) (carried 38)) (Fin.cases (fixed (hw ▸ hs₁) (carried 39))
+      (Fin.cases (fixed (hw ▸ hs₂) (carried 40)) (Fin.cases (fixed (hw ▸ hs₃) (carried 41))
+      (Fin.cases (fixed (hw ▸ hs₄) (carried 42)) (Fin.cases (fixed (hw ▸ hs₅) (carried 43))
+      (Fin.cases (fixed (hw ▸ hs₆) (carried 44)) (fun a => Fin.elim0 a)))))))))))))) i
+  have zκ := hj.1.1.1.2 (ε.bound 5).val (ζ.bound 24).val κ (carried 24) critical.image
+  have zU := hj.1.1.1.2 (ε.bound 15).val (ζ.bound 30).val U' (carried 30) hU
+  have zD := hj.1.1.1.2 (ε.bound 16).val (ζ.bound 31).val D'' (carried 31) hD
+  have zu := hj.1.1.1.2 (ε.bound 18).val (ζ.bound 25).val u' (carried 25) hu
+  have hδ : M.IsOrdinal (ε.bound 2).val := (context.round_regular_l hZF nc ξ source hw round).1.1
+  have iδ : Rd_entry_d p.δ (ζ.bound 5).val j :=
+    (show (ρ.bound 5).val = p.δ from eqρ 5) ▸
+      (show Rd_entry_d (ρ.bound 5).val (ζ.bound 5).val j from carried 5)
+  have δ' := hj.ordinal_l hZF game.setup.omega source.source.transitive ready.source.transitive
+    code mn iδ (hd ▸ hδ)
+  have fs' := (context'.read_l hZF ready.source).1
+  have state := (tg_issued_sat_l (rt_pair_l fs'.transitive nv hZF.1 fs'.pair)
+    (rt_model_ext_l hZF.1 fs'.transitive nv) ζ).mp (issued'.mp issued)
+  have below := δ'.transitive κ (zκ ▸ state.bound) (w 15).val (subset _ bound)
+  have rootNode := ext.2.2.1 p.e c oldRoot
+  have rootMap := result.tree.diagram.elementary p.e p.e π c X R c X R self₂ rootNode rootNode code.1 code.1
+  have response := context.answer_history_l hZF nc ξ context' source.source ready.source ready.hierarchy
+    source.source.transitive code code mn rootMap hj iRoot iC anchor anchor₂ limit₀ hwB
+    hW common level.member level.hierarchy limit (common.ordinal_subset_l hZF source.source.transitive hW _ bound)
+    nv ζ (issued'.mp issued) hw same below round (by
+      rw [zκ, zU, zD, zu]
+      exact reply)
   exact ⟨H, r, θ, X, R, c, K, η, C, regular, rank, code, source, context, record, nc, ρ, valid, eqρ,
     a, h, value, fn, next, event, ε, seed, hw, he, hd, hS, hν, hk, congrArg Subtype.val hb, hs, ht, hg,
     move, elastic, program, limit₀, letters, ℓ₀, issued, w, round, α, β, γ, T', Q', D', E', L', id, c', j, N, R', K', ℓ, F, κ, U', D'', u', η', C', W, π,
@@ -113,6 +200,8 @@ theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
     (ext.2.2.2.1 p.e α id pad.1.predecessor_mem).mpr edge₁, idFixed, empty₂, target, edge, mn, ready,
     ultra, critical, limit, bound, subset, heights, hU, hD, hu, reply, iη, iC, context', legal,
     hW, hWC, common, level, hQW, hwW, agreement, self₂, iRoot, hwB, anchor, anchor₁, anchor₂,
-    r', ir, record', nv, ρ', images, valid'.mp valid, ⟨h', hh'⟩, ih, fn', next', ζ, carried, issued'.mp issued⟩
+    r', ir, record', nv, ρ', images, valid'.mp valid,
+    tg_control_rank_l (ZF.modelsKP hZF) fs'.transitive nv ρ' (valid'.mp valid),
+    ⟨h', hh'⟩, ih, fn', next', ζ, carried, issued'.mp issued, response⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

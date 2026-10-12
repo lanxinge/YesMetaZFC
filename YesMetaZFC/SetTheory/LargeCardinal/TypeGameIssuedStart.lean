@@ -18,6 +18,10 @@ theorem tg_issued_start_l (I : kpair_convention_l.Interpretation M) (hE : Extens
     (history : Fn0_d j (ρ.bound 12) h) (position : M.mem h (ρ.bound 18))
     (clock : M.IsOrdinalDivision I j (ρ.bound 4) (ρ.bound 1) (ρ.bound 2))
     (event : Tg_event_d I (ρ.bound 4) (ρ.bound 1) (ρ.bound 1) h a)
+    (endt : Fseq_end_d I (ρ.bound 0) h (ρ.bound 1) a)
+    (aux : Formula.satisfies (⟨fun i => [ρ.bound 0, ρ.bound 1, ρ.bound 2, ρ.bound 3, ρ.bound 4,
+      ρ.bound 5, ρ.bound 6, ρ.bound 7, ρ.bound 8, ρ.bound 9, ρ.bound 10, ρ.bound 11,
+      ρ.bound 1, ρ.bound 1, a].get i, ρ.free⟩ : Env M 15) tg_aux0_m)
     (seed : Formula.satisfies ε tg_seed0_m) (hw : ε.bound 0 = ρ.bound 0) (he : ε.bound 1 = ρ.bound 1)
     (hd : ε.bound 2 = ρ.bound 5)
     (hk : ε.bound 6 = ρ.bound 1) (ht : ε.bound 25 = ρ.bound 1)
@@ -45,6 +49,14 @@ theorem tg_issued_start_l (I : kpair_convention_l.Interpretation M) (hE : Extens
     exact hk.symm ▸ ht.symm ▸ zero
   have round : M.mem (ρ.bound 1) (ρ.bound 0) := hw ▸ he ▸ hn
   have bound : M.mem (ε.bound 5) (ρ.bound 5) := hd ▸ below
-  exact ⟨head, round, time, history, position, clock, event, move, bound, labels, first, last, elastic, program⟩
+  refine ⟨head, round, time, history, position, clock, event, move, bound, labels, first, last, elastic, program, ?_⟩
+  simp only [tg_issued_aux0_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
+    fseq_end_sat_l I hE, tg_aux_m, Formula.satisfies_bind]
+  refine ⟨ρ.bound 1, endt, ?_⟩
+  apply (Formula.closed_env_l tg_aux0_m tg_aux0_closed_l (ρ := _) (η := _) ?_).mp aux
+  funext i
+  exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+    (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun k => Fin.elim0 k))))))))))))))) i
 
 end YesMetaZFC.SetTheory.LargeCardinal

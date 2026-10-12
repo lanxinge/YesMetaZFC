@@ -3,6 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRestart
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidRead
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameQueryTransfer
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssuedLow
 import YesMetaZFC.SetTheory.LargeCardinal.TypeImageRead
 import YesMetaZFC.SetTheory.LargeCardinal.IterationWorkingApply
 import YesMetaZFC.Model.SetTheory.Internal.SubtypeSource
@@ -15,7 +16,8 @@ import YesMetaZFC.Model.SetTheory.Internal.SubtypeProgramTransfer
 共同秩段识别旧类型的像，原程序沿实际树根图进入目标；由原子类型查询
 自动取得候选的较低层实现。旧回答基底先推出最大序数查询，再在同一目标
 反射层恢复恰好一个新标签，并直接形成下一轮输入、回答及实际奇数树边。
-旧轮记录、dcp 弹性及任意排列均保留；整列支撑界由实际树的末项推出。
+当前节点查询和候选由原策略已经发出的走法自动读取，低层参数界由原字母表
+所在层推出。旧轮记录、dcp 弹性及任意排列均保留；整列支撑界由实际树的末项推出。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -39,14 +41,11 @@ theorem Tg_context_d.continue_tree_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V
     (ho : ∀ x, ¬ M.mem x o) (root : It_map_d G o ξ π) (root₀ : It_map_d G o k π₀)
     (iRoot : Rd_entry_d Cᵣ C π) (iRoot₀ : Rd_entry_d Cᵣ C₀ π₀)
     (anchor : Tg_anchor_d γ Z₀ X π) (priorAnchor : Tg_anchor_d γ Z₀ Y π₀) (lower : M.MemberSubset γ (p 1))
-    (hγ : M.IsLimitOrdinal γ) (ψ : Env (rt_model_l C nc) 12)
-    (queries : Formula.satisfies ψ tg_query_row0_m) (ωψ : (ψ.bound 0).val = ω)
-    (eψ : (ψ.bound 1).val = (ρ₀.bound 17).val) (lψ : (ψ.bound 2).val = p 3) (nψ : (ψ.bound 3).val = p 9)
-    (node : M.mem (ψ.bound 11).val (p 13))
-    (queryLow : ∀ i : Fin 7, M.mem (ψ.bound (i.castAdd 5)).val Z₀)
-    (χ : Env (rt_model_l C nc) 12) (candidate : Formula.satisfies χ tg_candidate0_m)
-    (ωχ : (χ.bound 2).val = ω) (τχ : (χ.bound 3).val = p 8) (uχ : (χ.bound 0).val = p 13)
-    (mχ : (χ.bound 1).val = p 9)
+    (hγ : M.IsLimitOrdinal γ) (hωZ : M.mem ω Z₀)
+    (ι : Env (rt_model_l C nc) 46) (issued : Formula.satisfies ι tg_issued0_m)
+    (links : ∀ i : Fin 6, (ι.bound ([0, 1, 27, 28, 24, 25].get i)).val =
+      [ω, (ρ₀.bound 17).val, p 3, p 9, p 8, p 13].get i)
+    (letters : M.mem (ι.bound 6).val Z₀)
     (hw : p 0 = ω) (hδ : M.IsLimitOrdinal (p 2)) (regular : Sc_regular_d X (p 2))
     (hV : M.mem V X) (rank : Vr_d X ζ V)
     (hV' : M.mem V Y) (rank' : Vr_d Y ζ V) (hζ : M.IsLimitOrdinal ζ)
@@ -54,6 +53,12 @@ theorem Tg_context_d.continue_tree_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V
     (hU : M.mem (p 5) V) (hD : M.mem (p 6) V) (hu : M.mem (p 7) V)
     (above : ∀ i μ, Rd_entry_d i μ H → M.mem μ (p 8))
     (seed : Formula.satisfies ρ tc_seed0_m) :
+    ∃ ψ χ : Env (rt_model_l C nc) 12,
+      Formula.satisfies ψ tg_query_row0_m ∧ (ψ.bound 0).val = ω ∧
+      (ψ.bound 1).val = (ρ₀.bound 17).val ∧ (ψ.bound 2).val = p 3 ∧ (ψ.bound 3).val = p 9 ∧
+      M.mem (ψ.bound 11).val (p 13) ∧ (∀ i : Fin 7, M.mem (ψ.bound (i.castAdd 5)).val Z₀) ∧
+      Formula.satisfies χ tg_candidate0_m ∧ (χ.bound 2).val = ω ∧ (χ.bound 3).val = p 8 ∧
+      (χ.bound 0).val = p 13 ∧ (χ.bound 1).val = p 9 ∧
     ∃ β T' J' G' E' H' d' j N R' K₀ L F κ' U' D' u' η' C' W,
       It_pnice_d hZF ω c₀ β T' J' G' E' H' ∧ It_extension_d α ξ k T J G E β T' J' G' E' ∧
       Rd_entry_d α d' J' ∧ It_map_d G' k α j ∧ Smem_d I d' N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
@@ -119,6 +124,18 @@ theorem Tg_context_d.continue_tree_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V
                 (∃ V₂, M.mem V₂ X ∧ Vr_d X (q 21) V₂ ∧ M.mem V₂ N₂ ∧ Vr_d N₂ (q 21) V₂ ∧
                   ∀ x, M.mem x V₂ → Rd_entry_d x x j₂) ∧
                 ∃ π₂, It_map_d G₂ o β π₂ ∧ Rd_entry_d Cᵣ C₂ π₂ ∧ Tg_anchor_d γ Z₀ N₂ π₂ := by
+  obtain ⟨ψ, χ, queries, eqψ, node, queryLow, candidate, eqχ⟩ :=
+    context.issued_queries_l hZF owner.source nc ι issued (links 0) anchor.member anchor.rank hγ hωZ letters
+  have ωψ : (ψ.bound 0).val = ω := (eqψ 0).trans (links 0)
+  have eψ : (ψ.bound 1).val = (ρ₀.bound 17).val := (eqψ 1).trans (links 1)
+  have lψ : (ψ.bound 2).val = p 3 := (eqψ 2).trans (links 2)
+  have nψ : (ψ.bound 3).val = p 9 := (eqψ 3).trans (links 3)
+  have node : M.mem (ψ.bound 11).val (p 13) := (show (ι.bound 25).val = p 13 from links 5) ▸ node
+  have ωχ : (χ.bound 2).val = ω := (eqχ 2).trans (links 0)
+  have τχ : (χ.bound 3).val = p 8 := (eqχ 3).trans (links 4)
+  have uχ : (χ.bound 0).val = p 13 := (eqχ 0).trans (links 5)
+  have mχ : (χ.bound 1).val = p 9 := (eqχ 1).trans (links 3)
+  refine ⟨ψ, χ, queries, ωψ, eψ, lψ, nψ, node, queryLow, candidate, ωχ, τχ, uχ, mχ, ?_⟩
   have fs := (context.read_l hZF owner.source).1
   have facts := seed
   simp only [tc_seed0_m, Formula.satisfies_conj_iff] at facts
@@ -197,7 +214,13 @@ theorem Tg_context_d.continue_tree_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V
   obtain ⟨finite₀, _, last₀, _, _, _, _, _, _, _, base₀⟩ := replyLanguage
   let f : Fin 7 → Term 54 := fun i => [.bound 16, .bound 17, .bound 23, .bound 24, .bound 2, .bound 1, .bound 0].get i
   let ε₀ := Definitional.Env.substitute ρ₀ f
-  have base₀ : Formula.satisfies ε₀ tg_reply_base0_m := (Formula.satisfies_bind ρ₀ f tg_reply_base0_m).mp base₀
+  -- 只比较七个参数，避免为核对两次代入而展开整条查询公式。
+  simp only [tg_reply_base_m, Formula.satisfies_bind] at base₀
+  have base₀ : Formula.satisfies ε₀ tg_reply_base0_m := by
+    apply (Formula.closed_env_l tg_reply_base0_m tg_reply_base0_closed_l (ρ := _) (η := ε₀) ?_).mp base₀
+    funext i
+    exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun a => Fin.elim0 a))))))) i
   have zt := priorAnchor.rank.transitive_l hZF source.source.transitive priorAnchor.member
   have hwZ : M.mem ω Z₀ := ωψ ▸ queryLow 0
   have hnω : M.mem (ρ₀.bound 24).val ω := ω₀ ▸ finite₀
