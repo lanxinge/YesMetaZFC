@@ -32,8 +32,9 @@ theorem la_layer_l (hM : M.Models KPi) {a Y} (ha : Ja_d S a Y) : La_d S Y := by
 theorem la_seed_l (hM : M.Models KPi) : La_d S S := by
   obtain ⟨e, he⟩ := KP.exists_empty (KPi.models_iff_l.mp hM).1
   obtain ⟨Y, hy⟩ := ja_value_exists_l S hM e
-  have h := la_layer_l S hM ⟨Structure.IsOrdinal.of_no_members he, hy⟩
-  exact ja_zero_l S hM he hy ▸ h
+  have h : La_d S Y := la_layer_l S hM (a := e) (Y := Y) ⟨Structure.IsOrdinal.of_no_members he, hy⟩
+  have hY : Y = S := ja_zero_l S hM (a := e) (Y := Y) he hy
+  exact Eq.mp (congrArg (La_d S) hY) h
 
 def ja_index_s : BinarySchema 1 := {
   body := .conj (KP.ord0_m .newest) (.existsE (.conj (ja_value_m (.bound 3) (.bound 1) .newest)

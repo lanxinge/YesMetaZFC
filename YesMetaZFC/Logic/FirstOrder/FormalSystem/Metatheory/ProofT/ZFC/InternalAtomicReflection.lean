@@ -49,11 +49,41 @@ def atomicResult {free : SetContext} (membership positive : Bool) (left right : 
 theorem atomic_transport_derives {free : SetContext} (membership positive : Bool) (left right : SetOpenTerm free) :
     Derives intrinsic_zfc_theory [] (.imp (atomicLeft left) (.imp (atomicRight right)
       (.imp (atomicPremise membership positive) (atomicResult membership positive left right)))) := by
-  apply source_complete
-  intro 𝒩 _ env
+  apply Derives.imp_intro
+  apply Derives.imp_intro
+  apply Derives.imp_intro
+  let Γ : Context signature (.set :: .set :: free) :=
+    [atomicPremise membership positive, atomicRight right, atomicLeft left]
+  have hLeft : Derives intrinsic_zfc_theory Γ (atomicLeft left) :=
+    Derives.assumption (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ List.mem_cons_self))
+  have hRight : Derives intrinsic_zfc_theory Γ (atomicRight right) :=
+    Derives.assumption (List.mem_cons_of_mem _ List.mem_cons_self)
+  let firstBody : SetFormula [.set] (.set :: .set :: free) :=
+    polarity positive (atomicBody membership (.bvar .here) (.fvar .here))
+  let secondBody : SetFormula [.set] (.set :: .set :: free) :=
+    polarity positive (atomicBody membership ((liftTwo left).weakenBound SetSort.set) (.bvar .here))
+  have hStart : Derives intrinsic_zfc_theory Γ
+      (firstBody.instantiateTop (.fvar (.there .here))) := by
+    cases membership <;> cases positive <;>
+      exact Derives.assumption List.mem_cons_self
+  have hMiddle := Derives.eq_subst (body := firstBody) (Derives.eq_symm hLeft) hStart
+  have hMiddle' : Derives intrinsic_zfc_theory Γ
+      (secondBody.instantiateTop (.fvar .here)) := by
+    cases membership <;> cases positive <;>
+      simpa only [firstBody, secondBody, polarity, atomicBody, membership_formula,
+        Bool.false_eq_true, if_false, if_true, Formula.instantiateTop_neg,
+        Formula.instantiateTop_equal, Formula.instantiateTop_rel,
+        Arguments.instantiateTop_cons, Arguments.instantiateTop_nil,
+        Term.instantiateTop_bvar_here, Term.instantiateTop_fvar,
+        Term.instantiateTop_weakenBound] using! hMiddle
+  have hResult := Derives.eq_subst (body := secondBody) (Derives.eq_symm hRight) hMiddle'
   cases membership <;> cases positive <;>
-    simp only [atomicLeft, atomicRight, atomicPremise, atomicResult, atomicBody, polarity, Bool.false_eq_true, if_false, if_true, Formula.satisfies, Arguments.eval]
-  all_goals intro hl hr h; simpa only [hl, hr] using h
+    simpa only [Γ, secondBody, atomicResult, polarity, atomicBody, membership_formula,
+      Bool.false_eq_true, if_false, if_true, Formula.instantiateTop_neg,
+      Formula.instantiateTop_equal, Formula.instantiateTop_rel,
+      Arguments.instantiateTop_cons, Arguments.instantiateTop_nil,
+      Term.instantiateTop_bvar_here, Term.instantiateTop_fvar,
+      Term.instantiateTop_weakenBound] using! hResult
 
 theorem atomic_code {free : SetContext} (values : Nat → 𝒩.Carrier .set)
     (membership positive : Bool) (left right : SetOpenTerm free) :

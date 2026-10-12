@@ -23,13 +23,21 @@ def term {bound free : SetContext} : List (SetTerm bound free) → SetTerm bound
     (fs : VariableSubstitution signature sf tb tf) :
     (term elements).substituteMapped bs fs =
       term (elements.map (fun element => element.substituteMapped bs fs)) := by
-  induction elements <;> simp_all [term, Term.substituteMapped, Arguments.substituteMapped]
+  induction elements with
+  | nil => rfl
+  | cons head tail ih =>
+      exact congrArg
+        (fun rest => {head.substituteMapped bs fs}ₘ ∪ₘ rest) ih
 
 @[simp] theorem term_renameMapped {sb sf tb tf : SetContext}
     (elements : List (SetTerm sb sf)) (bs : VariableRenaming sb tb) (fs : VariableRenaming sf tf) :
     (term elements).renameMapped bs fs =
       term (elements.map (fun element => element.renameMapped bs fs)) := by
-  induction elements <;> simp_all [term, Term.renameMapped, Arguments.renameMapped]
+  induction elements with
+  | nil => rfl
+  | cons head tail ih =>
+      exact congrArg
+        (fun rest => {head.renameMapped bs fs}ₘ ∪ₘ rest) ih
 
 @[simp] theorem term_weakenFree {bound free : SetContext} (elements : List (SetTerm bound free)) :
     (term elements).weakenFree SetSort.set =

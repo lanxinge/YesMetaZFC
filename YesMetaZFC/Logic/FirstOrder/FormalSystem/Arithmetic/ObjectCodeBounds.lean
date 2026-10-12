@@ -48,10 +48,12 @@ theorem list_field_le (values : List Nat) (value : Nat) (h : value ∈ values) :
   induction values with
   | nil => cases h
   | cons head tail ih =>
-    rcases List.mem_cons.mp h with rfl | h
-    · exact Nat.le_trans (left_le_godel_pair_value _ _)
+    cases h with
+    | head =>
+      exact Nat.le_trans (left_le_godel_pair_value _ _)
         (Nat.le_trans (right_le_godel_pair_value _ _) (Nat.le_succ _))
-    · exact Nat.le_trans (ih h) (Nat.le_trans (right_le_godel_pair_value _ _)
+    | tail _ h =>
+      exact Nat.le_trans (ih h) (Nat.le_trans (right_le_godel_pair_value _ _)
         (Nat.le_trans (right_le_godel_pair_value _ _) (Nat.le_succ _)))
 
 theorem node_field_le (tag : Nat) (values : List Nat) (value : Nat) (h : value ∈ values) :

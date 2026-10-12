@@ -42,7 +42,7 @@ def pair_spec {bound free : SetContext}
         (element.renameMapped VariableRenaming.id ρ)
         (left.renameMapped VariableRenaming.id ρ)
         (right.renameMapped VariableRenaming.id ρ) := by
-  simp [pair_member_condition, Formula.renameMapped]
+  rfl
 
 /-- 配对规格与 free 重命名自然交换。 -/
 @[simp] theorem pair_spec_renameMapped

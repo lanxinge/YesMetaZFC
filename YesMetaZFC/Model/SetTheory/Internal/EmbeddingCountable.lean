@@ -130,11 +130,8 @@ theorem Smap_d.countable_fixed_l {ω c d X R Y S j A ι : M.Domain}
   have count : M.IsSetInjectionFromTo I η B ω := ⟨fn0_function_l (ZF.modelsKP hZF) fn,
     fun a b n ha hb => idx.injective a (fn.bound_l ha).1 b (fn.bound_l hb).1 n (fn.bound_l ha).2 ha hb⟩
   obtain ⟨_, _, _, cover⟩ := hj.countable_preimage_l hZF hω hX hY hm hn hωX hAB hη count
-  have rel x y u v (hx : Rd_entry_d x u j) (hy : Rd_entry_d y v j) : M.mem x y ↔ M.mem u v := by
-    have tr := smap_delta_l I hZF hω hX hY hm hn hj (n := 2) (.mem (.bound (Fin.succ 0)) .newest)
-      (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed]) (.mem ..)
-      ⟨Fin.cases y (fun _ => x), fun _ => x⟩ ⟨Fin.cases v (fun _ => u), fun _ => u⟩ (Fin.cases hy (fun _ => hx))
-    simpa only [Formula.satisfies_mem_iff, Definitional.Term.newest, Term.eval_bound, Fin.cases_succ, Fin.cases_zero] using tr
+  have rel x y u v (hx : Rd_entry_d x u j) (hy : Rd_entry_d y v j) : M.mem x y ↔ M.mem u v :=
+    hj.member_l I hZF hω hm hn hx hy
   -- 可数性覆盖整个像；传递性及 Mostowski 唯一性固定其中每个元素。
   obtain ⟨_, point⟩ := mem_embedding_fixed_l hZF hX hj.1 rel hBt
     (fun x hx => (cover x hx).imp fun _ h => h.2)

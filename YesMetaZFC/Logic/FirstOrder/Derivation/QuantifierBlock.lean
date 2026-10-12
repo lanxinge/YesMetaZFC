@@ -38,12 +38,14 @@ theorem Formula.instantiateFreeTop_substituteFree_liftFree
         witness = body.substituteFree (VariableSubstitution.cons witness substitution) := by
   change (body.substituteFree _).substituteFree _ = _
   rw [Formula.substituteFree_comp]
-  congr 1
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there previous =>
-      exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
+    rfl
+  · intro resultSort entry
+    cases entry with
+    | here => rfl
+    | there previous =>
+        exact Term.substituteMapped_weakenFree_instantiateFreeTop _ _ _
 
 /-- 任意长度、任意排序的存在见证一次性装配；外部自由参数保持原值。 -/
 theorem Derives.existsFreePrefix_intro

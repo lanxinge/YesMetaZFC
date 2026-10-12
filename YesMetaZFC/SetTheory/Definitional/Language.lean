@@ -36,7 +36,7 @@ def weaken {depth : Nat} (term : Term depth) : Term (depth + 1) :=
   term.rename Fin.succ
 /-- 当前上下文顶部最新引入的 bound 变量。 -/
 def newest {depth : Nat} : Term (depth + 1) :=
-  .bound 0
+  .bound ⟨0, Nat.zero_lt_succ _⟩
 /-- substitution 穿过一个 binder 时的 lifting。 -/
 def liftSubstitution {sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth) :
     Fin (sourceDepth + 1) → Term (targetDepth + 1) :=
@@ -278,6 +278,7 @@ termination_by structural _ formula => formula
   | _, .existsE body => by
       simp only [FreeClosed]
       exact instDecidableFreeClosed body
+termination_by structural _ formula => formula
 /-- 按 substitution 替换公式中的 bound 变量。 -/
 def bind {σ : AtomSignature.{u}} {availableStage sourceDepth targetDepth : Nat} (substitution : Fin sourceDepth → Term targetDepth) :
     Formula σ availableStage sourceDepth → Formula σ availableStage targetDepth
@@ -380,6 +381,8 @@ structure Definitions (σ : AtomSignature.{u}) where
 structure Sentence (σ : AtomSignature.{u}) where
   formula : OpenFormula σ
   freeClosed : formula.FreeClosed
+/- 闭合证书在隐式参数匹配时保持可归约。 -/
+attribute [implicit_reducible] Formula.FreeClosed
 end Definitional
 end SetTheory
 end YesMetaZFC

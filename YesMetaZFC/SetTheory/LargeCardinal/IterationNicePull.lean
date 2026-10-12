@@ -77,8 +77,8 @@ theorem it_nice_pull_l {ω B R b K U S u J C V π c c' T Q Q' G G' E E' L L' : M
     obtain ⟨Y, W, _, my, _⟩ := big.tree.sources i a' ha'
     obtain ⟨X, P, H, _, mx, sx, _⟩ := model ha' haa my
     exact ⟨X, P, H, mx, sx⟩
-  refine ⟨⟨hw, diagram, ?_, sources, (fn0_function_l (ZF.modelsKP hZF) ef).1, ?_, ?_, ?_⟩,
-    (fn0_function_l (ZF.modelsKP hZF) lf).1, ?_, ?_, ?_, ?_⟩
+  refine ⟨⟨⟨hw, diagram, ?_, sources, (fn0_function_l (ZF.modelsKP hZF) ef).1, ?_, ?_, ?_⟩,
+    (fn0_function_l (ZF.modelsKP hZF) lf).1, ?_, ?_, ?_⟩, ?_⟩
   · intro o ho
     have hoω := (big.tree.diagram.model_domain o).mpr ⟨c', big.tree.root o ho⟩
     obtain ⟨a, _, ha, haa⟩ := read qf big.tree.diagram.model_function hQQ (nat o hoω) hoω (big.tree.root o ho)
@@ -146,11 +146,6 @@ theorem it_nice_pull_l {ω B R b K U S u J C V π c c' T Q Q' G G' E E' L L' : M
       obtain ⟨ρ₀, _, hl, hρ₀⟩ := read lf big.function hLL (nat i (ef.bound_l hp).1) (ef.bound_l hp).1
         ((big.levels i ρ').mpr ⟨p', κ', F', hp', pay'⟩)
       exact (hj.1.2 ρ₀ ρ ρ' hρ₀ hρ) ▸ hl
-  · intro i p hp
-    obtain ⟨p', hp', hpp⟩ := image ef hEE hp
-    obtain ⟨κ', ρ', F', pay⟩ := big.active i p' hp'
-    obtain ⟨κ, ρ, F, pay, _⟩ := it_payload_pull_l hZF hw sb.transitive su.transitive mb mu hj hpp pay
-    exact ⟨κ, ρ, F, pay⟩
   · intro i p κ ρ F a X P hp pay ha mx
     obtain ⟨p', hp', hpp⟩ := image ef hEE hp
     obtain ⟨κ', ρ', F', pay', hκ, hρ, hF⟩ := payload hp' hpp pay
@@ -166,5 +161,10 @@ theorem it_nice_pull_l {ω B R b K U S u J C V π c c' T Q Q' G G' E E' L L' : M
     obtain ⟨ρ', hi', hρ⟩ := image lf hLL hi
     obtain ⟨φ', hj', hφ⟩ := image lf hLL hj'
     exact (hj.member_l I hZF hw mb mu hρ hφ).mpr (big.increasing i j ρ' φ' hi' hj' hij)
+  · intro i p hp
+    obtain ⟨p', hp', hpp⟩ := image ef hEE hp
+    obtain ⟨κ', ρ', F', pay⟩ := big.active i p' hp'
+    obtain ⟨κ, ρ, F, pay, _⟩ := it_payload_pull_l hZF hw sb.transitive su.transitive mb mu hj hpp pay
+    exact ⟨κ, ρ, F, pay⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -46,7 +46,13 @@ def Pattern.term {bound free : SetContext} (pattern : Pattern)
     (fs : VariableSubstitution signature sourceFree targetBound targetFree) :
     (pattern.term first second).substituteMapped bs fs =
       pattern.term (first.substituteMapped bs fs) (second.substituteMapped bs fs) := by
-  induction pattern <;> simp_all [Pattern.term, Term.substituteMapped, Arguments.substituteMapped]
+  induction pattern with
+  | literal value => exact finite_numeral_term_substituteMapped bs fs value
+  | first => rfl
+  | second => rfl
+  | successor _ ih => exact congrArg successor_term ih
+  | pairing _ _ ihLeft ihRight =>
+      exact congr (congrArg (fun left right => godel_pairₘ(left, right)) ihLeft) ihRight
 
 @[simp] theorem Pattern.term_instantiateTop (pattern : Pattern)
     {bound free : SetContext} (first second : SetTerm (SetSort.set :: bound) free)

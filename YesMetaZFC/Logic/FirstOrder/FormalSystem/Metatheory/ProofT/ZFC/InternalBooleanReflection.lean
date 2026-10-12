@@ -75,15 +75,31 @@ theorem boolean_signed_satisfies (operation : BooleanConnective) (first second :
     (left right : SetOpenFormula free) (env : Env 𝒩 [] free) :
     (polarity first left).satisfies env → (polarity second right).satisfies env →
       (polarity (operation.value first second) (operation.apply left right)).satisfies env := by
-  cases operation <;> cases first <;> cases second <;>
-    simp [BooleanConnective.value, BooleanConnective.apply, polarity, Formula.satisfies]
-  all_goals intro hl hr; simp_all
+  cases operation <;> cases first <;> cases second <;> intro hl hr
+  · exact fun h => hl h.1
+  · exact fun h => hl h.1
+  · exact fun h => hr h.2
+  · exact ⟨hl, hr⟩
+  · exact fun h => h.elim hl hr
+  · exact Or.inr hr
+  · exact Or.inl hl
+  · exact Or.inl hl
+  · exact fun h => False.elim (hl h)
+  · exact fun _ => hr
+  · exact fun h => hr (h hl)
+  · exact fun _ => hr
+  · exact ⟨fun h => False.elim (hl h), fun h => False.elim (hr h)⟩
+  · exact fun h => hl (h.mpr hr)
+  · exact fun h => hr (h.mp hl)
+  · exact ⟨fun _ => hr, fun _ => hl⟩
 
 theorem boolean_rule_derives (operation : BooleanConnective) (first second : Bool)
     (left right : SetOpenFormula free) :
     Derives intrinsic_zfc_theory [] (.imp (polarity first left) (.imp (polarity second right)
-      (polarity (operation.value first second) (operation.apply left right)))) :=
-  source_complete _ (fun _ _ env => boolean_signed_satisfies operation first second left right env)
+      (polarity (operation.value first second) (operation.apply left right)))) := by
+  cases operation <;> cases first <;> cases second
+  all_goals dsimp only [BooleanConnective.value, BooleanConnective.apply, polarity]
+  all_goals derive_prop
 
 /-- 合取、析取、蕴含与双条件都保持正负反射。 -/
 theorem boolean_reflection (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)

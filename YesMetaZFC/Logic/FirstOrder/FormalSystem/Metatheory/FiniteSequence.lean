@@ -62,8 +62,14 @@ abbrev standard_sequence {bound free : SetContext}
   | nil =>
       rfl
   | cons head tail ih =>
-      simp [standard_sequence_from, ih, ordered_pair_term,
-        singleton_term, binary_union_term]
+      exact (congrArg
+        (fun index =>
+          {⟨index, head.weakenFree introduced⟩ₘ}ₘ ∪ₘ
+            (standard_sequence_from (start + 1) tail).weakenFree introduced)
+        (finite_numeral_term_weakenFree introduced start)).trans
+          (congrArg
+            (fun rest => {⟨numₘ(start), head.weakenFree introduced⟩ₘ}ₘ ∪ₘ rest)
+            (ih (start + 1)))
 
 /-- 标准序列逐项弱化后再实例化顶部 free 槽，直接恢复原有限图。 -/
 @[simp] theorem standard_sequence_from_instantiateFreeTop_map_weakenFree

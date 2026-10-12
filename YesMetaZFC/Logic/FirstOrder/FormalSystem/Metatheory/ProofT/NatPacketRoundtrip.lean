@@ -13,7 +13,10 @@ theorem packBytes_pos (bytes : List Nat) : 0 < packBytes bytes := by
 theorem readBytes_pack (bytes : List Nat) (hBytes : ∀ b ∈ bytes, b < 256) (acc : List Nat) :
     readBytes (packBytes bytes) acc = some (acc.reverse ++ bytes) := by
   induction bytes generalizing acc with
-  | nil => rw [readBytes.eq_def]; simp [packBytes]
+  | nil =>
+      rw [readBytes.eq_def]
+      change some acc.reverse = some (acc.reverse ++ [])
+      rw [List.append_nil]
   | cons byte tail ih =>
       have hb : byte < 256 := hBytes byte (by simp)
       have hp := packBytes_pos tail
@@ -68,7 +71,9 @@ theorem readTokens_varint (n : Nat) (rest : List Nat) (value scale : Nat) (acc :
 theorem readTokens_flatMap (tokens : List Nat) (acc : List Nat) :
     readTokens (tokens.flatMap varint) 0 1 acc = some (acc.reverse ++ tokens) := by
   induction tokens generalizing acc with
-  | nil => simp [readTokens]
+  | nil =>
+      change some acc.reverse = some (acc.reverse ++ [])
+      rw [List.append_nil]
   | cons head tail ih =>
       simp only [List.flatMap_cons]
       rw [readTokens_varint head _ 0 1 acc (by simp)]
@@ -106,7 +111,7 @@ mutual
   cases tree with
   | node tag children =>
       cases fuel with
-      | zero => have := weight_pos (Tree.node tag children); omega
+      | zero => exfalso; have := weight_pos (Tree.node tag children); omega
       | succ fuel =>
           rw [treeTokens]
           simp only [List.cons_append, readTree]
@@ -121,7 +126,7 @@ mutual
   | nil => simp [readForest]
   | cons head tail =>
       cases fuel with
-      | zero => omega
+      | zero => exfalso; omega
       | succ fuel =>
           have hp := weight_pos head
           simp only [List.map_cons, List.sum_cons] at hFuel

@@ -52,14 +52,16 @@ universe u v w
     (fun entry => nomatch entry)
     (fun entry => by
       intro sourceBound targetBound targetFree boundSubstitution freeSubstitution
-      simp [Term.substituteMapped])
+      rw [Term.embedBoundClosed_fvar]
+      rfl)
     (fun function arguments ih => by
       intro sourceBound targetBound targetFree boundSubstitution freeSubstitution
       simp only [Term.embedBoundClosed_app, Term.substituteMapped]
       rw [ih sourceBound targetBound targetFree boundSubstitution freeSubstitution])
     (by
       intro sourceBound targetBound targetFree boundSubstitution freeSubstitution
-      simp [Arguments.substituteMapped])
+      rw [Arguments.embedBoundClosed_nil]
+      rfl)
     (fun head tail ihHead ihTail => by
       intro sourceBound targetBound targetFree boundSubstitution freeSubstitution
       simp only [Arguments.embedBoundClosed_cons, Arguments.substituteMapped]
@@ -101,7 +103,7 @@ universe u v w
         (VariableSubstitution.empty :
           VariableSubstitution σ [] [] free)
         VariableSubstitution.freeId = term := by
-  simp [Term.embedBoundClosed]
+  exact Term.substituteMapped_empty_freeId term
 
 /-- 无 bound 公式上的空替换同样直接保持原公式。 -/
 @[simp] theorem Formula.substituteMapped_empty_freeId_eq_self
@@ -112,15 +114,15 @@ universe u v w
         (VariableSubstitution.empty :
           VariableSubstitution σ [] [] free)
         VariableSubstitution.freeId = formula := by
-  have hEmpty :
-      (VariableSubstitution.empty :
-        VariableSubstitution σ [] [] free) =
-      (VariableSubstitution.boundId :
-        VariableSubstitution σ [] [] free) := by
-    funext sort entry
-    exact nomatch entry
-  rw [hEmpty]
-  exact Formula.substituteMapped_id formula
+  calc
+    _ = formula.substituteMapped
+        VariableSubstitution.boundId VariableSubstitution.freeId := by
+      apply Formula.substituteMapped_congr
+      · intro sort entry
+        exact nomatch entry
+      · intro sort entry
+        rfl
+    _ = formula := Formula.substituteMapped_id formula
 
 /-- 恒等 free 替换保持闭 bound 嵌入，连续 witness 实例化因此不展开原 AST。 -/
 @[simp] theorem Term.embedBoundClosed_substituteMapped_freeId
@@ -164,15 +166,15 @@ universe u v w
         (VariableSubstitution.cons witness boundSubstitution)
         freeSubstitution
   rw [Formula.substituteMapped_comp]
-  congr
-  · funext resultSort entry
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
     cases entry with
     | here =>
         rfl
     | there previous =>
         exact Term.instantiateTop_weakenBound
           witness (boundSubstitution previous)
-  · funext resultSort entry
+  · intro resultSort entry
     exact Term.instantiateTop_weakenBound
       witness (freeSubstitution entry)
 

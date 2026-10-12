@@ -70,14 +70,9 @@ def row_term {bound free : SetContext} (term : closed_term) :
       Arguments.embedClosed [] [] arguments = arguments)
     (fun entry => nomatch entry)
     (fun entry => nomatch entry)
-    (fun function arguments ih => by
-      simp [row_term, Term.embedClosed, ih])
-    (by simp [Arguments.embedClosed])
-    (fun head tail ihHead ihTail => by
-      have hHead : Term.embedClosed [] [] head = head := by
-        simpa [row_term] using ihHead
-      simp only [Arguments.embedClosed]
-      rw [hHead, ihTail])
+    (fun function _ ih => congrArg (Term.app function) ih)
+    rfl
+    (fun _ _ ihHead ihTail => congr (congrArg Arguments.cons ihHead) ihTail)
     term
 
 /-- 固定表行编译为内在二元分支，公式和证书槽位由上下文索引固定。 -/

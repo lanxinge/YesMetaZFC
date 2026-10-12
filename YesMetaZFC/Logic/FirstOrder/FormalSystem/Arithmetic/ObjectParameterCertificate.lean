@@ -72,10 +72,12 @@ theorem parameters_reject (free sorts : SetContext) (input : Tree)
     simp only [List.cons.injEq, and_true] at h
     obtain ⟨head, tail, rfl, hHeadCode, hTailCode⟩ := treeValue_node_two h.2.2
     cases sorts with
-    | nil => simp at h
+    | nil =>
+        have hZero : (0 : Nat) = Nat.succ (values 1) := h.2.1
+        cases hZero
     | cons sort sorts =>
       cases sort
-      have hCount : sorts.length = values 1 := by simpa using h.2.1
+      have hCount : sorts.length = values 1 := Nat.succ.inj h.2.1
       cases hTerm : SyntaxDecode.term [] free head with
       | none =>
         refine ⟨node 0 [.literal 0, .var 0, .var 2] , List.mem_cons_self, ?_⟩

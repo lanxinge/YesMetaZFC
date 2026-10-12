@@ -55,12 +55,12 @@ theorem st_unpack_source_l (n h p : (N).Domain) :
   refine read.trans ⟨?_, ?_⟩
   · rintro ⟨A, g, eq, hg, hh, cp, restrict⟩
     exact ⟨eq ▸ (fn h n A).mp hh, g.val, eq ▸ (fn g ⟨ω, hωY⟩ A).mp hg,
-      eq ▸ (code A g n p (eq.symm ▸ hV) hs hων).mp cp, (cut h g n).mp restrict⟩
+      eq ▸ (code A g n p (eq.symm ▸ hV) hων).mp cp, (cut h g n).mp restrict⟩
   · rintro ⟨hh, g, hg, cp, restrict⟩
     let A : (N).Domain := ⟨X, (ZF.v_successor_l Q hZF hV hW hs X).mpr (fun _ h => h)⟩
     let g' : (N).Domain := ⟨g, (ZF.v_successor_l Q hZF hV hW hs g).mpr
       (fp_function_rank_l Q hZF hω hV hων (fun i hi => ZF.v_ordinal_mem_l Q hZF hV (hων i hi)) hg)⟩
     exact ⟨A, g', rfl, (fn g' ⟨ω, hωY⟩ A).mpr hg, (fn h n A).mpr hh,
-      (code A g' n p hV hs hων).mpr cp, (cut h g' n).mpr restrict⟩
+      (code A g' n p hV hων).mpr cp, (cut h g' n).mpr restrict⟩
 
 end YesMetaZFC.SetTheory.Internal

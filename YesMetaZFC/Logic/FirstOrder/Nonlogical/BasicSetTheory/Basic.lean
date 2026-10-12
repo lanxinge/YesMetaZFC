@@ -120,7 +120,7 @@ theorem extensionality_instance_derives
     FirstOrder.Derives.context_weaken (Δ := Γ)
       (by
         intro candidate hMember
-        simp [Context.substituteFree, FreshVariable.extendContext] at hMember)
+        cases hMember)
       hInstance
   simpa [τ, extensionality_instance, agreement_to_equality,
     membership_agreement, Formula.substituteFree,
@@ -174,7 +174,14 @@ def membership_specification {bound free : SetContext}
           (replacement.weakenFree SetSort.set)) := by
   unfold membership_specification
   rw [Formula.instantiateTop_forallFreeTop]
-  simp
+  exact congrArg
+    (fun currentCandidate : SetTerm bound (SetSort.set :: free) =>
+      Formula.forallFreeTop SetSort.set
+        (((.fvar .here : SetTerm bound (SetSort.set :: free)) ∈ₘ
+          currentCandidate) ↔ₘ
+          condition.instantiateTop (replacement.weakenFree SetSort.set)))
+    (Term.instantiateTop_weakenFree
+      (introduced := SetSort.set) replacement candidate)
 
 /-- 两个集合满足同一个成员规格时相等。 -/
 theorem membership_specification_unique
@@ -196,14 +203,12 @@ theorem membership_specification_unique
         FreshVariable.extendContext SetSort.set
           (rightSpecification :: leftSpecification :: Γ) ⊢ₘ[extensionality_theory]
           leftSpecification.weakenFree SetSort.set :=
-      FirstOrder.Derives.assumption (by
-        simp [FreshVariable.extendContext])
+      FirstOrder.Derives.assumption (.tail _ (.head _))
     have hRightUniversal :
         FreshVariable.extendContext SetSort.set
           (rightSpecification :: leftSpecification :: Γ) ⊢ₘ[extensionality_theory]
           rightSpecification.weakenFree SetSort.set :=
-      FirstOrder.Derives.assumption (by
-        simp [FreshVariable.extendContext])
+      FirstOrder.Derives.assumption (.head _)
     have hLeftAt :=
       FirstOrder.Derives.forall_elim_newest_weakened hLeftUniversal
     have hRightAt :=
@@ -243,7 +248,7 @@ theorem subset_definition_instance_derives
     FirstOrder.Derives.context_weaken (Δ := Γ)
       (by
         intro candidate hMember
-        simp [Context.substituteFree, FreshVariable.extendContext] at hMember)
+        cases hMember)
       hInstance
   simpa [τ, subset_definition_instance, subset_condition,
     Formula.substituteFree, Substitution.free_map,

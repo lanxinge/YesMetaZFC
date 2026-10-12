@@ -12,11 +12,16 @@ open Logic.FirstOrder.Nonlogical.BasicSetTheory ProofT QuineEncoding
 open scoped Logic.FirstOrder.Nonlogical.BasicSetTheory.Symbols
 set_option autoImplicit false
 
+/-- 以零槽和后继槽直接拼接有限赋值。 -/
+private def consValues {n : Nat} (head : Nat) (tail : Fin n → Nat) : Fin (n + 1) → Nat
+  | ⟨0, _⟩ => head
+  | ⟨k + 1, h⟩ => tail ⟨k, Nat.lt_of_succ_lt_succ h⟩
+
 /-- 完整枚举给定有限界内的变量赋值。 -/
 def environments (bound : Nat) : (arity : Nat) → List (Fin arity → Nat)
   | 0 => [Fin.elim0]
   | n + 1 => (List.range (bound + 1)).flatMap fun head =>
-      (environments bound n).map fun tail => Fin.cases head tail
+      (environments bound n).map fun tail => consValues head tail
 
 theorem mem_environments (bound arity : Nat) (values : Fin arity → Nat) :
     values ∈ environments bound arity ↔ ∀ i, values i ≤ bound := by
@@ -113,10 +118,30 @@ decreasing_by
   rw [hHead]
   exact descending rule hRule values (by rwa [← hHead]) hGuards premise hPremise
 
+universe u
+
+/-- 对有限布尔检查表结构归纳，从非全真取得实际失败项。 -/
+theorem exists_check_failure {α : Type u} (items : List α) (checked : α → Bool)
+    (hFailure : ¬ ∀ item, item ∈ items → checked item = true) :
+    ∃ item, item ∈ items ∧ checked item = false := by
+  induction items with
+  | nil => exact False.elim (hFailure (by intro item hItem; cases hItem))
+  | cons item items ih =>
+    cases hChecked : checked item with
+    | false => exact ⟨item, List.mem_cons_self, hChecked⟩
+    | true =>
+      obtain ⟨failed, hMember, hFalse⟩ := ih (by
+        intro hAll
+        apply hFailure
+        intro value hValue
+        cases hValue with
+        | head => exact hChecked
+        | tail _ hValue => exact hAll value hValue)
+      exact ⟨failed, List.mem_cons_of_mem _ hMember, hFalse⟩
+
 theorem check_rejection (rules : List Rule) (rank : Nat → Nat)
     (descending : Descending rules rank) (root : Nat)
     (h : check rules rank root = false) : Rejection rules root := by
-  classical
   apply Rejection.of_rank rules (fun n => check rules rank n = false) rank ?_ root h
   intro root hFalse rule hRule values hBound hHead hGuards
   have hFailure : ¬ ∀ premise, premise ∈ rule.premises → check rules rank (premise.eval values) = true := by
@@ -125,15 +150,9 @@ theorem check_rejection (rules : List Rule) (rank : Nat → Nat)
       ⟨rule, hRule, values, hBound, hHead, hGuards, hPremises⟩
     rw [hFalse] at hTrue
     cases hTrue
-  have hExists : ∃ premise, premise ∈ rule.premises ∧ check rules rank (premise.eval values) ≠ true := by
-    apply Classical.byContradiction
-    intro hNo
-    apply hFailure
-    intro premise hPremise
-    apply Classical.byContradiction
-    exact fun hBad => hNo ⟨premise, hPremise, hBad⟩
-  obtain ⟨premise, hPremise, hFailure⟩ := hExists
-  refine ⟨premise, hPremise, Bool.eq_false_iff.mpr hFailure, ?_⟩
+  obtain ⟨premise, hPremise, hFailure⟩ :=
+    exists_check_failure rule.premises (fun premise => check rules rank (premise.eval values)) hFailure
+  refine ⟨premise, hPremise, hFailure, ?_⟩
   rw [hHead]
   exact descending rule hRule values (by rwa [← hHead]) hGuards premise hPremise
 

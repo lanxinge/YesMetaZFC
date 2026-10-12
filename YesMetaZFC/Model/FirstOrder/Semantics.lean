@@ -190,13 +190,27 @@ theorem satisfies_conjunctionList_iff {σ : Signature.{u, v, w}}
       ∀ formula ∈ formulas, satisfies env formula := by
   induction formulas with
   | nil =>
-      simp [conjunctionList, satisfies]
+      exact ⟨(fun _ formula hMem => nomatch hMem), fun _ => True.intro⟩
   | cons formula rest ih =>
       cases rest with
       | nil =>
-          simp [conjunctionList]
+          constructor
+          · intro hSat member hMem
+            cases hMem with
+            | head => exact hSat
+            | tail _ hMem => cases hMem
+          · intro hSat
+            exact hSat formula List.mem_cons_self
       | cons next tail =>
-          simp [conjunctionList, satisfies, ih]
+          constructor
+          · rintro ⟨hHead, hRest⟩ member hMem
+            cases hMem with
+            | head => exact hHead
+            | tail _ hMem => exact ih.mp hRest member hMem
+          · intro hSat
+            exact ⟨hSat formula List.mem_cons_self,
+              ih.mpr (fun member hMem =>
+                hSat member (List.mem_cons_of_mem formula hMem))⟩
 
 /-- 有限析取的满足关系等价于至少满足列表中的一个公式。 -/
 theorem satisfies_disjunctionList_iff {σ : Signature.{u, v, w}}
@@ -207,13 +221,32 @@ theorem satisfies_disjunctionList_iff {σ : Signature.{u, v, w}}
       ∃ formula ∈ formulas, satisfies env formula := by
   induction formulas with
   | nil =>
-      simp [disjunctionList, satisfies]
+      constructor
+      · exact False.elim
+      · rintro ⟨formula, hMem, _⟩
+        cases hMem
   | cons formula rest ih =>
       cases rest with
       | nil =>
-          simp [disjunctionList]
+          constructor
+          · intro hSat
+            exact ⟨formula, List.mem_cons_self, hSat⟩
+          · rintro ⟨member, hMem, hSat⟩
+            cases hMem with
+            | head => exact hSat
+            | tail _ hMem => cases hMem
       | cons next tail =>
-          simp [disjunctionList, satisfies, ih]
+          constructor
+          · intro hSat
+            cases hSat with
+            | inl hHead => exact ⟨formula, List.mem_cons_self, hHead⟩
+            | inr hRest =>
+                obtain ⟨member, hMem, hSat⟩ := ih.mp hRest
+                exact ⟨member, List.mem_cons_of_mem formula hMem, hSat⟩
+          · rintro ⟨member, hMem, hSat⟩
+            cases hMem with
+            | head => exact Or.inl hSat
+            | tail _ hMem => exact Or.inr (ih.mpr ⟨member, hMem, hSat⟩)
 
 end Formula
 end FirstOrder

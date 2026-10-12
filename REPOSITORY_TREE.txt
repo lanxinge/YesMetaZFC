@@ -1,0 +1,1355 @@
+YesMetaZFC/
+|-- .github/
+|   `-- workflows/
+|       `-- lean_action_ci.yml
+|-- markdown/
+|   |-- AGENTS.md
+|   |-- ARITHMETIC_PLAN.md
+|   |-- ARITHMETIC_STATUS.md
+|   |-- CACHE.md
+|   |-- CHOICE_FREE_ZF_RESEARCH.md
+|   |-- ELIMINATION.md
+|   |-- ENGINEERING.md
+|   |-- NAT_DECODING.md
+|   |-- ProofNaming.md
+|   |-- RESTORE.md
+|   |-- TROPHIES.md
+|   `-- UNIFIED_VERIFICATION.md
+|-- research/
+|   `-- ChoiceFreeZF/
+|       |-- collection-church.lean
+|       |-- collection-cover.lean
+|       |-- foundations-graph-rank.lean
+|       |-- foundations-rank.lean
+|       |-- README.md
+|       |-- root-universe.lean
+|       |-- semantics-church-stable.lean
+|       |-- semantics-description.lean
+|       |-- semantics-stable.lean
+|       `-- verification.json
+|-- scripts/
+|   |-- tests/
+|   |   `-- test_lean_cache.py
+|   |-- check-all.sh
+|   |-- check_arithmetic.py
+|   |-- check_elementary.py
+|   |-- check_filters.py
+|   |-- check_forcing.py
+|   |-- check_ultrapower.py
+|   |-- lean_cache.py
+|   |-- publish_cache.py
+|   `-- test_arithmetic_guard.py
+|-- tools/
+|   `-- metamath_kb/
+|       `-- build_kb.py
+|-- YesMetaZFC/
+|   |-- Automation/
+|   |   |-- CoreNormalForm/
+|   |   |   |-- FirstOrderProjectionSoundness/
+|   |   |   |   |-- Atom.lean
+|   |   |   |   |-- Clause.lean
+|   |   |   |   |-- Closed.lean
+|   |   |   |   |-- Core.lean
+|   |   |   |   |-- DAG.lean
+|   |   |   |   `-- Problem.lean
+|   |   |   |-- AntiPrenex.lean
+|   |   |   |-- AntiPrenexSoundness.lean
+|   |   |   |-- CheckedPreprocessing.lean
+|   |   |   |-- ContextualRewriteSoundness.lean
+|   |   |   |-- DefinitionalCnf.lean
+|   |   |   |-- DefinitionalCnfSoundness.lean
+|   |   |   |-- FirstOrderProjectionSoundness.lean
+|   |   |   |-- FoolLambdaSoundness.lean
+|   |   |   |-- FoolLambdaTraceSoundness.lean
+|   |   |   |-- FoolTraceSoundness.lean
+|   |   |   |-- HigherOrderProjectionSoundness.lean
+|   |   |   |-- LocalSkolem.lean
+|   |   |   |-- LocalSkolemSoundness.lean
+|   |   |   |-- NormalizationSoundness.lean
+|   |   |   |-- RewriteTyping.lean
+|   |   |   |-- ScopedEnvironmentSoundness.lean
+|   |   |   `-- Semantics.lean
+|   |   |-- DAGCertificate/
+|   |   |   |-- IntrinsicReplay/
+|   |   |   |   |-- Avatar.lean
+|   |   |   |   |-- AvatarSemantics.lean
+|   |   |   |   |-- Clause.lean
+|   |   |   |   |-- Core.lean
+|   |   |   |   |-- EqualityResolution.lean
+|   |   |   |   |-- Factoring.lean
+|   |   |   |   |-- Local.lean
+|   |   |   |   |-- LocalRules.lean
+|   |   |   |   |-- Resolution.lean
+|   |   |   |   |-- Rewrite.lean
+|   |   |   |   |-- Semantics.lean
+|   |   |   |   |-- StandardizeApart.lean
+|   |   |   |   `-- Substitution.lean
+|   |   |   |-- AvatarRegistry.lean
+|   |   |   |-- Compile.lean
+|   |   |   |-- CompileContext.lean
+|   |   |   |-- CompileDAG.lean
+|   |   |   |-- CompileRenaming.lean
+|   |   |   |-- CompileSemantics.lean
+|   |   |   |-- CompileSubstitution.lean
+|   |   |   |-- CompileSupport.lean
+|   |   |   |-- Core.lean
+|   |   |   |-- IntrinsicReplay.lean
+|   |   |   |-- LinearReplay.lean
+|   |   |   |-- Payload.lean
+|   |   |   |-- ReplayArena.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- Data/
+|   |   |   |-- Arena.lean
+|   |   |   |-- BitSet.lean
+|   |   |   |-- BranchHeap.lean
+|   |   |   |-- CanonicalSeedWorkspace.lean
+|   |   |   |-- CertificateBlob.lean
+|   |   |   |-- CertificateWorkspace.lean
+|   |   |   |-- ClauseArena.lean
+|   |   |   |-- ClauseMetadata.lean
+|   |   |   |-- ClauseSignature.lean
+|   |   |   |-- ConflictWorkspace.lean
+|   |   |   |-- FifoQueue.lean
+|   |   |   |-- Fixpoint.lean
+|   |   |   |-- GivenWorkspace.lean
+|   |   |   |-- Heap.lean
+|   |   |   |-- Intern.lean
+|   |   |   |-- ModelRoundWorkspace.lean
+|   |   |   |-- OpenAddress.lean
+|   |   |   |-- Packed.lean
+|   |   |   |-- Replay.lean
+|   |   |   |-- Signature.lean
+|   |   |   |-- Sparse.lean
+|   |   |   |-- StableIdLiveness.lean
+|   |   |   |-- StableIdMap.lean
+|   |   |   |-- StableIdRegistry.lean
+|   |   |   |-- Util.lean
+|   |   |   `-- Watch.lean
+|   |   |-- FirstOrderDerives/
+|   |   |   `-- TypedView.lean
+|   |   |-- HODAGCertificate/
+|   |   |   |-- Core.lean
+|   |   |   `-- LinearReplay.lean
+|   |   |-- HostAvatar/
+|   |   |   `-- Dispatch.lean
+|   |   |-- HostFirstOrder/
+|   |   |   |-- Backend.lean
+|   |   |   |-- Provider.lean
+|   |   |   |-- ReplaySemantics.lean
+|   |   |   |-- Semantics.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- HostNormalization/
+|   |   |   |-- CheckedReplay.lean
+|   |   |   |-- CheckedTransaction.lean
+|   |   |   |-- CoreRules.lean
+|   |   |   |-- EqualityClosure.lean
+|   |   |   |-- RestrictedSuperposition.lean
+|   |   |   |-- RuleCompiler.lean
+|   |   |   `-- RuleRegistry.lean
+|   |   |-- HostRules/
+|   |   |   |-- Backend.lean
+|   |   |   |-- Frontend.lean
+|   |   |   |-- Registry.lean
+|   |   |   `-- Semantics.lean
+|   |   |-- KernelReplay/
+|   |   |   `-- Source.lean
+|   |   |-- Request/
+|   |   |   `-- GoalAttempt.lean
+|   |   |-- Resolution/
+|   |   |   `-- CertificateSlice.lean
+|   |   |-- Superposition/
+|   |   |   |-- DiscriminationTree.lean
+|   |   |   `-- LiteralDiscriminationIndex.lean
+|   |   |-- Tools/
+|   |   |   |-- ProveAutoBranchProbe.lean
+|   |   |   `-- ProveAutoSweep.lean
+|   |   |-- Avatar.lean
+|   |   |-- AvatarSplit.lean
+|   |   |-- Certificate.lean
+|   |   |-- CheckerSeal.lean
+|   |   |-- Completeness.lean
+|   |   |-- CoreNormalForm.lean
+|   |   |-- CoreSyntax.lean
+|   |   |-- DAGCertificate.lean
+|   |   |-- Data.lean
+|   |   |-- DenseDAG.lean
+|   |   |-- DeriveFreeClosed.lean
+|   |   |-- DerivesClosure.lean
+|   |   |-- FiniteBasisModels.lean
+|   |   |-- FirstOrderDerives.lean
+|   |   |-- FormulaBinderSemantics.lean
+|   |   |-- FunctionFreeDelta0.lean
+|   |   |-- Guards.lean
+|   |   |-- GuardSemantics.lean
+|   |   |-- HigherOrderNativeReplay.lean
+|   |   |-- HigherOrderReplayBuilder.lean
+|   |   |-- HOAvatar.lean
+|   |   |-- HOAvatarSoundness.lean
+|   |   |-- HODAGCertificate.lean
+|   |   |-- HOExtensionalWitnessRegistry.lean
+|   |   |-- HOExtensionalWitnessSoundness.lean
+|   |   |-- HORefutationProvider.lean
+|   |   |-- HOReplayQuotation.lean
+|   |   |-- HOSearch.lean
+|   |   |-- HOSearchMaterialization.lean
+|   |   |-- HostFirstOrder.lean
+|   |   |-- HostHigherOrder.lean
+|   |   |-- HostNormalization.lean
+|   |   |-- HostProp.lean
+|   |   |-- HostReification.lean
+|   |   |-- KernelReplay.lean
+|   |   |-- LazyDefinitionRegistry.lean
+|   |   |-- LogicSoundness.lean
+|   |   |-- NaturalProofPresentation.lean
+|   |   |-- NaturalRosserSemantics.lean
+|   |   |-- ObjectArithmeticTerm.lean
+|   |   |-- ObjectBinaryTest.lean
+|   |   |-- ObjectBoundedReflection.lean
+|   |   |-- ObjectCheckedReflection.lean
+|   |   |-- ObjectCheckedTrace.lean
+|   |   |-- ObjectCodeBounds.lean
+|   |   |-- ObjectCodeInstantiation.lean
+|   |   |-- ObjectCodeMonotone.lean
+|   |   |-- ObjectCodeParameters.lean
+|   |   |-- ObjectCodeProjection.lean
+|   |   |-- ObjectCodeSubstitution.lean
+|   |   |-- ObjectDiagonalFixedPoint.lean
+|   |   |-- ObjectDiagonalRelation.lean
+|   |   |-- ObjectDiagonalSyntax.lean
+|   |   |-- ObjectExpressionIteration.lean
+|   |   |-- ObjectFiniteAxioms.lean
+|   |   |-- ObjectFiniteJoin.lean
+|   |   |-- ObjectFiniteSet.lean
+|   |   |-- ObjectFiniteTable.lean
+|   |   |-- ObjectFormulaAccept.lean
+|   |   |-- ObjectFormulaSound.lean
+|   |   |-- ObjectFormulaSyntax.lean
+|   |   |-- ObjectHorn.lean
+|   |   |-- ObjectHornCertificate.lean
+|   |   |-- ObjectHornCheck.lean
+|   |   |-- ObjectHornDerives.lean
+|   |   |-- ObjectHornLocal.lean
+|   |   |-- ObjectHornRanking.lean
+|   |   |-- ObjectHornReflection.lean
+|   |   |-- ObjectHornSemantics.lean
+|   |   |-- ObjectHornValues.lean
+|   |   |-- ObjectLeastWitness.lean
+|   |   |-- ObjectLocalDecision.lean
+|   |   |-- ObjectLocalDecisionSemantics.lean
+|   |   |-- ObjectLoebFixedPoint.lean
+|   |   |-- ObjectLogicalAxiom.lean
+|   |   |-- ObjectLogicalAxiomAccept.lean
+|   |   |-- ObjectLogicalAxiomSound.lean
+|   |   |-- ObjectLogicalAxiomSpec.lean
+|   |   |-- ObjectMinimumRelation.lean
+|   |   |-- ObjectMinimumSemantics.lean
+|   |   |-- ObjectNumeralComparison.lean
+|   |   |-- ObjectNumeralEvaluation.lean
+|   |   |-- ObjectNumeralOrder.lean
+|   |   |-- ObjectNumeralQuantifiers.lean
+|   |   |-- ObjectNumeralReflection.lean
+|   |   |-- ObjectNumeralSyntax.lean
+|   |   |-- ObjectNumeralSyntaxSpecifications.lean
+|   |   |-- ObjectNumeralTraceReflection.lean
+|   |   |-- ObjectPacketArithmetic.lean
+|   |   |-- ObjectPacketData.lean
+|   |   |-- ObjectPacketDerives.lean
+|   |   |-- ObjectPacketGraph.lean
+|   |   |-- ObjectPacketNumeric.lean
+|   |   |-- ObjectPacketRanking.lean
+|   |   |-- ObjectPacketReject.lean
+|   |   |-- ObjectPacketToken.lean
+|   |   |-- ObjectPacketTree.lean
+|   |   |-- ObjectParameterCertificate.lean
+|   |   |-- ObjectParameterDiagonal.lean
+|   |   |-- ObjectPositiveBinder.lean
+|   |   |-- ObjectPositiveReflection.lean
+|   |   |-- ObjectProjection.lean
+|   |   |-- ObjectProjectQuotation.lean
+|   |   |-- ObjectProjectQuotationAccept.lean
+|   |   |-- ObjectProjectQuotationBounds.lean
+|   |   |-- ObjectProjectQuotationDerives.lean
+|   |   |-- ObjectProjectQuotationReject.lean
+|   |   |-- ObjectProofNode.lean
+|   |   |-- ObjectProofNodeAccept.lean
+|   |   |-- ObjectProofNodePresentation.lean
+|   |   |-- ObjectProofNodeSemantics.lean
+|   |   |-- ObjectProofNodeSound.lean
+|   |   |-- ObjectProofRow.lean
+|   |   |-- ObjectProofTree.lean
+|   |   |-- ObjectProofTreeSpec.lean
+|   |   |-- ObjectRangeTable.lean
+|   |   |-- ObjectRawTreeBounds.lean
+|   |   |-- ObjectRelationBinder.lean
+|   |   |-- ObjectSyntaxReflection.lean
+|   |   |-- ObjectSyntaxTransform.lean
+|   |   |-- ObjectSyntaxTransformAccept.lean
+|   |   |-- ObjectSyntaxTransformConcrete.lean
+|   |   |-- ObjectSyntaxTransformSound.lean
+|   |   |-- ObjectSyntaxTransformSpec.lean
+|   |   |-- ObjectTarskiFixedPoint.lean
+|   |   |-- ObjectTermAccept.lean
+|   |   |-- ObjectTermDerives.lean
+|   |   |-- ObjectTermReject.lean
+|   |   |-- ObjectTermSyntax.lean
+|   |   |-- ObjectTrace.lean
+|   |   |-- ObjectTraceComposition.lean
+|   |   |-- ObjectTraceSemantics.lean
+|   |   |-- ObjectTransformRanking.lean
+|   |   |-- ObjectTreeTemplate.lean
+|   |   |-- ObjectUnaryIteration.lean
+|   |   |-- PropCdcl.lean
+|   |   |-- QuotationInduction.lean
+|   |   |-- Redundancy.lean
+|   |   |-- ReplayQuotation.lean
+|   |   |-- Request.lean
+|   |   |-- Resolution.lean
+|   |   |-- ResourceTrace.lean
+|   |   |-- Scheduler.lean
+|   |   |-- SearchMaterialization.lean
+|   |   |-- SearchReplayMaterial.lean
+|   |   |-- SourcePreprocessing.lean
+|   |   |-- Superposition.lean
+|   |   |-- Syntax.lean
+|   |   `-- TheoryInclusion.lean
+|   |-- LargeCardinals/
+|   |   |-- Definitions/
+|   |   |   |-- Basic.lean
+|   |   |   `-- Syntax.lean
+|   |   `-- Definitions.lean
+|   |-- Logic/
+|   |   |-- Arithmetic/
+|   |   |   |-- PA/
+|   |   |   |   |-- Addition.lean
+|   |   |   |   |-- Axioms.lean
+|   |   |   |   |-- Cancellation.lean
+|   |   |   |   |-- Induction.lean
+|   |   |   |   |-- Interpretation.lean
+|   |   |   |   |-- Multiplication.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   |-- StrictOrder.lean
+|   |   |   |   |-- Translation.lean
+|   |   |   |   `-- TranslationBinders.lean
+|   |   |   |-- PrimitiveRecursive/
+|   |   |   |   |-- Closure.lean
+|   |   |   |   |-- Formula.lean
+|   |   |   |   `-- Program.lean
+|   |   |   |-- Q/
+|   |   |   |   |-- Axioms.lean
+|   |   |   |   |-- Derivation.lean
+|   |   |   |   |-- Numeral.lean
+|   |   |   |   `-- Order.lean
+|   |   |   |-- Z2/
+|   |   |   |   |-- Axioms.lean
+|   |   |   |   |-- Beta.lean
+|   |   |   |   |-- Induction.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Beta.lean
+|   |   |   |-- BetaPrefix.lean
+|   |   |   |-- BetaSequence.lean
+|   |   |   |-- Divisibility.lean
+|   |   |   |-- Division.lean
+|   |   |   |-- Equality.lean
+|   |   |   |-- FiniteRange.lean
+|   |   |   |-- History.lean
+|   |   |   |-- Minimum.lean
+|   |   |   |-- Modular.lean
+|   |   |   |-- NatPairing.lean
+|   |   |   |-- Order.lean
+|   |   |   |-- Pairing.lean
+|   |   |   |-- README.md
+|   |   |   |-- Robinson.lean
+|   |   |   |-- Sequence.lean
+|   |   |   |-- Signature.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- FirstOrder/
+|   |   |   |-- Context/
+|   |   |   |   `-- Basic.lean
+|   |   |   |-- Derivation/
+|   |   |   |   |-- Substitution/
+|   |   |   |   |   |-- Algebra.lean
+|   |   |   |   |   |-- Basic.lean
+|   |   |   |   |   `-- ClosedTransport.lean
+|   |   |   |   |-- Classical.lean
+|   |   |   |   |-- Consistency.lean
+|   |   |   |   |-- Core.lean
+|   |   |   |   |-- Equality.lean
+|   |   |   |   |-- Propositional.lean
+|   |   |   |   |-- Quantifier.lean
+|   |   |   |   |-- QuantifierBlock.lean
+|   |   |   |   |-- Structural.lean
+|   |   |   |   `-- Substitution.lean
+|   |   |   |-- FormalSystem/
+|   |   |   |   |-- Metatheory/
+|   |   |   |   |   |-- ProofT/
+|   |   |   |   |   |   |-- ZFC/
+|   |   |   |   |   |   |   |-- AxiomCanonical.lean
+|   |   |   |   |   |   |   |-- AxiomDecode.lean
+|   |   |   |   |   |   |   |-- AxiomEncode.lean
+|   |   |   |   |   |   |   |-- BaseAxiomPacketData.lean
+|   |   |   |   |   |   |   |-- BaseAxiomPacketGraph.lean
+|   |   |   |   |   |   |   |-- BaseAxiomPacketSpec.lean
+|   |   |   |   |   |   |   |-- InternalArithmeticEvaluation.lean
+|   |   |   |   |   |   |   |-- InternalArithmeticRules.lean
+|   |   |   |   |   |   |   |-- InternalArithmeticTerms.lean
+|   |   |   |   |   |   |   |-- InternalArithmeticZero.lean
+|   |   |   |   |   |   |   |-- InternalAtomicReflection.lean
+|   |   |   |   |   |   |   |-- InternalBooleanReflection.lean
+|   |   |   |   |   |   |   |-- InternalBoundedExistence.lean
+|   |   |   |   |   |   |   |-- InternalBoundedInduction.lean
+|   |   |   |   |   |   |   |-- InternalBoundedReflection.lean
+|   |   |   |   |   |   |   |-- InternalBoundedRules.lean
+|   |   |   |   |   |   |   |-- InternalBoundedTerms.lean
+|   |   |   |   |   |   |   |-- InternalCheckedRanking.lean
+|   |   |   |   |   |   |   |-- InternalCheckedReflection.lean
+|   |   |   |   |   |   |   |-- InternalCheckedStepReflection.lean
+|   |   |   |   |   |   |   |-- InternalCodeParameters.lean
+|   |   |   |   |   |   |   |-- InternalCodingEvaluation.lean
+|   |   |   |   |   |   |   |-- InternalHornRanking.lean
+|   |   |   |   |   |   |   |-- InternalHornReflection.lean
+|   |   |   |   |   |   |   |-- InternalLocalDecisionReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralArithmeticReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralEqualityReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralEqualityRules.lean
+|   |   |   |   |   |   |   |-- InternalNumeralEvaluation.lean
+|   |   |   |   |   |   |   |-- InternalNumeralOrderReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralOrderRules.lean
+|   |   |   |   |   |   |   |-- InternalNumeralParameters.lean
+|   |   |   |   |   |   |   |-- InternalNumeralProof.lean
+|   |   |   |   |   |   |   |-- InternalNumeralQuantifiers.lean
+|   |   |   |   |   |   |   |-- InternalNumeralQuotation.lean
+|   |   |   |   |   |   |   |-- InternalNumeralReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralSpecialization.lean
+|   |   |   |   |   |   |   |-- InternalNumeralSubstitution.lean
+|   |   |   |   |   |   |   |-- InternalNumeralTraceDecision.lean
+|   |   |   |   |   |   |   |-- InternalNumeralTraceReflection.lean
+|   |   |   |   |   |   |   |-- InternalNumeralTraceRules.lean
+|   |   |   |   |   |   |   |-- InternalNumeralTransform.lean
+|   |   |   |   |   |   |   |-- InternalNumeralZeroReflection.lean
+|   |   |   |   |   |   |   |-- InternalPacketReflection.lean
+|   |   |   |   |   |   |   |-- InternalPairingEvaluation.lean
+|   |   |   |   |   |   |   |-- InternalPairingRules.lean
+|   |   |   |   |   |   |   |-- InternalPositiveFormula.lean
+|   |   |   |   |   |   |   |-- InternalPositiveQuantifiers.lean
+|   |   |   |   |   |   |   |-- InternalPositiveQueries.lean
+|   |   |   |   |   |   |   |-- InternalPositiveQuotation.lean
+|   |   |   |   |   |   |   |-- InternalPredicateTransport.lean
+|   |   |   |   |   |   |   |-- InternalProjectionReflection.lean
+|   |   |   |   |   |   |   |-- InternalProofQueries.lean
+|   |   |   |   |   |   |   |-- InternalProofRowReflection.lean
+|   |   |   |   |   |   |   |-- InternalProofTraceReflection.lean
+|   |   |   |   |   |   |   |-- InternalQuantifierReflection.lean
+|   |   |   |   |   |   |   |-- InternalQuotationEvaluation.lean
+|   |   |   |   |   |   |   |-- InternalSchemaGraphs.lean
+|   |   |   |   |   |   |   |-- InternalSchemaQueries.lean
+|   |   |   |   |   |   |   |-- InternalSchemaReflection.lean
+|   |   |   |   |   |   |   |-- InternalSyntaxReflection.lean
+|   |   |   |   |   |   |   |-- InternalTermComposition.lean
+|   |   |   |   |   |   |   |-- InternalTraceReflection.lean
+|   |   |   |   |   |   |   |-- InternalTransformReflection.lean
+|   |   |   |   |   |   |   |-- InternalVerificationReflection.lean
+|   |   |   |   |   |   |   |-- InternalVerificationTrace.lean
+|   |   |   |   |   |   |   |-- IntrinsicAxiomCertificate.lean
+|   |   |   |   |   |   |   |-- IntrinsicFirstOrderLogicalLine.lean
+|   |   |   |   |   |   |   |-- IntrinsicFixedRows.lean
+|   |   |   |   |   |   |   |-- IntrinsicFixedTable.lean
+|   |   |   |   |   |   |   |-- IntrinsicGraph.lean
+|   |   |   |   |   |   |   |-- IntrinsicKernel.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalCertificate.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalTranscript.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalTranscriptEquality.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalTranscriptReflexivity.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalTranscriptRows.lean
+|   |   |   |   |   |   |   |-- IntrinsicLogicalTranscriptSupport.lean
+|   |   |   |   |   |   |   |-- IntrinsicProofCertificate.lean
+|   |   |   |   |   |   |   |-- IntrinsicSchemaCertificate.lean
+|   |   |   |   |   |   |   |-- IntrinsicSchemaLine.lean
+|   |   |   |   |   |   |   |-- IntrinsicVerifier.lean
+|   |   |   |   |   |   |   |-- KernelQuotation.lean
+|   |   |   |   |   |   |   |-- NatDecode.lean
+|   |   |   |   |   |   |   |-- NatEncode.lean
+|   |   |   |   |   |   |   |-- NatPacketLink.lean
+|   |   |   |   |   |   |   |-- PureDiagonalGraph.lean
+|   |   |   |   |   |   |   |-- PureFixedPoint.lean
+|   |   |   |   |   |   |   |-- PureLoeb.lean
+|   |   |   |   |   |   |   |-- PureNaturalRosserAgreement.lean
+|   |   |   |   |   |   |   |-- PureNumeralFormula.lean
+|   |   |   |   |   |   |   |-- PureProvability.lean
+|   |   |   |   |   |   |   |-- PureQuotation.lean
+|   |   |   |   |   |   |   |-- PureQuotationFaithful.lean
+|   |   |   |   |   |   |   |-- PureRosser.lean
+|   |   |   |   |   |   |   |-- PureRosserComplete.lean
+|   |   |   |   |   |   |   |-- PureRosserDelta0.lean
+|   |   |   |   |   |   |   |-- PureRosserSchedule.lean
+|   |   |   |   |   |   |   |-- PureRosserTransfer.lean
+|   |   |   |   |   |   |   |-- PureSecondIncompleteness.lean
+|   |   |   |   |   |   |   |-- PureTarski.lean
+|   |   |   |   |   |   |   |-- PureTarskiSource.lean
+|   |   |   |   |   |   |   |-- ReducedAxiomNumber.lean
+|   |   |   |   |   |   |   |-- ReducedAxiomPacket.lean
+|   |   |   |   |   |   |   |-- ReducedAxioms.lean
+|   |   |   |   |   |   |   |-- ReducedDerivability.lean
+|   |   |   |   |   |   |   |-- ReducedIntrospection.lean
+|   |   |   |   |   |   |   |-- ReducedLoeb.lean
+|   |   |   |   |   |   |   |-- ReducedNaturalProofPresentation.lean
+|   |   |   |   |   |   |   |-- ReducedProofCodeSemantics.lean
+|   |   |   |   |   |   |   |-- ReducedProofComposition.lean
+|   |   |   |   |   |   |   |-- ReducedProofHeaders.lean
+|   |   |   |   |   |   |   |-- ReducedProofLocalConstruction.lean
+|   |   |   |   |   |   |   |-- ReducedProofLogicalConstruction.lean
+|   |   |   |   |   |   |   |-- ReducedProofPresentation.lean
+|   |   |   |   |   |   |   |-- ReducedProofReflection.lean
+|   |   |   |   |   |   |   |-- ReducedProofRowConstruction.lean
+|   |   |   |   |   |   |   |-- ReducedProofTree.lean
+|   |   |   |   |   |   |   |-- ReducedProvability.lean
+|   |   |   |   |   |   |   |-- ReducedRosser.lean
+|   |   |   |   |   |   |   |-- ReducedSecondIncompleteness.lean
+|   |   |   |   |   |   |   |-- ReducedTarski.lean
+|   |   |   |   |   |   |   |-- ReducedTarskiParameters.lean
+|   |   |   |   |   |   |   |-- RosserDomainBoundary.lean
+|   |   |   |   |   |   |   |-- SchemaBody.lean
+|   |   |   |   |   |   |   |-- SchemaBodyDerives.lean
+|   |   |   |   |   |   |   |-- SchemaBodyObject.lean
+|   |   |   |   |   |   |   |-- SchemaBodyObjectReject.lean
+|   |   |   |   |   |   |   |-- SchemaClosure.lean
+|   |   |   |   |   |   |   |-- SchemaConclusion.lean
+|   |   |   |   |   |   |   |-- SchemaEnvelope.lean
+|   |   |   |   |   |   |   |-- SchemaEnvelopeLink.lean
+|   |   |   |   |   |   |   |-- SchemaJoinData.lean
+|   |   |   |   |   |   |   |-- SchemaJoinDerives.lean
+|   |   |   |   |   |   |   |-- SchemaJoinGraph.lean
+|   |   |   |   |   |   |   |-- SchemaJoinInstances.lean
+|   |   |   |   |   |   |   |-- SchemaJoinMatrix.lean
+|   |   |   |   |   |   |   |-- SchemaKernelInstances.lean
+|   |   |   |   |   |   |   |-- SchemaKernelJoin.lean
+|   |   |   |   |   |   |   |-- SchemaKernelSpec.lean
+|   |   |   |   |   |   |   |-- SchemaObjectGraph.lean
+|   |   |   |   |   |   |   |-- SchemaPacketData.lean
+|   |   |   |   |   |   |   |-- SchemaPacketDerives.lean
+|   |   |   |   |   |   |   |-- SchemaPacketGraph.lean
+|   |   |   |   |   |   |   |-- SchemaPacketMatrix.lean
+|   |   |   |   |   |   |   |-- SchemaPacketSpec.lean
+|   |   |   |   |   |   |   |-- SchemaQuotationAudit.lean
+|   |   |   |   |   |   |   |-- SchemaReflectionPlans.lean
+|   |   |   |   |   |   |   |-- SchemaRename.lean
+|   |   |   |   |   |   |   |-- SchemaRenameDerives.lean
+|   |   |   |   |   |   |   |-- SchemaRenameFormulaReject.lean
+|   |   |   |   |   |   |   |-- SchemaRenameInstances.lean
+|   |   |   |   |   |   |   |-- SchemaRenameNumeric.lean
+|   |   |   |   |   |   |   |-- SchemaRenameObject.lean
+|   |   |   |   |   |   |   |-- SchemaRenameObjectReject.lean
+|   |   |   |   |   |   |   |-- SchemaTable.lean
+|   |   |   |   |   |   |   |-- SchemaTemplate.lean
+|   |   |   |   |   |   |   |-- SchemaTemplateDerives.lean
+|   |   |   |   |   |   |   |-- SchemaTerm.lean
+|   |   |   |   |   |   |   `-- SupportParameterDerives.lean
+|   |   |   |   |   |   |-- ArithmeticEvaluation.lean
+|   |   |   |   |   |   |-- ArithmeticTrace.lean
+|   |   |   |   |   |   |-- AxiomDecode.lean
+|   |   |   |   |   |   |-- AxiomDecoderShape.lean
+|   |   |   |   |   |   |-- AxiomEncode.lean
+|   |   |   |   |   |   |-- AxiomPresentation.lean
+|   |   |   |   |   |   |-- CodeDomain.lean
+|   |   |   |   |   |   |-- CodePattern.lean
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   |-- Delta0Support.lean
+|   |   |   |   |   |   |-- Delta1AxiomPresentation.lean
+|   |   |   |   |   |   |-- Delta1ProofPresentation.lean
+|   |   |   |   |   |   |-- ExponentiationTrace.lean
+|   |   |   |   |   |   |-- FiniteAxiomBasis.lean
+|   |   |   |   |   |   |-- FiniteSequenceBounds.lean
+|   |   |   |   |   |   |-- FiniteSequenceConstruction.lean
+|   |   |   |   |   |   |-- FiniteSequenceDomain.lean
+|   |   |   |   |   |   |-- FiniteSequenceDomainSemantics.lean
+|   |   |   |   |   |   |-- FiniteSequenceExtensionality.lean
+|   |   |   |   |   |   |-- FiniteSequenceGraph.lean
+|   |   |   |   |   |   |-- FiniteSequenceMappingSemantics.lean
+|   |   |   |   |   |   |-- FiniteSequenceSemantics.lean
+|   |   |   |   |   |   |-- FiniteSequenceSpaceSemantics.lean
+|   |   |   |   |   |   |-- FiniteSequenceSupportTheory.lean
+|   |   |   |   |   |   |-- FixedAxiomTable.lean
+|   |   |   |   |   |   |-- Hierarchy.lean
+|   |   |   |   |   |   |-- IntrinsicAxiomCertificate.lean
+|   |   |   |   |   |   |-- IntrinsicAxiomDecode.lean
+|   |   |   |   |   |   |-- IntrinsicAxiomEncode.lean
+|   |   |   |   |   |   |-- IntrinsicCertificateTable.lean
+|   |   |   |   |   |   |-- IntrinsicCheckedLine.lean
+|   |   |   |   |   |   |-- IntrinsicCheckedSequence.lean
+|   |   |   |   |   |   |-- IntrinsicCheckedWitness.lean
+|   |   |   |   |   |   |-- IntrinsicForallGeneralization.lean
+|   |   |   |   |   |   |-- IntrinsicForallPrefix.lean
+|   |   |   |   |   |   |-- IntrinsicFormulaTemplate.lean
+|   |   |   |   |   |   |-- IntrinsicKernel.lean
+|   |   |   |   |   |   |-- IntrinsicLogicalLine.lean
+|   |   |   |   |   |   |-- IntrinsicProofRows.lean
+|   |   |   |   |   |   |-- IntrinsicProofSupport.lean
+|   |   |   |   |   |   |-- IntrinsicProofTerminal.lean
+|   |   |   |   |   |   |-- IntrinsicQuantifier.lean
+|   |   |   |   |   |   |-- IntrinsicQuineCarrier.lean
+|   |   |   |   |   |   |-- IntrinsicQuineFormulaCarrier.lean
+|   |   |   |   |   |   |-- IntrinsicQuotation.lean
+|   |   |   |   |   |   |-- IntrinsicQuotationDecode.lean
+|   |   |   |   |   |   |-- IntrinsicQuotationEvaluation.lean
+|   |   |   |   |   |   |-- IntrinsicRosserAssembly.lean
+|   |   |   |   |   |   |-- IntrinsicSchema.lean
+|   |   |   |   |   |   |-- IntrinsicSchemaClosure.lean
+|   |   |   |   |   |   |-- IntrinsicSyntaxCarrier.lean
+|   |   |   |   |   |   |-- IntrinsicSyntaxSemantics.lean
+|   |   |   |   |   |   |-- IntrinsicSyntaxTransport.lean
+|   |   |   |   |   |   |-- IntrinsicTheoryLine.lean
+|   |   |   |   |   |   |-- Loeb.lean
+|   |   |   |   |   |   |-- LogicalAxiomCanonical.lean
+|   |   |   |   |   |   |-- LogicalAxiomDecode.lean
+|   |   |   |   |   |   |-- LogicalAxiomEncode.lean
+|   |   |   |   |   |   |-- MultiplicationTrace.lean
+|   |   |   |   |   |   |-- NatDecode.lean
+|   |   |   |   |   |   |-- NatEncode.lean
+|   |   |   |   |   |   |-- NatPacket.lean
+|   |   |   |   |   |   |-- NatPacketCanonical.lean
+|   |   |   |   |   |   |-- NatPacketRoundtrip.lean
+|   |   |   |   |   |   |-- NatSequenceInversion.lean
+|   |   |   |   |   |   |-- NumeralArithmetic.lean
+|   |   |   |   |   |   |-- PairingEvaluation.lean
+|   |   |   |   |   |   |-- PairingInversionDirect.lean
+|   |   |   |   |   |   |-- ProofCertificate.lean
+|   |   |   |   |   |   |-- ProofSequenceCodeConstruction.lean
+|   |   |   |   |   |   |-- ProofSequenceInversion.lean
+|   |   |   |   |   |   |-- ProofTreeCheck.lean
+|   |   |   |   |   |   |-- ProofTreeCode.lean
+|   |   |   |   |   |   |-- ProofTreePresentation.lean
+|   |   |   |   |   |   |-- ProofTreeReplay.lean
+|   |   |   |   |   |   |-- Provability.lean
+|   |   |   |   |   |   |-- ProvabilitySemantics.lean
+|   |   |   |   |   |   |-- RepresentationCongruence.lean
+|   |   |   |   |   |   |-- Rosser.lean
+|   |   |   |   |   |   |-- SecondIncompleteness.lean
+|   |   |   |   |   |   |-- SequenceCodeConstruction.lean
+|   |   |   |   |   |   |-- SequenceCondition.lean
+|   |   |   |   |   |   |-- SequenceConditionInversion.lean
+|   |   |   |   |   |   |-- SequenceInversion.lean
+|   |   |   |   |   |   |-- StructuralSequenceCodeConstruction.lean
+|   |   |   |   |   |   |-- StructuralSequenceCondition.lean
+|   |   |   |   |   |   |-- StructuralSequenceConditionInversion.lean
+|   |   |   |   |   |   |-- StructuredCertificateCondition.lean
+|   |   |   |   |   |   |-- StructuredWitness.lean
+|   |   |   |   |   |   |-- SuccessorCodeDomain.lean
+|   |   |   |   |   |   |-- SupportAssembly.lean
+|   |   |   |   |   |   |-- SupportAxiomBasis.lean
+|   |   |   |   |   |   |-- SupportBasisTemplate.lean
+|   |   |   |   |   |   |-- SupportConclusion.lean
+|   |   |   |   |   |   |-- SupportParameters.lean
+|   |   |   |   |   |   |-- SupportRealization.lean
+|   |   |   |   |   |   |-- SupportTemplate.lean
+|   |   |   |   |   |   |-- SyntaxCanonical.lean
+|   |   |   |   |   |   |-- SyntaxCodeRenaming.lean
+|   |   |   |   |   |   |-- SyntaxDecode.lean
+|   |   |   |   |   |   |-- SyntaxEncode.lean
+|   |   |   |   |   |   |-- SyntaxInstantiation.lean
+|   |   |   |   |   |   |-- SyntaxParameters.lean
+|   |   |   |   |   |   |-- SyntaxSubstitution.lean
+|   |   |   |   |   |   |-- SyntaxTransform.lean
+|   |   |   |   |   |   |-- SyntaxTransformInstances.lean
+|   |   |   |   |   |   |-- SyntaxTransformKernel.lean
+|   |   |   |   |   |   `-- Tarski.lean
+|   |   |   |   |   |-- DefinitionContracts.lean
+|   |   |   |   |   `-- FiniteSequence.lean
+|   |   |   |   |-- QuineEncoding/
+|   |   |   |   |   |-- AbstractFreeTopFormulaCorrectness.lean
+|   |   |   |   |   |-- AbstractFreeTopStructuralCorrectness.lean
+|   |   |   |   |   |-- FormalSystem.lean
+|   |   |   |   |   |-- FormulaStructuralCorrectness.lean
+|   |   |   |   |   |-- FormulaTransformStructuralCorrectness.lean
+|   |   |   |   |   |-- OccurrenceStructuralCorrectness.lean
+|   |   |   |   |   |-- OpenBoundFormulaCorrectness.lean
+|   |   |   |   |   |-- OpenBoundStructuralCorrectness.lean
+|   |   |   |   |   |-- Project.lean
+|   |   |   |   |   |-- PureSet.lean
+|   |   |   |   |   |-- StructuralCorrectness.lean
+|   |   |   |   |   |-- SwapBoundStructuralCorrectness.lean
+|   |   |   |   |   |-- SyntaxCoding.lean
+|   |   |   |   |   |-- SyntaxNumeralCoding.lean
+|   |   |   |   |   |-- TransformStructuralCorrectness.lean
+|   |   |   |   |   `-- WeakenBoundStructuralCorrectness.lean
+|   |   |   |   |-- ExpressionEncoding.lean
+|   |   |   |   |-- FiniteSequenceConcatenation.lean
+|   |   |   |   |-- LanguageEncoding.lean
+|   |   |   |   |-- LogicalRuleEncoding.lean
+|   |   |   |   |-- Metatheory.lean
+|   |   |   |   |-- ProofCode.lean
+|   |   |   |   |-- QuineEncoding.lean
+|   |   |   |   |-- SemanticInterpretation.lean
+|   |   |   |   `-- TarskiTruth.lean
+|   |   |   |-- Hilbert/
+|   |   |   |   |-- Equivalence.lean
+|   |   |   |   `-- Translation.lean
+|   |   |   |-- Metatheory/
+|   |   |   |   |-- Equality/
+|   |   |   |   |   `-- Basic.lean
+|   |   |   |   |-- Quantifier/
+|   |   |   |   |   |-- Closure.lean
+|   |   |   |   |   |-- Monotonicity.lean
+|   |   |   |   |   |-- Prenex.lean
+|   |   |   |   |   `-- Reordering.lean
+|   |   |   |   |-- Basic.lean
+|   |   |   |   |-- Equality.lean
+|   |   |   |   |-- Notation.lean
+|   |   |   |   |-- Propositional.lean
+|   |   |   |   `-- Quantifier.lean
+|   |   |   |-- Nonlogical/
+|   |   |   |   |-- BasicSetTheory/
+|   |   |   |   |   |-- Function/
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   `-- Derived.lean
+|   |   |   |   |   |-- FunctionProperties/
+|   |   |   |   |   |   `-- Core.lean
+|   |   |   |   |   |-- Intersection/
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   `-- Derived.lean
+|   |   |   |   |   |-- Relation/
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   `-- Derived.lean
+|   |   |   |   |   |-- RelationComposition/
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   `-- Derived.lean
+|   |   |   |   |   |-- RelationFunction/
+|   |   |   |   |   |   |-- Core.lean
+|   |   |   |   |   |   `-- Derived.lean
+|   |   |   |   |   |-- RelationProperties/
+|   |   |   |   |   |   |-- Bounds.lean
+|   |   |   |   |   |   |-- Cartesian.lean
+|   |   |   |   |   |   `-- Core.lean
+|   |   |   |   |   |-- Axioms.lean
+|   |   |   |   |   |-- Basic.lean
+|   |   |   |   |   |-- BasicFiniteTheory.lean
+|   |   |   |   |   |-- CartesianProduct.lean
+|   |   |   |   |   |-- EmptySet.lean
+|   |   |   |   |   |-- FiniteOrdinal.lean
+|   |   |   |   |   |-- Foundation.lean
+|   |   |   |   |   |-- Function.lean
+|   |   |   |   |   |-- FunctionProperties.lean
+|   |   |   |   |   |-- HereditarilyFinite.lean
+|   |   |   |   |   |-- HypertransfiniteRecursion.lean
+|   |   |   |   |   |-- IndexOrder.lean
+|   |   |   |   |   |-- Infinity.lean
+|   |   |   |   |   |-- Intersection.lean
+|   |   |   |   |   |-- Language.lean
+|   |   |   |   |   |-- NaturalArithmetic.lean
+|   |   |   |   |   |-- NaturalArithmeticBound.lean
+|   |   |   |   |   |-- NaturalArithmeticSemantics.lean
+|   |   |   |   |   |-- NaturalDiscreteLinearOrder.lean
+|   |   |   |   |   |-- NaturalNumeral.lean
+|   |   |   |   |   |-- NaturalOrderAlgebra.lean
+|   |   |   |   |   |-- NaturalSetTheory.lean
+|   |   |   |   |   |-- OrderOperators.lean
+|   |   |   |   |   |-- OrderProductMapping.lean
+|   |   |   |   |   |-- Ordinal.lean
+|   |   |   |   |   |-- Pairing.lean
+|   |   |   |   |   |-- PowerSet.lean
+|   |   |   |   |   |-- PowerSetCoding.lean
+|   |   |   |   |   |-- Relation.lean
+|   |   |   |   |   |-- RelationComposition.lean
+|   |   |   |   |   |-- RelationFunction.lean
+|   |   |   |   |   |-- RelationProperties.lean
+|   |   |   |   |   |-- Separation.lean
+|   |   |   |   |   |-- Successor.lean
+|   |   |   |   |   |-- SymmetricDifference.lean
+|   |   |   |   |   |-- Union.lean
+|   |   |   |   |   `-- WellOrderComparison.lean
+|   |   |   |   `-- BasicSetTheory.lean
+|   |   |   |-- BoundRenaming.lean
+|   |   |   |-- Context.lean
+|   |   |   |-- Derivation.lean
+|   |   |   |-- FormalSystem.lean
+|   |   |   |-- FormulaComplexity.lean
+|   |   |   |-- FreshVariable.lean
+|   |   |   |-- FunctionMap.lean
+|   |   |   |-- LevyHierarchy.lean
+|   |   |   |-- Lindenbaum.lean
+|   |   |   |-- Metatheory.lean
+|   |   |   |-- NatPairing.lean
+|   |   |   `-- Nonlogical.lean
+|   |   |-- FreeVariableSupport/
+|   |   |   `-- Basic.lean
+|   |   |-- HigherOrder/
+|   |   |   |-- Signature.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- Notation/
+|   |   |   |-- Raw.lean
+|   |   |   |-- Relation.lean
+|   |   |   |-- Surface.lean
+|   |   |   `-- SurfaceSyntax.lean
+|   |   |-- Shallow/
+|   |   |   |-- Bridge.lean
+|   |   |   `-- Soundness.lean
+|   |   |-- Theory/
+|   |   |   `-- Basic.lean
+|   |   |-- Arithmetic.lean
+|   |   |-- FirstOrder.lean
+|   |   |-- Fragment.lean
+|   |   |-- HigherOrder.lean
+|   |   |-- Notation.lean
+|   |   |-- Shallow.lean
+|   |   |-- Signature.lean
+|   |   `-- Syntax.lean
+|   |-- Model/
+|   |   |-- Arithmetic/
+|   |   |   |-- PA/
+|   |   |   |   |-- Beta.lean
+|   |   |   |   |-- BetaExtension.lean
+|   |   |   |   |-- BetaModuli.lean
+|   |   |   |   |-- BetaPrefix.lean
+|   |   |   |   |-- BetaProvability.lean
+|   |   |   |   |-- BetaSequence.lean
+|   |   |   |   |-- Cancellation.lean
+|   |   |   |   |-- Divisibility.lean
+|   |   |   |   |-- Division.lean
+|   |   |   |   |-- FiniteRange.lean
+|   |   |   |   |-- History.lean
+|   |   |   |   |-- HistoryUniqueness.lean
+|   |   |   |   |-- Induction.lean
+|   |   |   |   |-- LinearOrder.lean
+|   |   |   |   |-- Minimum.lean
+|   |   |   |   |-- Modular.lean
+|   |   |   |   |-- Operations.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   |-- OrderedOperations.lean
+|   |   |   |   |-- Pairing.lean
+|   |   |   |   |-- PairingBounds.lean
+|   |   |   |   |-- PairingProvability.lean
+|   |   |   |   |-- Provability.lean
+|   |   |   |   `-- Unpairing.lean
+|   |   |   |-- PrimitiveRecursive/
+|   |   |   |   |-- NatPairing.lean
+|   |   |   |   |-- Numeral.lean
+|   |   |   |   |-- Provability.lean
+|   |   |   |   |-- Relation.lean
+|   |   |   |   |-- Standard.lean
+|   |   |   |   `-- Totality.lean
+|   |   |   |-- Q/
+|   |   |   |   `-- Operations.lean
+|   |   |   |-- Z2/
+|   |   |   |   |-- Beta.lean
+|   |   |   |   |-- BetaProvability.lean
+|   |   |   |   |-- Completeness.lean
+|   |   |   |   |-- Comprehension.lean
+|   |   |   |   |-- FiniteRange.lean
+|   |   |   |   |-- Minimum.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   |-- PrimitiveRecursive.lean
+|   |   |   |   |-- Provability.lean
+|   |   |   |   |-- Reduct.lean
+|   |   |   |   |-- Standard.lean
+|   |   |   |   `-- Structure.lean
+|   |   |   |-- BetaPrefix.lean
+|   |   |   |-- Completeness.lean
+|   |   |   |-- Divisibility.lean
+|   |   |   |-- FiniteRange.lean
+|   |   |   |-- Minimum.lean
+|   |   |   |-- Numeral.lean
+|   |   |   |-- Order.lean
+|   |   |   |-- Pairing.lean
+|   |   |   |-- PairingProvability.lean
+|   |   |   |-- Sequence.lean
+|   |   |   |-- Standard.lean
+|   |   |   `-- Structure.lean
+|   |   |-- Boolean/
+|   |   |   |-- Algebra.lean
+|   |   |   |-- Bindings.lean
+|   |   |   |-- ChainFixedPoint.lean
+|   |   |   |-- Choice.lean
+|   |   |   |-- Closure.lean
+|   |   |   |-- Completion.lean
+|   |   |   |-- Congruence.lean
+|   |   |   |-- Equality.lean
+|   |   |   |-- Filter.lean
+|   |   |   |-- Foundation.lean
+|   |   |   |-- Infinity.lean
+|   |   |   |-- Maximum.lean
+|   |   |   |-- Mixing.lean
+|   |   |   |-- NameModel.lean
+|   |   |   |-- Names.lean
+|   |   |   |-- Native.lean
+|   |   |   |-- Order.lean
+|   |   |   |-- Project.lean
+|   |   |   |-- Refinement.lean
+|   |   |   |-- RootSum.lean
+|   |   |   |-- Schemas.lean
+|   |   |   |-- Selection.lean
+|   |   |   |-- Semantics.lean
+|   |   |   |-- Soundness.lean
+|   |   |   |-- TruthCongruence.lean
+|   |   |   |-- Ultrafilter.lean
+|   |   |   `-- ZFC.lean
+|   |   |-- FirstOrder/
+|   |   |   |-- Elementary.lean
+|   |   |   |-- FreeVariableSupport.lean
+|   |   |   |-- LevyAbsoluteness.lean
+|   |   |   |-- Morphism.lean
+|   |   |   |-- Semantics.lean
+|   |   |   |-- Skolem.lean
+|   |   |   |-- Soundness.lean
+|   |   |   |-- SubstitutionSemantics.lean
+|   |   |   |-- Substructure.lean
+|   |   |   |-- Theory.lean
+|   |   |   `-- Valuation.lean
+|   |   |-- Forcing/
+|   |   |   |-- Boolean.lean
+|   |   |   |-- BooleanGeneric.lean
+|   |   |   |-- CH.lean
+|   |   |   |-- CHIndependence.lean
+|   |   |   |-- Cohen.lean
+|   |   |   |-- CohenAdd.lean
+|   |   |   |-- CohenCoordinates.lean
+|   |   |   |-- CohenReal.lean
+|   |   |   |-- CohenTheory.lean
+|   |   |   |-- Collapse.lean
+|   |   |   |-- CollapseGeneric.lean
+|   |   |   |-- Completion.lean
+|   |   |   |-- Density.lean
+|   |   |   |-- Domain.lean
+|   |   |   |-- Extension.lean
+|   |   |   |-- Formula.lean
+|   |   |   |-- FormulaEnumeration.lean
+|   |   |   |-- FormulaGeneric.lean
+|   |   |   |-- Generic.lean
+|   |   |   |-- GenericFunction.lean
+|   |   |   |-- GroundTransfer.lean
+|   |   |   |-- InternalAtomic.lean
+|   |   |   |-- InternalAtomicClosure.lean
+|   |   |   |-- InternalAtomicSyntax.lean
+|   |   |   |-- InternalAtomicTruth.lean
+|   |   |   |-- InternalAtomicWitness.lean
+|   |   |   |-- InternalBoolean.lean
+|   |   |   |-- InternalCCC.lean
+|   |   |   |-- InternalCCCBounds.lean
+|   |   |   |-- InternalCheck.lean
+|   |   |   |-- InternalCheckForcing.lean
+|   |   |   |-- InternalCheckModel.lean
+|   |   |   |-- InternalCheckRealization.lean
+|   |   |   |-- InternalCheckSyntax.lean
+|   |   |   |-- InternalCheckVal.lean
+|   |   |   |-- InternalChoice.lean
+|   |   |   |-- InternalClosed.lean
+|   |   |   |-- InternalClosure.lean
+|   |   |   |-- InternalCohen.lean
+|   |   |   |-- InternalCollection.lean
+|   |   |   |-- InternalConditions.lean
+|   |   |   |-- InternalDefinability.lean
+|   |   |   |-- InternalEquivalence.lean
+|   |   |   |-- InternalFormula.lean
+|   |   |   |-- InternalFoundation.lean
+|   |   |   |-- InternalGeneric.lean
+|   |   |   |-- InternalGenericInstance.lean
+|   |   |   |-- InternalGraph.lean
+|   |   |   |-- InternalGround.lean
+|   |   |   |-- InternalLogic.lean
+|   |   |   |-- InternalNameConstruction.lean
+|   |   |   |-- InternalNames.lean
+|   |   |   |-- InternalPair.lean
+|   |   |   |-- InternalPower.lean
+|   |   |   |-- InternalQuotient.lean
+|   |   |   |-- InternalRealization.lean
+|   |   |   |-- InternalSelection.lean
+|   |   |   |-- InternalSeparation.lean
+|   |   |   |-- InternalTruth.lean
+|   |   |   |-- InternalZF.lean
+|   |   |   |-- InternalZFOperations.lean
+|   |   |   |-- NameGeneric.lean
+|   |   |   |-- NoNewReals.lean
+|   |   |   |-- NotCH.lean
+|   |   |   |-- Order.lean
+|   |   |   |-- README.md
+|   |   |   |-- RealName.lean
+|   |   |   |-- RegularOpen.lean
+|   |   |   |-- Separative.lean
+|   |   |   |-- Tree.lean
+|   |   |   |-- Truth.lean
+|   |   |   |-- Valuation.lean
+|   |   |   `-- ZFCBase.lean
+|   |   |-- Henkin/
+|   |   |   |-- CanonicalModel.lean
+|   |   |   |-- Conservativity.lean
+|   |   |   |-- Construction.lean
+|   |   |   |-- Elimination.lean
+|   |   |   |-- Embedding.lean
+|   |   |   |-- MaximalTheory.lean
+|   |   |   |-- OpenCompleteness.lean
+|   |   |   |-- ProofTheory.lean
+|   |   |   |-- ProofTheoryCore.lean
+|   |   |   |-- Schedule.lean
+|   |   |   |-- Signature.lean
+|   |   |   |-- StrongCompleteness.lean
+|   |   |   |-- SyntaxNatCoding.lean
+|   |   |   |-- Transport.lean
+|   |   |   |-- TruthLemma.lean
+|   |   |   `-- WitnessSupport.lean
+|   |   |-- Interpretation/
+|   |   |   |-- ModelClosure.lean
+|   |   |   |-- PredicateCongruence.lean
+|   |   |   |-- PredicateExpansion.lean
+|   |   |   |-- RelationalCongruence.lean
+|   |   |   |-- RelationalDefinitions.lean
+|   |   |   |-- RelationalEnvironment.lean
+|   |   |   |-- RelationalExpansion.lean
+|   |   |   |-- RelationalInheritance.lean
+|   |   |   |-- RelationalSemantics.lean
+|   |   |   |-- RelationalTransfer.lean
+|   |   |   |-- RelationalTranslation.lean
+|   |   |   |-- SemanticTransfer.lean
+|   |   |   `-- TotalizedGraph.lean
+|   |   |-- ReducedProduct/
+|   |   |   |-- Germ.lean
+|   |   |   |-- Los.lean
+|   |   |   `-- Structure.lean
+|   |   |-- SecondOrder/
+|   |   |   `-- Full.lean
+|   |   |-- Semantics/
+|   |   |   |-- Algebra.lean
+|   |   |   |-- Background.lean
+|   |   |   |-- Instances.lean
+|   |   |   |-- Predicates.lean
+|   |   |   |-- Substitution.lean
+|   |   |   `-- SyntaxView.lean
+|   |   |-- SetTheory/
+|   |   |   |-- Countable.lean
+|   |   |   |-- CountableSyntax.lean
+|   |   |   |-- DefinitionalSemantics.lean
+|   |   |   |-- DefinitionalTheory.lean
+|   |   |   |-- FromFirstOrder.lean
+|   |   |   |-- FunctionSemantics.lean
+|   |   |   |-- Infinitary.lean
+|   |   |   |-- OrderSemantics.lean
+|   |   |   |-- ProjectSemantics.lean
+|   |   |   |-- ProjectSoundness.lean
+|   |   |   |-- Structure.lean
+|   |   |   `-- Theory.lean
+|   |   |-- SmallGraph/
+|   |   |   |-- Bisimulation.lean
+|   |   |   |-- Choice.lean
+|   |   |   |-- Closure.lean
+|   |   |   |-- Infinity.lean
+|   |   |   |-- RootSum.lean
+|   |   |   |-- Sets.lean
+|   |   |   `-- ZFC.lean
+|   |   |-- ZFC/
+|   |   |   |-- Pure/
+|   |   |   |   |-- PureAllSchemaStage.lean
+|   |   |   |   |-- PureArithmeticBounds.lean
+|   |   |   |   |-- PureArithmeticOrder.lean
+|   |   |   |   |-- PureArithmeticRecurrence.lean
+|   |   |   |   |-- PureArithmeticSpecifications.lean
+|   |   |   |   |-- PureArithmeticStage.lean
+|   |   |   |   |-- PureBoundedDefinitions.lean
+|   |   |   |   |-- PureBoundedNaturalOrder.lean
+|   |   |   |   |-- PureCollectionStage.lean
+|   |   |   |   |-- PureCompletedStage.lean
+|   |   |   |   |-- PureConcatenationStage.lean
+|   |   |   |   |-- PureCoordinateSpecifications.lean
+|   |   |   |   |-- PureDependentSchemaSets.lean
+|   |   |   |   |-- PureDifferenceStage.lean
+|   |   |   |   |-- PureFinalArithmetic.lean
+|   |   |   |   |-- PureFinalBasic.lean
+|   |   |   |   |-- PureFinalCollections.lean
+|   |   |   |   |-- PureFinalConstructions.lean
+|   |   |   |   |-- PureFinalExtrema.lean
+|   |   |   |   |-- PureFinalInfinity.lean
+|   |   |   |   |-- PureFinalMappings.lean
+|   |   |   |   |-- PureFinalOperations.lean
+|   |   |   |   |-- PureFinalPairs.lean
+|   |   |   |   |-- PureFinalRelations.lean
+|   |   |   |   |-- PureFinalSeparation.lean
+|   |   |   |   |-- PureFinalSyntax.lean
+|   |   |   |   |-- PureFinalTransfer.lean
+|   |   |   |   |-- PureFiniteOrderTypes.lean
+|   |   |   |   |-- PureFiniteSequenceCore.lean
+|   |   |   |   |-- PureFiniteSequenceSpace.lean
+|   |   |   |   |-- PureFiniteUniverseStage.lean
+|   |   |   |   |-- PureFlattenRecursion.lean
+|   |   |   |   |-- PureFreeVariableOccurs.lean
+|   |   |   |   |-- PureFunctionDefinitions.lean
+|   |   |   |   |-- PureGodelPairing.lean
+|   |   |   |   |-- PureGodelPairingInversion.lean
+|   |   |   |   |-- PureKuratowski.lean
+|   |   |   |   |-- PureKuratowskiProject.lean
+|   |   |   |   |-- PureLeastFixedPoint.lean
+|   |   |   |   |-- PureLogicalClosure.lean
+|   |   |   |   |-- PureLogicalSchemaSets.lean
+|   |   |   |   |-- PureLogicalSchemaStage.lean
+|   |   |   |   |-- PureLogicalStage.lean
+|   |   |   |   |-- PureMappingDefinitions.lean
+|   |   |   |   |-- PureMappingOperations.lean
+|   |   |   |   |-- PureMappingSpecifications.lean
+|   |   |   |   |-- PureMinimumDifference.lean
+|   |   |   |   |-- PureModel.lean
+|   |   |   |   |-- PureNaturalDifference.lean
+|   |   |   |   |-- PureNaturalDifferenceStage.lean
+|   |   |   |   |-- PureNaturalInduction.lean
+|   |   |   |   |-- PureNaturalOrderType.lean
+|   |   |   |   |-- PureNaturalRelations.lean
+|   |   |   |   |-- PureNaturalSubsetType.lean
+|   |   |   |   |-- PureNaturalTuple.lean
+|   |   |   |   |-- PureOmegaAndReverse.lean
+|   |   |   |   |-- PureOmegaIteration.lean
+|   |   |   |   |-- PureOpenTransfer.lean
+|   |   |   |   |-- PureOrderExtrema.lean
+|   |   |   |   |-- PureOrderSemantics.lean
+|   |   |   |   |-- PureOrdinalArithmetic.lean
+|   |   |   |   |-- PureProjectEmbedding.lean
+|   |   |   |   |-- PureProjectTemplate.lean
+|   |   |   |   |-- PureRelatedStage.lean
+|   |   |   |   |-- PureRelatedSyntaxFixedPoint.lean
+|   |   |   |   |-- PureRelatedSyntaxOperator.lean
+|   |   |   |   |-- PureRelatedSyntaxSets.lean
+|   |   |   |   |-- PureRelatedSyntaxStage.lean
+|   |   |   |   |-- PureRelationCoordinates.lean
+|   |   |   |   |-- PureRelationDefinitions.lean
+|   |   |   |   |-- PureRelationFunctions.lean
+|   |   |   |   |-- PureRelationSetOperations.lean
+|   |   |   |   |-- PureReplacement.lean
+|   |   |   |   |-- PureRoundOneRelations.lean
+|   |   |   |   |-- PureRoundOneSpecifications.lean
+|   |   |   |   |-- PureRoundThreeSpecifications.lean
+|   |   |   |   |-- PureRoundTwoSpecifications.lean
+|   |   |   |   |-- PureRoundTwoStage.lean
+|   |   |   |   |-- PureSentenceTransfer.lean
+|   |   |   |   |-- PureSeparation.lean
+|   |   |   |   |-- PureSequenceConcatenation.lean
+|   |   |   |   |-- PureSequenceFilters.lean
+|   |   |   |   |-- PureSequenceFlatten.lean
+|   |   |   |   |-- PureSequenceStage.lean
+|   |   |   |   |-- PureSetIterations.lean
+|   |   |   |   |-- PureSetStage.lean
+|   |   |   |   |-- PureSourceArithmetic.lean
+|   |   |   |   |-- PureSourceArithmeticRecurrence.lean
+|   |   |   |   |-- PureSourceBounds.lean
+|   |   |   |   |-- PureSourceCheckedConstruction.lean
+|   |   |   |   |-- PureSourceCoding.lean
+|   |   |   |   |-- PureSourceCodingInversion.lean
+|   |   |   |   |-- PureSourceFormula.lean
+|   |   |   |   |-- PureSourceFormulaConstruction.lean
+|   |   |   |   |-- PureSourceHorn.lean
+|   |   |   |   |-- PureSourceHornConstruction.lean
+|   |   |   |   |-- PureSourceHornElimination.lean
+|   |   |   |   |-- PureSourceInduction.lean
+|   |   |   |   |-- PureSourceInfinity.lean
+|   |   |   |   |-- PureSourceInstantiation.lean
+|   |   |   |   |-- PureSourceInstantiationSyntax.lean
+|   |   |   |   |-- PureSourceLocalTests.lean
+|   |   |   |   |-- PureSourceMappedTransform.lean
+|   |   |   |   |-- PureSourceMappings.lean
+|   |   |   |   |-- PureSourceNumerals.lean
+|   |   |   |   |-- PureSourceNumeralSyntax.lean
+|   |   |   |   |-- PureSourceNumeralTotality.lean
+|   |   |   |   |-- PureSourcePacketBounds.lean
+|   |   |   |   |-- PureSourcePointInstantiation.lean
+|   |   |   |   |-- PureSourceProjection.lean
+|   |   |   |   |-- PureSourceSchemas.lean
+|   |   |   |   |-- PureSourceStrongInduction.lean
+|   |   |   |   |-- PureSourceSubstitution.lean
+|   |   |   |   |-- PureSourceSyntaxRank.lean
+|   |   |   |   |-- PureSourceTermConstruction.lean
+|   |   |   |   |-- PureSourceTraceComposition.lean
+|   |   |   |   |-- PureSourceTransformConstruction.lean
+|   |   |   |   |-- PureStageBase.lean
+|   |   |   |   |-- PureStageSemantics.lean
+|   |   |   |   |-- PureStageTwoBase.lean
+|   |   |   |   |-- PureStageTwoSemantics.lean
+|   |   |   |   |-- PureStructuralCodeBounds.lean
+|   |   |   |   |-- PureStructureStage.lean
+|   |   |   |   |-- PureSupportModels.lean
+|   |   |   |   |-- PureSupportSeparation.lean
+|   |   |   |   |-- PureSyntaxFixedPoint.lean
+|   |   |   |   |-- PureSyntaxOperator.lean
+|   |   |   |   |-- PureSyntaxStage.lean
+|   |   |   |   |-- PureSyntaxTransform.lean
+|   |   |   |   |-- PureTotalCodeBounds.lean
+|   |   |   |   |-- PureTransformStage.lean
+|   |   |   |   |-- PureTransitiveClosure.lean
+|   |   |   |   |-- PureValueFixedPoint.lean
+|   |   |   |   |-- PureValueOperator.lean
+|   |   |   |   |-- PureValueStage.lean
+|   |   |   |   `-- PureZFCModels.lean
+|   |   |   |-- FiniteAxiomModels.lean
+|   |   |   `-- Pure.lean
+|   |   |-- Arithmetic.lean
+|   |   |-- Boolean.lean
+|   |   |-- Closure.lean
+|   |   |-- FirstOrder.lean
+|   |   |-- Forcing.lean
+|   |   |-- Henkin.lean
+|   |   |-- HigherOrder.lean
+|   |   |-- Infinitary.lean
+|   |   |-- Interpretation.lean
+|   |   |-- README.md
+|   |   |-- SecondOrder.lean
+|   |   |-- Semantics.lean
+|   |   |-- SetTheory.lean
+|   |   |-- SmallGraph.lean
+|   |   |-- Ultrapower.lean
+|   |   `-- Values.lean
+|   |-- SetTheory/
+|   |   |-- Automation/
+|   |   |   `-- Context.lean
+|   |   |-- Axioms/
+|   |   |   |-- Common.lean
+|   |   |   |-- KP.lean
+|   |   |   |-- ZF.lean
+|   |   |   `-- ZFC.lean
+|   |   |-- Boolean/
+|   |   |   |-- Algebra.lean
+|   |   |   |-- Completion.lean
+|   |   |   `-- Filter.lean
+|   |   |-- Card/
+|   |   |   |-- Aleph/
+|   |   |   |   |-- Basic.lean
+|   |   |   |   |-- Existence.lean
+|   |   |   |   |-- Hartogs.lean
+|   |   |   |   |-- Multiplication.lean
+|   |   |   |   |-- Recursion.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Arithmetic/
+|   |   |   |   |-- Addition.lean
+|   |   |   |   |-- Basic.lean
+|   |   |   |   |-- Equinumerosity.lean
+|   |   |   |   |-- Exponentiation.lean
+|   |   |   |   |-- Multiplication.lean
+|   |   |   |   |-- PowerSet.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Cofinality/
+|   |   |   |   |-- Basic.lean
+|   |   |   |   |-- Boundedness.lean
+|   |   |   |   |-- Comparison.lean
+|   |   |   |   |-- Composition.lean
+|   |   |   |   |-- Exponentiation.lean
+|   |   |   |   |-- LimitLength.lean
+|   |   |   |   |-- OrderType.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Properties/
+|   |   |   |   |-- Basic.lean
+|   |   |   |   |-- Regularity.lean
+|   |   |   |   |-- Singularity.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Aleph.lean
+|   |   |   |-- Arithmetic.lean
+|   |   |   |-- Basic.lean
+|   |   |   |-- Cantor.lean
+|   |   |   |-- CantorBernstein.lean
+|   |   |   |-- Cofinality.lean
+|   |   |   |-- CountableUnion.lean
+|   |   |   |-- Finite.lean
+|   |   |   |-- Omega.lean
+|   |   |   |-- OrdinalCardinality.lean
+|   |   |   |-- Properties.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- Definitional/
+|   |   |   |-- Audit/
+|   |   |   |   `-- Pure.lean
+|   |   |   |-- Project/
+|   |   |   |   |-- Class/
+|   |   |   |   |   `-- Syntax.lean
+|   |   |   |   |-- Hierarchy/
+|   |   |   |   |   `-- Syntax.lean
+|   |   |   |   |-- Ord/
+|   |   |   |   |   `-- Syntax.lean
+|   |   |   |   |-- Class.lean
+|   |   |   |   |-- Definitions.lean
+|   |   |   |   |-- Derivation.lean
+|   |   |   |   |-- FlatPairing.lean
+|   |   |   |   |-- Hierarchy.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Theory/
+|   |   |   |   `-- Basic.lean
+|   |   |   |-- Audit.lean
+|   |   |   |-- DeepRfl.lean
+|   |   |   |-- DeepRflAttr.lean
+|   |   |   |-- Interned.lean
+|   |   |   |-- Language.lean
+|   |   |   `-- Project.lean
+|   |   |-- Filter/
+|   |   |   |-- Extension.lean
+|   |   |   |-- Internal.lean
+|   |   |   |-- Logic.lean
+|   |   |   `-- Tarski.lean
+|   |   |-- Notation/
+|   |   |   |-- Surface.lean
+|   |   |   `-- Syntax.lean
+|   |   |-- Ord/
+|   |   |   |-- Arithmetic/
+|   |   |   |   |-- Algebra.lean
+|   |   |   |   |-- CantorNormalForm.lean
+|   |   |   |   |-- Closure.lean
+|   |   |   |   |-- Comparison.lean
+|   |   |   |   |-- FixedPoint.lean
+|   |   |   |   |-- Identity.lean
+|   |   |   |   |-- Isomorphism.lean
+|   |   |   |   |-- Noncommutative.lean
+|   |   |   |   |-- Normal.lean
+|   |   |   |   |-- Order.lean
+|   |   |   |   |-- Recursion.lean
+|   |   |   |   |-- Semantics.lean
+|   |   |   |   `-- Syntax.lean
+|   |   |   |-- Arithmetic.lean
+|   |   |   |-- Basic.lean
+|   |   |   |-- CanonicalPairing.lean
+|   |   |   |-- Closure.lean
+|   |   |   |-- FiniteSequenceParsing.lean
+|   |   |   |-- Induction.lean
+|   |   |   |-- Natural.lean
+|   |   |   |-- NaturalPrime.lean
+|   |   |   |-- Normal.lean
+|   |   |   |-- Notation.lean
+|   |   |   |-- OrderType.lean
+|   |   |   |-- PrimePower.lean
+|   |   |   |-- PrimePowerSequence.lean
+|   |   |   `-- Recursion.lean
+|   |   |-- Theory/
+|   |   |   `-- Basic.lean
+|   |   |-- WellFounded/
+|   |   |   |-- Basic.lean
+|   |   |   |-- Rank.lean
+|   |   |   `-- Recursion.lean
+|   |   |-- Automation.lean
+|   |   |-- Binding.lean
+|   |   |-- Card.lean
+|   |   |-- Choice.lean
+|   |   |-- Collection.lean
+|   |   |-- Continuum.lean
+|   |   |-- Definitional.lean
+|   |   |-- DependentChoice.lean
+|   |   |-- Extension.lean
+|   |   |-- Fiber.lean
+|   |   |-- Filter.lean
+|   |   |-- Foundation.lean
+|   |   |-- FunctionConstruction.lean
+|   |   |-- FunctionSpaceAlgebra.lean
+|   |   |-- FunctionSpaceConstruction.lean
+|   |   |-- Language.lean
+|   |   |-- MembershipInduction.lean
+|   |   |-- Notation.lean
+|   |   |-- Ord.lean
+|   |   |-- PartialFunction.lean
+|   |   |-- PartialFunctionCCC.lean
+|   |   |-- ProductConstruction.lean
+|   |   |-- Replacement.lean
+|   |   |-- Separation.lean
+|   |   |-- SetConstruction.lean
+|   |   |-- TaggedUnionConstruction.lean
+|   |   `-- WellFounded.lean
+|   |-- Automation.lean
+|   |-- Basic.lean
+|   |-- LargeCardinals.lean
+|   |-- Logic.lean
+|   |-- Model.lean
+|   `-- SetTheory.lean
+|-- .gitignore
+|-- lake-manifest.json
+|-- lakefile.toml
+|-- lean-toolchain
+|-- LICENSE
+|-- NOTICE
+|-- README.en.md
+|-- README.md
+|-- REPOSITORY_TREE.txt
+`-- YesMetaZFC.lean

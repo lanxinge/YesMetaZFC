@@ -87,14 +87,20 @@ theorem matrix_negative (kind : SchemaTemplate.Kind) (n : Nat) (input : Tree) (o
     (hBad : (SchemaClosure.run kind n input).map treeValue ≠ some output) (values : Fin 7 → Nat) :
     Derives intrinsic_zfc_theory [] (¬ₘ matrix kind (fun i => (numₘ(values i) : Code))
       (numₘ(n)) (numₘ(treeValue input)) (numₘ(output))) := by
-  classical
   by_cases hTables : ∀ i, listValue ((site kind i).table n) = values (tableSlot i)
   · by_cases hRenames : ∀ i, (rename kind n input i).map treeValue = some (values (bodySlot i))
     · have hExists : ∀ i, ∃ body, rename kind n input i = some body ∧ treeValue body = values (bodySlot i) :=
         fun i => Option.map_eq_some_iff.mp (hRenames i)
-      let bodies : Fin 3 → Tree := fun i => (hExists i).choose
-      have hBodies : CorrectInputs kind n input bodies := fun i => (hExists i).choose_spec.1
-      have hValues : ∀ i, treeValue (bodies i) = values (bodySlot i) := fun i => (hExists i).choose_spec.2
+      obtain ⟨body0, hBody0, hValue0⟩ := hExists 0
+      obtain ⟨body1, hBody1, hValue1⟩ := hExists 1
+      obtain ⟨body2, hBody2, hValue2⟩ := hExists 2
+      let bodies : Fin 3 → Tree := SchemaTemplate.three body0 body1 body2
+      have hBodies : CorrectInputs kind n input bodies := by
+        intro i
+        exact Fin.cases hBody0 (Fin.cases hBody1 (Fin.cases hBody2 (fun j => Fin.elim0 j))) i
+      have hValues : ∀ i, treeValue (bodies i) = values (bodySlot i) := by
+        intro i
+        exact Fin.cases hValue0 (Fin.cases hValue1 (Fin.cases hValue2 (fun j => Fin.elim0 j))) i
       by_cases hCore : kind.shape.expr.eval (fun i => values (bodySlot i)) = values 6
       · apply allOf_negative_of_member (close_mem kind _ _ _ _)
         apply SchemaClosure.negative
@@ -107,11 +113,11 @@ theorem matrix_negative (kind : SchemaTemplate.Kind) (n : Nat) (input : Tree) (o
         simp only [hValues]
         exact hCore ▸ hClosed
       · exact allOf_negative_of_member (core_mem kind _ _ _ _) (SchemaTemplate.negative kind _ _ hCore)
-    · obtain ⟨i, hi⟩ : ∃ i, (rename kind n input i).map treeValue ≠ some (values (bodySlot i)) := by simpa using hRenames
+    · obtain ⟨i, hi⟩ : ∃ i, (rename kind n input i).map treeValue ≠ some (values (bodySlot i)) := Decidable.not_forall.mp hRenames
       apply allOf_negative_of_member (rename_mem kind _ _ _ _ i)
       rw [target_numeral, ← hTables i]
       exact SchemaObjectGraph.Rename.negative_number _ _ _ _ hi
-  · obtain ⟨i, hi⟩ : ∃ i, listValue ((site kind i).table n) ≠ values (tableSlot i) := by simpa using hTables
+  · obtain ⟨i, hi⟩ : ∃ i, listValue ((site kind i).table n) ≠ values (tableSlot i) := Decidable.not_forall.mp hTables
     exact allOf_negative_of_member (table_mem kind _ _ _ _ i) (SchemaTable.negative _ _ _ hi)
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.SchemaJoin

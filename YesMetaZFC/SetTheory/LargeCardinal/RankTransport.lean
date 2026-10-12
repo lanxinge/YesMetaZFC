@@ -37,7 +37,7 @@ theorem ed_hierarchy_l (hZF : M.Models ZF) {ω δ X A Y B j κ k U : M.Domain}
   have ko := (target U' hUY).1
   refine ⟨H, F, U', H', F', hHX, hFX, hjU, hjH, hjF, cert, history, target, fun ν V hν hV cover => ?_⟩
   obtain ⟨W, hW, hνW⟩ := fn.2.1 ν hν
-  have eq := vr_compare_l hZF hY hHY fn (ko.transitive ν hν) (hY H' hHY W hW) hV cover
+  have eq := vr_compare_l hZF hY (hY H' hHY) fn (ko.transitive ν hν) (hY H' hHY W hW) hV cover
     (fun β hβ T hβT t ht => (target t ht).2.2.1 β (ko.transitive ν hν β hβ) T (fn.bound_l hβT).2 hβT)
     (fun t ht => (target t ht).2.2.1 ν hν W hW hνW)
   exact eq ▸ hνW

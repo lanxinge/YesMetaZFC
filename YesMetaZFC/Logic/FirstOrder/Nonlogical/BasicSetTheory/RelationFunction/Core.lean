@@ -245,8 +245,7 @@ def ordered_pair_reverse_operator_theory : SetTheory :=
     (⟨left, right⟩ₘ).renameMapped boundRenaming freeRenaming =
       ⟨left.renameMapped boundRenaming freeRenaming,
         right.renameMapped boundRenaming freeRenaming⟩ₘ := by
-  simp [ordered_pair_term, Term.renameMapped,
-    Arguments.renameMapped]
+  rfl
 
 /-- 左投影函数项与任意 bound/free 重命名严格交换。 -/
 @[simp] theorem left_projection_term_renameMapped

@@ -14,8 +14,8 @@ open _root_.YesMetaZFC.Automation ObjectHorn ObjectArithmeticTerm
 open scoped Nonlogical.BasicSetTheory.Symbols
 set_option autoImplicit false
 
-def tableSlot (i : Fin 3) : Fin 7 := ⟨i.val, by omega⟩
-def bodySlot (i : Fin 3) : Fin 7 := ⟨i.val + 3, by omega⟩
+def tableSlot (i : Fin 3) : Fin 7 := ⟨i.val, Nat.lt_trans i.isLt (by decide)⟩
+def bodySlot (i : Fin 3) : Fin 7 := ⟨i.val + 3, Nat.lt_trans (Nat.add_lt_add_right i.isLt 3) (by decide)⟩
 
 def target {bound free : SetContext} (which : SchemaRename.Site) (n : SetTerm bound free) : SetTerm bound free :=
   shift (SchemaTable.entry which).start n
@@ -80,8 +80,8 @@ theorem bounded_delta0 {bound free : SetContext} (kind : SchemaTemplate.Kind) (l
       bounded kind (limit.substituteMapped bs fs) (n.substituteMapped bs fs)
         (input.substituteMapped bs fs) (output.substituteMapped bs fs) := by
   simp only [bounded, FormulaTemplate.instantiate_substituteMapped]
-  congr 1
-  funext sort v
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro sort v
   cases v with
   | here => rfl
   | there v => cases v with

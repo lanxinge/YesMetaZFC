@@ -42,23 +42,34 @@ theorem condition_delta0 (step : FormulaTemplate.Binary)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (closed step trace).substituteMapped bs fs =
       closed step (trace.substituteMapped bs fs) := by
-  simp [closed, Formula.LevyBound.boundedForall, set_levy_bound, Formula.LevyBound.membership,
-    Formula.substituteMapped, Arguments.substituteMapped, Term.substituteMapped,
-    VariableSubstitution.liftBound]
+  have hTrace := Term.substituteMapped_weakenBound SetSort.set bs fs trace
+  dsimp only [closed, Formula.LevyBound.boundedForall, Formula.substituteMapped]
+  apply congrArg (Formula.forallE (σ := signature) SetSort.set)
+  apply congr
+  · exact congrArg Formula.imp (congrArg
+      (fun t => (.bvar .here : SetTerm (SetSort.set :: tb) tf) ∈ₘ t) hTrace)
+  · exact (FormulaTemplate.apply_two_substituteMapped step (.bvar .here)
+      (trace.weakenBound SetSort.set) (VariableSubstitution.liftBound SetSort.set bs)
+      (VariableSubstitution.weakenBound SetSort.set fs)).trans
+        (congrArg (fun t => step (.bvar .here) t) hTrace)
 
 @[simp] theorem witnessBody_instantiateTop (step : FormulaTemplate.Binary)
     {free : SetContext} (root trace : SetOpenTerm free) :
     (witnessBody step (root.weakenBound SetSort.set) (.bvar .here)).instantiateTop trace =
       witnessBody step root trace := by
-  simp [witnessBody, Formula.instantiateTop, Formula.substitute, Substitution.instantiateTop,
-    Formula.substituteMapped, Arguments.substituteMapped, Term.substituteMapped,
-    VariableSubstitution.instantiateTop]
+  exact congr (congrArg Formula.conj
+    (congrArg (fun t : SetOpenTerm free => t ∈ₘ trace)
+      (Term.instantiateTop_weakenBound trace root)))
+    (closed_substituteMapped step (.bvar .here)
+      (VariableSubstitution.instantiateTop trace) VariableSubstitution.freeId)
 
 @[simp] theorem step_instantiateTop (step : FormulaTemplate.Binary)
     {free : SetContext} (trace row : SetOpenTerm free) :
     (step (.bvar .here) (trace.weakenBound SetSort.set)).instantiateTop row = step row trace := by
-  simp [Formula.instantiateTop, Formula.substitute, Substitution.instantiateTop,
-    Term.substituteMapped, VariableSubstitution.instantiateTop]
+  exact (FormulaTemplate.apply_two_substituteMapped step (.bvar .here)
+    (trace.weakenBound SetSort.set) (VariableSubstitution.instantiateTop row)
+    VariableSubstitution.freeId).trans
+      (congrArg (fun t => step row t) (Term.instantiateTop_weakenBound row trace))
 
 theorem positive {T : SetTheory} (S : FiniteSequenceGraphSupport T)
     (hPower : ∀ {φ}, power_set_operator_theory φ → T φ)
@@ -90,16 +101,25 @@ theorem closed_elim {T : SetTheory} (step : FormulaTemplate.Binary)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (witnessBody step root trace).substituteMapped bs fs =
       witnessBody step (root.substituteMapped bs fs) (trace.substituteMapped bs fs) := by
-  simp [witnessBody, Formula.substituteMapped, Arguments.substituteMapped]
+  exact congrArg (Formula.conj ((root.substituteMapped bs fs) ∈ₘ (trace.substituteMapped bs fs)))
+    (closed_substituteMapped step trace bs fs)
 
 @[simp] theorem condition_substituteMapped (step : FormulaTemplate.Binary)
     {sb sf tb tf : SetContext} (carrier root : SetTerm sb sf)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (condition step carrier root).substituteMapped bs fs =
       condition step (carrier.substituteMapped bs fs) (root.substituteMapped bs fs) := by
-  simp [condition, Formula.LevyBound.boundedExists, set_levy_bound, Formula.LevyBound.membership,
-    Formula.substituteMapped, Arguments.substituteMapped, Term.substituteMapped,
-    VariableSubstitution.liftBound]
+  have hCarrier := Term.substituteMapped_weakenBound SetSort.set bs fs (𝒫ₘ(carrier))
+  have hRoot := Term.substituteMapped_weakenBound SetSort.set bs fs root
+  dsimp only [condition, Formula.LevyBound.boundedExists, Formula.substituteMapped]
+  apply congrArg (Formula.existsE (σ := signature) SetSort.set)
+  apply congr
+  · exact congrArg Formula.conj (congrArg
+      (fun t => (.bvar .here : SetTerm (SetSort.set :: tb) tf) ∈ₘ t) hCarrier)
+  · exact (witnessBody_substituteMapped step (root.weakenBound SetSort.set) (.bvar .here)
+      (VariableSubstitution.liftBound SetSort.set bs)
+      (VariableSubstitution.weakenBound SetSort.set fs)).trans
+        (congrArg (fun t => witnessBody step t (.bvar .here)) hRoot)
 
 @[simp] theorem witnessBody_openBoundTop (step : FormulaTemplate.Binary)
     {free : SetContext} (root : SetOpenTerm free) :

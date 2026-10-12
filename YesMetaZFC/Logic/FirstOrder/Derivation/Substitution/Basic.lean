@@ -93,11 +93,7 @@ end Formula
         (bound := introduced :: bound) ρ :
       VariableSubstitution σ sourceFree
         (introduced :: bound) targetFree) := by
-  funext sort entry
-  simp [VariableSubstitution.weakenBound,
-    VariableSubstitution.of_renaming, Term.weakenBound,
-    Term.rename, Renaming.weakenBound, Renaming.bound,
-    Term.renameMapped, VariableRenaming.id]
+  rfl
 
 /-- free 重命名替换穿过规范新变量后仍保持重命名规范形。 -/
 @[simp] theorem VariableSubstitution.liftFree_of_renaming
@@ -128,7 +124,7 @@ theorem Term.renameMapped_eq_substituteMapped
   cases input with
   | bvar _ | fvar _ => rfl
   | app _ args =>
-    simp only [Term.renameMapped, Term.substituteMapped, Arguments.renameMapped_eq_substituteMapped]
+    exact congrArg (Term.app _) (Arguments.renameMapped_eq_substituteMapped br fr args)
 
 /-- 参数列共用同一重命名与替换对应。 -/
 theorem Arguments.renameMapped_eq_substituteMapped
@@ -138,8 +134,11 @@ theorem Arguments.renameMapped_eq_substituteMapped
       input.substituteMapped (fun entry => .bvar (br entry)) (fun entry => .fvar (fr entry)) := by
   cases input with
   | nil => rfl
-  | cons _ _ => simp only [Arguments.renameMapped, Arguments.substituteMapped,
-      Term.renameMapped_eq_substituteMapped, Arguments.renameMapped_eq_substituteMapped]
+  | cons head tail =>
+      dsimp only [Arguments.renameMapped, Arguments.substituteMapped]
+      exact congr (congrArg Arguments.cons
+        (Term.renameMapped_eq_substituteMapped br fr head))
+        (Arguments.renameMapped_eq_substituteMapped br fr tail)
 end
 
 /-- 公式只在此证明一次重命名与替换对应，量词下同时提升变量像。 -/
@@ -150,18 +149,34 @@ theorem Formula.renameMapped_eq_substituteMapped
       input.substituteMapped (fun entry => .bvar (br entry)) (fun entry => .fvar (fr entry)) := by
   induction input generalizing tb tf with
   | falsum | truth => rfl
-  | rel _ _ =>
-    simp only [Formula.renameMapped, Formula.substituteMapped, Arguments.renameMapped_eq_substituteMapped]
-  | equal _ _ =>
-    simp only [Formula.renameMapped, Formula.substituteMapped, Term.renameMapped_eq_substituteMapped]
-  | neg _ ih => simp only [Formula.renameMapped, Formula.substituteMapped, ih]
-  | conj _ _ ih₁ ih₂ | disj _ _ ih₁ ih₂ | imp _ _ ih₁ ih₂ | iff _ _ ih₁ ih₂ =>
-    simp only [Formula.renameMapped, Formula.substituteMapped, ih₁, ih₂]
-  | forallE sort body ih | existsE sort body ih =>
-    simp only [Formula.renameMapped, Formula.substituteMapped, ih]
-    congr 2
-    funext s e
-    cases e <;> rfl
+  | rel relation args =>
+      exact congrArg (Formula.rel relation)
+        (Arguments.renameMapped_eq_substituteMapped br fr args)
+  | equal left right =>
+      dsimp only [Formula.renameMapped, Formula.substituteMapped]
+      exact congr (congrArg Formula.equal (Term.renameMapped_eq_substituteMapped br fr left))
+        (Term.renameMapped_eq_substituteMapped br fr right)
+  | neg _ ih => exact congrArg Formula.neg (ih _ _)
+  | conj _ _ ih₁ ih₂ =>
+      dsimp only [Formula.renameMapped, Formula.substituteMapped]
+      exact congr (congrArg Formula.conj (ih₁ _ _)) (ih₂ _ _)
+  | disj _ _ ih₁ ih₂ =>
+      dsimp only [Formula.renameMapped, Formula.substituteMapped]
+      exact congr (congrArg Formula.disj (ih₁ _ _)) (ih₂ _ _)
+  | imp _ _ ih₁ ih₂ =>
+      dsimp only [Formula.renameMapped, Formula.substituteMapped]
+      exact congr (congrArg Formula.imp (ih₁ _ _)) (ih₂ _ _)
+  | iff _ _ ih₁ ih₂ =>
+      dsimp only [Formula.renameMapped, Formula.substituteMapped]
+      exact congr (congrArg Formula.iff (ih₁ _ _)) (ih₂ _ _)
+  | forallE sort body ih =>
+      apply congrArg (Formula.forallE sort)
+      exact (ih _ _).trans (Formula.substituteMapped_congr
+        (fun entry => by cases entry <;> rfl) (fun _ => rfl) body)
+  | existsE sort body ih =>
+      apply congrArg (Formula.existsE sort)
+      exact (ih _ _).trans (Formula.substituteMapped_congr
+        (fun entry => by cases entry <;> rfl) (fun _ => rfl) body)
 
 /-- 映射替换中的 free 重命名与底层专用重命名递归一致。 -/
 @[simp] theorem Term.substituteMapped_of_renaming
@@ -394,8 +409,8 @@ mutual
           VariableSubstitution.freeId = term
   | _, .bvar _ => rfl
   | _, .fvar _ => rfl
-  | _, .app function arguments => by
-      simp [Term.substituteMapped, Arguments.substituteMapped_id]
+  | _, .app function arguments =>
+      congrArg (Term.app function) (Arguments.substituteMapped_id arguments)
 
 /-- 显式恒等变量像在参数列上不产生 AST 变化。 -/
 @[simp] theorem Arguments.substituteMapped_id
@@ -406,8 +421,9 @@ mutual
           VariableSubstitution.freeId = arguments
   | _, .nil => rfl
   | _, .cons term rest => by
-      simp [Arguments.substituteMapped, Term.substituteMapped_id,
-        Arguments.substituteMapped_id]
+      dsimp only [Arguments.substituteMapped]
+      exact congr (congrArg Arguments.cons (Term.substituteMapped_id term))
+        (Arguments.substituteMapped_id rest)
 
 end
 
@@ -419,24 +435,39 @@ end
           VariableSubstitution.freeId = formula
   | .falsum => rfl
   | .truth => rfl
-  | .rel relation arguments => by
-      simp [Formula.substituteMapped]
+  | .rel relation arguments =>
+      congrArg (Formula.rel relation) (Arguments.substituteMapped_id arguments)
   | .equal left right => by
-      simp [Formula.substituteMapped]
-  | .neg body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      dsimp only [Formula.substituteMapped]
+      exact congr (congrArg Formula.equal (Term.substituteMapped_id left))
+        (Term.substituteMapped_id right)
+  | .neg body => congrArg Formula.neg (Formula.substituteMapped_id body)
   | .conj left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      dsimp only [Formula.substituteMapped]
+      exact congr (congrArg Formula.conj (Formula.substituteMapped_id left))
+        (Formula.substituteMapped_id right)
   | .disj left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      dsimp only [Formula.substituteMapped]
+      exact congr (congrArg Formula.disj (Formula.substituteMapped_id left))
+        (Formula.substituteMapped_id right)
   | .imp left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      dsimp only [Formula.substituteMapped]
+      exact congr (congrArg Formula.imp (Formula.substituteMapped_id left))
+        (Formula.substituteMapped_id right)
   | .iff left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      dsimp only [Formula.substituteMapped]
+      exact congr (congrArg Formula.iff (Formula.substituteMapped_id left))
+        (Formula.substituteMapped_id right)
   | .forallE sort body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      apply congrArg (Formula.forallE sort)
+      exact (Formula.substituteMapped_congr
+        (fun entry => by cases entry <;> rfl) (fun _ => rfl) body).trans
+        (Formula.substituteMapped_id body)
   | .existsE sort body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_id]
+      apply congrArg (Formula.existsE sort)
+      exact (Formula.substituteMapped_congr
+        (fun entry => by cases entry <;> rfl) (fun _ => rfl) body).trans
+        (Formula.substituteMapped_id body)
 
 /-- 抽象顶部 free 变量后再实例化，等于直接实例化该 free 变量。 -/
 @[simp] theorem Formula.instantiateTop_abstractFreeTop
@@ -448,8 +479,8 @@ end
       body.instantiateFreeTop replacement := by
   change (body.substituteMapped _ _).substituteMapped _ _ = body.substituteMapped _ _
   rw [Formula.substituteMapped_comp]
-  congr 1
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   cases entry <;> rfl
 
 /--
@@ -466,8 +497,8 @@ free 上下文顶部变量抽象成 binder 后，在扩展上下文中以规范�
   rw [Formula.renameMapped_eq_substituteMapped,
     Formula.substituteMapped_comp, Formula.substituteMapped_comp]
   conv => rhs; rw [← Formula.substituteMapped_id body]
-  congr 1
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   cases entry <;> rfl
 
 /-- β 往返律的执行器规范形，供重命名后的量词消去直接命中。 -/
@@ -531,8 +562,8 @@ theorem Formula.weakenFree_eq_renameMapped
   change (formula.renameMapped _ _).renameMapped _ _ = formula
   rw [Formula.renameMapped_comp]
   conv => rhs; rw [← Formula.renameMapped_id formula]
-  congr 1
-  funext resultSort entry
+  apply Formula.renameMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   exact VariableRenaming.swapTop_swapTop entry
 
 /-- 两次弱化后的公式随顶部交换只交换两个新槽位。 -/
@@ -565,8 +596,8 @@ theorem Formula.weakenFree_eq_renameMapped
   change ((body.substituteMapped _ _).renameMapped _ _).substituteMapped _ _ =
     body.renameMapped _ _
   simp only [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
-  congr 1
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   cases entry <;> rfl
 
 /-- 弱化后的 binder 以弱化项打开，等于先实例化再整体弱化。 -/
@@ -583,8 +614,8 @@ theorem Formula.weakenFree_eq_renameMapped
   change ((body.substituteMapped _ _).renameMapped _ _).substituteMapped _ _ =
     (body.substituteMapped _ _).renameMapped _ _
   simp only [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
-  congr 1
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   cases entry with
   | here => exact Term.renameMapped_eq_substituteMapped _ _ replacement
   | there _ => rfl
@@ -603,8 +634,8 @@ theorem Formula.weakenFree_eq_renameMapped
   rw [Formula.renameMapped_comp]
   change (body.abstractFreeTop.renameMapped VariableRenaming.id _).instantiateTop _ = _
   rw [Formula.instantiateTop_renameMapped_abstractFreeTop_fvar]
-  congr 1
-  funext resultSort entry
+  apply Formula.renameMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   cases entry <;> rfl
 
 /--
@@ -1030,8 +1061,12 @@ end
     (Formula.forallE quantified body).instantiateFreeTop replacement =
       .forallE quantified
         (body.instantiateFreeTop (replacement.weakenBound quantified)) := by
-  simp [Formula.instantiateFreeTop, Formula.substitute,
-    Formula.substituteMapped, Substitution.instantiateFreeTop]
+  apply congrArg (Formula.forallE quantified)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
+    cases entry <;> rfl
+  · intro resultSort entry
+    cases entry <;> rfl
 
 @[simp] theorem Formula.instantiateFreeTop_existsE
     {σ : Signature.{u, v, w}}
@@ -1041,8 +1076,12 @@ end
     (Formula.existsE quantified body).instantiateFreeTop replacement =
       .existsE quantified
         (body.instantiateFreeTop (replacement.weakenBound quantified)) := by
-  simp [Formula.instantiateFreeTop, Formula.substitute,
-    Formula.substituteMapped, Substitution.instantiateFreeTop]
+  apply congrArg (Formula.existsE quantified)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
+    cases entry <;> rfl
+  · intro resultSort entry
+    cases entry <;> rfl
 
 /--
 项先穿过一个新 free 槽，再把该槽抽象为 binder，等于直接穿过该 binder。
@@ -1075,10 +1114,10 @@ theorem Formula.substituteMapped_abstractFreeTop_lift
   change (body.substituteMapped _ _).substituteMapped _ _ =
     (body.substituteMapped _ _).substituteMapped _ _
   rw [Formula.substituteMapped_comp, Formula.substituteMapped_comp]
-  congr 1
-  · funext resultSort entry
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
     exact (Term.substituteMapped_abstractFreeTop_weakenFree (introduced := sort) (b entry)).symm
-  · funext resultSort entry
+  · intro resultSort entry
     cases entry with
     | here => rfl
     | there previous =>
@@ -1109,7 +1148,8 @@ theorem Formula.instantiateTop_abstractFreeTop_lift
         (VariableSubstitution.weakenBound quantified VariableSubstitution.freeId) =
       (body.instantiateTop (replacement.weakenFree quantified)).abstractFreeTop := by
   rw [Formula.substituteMapped_abstractFreeTop_lift]
-  congr 2 <;> funext resultSort entry <;> cases entry <;> rfl
+  apply congrArg Formula.abstractFreeTop
+  apply Formula.substituteMapped_congr <;> intro resultSort entry <;> cases entry <;> rfl
 
 /-- 外部 bound 实例化与规范全称 free 封闭交换。 -/
 @[simp] theorem Formula.instantiateTop_forallFreeTop
@@ -1297,8 +1337,8 @@ end
         substitution).weakenFree introduced := by
   change (formula.renameMapped _ _).substituteMapped _ _ = (formula.substituteMapped _ _).renameMapped _ _
   simp only [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
-  congr 1
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
   exact Term.renameMapped_eq_substituteMapped _ _ (substitution entry)
 
 /-- free 替换与同一个新 free 槽的 weakening 交换。 -/
@@ -1332,10 +1372,10 @@ end
   change (body.substituteMapped _ _).substituteMapped _ _ =
     (body.substituteMapped _ _).substituteMapped _ _
   rw [Formula.substituteMapped_comp, Formula.substituteMapped_comp]
-  congr 1
-  · funext resultSort entry
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
     cases entry <;> rfl
-  · funext resultSort entry
+  · intro resultSort entry
     change substitution entry = ((substitution entry).weakenBound sort).instantiateTop
       (replacement.substituteMapped VariableSubstitution.boundId substitution)
     exact (Term.instantiateTop_weakenBound _ (substitution entry)).symm
@@ -1398,12 +1438,12 @@ end
     (body.forallFreeTop sort).substituteFree
         (VariableSubstitution.of_renaming (bound := bound) ρ) = _
   rw [Formula.substituteFree_forallFreeTop]
-  rw [VariableSubstitution.liftFree_of_renaming]
-  change
-    (body.substituteMapped VariableSubstitution.boundId
-      (VariableSubstitution.of_renaming
-        (VariableRenaming.lift (introduced := sort) ρ))).forallFreeTop sort = _
-  rw [Formula.substituteMapped_of_renaming]
+  apply congrArg (Formula.forallFreeTop sort)
+  change body.substituteMapped _ _ = body.renameMapped _ _
+  rw [Formula.renameMapped_eq_substituteMapped]
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
+  cases entry <;> rfl
 
 /-- bound 恒等的非恒等替换与规范存在封闭交换。 -/
 @[simp] theorem Formula.substituteMapped_existsFreeTop_boundId
@@ -1448,12 +1488,12 @@ end
     (body.existsFreeTop sort).substituteFree
         (VariableSubstitution.of_renaming (bound := bound) ρ) = _
   rw [Formula.substituteFree_existsFreeTop]
-  rw [VariableSubstitution.liftFree_of_renaming]
-  change
-    (body.substituteMapped VariableSubstitution.boundId
-      (VariableSubstitution.of_renaming
-        (VariableRenaming.lift (introduced := sort) ρ))).existsFreeTop sort = _
-  rw [Formula.substituteMapped_of_renaming]
+  apply congrArg (Formula.existsFreeTop sort)
+  change body.substituteMapped _ _ = body.renameMapped _ _
+  rw [Formula.renameMapped_eq_substituteMapped]
+  apply Formula.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
+  cases entry <;> rfl
 
 /-- 顶部 free 实例化穿过一个更晚引入的规范存在变量。 -/
 @[simp] theorem Formula.instantiateFreeTop_existsFreeTop

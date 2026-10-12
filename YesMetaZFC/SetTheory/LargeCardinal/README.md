@@ -744,11 +744,169 @@ U 是原源内的严格极限秩段且其高度满足源内正则性时，自动
 并逐层搬运名字域、有限列空间和查询对，保证全部新低秩查询进入像类型的查询域。
 `Et_stretch_d` 将投影与同一张 E 的实际超幂图绑定。
 
-尚未完成引理 3.22 的完整弹性结论：`u⁻`、弹性条件的单一内部公式及其绝对性仍待建立；
-第 3.23 引理的单步伸展及后续指定分叉构造也未完成。
+[TypeElasticSource](TypeElasticSource.lean) 的 `ee_realized_source_l` 已在 V(η+1) 内用单一原公式
+读取同一元组的 Vη 完整 κ 型，并检验全部 τ<δ 的实际伸展。公式内部量化源、扩展器、
+常量域、查询域与类型，外层无需满足 ZF。任意通过短扩展器及不可达最大强度检验的候选，
+都由 [TypeStretchQuality](TypeStretchQuality.lean) 自动构造良基超幂、支撑层枚举和类型秩界。
+[TypeElasticCode](TypeElasticCode.lean) 的 `st_ee_build_l` 在 ZF 中按内部 n 构造实际原程序，
+自动绑定原变量列；语义读取中的 ZFC 用于超幂及枚举构造。`woodin_elastic_l` 给出这一全高度
+条件的实际武丁实例，各高度共用同一源隶属关系及原 κ 型。
 
-后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf)
-的短扩展器、迭代树、齐性树与泛型迭代路线推进。有限支撑测度图及任意有限坐标投影已构造；
+[TypeElastic](TypeElastic.lean) 的 `ee_definition_l` 已完成定义 3.13 的查询装配。
+只输入 ω、非零极限 κ 和内部元数 n，就在 ZF 中构造 Vκ∪{κ}、全部查询域及固定的四查询组：
+最大序数、前驱参数域、δ 不可达、全高度伸展。`Ee_elastic_d` 在这份固定语言表示下只检查
+四条查询的成员关系，适用于未实现类型；两条前驱守卫分别检查，未将裸类型当作演绎封闭理论。
+`Ee_minus_d` 对原语法前驱算子加入这两条守卫，已有存在域与唯一性定理。
+`ee_elastic_absolute_l` 证明固定查询判断在传递源中绝对。整个查询组先于任意类型构造，
+实现类型上的等价式再读取同一元组的实际前驱、当前结构的原不可达判断及每个 τ<δ 的伸展。
+ω 与 n 的名字合法性直接来自 κ 为非零极限序数，未附加 κ>ω。
+
+引理 3.22 已完成：`woodin_elastic_l` 返回无界多个 κ 的完整弹性类型，并携带
+`Ee_language_d` 的实际查询及统一读取证书。`sc_v_inaccessible_l` 在任意包含 δ 的秩层
+验证 δ 的原不可达查询，不要求层高为极限或该层对 Kuratowski 配对封闭。
+`sc_v_inaccessible_read_l` 给出反向读取。`Ee_language_d.realized_l` 从任意秩实现自动
+恢复后继高度、δ 的不可达性、Vδ 源、实际前驱和全部高度的伸展。
+[Subtype](../../Model/SetTheory/Internal/Subtype.lean) 已构造定义 3.6 的固定查询，
+对任意内部有限元数扩充及排列读取完整实现见证。查询程序先于具体类型及常量固定，
+同一查询码具有唯一性。[TypeExceeds](../../Model/SetTheory/Internal/TypeExceeds.lean)
+保留定义 3.9 的原秩间隔 ν+1<η 和实际排列。
+
+[TypeOneStep](TypeOneStep.lean) 的 `ee_one_step_l` 完成引理 3.23。
+对事先编译的任意子类型程序，由原弹性类型、超过关系和候选类型的参数域构造伸展；
+δ 的不可达性及实际 Vδ 源自动读取，结论保留输入的同一程序及参数槽。
+正则性给出 τ+ω<δ，弹性提供同一扩展器在前驱类型上的伸展；固定子类型查询经
+[SubtypeStretch](SubtypeStretch.lean) 从前驱像搬到原类型像。输出包含支撑等于不可达最大强度
+的实际扩展器、τ+ω 上的投影，以及原定义的子类型查询成员关系。
+[WoodinTypeStep](WoodinTypeStep.lean) 的 `woodin_elastic_step_l` 给出直接实例：
+任意 Vη 中的内部有限元组，在 V(η+3) 与 V(η+1) 有域递增的弹性类型，后者超过前者，
+并实际构造所需的一步伸展；两个类型的实现元组和精确高度一并保留。
+子类型程序先于临界点及类型固定，全部无界实例使用同一份原代码。
+
+[LocalIndiscernibles](LocalIndiscernibles.lean) 的 `li_indiscernibles_l` 已构造定义 3.27
+所需的实际对象，背景只需 ZF。给定序数 δ，固定参数带 U=V(δ+ω) 和包含全部内部
+公式码、任意内部有限参数列的查询域 D。在 V(ν+ω) 中以 ν 为指定点的完整类型
+属于 P(D)；[UnboundedFiber](../Ord/UnboundedFiber.lean) 的实际原公式收集证明
+某个类型在无界多个高度重复，因此对任意下界 α 都能取 α<ν<ν+ω<μ 的不可分辨对。
+证明不要求武丁性、外部良基性、标准 ω 或一个假定存在的类型选择函数。
+
+`Li_pair_d.read_l` 返回两边的实际隶属模型和完整实现，并逐个原公式核验
+φ(ν,a₀,…,aₖ₋₁) 与 φ(μ,a₀,…,aₖ₋₁) 在各自 V(ν+ω)、V(μ+ω) 中真值相同，
+所有 aᵢ 都来自同一 U。重复参数、任意参数顺序以及全部内部查询均保留。
+[LocalIndiscerniblesLeast](LocalIndiscerniblesLeast.lean) 的 `li_canonical_l` 自动构造
+δ 以上按第二坐标优先的字典序最小不可分辨对；`Li_least_d.unique_l` 保证唯一性，`li_least_m`
+给出同一最小条件的原公式。最小化使用原 δ<ν 条件，没有另加间隔限制；带明确
+ω 间隔的存在性由前一个入口单独提供。
+
+[LocalTypeTransportTuple](LocalTypeTransportTuple.lean) 的 `Li_pair_d.transport_l`
+已把这份真值对应接到完整类型搬运。给定实际 V(ν+k) 元组及其完整 κ 型，
+其中 k∈ω 且 k>0，元组长度为任意内部自然数；元组项可以来自整个共同参数带，
+也可在任意位置重复出现 ν。接口自动恢复原名字列，在 V(μ+k) 中实际生成新元组，
+只把 ν 换成 μ，并保留同一个常量域、查询域及类型集合。`Tm_move_d` 记录原函数图
+上的逐项对应，不要求预先排成标准坐标顺序。
+
+`li_canonical_transport_l` 自动选择任意 θ≥δ 的字典序最小不可分辨对，参数带为
+V(θ+ω)，指定常量仍为 δ；因此 θ 可以另行覆盖树的秩。背景仅需 ZF，δ 是大于 ω
+的极限序数，不要求武丁性、不可达性或源秩层满足 ZF。读取公式一次检验整个候选
+类型的所有内部查询；[OrdinalAdditionSource](../../Model/SetTheory/Internal/OrdinalAdditionSource.lean)
+直接证明原序数加法的源绝对性，[CumulativeFinite](../CumulativeFinite.lean) 保证
+内部有限名字列仍在共同参数带内。`li_canonical_finite_l` 还自动生成共同名字域和
+两侧的实际完整类型，供无需指定已有类型的调用使用。
+
+[TypeGameDecoding](TypeGameDecoding.lean) 的 `tg_one_graph_recovery_l` 已实现优化路线的
+一张图恢复。先自动编译完整节点、空根和末位最大序数的实际查询，随后读取任意
+`Ts_at_d` 子类型见证。全部长度为内部自然数，原双射排列及旧坐标的逐项对应都保留。
+完整节点谓词核验三张坐标图的函数性、同一精确定义域和合成节点属于树；中间坐标
+只组成集合，不预设标签次序。源绝对性只需传递性，不假设秩层满足 ZF。
+
+在 k≥1、旧树含空根且属于 Vα 的条件下，旧 α 不能进入标签图，也不能成为含非空
+节点的树，所以只能处于末位；旧树则恢复为首位。旧图因此包含在新图中，再由精确
+定义域和函数性推出新图恰延长一项。最大序数查询反推见证高度为 α+1，未先假设这一
+高度。[TypeGameReset](TypeGameReset.lean) 的 `tg_reset_type_l` 从实际含根树构造
+(S,ν) 在 V(ν+1) 中的完整类型，并返回上述三个查询的可复用语义证书及真值。
+规范不可分辨对已同步校正为原 5.12 的约定：
+先最小化第二坐标，再最小化第一坐标。
+
+[TypeDrop](../../Model/SetTheory/Internal/TypeDrop.lean) 已实现 dcp 的原语法投影。
+任意内部前缀元数 n≤m 的投影均通过查询重编码逆像构造；原公式自然数码不变，
+只把名字列中指定常量 δ 的标记由 n 改为 m。`Tt_realized_d.dcp_l` 证明删除末位后
+仍是同一秩层、同一常量域中原前缀的完整类型；`append_l` 实际添加末位，且再次
+做 dcp 字面返回原类型。投影对裸查询集合定义，不量化语义正确性作为算子条件。
+
+[TypeGameReply](TypeGameReply.lean) 的 `Tg_reply_d` 已装配规则 (7) 的完整类型约束：
+w 是 dcp(u) 的子类型，同时含空根、末位严格超过 δ 和树秩、末位加二最大序数三条
+实际查询。`tg_reply_language_l` 自动构造常量域、查询域及代码；`read_l` 从原查询
+恢复真实低层模型、任意子类型排列、根和末位，并给出严格秩界与精确高度 α+3。
+[TypeGameReplyBuild](TypeGameReplyBuild.lean) 从实际低层前缀添加末位，构造满足这份
+约束的完整回答类型和原定义的子类型查询。此构造使用恒等排列，规则及读取不限制排列。
+
+[TypeElasticDomain](TypeElasticDomain.lean) 只用 ZF 从两条定义域查询取得实际前驱。
+[TypeGameRigidity](TypeGameRigidity.lean) 的 `tg_exceeds_rigid_l` 完成后继高度刚性：
+旧类型含末位加二最大序数，新类型超过它且 dcp⁻ 有定义，便推出新类型末位为最大序数。
+证明使用任意真实排列；没有把完整弹性、δ 不可达性或扩展器强性加作这一结论的前提。
+
+[WoodinGameTypes](WoodinGameTypes.lean) 从任意内部有限历史自动构造 dcp 弹性的游戏
+类型，参数域可超过任意 χ<δ；[WoodinGameReset](WoodinGameReset.lean) 已将它实例化
+为含空根树的实际二元重置类型，完整节点、空根、最大序数和 dcp 弹性同时成立。
+
+[TypeGame](TypeGame.lean) 的 `tg_game_l` 已完成完整辅助闭博弈装配。从 δ、落子字母表
+A∈Vδ 和 S 自动选择相对于 max(δ,rank(S)) 的原最小局部不可分辨点，构造三张实际代码表，
+再产生模型内部的游戏码、有限历史、合法历史树、无限对局与策略空间。构造只需 ZFC、
+ω<δ 且 δ 为极限；这里没有先假设获胜策略，也未把整个秩层假定为 ZFC 模型。
+
+[TypeElasticCatalog](TypeElasticCatalog.lean)、[TypeGameProgramCatalog](TypeGameProgramCatalog.lean)
+和 [TypeGameQueryCatalog](TypeGameQueryCatalog.lean) 用已有编译工厂及原公式的集合内统一化，
+在任何对局出现前固定查询字节。弹性表和节点／端点表的图包含于 Vδ；子类型程序表只按
+内部元数选择，其图包含于 Vω，κ、候选类型不参与程序选择。表项直接回收原完整语义证书。
+没有对裸类型加入逻辑闭包，也不在每轮另换语义等价的查询。
+
+[TypeGameAuxiliary](TypeGameAuxiliary.lean) 接合规则 (2)–(6)：完整节点和 dcp 弹性、
+初始 rank(A)<κ 与逐轮域增长、原树和 νL 的完整重置类型、tℓ=pred(t) 及新 u 超过旧 w。
+[TypeGameAnswer](TypeGameAnswer.lean) 接合规则 (7)，仅增加优化稿要求的空根条件；
+任意有限排列仍保留。[TypeGameStages](TypeGameStages.lean) 对每个内部时刻自动恢复
+唯一轮号和三阶段之一，依次由 II 出辅助走法、I 回答、按原轮号奇偶落下实数坐标。
+
+[FirstViolation](../Descriptive/FirstViolation.lean) 与
+[FirstViolationMinimum](../Descriptive/FirstViolationMinimum.lean) 构造有限违规证据和闭收益集。
+最早失败长度由模型内部的序数最小化取得，覆盖非标准 ω；`Tg_game_d.payoff_l` 精确证明
+I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历史树与违规后的胜负树分别构造。
+[ClosedDeterminacy](../Descriptive/ClosedDeterminacy.lean) 的 `cg_closed_det_l` 已完成 4.16：
+在 ZFC 中对任意非空集合字母表和固定玩家时序，直接分离 II 的获胜局面集合，
+按第一步落子拼接模型内的策略，再构造 I 避开该集合的策略。
+取模型内部最早进入获胜区的长度证明所有前缀均避开该区，故属于闭收益树。
+证明覆盖非标准 ω，策略拼接仅用 ZF；选择公理分别用于选取子策略和可走字母。
+[TypeGameDeterminacy](TypeGameDeterminacy.lean) 的 `Tg_game_d.determined_l` 将此结论直接
+用于原三阶段游戏，返回原策略空间中的获胜策略及其玩家。
+尚待完成 5.15 将 II 的获胜策略从辅助博弈转到原博弈的完整迭代论证。
+
+[TypeGameContinue](TypeGameContinue.lean) 已把继续扩展器施加到指定较早节点，
+并在同一目标反射层内得到候选实现与一张图恢复。旧回答查询和任意落子字母表
+所在的共同低秩层沿实际根图固定；[TypeGameRigidRead](TypeGameRigidRead.lean)
+从原超过见证及 dcp 定义域推出最大序数查询，[TypeGameRecovery](TypeGameRecovery.lean)
+保留任意排列并恢复恰好一个新标签。六个反射句子都有已证实例，工作模型不预设 ZFC。
+[TypeGameRestart](TypeGameRestart.lean) 将同一次恢复的完整实现、原 dcp 弹性与原程序
+直接组成下一轮输入，并调用原更新句子产生完整回答。
+[TypeGameRoundScope](TypeGameRoundScope.lean) 从原武丁公式读取工作模型内的正则性，
+取回答的小超幂支撑为共同高度，并自动回收原语言、查询域和完整类型。
+[TypeGameRound](TypeGameRound.lean) 使用这份回答建立当前完整模型上的实际树边；
+首轮已直接迁移到同一接口。`continue_tree_l` 也已接上这一奇数树边，
+保留偶数边与奇数边的原回答、根图复合及原字母表的逐点固定性。
+实际 nice 树的末项界住整列支撑，下一轮的下界允许等号，回答高度仍严格增长。
+有限历史递归、padding、偶数枝良基性矛盾和奇数返回分支仍待接合。
+
+后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
+及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，
+保留类型游戏、6.7 与 6.10 的地面／坍缩二择一、7.22–7.23 的实数吸收，
+以及 8.5 的转移和 8.12、8.15–8.18 的双侧树证书，
+最后接 8.21–8.24 的高度提升。余解析齐性、齐性传播、projective 展示和 UB 拓扑刻画
+不作为这条主线的前置。连续策略族审阅稿的直接游戏和统一反例树秩提供后续的策略输出接口；
+其单 Woodin 结论不替代最终 L(ℝ) 的大基数假设。
+
+类型游戏继续允许 subtype／exceeds 的任意有限排列。一张图已经按完整节点谓词恢复，
+根角色用固定公式 ∅∈v₀ 锚定；一张图和两张图的恢复分别保留非空长度与不交字母表条件。
+旧逐坐标标签查询仍是可独立使用的语法接口，不作为新游戏路线的额外排序规则。
+两份审阅稿作为纸面证明依据，其中保留的深层引理仍须逐一在 Lean 中证明。
+
+有限支撑测度图及任意有限坐标投影已构造；
 分量商结构、源内部相对超滤与代表族、全背景函数版本的 Łoś 已完成；
 实际源理论下的源内部 Łoś、存在见证对角化及传递后继源保持也已完成。
 相对测度的跨模型施加、双映射完整初等复制、常值交换方块与良基性回传已完成。
@@ -760,8 +918,11 @@ U 是原源内的严格极限秩段且其高度满足源内正则性时，自动
 按 ν 选择不可达 L>ν、整个 V_L 覆盖、谓词一致性、临界点恢复和完整谓词初等性已完成。
 实际迭代树、单根与 pad、任意树前驱上的后继扩张，以及其后继一致性已实现。
 极限处添枝和上述条件下的共尾良基分支已实现；小模型的内部编码与跨源还原也已实现。
-nice 树的 ω₁ 弱迭代策略及上述完整类型伸展等式已完成；弹性公式、单步伸展、
-齐性树、泛型迭代及最终 L(ℝ) 的 AD 蕴涵仍待证明。
+nice 树的 ω₁ 弱迭代策略、定义 3.13、引理 3.22–3.23，以及局部不可分辨对象的
+实际存在性、真值对应、规范最小选取及有限后继秩层的完整类型搬运已完成；类型游戏的
+完整节点查询、一张图恢复、原 dcp、弹性重置类型、规则 (7) 的类型约束及后继高度刚性
+也已完成。完整辅助闭博弈、有限历史、首次违规胜负与决定性已完成；
+5.15 的迭代获胜论证、泛型迭代、双侧树证书及最终 L(ℝ) 的 AD 蕴涵仍待证明。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；

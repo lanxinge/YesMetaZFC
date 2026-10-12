@@ -62,6 +62,13 @@ theorem Fs_trace_d.prefix_l (hZF : M.Models ZF) {ω X f g H G n p q : M.Domain} 
 def Fs_code_d (ω X f n p : M.Domain) : Prop :=
   ∃ H, Fs_trace_d I ω X f H ∧ M.PairMember I n p H
 
+/-- 扩大对象域保持同一条编码轨道，编码本身不改变。 -/
+theorem Fs_code_d.mono_l {ω A B f n p : M.Domain} (h : Fs_code_d I ω A f n p)
+    (sub : M.MemberSubset A B) : Fs_code_d I ω B f n p := by
+  obtain ⟨H, trace, hp⟩ := h
+  exact ⟨H, ⟨⟨trace.1.1, trace.1.2.1, fun i hi =>
+    (trace.1.2.2 i hi).imp fun x hx => ⟨sub x hx.1, hx.2⟩⟩, trace.2⟩, hp⟩
+
 def fs_code_m {d} (ω X f n p : Term d) : Formula 1 d := .existsE (.conj
   (fs_trace_m (𝒞 := 𝒞) ω.weaken X.weaken f.weaken .newest)
   (Formula.orderedPairMem 𝒞 n.weaken p.weaken .newest))
@@ -82,5 +89,13 @@ theorem Fs_code_d.prefix_l (hZF : M.Models ZF) {ω X f g n p q : M.Domain} (hω 
 
 theorem Fs_code_d.bound_l {ω X f n p : M.Domain} (h : Fs_code_d I ω X f n p) : M.mem n ω ∧ M.mem p X :=
   h.elim fun _ h => ⟨h.1.1.input_mem_of_pairMember h.2, h.1.1.output_mem_of_pairMember h.2⟩
+
+theorem Fs_code_d.transport_l (hZF : M.Models ZF) {ω X f g G n p : M.Domain} (hω : M.IsOmega ω)
+    (hf : M.IsSetFunctionFromTo I f ω X) (hg : M.IsSetFunctionFromTo I g ω X)
+    (trace : Fs_trace_d I ω X g G) (h : Fs_code_d I ω X f n p) (agree : Senv_agree_d I n f g) :
+    Fs_code_d I ω X g n p := by
+  obtain ⟨q, _, hq⟩ := trace.1.2.2 n (h.bound_l I).1
+  have code : Fs_code_d I ω X g n q := ⟨G, trace, hq⟩
+  exact ((h.prefix_l I hZF hω hf hg code).mpr agree).symm ▸ code
 
 end YesMetaZFC.SetTheory

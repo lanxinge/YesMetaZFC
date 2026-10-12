@@ -74,7 +74,7 @@ certificates and witness pairing. The direct criterion quantifies over an intern
 and all internal prefix lengths, and also has a relative subspace version.
 The [projective layer](YesMetaZFC/SetTheory/Descriptive/Projective.lean) constructs Σ¹ₙ, Π¹ₙ,
 and Δ¹ₙ along the model's own ω, including nonstandard levels. Base and first-level identities,
-successor projection equations, complement duality, monotonicity, and Borel ⊆ Δ¹₁ are proved.
+successor projection equations, complement duality, monotonicity, and Δ¹₁ = Borel are proved.
 Individual projective codes and the entire hierarchy have unique internal interpretations;
 Cantor pointclasses are obtained by subspace traces. Code operations now include complements,
 alternating quantifiers, merging adjacent quantifiers of the same polarity, raising levels,
@@ -82,8 +82,15 @@ continuous preimages, and binary unions/intersections in ZF. Coded countable uni
 preserve each Σ, Π, and Δ level under countable choice for internal reals; the finer interface
 only needs choice on the given index set. Standard numeral levels agree with finite alternating
 real quantifiers over Borel matrices, with subspace-relative interfaces.
-Borel ranks, separation and perfect-set
-theorems, Δ¹₁ ⊆ Borel, and strictness remain to be implemented.
+Borel separation for disjoint analytic sets, Suslin's theorem, universal sets, and strictness
+of the positive internal projective levels are implemented over ZF. [Borel ranks](YesMetaZFC/SetTheory/Descriptive/BorelRank.lean)
+distinguish code-tree rank from the standard rank of a coded set; complementation preserves
+the latter, and restriction to an internal subspace does not increase it.
+The [perfect-set theorem](YesMetaZFC/SetTheory/Descriptive/Perfect.lean) covers internal analytic
+and coded Borel sets in ZF, without countable choice or regularity of ω₁. These results allow
+nonstandard internal ω and externally ill-founded models. Uncoded set-based Borel classes
+are not identified with the coded classes in ZF. Uniformization and determinacy remain
+unimplemented.
 
 ## Explore the infrastructure
 
@@ -125,22 +132,21 @@ cd YesMetaZFC
 lake --wfail build
 ```
 
-For the full source check, including independent modules outside the default import graph
-and the proof-scanning tool, use Python 3.11 or later:
+For the full source check, including independent modules outside the default import graph,
+use Python 3.11 or later:
 
 ```bash
 python scripts/lean_cache.py build
 ```
 
-Warnings cause these checks to fail. Recorded validation runs and their scope are documented
-in [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) and
-[PROOF_REDUCTION.md](markdown/PROOF_REDUCTION.md).
+Warnings cause these checks to fail. Mathematical scope and dependency-audit entry points
+are documented in [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md).
 
 ## Prebuilt caches
 
 After installing the toolchain, run `python scripts/lean_cache.py get` from a checkout of
 the desired commit. Use `python scripts/lean_cache.py get --kind full` to include native
-static and shared libraries and the proof-scanning executable.
+object files and static and shared libraries.
 
 CI builds separate Linux x86-64/ARM64, Windows x86-64, and macOS Intel/Apple Silicon caches.
 Successful main-branch builds publish a complete set in a release named `cache-<commit>`.

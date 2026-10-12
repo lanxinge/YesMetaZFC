@@ -38,7 +38,7 @@ theorem rt_ft_arg_l (k : Nat) (A R b T f p i j : (N).Domain) {ν : M.Domain}
   · constructor
     · rintro ⟨x, g, q, hx, update, code, truth⟩
       exact ⟨x.val, g.val, q.val, hx, (rt_fp_update_l I hZF hω hW hωY f i x g).mp update,
-        (rt_fs_code_l I hZF hω hW hωY A g b q hV hs hων).mp code, (entry j q T).mp truth⟩
+        (rt_fs_code_l I hZF hω hW hωY A g b q hV hων).mp code, (entry j q T).mp truth⟩
     · rintro ⟨x, g, q, hx, update, code, truth⟩
       have hg := update.function_l K hf hi hx
       have bound := fp_function_rank_l I hZF hω hV hων
@@ -47,7 +47,7 @@ theorem rt_ft_arg_l (k : Nat) (A R b T f p i j : (N).Domain) {ν : M.Domain}
       let g' : (N).Domain := ⟨g, (ZF.v_successor_l I hZF hV hW hs g).mpr bound⟩
       let q' : (N).Domain := ⟨q, trans A.val A.property q (code.bound_l K).2⟩
       exact ⟨x', g', q', hx, (rt_fp_update_l I hZF hω hW hωY f i x' g').mpr update,
-        (rt_fs_code_l I hZF hω hW hωY A g' b q' hV hs hων).mpr code, (entry j q' T).mpr truth⟩
+        (rt_fs_code_l I hZF hω hW hωY A g' b q' hV hων).mpr code, (entry j q' T).mpr truth⟩
 
 theorem rt_ft_node_l (A R b T c f p : (N).Domain) {ν r : M.Domain}
     (hV : V_d I ν A.val) (hs : M.SuccessorOf μ ν) (hων : M.MemberSubset ω ν)
@@ -72,7 +72,7 @@ theorem rt_ft_eval_l (A R b F n T : (N).Domain) {ν : M.Domain}
     Ft_eval_d J ⟨ω, hωY⟩ A R b F n T ↔ Ft_eval_d K ω A.val R.val b.val F.val n.val T.val := by
   have entry := rt_fp_entry_l I hZF hω hW hωY
   have fn f := rt_fp_function_from_l I hZF hω hW hωY f ⟨ω, hωY⟩ A
-  have code f p := rt_fs_code_l I hZF hω hW hωY A f b p hV hs hων
+  have code f p := rt_fs_code_l I hZF hω hW hωY A f b p hV hων
   have trans := ZF.v_transitive_l I hZF hW
   have own f (hf : M.IsSetFunctionFromTo K f ω A.val) : M.mem f Y :=
     (ZF.v_successor_l I hZF hV hW hs f).mpr (fp_function_rank_l I hZF hω hV hων

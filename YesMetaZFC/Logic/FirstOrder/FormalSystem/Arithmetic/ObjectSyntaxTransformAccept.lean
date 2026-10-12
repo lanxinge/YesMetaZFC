@@ -121,7 +121,7 @@ theorem bound_accept (mode depth parameter index output : Nat)
         exact bound_point_accept _ _
       · cases h
         cases index with
-        | zero => omega
+        | zero => exfalso; omega
         | succ index => exact bound_predecessor_accept _ _ _ (by omega)
   | 3 =>
     cases h

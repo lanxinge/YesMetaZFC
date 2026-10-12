@@ -50,7 +50,7 @@ theorem vr_source_l (hZF : M.Models ZF) {δ X α V : M.Domain}
 
 /-- 已覆盖的秩层可同任意更长相对历史比较；不要求截断历史自身属于载体。 -/
 theorem vr_compare_l (hZF : M.Models ZF) {Z η B F α V W : M.Domain} (hZ : M.TransitiveSet Z)
-    (hBZ : M.mem B Z) (fn : Fn0_d η B F) (hαη : M.MemberSubset α η)
+    (hBZ : M.MemberSubset B Z) (fn : Fn0_d η B F) (hαη : M.MemberSubset α η)
     (hWZ : M.mem W Z) (hV : V_d (kp_pair_l (ZF.modelsKP hZF)) α V) (hVZ : M.MemberSubset V Z)
     (history : ∀ β, M.mem β α → ∀ H, Rd_entry_d β H F → ∀ t, M.mem t Z → Vc_step_d β B F H t)
     (root : ∀ t, M.mem t Z → Vc_step_d α B F W t) : W = V := by
@@ -80,7 +80,7 @@ theorem vr_compare_l (hZF : M.Models ZF) {Z η B F α V W : M.Domain} (hZ : M.Tr
     apply (sat β).mpr
     intro hβ H hβH
     exact compare β H ((v_ordinal_l I hV).mem hβ) ((v_ordinal_l I hV).transitive β hβ)
-      (hZ B hBZ H (fn.bound_l hβH).2)
+      (hBZ H (fn.bound_l hβH).2)
       (history β hβ H hβH)
       (fun γ hγ => (sat γ).mp (ih γ hγ) ((v_ordinal_l I hV).transitive β hβ γ hγ))
   exact ZF.v_unique_l I hZF (compare α W (v_ordinal_l I hV) (fun _ h => h) hWZ
@@ -92,7 +92,7 @@ theorem vr_agree_l (hZF : M.Models ZF) {Z α V W : M.Domain} (hZ : M.TransitiveS
     (hW : Vr_d Z α W) : W = V := by
   obtain ⟨B, F, hBZ, _, cert⟩ := hW
   have fn := (cert W hWZ).2.1
-  exact vr_compare_l hZF hZ hBZ fn (fun _ h => h) hWZ hV hVZ
+  exact vr_compare_l hZF hZ (hZ B hBZ) fn (fun _ h => h) hWZ hV hVZ
     (fun β hβ H hβH t ht => (cert t ht).2.2.1 β hβ H (fn.bound_l hβH).2 hβH)
     (fun t ht => (cert t ht).2.2.2)
 

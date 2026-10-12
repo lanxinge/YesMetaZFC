@@ -163,8 +163,7 @@ theorem proof_sequence_code_prefix_unique
             (hStep prefixLength (Nat.lt_succ_self _))
             (hTraceBound prefixLength (Nat.le_succ _)) hFinalZero
           intro accumulator hAccumulator item hItem hMatch hInner
-          exfalso
-          simp [nat_sequence_code_step] at hMatch
+          exact Nat.noConfusion hMatch
         constructor
         · exact FirstOrder.Derives.falsum_elim hFalse
         · intro index hIndex

@@ -403,7 +403,14 @@ theorem successor_term_eq_witness_derives
   unfold successor_spec
   rw [membership_specification_instantiateTop]
   rw [Term.instantiateTop_bvar_here]
-  simp [successor_member_condition]
+  have hSource :
+      ((source.weakenBound SetSort.set).weakenFree SetSort.set).instantiateTop
+          (replacement.weakenFree SetSort.set) = source.weakenFree SetSort.set := by
+    rw [Term.instantiateTop_weakenFree, Term.instantiateTop_weakenBound]
+  exact congrArg
+    (fun current : SetOpenTerm (SetSort.set :: free) =>
+      membership_specification replacement
+        (successor_member_condition (.fvar .here) current)) hSource
 
 /-- 规范后继函数项满足现代后继规格。 -/
 theorem successor_term_spec_derives

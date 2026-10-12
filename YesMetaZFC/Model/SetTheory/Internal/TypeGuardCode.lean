@@ -2,6 +2,7 @@ import YesMetaZFC.Model.SetTheory.Internal.FiniteConjunction
 import YesMetaZFC.Model.SetTheory.Internal.RankLargest
 import YesMetaZFC.Model.SetTheory.Internal.Compiler
 import YesMetaZFC.Model.SetTheory.Internal.Sigma1Substructure
+import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
 
 /-! # 前驱定义域的实际内部公式
 
@@ -82,5 +83,18 @@ theorem sg_guard_rank_l (hZF : M.Models ZF) {ω n : M.Domain} (hω : M.IsOmega �
     exact (last Z hZ).mp hz ▸ all
   · intro all
     exact ⟨X, hXY, (last X hXY).mpr rfl, all⟩
+
+/-- 自然数码的读取只依赖 ω 和程序元数，与具体 κ 常量无关。 -/
+def Tg_guard_program_d (ω l z : M.Domain) : Prop := M.mem l ω ∧ M.mem z ω ∧
+  ∀ ν μ X Y c R f, V_d I ν X → V_d I μ Y → M.SuccessorOf μ ν → M.MemberSubset ω ν →
+    Smem_d I c Y R → M.IsSetFunctionFromTo I f ω Y →
+      (Sc_sat_d I ω c z f ↔ ∀ i y, M.mem i l → M.PairMember I i y f → M.mem y X)
+
+theorem tg_guard_program_l (hZF : M.Models ZF) {ω l : M.Domain}
+    (hω : M.IsOmega ω) (hl : M.mem l ω) : ∃ z, Tg_guard_program_d I ω l z := by
+  obtain ⟨a, m, G, u, form, guard⟩ := sg_guard_rank_l I hZF hω hl
+  obtain ⟨z, code⟩ := sc_num_exists_l I hZF hω form
+  exact ⟨z, hl, sc_num_natural_l I hZF hω code, fun ν μ X Y c R f hX hY succ bound model fn =>
+    (sc_sat_decode_l I hZF hω code).trans (guard ν μ X Y c R f hX hY succ bound model fn)⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -103,7 +103,7 @@ theorem woodin_rank_strength_l (hZFC : M.Models ZFC) {δ : M.Domain}
       hFX hm hn ultra crit'.image bound cover' missing
   exact ⟨L, K, F, R, V₀, Y, j, hL, hκL, hνL, hωL, rL, sL, hV₀, short, source,
     J, O, Z, D, p, T, V, q, c, C, Q, system, limit, code, wf, elementary, collapse, factor, strength, exact_strength, level,
-    sc_v_inaccessible_l hZF hr.isLimitOrdinal hX hLX hωL rL sL,
+    sc_v_inaccessible_l hZF hX hLX hωL rL sL,
     short.local_l hZF hX hr.isLimitOrdinal hLX hFX⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

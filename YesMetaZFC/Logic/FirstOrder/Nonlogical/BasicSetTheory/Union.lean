@@ -91,8 +91,7 @@ def binary_union_spec {bound free : SetContext}
         (left.renameMapped VariableRenaming.id ρ)
         (right.renameMapped VariableRenaming.id ρ)
         (element.renameMapped VariableRenaming.id ρ) := by
-  simp [binary_union_member_condition, Formula.renameMapped,
-    Arguments.renameMapped]
+  rfl
 
 /-- 二元并规格与 free 重命名自然交换。 -/
 @[simp] theorem binary_union_spec_renameMapped

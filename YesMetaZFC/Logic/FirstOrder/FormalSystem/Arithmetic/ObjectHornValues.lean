@@ -16,32 +16,65 @@ def nodeValue (tag : Nat) (fields : List Nat) : Nat := godel_pair_value tag (lis
 @[simp] theorem Expr.list_term {n : Nat} {bound free : SetContext}
     (fields : List (Expr n)) (env : Fin n → SetTerm bound free) :
     (Expr.list fields).term env = structural_list_code_term (fields.map (Expr.term env)) := by
-  induction fields <;> simp_all [Expr.list, Expr.term, structural_list_code_term,
-    structural_raw_node_code_term, structural_code_tag, finite_numeral_term]
+  induction fields with
+  | nil => rfl
+  | cons head _ ih =>
+      exact congrArg (fun tail => Sₘ(godel_pairₘ(numₘ(1), godel_pairₘ(head.term env, tail)))) ih
 
 @[simp] theorem Expr.node_term {n : Nat} {bound free : SetContext}
     (tag : Nat) (fields : List (Expr n)) (env : Fin n → SetTerm bound free) :
     (Expr.node (.literal tag) fields).term env =
       IntrinsicQuotation.node tag (fields.map (Expr.term env)) := by
-  simp [Expr.node, Expr.term, IntrinsicQuotation.node]
+  exact congrArg (fun tail => Sₘ(godel_pairₘ(numₘ(tag), tail))) (Expr.list_term fields env)
 
 @[simp] theorem Expr.list_eval {n : Nat} (fields : List (Expr n)) (env : Fin n → Nat) :
     (Expr.list fields).eval env = listValue (fields.map (Expr.eval env)) := by
-  induction fields <;> simp_all [Expr.list, Expr.eval, listValue]
+  induction fields with
+  | nil => rfl
+  | cons head _ ih =>
+      exact congrArg (fun tail => godel_pair_value 1 (godel_pair_value (head.eval env) tail) + 1) ih
 
 @[simp] theorem Expr.node_eval {n : Nat} (tag : Expr n) (fields : List (Expr n)) (env : Fin n → Nat) :
     (Expr.node tag fields).eval env = nodeValue (tag.eval env) (fields.map (Expr.eval env)) := by
-  simp [Expr.node, Expr.eval, nodeValue]
+  exact congrArg (fun tail => godel_pair_value (tag.eval env) tail + 1) (Expr.list_eval fields env)
 
 theorem node_evaluate {T : SetTheory} (C : CertificateCore T) (tag : Nat) (fields : List Nat) :
     Derives T [] (IntrinsicQuotation.node tag (fields.map (fun n => (numₘ(n) : Code))) ≐ₘ numₘ(nodeValue tag fields)) := by
+  have hTerms :
+      (fields.map (Expr.literal (arity := 0))).map
+          (Expr.term (fun i => (numₘ(Fin.elim0 i) : Code))) =
+        fields.map (fun n => (numₘ(n) : Code)) := by
+    induction fields with
+    | nil => rfl
+    | cons head tail ih => exact congrArg (List.cons (numₘ(head) : Code)) ih
+  have hValues :
+      (fields.map (Expr.literal (arity := 0))).map (Expr.eval Fin.elim0) = fields := by
+    clear hTerms
+    induction fields with
+    | nil => rfl
+    | cons head tail ih => exact congrArg (List.cons head) ih
   have h := (Expr.node (.literal tag) (fields.map (Expr.literal (arity := 0)))).evaluate C Fin.elim0
-  simpa [Expr.term, Expr.eval, Function.comp_def] using h
+  rw [Expr.node_term, Expr.node_eval, hTerms, hValues] at h
+  exact h
 
 theorem numeral_list_evaluate {T : SetTheory} (C : CertificateCore T) (fields : List Nat) :
     Derives T [] (structural_list_code_term (fields.map (fun n => (numₘ(n) : Code))) ≐ₘ numₘ(listValue fields)) := by
+  have hTerms :
+      (fields.map (Expr.literal (arity := 0))).map
+          (Expr.term (fun i => (numₘ(Fin.elim0 i) : Code))) =
+        fields.map (fun n => (numₘ(n) : Code)) := by
+    induction fields with
+    | nil => rfl
+    | cons head tail ih => exact congrArg (List.cons (numₘ(head) : Code)) ih
+  have hValues :
+      (fields.map (Expr.literal (arity := 0))).map (Expr.eval Fin.elim0) = fields := by
+    clear hTerms
+    induction fields with
+    | nil => rfl
+    | cons head tail ih => exact congrArg (List.cons head) ih
   have h := (Expr.list (fields.map (Expr.literal (arity := 0)))).evaluate C Fin.elim0
-  simpa [Expr.term, Expr.eval, Function.comp_def] using h
+  rw [Expr.list_term, Expr.list_eval, hTerms, hValues] at h
+  exact h
 
 inductive FieldEqualities (T : SetTheory) {free : SetContext} (Γ : Context signature free) :
     List (SetOpenTerm free) → List (SetOpenTerm free) → Prop where
@@ -71,8 +104,9 @@ theorem node_congr {T : SetTheory} {free : SetContext} {Γ : Context signature f
 @[simp] theorem condition_instantiateTop (rules : List Rule) {free : SetContext} (point : SetOpenTerm free) :
     (condition rules (.bvar .here : SetTerm [SetSort.set] free)).instantiateTop point =
       condition rules point := by
-  simp [condition, Formula.instantiateTop, Formula.substitute, Substitution.instantiateTop,
-    Term.substituteMapped, Arguments.substituteMapped, VariableSubstitution.instantiateTop]
+  exact ObjectTrace.condition_substituteMapped (step rules)
+    (ωₘ : SetTerm [SetSort.set] free) (.bvar .here)
+    (VariableSubstitution.instantiateTop point) VariableSubstitution.freeId
 
 theorem transport {T : SetTheory} (rules : List Rule) {free : SetContext} {Γ : Context signature free}
     {left right : SetOpenTerm free} (hEq : Derives T Γ (left ≐ₘ right))
@@ -91,13 +125,43 @@ theorem transport_negative {T : SetTheory} (rules : List Rule) {free : SetContex
 @[simp] theorem listValue_eq_iff (left right : List Nat) :
     listValue left = listValue right ↔ left = right := by
   induction left generalizing right with
-  | nil => cases right <;> simp [listValue, godel_pair_value_eq_iff]
+  | nil =>
+    cases right with
+    | nil => exact ⟨fun _ => rfl, fun _ => rfl⟩
+    | cons head tail =>
+      constructor
+      · intro h
+        have hTag := (godel_pair_value_eq_iff.mp (Nat.succ.inj h)).1
+        exact False.elim (Nat.zero_ne_one hTag)
+      · intro h
+        cases h
   | cons head tail ih =>
-    cases right <;> simp [listValue, godel_pair_value_eq_iff, ih]
+    cases right with
+    | nil =>
+      constructor
+      · intro h
+        have hTag := (godel_pair_value_eq_iff.mp (Nat.succ.inj h)).1
+        exact False.elim (Nat.zero_ne_one hTag.symm)
+      · intro h
+        cases h
+    | cons other rest =>
+      constructor
+      · intro h
+        have hFields := godel_pair_value_eq_iff.mp
+          (godel_pair_value_eq_iff.mp (Nat.succ.inj h)).2
+        exact congr (congrArg List.cons hFields.1) ((ih rest).mp hFields.2)
+      · intro h
+        cases h
+        rfl
 
 @[simp] theorem nodeValue_eq_iff (leftTag rightTag : Nat) (left right : List Nat) :
     nodeValue leftTag left = nodeValue rightTag right ↔ leftTag = rightTag ∧ left = right := by
-  simp [nodeValue, godel_pair_value_eq_iff]
+  constructor
+  · intro h
+    have hParts := godel_pair_value_eq_iff.mp (Nat.succ.inj h)
+    exact ⟨hParts.1, (listValue_eq_iff left right).mp hParts.2⟩
+  · rintro ⟨rfl, rfl⟩
+    rfl
 
 theorem listValue_cons {input : List Nat} {head tail : Nat}
     (h : listValue input = godel_pair_value 1 (godel_pair_value head tail) + 1) :
@@ -116,7 +180,12 @@ theorem listValue_cons {input : List Nat} {head tail : Nat}
       nodeValue tag (children.map IntrinsicQuotation.treeValue) := by
   have hForest : IntrinsicQuotation.forestValue children =
       listValue (children.map IntrinsicQuotation.treeValue) := by
-    induction children <;> simp_all [IntrinsicQuotation.forestValue, listValue]
+    induction children with
+    | nil => rfl
+    | cons head _ ih =>
+      exact congrArg
+        (fun tail => godel_pair_value 1
+          (godel_pair_value (IntrinsicQuotation.treeValue head) tail) + 1) ih
   exact congrArg (fun payload => godel_pair_value tag payload + 1) hForest
 
 theorem tree_node_zero (input : NatPacket.Tree) (tag : Nat)
@@ -218,7 +287,11 @@ def rulesFor (rules : List Rule) (tag : Nat) : List Rule :=
 theorem matching_rule {rules : List Rule} (hTagged : ∀ rule, rule ∈ rules → rule.head.tag?.isSome)
     {rule : Rule} (hRule : rule ∈ rules) (values : Fin rule.arity → Nat) (tag : Nat) (fields : List Nat)
     (hHead : nodeValue tag fields = rule.head.eval values) : rule ∈ rulesFor rules tag := by
-  exact List.mem_filter.mpr ⟨hRule, by simp [rule.head.tag_of_eval values tag fields (hTagged rule hRule) hHead]⟩
+  apply List.mem_filter.mpr
+  refine ⟨hRule, ?_⟩
+  rw [rule.head.tag_of_eval values tag fields (hTagged rule hRule) hHead]
+  change decide (tag = tag) = true
+  exact decide_eq_true rfl
 
 theorem Rejection.of_tagged {rules : List Rule}
     (hTagged : ∀ rule, rule ∈ rules → rule.head.tag?.isSome) (tag : Nat) (fields : List Nat)

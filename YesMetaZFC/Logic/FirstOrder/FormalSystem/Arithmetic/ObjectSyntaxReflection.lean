@@ -39,7 +39,10 @@ def Row.map {α : Type u} {β : Type v} (f : α → β) : Row α → Row β
 @[simp] theorem Row.map_input {α : Type u} {β : Type v} (f : α → β) (row : Row α) :
     (row.map f).input = f row.input := by cases row <;> rfl
 theorem Row.input_mem {α : Type u} (row : Row α) : row.input ∈ row.fields := by
-  cases row <;> simp [input, fields]
+  cases row with
+  | term => exact .tail _ (.tail _ (.head _))
+  | arguments => exact .tail _ (.tail _ (.tail _ (.head _)))
+  | formula => exact .tail _ (.tail _ (.head _))
 
 def Row.expr {n : Nat} (row : Row (Expr n)) : Expr n := .node (.literal row.tag) row.fields
 

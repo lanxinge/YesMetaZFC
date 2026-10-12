@@ -27,7 +27,10 @@ end BinarySchema
 namespace RelationSchema
 /-- 原始隶属关系。 -/
 def membership : BinarySchema 0 where
-  body := .mem (.bound 1) (.bound 0)
+  body := by
+    letI : NeZero (0 + 2) := ⟨by intro h; cases h⟩
+    exact .mem (.bound 1) (.bound 0)
+  freeClosed := by exact ⟨rfl, rfl⟩
 /-- 由有序对集合编码的二元关系；唯一参数是关系集合。 -/
 def setCoded (𝒞 : OrderedPairConvention) : BinarySchema 1 where
   body :=

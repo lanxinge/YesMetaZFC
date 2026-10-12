@@ -28,22 +28,30 @@ def condition {bound free : SetContext} (entries : List Entry)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (condition entries input output).substituteMapped bs fs =
       condition entries (input.substituteMapped bs fs) (output.substituteMapped bs fs) := by
-  simp [condition, branch, FixedAxiomTable.row_term, Function.comp_def, Formula.substituteMapped]
+  induction entries with
+  | nil => rfl
+  | cons entry _ ih =>
+      exact congr (congrArg Formula.disj
+        (congr (congrArg Formula.conj
+          (congrArg (fun term => input.substituteMapped bs fs ≐ₘ term)
+            (finite_numeral_term_substituteMapped bs fs entry.1)))
+          (congrArg (fun term => term ≐ₘ output.substituteMapped bs fs)
+            (Term.embedClosed_substituteMapped (IntrinsicQuotation.tree entry.2) bs fs)))) ih
 
 def template (entries : List Entry) : FormulaTemplate.Binary where
   body := condition entries (.fvar .here) (.fvar (.there .here))
 
 @[simp] theorem template_apply (entries : List Entry) {bound free : SetContext}
     (input output : SetTerm bound free) : template entries input output = condition entries input output := by
-  simp [template, FormulaTemplate.apply_two, FormulaTemplate.instantiate,
-    Term.substituteMapped, VariableSubstitution.cons]
+  exact condition_substituteMapped entries (.fvar .here) (.fvar (.there .here))
+    VariableSubstitution.empty
+    (VariableSubstitution.cons input (VariableSubstitution.cons output VariableSubstitution.empty))
 
 theorem condition_delta0 (entries : List Entry) {bound free : SetContext}
     (input output : SetTerm bound free) : Formula.IsDelta0 set_levy_bound (condition entries input output) := by
-  apply anyOf_delta0
-  intro φ hφ
-  obtain ⟨entry, _, rfl⟩ := List.mem_map.mp hφ
-  exact .conj (.equal _ _) (.equal _ _)
+  induction entries with
+  | nil => exact .falsum
+  | cons entry _ ih => exact .disj (.conj (.equal _ _) (.equal _ _)) ih
 
 theorem template_delta0 (entries : List Entry) :
     Formula.IsDelta0 set_levy_bound (template entries).body := condition_delta0 entries _ _

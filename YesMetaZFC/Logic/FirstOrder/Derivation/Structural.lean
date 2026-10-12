@@ -252,7 +252,7 @@ theorem context_weaken_append {σ : Signature.{u, v, w}}
     (hDerives : Derives T Γ formula) :
     Derives T (Γ ++ Δ) formula :=
   context_weaken (fun _ hMem =>
-    List.mem_append.mpr (Or.inl hMem)) hDerives
+    List.mem_append_left Δ hMem) hDerives
 
 /-- 在上下文左侧加入任意有限前缀。 -/
 theorem context_weaken_prefix {σ : Signature.{u, v, w}}
@@ -261,7 +261,7 @@ theorem context_weaken_prefix {σ : Signature.{u, v, w}}
     (hDerives : Derives T Γ formula) :
     Derives T (initial ++ Γ) formula :=
   context_weaken (fun _ hMem =>
-    List.mem_append.mpr (Or.inr hMem)) hDerives
+    List.mem_append_right initial hMem) hDerives
 
 /-- 交换最前面的两个局部假设。 -/
 theorem exchange {σ : Signature.{u, v, w}}
@@ -272,12 +272,12 @@ theorem exchange {σ : Signature.{u, v, w}}
     Derives T (right :: left :: Γ) formula :=
   context_weaken (by
     intro candidate hMem
-    rcases List.mem_cons.mp hMem with rfl | hMem
-    · exact List.mem_cons_of_mem right List.mem_cons_self
-    · rcases List.mem_cons.mp hMem with rfl | hTail
-      · exact List.mem_cons_self
-      · exact List.mem_cons_of_mem right
-          (List.mem_cons_of_mem left hTail)) hDerives
+    cases hMem with
+    | head => exact .tail right (.head _)
+    | tail _ hMem =>
+        cases hMem with
+        | head => exact .head _
+        | tail _ hTail => exact .tail right (.tail left hTail)) hDerives
 
 /-- 收缩重复的最前假设。 -/
 theorem contraction {σ : Signature.{u, v, w}}
@@ -288,11 +288,12 @@ theorem contraction {σ : Signature.{u, v, w}}
     Derives T (assumption :: Γ) formula :=
   context_weaken (by
     intro candidate hMem
-    rcases List.mem_cons.mp hMem with rfl | hMem
-    · exact List.mem_cons_self
-    · rcases List.mem_cons.mp hMem with rfl | hTail
-      · exact List.mem_cons_self
-      · exact List.mem_cons_of_mem assumption hTail) hDerives
+    cases hMem with
+    | head => exact .head _
+    | tail _ hMem =>
+        cases hMem with
+        | head => exact .head _
+        | tail _ hTail => exact .tail assumption hTail) hDerives
 
 /-- 沿理论包含关系搬运局部推导。 -/
 theorem theory_weaken {σ : Signature.{u, v, w}}
@@ -319,7 +320,7 @@ theorem of_empty {σ : Signature.{u, v, w}}
     {Γ : Context σ free} {formula : OpenFormula σ free}
     (hDerives : Derives (Theory.empty : Theory σ) [] formula) :
     Derives T Γ formula :=
-  context_weaken (by simp)
+  of_provable
     (theory_weaken (fun hTheory => False.elim hTheory) hDerives)
 
 /-- 有限多个已证明前提可一次性从结论证明中消去。 -/
@@ -337,8 +338,7 @@ theorem multi_cut {σ : Signature.{u, v, w}}
       have hHead : Derives T Γ head :=
         hPremises head List.mem_cons_self
       have hHeadInTail : Derives T (tail ++ Γ) head :=
-        hHead.context_weaken (fun candidate hMem =>
-          List.mem_append.mpr (Or.inr hMem))
+        hHead.context_weaken_prefix
       have hAfterHead : Derives T (tail ++ Γ) conclusion := by
         apply hHeadInTail.cut
         simpa [List.cons_append] using hConclusion
@@ -360,11 +360,14 @@ theorem multi_cut_append {σ : Signature.{u, v, w}}
   · intro formula hFormula
     exact (hPremises formula hFormula).context_weaken_append
   · apply hConclusion.context_weaken
+    clear hPremises hConclusion
     intro formula hFormula
-    rcases List.mem_append.mp hFormula with hPremise | hRight
-    · exact List.mem_append.mpr (Or.inl hPremise)
-    · exact List.mem_append.mpr
-        (Or.inr (List.mem_append.mpr (Or.inr hRight)))
+    induction premises with
+    | nil => exact List.mem_append_right left hFormula
+    | cons head tail ih =>
+        cases hFormula with
+        | head => exact .head _
+        | tail _ hTail => exact .tail head (ih hTail)
 
 /-- 单个中间公式的左右上下文拼接。 -/
 theorem cut_append {σ : Signature.{u, v, w}}
@@ -378,10 +381,10 @@ theorem cut_append {σ : Signature.{u, v, w}}
   · exact hMiddle.context_weaken_append
   · apply hConclusion.context_weaken
     intro formula hFormula
-    rcases List.mem_cons.mp hFormula with rfl | hRight
-    · exact List.mem_cons_self
-    · exact List.mem_cons_of_mem middle
-        (List.mem_append.mpr (Or.inr hRight))
+    cases hFormula with
+    | head => exact .head _
+    | tail _ hRight =>
+        exact .tail middle (List.mem_append_right left hRight)
 
 /-- 左理论中的证明可嵌入理论并。 -/
 theorem theory_union_left {σ : Signature.{u, v, w}}

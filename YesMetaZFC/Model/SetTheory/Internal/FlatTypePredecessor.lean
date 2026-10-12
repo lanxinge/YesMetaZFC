@@ -44,31 +44,34 @@ private theorem tf_prev_values_l (n h δ p : (N).Domain) {Z c R s U D : M.Domain
     (agree : Sx_graph_d Q K s h.val) :
     tf_prev_s.denote (⟨Fin.cases h (Fin.cases n (Fin.cases δ (fun _ => ⟨ω, hωY⟩))), fun _ => h⟩ : Env N 4) p ↔
       Tt_query_d Q ω c n.val s δ.val p.val := by
-  let ρ : Env N 5 := ⟨Fin.cases p (Fin.cases h (Fin.cases n (Fin.cases δ (fun _ => ⟨ω, hωY⟩)))), fun _ => h⟩
-  change Formula.satisfies ρ tf_prev_s.body ↔ _
+  let ρ : Env N 5 := (⟨Fin.cases h (Fin.cases n (Fin.cases δ (fun _ => ⟨ω, hωY⟩))), fun _ => h⟩ : Env N 4).push p
+  have hδν := ZF.v_ordinal_height_l hZF hV hδ.1 point
+  have hων : M.MemberSubset ω ν := fun i hi =>
+    (v_ordinal_l Q hV).transitive δ.val hδν i (hδ.1.transitive ω hωδ i hi)
+  dsimp only [UnarySchema.denote]
   simp only [tf_prev_s, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff, sv_max_sat_l,
     v_sat_l J (rt_model_ext_l hZF.1 T nz)]
   constructor
   · rintro ⟨η, A, B, greatest, layer, decode, truth⟩
     have eqη := (sv_max_rank_l Q hZF hV hW hs hωY η).mp greatest
-    have layer' := (rt_fp_v_l Q hZF hω hW hωY hV hs η A).mp layer
+    have layer' := (rt_fp_v_l Q hZF hω hW hωY η A).mp layer
     have eqA := ZF.v_unique_l Q hZF (eqη ▸ layer') hV
-    have decode' := (rt_fp_v_l Q hZF hω hW hωY hV hs δ B).mp decode
+    have decode' := (rt_fp_v_l Q hZF hω hW hωY δ B).mp decode
     have eqB := ZF.v_unique_l Q hZF decode' hZ
-    exact (tf_query_source_l hZF hω hW hs hωY (((ρ.push η).push A).push B)
+    exact (tf_query_source_l hZF hω hW hωY (((ρ.push η).push A).push B)
       (.bound 7) (.bound 1) .newest (.bound 5) (.bound 4) (.bound 6) (.bound 3) rfl
-      (eqA.symm ▸ hV) decode' hδ hωδ (eqA.symm ▸ hm) hn (eqA.symm ▸ tuple)
+      (eqA.symm ▸ hV) hων decode' hδ hωδ (eqA.symm ▸ hm) hn (eqA.symm ▸ tuple)
       (eqA.symm ▸ point) (eqA.symm ▸ constants) pool hp (eqB.symm ▸ hpZ) agree).mp truth
   · intro truth
     let η : (N).Domain := ⟨ν, ZF.v_ordinal_mem_l Q hZF hW hs.predecessor_mem⟩
     let A : (N).Domain := ⟨X, (ZF.v_successor_l Q hZF hV hW hs X).mpr (fun _ h => h)⟩
     let B : (N).Domain := ⟨Z, ZF.v_mem_l Q hZF hZ hW (ZF.v_ordinal_height_l hZF hW hδ.1 δ.property)⟩
     exact ⟨η, A, B, (sv_max_rank_l Q hZF hV hW hs hωY η).mpr rfl,
-      (rt_fp_v_l Q hZF hω hW hωY hV hs η A).mpr hV,
-      (rt_fp_v_l Q hZF hω hW hωY hV hs δ B).mpr hZ,
-      (tf_query_source_l hZF hω hW hs hωY (((ρ.push η).push A).push B)
+      (rt_fp_v_l Q hZF hω hW hωY η A).mpr hV,
+      (rt_fp_v_l Q hZF hω hW hωY δ B).mpr hZ,
+      (tf_query_source_l hZF hω hW hωY (((ρ.push η).push A).push B)
         (.bound 7) (.bound 1) .newest (.bound 5) (.bound 4) (.bound 6) (.bound 3) rfl
-        hV hZ hδ hωδ hm hn tuple point constants pool hp hpZ agree).mpr truth⟩
+        hV hων hZ hδ hωδ hm hn tuple point constants pool hp hpZ agree).mpr truth⟩
 
 include hω hV hW hs in
 theorem tf_prev_source_l {d} (ρ : Env N d) (w δ n h p : Term d) (hw : w.eval ρ = ⟨ω, hωY⟩)

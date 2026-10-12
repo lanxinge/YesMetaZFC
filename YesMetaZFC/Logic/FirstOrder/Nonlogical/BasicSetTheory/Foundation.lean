@@ -34,8 +34,7 @@ theorem membership_irreflexive_instance_derives
   have hAxiom :
       ([] : Context signature []) ⊢ₘ[membership_irreflexive_theory]
         Formula.fromSentence membership_irreflexive_axiom :=
-    FirstOrder.Derives.theory_axiom (by
-      simp [membership_irreflexive_theory, Theory.singleton])
+    FirstOrder.Derives.theory_axiom rfl
   have hInstance :
       Γ ⊢ₘ[membership_irreflexive_theory]
         ¬ₘ (term ∈ₘ term) := by
@@ -46,9 +45,7 @@ theorem membership_irreflexive_instance_derives
       (fun _ => term :
         VariableSubstitution signature [SetSort.set] [] free)
       hAxiom
-  simpa [membership_irreflexive_axiom, Formula.fromSentence,
-    Formula.substituteFree, Substitution.free_map, Formula.substitute]
-    using hInstance
+  exact hInstance
 
 /-! ## ε-极小模式 -/
 

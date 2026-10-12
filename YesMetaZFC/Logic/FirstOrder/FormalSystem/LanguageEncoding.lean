@@ -92,8 +92,11 @@ abbrev structural_node_code_term {bound free : SetContext}
         boundSubstitution freeSubstitution =
       structural_raw_node_code_term tag
         (payload.substituteMapped boundSubstitution freeSubstitution) := by
-  simp [structural_raw_node_code_term, Term.substituteMapped,
-    Arguments.substituteMapped]
+  exact congrArg
+    (fun numeral => Sₘ(godel_pairₘ(numeral,
+      payload.substituteMapped boundSubstitution freeSubstitution)))
+    (finite_numeral_term_substituteMapped boundSubstitution freeSubstitution
+      (structural_code_tag tag))
 
 /-- 结构字段列编码逐项保持类型化替换。 -/
 @[simp] theorem structural_list_code_term_substituteMapped
@@ -109,12 +112,12 @@ abbrev structural_node_code_term {bound free : SetContext}
         (fields.map fun field =>
           field.substituteMapped boundSubstitution freeSubstitution) := by
   induction fields with
-  | nil =>
-      simp [structural_list_code_term, Term.substituteMapped,
-        Arguments.substituteMapped]
+  | nil => rfl
   | cons head tail ih =>
-      simp [structural_list_code_term, Term.substituteMapped,
-        Arguments.substituteMapped, ih]
+      exact congrArg
+        (fun rest => structural_raw_node_code_term .listCons
+          (godel_pairₘ(head.substituteMapped boundSubstitution freeSubstitution, rest)))
+        ih
 
 /-- 完整结构节点在替换下只需变换字段。 -/
 @[simp] theorem structural_node_code_term_substituteMapped

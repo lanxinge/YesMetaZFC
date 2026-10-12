@@ -64,8 +64,7 @@ private theorem variable_index_injective {S : Type}
       | there previous' =>
           apply congrArg Variable.there
           apply ih
-          simp [Variable.index] at hIndex
-          omega
+          exact Nat.succ.inj hIndex
 
 def function_symbol_code (symbol : FunctionSymbol) : Nat :=
   symbol.ctorIdx

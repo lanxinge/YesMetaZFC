@@ -63,8 +63,7 @@ scoped notation:max "numₘ(" number ")" =>
   | zero =>
       rfl
   | succ number ih =>
-      simp [finite_numeral_term, Term.substituteMapped,
-        Arguments.substituteMapped, ih]
+      exact congrArg successor_term ih
 
 @[simp] theorem finite_numeral_term_weakenBound
     {bound free : SetContext}
@@ -78,7 +77,7 @@ scoped notation:max "numₘ(" number ")" =>
   | zero =>
       rfl
   | succ number ih =>
-      simp [finite_numeral_term, ih]
+      exact congrArg successor_term ih
 
 @[simp] theorem finite_numeral_term_weakenFree
     {bound free : SetContext}
@@ -92,7 +91,7 @@ scoped notation:max "numₘ(" number ")" =>
   | zero =>
       rfl
   | succ number ih =>
-      simp [finite_numeral_term, ih]
+      exact congrArg successor_term ih
 
 @[simp] theorem finite_numeral_term_renameMapped
     {sourceBound sourceFree targetBound targetFree : SetContext}
@@ -108,8 +107,7 @@ scoped notation:max "numₘ(" number ")" =>
   | zero =>
       rfl
   | succ number ih =>
-      simp [finite_numeral_term, Term.renameMapped,
-        Arguments.renameMapped, ih]
+      exact congrArg successor_term ih
 
 /-! ## 理论嵌入 -/
 

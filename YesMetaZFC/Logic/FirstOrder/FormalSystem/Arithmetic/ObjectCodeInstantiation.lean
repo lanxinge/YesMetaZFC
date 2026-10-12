@@ -144,9 +144,9 @@ theorem FieldsRel.left_property {β : Type v} {P : α → Prop} {left : List α}
   | nil => intro value hv; cases hv
   | cons h _ ih =>
     intro value hv
-    rcases List.mem_cons.mp hv with rfl | hv
-    · exact h
-    · exact ih value hv
+    cases hv with
+    | head => exact h
+    | tail _ hv => exact ih value hv
 
 theorem FieldsRel.eq {left right : List α} (h : FieldsRel Eq left right) : left = right := by
   induction h with

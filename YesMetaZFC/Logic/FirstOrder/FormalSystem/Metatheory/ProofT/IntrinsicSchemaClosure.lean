@@ -322,7 +322,7 @@ theorem weaken_bound_context_eq_embedBoundClosed
   | nil =>
       rfl
   | cons sort rest ih =>
-      simp [weaken_bound_context, Term.embedBoundClosed, ih]
+      exact congrArg (fun term => term.weakenBound sort) ih
 
 /-- 闭 bound 项进入任意 witness 上下文后，替换只作用于其 free 参数。 -/
 @[simp] theorem weaken_bound_context_substituteMapped

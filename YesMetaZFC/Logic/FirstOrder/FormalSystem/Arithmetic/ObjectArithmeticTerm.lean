@@ -19,7 +19,9 @@ def shift {bound free : SetContext} : Nat → SetTerm bound free → SetTerm bou
 @[simp] theorem shift_substituteMapped {sb sf tb tf : SetContext} (k : Nat) (input : SetTerm sb sf)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (shift k input).substituteMapped bs fs = shift k (input.substituteMapped bs fs) := by
-  induction k <;> simp_all [shift, Term.substituteMapped, Arguments.substituteMapped]
+  induction k with
+  | zero => rfl
+  | succ _ ih => exact congrArg successor_term ih
 
 theorem power_congr {T : SetTheory} {left right a b : Code}
     (ha : Derives T [] (left ≐ₘ a)) (hb : Derives T [] (right ≐ₘ b)) :

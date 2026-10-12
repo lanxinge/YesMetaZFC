@@ -68,7 +68,6 @@ private theorem binary_number_matched (tag : Nat) (atomic : Bool) (table : List 
       (SchemaRename.formula (lifted nextCutoff table) child).map treeValue ≠ some childOut →
       Rejection rules (numberRow 2 table nextCutoff child childOut)) :
     ∃ premise, premise ∈ (binaryRule tag (if atomic then 3 else 2)).premises ∧ Rejection rules (premise.eval values) := by
-  classical
   have h := (nodeValue_eq_iff 2 2 [listValue table, cutoff, treeValue input, output]
     [values 0, values 1, nodeValue tag [values 2, values 3] , nodeValue tag [values 4, values 5]]).mp hHead |>.2
   simp only [List.cons.injEq, and_true] at h

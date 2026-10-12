@@ -13,7 +13,11 @@ def tree (input : Tree) (tail : Nat) : Nat := bytes ((treeTokens input).flatMap 
 def forest (input : List Tree) (tail : Nat) : Nat := bytes ((input.flatMap treeTokens).flatMap varint) tail
 
 theorem bytes_append (left right : List Nat) (tail : Nat) :
-    bytes (left ++ right) tail = bytes left (bytes right tail) := by simp [bytes]
+    bytes (left ++ right) tail = bytes left (bytes right tail) := by
+  induction left with
+  | nil => rfl
+  | cons byte rest ih =>
+      exact congrArg (fun value => byte + 256 * value) ih
 
 theorem bytes_tail_le (input : List Nat) (tail : Nat) : tail ≤ bytes input tail := by
   induction input with

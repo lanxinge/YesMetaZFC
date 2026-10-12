@@ -28,20 +28,26 @@ theorem boundedCounter_satisfies (env : Env 𝒩 [] free) (body : SetOpenFormula
 theorem bounded_counter_derives (body : SetOpenFormula (.set :: free)) :
     Derives intrinsic_zfc_theory [] (.imp ObjectBoundedReflection.counterGuard
       (.imp (.neg (body.weakenFree SetSort.set)) (.neg (ObjectBoundedReflection.counterResult body)))) := by
-  apply source_complete
-  intro 𝒩 _ env
-  let tail : Env 𝒩 [] free := ⟨env.boundVal, fun entry => env.freeVal (.there (.there entry))⟩
-  have he : (tail.pushFree (env.freeVal (.there .here))).pushFree (env.freeVal .here) = env := by
-    apply Env.ext
-    · intro sort entry; cases entry
-    · intro sort entry; cases entry with
-      | here => rfl
-      | there entry => cases entry <;> rfl
-  rw [← he]
-  change mem 𝒩 _ _ → ¬ (body.weakenFree SetSort.set).satisfies _ → ¬ (ObjectBoundedReflection.counterResult body).satisfies _
-  rw [Formula.satisfies_weakenFree, boundedCounter_satisfies]
-  intro hm hn hAll
-  exact hn (hAll _ hm)
+  apply Derives.imp_intro
+  apply Derives.imp_intro
+  apply Derives.neg_intro
+  apply Derives.neg_elim (formula := body.weakenFree SetSort.set)
+  · exact Eq.mp
+      (congrArg (Derives intrinsic_zfc_theory
+        [ObjectBoundedReflection.counterResult body,
+          .neg (body.weakenFree SetSort.set), ObjectBoundedReflection.counterGuard])
+        (Formula.instantiateTop_two_weakenings_abstractFreeTop SetSort.set body))
+      (bounded_forall_elim
+        (T := intrinsic_zfc_theory)
+        (Γ := [ObjectBoundedReflection.counterResult body,
+          .neg (body.weakenFree SetSort.set), ObjectBoundedReflection.counterGuard])
+        (.fvar .here)
+        ((body.abstractFreeTop.weakenFree SetSort.set).weakenFree SetSort.set)
+        (.fvar (.there .here))
+        (Derives.assumption List.mem_cons_self)
+        (Derives.assumption
+          (List.mem_cons_of_mem _ (List.mem_cons_of_mem _ List.mem_cons_self))))
+  · exact Derives.assumption (List.mem_cons_of_mem _ List.mem_cons_self)
 
 theorem bounded_counterexample (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     (body : SetOpenFormula (.set :: free)) (values : Nat → 𝒩.Carrier .set) (hv : NumeralValues 𝒩 values)

@@ -42,7 +42,7 @@ theorem ft_prev_source_l (F n r f : (N).Domain) {c R a : M.Domain}
   constructor
   · rintro ⟨η, A, b, S, greatest, layer, model, truth⟩
     have eqη := (sv_max_rank_l I hZF hV hW hs hωY η).mp greatest
-    have hA := (rt_fp_v_l I hZF hω hW hωY hV hs η A).mp layer
+    have hA := (rt_fp_v_l I hZF hω hW hωY η A).mp layer
     have eqA := ZF.v_unique_l Q hZF (eqη ▸ hA) ((v_pairing_l I Q hZF).mp hV)
     have code := (rt_fp_smem_l I hZF hω hW hωY b A S).mp model
     have code' : Smem_d K b.val X S.val := eqA ▸ code
@@ -58,7 +58,7 @@ theorem ft_prev_source_l (F n r f : (N).Domain) {c R a : M.Domain}
     let c' : (N).Domain := ⟨c, hb⟩
     let R' : (N).Domain := ⟨R, hS⟩
     exact ⟨η, A, c', R', (sv_max_rank_l I hZF hV hW hs hωY η).mpr rfl,
-      (rt_fp_v_l I hZF hω hW hωY hV hs η A).mpr ((v_pairing_l I Q hZF).mp hV),
+      (rt_fp_v_l I hZF hω hW hωY η A).mpr ((v_pairing_l I Q hZF).mp hV),
       (rt_fp_smem_l I hZF hω hW hωY c' A R').mpr hm,
       (ft_source_satisfaction_l I hZF hω hW hωY A R' F n r f hV hs hων hm.1 ha hf).mpr truth⟩
 

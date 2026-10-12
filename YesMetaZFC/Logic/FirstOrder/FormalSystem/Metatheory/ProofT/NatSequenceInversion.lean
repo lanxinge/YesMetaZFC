@@ -92,7 +92,7 @@ theorem nat_sequence_code_step_numeral_at
   have hFree := lift_closed (free := free) hGround
   have hContext := FirstOrder.Derives.context_weaken
     (Γ := ([] : Context signature free))
-    (Δ := Γ) (by simp) hFree
+    (Δ := Γ) (by intro φ hφ; cases hφ) hFree
   simpa [Formula.renameFree, Formula.rename, Renaming.free,
     Formula.renameMapped, Term.renameMapped, Arguments.renameMapped,
     finite_numeral_term_renameMapped] using hContext
@@ -126,7 +126,7 @@ theorem numeral_ne_context
     hClosed
   have hContext := FirstOrder.Derives.context_weaken
     (Γ := ([] : Context signature free))
-    (Δ := Γ) (by simp) hFree
+    (Δ := Γ) (by intro φ hφ; cases hφ) hFree
   simpa [Formula.renameFree, Formula.rename, Renaming.free,
     Formula.renameMapped, Term.renameMapped, Arguments.renameMapped,
     finite_numeral_term_renameMapped] using hContext
@@ -221,7 +221,7 @@ theorem nat_sequence_code_prefix_unique
             (hValueBound prefixLength (Nat.lt_succ_self _))
             (FirstOrder.Derives.eq_trans hFinal (hStep prefixLength (Nat.lt_succ_self _)))
           intro accumulator _ item _ hMatch
-          simp [nat_sequence_code_step] at hMatch
+          exact Nat.noConfusion hMatch
         exact ⟨FirstOrder.Derives.falsum_elim hFalse,
           fun _ _ => FirstOrder.Derives.falsum_elim hFalse⟩
   | hSnoc xs item ih =>

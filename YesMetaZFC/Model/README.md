@@ -70,7 +70,7 @@ Windows 的命令行长度限制。
 全源脚本默认使用 4 线程，并保留显式设置的 `LEAN_NUM_THREADS`。
 
 已迁移的 185 个模型模块最长为 1,132 行，没有旧模块路径或循环导入残留。
-模块规模及历史构建性能的边界见 [工程指南](../../markdown/ENGINEERING.md)。
+模块规模与检查性能的维护要求见 [工程指南](../../markdown/ENGINEERING.md)。
 
 ## 原 ZF 中的有限公式反射
 
@@ -234,9 +234,10 @@ properness 自动取得同一个 N 与主加强 q，见证池闭性由上述有�
 `ng_next_master_l` 进一步自动选择同一个 N、地阶段主加强及每个泛型中的 N[G] 后继主加强。
 二步主条件完整双向分解及全阶段共用的内部初等 N 已完成；原生多排序 AST
 仍待完成；完整 proper 迭代引理及可数支撑保持已完成，见 [迭代接口](Forcing/ITERATION.md)。
-审计入口为 `python scripts/check_internal_models.py`：ZF 基础逐声明限制在原七条
-证书，司寇伦及初等模型装配另允许原选择公理证书，并收紧其中的 ZF 端点；全部数据定义
-严格排除 `Classical.choice`，没有新增不可计算数据。
+审计入口为 `python scripts/check_internal_models.py`：ZF 基础、司寇伦及初等模型装配
+均不再允许原生句法闭合性公理，并继续单独审计其中的 ZF 端点；全部数据定义
+严格排除 `Classical.choice`，没有新增不可计算数据。当前 Lean 公理边界见
+[核验指南](../../markdown/UNIFIED_VERIFICATION.md#当前-lean-公理边界)，对象理论的 ZF／ZFC 强度不变。
 
 ## 后续路线
 
@@ -457,8 +458,9 @@ Full 语义的保真只在已证明范围内使用，不能把一阶可靠性或
 38 个小图关键接口的依赖审计显示：图并合、ω 图等数据构造不依赖公理，
 `sg_model` 仅依赖商成员关系所需的 `propext`；商证明使用 `Quot.sound`，经典存在性
 与选择证明使用 `Classical.choice`。没有新增不可计算数据实例、`sorry` 或自定义公理。
-原 ZFC 终点另沿用 `Axioms.{extensionality,emptySet,pairing,union,powerSet,infinity,foundation,choice}`
-各一处已有的 `sentence!` 自由闭合性 `native_decide` 依赖，共 8 处；没有新增原生计算可信依赖。
+`sg_models_zfc` 与 `zfc_consistent` 在 `1e89850` 原始依赖审计中均只依赖上述三项
+标准公理，不再沿用原八条固定公理的 `sentence!` 原生闭合性证书；当前范围见
+[核验指南](../../markdown/UNIFIED_VERIFICATION.md#当前-lean-公理边界)。
 
 2026-09-11 在 `be4d15d` 上的未提交工作区完成 `lake --wfail build` 的 973 个任务和
 `check-all.sh --library-only` 的全部 979 个 Lean 模块，零错误、零警告，未运行扫描器。
@@ -503,18 +505,13 @@ bv_models_zfc {B : Type u} (𝔹 : CB_alg B) : (name_model 𝔹).models PureMode
 50 个布尔关键接口及 8 个小图交叉入口已做依赖审计：名称、图并合、混合、ω 和
 `name_structure` 的数据构造不依赖公理；一般布尔值可靠性、名称等词、分离、幂集、无穷、
 基础的通用证明只涉及 `propext`、`Quot.sound`。不交细化、最大值和收集使用
-`Classical.choice`。原 ZFC 终点沿用原八条固定公理已有的句法闭合性 `native_decide`
-依赖；无新增公理、`sorry`、不可计算数据实例或原生计算可信依赖。
+`Classical.choice`。`Boolean.zfc_consistent` 在 `1e89850` 原始依赖审计中只依赖上述
+三项标准公理，不再继承原生句法闭合性公理；无 `sorry` 或自定义公理。
+不可计算数据边界保持不变。
 
-在 `a911617` 的未提交工作区，`lake --wfail build` 的 998 个任务和
-`check-all.sh --library-only` 的全部 1,004 个独立 Lean 模块均通过，零错误、零警告。
-布尔层共 25 个模块、2,388 行，最长模块 191 行；整个代码工作区新增 2,396 行、删除
-6 行，净增 2,390 行。新模块单次检查均低于 6 秒；全库本次最慢模块为 55 秒。
-源码与工具链配置指纹为 `17b05ad24fb8561093da8905373d0474caa8f23a80a8a42a9525db7130f4766e`。
-没有运行扫描器或提交 Git。旧 `DefinitionalSemantics` 中的 binder 环境等式已直接公开为
-`Semantics.substitute_lift`，原消费者同步改用该名字，布尔适配复用同一证明。
+binder 环境等式复用 `Semantics.substitute_lift`，布尔适配与其他消费者共用同一证明。
 
-## 一致性与交付顺序
+## 一致性接口
 
 一致性走以下两个原生语义出口，理论和语言均不要求枚举：
 

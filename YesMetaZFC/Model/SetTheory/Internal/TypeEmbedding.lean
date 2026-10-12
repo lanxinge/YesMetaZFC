@@ -13,13 +13,18 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Smap_d.type_pool_cover_l {ω θ X R Y S c d j n U U' D D' V E : M.Domain}
+/-- 名字、有限列空间与查询乘积的像由同一映射同时读取。 -/
+theorem Smap_d.type_frame_l {ω θ X R Y S c d j n U U' D D' : M.Domain}
     (hω : M.IsOmega ω) (hX : V_d I θ X) (hθ : M.IsLimitOrdinal θ) (hωX : M.mem ω X)
     (hY : M.TransitiveSet Y) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)
     (hj : Smap_d I ω c d X Y j) (hnω : M.mem n ω) (hnj : Rd_entry_d n n j)
     (hUX : M.mem U X) (hU : Rd_entry_d U U' j) (hD : Rd_entry_d D D' j)
-    (pool : Tt_pool_d I ω n U D) (pool' : Tt_pool_d I ω n V E)
-    (hVU : M.MemberSubset V U') (hEY : M.MemberSubset E Y) : M.MemberSubset E D' := by
+    (pool : Tt_pool_d I ω n U D) :
+    ∃ N T N' T', Tn_names_d n U N ∧ Fseq_space_d I ω N T ∧ M.IsCartesianProduct I D ω T ∧
+      Rd_entry_d N N' j ∧ Rd_entry_d T T' j ∧
+      (∀ a, M.mem a Y → (M.mem a N' ↔ Tn_name_d n U' a)) ∧
+      (∀ e, M.mem e Y → (M.mem e T' ↔ ∃ b, M.mem b ω ∧ Fn0_d b N' e)) ∧
+      (∀ p, M.mem p Y → (M.mem p D' ↔ ∃ z, M.mem z ω ∧ ∃ e, M.mem e T' ∧ KPair_d M p z e)) := by
   have ht := ZF.v_transitive_l I hZF hX
   have hωj := hj.omega_l I hZF hω ht hY hm hn hωX
   obtain ⟨N, T, names, seq, prod⟩ := pool
@@ -55,6 +60,17 @@ theorem Smap_d.type_pool_cover_l {ω θ X R Y S c d j n U U' D D' V E : M.Domain
   simp only [χ, Formula.satisfies_iff_iff, Formula.satisfies_mem_iff, Formula.satisfies_existsMem_iff, kpair0_sat_l hZF.1] at tr
   have prod' : ∀ p, M.mem p Y → (M.mem p D' ↔ ∃ z, M.mem z ω ∧ ∃ e, M.mem e T' ∧ KPair_d M p z e) :=
     tr.mp (fun p _ => prod p)
+  exact ⟨N, T, N', T', names, seq, prod, hN, hT, names', seq', prod'⟩
+
+theorem Smap_d.type_pool_cover_l {ω θ X R Y S c d j n U U' D D' V E : M.Domain}
+    (hω : M.IsOmega ω) (hX : V_d I θ X) (hθ : M.IsLimitOrdinal θ) (hωX : M.mem ω X)
+    (hY : M.TransitiveSet Y) (hm : Smem_d I c X R) (hn : Smem_d I d Y S)
+    (hj : Smap_d I ω c d X Y j) (hnω : M.mem n ω) (hnj : Rd_entry_d n n j)
+    (hUX : M.mem U X) (hU : Rd_entry_d U U' j) (hD : Rd_entry_d D D' j)
+    (pool : Tt_pool_d I ω n U D) (pool' : Tt_pool_d I ω n V E)
+    (hVU : M.MemberSubset V U') (hEY : M.MemberSubset E Y) : M.MemberSubset E D' := by
+  obtain ⟨N, T, N', T', _, _, _, _, _, names', seq', prod'⟩ :=
+    hj.type_frame_l hZF hω hX hθ hωX hY hm hn hnω hnj hUX hU hD pool
   obtain ⟨N₀, T₀, names₀, seq₀, prod₀⟩ := pool'
   intro p hp
   have hpY := hEY p hp

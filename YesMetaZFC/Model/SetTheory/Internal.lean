@@ -6,16 +6,39 @@ import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.Model.SetTheory.Internal.CanonicalSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.TypePredecessorCode
+import YesMetaZFC.Model.SetTheory.Internal.TypeKappaCode
 import YesMetaZFC.Model.SetTheory.Internal.RankSatisfaction
 import YesMetaZFC.Model.SetTheory.Internal.FlatPredecessor
 import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateSource
 import YesMetaZFC.Model.SetTheory.Internal.PredicateTrace
 import YesMetaZFC.Model.SetTheory.Internal.TypeSource
+import YesMetaZFC.Model.SetTheory.Internal.TypeProgramSource
+import YesMetaZFC.Model.SetTheory.Internal.TypeProgramReflect
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeProgramTransfer
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeMinusEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
 import YesMetaZFC.Model.SetTheory.Internal.TypeRoles
+import YesMetaZFC.Model.SetTheory.Internal.Subtype
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeLift
+import YesMetaZFC.Model.SetTheory.Internal.TypeExceeds
+import YesMetaZFC.Model.SetTheory.Internal.TypeMoveRead
+import YesMetaZFC.Model.SetTheory.Internal.TypeMoveQuote
+import YesMetaZFC.Model.SetTheory.Internal.TypeGameQueryScope
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingRankFixed
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeProgramSyntax
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeSyntax
+import YesMetaZFC.Model.SetTheory.Internal.TypeExceedsSyntax
+import YesMetaZFC.Model.SetTheory.Internal.SourceInaccessibleSyntax
+import YesMetaZFC.Model.SetTheory.Internal.TypeGameGraph
+import YesMetaZFC.Model.SetTheory.Internal.TypeDropAppend
+import YesMetaZFC.Model.SetTheory.Internal.TypeGameBound
+import YesMetaZFC.Model.SetTheory.Internal.TypeGameHeight
+import YesMetaZFC.Model.SetTheory.Internal.FiniteTailSource
+import YesMetaZFC.Model.SetTheory.Internal.TypeDropEmbedding
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeReboundImage
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeReflect
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower
 import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 import YesMetaZFC.Model.SetTheory.Internal.UniformizationHull
@@ -68,6 +91,12 @@ import YesMetaZFC.Model.SetTheory.Internal.RankSkolem
 `Smap_d.type_pool_cover_l` 与 `type_constants_cover_l` 证明像查询域包含目标中的新低秩参数。
 `tt_roles_query_l` 对任意内部长度实际编译坐标标签条件：第 i+1 项是首坐标为 i 的
 Kuratowski 对。查询使用原元组的恒等名字列，类型成员性恰等价于全部标签约束。
+当前类型游戏使用 `tt_node_query_l` 的完整节点查询及 `tt_root_query_l` 的单个空根条件，
+按函数图恢复历史，保留任意排列。`tt_max_query_l` 由末位最大序数查询准确反推层高。
+三个查询均实际编译，对全部内部有限元数有效；其语义证书可在后续每个实现中复用。
+`Td_project_d` 以原查询的名字重编码逆像构造任意前缀投影；`Tt_realized_d.dcp_l`
+删除内部有限元组的末位，保留同一秩层的完整类型，`append_l` 给出实际逆向构造。
+严格秩界查询等价于 δ<α 且 rank(S)<α；加二最大序数查询准确给出实现高度 α+3。
 `rt_sc_num_l` 在含 ω 的极限秩层中双向保持原规范自然数编码；`sc_flat_local_m`
 以 Δ₀ 公式恢复等义的平坦程序，`Sx_program_d.satisfies_l` 保持全部内部码的真值。
 `tt_predecessor_formula_l` 自动重编码原实现元组，在 V(ν+1) 中以同一原公式识别

@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.Order.Relation
+import YesMetaZFC.SetTheory.MembershipInduction
 
 /-! # 对象模型内的迭代树序及后继添枝
 
@@ -24,6 +25,28 @@ structure It_order_d (α T : M.Domain) : Prop where
   predecessor : ∀ i j, M.mem j α → M.SuccessorOf j i → ∃ k, It_pred_d T k j
   cofinal : ∀ δ, M.mem δ α → M.IsLimitOrdinal δ → ∀ i, M.mem i δ →
     ∃ j, M.mem j δ ∧ Rd_entry_d j δ T ∧ (i = j ∨ M.mem i j)
+
+/-- 每个实际结点都在空序数根之上；证明也覆盖非标准长度和极限结点。 -/
+theorem It_order_d.root_l (hZF : M.Models ZF) {α T z : M.Domain} (h : It_order_d α T)
+    (hz : ∀ x, ¬ M.mem x z) : ∀ i, M.mem i α → Rd_entry_d z i T := by
+  let ρ : Env M 3 := ⟨Fin.cases α (Fin.cases z (fun _ => T)), fun _ => T⟩
+  let φ : UnarySchema 3 := { body := .imp (.mem .newest (.bound 1)) (rd_entry0_m (.bound 2) .newest (.bound 3)) }
+  have sat i : φ.denote ρ i ↔ M.mem i α → Rd_entry_d z i T := by
+    simp only [φ, UnarySchema.denote, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff, rd_entry0_sat_l hZF.1]; rfl
+  intro i hi
+  apply (sat i).mp (ZF.mem_ind_l M hZF (kp_pair_l (ZF.modelsKP hZF)) φ ρ ?_ i) hi
+  intro i ih
+  apply (sat i).mpr
+  intro hi
+  have prev j (hj : M.mem j i) := (sat j).mp (ih j hj) (h.ordinal.transitive i hi j hj)
+  rcases (h.ordinal.mem hi).classify hZF.1 with empty | ⟨j, _, succ⟩ | limit
+  · have eq := hZF.1.eq_of_same_members i z (fun x => iff_of_false (empty x) (hz x))
+    exact eq ▸ h.refl i hi
+  · obtain ⟨k, hk, pred⟩ := h.predecessor j i hi succ
+    exact (pred z).mpr (Or.inr (prev k hk))
+  · obtain ⟨j, hj⟩ := limit.2.1
+    obtain ⟨k, hk, edge, _⟩ := h.cofinal i hi limit j hj
+    exact h.trans z k i (prev k hk) edge
 
 theorem it_successor_not_limit_l (hE : Extensional M) {α ξ : M.Domain} (ho : M.IsOrdinal ξ) (hs : M.SuccessorOf α ξ) : ¬ M.IsLimitOrdinal α := by
   intro hl

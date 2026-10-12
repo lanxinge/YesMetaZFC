@@ -12,11 +12,14 @@ attribute [local implicit_reducible] _root_.YesMetaZFC.SetTheory.signature
 private theorem variable_injective_m {S : Type} {context : List S} {s : S}
     (a b : Variable context s) (h : a.index = b.index) : a = b := by
   induction a with
-  | here => cases b <;> simp_all [Variable.index]
+  | here =>
+    cases b with
+    | here => rfl
+    | there b => exact Nat.noConfusion h
   | there a ih =>
     cases b with
-    | here => simp [Variable.index] at h
-    | there b => exact congrArg Variable.there (ih b (Nat.add_right_cancel h))
+    | here => exact Nat.noConfusion h
+    | there b => exact congrArg Variable.there (ih b (Nat.succ.inj h))
 
 theorem termTree_injective_m {bound free : SortContext ℒ} :
     {s : _root_.YesMetaZFC.SetTheory.SetSort} → (a b : Term ℒ bound free s) →

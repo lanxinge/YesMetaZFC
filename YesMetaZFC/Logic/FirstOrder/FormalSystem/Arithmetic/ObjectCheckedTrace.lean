@@ -77,8 +77,9 @@ def condition (rules : List Rule) (localCondition : FormulaTemplate.Unary)
     {free : SetContext} (point : SetOpenTerm free) :
     (condition rules localCondition (.bvar .here : SetTerm [SetSort.set] free)).instantiateTop point =
       condition rules localCondition point := by
-  simp [condition, Formula.instantiateTop, Formula.substitute, Substitution.instantiateTop,
-    Term.substituteMapped, Arguments.substituteMapped, VariableSubstitution.instantiateTop]
+  exact ObjectTrace.condition_substituteMapped (step rules localCondition)
+    (ωₘ : SetTerm [SetSort.set] free) (.bvar .here)
+    (VariableSubstitution.instantiateTop point) VariableSubstitution.freeId
 
 theorem transport {T : SetTheory} (rules : List Rule) (localCondition : FormulaTemplate.Unary)
     {free : SetContext} {Γ : Context signature free} {left right : SetOpenTerm free}
@@ -109,23 +110,44 @@ theorem accepted_rows (localCheck : Nat → Bool) (rules : List Rule) (rank : Na
     (descending : Descending rules rank) (root : Nat)
     (h : check localCheck rules rank root = true) :
     ∃ rows, root ∈ rows ∧ ClosedRows rules rows ∧ ∀ row, row ∈ rows → localCheck row = true := by
-  classical
   obtain ⟨hLocal, rule, hRule, values, hBound, hHead, hGuards, hPremises⟩ :=
     (check_eq_true_iff localCheck rules rank descending root).mp h
   have children : ∀ premise, premise ∈ rule.premises → ∃ rows,
       premise.eval values ∈ rows ∧ ClosedRows rules rows ∧ ∀ row, row ∈ rows → localCheck row = true := by
     intro premise hPremise
     exact accepted_rows localCheck rules rank descending (premise.eval values) (hPremises premise hPremise)
-  let parts := rule.premises.attach.map (fun p => (children p.1 p.2).choose)
-  have hParts : ∀ part, part ∈ parts → ClosedRows rules part ∧ ∀ row, row ∈ part → localCheck row = true := by
-    intro part hPart
-    obtain ⟨p, _, rfl⟩ := List.mem_map.mp hPart
-    exact (children p.1 p.2).choose_spec.2
-  have hMembers : ∀ premise, premise ∈ rule.premises → premise.eval values ∈ parts.flatten := by
-    intro premise hPremise
-    exact List.mem_flatten.mpr ⟨(children premise hPremise).choose,
-      List.mem_map.mpr ⟨⟨premise, hPremise⟩, List.mem_attach _ _, rfl⟩,
-      (children premise hPremise).choose_spec.1⟩
+  have gather : ∀ premises : List (Expr rule.arity),
+      (∀ premise, premise ∈ premises → ∃ rows,
+        premise.eval values ∈ rows ∧ ClosedRows rules rows ∧
+          ∀ row, row ∈ rows → localCheck row = true) →
+      ∃ parts : List (List Nat),
+        (∀ part, part ∈ parts → ClosedRows rules part ∧
+          ∀ row, row ∈ part → localCheck row = true) ∧
+        ∀ premise, premise ∈ premises → premise.eval values ∈ parts.flatten := by
+    intro premises
+    induction premises with
+    | nil =>
+      intro _
+      refine ⟨(List.nil : List (List Nat)), ?_, ?_⟩
+      · intro _ h
+        cases h
+      · intro _ h
+        cases h
+    | cons premise premises ih =>
+      intro h
+      obtain ⟨head, hHead, hClosedHead⟩ := h premise List.mem_cons_self
+      obtain ⟨tail, hTail, hMembers⟩ := ih (fun p hp => h p (List.mem_cons_of_mem _ hp))
+      refine ⟨head :: tail, ?_, ?_⟩
+      · intro part hPart
+        rcases List.mem_cons.mp hPart with rfl | hPart
+        · exact hClosedHead
+        · exact hTail part hPart
+      · intro p hp
+        rcases List.mem_cons.mp hp with rfl | hp
+        · exact List.mem_flatten.mpr ⟨head, List.mem_cons_self, hHead⟩
+        · obtain ⟨part, hPart, hMember⟩ := List.mem_flatten.mp (hMembers p hp)
+          exact List.mem_flatten.mpr ⟨part, List.mem_cons_of_mem _ hPart, hMember⟩
+  obtain ⟨parts, hParts, hMembers⟩ := gather rule.premises children
   refine ⟨root :: parts.flatten, List.mem_cons_self, ?_, ?_⟩
   · intro row hRow
     rcases List.mem_cons.mp hRow with rfl | hRow
@@ -198,7 +220,6 @@ theorem not_member {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSuppor
     {free : SetContext} {Γ : Context signature free} (trace : SetOpenTerm free)
     (hClosed : Derives T Γ (ObjectTrace.closed (step rules localTest.condition) trace)) :
     Derives T Γ (¬ₘ ((numₘ(root)) ∈ₘ trace)) := by
-  classical
   apply FirstOrder.Derives.neg_intro
   have hStep := ObjectTrace.closed_elim (step rules localTest.condition) trace (numₘ(root))
     (FirstOrder.Derives.context_weaken_cons hClosed)
@@ -214,13 +235,11 @@ theorem not_member {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSuppor
       intro values hBound hHead hGuards
       have hExists : ∃ premise, premise ∈ rule.premises ∧
           check localTest.checked rules rank (premise.eval values) = false := by
-        apply Classical.byContradiction
-        intro hNo
+        apply exists_check_failure rule.premises
+          (fun premise => check localTest.checked rules rank (premise.eval values))
+        intro hPremises
         have hTrue := (check_eq_true_iff localTest.checked rules rank descending root).mpr
-          ⟨hLocal, rule, hRule, values, hBound, hHead, hGuards, fun p hp => by
-            cases hChild : check localTest.checked rules rank (p.eval values) with
-            | false => exact False.elim (hNo ⟨p, hp, hChild⟩)
-            | true => rfl⟩
+          ⟨hLocal, rule, hRule, values, hBound, hHead, hGuards, hPremises⟩
         rw [h] at hTrue
         cases hTrue
       obtain ⟨premise, hPremise, hFalse⟩ := hExists

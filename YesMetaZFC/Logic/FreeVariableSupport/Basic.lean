@@ -54,20 +54,26 @@ def Disjoint {σ : Signature.{u, v, w}} {free : SortContext σ}
 @[simp] theorem contains_empty {σ : Signature.{u, v, w}}
     {free : SortContext σ} (position : Fin free.length) :
     ¬ (empty : FreeSupport σ free).Contains position := by
-  simp [Contains, empty]
+  exact Bool.false_ne_true
 
 @[simp] theorem contains_singleton_self {σ : Signature.{u, v, w}}
     {free : SortContext σ} {sort : σ.SortSymbol}
     (entry : Variable free sort) :
     (singleton entry).Contains entry.position := by
-  simp [Contains, singleton]
+  exact decide_eq_true rfl
 
 @[simp] theorem contains_union {σ : Signature.{u, v, w}}
     {free : SortContext σ} {left right : FreeSupport σ free}
     {position : Fin free.length} :
     (union left right).Contains position ↔
       left.Contains position ∨ right.Contains position := by
-  simp [Contains, union, Bool.or_eq_true]
+  change (left position || right position) = true ↔
+    left position = true ∨ right position = true
+  cases left position <;> cases right position
+  · exact ⟨Or.inl, fun h => h.elim id id⟩
+  · exact ⟨fun _ => Or.inr rfl, fun _ => rfl⟩
+  · exact ⟨fun _ => Or.inl rfl, fun _ => rfl⟩
+  · exact ⟨fun _ => Or.inl rfl, fun _ => rfl⟩
 
 /-- 支持不交关系是对称的。 -/
 theorem Disjoint.symm {σ : Signature.{u, v, w}}

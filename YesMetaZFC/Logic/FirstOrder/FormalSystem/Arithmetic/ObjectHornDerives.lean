@@ -35,21 +35,18 @@ theorem allOf_elim {T : SetTheory} {free : SetContext} {Γ : Context signature f
     {formulas : List (SetOpenFormula free)} {φ : SetOpenFormula free}
     (h : Derives T Γ (allOf formulas)) (hφ : φ ∈ formulas) : Derives T Γ φ := by
   induction formulas with
-  | nil => simp at hφ
+  | nil => cases hφ
   | cons head tail ih =>
-    rcases List.mem_cons.mp hφ with rfl | hφ
-    · exact FirstOrder.Derives.conj_elim_left h
-    · exact ih (FirstOrder.Derives.conj_elim_right h) hφ
+    cases hφ with
+    | head => exact FirstOrder.Derives.conj_elim_left h
+    | tail _ hφ => exact ih (FirstOrder.Derives.conj_elim_right h) hφ
 
 theorem anyOf_intro {T : SetTheory} {free : SetContext} {Γ : Context signature free}
     {formulas : List (SetOpenFormula free)} {φ : SetOpenFormula free}
     (hφ : φ ∈ formulas) (h : Derives T Γ φ) : Derives T Γ (anyOf formulas) := by
-  induction formulas with
-  | nil => simp at hφ
-  | cons head tail ih =>
-    rcases List.mem_cons.mp hφ with rfl | hφ
-    · exact FirstOrder.Derives.disj_intro_left h
-    · exact FirstOrder.Derives.disj_intro_right (ih hφ)
+  induction hφ with
+  | head _ => exact FirstOrder.Derives.disj_intro_left h
+  | tail _ _ ih => exact FirstOrder.Derives.disj_intro_right ih
 
 theorem anyOf_negative {T : SetTheory} {free : SetContext} {Γ : Context signature free}
     (formulas : List (SetOpenFormula free))
@@ -171,7 +168,7 @@ private theorem numeral_ne_open {T : SetTheory} (C : NumeralArithmetic T)
     Derives T Γ (¬ₘ ((numₘ(left)) ≐ₘ numₘ(right))) := by
   have h := FirstOrder.Derives.free_renaming
     (ρ := (VariableRenaming.empty : VariableRenaming [] free)) (C.numeral_ne h)
-  apply FirstOrder.Derives.context_weaken (Γ := []) (by simp)
+  apply FirstOrder.Derives.context_weaken (Γ := []) (by intro φ hφ; cases hφ)
   simpa [Formula.renameFree, Formula.rename, Renaming.free, Formula.renameMapped] using h
 
 private theorem numeral_not_mem_open {T : SetTheory} (A : ArithmeticSupport T)
@@ -224,7 +221,6 @@ theorem Rule.negative {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSup
       (∀ guard, guard ∈ rule.guards → guard.1.eval values < guard.2.eval values) →
       ∃ premise, premise ∈ rule.premises ∧ Derives T Γ (¬ₘ (numₘ(premise.eval values) ∈ₘ trace))) :
     Derives T Γ (¬ₘ rule.template (numₘ(root)) trace) := by
-  classical
   apply rule.negative_matrix C.toFiniteCore root trace
   intro values hValues
   apply FirstOrder.Derives.neg_intro
@@ -232,7 +228,21 @@ theorem Rule.negative {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSup
   have hMatrix : Derives T (matrix :: Γ) matrix :=
     FirstOrder.Derives.assumption List.mem_cons_self
   by_cases hHead : root = rule.head.eval values
-  · by_cases hGuards : ∀ guard, guard ∈ rule.guards → guard.1.eval values < guard.2.eval values
+  · have guardCases (guards : List (Expr rule.arity × Expr rule.arity)) :
+        (∀ guard, guard ∈ guards → guard.1.eval values < guard.2.eval values) ∨
+        (∃ guard, guard ∈ guards ∧ ¬ guard.1.eval values < guard.2.eval values) := by
+      induction guards with
+      | nil => exact Or.inl (fun _ h => False.elim (List.not_mem_nil h))
+      | cons guard guards ih =>
+        by_cases hGuard : guard.1.eval values < guard.2.eval values
+        · rcases ih with hAll | ⟨failed, hFailed, hNotLt⟩
+          · exact Or.inl (fun candidate hCandidate => by
+              rcases List.mem_cons.mp hCandidate with rfl | hCandidate
+              · exact hGuard
+              · exact hAll candidate hCandidate)
+          · exact Or.inr ⟨failed, List.mem_cons_of_mem guard hFailed, hNotLt⟩
+        · exact Or.inr ⟨guard, List.mem_cons_self, hGuard⟩
+    rcases guardCases rule.guards with hGuards | ⟨guard, hGuard, hNotLt⟩
     · obtain ⟨premise, hPremise, hNeg⟩ := hReject values hValues hHead hGuards
       have hMember := allOf_elim
         (FirstOrder.Derives.conj_elim_right (FirstOrder.Derives.conj_elim_right hMatrix))
@@ -241,9 +251,7 @@ theorem Rule.negative {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSup
         (FirstOrder.Derives.iff_elim_left
           (membership_left_iff_of_equality _ _ _ (premise.evaluate_open C values)) hMember)
         (FirstOrder.Derives.context_weaken_cons hNeg)
-    · obtain ⟨guard, hGuard, hNotLt⟩ : ∃ guard, guard ∈ rule.guards ∧
-          ¬ guard.1.eval values < guard.2.eval values := by simpa using hGuards
-      have hMember := allOf_elim
+    · have hMember := allOf_elim
         (FirstOrder.Derives.conj_elim_left (FirstOrder.Derives.conj_elim_right hMatrix))
         (List.mem_map.mpr ⟨guard, hGuard, rfl⟩)
       have hLeft := FirstOrder.Derives.iff_elim_left

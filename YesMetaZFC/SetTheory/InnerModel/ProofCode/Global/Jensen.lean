@@ -33,8 +33,10 @@ theorem lo_initial_in_l_l (hM : M.Models KPi) {x : M.Domain} (hx : L_d x) : ∃ 
   let a : (l_model_l hM).Domain := ⟨x, hx⟩
   obtain ⟨Y, hy⟩ := lo_initial_exists_l (l_model_kpi_l hM) (l_internal_constructible_l hM a)
   let ρ : Env (l_model_l hM) 0 := jh_env_l a
-  exact ⟨Y.val, Y.property, (lo_initial_sat_l hM _ x Y.val).mp
-    (l_sigma1_up_l hM lo_initial_s ρ ((lo_initial_sat_l (l_model_kpi_l hM) ρ a Y).mpr hy))⟩
+  have hp := (lo_initial_sat_l (l_model_kpi_l hM) ρ a Y).mpr hy
+  have hq := l_sigma1_up_l hM lo_initial_s ρ (x := a) (y := Y) hp
+  exact ⟨Y.val, Y.property, (lo_initial_sat_l hM
+    (image_env_l (M := l_model_l hM) (N := M) Subtype.val ρ) x Y.val).mp hq⟩
 
 /-- J 内任意集合自动获得由统一公式定义的实际良序关系表。 -/
 theorem lo_l_order_table_l (hM : M.Models KPi) (X : (l_model_l hM).Domain) :

@@ -33,4 +33,12 @@ theorem Formula.closed_env_l {n} (φ : Formula 1 n) (hφ : φ.FreeClosed) {ρ η
     simp only [Formula.satisfies_exists_iff]
     exact exists_congr fun x => ih hφ (funext (Fin.cases rfl (congrFun he)))
 
+/-- 闭公式的两次代入只需逐项参数相同，不要求外围赋值的维数相同。 -/
+theorem Formula.bind_congr_l {n a b} (φ : Formula 1 n) (hφ : φ.FreeClosed)
+    (ρ : Env M a) (η : Env M b) (s : Fin n → Term a) (t : Fin n → Term b)
+    (same : ∀ i, (s i).eval ρ = (t i).eval η) :
+    Formula.satisfies ρ (φ.bind s) ↔ Formula.satisfies η (φ.bind t) :=
+  (Formula.satisfies_bind ρ s φ).trans
+    ((Formula.closed_env_l φ hφ (funext same)).trans (Formula.satisfies_bind η t φ).symm)
+
 end YesMetaZFC.SetTheory.Definitional.Project

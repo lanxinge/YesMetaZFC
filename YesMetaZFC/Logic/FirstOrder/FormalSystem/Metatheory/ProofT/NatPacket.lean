@@ -77,12 +77,29 @@ def varint (value : Nat) : List Nat :=
   if h : value < 128 then [value]
   else (value % 128 + 128) :: varint (value / 128)
 termination_by value
-decreasing_by exact Nat.div_lt_self (by omega) (by decide)
+decreasing_by
+  exact Nat.div_lt_self
+    (Nat.lt_of_lt_of_le (by decide : 0 < 128) (Nat.le_of_not_lt h)) (by decide)
+
+/-- 成员的大小严格小于整个列表；直接使用结构证据。 -/
+private theorem list_sizeOf_lt_of_mem {α : Type u} [SizeOf α] {a : α} {as : List α}
+    (h : a ∈ as) : sizeOf a < sizeOf as := by
+  induction h with
+  | head =>
+      exact Nat.lt_of_lt_of_le
+        (Nat.lt_add_of_pos_left (Nat.zero_lt_succ 0)) (Nat.le_add_right _ _)
+  | tail _ _ ih =>
+      exact Nat.lt_trans ih (Nat.lt_add_of_pos_left
+        (Nat.lt_of_lt_of_le (Nat.zero_lt_succ 0) (Nat.le_add_right 1 _)))
 
 def treeTokens : Tree → List Nat
   | .node tag children =>
       tag :: children.length :: children.flatMap treeTokens
 termination_by tree => sizeOf tree
+decreasing_by
+  change sizeOf _ < sizeOf (Tree.node _ _)
+  rw [Tree.node.sizeOf_spec]
+  exact Nat.lt_of_lt_of_le (list_sizeOf_lt_of_mem (by assumption)) (Nat.le_add_left ..)
 
 /-- 数据树的传输编码；完整往返定理见 `NatPacketRoundtrip.decode_encode`。 -/
 def encode (tree : Tree) : Nat :=

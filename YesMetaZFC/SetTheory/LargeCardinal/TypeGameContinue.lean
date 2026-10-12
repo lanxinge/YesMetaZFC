@@ -1,0 +1,369 @@
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRecovery
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRestart
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidRead
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameQueryTransfer
+import YesMetaZFC.SetTheory.LargeCardinal.TypeImageRead
+import YesMetaZFC.SetTheory.LargeCardinal.IterationWorkingApply
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeSource
+import YesMetaZFC.Model.SetTheory.Internal.EmbeddingRelative
+import YesMetaZFC.Model.SetTheory.Internal.SubtypeProgramTransfer
+
+/-! # 继续较早轮的实际跨模型超幂
+
+当前模型中的弹性和超过见证产生 E₂ₙ，施加源是所选较早节点的完整模型。
+共同秩段识别旧类型的像，原程序沿实际树根图进入目标；由原子类型查询
+自动取得候选的较低层实现。旧回答基底先推出最大序数查询，再在同一目标
+反射层恢复恰好一个新标签，并直接形成下一轮输入、回答及实际奇数树边。
+旧轮记录、dcp 弹性及任意排列均保留；整列支撑界由实际树的末项推出。
+-/
+namespace YesMetaZFC.SetTheory.LargeCardinal
+open Definitional.Project InnerModel Internal
+universe u
+variable {M : Structure.{u}} (hZFC : M.Models ZFC)
+local notation "hZF" => ZFC.models_zf_l hZFC
+local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+variable {ω X η C : M.Domain} (nc : Nonempty {x // M.mem x C}) (ρ : Env (rt_model_l C nc) 28)
+local notation "p" => (fun i => Subtype.val (Env.bound ρ i))
+local notation "σ" => (Fin.cases (p 21) (Fin.cases (p 22) (Fin.cases (p 23) (Fin.cases (p 24)
+  (Fin.cases (p 25) (Fin.cases (p 26) (fun _ => p 27)))))))
+
+theorem Tg_context_d.continue_tree_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V η₀ C₀ o π π₀ Cᵣ γ Z₀ : M.Domain}
+    (context : Tg_context_d ω X η C) (prior : Tg_context_d ω Y η₀ C₀)
+    (nc₀ : Nonempty {x // M.mem x C₀}) (ρ₀ : Env (rt_model_l C₀ nc₀) 54)
+    (old : Formula.satisfies ρ₀ tg_round0_m) (oldType : (ρ₀.bound 11).val = p 7)
+    (oldκ : (ρ₀.bound 15).val = p 1) (oldn : (ρ₀.bound 24).val = p 3) (oldU : (ρ₀.bound 13).val = p 5)
+    (owner : Ic_model_d hZF ω (p 1) K X R) (source : Ic_model_d hZF ω (p 1) K' Y S)
+    (tree : It_pnice_d hZF ω c₀ α T J G E H) (succ : M.SuccessorOf α ξ)
+    (hc : Rd_entry_d ξ c J) (hd : Rd_entry_d k d J) (mx : Smem_d I c X R) (my : Smem_d I d Y S)
+    (ho : ∀ x, ¬ M.mem x o) (root : It_map_d G o ξ π) (root₀ : It_map_d G o k π₀)
+    (iRoot : Rd_entry_d Cᵣ C π) (iRoot₀ : Rd_entry_d Cᵣ C₀ π₀)
+    (anchor : Tg_anchor_d γ Z₀ X π) (priorAnchor : Tg_anchor_d γ Z₀ Y π₀) (lower : M.MemberSubset γ (p 1))
+    (hγ : M.IsLimitOrdinal γ) (ψ : Env (rt_model_l C nc) 12)
+    (queries : Formula.satisfies ψ tg_query_row0_m) (ωψ : (ψ.bound 0).val = ω)
+    (eψ : (ψ.bound 1).val = (ρ₀.bound 17).val) (lψ : (ψ.bound 2).val = p 3) (nψ : (ψ.bound 3).val = p 9)
+    (node : M.mem (ψ.bound 11).val (p 13))
+    (queryLow : ∀ i : Fin 7, M.mem (ψ.bound (i.castAdd 5)).val Z₀)
+    (χ : Env (rt_model_l C nc) 12) (candidate : Formula.satisfies χ tg_candidate0_m)
+    (ωχ : (χ.bound 2).val = ω) (τχ : (χ.bound 3).val = p 8) (uχ : (χ.bound 0).val = p 13)
+    (mχ : (χ.bound 1).val = p 9)
+    (hw : p 0 = ω) (hδ : M.IsLimitOrdinal (p 2)) (regular : Sc_regular_d X (p 2))
+    (hV : M.mem V X) (rank : Vr_d X ζ V)
+    (hV' : M.mem V Y) (rank' : Vr_d Y ζ V) (hζ : M.IsLimitOrdinal ζ)
+    (hVC : M.mem V C₀) (hζδ : M.mem ζ (p 2)) (hκV : M.mem (p 1) V)
+    (hU : M.mem (p 5) V) (hD : M.mem (p 6) V) (hu : M.mem (p 7) V)
+    (above : ∀ i μ, Rd_entry_d i μ H → M.mem μ (p 8))
+    (seed : Formula.satisfies ρ tc_seed0_m) :
+    ∃ β T' J' G' E' H' d' j N R' K₀ L F κ' U' D' u' η' C' W,
+      It_pnice_d hZF ω c₀ β T' J' G' E' H' ∧ It_extension_d α ξ k T J G E β T' J' G' E' ∧
+      Rd_entry_d α d' J' ∧ It_map_d G' k α j ∧ Smem_d I d' N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
+      It_ultra_d hZF ω (p 1) L F d d' j ∧ Wd_crit_d I Y j (p 1) κ' ∧ M.mem (p 8) L ∧ M.MemberSubset L κ' ∧
+      (∀ i μ, Rd_entry_d i μ H' → M.mem μ κ' ∨ μ = κ') ∧
+      Rd_entry_d (p 5) U' j ∧ Rd_entry_d (p 6) D' j ∧ Rd_entry_d (p 7) u' j ∧
+      Ts_subtype_d ω (p 3) κ' (p 8) (p 9) U' (p 13) (p 14) σ (p 16) u' ∧
+      Tg_subtype_in_d ω (p 3) κ' (p 8) (p 9) U' (p 13) (p 14) (p 16) u' σ C' ∧
+      Ts_program_in_d ω (p 3) (p 14) (p 16) σ C' ∧
+      Rd_entry_d η₀ η' j ∧ Rd_entry_d C₀ C' j ∧ Tg_context_d ω N η' C' ∧
+      M.mem U' C' ∧ M.mem D' C' ∧ M.mem u' C' ∧ M.mem (p 13) C' ∧
+      M.mem W X ∧ Vr_d X L W ∧ Er_level_d N L W ∧ (∀ μ, M.mem μ L → Ea_agree_d ω μ X N) ∧
+      (∃ V₀, M.mem V₀ Y ∧ Vr_d Y (p 1) V₀ ∧ M.mem V₀ N ∧ Vr_d N (p 1) V₀ ∧
+        ∀ x, M.mem x V₀ → Rd_entry_d x x j) ∧
+      ∃ π', It_map_d G' o α π' ∧ Rd_entry_d Cᵣ C' π' ∧
+        Tg_anchor_d γ Z₀ N π' ∧
+        M.mem (ψ.bound 8).val (p 13) ∧
+        (∀ i, M.mem (ψ.bound i).val Z₀) ∧
+        (∀ i : Fin 10, M.mem (χ.bound i.succ.succ).val W) ∧
+        ∃ nv : Nonempty {x // M.mem x C'}, ∃ χ' : Env (rt_model_l C' nv) 12,
+          (∀ i, (χ'.bound i).val = (χ.bound i).val) ∧ Formula.satisfies χ' tg_candidate0_m ∧
+      ∃ ψ' : Env (rt_model_l C' nv) 12,
+        (∀ i, (ψ'.bound i).val = (ψ.bound i).val) ∧ Formula.satisfies ψ' tg_query_row0_m ∧
+      ∃ θ : Env (rt_model_l C' nv) 54,
+        (∀ i, Rd_entry_d (ρ₀.bound i).val (θ.bound i).val j) ∧
+        Formula.satisfies θ tg_round0_m ∧ (θ.bound 11).val = u' ∧
+        ∃ P ν, Tt_pool_d I ω (p 9) (χ'.bound 6).val P ∧ M.mem ν (θ.bound 10).val ∧
+          Tg_realized_in_d ω (θ.bound 18).val (p 3) (θ.bound 29).val (p 9) (χ'.bound 6).val P (p 13) ν C' ∧
+        ∃ ε : Env (rt_model_l C' nv) 29,
+          (∀ i : Fin 22, (ε.bound i.succ.succ.succ.succ.succ.succ.succ).val =
+            [ω, (θ.bound 17).val, (θ.bound 22).val, (θ.bound 23).val, (θ.bound 24).val,
+              (ψ'.bound 3).val, (χ'.bound 6).val, P, (ψ'.bound 5).val, (ψ'.bound 6).val,
+              (ψ'.bound 7).val, (ψ'.bound 8).val, (ψ'.bound 9).val, (ψ'.bound 10).val, (ψ'.bound 11).val,
+              (θ.bound 29).val, (θ.bound 18).val, (θ.bound 19).val, (θ.bound 20).val, (θ.bound 42).val, ν, p 13].get i) ∧
+          Formula.satisfies ε tc_recovered0_m ∧
+        ∃ πp : Env (rt_model_l C' nv) 12,
+          (∀ i : Fin 11, (πp.bound ([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11].get i)).val =
+            [ω, (θ.bound 24).val, p 14, p 16, p 21, p 22, p 23, p 24, p 25, p 26, p 27].get i) ∧
+          ∃ v : (rt_model_l C' nv).Domain,
+            Formula.satisfies (tg_restart_env_d θ χ' ε πp v) tg_seed0_m ∧
+            ∃ a : Fin 16 → (rt_model_l C' nv).Domain,
+              let ρ' := tg_round_env_d (tg_restart_env_d θ χ' ε πp v) a
+              let q : Fin 54 → M.Domain := fun i => (ρ'.bound i).val
+              let σ' : Fin 7 → M.Domain := Fin.cases (q 47) (Fin.cases (q 48) (Fin.cases (q 49)
+                (Fin.cases (q 50) (Fin.cases (q 51) (Fin.cases (q 52) (fun _ => q 53))))))
+              Formula.satisfies ρ' tg_round0_m ∧
+              ∃ β₂ T₂ J₂ G₂ E₂ H₂ c₂ j₂ N₂ R₂ K₂ L₂ F₂ κ₂ U₂ D₂ u₂ η₂ C₂ W₂,
+                It_pnice_d hZF ω c₀ β₂ T₂ J₂ G₂ E₂ H₂ ∧
+                It_extension_d β α ξ T' J' G' E' β₂ T₂ J₂ G₂ E₂ ∧
+                Rd_entry_d β c₂ J₂ ∧ It_map_d G₂ ξ β j₂ ∧ Smem_d I c₂ N₂ R₂ ∧
+                Ic_model_d hZF ω L₂ K₂ N₂ R₂ ∧ It_ultra_d hZF ω (q 21) L₂ F₂ c c₂ j₂ ∧
+                Wd_crit_d I X j₂ (q 21) κ₂ ∧ M.IsLimitOrdinal L₂ ∧ M.mem (q 15) L₂ ∧ M.MemberSubset L₂ κ₂ ∧
+                (∀ i μ, Rd_entry_d i μ H₂ → M.mem μ κ₂ ∨ μ = κ₂) ∧
+                Rd_entry_d (q 31) U₂ j₂ ∧ Rd_entry_d (q 32) D₂ j₂ ∧ Rd_entry_d (q 34) u₂ j₂ ∧
+                Tg_reply_d I ω (q 23) (q 24) κ₂ (q 15) U₂ D₂ (q 12) u₂ (q 11) (q 36) σ'
+                  (q 38) ⟨q 2, q 1, q 0⟩ ∧
+                Rd_entry_d η η₂ j₂ ∧ Rd_entry_d C C₂ j₂ ∧ Tg_context_d ω N₂ η₂ C₂ ∧
+                Tg_reply_in_d ω (q 23) (q 24) κ₂ (q 15) U₂ D₂ (q 12) u₂ (q 11) (q 36) (q 38)
+                  (q 2) (q 1) (q 0) σ' C₂ ∧
+                M.mem W₂ N ∧ M.mem W₂ C' ∧ Vr_d N L₂ W₂ ∧ Er_level_d N₂ L₂ W₂ ∧
+                M.mem (q 12) W₂ ∧ M.mem (q 11) W₂ ∧
+                (∀ μ, M.mem μ L₂ → Ea_agree_d ω μ N N₂) ∧
+                (∃ V₂, M.mem V₂ X ∧ Vr_d X (q 21) V₂ ∧ M.mem V₂ N₂ ∧ Vr_d N₂ (q 21) V₂ ∧
+                  ∀ x, M.mem x V₂ → Rd_entry_d x x j₂) ∧
+                ∃ π₂, It_map_d G₂ o β π₂ ∧ Rd_entry_d Cᵣ C₂ π₂ ∧ Tg_anchor_d γ Z₀ N₂ π₂ := by
+  have fs := (context.read_l hZF owner.source).1
+  have facts := seed
+  simp only [tc_seed0_m, Formula.satisfies_conj_iff] at facts
+  let fp : Fin 12 → Term 28 := fun i => [.bound 0, .bound 3, .bound 14, .bound 15, .bound 16,
+    .bound 21, .bound 22, .bound 23, .bound 24, .bound 25, .bound 26, .bound 27].get i
+  let ρp := Definitional.Env.substitute ρ fp
+  have program : Formula.satisfies ρp ts_program0_m := (Formula.satisfies_bind ρ fp ts_program0_m).mp facts.2.1
+  have prog := program
+  simp only [ts_program0_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at prog
+  have hb : M.mem (p 14) ω := hw ▸ prog.2.1
+  have valid := context.continue_l hZF owner.source nc ρ seed
+  simp only [tc_result0_m, tc_image_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff] at valid
+  obtain ⟨⟨A, K₁, R₁, L, F, a, a', B, S₁, f, κ', U', D', u', core, _, subtype⟩, _, _⟩ := valid
+  let ε := ρ.push A |>.push K₁ |>.push R₁ |>.push L |>.push F |>.push a |>.push a' |>.push B
+    |>.push S₁ |>.push f |>.push κ' |>.push U' |>.push D' |>.push u'
+  let q (t : Term 28) := t.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken
+  let t (i : Fin 14) : Term 42 := .bound ⟨i.val, by omega⟩
+  obtain ⟨hA, cut, K₂, small, _, hκL, hτL, loc, card, strong, ma, mb, smallUltra, crit, _, _, iU, iD, iu⟩ :=
+    ti_image_read_l hZFC nc ε (q (.bound 0)) (q (.bound 1)) (q (.bound 2)) (q (.bound 8))
+      (q (.bound 5)) (q (.bound 6)) (q (.bound 7))
+      (t 13) (t 12) (t 11) (t 10) (t 9) (t 8) (t 7) (t 6) (t 5) (t 4) (t 3) (t 2) (t 1) (t 0)
+      owner.source owner.power context.member context.rank fs (by exact hw) (by exact hδ) (by exact regular) core
+  have subtype := ts_subtype_source_l (ZF.modelsKP hZF) fs.transitive nc _ _ _ _ _ _ _ _ _ _ _ _ subtype
+  simp only [Definitional.Term.eval_weaken, Definitional.Term.eval_newest] at subtype
+  have slots : (fun i : Fin 7 => (Definitional.Term.eval ε
+      (Fin.cases (q (.bound 21)) (Fin.cases (q (.bound 22)) (Fin.cases (q (.bound 23))
+        (Fin.cases (q (.bound 24)) (Fin.cases (q (.bound 25)) (Fin.cases (q (.bound 26))
+          (fun _ => q (.bound 27))))))) i)).val) = σ := by
+    funext i
+    exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))))) i
+  have subtype' : Ts_subtype_d ω (p 3) κ'.val (p 8) (p 9) U'.val (p 13) (p 14) σ (p 16) u'.val :=
+    slots ▸ (hw ▸ subtype)
+  have hL := (loc.ordinals_l (ZF.modelsKP hZF) small.transitive).2
+  obtain ⟨β, T', J', G', E', H', d', j, N, R', K₀, W, κ₀, next, ext, target, edge, mn, ready,
+    ultra, critical, bound, heights, hW, common, level, agreement, same, fixed⟩ :=
+    it_working_image_l hZFC tree succ hc hd mx my owner source hA cut hδ small ma mb smallUltra loc strong card
+      hκL hV rank hV' rank' hζ hζδ hκV (fun i μ hm => hL.transitive (p 8) hτL μ (above i μ hm))
+  have eq := (ultra.elementary_l hZF my.1 mn.1).1.1.1.2 (p 1) κ₀ κ'.val critical.image (same _ _ hκV crit.image)
+  subst κ₀
+  have hj := ultra.elementary_l hZF my.1 mn.1
+  obtain ⟨η', C', iη, iC, context'⟩ := prior.map_l hZF source.source.omega source.source.transitive ready.source.transitive my mn hj
+  let nv : Nonempty {x // M.mem x C'} := ⟨⟨ω, context'.omega⟩⟩
+  obtain ⟨θ, images, moved⟩ := hj.relative_image_l hZF source.source.omega source.source.transitive
+    ready.source.transitive my mn (prior.read_l hZF source.source).1.transitive
+    (context'.read_l hZF ready.source).1.transitive nc₀ nv iC tg_round0_m tg_round0_closed_l ρ₀
+  have oldImage : Rd_entry_d (p 7) (θ.bound 11).val j := oldType ▸ images 11
+  have oldEq := hj.1.1.1.2 (p 7) (θ.bound 11).val u'.val oldImage (same _ _ hu iu)
+  have inner x (hx : M.mem x V) := (prior.read_l hZF source.source).1.transitive V hVC x hx
+  have inU := (hj.member_l I hZF source.source.omega my mn (same _ _ hU iU) iC).mp (inner _ hU)
+  have inD := (hj.member_l I hZF source.source.omega my mn (same _ _ hD iD) iC).mp (inner _ hD)
+  have inu := (hj.member_l I hZF source.source.omega my mn (same _ _ hu iu) iC).mp (inner _ hu)
+  have relativeSubtype := context'.subtype_l hZF ready.source inU inu hb subtype'
+  have data := subtype'
+  obtain ⟨_, _, _, query, _⟩ := data
+  have inw := (context'.read_l hZF ready.source).1.transitive U'.val inU (p 13) query.1.1
+  -- 新语言沿实际树根图传递；共同秩层同时给出所有名字及查询的目标成员性。
+  obtain ⟨B₀, R₀, Kᵣ, mb, rootSource⟩ := tree.tree.sources o c₀ (tree.tree.root o ho)
+  have jRoot := tree.tree.diagram.elementary o ξ π c₀ B₀ R₀ c X R root (tree.tree.root o ho) hc mb.1 mx.1
+  have jPrior := tree.tree.diagram.elementary o k π₀ c₀ B₀ R₀ d Y S root₀ (tree.tree.root o ho) hd mb.1 my.1
+  -- 旧回答基底由实际较早轮读取，再沿同一根图送到当前层。
+  have fs₀ := (prior.read_l hZF source.source).1
+  obtain ⟨oldSeed, oldRound⟩ := (Formula.satisfies_conj_iff ..).mp old
+  simp only [tg_seed0_m, Formula.satisfies_rename, tg_seed_m, Formula.satisfies_conj_iff] at oldSeed
+  have omega₀ := (Formula.satisfies_isOmega_iff ..).mp oldSeed.1
+  let w₀ : (rt_model_l C₀ nc₀).Domain := ⟨ω, prior.omega⟩
+  have actualω := rt_omega_l fs₀.transitive nc₀ hZF.1 w₀ source.source.omega
+  have eqω := (rt_model_ext_l hZF.1 fs₀.transitive nc₀).eq_of_same_members (ρ₀.bound 16) w₀
+    (fun x => ⟨omega₀.2 w₀ actualω.1 x, actualω.2 (ρ₀.bound 16) omega₀.1 x⟩)
+  have ω₀ : (ρ₀.bound 16).val = ω := congrArg Subtype.val eqω
+  have heω : M.mem (ρ₀.bound 17).val ω := ω₀ ▸ oldSeed.2.2.1
+  simp only [tg_witness0_m, tg_round_m, Formula.satisfies_conj_iff] at oldRound
+  obtain ⟨_, _, _, _, _, _, _, _, _, replyLanguage, _, _, heightMember, _⟩ := oldRound
+  simp only [tg_reply_language_m, Formula.satisfies_bind, tg_reply_language0_m,
+    Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at replyLanguage
+  obtain ⟨finite₀, _, last₀, _, _, _, _, _, _, _, base₀⟩ := replyLanguage
+  let f : Fin 7 → Term 54 := fun i => [.bound 16, .bound 17, .bound 23, .bound 24, .bound 2, .bound 1, .bound 0].get i
+  let ε₀ := Definitional.Env.substitute ρ₀ f
+  have base₀ : Formula.satisfies ε₀ tg_reply_base0_m := (Formula.satisfies_bind ρ₀ f tg_reply_base0_m).mp base₀
+  have zt := priorAnchor.rank.transitive_l hZF source.source.transitive priorAnchor.member
+  have hwZ : M.mem ω Z₀ := ωψ ▸ queryLow 0
+  have hnω : M.mem (ρ₀.bound 24).val ω := ω₀ ▸ finite₀
+  have low₀ : ∀ i : Fin 4, M.mem (ε₀.bound (i.castAdd 3)).val Z₀ := by
+    intro i
+    exact Fin.cases (ω₀.symm ▸ hwZ) (Fin.cases (zt _ hwZ _ heω)
+      (Fin.cases (zt _ hwZ _ (source.source.omega.transitive hZF _ hnω _ last₀))
+        (Fin.cases (zt _ hwZ _ hnω) (fun j => Fin.elim0 j)))) i
+  obtain ⟨_, ε', eqε, reply'⟩ := priorAnchor.reply_peer_l hZF nc₀ ε₀ anchor nc source.source prior.member fs₀
+    rootSource.transitive owner.source.transitive fs.transitive mb my mx jPrior jRoot iRoot₀ iRoot hγ ω₀ low₀ base₀
+  have qShape := (Formula.satisfies_conj_iff ..).mp queries |>.2
+  have sn := (rt_successor_l fs.transitive nc hZF.1 (ψ.bound 3) (ψ.bound 2)).mp
+    ((Formula.satisfies_isSuccessor_iff ..).mp qShape.2)
+  have cElastic := (Formula.satisfies_conj_iff ..).mp candidate |>.2
+  simp only [tg_elastic_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff] at cElastic
+  obtain ⟨v, drop, _⟩ := cElastic
+  have drop := (td_dcp_source_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) fs.transitive nc fs.pair
+    (χ.push v) (.bound 5) (.bound 2) (.bound 8) (.bound 1) (.bound 0)).mp drop
+  have mω : M.mem (p 9) ω := hw ▸ ((Formula.satisfies_conj_iff ..).mp (context.continue_l hZF owner.source nc ρ seed)).2.1
+  have ℓχ : (ψ.bound 2).val = (χ.bound 4).val := sn.predecessor_eq hZF.1
+    ((owner.source.omega.members_areOrdinals hZF _ (nψ.symm ▸ mω)).mem sn.predecessor_mem)
+    (Eq.mp (congrArg (fun a => M.SuccessorOf a (χ.bound 4).val) (mχ.trans nψ.symm)) drop.1)
+  obtain ⟨_, scope, maximum⟩ := context.rigid_l hZF nc ρ χ ψ ε' owner.source anchor.member anchor.rank lower
+    ⟨queryLow 4, queryLow 5, queryLow 6⟩ hw ωχ τχ uχ mχ ωψ ℓχ nψ (eψ.trans (eqε 1).symm)
+    ((eqε 0).trans ω₀) ((eqε 3).trans oldn)
+    (Eq.mpr ((congrArg (fun a => M.mem a (p 3)) (eqε 2)).trans
+      (congrArg (fun a => M.mem (ρ₀.bound 23).val a) oldn.symm)) last₀)
+    (Eq.mpr (congrArg (fun a => M.mem a (p 7)) (eqε 6)) (oldType ▸ heightMember)) seed candidate queries reply'
+  obtain ⟨π', root'⟩ := next.tree.diagram.map_l hZF (next.tree.diagram.order.root_l hZF ho α ext.1.predecessor_mem)
+  have kRoot := next.tree.diagram.elementary o α π' c₀ B₀ R₀ d' N R' root'
+    (next.tree.root o ho) target mb.1 mn.1
+  have oldRoot := (ext.2.2.2.1 o k π₀ ((tree.tree.diagram.model_domain k).mpr ⟨d, hd⟩)).mpr root₀
+  have iRoot' := next.tree.diagram.comp o k α π₀ j π' oldRoot edge root' Cᵣ C₀ C' iRoot₀ iC
+  have hLimit := card.limit_l (ZF.modelsKP hZF) small.transitive small.theory.algebra.pair
+  have fixedCopy := fixed
+  obtain ⟨V₀, hV₀, rank₀, _, _, pointwise⟩ := fixedCopy
+  have anchor' := priorAnchor.extend_l hZF owner.source.transitive source.source.transitive ready.source.transitive
+    anchor.member anchor.rank hW common level.member level.hierarchy hLimit hκL lower
+    hV₀ rank₀ pointwise next.tree.diagram oldRoot edge root'
+  obtain ⟨allQueries, ψ', eqψ, movedψ⟩ := anchor.query_peer_l hZF nc ψ anchor' nv owner.source context.member fs
+    rootSource.transitive ready.source.transitive (context'.read_l hZF ready.source).1.transitive mb mx mn jRoot kRoot
+    iRoot iRoot' hγ ωψ queryLow queries
+  have carried := ts_program_peer_l hZF nc ρp owner.source.omega rootSource.transitive owner.source.transitive
+    ready.source.transitive mb mx mn jRoot kRoot rootSource.omega_mem iRoot iRoot' fs.transitive
+    (context'.read_l hZF ready.source).1.transitive context'.omega hw program
+  have σeq : (fun i : Fin 7 => [p 21, p 22, p 23, p 24, p 25, p 26, p 27].get i) = σ := by
+    funext i
+    exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))))) i
+  have program' : Ts_program_in_d ω (p 3) (p 14) (p 16) σ C' := σeq ▸ carried
+  have hκC' := (hj.member_l I hZF source.source.omega my mn critical.image iC).mp (inner _ hκV)
+  have hLC' := context'.rank.subset_mem_l ready.source.transitive context'.member hκC' ready.source.cardinal_mem bound
+  have hWC' := (context'.rank.rank_l hZF ready.source.transitive context'.member context'.limit
+    hLC' level.member level.hierarchy).1
+  have κW := common.ordinal_subset_l hZF owner.source.transitive hW (p 1) hκL
+  have ωW := common.subset_mem_l owner.source.transitive hW κW owner.source.omega_mem owner.source.below
+  have τW := common.ordinal_subset_l hZF owner.source.transitive hW (p 8) hτL
+  obtain ⟨hmω, low, nχ, χ', eqχ, movedχ⟩ := context.candidate_peer_l hZF nc χ context' owner.source ready.source
+    rootSource.transitive mb mx mn jRoot kRoot rootSource.omega_mem iRoot iRoot'
+    hW common level.member level.hierarchy hLimit
+    ωW (Eq.mpr (congrArg (fun a => M.mem a W) τχ) τW) hWC' ωχ
+    (Eq.mpr (congrArg (fun a => M.mem a C') uχ) inw) candidate
+  have natural := hj.natural_l hZF source.source.omega source.source.transitive ready.source.transitive my mn source.source.omega_mem
+  have nImage : Rd_entry_d (p 3) (θ.bound 24).val j := oldn ▸ images 24
+  have κImage : Rd_entry_d (p 1) (θ.bound 15).val j := oldκ ▸ images 15
+  have UImage : Rd_entry_d (p 5) (θ.bound 13).val j := oldU ▸ images 13
+  have eqn := hj.1.1.1.2 (p 3) (θ.bound 24).val (p 3) nImage (natural _ (hw ▸ prog.1))
+  have eqκ := hj.1.1.1.2 (p 1) (θ.bound 15).val κ'.val κImage critical.image
+  have eqU := hj.1.1.1.2 (p 5) (θ.bound 13).val U'.val UImage (same _ _ hU iU)
+  have realized := context'.realize_l hZF nv θ χ' ready.source (moved.mp old) movedχ eqn eqκ eqU oldEq
+    ((eqχ 3).trans τχ) ((eqχ 1).trans mχ) ((eqχ 0).trans uχ)
+    (Eq.mp (congrArg (fun a => M.mem a ω) mχ) hmω) program' relativeSubtype
+  obtain ⟨P, ν, pool, below, witness⟩ := realized
+  -- 同一候选的低层实现、最大序数查询及原节点在目标层合流，保留原排列。
+  have eqe := hj.1.1.1.2 (ρ₀.bound 17).val (θ.bound 17).val (ρ₀.bound 17).val (images 17) (natural _ heω)
+  have candidateDomain := (Formula.satisfies_conj_iff ..).mp candidate |>.1
+  simp only [Formula.satisfies_rename, ee_language0_m, ee_domain_pack_m,
+    Formula.satisfies_bind, ee_domain_pack0_m, Formula.satisfies_conj_iff] at candidateDomain
+  have hωU : M.mem ω (χ.bound 6).val := ωχ ▸ (show M.mem (χ.bound 2).val (χ.bound 6).val from candidateDomain.1.1)
+  have witness' : Tg_realized_in_d ω (θ.bound 18).val (θ.bound 24).val (θ.bound 29).val
+      (ψ'.bound 3).val (χ'.bound 6).val P (p 13) ν C' := by
+    apply Eq.mpr (congrArg (fun n : M.Domain => Tg_realized_in_d ω (θ.bound 18).val n (θ.bound 29).val
+      (ψ'.bound 3).val (χ'.bound 6).val P (p 13) ν C') eqn)
+    exact Eq.mpr (congrArg (fun m : M.Domain => Tg_realized_in_d ω (θ.bound 18).val (p 3) (θ.bound 29).val m
+      (χ'.bound 6).val P (p 13) ν C') ((eqψ 3).trans nψ)) witness
+  obtain ⟨εr, eqr, recovered⟩ := context'.recover_l hZF nv θ ψ' ready.source (moved.mp old) movedψ
+    ((eqψ 0).trans ωψ) ((eqψ 1).trans (eψ.trans eqe.symm)) ((eqψ 2).trans (lψ.trans eqn.symm))
+    (Eq.mpr (congrArg (fun a => M.mem ω a) (eqχ 6)) hωU)
+    ⟨Eq.mpr (congr (congrArg M.mem (eqψ 4)) (eqχ 6)) scope.1,
+      Eq.mpr (congr (congrArg M.mem (eqψ 5)) (eqχ 6)) scope.2.1,
+      Eq.mpr (congr (congrArg M.mem (eqψ 6)) (eqχ 6)) scope.2.2⟩
+    (Eq.mpr (congrArg (fun a => M.mem a (p 13)) (eqψ 11)) node)
+    (Eq.mpr (congrArg (fun a => M.mem a (p 13)) (eqψ 8)) maximum) witness'
+  have imageω := hj.omega_l I hZF source.source.omega source.source.transitive ready.source.transitive my mn source.source.omega_mem
+  have ωθ := hj.1.1.1.2 ω (θ.bound 16).val ω (ω₀ ▸ images 16) imageω
+  have hlχ := (eqχ 4).trans (ℓχ.symm.trans (lψ.trans eqn.symm))
+  have hnχ := ((eqψ 3).trans nψ).trans ((eqχ 1).trans mχ).symm
+  have sameRecovery : ∀ i : Fin 10, εr.bound ([7, 8, 10, 11, 12, 13, 23, 24, 25, 28].get i) =
+      [θ.bound 16, θ.bound 17, θ.bound 23, θ.bound 24, χ'.bound 1, χ'.bound 6,
+        θ.bound 18, θ.bound 19, θ.bound 20, χ'.bound 0].get i := by
+    intro i
+    apply Subtype.ext
+    exact Fin.cases ((eqr 0).trans ωθ.symm) (Fin.cases (eqr 1) (Fin.cases (eqr 3)
+      (Fin.cases (eqr 4) (Fin.cases ((eqr 5).trans hnχ) (Fin.cases (eqr 6)
+        (Fin.cases (eqr 16) (Fin.cases (eqr 17) (Fin.cases (eqr 18)
+          (Fin.cases ((eqr 21).trans ((eqχ 0).trans uχ).symm) (fun j => Fin.elim0 j)))))))))) i
+  have belowχ : M.mem (χ'.bound 3).val (θ.bound 15).val :=
+    Eq.mpr (congr (congrArg M.mem ((eqχ 3).trans τχ)) eqκ) (bound _ hτL)
+  have programθ : Ts_program_in_d ω (θ.bound 24).val (p 14) (p 16) σ C' :=
+    Eq.mpr (congrArg (fun n : M.Domain => Ts_program_in_d ω n (p 14) (p 16) σ C') eqn) program'
+  have restarted := context'.restart_l hZF ready.source nv θ χ' εr (moved.mp old) movedχ recovered sameRecovery
+    (Subtype.ext (((eqχ 2).trans ωχ).trans ωθ.symm)) (Subtype.ext hlχ) ωθ belowχ programθ
+  obtain ⟨πp, eqp, v₂, seed₂, a₂, round₂⟩ := restarted
+  let ρ₂ := tg_round_env_d (tg_restart_env_d θ χ' εr πp v₂) a₂
+  -- 偶数操作的末项界正是新轮下界；奇数操作的施加源仍为原偶数模型 X。
+  have above₂ : ∀ i μ, Rd_entry_d i μ H' → M.mem μ (ρ₂.bound 39).val ∨ μ = (ρ₂.bound 39).val := by
+    change ∀ i μ, Rd_entry_d i μ H' → M.mem μ (θ.bound 15).val ∨ μ = (θ.bound 15).val
+    rw [eqκ]
+    exact heights
+  have hδ₂ := (context'.round_regular_l hZF nv ρ₂ ready ωθ round₂).1
+  have oldData := (Formula.satisfies_conj_iff ..).mp (moved.mp old) |>.2
+  simp only [tg_witness0_m, tg_round_m, Formula.satisfies_conj_iff,
+    Formula.satisfies_mem_iff] at oldData
+  have hLδ₂ : M.mem L.val (ρ₂.bound 18).val := ordinal_down_l (ZF.modelsKP hZF) hLimit.1 hδ₂.1
+    (fun x hx => Eq.mpr (congrArg (fun z => M.mem x z) eqκ) (bound x hx)) oldData.2.2.1
+  have hκW₂ : M.mem (ρ₂.bound 21).val W := Eq.mpr (congrArg (fun z => M.mem z W) ((eqχ 3).trans τχ))
+    (common.ordinal_subset_l hZF owner.source.transitive hW (p 8) hτL)
+  have hWCX := (context.rank.rank_l hZF owner.source.transitive context.member context.limit L.property hW common).1
+  have evenNode := ext.2.2.1 ξ c hc
+  obtain ⟨β₂, T₂, J₂, G₂, E₂, H₂, c₂, j₂, N₂, R₂, K₂, L₂, F₂, κ₂, U₂, D₂, u₂, η₂, C₂, W₂,
+    next₂, ext₂, target₂, edge₂, mn₂, ready₂, ultra₂, critical₂, limit₂, bound₂, subset₂, heights₂,
+    iU₂, iD₂, iu₂, reply₂, iη₂, iC₂, context₂, legal₂, hW₂, hWC₂, common₂, level₂, hQ₂, hw₂, agreement₂, fixed₂⟩ :=
+    context'.round_l hZFC nv ρ₂ context ready owner next ext.1 target evenNode mn mx
+      level.member level.hierarchy hW common hLimit hWCX hLδ₂ hκW₂ ωθ above₂ round₂
+  -- 根图按实际树的复合律延伸；旧字母表仍严格低于新临界点。
+  obtain ⟨π₂, root₂⟩ := next₂.tree.diagram.map_l hZF
+    (next₂.tree.diagram.order.root_l hZF ho β ext₂.1.predecessor_mem)
+  have oldEvenRoot := (ext.2.2.2.1 o ξ π succ.predecessor_mem).mpr root
+  have oldRoot₂ := (ext₂.2.2.2.1 o ξ π ((next.tree.diagram.model_domain ξ).mpr ⟨c, evenNode⟩)).mpr oldEvenRoot
+  have iRoot₂ := next₂.tree.diagram.comp o ξ β π j₂ π₂ oldRoot₂ edge₂ root₂ Cᵣ C C₂ iRoot iC₂
+  obtain ⟨_, _, _, hτ, _, _, _, _, exceeds⟩ := facts
+  have hτ := (rt_limit_l fs.transitive nc (ZF.modelsKP hZF) (ρ.bound 8)).mp
+    ((Formula.satisfies_isLimitOrdinal_iff ..).mp hτ)
+  simp only [tx_exceeds_m, Formula.satisfies_bind, tx_exceeds0_m,
+    Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at exceeds
+  have lower₂ : M.MemberSubset γ (ρ₂.bound 21).val := by
+    exact Eq.mpr (congrArg (fun z => M.MemberSubset γ z) ((eqχ 3).trans τχ))
+      (fun x hx => hτ.1.transitive (p 1) exceeds.1 x (lower x hx))
+  have roundData := (Formula.satisfies_conj_iff ..).mp round₂ |>.2
+  simp only [tg_witness0_m, tg_round_m, Formula.satisfies_conj_iff,
+    Formula.satisfies_mem_iff] at roundData
+  have hκL₂ := limit₂.1.transitive (ρ₂.bound 15).val bound₂ (ρ₂.bound 21).val roundData.2.1
+  have fixedCopy₂ := fixed₂
+  obtain ⟨V₂, hV₂, rank₂, _, _, pointwise₂⟩ := fixedCopy₂
+  have anchor₂ := anchor.extend_l hZF ready.source.transitive owner.source.transitive ready₂.source.transitive
+    anchor'.member anchor'.rank hW₂ common₂ level₂.member level₂.hierarchy limit₂ hκL₂ lower₂
+    hV₂ rank₂ pointwise₂ next₂.tree.diagram oldRoot₂ edge₂ root₂
+  exact ⟨β, T', J', G', E', H', d', j, N, R', K₀, L.val, F.val, κ'.val, U'.val, D'.val, u'.val, η', C', W,
+    next, ext, target, edge, mn, ready, ultra, critical, hτL, bound, heights, same _ _ hU iU, same _ _ hD iD, same _ _ hu iu,
+    subtype', relativeSubtype, program', iη, iC, context', inU, inD, inu, inw, hW, common, level, agreement, fixed,
+    π', root', iRoot', anchor', maximum, allQueries, low, nv, χ', eqχ, movedχ, ψ', eqψ, movedψ,
+    θ, images, moved.mp old, oldEq, P, ν, pool, below, witness, εr, eqr, recovered,
+    πp, eqp, v₂, seed₂, a₂, round₂,
+    β₂, T₂, J₂, G₂, E₂, H₂, c₂, j₂, N₂, R₂, K₂, L₂, F₂, κ₂, U₂, D₂, u₂, η₂, C₂, W₂,
+    next₂, ext₂, target₂, edge₂, mn₂, ready₂, ultra₂, critical₂, limit₂, bound₂, subset₂, heights₂,
+    iU₂, iD₂, iu₂, reply₂, iη₂, iC₂, context₂, legal₂, hW₂, hWC₂, common₂, level₂, hQ₂, hw₂, agreement₂, fixed₂,
+    π₂, root₂, iRoot₂, anchor₂⟩
+
+end YesMetaZFC.SetTheory.LargeCardinal

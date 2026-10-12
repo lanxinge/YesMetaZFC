@@ -55,7 +55,22 @@ def matrix {T : SetTheory} (rule : Rule T) {bound free : SetContext}
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (rule.matrix env root).substituteMapped bs fs =
       rule.matrix (fun i => (env i).substituteMapped bs fs) (root.substituteMapped bs fs) := by
-  simp [matrix, Formula.substituteMapped, Function.comp_def]
+  have hQueries : ∀ queries : List (ObjectCheckedTrace.LocalTest T × Expr rule.arity),
+      (allOf (queries.map (fun query => query.1.condition (query.2.term env)))).substituteMapped bs fs =
+        allOf (queries.map (fun query => query.1.condition
+          (query.2.term (fun i => (env i).substituteMapped bs fs)))) := by
+    intro queries
+    induction queries with
+    | nil => rfl
+    | cons query _ ih =>
+        exact congr (congrArg Formula.conj
+          ((FormulaTemplate.apply_one_substituteMapped query.1.condition
+            (query.2.term env) bs fs).trans
+            (congrArg (fun term => query.1.condition term)
+              (query.2.term_substituteMapped env bs fs)))) ih
+  exact congr (congrArg Formula.conj
+    (congrArg (fun term => root.substituteMapped bs fs ≐ₘ term)
+      (rule.head.term_substituteMapped env bs fs))) (hQueries rule.queries)
 
 def template {T : SetTheory} (rule : Rule T) : FormulaTemplate.Unary where
   body := quantify rule.arity (Sₘ(.fvar .here))
@@ -65,10 +80,11 @@ theorem delta0 {T : SetTheory} (rule : Rule T) :
     Formula.IsDelta0 set_levy_bound rule.template.body := by
   apply quantify_delta0
   apply Formula.IsDelta0.conj (.equal _ _)
-  apply allOf_delta0
-  intro φ hφ
-  obtain ⟨query, _, rfl⟩ := List.mem_map.mp hφ
-  exact query.1.condition.instantiate_delta0 query.1.delta0 _
+  generalize rule.queries = queries
+  induction queries with
+  | nil => exact .truth
+  | cons query _ ih =>
+      exact .conj (query.1.condition.instantiate_delta0 query.1.delta0 _) ih
 
 theorem positive {T : SetTheory} (C : CertificateCore T)
     (hSuccessor : ∀ {φ}, successor_operator_theory φ → T φ)
@@ -94,7 +110,6 @@ theorem positive {T : SetTheory} (C : CertificateCore T)
 theorem negative {T : SetTheory} (C : CertificateCore T)
     (rule : Rule T) (root : Nat) (h : rule.checked root = false) :
     Derives T [] (¬ₘ rule.template (numₘ(root) : Code)) := by
-  classical
   have hMatrix : ∀ values : Fin rule.arity → Nat, (∀ i, values i ≤ root) →
       Derives T [] (¬ₘ rule.matrix (fun i => (numₘ(values i) : Code)) (numₘ(root))) := by
     intro values hBound
@@ -103,13 +118,8 @@ theorem negative {T : SetTheory} (C : CertificateCore T)
     have hBody : Derives T [body] body := FirstOrder.Derives.assumption List.mem_cons_self
     by_cases hHead : root = rule.head.eval values
     · have hFailure : ∃ query, query ∈ rule.queries ∧ query.1.checked (query.2.eval values) = false := by
-        apply Classical.byContradiction
-        intro hNo
-        have hQueries : ∀ query, query ∈ rule.queries → query.1.checked (query.2.eval values) = true := by
-          intro query hQuery
-          cases hQueryResult : query.1.checked (query.2.eval values) with
-          | false => exact False.elim (hNo ⟨query, hQuery, hQueryResult⟩)
-          | true => rfl
+        apply exists_check_failure rule.queries (fun query => query.1.checked (query.2.eval values))
+        intro hQueries
         have hTrue := (rule.checked_iff root).mpr ⟨values, hBound, hHead, hQueries⟩
         rw [h] at hTrue
         cases hTrue

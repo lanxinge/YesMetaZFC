@@ -9,11 +9,10 @@ from check_filters import ROOT, main
 # 模块路径按功能目录组织；数学声明仍使用原命名空间。
 MODULE_PREFIX = "YesMetaZFC.Model.Forcing."
 
-ZFC_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
-                for n in ("extensionality", "emptySet", "foundation", "infinity")]
-INTERNAL_BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1"
-                     for n in ("emptySet", "extensionality", "foundation", "infinity", "pairing", "powerSet", "union")]
-CHOICE_BASELINE = INTERNAL_BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
+# 当前生产句子的闭合性由内核检查；各切片均不再允许原生决策公理。
+ZFC_BASELINE = []
+INTERNAL_BASELINE = []
+CHOICE_BASELINE = []
 
 MODULES = [MODULE_PREFIX + n for n in (
     "Applications.Cohen.Algebra", "Applications.Cohen.Internal", "Applications.Cohen.Real",

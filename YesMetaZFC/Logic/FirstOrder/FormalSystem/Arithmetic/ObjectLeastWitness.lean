@@ -15,7 +15,7 @@ set_option autoImplicit false
 theorem closed {T : SetTheory} {free : SetContext} {Γ : Context signature free}
     {formula : SetSentence} (h : Derives T [] formula) :
     Derives T Γ (formula.substituteFree (VariableSubstitution.empty : VariableSubstitution signature [] [] free)) := by
-  apply FirstOrder.Derives.context_weaken (Γ := []) (by simp)
+  apply FirstOrder.Derives.context_weaken (Γ := []) (by intro φ hφ; cases hφ)
   exact FirstOrder.Derives.free_substitution VariableSubstitution.empty h
 
 /-- 只消费有限个负实例，排除码域内的全部错误最小见证。 -/

@@ -75,10 +75,19 @@ theorem heads_tagged (program : List Entry) (rule : Rule) (h : rule ∈ rules pr
   rfl
 
 @[simp] theorem rulesFor_range (program : List Entry) : rulesFor (rules program) 0 = [base, step] := by
-  induction program <;> simp_all [rules, rulesFor, Entry.rule, base, step, Expr.node, Expr.tag?]
+  change base :: step :: (program.map Entry.rule).filter
+    (fun rule => rule.head.tag? == some 0) = [base, step]
+  suffices h : (program.map Entry.rule).filter (fun rule => rule.head.tag? == some 0) = [] by
+    rw [h]
+  induction program with
+  | nil => rfl
+  | cons entry rest ih => exact ih
 
 @[simp] theorem rulesFor_table (program : List Entry) : rulesFor (rules program) 1 = program.map Entry.rule := by
-  induction program <;> simp_all [rules, rulesFor, Entry.rule, base, step, Expr.node, Expr.tag?]
+  change (program.map Entry.rule).filter (fun rule => rule.head.tag? == some 1) = program.map Entry.rule
+  induction program with
+  | nil => rfl
+  | cons entry rest ih => exact congrArg (entry.rule :: ·) ih
 
 theorem range_accept (program : List Entry) (start n : Nat) :
     Acceptance (rules program) (nodeValue 0 [start, n, listValue (range start n)]) := by

@@ -19,14 +19,30 @@ def theory {T : SetTheory} (basis : FiniteAxiomBasis T) : SetTheory := fun φ =>
 
 def singleton (φ : SetSentence) : FiniteAxiomBasis (Theory.singleton φ) where
   axioms := [φ]
-  sound _ h := List.mem_singleton.mp h
-  complete h := FirstOrder.Derives.theory_axiom (List.mem_singleton.mpr h)
+  sound _ h := by
+    cases h with
+    | head => rfl
+    | tail _ h => cases h
+  complete h := by
+    cases h
+    exact FirstOrder.Derives.theory_axiom (.head _)
 
 def union {T U : SetTheory} (left : FiniteAxiomBasis T) (right : FiniteAxiomBasis U) :
     FiniteAxiomBasis (Theory.union T U) where
   axioms := left.axioms ++ right.axioms
   sound φ h := by
-    rcases List.mem_append.mp h with h | h
+    have append_cases (xs ys : List SetSentence)
+        (h : φ ∈ xs ++ ys) : φ ∈ xs ∨ φ ∈ ys := by
+      induction xs with
+      | nil => exact Or.inr h
+      | cons head tail ih =>
+        cases h with
+        | head => exact Or.inl (.head _)
+        | tail _ h =>
+          cases ih h with
+          | inl h => exact Or.inl (.tail _ h)
+          | inr h => exact Or.inr h
+    rcases append_cases left.axioms right.axioms h with h | h
     · exact Or.inl (left.sound φ h)
     · exact Or.inr (right.sound φ h)
   complete h := by

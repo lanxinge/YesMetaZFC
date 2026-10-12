@@ -56,9 +56,8 @@ def sequenceBody (step : Project.BinarySchema 0) : Project.Formula 1 3 :=
   Project.Formula.isRecursiveSequence PureKuratowskiProject.convention (history step)
     (TermVector.boundParameters 1 2) (.bound 0) (.bound 1)
 
-theorem sequenceBody_closed (step : Project.BinarySchema 0) : (sequenceBody step).FreeClosed := by
-  simpa only [Project.BinarySchema.recursiveSequenceExistence, Formula.FreeClosed, sequenceBody, Term.newest] using
-    ((history step).recursiveSequenceExistence PureKuratowskiProject.convention).freeClosed
+theorem sequenceBody_closed (step : Project.BinarySchema 0) : (sequenceBody step).FreeClosed :=
+  ((history step).recursiveSequenceExistence PureKuratowskiProject.convention).freeClosed
 
 def sequencePure (step : Project.BinarySchema 0) : Formula ℒ [] [setSort,setSort,setSort] :=
   PureProjectTemplate.toPure (sequenceBody step) (sequenceBody_closed step)

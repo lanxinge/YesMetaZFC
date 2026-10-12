@@ -40,9 +40,10 @@ def template (graph : Delta0ProofGraph) : FormulaTemplate.Binary where
 theorem template_apply (graph : Delta0ProofGraph) {bound free : SetContext}
     (code conclusion : SetTerm bound free) :
     template graph code conclusion = (code ∈ₘ ωₘ) ∧ₘ graph.condition code conclusion := by
-  change (_ ∧ₘ _).substituteMapped _ _ = _
-  simp only [Formula.substituteMapped, FormulaTemplate.apply_two_substituteMapped,
-    Term.substituteMapped, Arguments.substituteMapped, VariableSubstitution.cons]
+  exact congrArg (Formula.conj (code ∈ₘ ωₘ))
+    (FormulaTemplate.apply_two_substituteMapped graph.condition
+      (.fvar .here) (.fvar (.there .here)) VariableSubstitution.empty
+      (VariableSubstitution.cons code (VariableSubstitution.cons conclusion VariableSubstitution.empty)))
 
 def graph (original : Delta0ProofGraph) : Delta0ProofGraph where
   condition := template original

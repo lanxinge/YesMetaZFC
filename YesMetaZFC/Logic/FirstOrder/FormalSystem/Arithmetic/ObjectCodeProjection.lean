@@ -21,28 +21,35 @@ def field (input index : Nat) : Nat := get (payload input) index
 
 @[simp] theorem tag_node (tagValue : Nat) (fields : List Nat) :
     tag (nodeValue tagValue fields) = tagValue := by
-  simp [tag, nodeValue, godel_unpair_value_pair]
+  exact congrArg Prod.fst (godel_unpair_value_pair tagValue (listValue fields))
 
 @[simp] theorem payload_node (tagValue : Nat) (fields : List Nat) :
     payload (nodeValue tagValue fields) = listValue fields := by
-  simp [payload, nodeValue, godel_unpair_value_pair]
+  exact congrArg Prod.snd (godel_unpair_value_pair tagValue (listValue fields))
 
 @[simp] theorem head_cons (first : Nat) (rest : List Nat) :
     head (listValue (first :: rest)) = first := by
-  simp [head, payload, listValue, godel_unpair_value_pair]
+  exact (congrArg (fun pair : Nat × Nat => (godel_unpair_value pair.2).1)
+    (godel_unpair_value_pair 1 (godel_pair_value first (listValue rest)))).trans
+      (congrArg Prod.fst (godel_unpair_value_pair first (listValue rest)))
 
 @[simp] theorem tail_cons (first : Nat) (rest : List Nat) :
     tail (listValue (first :: rest)) = listValue rest := by
-  simp [tail, payload, listValue, godel_unpair_value_pair]
+  exact (congrArg (fun pair : Nat × Nat => (godel_unpair_value pair.2).2)
+    (godel_unpair_value_pair 1 (godel_pair_value first (listValue rest)))).trans
+      (congrArg Prod.snd (godel_unpair_value_pair first (listValue rest)))
 
 @[simp] theorem get_zero (first : Nat) (rest : List Nat) :
-    get (listValue (first :: rest)) 0 = first := by simp [get]
+    get (listValue (first :: rest)) 0 = first := by
+  exact head_cons first rest
 
 @[simp] theorem get_succ (first : Nat) (rest : List Nat) (index : Nat) :
-    get (listValue (first :: rest)) (index + 1) = get (listValue rest) index := by simp [get]
+    get (listValue (first :: rest)) (index + 1) = get (listValue rest) index := by
+  exact congrArg (fun code => get code index) (tail_cons first rest)
 
 @[simp] theorem field_node (tagValue : Nat) (fields : List Nat) (index : Nat) :
-    field (nodeValue tagValue fields) index = get (listValue fields) index := by simp [field]
+    field (nodeValue tagValue fields) index = get (listValue fields) index := by
+  exact congrArg (fun input : Nat => get input index) (payload_node tagValue fields)
 
 theorem node_field_lt (tagValue : Nat) (fields : List Nat) (value : Nat) (h : value ∈ fields) :
     value < nodeValue tagValue fields :=

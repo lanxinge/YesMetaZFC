@@ -25,6 +25,7 @@ theorem finite_numeral_mem_of_lt
       (numₘ(left) : SetOpenTerm free) ∈ₘ numₘ(right) := by
   induction right with
   | zero =>
+      exfalso
       omega
   | succ right ih =>
       by_cases hEq : left = right

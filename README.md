@@ -12,7 +12,7 @@ YesMetaZFC 在 Lean 4 中发展一阶逻辑、集合论与元数学的形式化�
 标准布尔名称模型也已对任意完备布尔代数构造并核验原 ZFC，包含全部有限参数模式。
 地模型全部内部名称的泛型商已证明原公式真值定理及完整 ZFC 保持，允许外部非良基地模型，
 参数化 Cohen 添加与可数闭塌缩分别构造了 ZFC＋¬CH、ZFC＋CH 模型，
-并在原推导核中证明 CH 双侧不可证，见 [力迫模块](YesMetaZFC/Model/Forcing/README.md)及其[功能目录与构造历史](YesMetaZFC/Model/Forcing/INDEX.md)。
+并在原推导核中证明 CH 双侧不可证，见 [力迫模块](YesMetaZFC/Model/Forcing/README.md)及其[功能目录与阅读顺序](YesMetaZFC/Model/Forcing/INDEX.md)。
 Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义版覆盖任意裸 ZFC
 模型和每组有限参数赋值。准确的公式范围、编码约定与声明见 [TROPHIES.md](markdown/TROPHIES.md)。
 
@@ -38,7 +38,13 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 [联合尝试树的完整像](YesMetaZFC/SetTheory/LargeCardinal/IterationAttemptMember.lean) 已由有限真值证书的绝对性及实际有限节点拥有性证明，原节点公式和调用方已迁移。
 [移位秩与下降复制树](YesMetaZFC/SetTheory/LargeCardinal/IterationFailureCopy.lean) 已从返回失败自动构造：高度列覆盖内部 ω，每条严格树边上新高度小于旧高度的像，实际正则秩段包含相应扩展器。
 [指定超幂证书的读取](YesMetaZFC/SetTheory/LargeCardinal/IterationUltraRead.lean) 已保留原商、常值图、坍塌与复合图，并重新证明完整初等性；容器只需有限闭性，拥有极限秩段提供不要求正则性的实例。
-[nice 树返回定理](YesMetaZFC/SetTheory/LargeCardinal/IterationNiceReturn.lean) 已由整树 Skolem 回拉及 Pₙ 下降反证完成：可数 nice ω 树有共尾良基枝，返回原 Vθ 的初等因子保持根复合式。ω₁ 长弱迭代博弈策略及 L(R) 的 AD 尚未证明。
+[nice 树返回定理](YesMetaZFC/SetTheory/LargeCardinal/IterationNiceReturn.lean) 与 ω₁ 长弱迭代策略已完成。
+[弹性类型的一步伸展](YesMetaZFC/SetTheory/LargeCardinal/TypeOneStep.lean) 已接通原定义的子类型查询、任意内部有限排列及同一扩展器，武丁实例保留精确实现高度。后续采用双树坍缩穷尽的直接决定性路线；L(R) 的 AD 尚未证明。
+[局部不可分辨对象](YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscerniblesLeast.lean) 已在 ZF 中实际构造，包含完整内部类型、原公式真值对应及唯一的字典序最小选取。
+[有限后继秩层的完整类型搬运](YesMetaZFC/SetTheory/LargeCardinal/LocalTypeTransportTuple.lean) 已接通该最小对：内部任意正有限层高和有限元组均可自动搬运，整个 V(θ+ω) 参数带保持原值，原 κ 型集合与全部内部查询不变。
+[类型游戏的图恢复](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean) 已接到实际子类型见证：完整节点、空根和高度查询均自动编译，任意有限排列下恢复原树、末位及函数图的单点延长；重置位置的完整类型也已实际构造。
+[dcp 与规则 (7)](YesMetaZFC/SetTheory/LargeCardinal/TypeGameReply.lean) 已接通原语法投影、严格秩界和加二最大序数查询；后继高度刚性只需 ZF。[武丁重置工厂](YesMetaZFC/SetTheory/LargeCardinal/WoodinGameReset.lean) 自动产生任意参数域下界以上、dcp 弹性的实际重置类型。
+[完整辅助闭博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 已装配原七条规则、全部内部有限历史、固定三阶段时序和策略空间。三张编码表在开局前实际构造，裸类型只检查既定查询的字面成员性；已证明首次违规者输、无限合法对局由 I 获胜及收益集闭。[闭博弈决定性](YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 已按 Neeman 4.16 的获胜局面集合证明，并在[类型博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 中给出某一方的实际获胜策略；5.15 将辅助博弈中 II 的获胜策略经迭代转成原博弈中 II 的获胜策略，这一转移仍待完成。
 
 ## 描述集合论基础
 
@@ -73,7 +79,8 @@ Cantor 是 Baire 的闭且无处稠密子空间，并与内部自然数幂集等
 [完美集定理](YesMetaZFC/SetTheory/Descriptive/Perfect.lean) 已证明内部解析集及
 有码 Borel 集可数，或含实际非空、闭且无孤立点的子集。两类秩及完美集证明
 均只用 ZF，允许非标准 ω 和外部非良基模型，不假设可数选择或 ω₁ 正则。
-ZF 中未把无统一码族的集合式 Borel 类与有码类等同。统一化与决定性尚未实现。
+ZF 中未把无统一码族的集合式 Borel 类与有码类等同。闭博弈决定性已在 ZFC 中证明；
+一般统一化与 Borel 决定性尚未实现。
 
 ## 算术理论
 
@@ -118,12 +125,12 @@ CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，�
 | 修改源码时的约束和命名 | [AGENTS.md](markdown/AGENTS.md)、[ProofNaming.md](markdown/ProofNaming.md) |
 
 文档按接口职责维护；完成的计划不再逐轮追加，过程记录可从 Git 历史查看。
-当前重构目标是用底层公共证明消除上层重复义务，使全部代码严格低于 200,000 行。
-规模口径及仍可推进的方向集中于 [ENGINEERING.md](markdown/ENGINEERING.md)，文档减量不计入代码指标。
+公共证明复用、规模统计与检查性能的维护方法见 [ENGINEERING.md](markdown/ENGINEERING.md)，
+具体工作约束见 [AGENTS.md](markdown/AGENTS.md)。
 
 ## 许可证
 
 本项目的原创代码与随附文档采用 [Apache License 2.0](LICENSE)，署名见 [NOTICE](NOTICE)。
 第三方材料如有单独声明，仍遵循其原有许可。
 
-轻量证明派生入口为 `YesMetaZFC.Tactic`，包括命题推导、闭合性、理论包含和有限公理基装配。通用搜索证明器已移出主项目，源码留档与模块迁移见 [拆分说明](markdown/PROVER_SPLIT.md)。
+轻量证明派生入口为 `YesMetaZFC.Tactic`，包括命题推导、闭合性、理论包含和有限公理基装配。通用搜索证明器已移出主项目，当前模块边界见 [策略说明](markdown/PROVER_SPLIT.md)。

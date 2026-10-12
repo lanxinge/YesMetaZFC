@@ -11,6 +11,10 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+def Tg_guard_code_d (n κ U l z p : M.Domain) : Prop := ∃ b k C N,
+  M.SuccessorOf b n ∧ M.SuccessorOf l b ∧ Tn_names_d n U N ∧ Fn0_d l N C ∧
+    KPair_d M k κ κ ∧ KPair_d M p z C ∧ (∀ i, M.mem i b → Rd_entry_d i i C) ∧ Rd_entry_d b k C
+
 theorem tg_column_l {ω n κ U N : M.Domain} (hω : M.IsOmega ω) (hn : M.mem n ω)
     (hκ : M.mem κ U) (names : Tn_names_d n U N) : ∃ b l k e,
       M.SuccessorOf b n ∧ M.SuccessorOf l b ∧ M.mem l ω ∧ (I).Codes k κ κ ∧

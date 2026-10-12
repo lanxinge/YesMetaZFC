@@ -55,7 +55,11 @@ theorem strengthen_extended_context {σ : Signature.{u, v, w}}
   | nil =>
       rfl
   | cons formula rest ih =>
-      simp [extendContext]
+      change (formula.weakenFree sort).strengthenFreeTop? sort ::
+        (extendContext sort rest).map (Formula.strengthenFreeTop? sort) =
+        some formula :: rest.map some
+      exact congr (congrArg List.cons
+        (Formula.strengthenFreeTop?_weakenFree sort formula)) ih
 
 /-! ## 跨推导规则保持位置的持久新变量 -/
 
@@ -207,12 +211,11 @@ theorem instantiateLastBound_bvar
       | there previous =>
           rcases ih previous with
             ⟨target, hIndex, hTarget⟩ | ⟨hSort, hIndex, hTarget⟩
-          · exact Or.inl ⟨.there target, by simp [Variable.index, hIndex], by
-              simp [instantiateLastBound, hTarget]⟩
+          · exact Or.inl ⟨.there target, congrArg Nat.succ hIndex,
+              congrArg (Term.weakenBound introduced) hTarget⟩
           · subst resultSort
-            exact Or.inr ⟨rfl, by simp [Variable.index, hIndex], by
-              simpa [instantiateLastBound, Term.embedBoundClosed] using
-                congrArg (Term.weakenBound introduced) hTarget⟩
+            exact Or.inr ⟨rfl, congrArg Nat.succ hIndex,
+              congrArg (Term.weakenBound introduced) hTarget⟩
 
 /-! ## bound 上下文尾槽的规范打开 -/
 
@@ -350,9 +353,8 @@ def instantiateLastBound {σ : Signature.{u, v, w}}
       term.instantiateTop replacement :=
   by
     change term.substituteMapped _ _ = term.substituteMapped _ _
-    apply congrArg (fun τ : VariableSubstitution σ [sort] [] free =>
-      term.substituteMapped τ VariableSubstitution.freeId)
-    funext currentSort entry
+    apply Term.substituteMapped_congr (hFree := fun _ => rfl)
+    intro currentSort entry
     cases entry with
     | here => rfl
     | there previous => exact nomatch previous
@@ -413,8 +415,8 @@ theorem openBoundTop_eq_openBoundLast
         (VariableSubstitution.openLastBound [] sort)
         (VariableSubstitution.of_renaming
           (VariableRenaming.weaken sort))
-  congr
-  funext resultSort entry
+  apply Term.substituteMapped_congr (hFree := fun _ => rfl)
+  intro resultSort entry
   cases entry with
   | here => rfl
   | there previous => exact nomatch previous
@@ -430,12 +432,12 @@ theorem openBoundTop_eq_openBoundLast
     Term.openBoundLast (introduced :: prefixContext) sort
         (term.weakenBound introduced) =
       (Term.openBoundLast prefixContext sort term).weakenBound introduced := by
-  simpa [Term.openBoundLast] using
-    (Term.substituteMapped_weakenBound
-      introduced
-      (VariableSubstitution.openLastBound prefixContext sort)
-      (VariableSubstitution.of_renaming
-        (VariableRenaming.weaken sort)) term)
+  refine Eq.trans ?_ (Term.substituteMapped_weakenBound introduced
+    (VariableSubstitution.openLastBound prefixContext sort)
+    (VariableSubstitution.of_renaming (VariableRenaming.weaken sort)) term)
+  apply Term.substituteMapped_congr
+  · intro resultSort entry; cases entry <;> rfl
+  · intro resultSort entry; rfl
 
 /-- 闭项先提升再打开，严格等于 free weakening。 -/
 @[simp] theorem openBoundTop_weakenBound
@@ -480,9 +482,8 @@ def instantiateLastBound {σ : Signature.{u, v, w}}
   by
     change arguments.substituteMapped _ _ =
       arguments.substituteMapped _ _
-    apply congrArg (fun τ : VariableSubstitution σ [sort] [] free =>
-      arguments.substituteMapped τ VariableSubstitution.freeId)
-    funext currentSort entry
+    apply Arguments.substituteMapped_congr (hFree := fun _ => rfl)
+    intro currentSort entry
     cases entry with
     | here => rfl
     | there previous => exact nomatch previous
@@ -549,9 +550,8 @@ def instantiateLastBound {σ : Signature.{u, v, w}}
       Formula.instantiateTop replacement body :=
   by
     change body.substituteMapped _ _ = body.substituteMapped _ _
-    apply congrArg (fun τ : VariableSubstitution σ [sort] [] free =>
-      body.substituteMapped τ VariableSubstitution.freeId)
-    funext currentSort entry
+    apply Formula.substituteMapped_congr (hFree := fun _ => rfl)
+    intro currentSort entry
     cases entry with
     | here => rfl
     | there previous => exact nomatch previous
@@ -567,8 +567,10 @@ def instantiateLastBound {σ : Signature.{u, v, w}}
       Formula.forallE quantified
         (Formula.instantiateLastBound
           (quantified :: prefixContext) replacement body) := by
-  simp [Formula.instantiateLastBound, Substitution.instantiateLastBound,
-    Formula.substitute, Formula.substituteMapped]
+  apply congrArg (Formula.forallE quantified)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry; cases entry <;> rfl
+  · intro resultSort entry; rfl
 
 @[simp] theorem instantiateLastBound_existsE
     {σ : Signature.{u, v, w}} {free : SortContext σ}
@@ -581,8 +583,10 @@ def instantiateLastBound {σ : Signature.{u, v, w}}
       Formula.existsE quantified
         (Formula.instantiateLastBound
           (quantified :: prefixContext) replacement body) := by
-  simp [Formula.instantiateLastBound, Substitution.instantiateLastBound,
-    Formula.substitute, Formula.substituteMapped]
+  apply congrArg (Formula.existsE quantified)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry; cases entry <;> rfl
+  · intro resultSort entry; rfl
 
 /-! ## free 顶部变量向 bound 尾槽的规范抽象 -/
 
@@ -601,9 +605,9 @@ def abstractFreeTopLast {σ : Signature.{u, v, w}}
     (body : Formula σ [] (sort :: free)) :
     body.abstractFreeTopLast [] sort = body.abstractFreeTop := by
   change body.substituteMapped _ _ = body.substituteMapped _ _
-  congr
-  funext resultSort entry
-  cases entry <;> rfl
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry; exact nomatch entry
+  · intro resultSort entry; cases entry <;> rfl
 
 /-! ## 最外层 binder 的规范打开 -/
 
@@ -637,10 +641,10 @@ def weakenBoundUnderTop
         VariableSubstitution.freeId = body := by
   change (body.renameMapped _ _).substituteMapped _ _ = body
   rw [Formula.renameMapped_eq_substituteMapped, Formula.substituteMapped_comp]
-  conv => rhs; rw [← Formula.substituteMapped_id body]
-  congr 1
-  funext resultSort entry
-  cases entry <;> rfl
+  refine Eq.trans ?_ (Formula.substituteMapped_id body)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry; cases entry <;> rfl
+  · intro resultSort entry; rfl
 
 /-- bound 顶部实例化与 free weakening 在公式层严格交换。 -/
 @[simp] theorem instantiateTop_weakenFree
@@ -652,18 +656,18 @@ def weakenBoundUnderTop
     (body.weakenFree introduced).instantiateTop
         (replacement.weakenFree introduced) =
       (body.instantiateTop replacement).weakenFree introduced := by
-  symm
-  simpa only [
-    VariableSubstitution.weakenBound_of_renaming,
-    Formula.substituteMapped_of_renaming,
-    Term.substituteMapped_of_renaming,
-    Formula.weakenFree_eq_renameMapped,
-    Term.weakenFree, Term.rename,
-    Renaming.weakenFree, Renaming.free] using
-    (Formula.substituteMapped_instantiateTop_boundId
+  have hBody : body.substituteMapped VariableSubstitution.boundId
+      (VariableSubstitution.weakenBound sort
+        (VariableSubstitution.of_renaming (bound := bound)
+          (VariableRenaming.weaken introduced))) = body.weakenFree introduced :=
+    Formula.substituteMapped_of_renaming (VariableRenaming.weaken introduced) body
+  have hTerm := Term.substituteMapped_of_renaming (VariableRenaming.weaken introduced) replacement
+  exact (congr (congrArg Formula.instantiateTop hTerm.symm) hBody.symm).trans
+    ((Formula.substituteMapped_instantiateTop_boundId
       (VariableSubstitution.of_renaming (bound := bound)
-        (VariableRenaming.weaken introduced))
-      replacement body)
+        (VariableRenaming.weaken introduced)) replacement body).symm.trans
+      (Formula.substituteMapped_of_renaming (VariableRenaming.weaken introduced)
+        (body.instantiateTop replacement)))
 
 /-- 删除 bound 上下文最右侧槽，并把它转为规范 free 槽。 -/
 def openBoundLast {σ : Signature.{u, v, w}}
@@ -731,8 +735,8 @@ theorem openBoundTop_eq_openBoundLast
         (VariableSubstitution.openLastBound [] sort)
         (VariableSubstitution.of_renaming
           (VariableRenaming.weaken sort))
-  congr
-  funext resultSort entry
+  apply Formula.substituteMapped_congr (hFree := fun _ => rfl)
+  intro resultSort entry
   cases entry with
   | here => rfl
   | there previous => exact nomatch previous
@@ -760,8 +764,10 @@ theorem openBoundTop_eq_openBoundLast
           (VariableSubstitution.openLastBound (quantified :: prefixContext) sort)
           (VariableSubstitution.of_renaming
             (VariableRenaming.weaken sort)))
-  rw [VariableSubstitution.openLastBound_cons,
-    VariableSubstitution.weakenBound_of_renaming]
+  apply congrArg (Formula.existsE quantified)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry; cases entry <;> rfl
+  · intro resultSort entry; rfl
 
 /-- 规范打开后的顶部 free 变量重新抽象时严格恢复原量词体。 -/
 @[simp] theorem abstractFreeTop_openBoundTop
@@ -771,12 +777,13 @@ theorem openBoundTop_eq_openBoundLast
     (body.openBoundTop sort).abstractFreeTop = body := by
   change (body.substituteMapped _ _).substituteMapped _ _ = body
   rw [Formula.substituteMapped_comp]
-  conv => rhs; rw [← Formula.substituteMapped_id body]
-  congr 1
-  funext resultSort entry
-  cases entry with
-  | here => rfl
-  | there previous => exact nomatch previous
+  refine Eq.trans ?_ (Formula.substituteMapped_id body)
+  apply Formula.substituteMapped_congr
+  · intro resultSort entry
+    cases entry with
+    | here => rfl
+    | there previous => exact nomatch previous
+  · intro resultSort entry; rfl
 
 /-- 规范打开后重新全称封闭，严格恢复原全称式。 -/
 @[simp] theorem forallFreeTop_openBoundTop
@@ -785,7 +792,7 @@ theorem openBoundTop_eq_openBoundLast
     (body : Formula σ [sort] free) :
     (body.openBoundTop sort).forallFreeTop sort =
       (.forallE sort body : OpenFormula σ free) := by
-  simp [Formula.forallFreeTop]
+  exact congrArg (Formula.forallE sort) (Formula.abstractFreeTop_openBoundTop sort body)
 
 /-- 规范打开后重新存在封闭，严格恢复原存在式。 -/
 @[simp] theorem existsFreeTop_openBoundTop
@@ -794,7 +801,7 @@ theorem openBoundTop_eq_openBoundLast
     (body : Formula σ [sort] free) :
     (body.openBoundTop sort).existsFreeTop sort =
       (.existsE sort body : OpenFormula σ free) := by
-  simp [Formula.existsFreeTop]
+  exact congrArg (Formula.existsE sort) (Formula.abstractFreeTop_openBoundTop sort body)
 
 end Formula
 

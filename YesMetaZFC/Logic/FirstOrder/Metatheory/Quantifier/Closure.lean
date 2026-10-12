@@ -120,7 +120,7 @@ theorem forall_close_elim {σ : Signature.{u, v, w}}
   exact FirstOrder.Derives.context_weaken
     (by
       intro candidate hMember
-      simp [Context.substituteFree] at hMember)
+      cases hMember)
     hInstance
 
 end Derives

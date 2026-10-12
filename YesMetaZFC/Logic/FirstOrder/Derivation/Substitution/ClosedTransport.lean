@@ -58,8 +58,9 @@ mutual
     | .bvar entry => nomatch entry
     | .fvar entry => nomatch entry
     | .app function arguments =>
-        simp only [Term.embedClosed, Term.substituteMapped,
-          Arguments.embedClosed_substituteMapped]
+        exact congrArg (Term.app function)
+          (Arguments.embedClosed_substituteMapped arguments
+            boundSubstitution freeSubstitution)
 
   /-- 闭参数列的直接嵌入与任意类型化替换交换。 -/
   @[simp] theorem Arguments.embedClosed_substituteMapped
@@ -77,8 +78,9 @@ mutual
     match arguments with
     | .nil => rfl
     | .cons head tail =>
-        simp only [Arguments.embedClosed, Arguments.substituteMapped,
-          Term.embedClosed_substituteMapped, Arguments.embedClosed_substituteMapped]
+        exact congr (congrArg Arguments.cons
+          (Term.embedClosed_substituteMapped head boundSubstitution freeSubstitution))
+          (Arguments.embedClosed_substituteMapped tail boundSubstitution freeSubstitution)
 
 end
 

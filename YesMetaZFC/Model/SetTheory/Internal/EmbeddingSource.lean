@@ -37,7 +37,8 @@ theorem Smap_d.relation_l (hZF : M.Models ZF) {ω c d X R Y S j x y x' y' : M.Do
     (hω : M.IsOmega ω) (hm : Smdl_d I c X R) (hn : Smdl_d I d Y S) (hj : Smap_d I ω c d X Y j)
     (hx : M.PairMember I x x' j) (hy : M.PairMember I y y' j) :
     M.PairMember I x y R ↔ M.PairMember I x' y' S := by
-  simpa only [Formula.satisfies_mem_iff, smdl_structure_l, Definitional.Term.newest, Term.eval_bound, Fin.cases_succ, Fin.cases_zero] using smap_source_l I hZF hω hm hn hj (n := 2) (.mem (.bound (Fin.succ 0)) .newest) (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed])
+  exact smap_source_l I hZF hω hm hn hj (n := 2)
+    (.mem (.bound (Fin.succ 0)) .newest) ⟨rfl, rfl⟩
     ⟨Fin.cases ⟨y, hj.1.1.input_mem_of_pairMember hy⟩ (fun _ => ⟨x, hj.1.1.input_mem_of_pairMember hx⟩),
       fun _ => ⟨x, hj.1.1.input_mem_of_pairMember hx⟩⟩
     ⟨Fin.cases ⟨y', hj.1.1.output_mem_of_pairMember hy⟩ (fun _ => ⟨x', hj.1.1.output_mem_of_pairMember hx⟩),

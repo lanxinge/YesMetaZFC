@@ -66,9 +66,14 @@ theorem free_renaming {σ : Signature.{u, v, w}}
     VariableSubstitution.of_renaming (bound := []) ρ
   have hContext : Context.substituteFree τ Γ =
       Γ.map (Formula.renameFree ρ) := by
-    apply List.map_congr_left
-    intro assumption _
-    exact Formula.substituteFree_of_renaming ρ assumption
+    clear hFormula
+    induction Γ with
+    | nil => rfl
+    | cons assumption rest ih =>
+        change (assumption.substituteFree τ :: Context.substituteFree τ rest) =
+          (assumption.renameFree ρ :: rest.map (Formula.renameFree ρ))
+        exact congr
+          (congrArg List.cons (Formula.substituteFree_of_renaming ρ assumption)) ih
   rw [← hContext]
   simpa [τ] using free_substitution τ hFormula
 
@@ -80,9 +85,10 @@ theorem forall_elim_newest_weakened {σ : Signature.{u, v, w}}
     (hUniversal :
       Derives T Γ ((body.forallFreeTop sort).weakenFree sort)) :
     Derives T Γ body := by
+  rw [Formula.forallFreeTop, Formula.weakenFree_forallE] at hUniversal
   have hOpened :=
     forall_elim (FreshVariable.newest sort) hUniversal
-  simpa [Formula.forallFreeTop, FreshVariable.newest] using hOpened
+  exact (Formula.instantiateTop_weakenFree_abstractFreeTop sort body) ▸ hOpened
 
 /-- 全称公式进入规范 fresh 上下文后，以 newest 变量打开为原公式体。 -/
 theorem forall_elim_newest {σ : Signature.{u, v, w}}

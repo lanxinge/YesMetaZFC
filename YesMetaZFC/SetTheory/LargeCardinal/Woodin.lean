@@ -85,21 +85,28 @@ def Woodin_d (δ : M.Domain) : Prop := ∃ ω X, M.IsOmega ω ∧ M.mem ω δ �
   M.IsRegularCardinal I δ ∧ M.IsStrongLimitCardinal I δ ∧ V_d I δ X ∧
     ∀ A, M.MemberSubset A X → ∃ κ, M.mem κ δ ∧ Wd_strong_d I ω δ X A κ
 
-def woodin_m {d} (δ : Term d) : Formula 1 d :=
+def woodin0_m (𝒞 : OrderedPairConvention) : Formula 1 1 :=
+  let δ : Term 1 := .bound 0
   .existsE (.existsE (.conj (Formula.isOmega (.bound 1)) (.conj (.mem (.bound 1) δ.weaken.weaken)
     (.conj (Formula.isRegularCardinal 𝒞 δ.weaken.weaken) (.conj (Formula.isStrongLimitCardinal 𝒞 δ.weaken.weaken)
       (.conj (v_m 𝒞 δ.weaken.weaken .newest) (.forallE (.imp (Formula.subset .newest (.bound 1))
         (Formula.existsMem δ.weaken.weaken.weaken
           (wd_strong_m (𝒞 := 𝒞) (.bound 3) δ.weaken.weaken.weaken.weaken (.bound 2) (.bound 1) .newest))))))))))
 
+@[simp] theorem woodin0_closed_l : (woodin0_m 𝒞).FreeClosed := by
+  simp -implicitDefEqProofs [woodin0_m, Formula.isStrongLimitCardinal,
+    Formula.cardinalLess, Definitional.Formula.FreeClosed]
+
+def woodin_m {d} (δ : Term d) : Formula 1 d :=
+  (woodin0_m 𝒞).bind (fun _ => δ)
+
 @[simp] theorem woodin_closed_l {d} (δ : Term d) (hδ : δ.freeSupport = []) :
-    (woodin_m (𝒞 := 𝒞) δ).FreeClosed := by
-  simp -implicitDefEqProofs [woodin_m, Formula.isStrongLimitCardinal, Formula.cardinalLess,
-    Definitional.Formula.FreeClosed, hδ]
+    (woodin_m (𝒞 := 𝒞) δ).FreeClosed :=
+  (Definitional.Formula.freeClosed_bind_iff_of_closed _ (fun _ => hδ) _).mpr woodin0_closed_l
 
 theorem woodin_sat_l (hE : Extensional M) {d} (ρ : Env M d) (δ : Term d) :
     Formula.satisfies ρ (woodin_m (𝒞 := 𝒞) δ) ↔ Woodin_d I (δ.eval ρ) := by
-  simp only [woodin_m, Woodin_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
+  simp only [woodin_m, Formula.satisfies_bind, woodin0_m, Woodin_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     Formula.satisfies_isOmega_iff, Formula.satisfies_mem_iff, Formula.satisfies_isRegularCardinal_iff I hE,
     Formula.satisfies_isStrongLimitCardinal_iff I hE, v_sat_l I hE, Formula.satisfies_forall_iff,
     Formula.satisfies_imp_iff, Formula.satisfies_subset_iff, Formula.satisfies_existsMem_iff,

@@ -76,9 +76,11 @@ theorem instantiate_delta0
           (substitution entry).substituteMapped
             boundSubstitution freeSubstitution)
   rw [Formula.substituteMapped_comp]
-  congr
-  funext sort entry
-  exact nomatch entry
+  apply Formula.substituteMapped_congr
+  · intro sort entry
+    exact nomatch entry
+  · intro sort entry
+    rfl
 
 /-- 模板实例化与顶部 bound 替换交换，公式树只遍历一次。 -/
 @[simp] theorem instantiate_top
@@ -216,8 +218,15 @@ def apply_four
         boundSubstitution freeSubstitution =
       template.apply_one
         (term.substituteMapped boundSubstitution freeSubstitution) := by
-  simp only [apply_one, instantiate_substituteMapped,
-    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+  unfold apply_one
+  rw [instantiate_substituteMapped]
+  apply Formula.substituteMapped_congr
+  · intro sort entry
+    cases entry
+  · intro sort entry
+    cases entry with
+    | here => rfl
+    | there previous => cases previous
 
 
 /-- 双参数模板的实例化与后续替换交换。 -/
@@ -234,8 +243,18 @@ def apply_four
       template.apply_two
         (left.substituteMapped boundSubstitution freeSubstitution)
         (right.substituteMapped boundSubstitution freeSubstitution) := by
-  simp only [apply_two, instantiate_substituteMapped,
-    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+  unfold apply_two
+  rw [instantiate_substituteMapped]
+  apply Formula.substituteMapped_congr
+  · intro sort entry
+    cases entry
+  · intro sort entry
+    cases entry with
+    | here => rfl
+    | there previous =>
+        cases previous with
+        | here => rfl
+        | there impossible => cases impossible
 
 
 /-- 单参数模板沿 free 上下文顶部弱化。 -/
@@ -313,8 +332,21 @@ def apply_four
         (first.substituteMapped boundSubstitution freeSubstitution)
         (second.substituteMapped boundSubstitution freeSubstitution)
         (third.substituteMapped boundSubstitution freeSubstitution) := by
-  simp only [apply_three, instantiate_substituteMapped,
-    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+  unfold apply_three
+  rw [instantiate_substituteMapped]
+  apply Formula.substituteMapped_congr
+  · intro sort entry
+    cases entry
+  · intro sort entry
+    cases entry with
+    | here => rfl
+    | there secondEntry =>
+        cases secondEntry with
+        | here => rfl
+        | there thirdEntry =>
+            cases thirdEntry with
+            | here => rfl
+            | there impossible => cases impossible
 
 
 /-- 四参数模板的实例化与后续替换交换。 -/
@@ -333,8 +365,24 @@ def apply_four
         (second.substituteMapped boundSubstitution freeSubstitution)
         (third.substituteMapped boundSubstitution freeSubstitution)
         (fourth.substituteMapped boundSubstitution freeSubstitution) := by
-  simp only [apply_four, instantiate_substituteMapped,
-    VariableSubstitution.map_cons, VariableSubstitution.map_empty]
+  unfold apply_four
+  rw [instantiate_substituteMapped]
+  apply Formula.substituteMapped_congr
+  · intro sort entry
+    cases entry
+  · intro sort entry
+    cases entry with
+    | here => rfl
+    | there secondEntry =>
+        cases secondEntry with
+        | here => rfl
+        | there thirdEntry =>
+            cases thirdEntry with
+            | here => rfl
+            | there fourthEntry =>
+                cases fourthEntry with
+                | here => rfl
+                | there impossible => cases impossible
 
 instance unary_coe_fun : CoeFun Unary
     (fun _ => ∀ {bound free : SetContext},

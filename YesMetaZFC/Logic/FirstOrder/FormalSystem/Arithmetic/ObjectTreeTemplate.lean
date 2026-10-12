@@ -107,10 +107,9 @@ def graph {n : Nat} (program : List (Nat × Template n)) {bound free : SetContex
 theorem graph_delta0 {n : Nat} (program : List (Nat × Template n)) {bound free : SetContext}
     (tag : SetTerm bound free) (inputs : Fin n → SetTerm bound free) (output : SetTerm bound free) :
     Formula.IsDelta0 set_levy_bound (graph program tag inputs output) := by
-  apply anyOf_delta0
-  intro φ hφ
-  obtain ⟨entry, _, rfl⟩ := List.mem_map.mp hφ
-  exact .conj (.equal _ _) (.equal _ _)
+  induction program with
+  | nil => exact .falsum
+  | cons entry rest ih => exact .disj (.conj (.equal _ _) (.equal _ _)) ih
 
 @[simp] theorem graph_substituteMapped {n : Nat} (program : List (Nat × Template n))
     {sb sf tb tf : SetContext} (tag : SetTerm sb sf) (inputs : Fin n → SetTerm sb sf)
@@ -119,13 +118,39 @@ theorem graph_delta0 {n : Nat} (program : List (Nat × Template n)) {bound free 
     (graph program tag inputs output).substituteMapped bs fs =
       graph program (tag.substituteMapped bs fs)
         (fun i => (inputs i).substituteMapped bs fs) (output.substituteMapped bs fs) := by
-  simp [graph, Template.condition, Formula.substituteMapped, Function.comp_def]
+  induction program with
+  | nil => rfl
+  | cons entry _ ih =>
+      exact congr (congrArg Formula.disj
+        (congr (congrArg Formula.conj
+          (congrArg (fun term => tag.substituteMapped bs fs ≐ₘ term)
+            (finite_numeral_term_substituteMapped bs fs entry.1)))
+          (congrArg (fun term => term ≐ₘ output.substituteMapped bs fs)
+            (entry.2.expr.term_substituteMapped inputs bs fs)))) ih
+
+/-- 用列表成员证据直接传递映射，不经过成员等价式。 -/
+private theorem map_member_intro {α : Type _} {β : Type _} (f : α → β)
+    {a : α} {l : List α} (h : a ∈ l) : f a ∈ l.map f := by
+  induction h with
+  | head => exact .head _
+  | tail _ _ ih => exact .tail _ ih
+
+private theorem map_member_elim {α : Type _} {β : Type _} (f : α → β)
+    {l : List α} {b : β} (h : b ∈ l.map f) : ∃ a, a ∈ l ∧ f a = b := by
+  induction l with
+  | nil => cases h
+  | cons a l ih =>
+      cases h with
+      | head => exact ⟨a, .head _, rfl⟩
+      | tail _ h =>
+          obtain ⟨a', ha', hEq⟩ := ih h
+          exact ⟨a', .tail _ ha', hEq⟩
 
 theorem graph_positive {T : SetTheory} {n : Nat} (program : List (Nat × Template n))
     (tag : Nat) (inputs : Fin n → Code) (output : Code) (shape : Template n)
     (hEntry : (tag, shape) ∈ program) (h : Derives T [] (shape.condition inputs output)) :
     Derives T [] (graph program (numₘ(tag)) inputs output) := by
-  apply anyOf_intro (List.mem_map.mpr ⟨(tag, shape), hEntry, rfl⟩)
+  apply anyOf_intro (map_member_intro _ hEntry)
   exact FirstOrder.Derives.conj_intro (Metatheory.Derives.equality_refl _) h
 
 /-- 负向覆盖所有匹配分支；未知标签不需要关于正文的任何假设。 -/
@@ -136,7 +161,7 @@ theorem graph_negative {T : SetTheory} (C : CertificateCore T) {n : Nat}
     Derives T [] (¬ₘ graph program (numₘ(tag)) inputs output) := by
   apply anyOf_negative
   intro φ hφ
-  obtain ⟨entry, hEntry, rfl⟩ := List.mem_map.mp hφ
+  obtain ⟨entry, hEntry, rfl⟩ := map_member_elim _ hφ
   apply FirstOrder.Derives.neg_intro
   have hBoth := FirstOrder.Derives.assumption (T := T)
     (Γ := [(numₘ(tag) ≐ₘ numₘ(entry.1)) ∧ₘ entry.2.condition inputs output]) List.mem_cons_self

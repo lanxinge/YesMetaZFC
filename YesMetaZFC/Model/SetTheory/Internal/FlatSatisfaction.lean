@@ -43,7 +43,7 @@ theorem ft_sat_source_l (A R F n r f : (N).Domain) {ν E : M.Domain}
   have trans := ZF.v_transitive_l I hZF hW
   constructor
   · rintro ⟨_, b, p, T, code, eval, truth⟩
-    have code' := (rt_fs_code_l I hZF hω hW hωY A f b p hV hs hων).mp code
+    have code' := (rt_fs_code_l I hZF hω hW hωY A f b p hV hων).mp code
     have eval' := (rt_ft_eval_l I hZF hω hW hωY A R b F n T hV hs hων hF).mp eval
     exact (eval'.correct_l I hZF hω hV hων hF hE hr ((hE f.val).mpr hf) code').mp ((entry r p T).mp truth)
   · intro truth
@@ -54,7 +54,7 @@ theorem ft_sat_source_l (A R F n r f : (N).Domain) {ν E : M.Domain}
     let p' : (N).Domain := ⟨p, trans A.val A.property p hp⟩
     let T' : (N).Domain := ⟨T, ht⟩
     exact ⟨(rt_fp_function_from_l I hZF hω hW hωY f ⟨ω, hωY⟩ A).mpr hf, b', p', T',
-      (rt_fs_code_l I hZF hω hW hωY A f b' p' hV hs hων).mpr code,
+      (rt_fs_code_l I hZF hω hW hωY A f b' p' hV hων).mpr code,
       (rt_ft_eval_l I hZF hω hW hωY A R b' F n T' hV hs hων hF).mpr eval,
       (entry r p' T').mpr ((eval.correct_l I hZF hω hV hων hF hE hr ((hE f.val).mpr hf) code).mpr truth)⟩
 

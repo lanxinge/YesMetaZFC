@@ -1,522 +1,14 @@
-import YesMetaZFC.Logic.Signature
+import YesMetaZFC.Logic.Syntax.Core
+
 /-!
-# 内在良构的一阶语法核
-本模块只允许构造排序正确、元数正确且作用域正确的项和公式。
-* bound 与 free 变量分别由有限排序上下文索引；
-* 函数和关系的参数由签名中的排序列表索引；
-* 等式两端在类型上具有同一排序；
-* 量词体直接处于扩展后的 bound 上下文；
-* 重命名与替换统一表达为上下文之间的保排序映射。
-因此本层不存在 raw AST、良构谓词、作用域谓词、合法性 Bool 检查器或 checked
-包装。稳定自然数变量编号属于后续序列化层，不进入语法核。
+# 内在语法的替换、结构合同与新鲜性
+
+逐点映射合同沿有限 AST 递归；仅真正断言函数相等的兼容接口使用函数外延。
 -/
 namespace YesMetaZFC
 namespace Logic
 namespace FirstOrder
 universe u v w
-/-- 排序上下文。列表头表示最近引入的变量。 -/
-abbrev SortContext (σ : Signature.{u, v, w}) := List σ.SortSymbol
-/--
-排序上下文中的变量。构造子同时证明变量存在于上下文并具有指定排序。
--/
-inductive Variable {S : Type u} : List S → S → Type u where
-  | here {Γ : List S} {s : S} : Variable (s :: Γ) s
-  | there {Γ : List S} {s t : S} : Variable Γ s → Variable (t :: Γ) s
-
-namespace Variable
-
-/-- 变量的 de Bruijn 位置，仅供后续序列化使用。 -/
-def index {S : Type u} {Γ : List S} {s : S} : Variable Γ s → Nat
-  | .here => 0
-  | .there entry => entry.index + 1
-
-/-- 变量位置严格落在其上下文长度内。 -/
-theorem index_lt_length {S : Type u} {Γ : List S} {s : S}
-    (entry : Variable Γ s) : entry.index < Γ.length := by
-  induction entry with
-  | here =>
-      simp [index]
-  | there previous ih =>
-      simpa [index] using Nat.succ_lt_succ ih
-
-/-- 变量在有限上下文中的位置。 -/
-def position {S : Type u} {Γ : List S} {s : S}
-    (entry : Variable Γ s) : Fin Γ.length :=
-  ⟨entry.index, entry.index_lt_length⟩
-
-/-- 在上下文头部加入一个变量后，原变量仍然可用。 -/
-def weaken {S : Type u} {Γ : List S} {s : S} (introduced : S) :
-    Variable Γ s → Variable (introduced :: Γ) s :=
-  .there
-
-/-- 扩展上下文中新引入的规范变量。 -/
-def newest {S : Type u} {Γ : List S} {s : S} :
-    Variable (s :: Γ) s :=
-  .here
-
-/-- 在上下文尾部加入变量后，原变量保持原有 de Bruijn 位置。 -/
-def appendRight {S : Type u} {Γ : List S} {s : S}
-    (introduced : S) : Variable Γ s → Variable (Γ ++ [introduced]) s
-  | .here => .here
-  | .there previous => .there (appendRight introduced previous)
-
-/-- 尾扩展不改变既有变量的 de Bruijn 位置。 -/
-@[simp] theorem index_appendRight {S : Type u} {Γ : List S} {s : S}
-    (introduced : S) (entry : Variable Γ s) :
-    (appendRight introduced entry).index = entry.index := by
-  induction entry <;> simp [appendRight, index, *]
-
-/-- 上下文尾部新加入的变量。 -/
-def last {S : Type u} (Γ : List S) (s : S) : Variable (Γ ++ [s]) s :=
-  match Γ with
-  | [] => .here
-  | _ :: tail => .there (last tail s)
-
-/-- 尾部新变量的 de Bruijn 位置恰为原上下文长度。 -/
-@[simp] theorem index_last {S : Type u} (Γ : List S) (s : S) :
-    (last Γ s).index = Γ.length := by
-  induction Γ with
-  | nil => rfl
-  | cons head tail ih =>
-      simp [last, index, ih]
-
-end Variable
-
-/-- 两个排序上下文之间的保排序变量映射。 -/
-abbrev VariableRenaming {S : Type u} (source target : List S) :=
-  {s : S} → Variable source s → Variable target s
-
-namespace VariableRenaming
-
-/-- 恒等变量映射。 -/
-def id {S : Type u} {Γ : List S} : VariableRenaming Γ Γ :=
-  fun entry => entry
-
-/-- 从空上下文到任意上下文的唯一重命名。 -/
-def empty {S : Type u} {Γ : List S} : VariableRenaming [] Γ :=
-  fun entry => nomatch entry
-
-/-- 将整个源上下文嵌入扩展后的上下文。 -/
-def weaken {S : Type u} {Γ : List S} (introduced : S) :
-    VariableRenaming Γ (introduced :: Γ) :=
-  fun entry => .there entry
-
-/-- 将整个源上下文嵌入其尾扩展。 -/
-def appendRight {S : Type u} {Γ : List S} (introduced : S) :
-    VariableRenaming Γ (Γ ++ [introduced]) :=
-  Variable.appendRight introduced
-
-/-- 在变量映射头部指定一个像，其余变量沿用既有映射。 -/
-def cons {S : Type u} {source target : List S} {sort : S}
-    (head : Variable target sort) (tail : VariableRenaming source target) :
-    VariableRenaming (sort :: source) target :=
-  fun entry =>
-    match entry with
-    | .here => head
-    | .there previous => tail previous
-
-/-- 交换 free 上下文顶部的两个变量。 -/
-def swapTop {S : Type u} {Γ : List S} {first second : S} :
-    VariableRenaming (first :: second :: Γ) (second :: first :: Γ) :=
-  fun entry =>
-    match entry with
-    | .here => .there .here
-    | .there .here => .here
-    | .there (.there previous) => .there (.there previous)
-
-/-- 重命名穿过同一个新 binder。 -/
-def lift {S : Type u} {source target : List S} {introduced : S}
-    (ρ : VariableRenaming source target) :
-    VariableRenaming (introduced :: source) (introduced :: target) :=
-  fun entry =>
-    match entry with
-    | .here => .here
-    | .there previous => .there (ρ previous)
-
-/-- 重命名的复合。 -/
-def comp {S : Type u} {source middle target : List S}
-    (outer : VariableRenaming middle target)
-    (inner : VariableRenaming source middle) :
-    VariableRenaming source target :=
-  fun entry => outer (inner entry)
-
-end VariableRenaming
-
-/--
-同时作用于 bound/free 上下文的重命名。`.id` 是显式快路径，不把恒等性藏在函数
-外延等式里。
--/
-inductive Renaming (σ : Signature.{u, v, w}) :
-    SortContext σ → SortContext σ → SortContext σ → SortContext σ →
-      Type (max u v w) where
-  | id {bound free : SortContext σ} : Renaming σ bound free bound free
-  | map {sourceBound sourceFree targetBound targetFree : SortContext σ} :
-      VariableRenaming sourceBound targetBound →
-      VariableRenaming sourceFree targetFree →
-      Renaming σ sourceBound sourceFree targetBound targetFree
-
-namespace Renaming
-
-/-- 仅改变 bound 上下文。 -/
-def bound {σ : Signature.{u, v, w}}
-    {sourceBound targetBound free : SortContext σ}
-    (ρ : VariableRenaming sourceBound targetBound) :
-    Renaming σ sourceBound free targetBound free :=
-  .map ρ VariableRenaming.id
-
-/-- 仅改变 free 上下文。 -/
-def free {σ : Signature.{u, v, w}}
-    {bound sourceFree targetFree : SortContext σ}
-    (ρ : VariableRenaming sourceFree targetFree) :
-    Renaming σ bound sourceFree bound targetFree :=
-  .map VariableRenaming.id ρ
-
-/-- 在 bound 上下文头部加入一个变量。 -/
-def weakenBound {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} (introduced : σ.SortSymbol) :
-    Renaming σ bound free (introduced :: bound) free :=
-  .bound (VariableRenaming.weaken introduced)
-
-/-- 在 free 上下文头部加入一个变量。 -/
-def weakenFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} (introduced : σ.SortSymbol) :
-    Renaming σ bound free bound (introduced :: free) :=
-  .free (VariableRenaming.weaken introduced)
-
-/-- 将空 free 上下文嵌入任意 free 上下文。 -/
-def emptyFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} :
-    Renaming σ bound [] bound free :=
-  match free with
-  | [] => .id
-  | _ :: _ => .free VariableRenaming.empty
-
-/-- 重命名穿过同一个新 binder；恒等重命名保持 `.id`。 -/
-def liftBound {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (introduced : σ.SortSymbol) :
-    Renaming σ sourceBound sourceFree targetBound targetFree →
-      Renaming σ (introduced :: sourceBound) sourceFree
-        (introduced :: targetBound) targetFree
-  | .id => .id
-  | .map boundRenaming freeRenaming =>
-      .map (VariableRenaming.lift boundRenaming) freeRenaming
-
-/-- 重命名复合；任一侧为恒等时不创建新的映射节点。 -/
-def comp {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree middleBound middleFree targetBound targetFree :
-      SortContext σ}
-    (outer : Renaming σ middleBound middleFree targetBound targetFree)
-    (inner : Renaming σ sourceBound sourceFree middleBound middleFree) :
-    Renaming σ sourceBound sourceFree targetBound targetFree :=
-  match outer, inner with
-  | .id, inner => inner
-  | outer, .id => outer
-  | .map outerBound outerFree, .map innerBound innerFree =>
-      .map (VariableRenaming.comp outerBound innerBound)
-        (VariableRenaming.comp outerFree innerFree)
-
-end Renaming
-
-mutual
-
-/-- 内在排序的一阶项。 -/
-inductive Term (σ : Signature.{u, v, w})
-    (bound free : SortContext σ) : σ.SortSymbol → Type (max u v w) where
-  | bvar {sort : σ.SortSymbol} :
-      Variable bound sort → Term σ bound free sort
-  | fvar {sort : σ.SortSymbol} :
-      Variable free sort → Term σ bound free sort
-  | app (function : σ.FuncSymbol) :
-      Arguments σ bound free (σ.funcDomain function) →
-        Term σ bound free (σ.funcCodomain function)
-
-/-- 由排序列表索引的异质参数列。 -/
-inductive Arguments (σ : Signature.{u, v, w})
-    (bound free : SortContext σ) : List σ.SortSymbol →
-    Type (max u v w) where
-  | nil : Arguments σ bound free []
-  | cons {sort : σ.SortSymbol} {sorts : List σ.SortSymbol} :
-      Term σ bound free sort → Arguments σ bound free sorts →
-        Arguments σ bound free (sort :: sorts)
-
-end
-
-/-- 只沿参数列归纳；各头项的性质可直接复用既有项定理。 -/
-@[elab_as_elim] theorem Arguments.listRec {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ}
-    {motive : {sorts : List σ.SortSymbol} → Arguments σ bound free sorts → Prop}
-    (nil : motive .nil)
-    (cons : ∀ {sort sorts} (head : Term σ bound free sort)
-      (tail : Arguments σ bound free sorts),
-      motive tail → motive (.cons head tail)) :
-    ∀ {sorts} (arguments : Arguments σ bound free sorts), motive arguments
-  | _, .nil => nil
-  | _, .cons head tail => cons head tail (Arguments.listRec nil cons tail)
-
-/-- 内在排序且内在作用域正确的一阶公式。 -/
-inductive Formula (σ : Signature.{u, v, w}) :
-    SortContext σ → SortContext σ → Type (max u v w) where
-  | falsum {bound free : SortContext σ} : Formula σ bound free
-  | truth {bound free : SortContext σ} : Formula σ bound free
-  | rel {bound free : SortContext σ} (relation : σ.RelSymbol) :
-      Arguments σ bound free (σ.relDomain relation) → Formula σ bound free
-  | equal {bound free : SortContext σ} {sort : σ.SortSymbol} :
-      Term σ bound free sort → Term σ bound free sort → Formula σ bound free
-  | neg {bound free : SortContext σ} :
-      Formula σ bound free → Formula σ bound free
-  | conj {bound free : SortContext σ} :
-      Formula σ bound free → Formula σ bound free → Formula σ bound free
-  | disj {bound free : SortContext σ} :
-      Formula σ bound free → Formula σ bound free → Formula σ bound free
-  | imp {bound free : SortContext σ} :
-      Formula σ bound free → Formula σ bound free → Formula σ bound free
-  | iff {bound free : SortContext σ} :
-      Formula σ bound free → Formula σ bound free → Formula σ bound free
-  | forallE {bound free : SortContext σ} (sort : σ.SortSymbol) :
-      Formula σ (sort :: bound) free → Formula σ bound free
-  | existsE {bound free : SortContext σ} (sort : σ.SortSymbol) :
-      Formula σ (sort :: bound) free → Formula σ bound free
-
-/-- 没有外层 bound 变量的项。 -/
-abbrev OpenTerm (σ : Signature.{u, v, w})
-    (free : SortContext σ) (sort : σ.SortSymbol) :=
-  Term σ [] free sort
-
-/-- 没有外层 bound 变量的公式。 -/
-abbrev OpenFormula (σ : Signature.{u, v, w})
-    (free : SortContext σ) :=
-  Formula σ [] free
-
-/-- 没有 bound 或 free 变量的闭句。 -/
-abbrev Sentence (σ : Signature.{u, v, w}) :=
-  Formula σ [] []
-
-mutual
-
-/-- 执行非恒等项重命名。公共入口 `Term.rename` 负责恒等快路径。 -/
-def Term.renameMapped {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (boundRenaming : VariableRenaming sourceBound targetBound)
-    (freeRenaming : VariableRenaming sourceFree targetFree) :
-    {sort : σ.SortSymbol} →
-      Term σ sourceBound sourceFree sort → Term σ targetBound targetFree sort
-  | _, .bvar entry => .bvar (boundRenaming entry)
-  | _, .fvar entry => .fvar (freeRenaming entry)
-  | _, .app function arguments =>
-      .app function
-        (Arguments.renameMapped boundRenaming freeRenaming arguments)
-
-/-- 执行非恒等参数列重命名。 -/
-def Arguments.renameMapped {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (boundRenaming : VariableRenaming sourceBound targetBound)
-    (freeRenaming : VariableRenaming sourceFree targetFree) :
-    {sorts : List σ.SortSymbol} →
-      Arguments σ sourceBound sourceFree sorts →
-        Arguments σ targetBound targetFree sorts
-  | _, .nil => .nil
-  | _, .cons term rest =>
-      .cons (term.renameMapped boundRenaming freeRenaming)
-        (Arguments.renameMapped boundRenaming freeRenaming rest)
-
-end
-
-/-- 同时重命名项的 bound 与 free 变量；恒等情形在根节点直接返回。 -/
-def Term.rename {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (ρ : Renaming σ sourceBound sourceFree targetBound targetFree)
-    {sort : σ.SortSymbol} (term : Term σ sourceBound sourceFree sort) :
-    Term σ targetBound targetFree sort :=
-  match ρ with
-  | .id => term
-  | .map boundRenaming freeRenaming =>
-      term.renameMapped boundRenaming freeRenaming
-
-/-- 同时重命名参数列的 bound 与 free 变量；恒等情形在根节点直接返回。 -/
-def Arguments.rename {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (ρ : Renaming σ sourceBound sourceFree targetBound targetFree)
-    {sorts : List σ.SortSymbol}
-    (arguments : Arguments σ sourceBound sourceFree sorts) :
-    Arguments σ targetBound targetFree sorts :=
-  match ρ with
-  | .id => arguments
-  | .map boundRenaming freeRenaming =>
-      arguments.renameMapped boundRenaming freeRenaming
-
-/-- 项穿过一个新 binder。 -/
-def Term.weakenBound {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (introduced : σ.SortSymbol) (term : Term σ bound free sort) :
-    Term σ (introduced :: bound) free sort :=
-  term.rename (Renaming.weakenBound introduced)
-
-/-- 参数列穿过一个新 binder。 -/
-def Arguments.weakenBound {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} {sorts : List σ.SortSymbol}
-    (introduced : σ.SortSymbol)
-    (arguments : Arguments σ bound free sorts) :
-    Arguments σ (introduced :: bound) free sorts :=
-  arguments.rename (Renaming.weakenBound introduced)
-
-/-- 无 bound 变量的项可规范嵌入任意 binder 上下文。 -/
-def Term.embedBoundClosed {σ : Signature.{u, v, w}}
-    {free : SortContext σ} {sort : σ.SortSymbol} :
-    (targetBound : SortContext σ) →
-      Term σ [] free sort → Term σ targetBound free sort
-  | [], term => term
-  | introduced :: rest, term =>
-      (term.embedBoundClosed rest).weakenBound introduced
-
-/-- 无 bound 变量的参数列可规范嵌入任意 binder 上下文。 -/
-def Arguments.embedBoundClosed {σ : Signature.{u, v, w}}
-    {free : SortContext σ} {sorts : List σ.SortSymbol} :
-    (targetBound : SortContext σ) →
-      Arguments σ [] free sorts → Arguments σ targetBound free sorts
-  | [], arguments => arguments
-  | introduced :: rest, arguments =>
-      (arguments.embedBoundClosed rest).weakenBound introduced
-
-/-- 按保排序映射改变项的 free 上下文。 -/
-def Term.renameFree {σ : Signature.{u, v, w}}
-    {bound sourceFree targetFree : SortContext σ}
-    (ρ : VariableRenaming sourceFree targetFree)
-    {sort : σ.SortSymbol} (term : Term σ bound sourceFree sort) :
-    Term σ bound targetFree sort :=
-  term.rename (Renaming.free ρ)
-
-/-- 按保排序映射改变参数列的 free 上下文。 -/
-def Arguments.renameFree {σ : Signature.{u, v, w}}
-    {bound sourceFree targetFree : SortContext σ}
-    (ρ : VariableRenaming sourceFree targetFree)
-    {sorts : List σ.SortSymbol}
-    (arguments : Arguments σ bound sourceFree sorts) :
-    Arguments σ bound targetFree sorts :=
-  arguments.rename (Renaming.free ρ)
-
-/-- 扩展 free 上下文中新引入的规范自由变量项。 -/
-def Term.newestFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} (sort : σ.SortSymbol) :
-    Term σ bound (sort :: free) sort :=
-  .fvar .here
-
-/-- 项穿过一个新 free 变量。 -/
-def Term.weakenFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} {sort : σ.SortSymbol}
-    (introduced : σ.SortSymbol) (term : Term σ bound free sort) :
-    Term σ bound (introduced :: free) sort :=
-  term.rename (Renaming.weakenFree introduced)
-
-/-- 参数列穿过一个新 free 变量。 -/
-def Arguments.weakenFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} {sorts : List σ.SortSymbol}
-    (introduced : σ.SortSymbol)
-    (arguments : Arguments σ bound free sorts) :
-    Arguments σ bound (introduced :: free) sorts :=
-  arguments.rename (Renaming.weakenFree introduced)
-
-namespace Formula
-
-/-- 执行非恒等公式重命名。公共入口 `Formula.rename` 负责恒等快路径。 -/
-def renameMapped {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (boundRenaming : VariableRenaming sourceBound targetBound)
-    (freeRenaming : VariableRenaming sourceFree targetFree) :
-    Formula σ sourceBound sourceFree → Formula σ targetBound targetFree
-  | .falsum => .falsum
-  | .truth => .truth
-  | .rel relation arguments =>
-      .rel relation
-        (Arguments.renameMapped boundRenaming freeRenaming arguments)
-  | .equal left right =>
-      .equal (left.renameMapped boundRenaming freeRenaming)
-        (right.renameMapped boundRenaming freeRenaming)
-  | .neg body => .neg (renameMapped boundRenaming freeRenaming body)
-  | .conj left right =>
-      .conj (renameMapped boundRenaming freeRenaming left)
-        (renameMapped boundRenaming freeRenaming right)
-  | .disj left right =>
-      .disj (renameMapped boundRenaming freeRenaming left)
-        (renameMapped boundRenaming freeRenaming right)
-  | .imp left right =>
-      .imp (renameMapped boundRenaming freeRenaming left)
-        (renameMapped boundRenaming freeRenaming right)
-  | .iff left right =>
-      .iff (renameMapped boundRenaming freeRenaming left)
-        (renameMapped boundRenaming freeRenaming right)
-  | .forallE sort body =>
-      .forallE sort
-        (renameMapped (VariableRenaming.lift boundRenaming)
-          freeRenaming body)
-  | .existsE sort body =>
-      .existsE sort
-        (renameMapped (VariableRenaming.lift boundRenaming)
-          freeRenaming body)
-
-/-- 同时重命名公式的 bound 与 free 变量；恒等情形在根节点直接返回。 -/
-def rename {σ : Signature.{u, v, w}}
-    {sourceBound sourceFree targetBound targetFree : SortContext σ}
-    (ρ : Renaming σ sourceBound sourceFree targetBound targetFree)
-    (formula : Formula σ sourceBound sourceFree) :
-    Formula σ targetBound targetFree :=
-  match ρ with
-  | .id => formula
-  | .map boundRenaming freeRenaming =>
-      renameMapped boundRenaming freeRenaming formula
-
-/-- 公式穿过一个新 binder。 -/
-def weakenBound {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} (introduced : σ.SortSymbol)
-    (formula : Formula σ bound free) :
-    Formula σ (introduced :: bound) free :=
-  formula.rename (Renaming.weakenBound introduced)
-
-/-- 按保排序映射改变公式的 free 上下文。 -/
-def renameFree {σ : Signature.{u, v, w}}
-    {bound sourceFree targetFree : SortContext σ}
-    (ρ : VariableRenaming sourceFree targetFree)
-    (formula : Formula σ bound sourceFree) :
-    Formula σ bound targetFree :=
-  formula.rename (Renaming.free ρ)
-
-/-- 公式穿过一个新 free 变量。新变量在结果中按构造不可出现。 -/
-def weakenFree {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} (introduced : σ.SortSymbol)
-    (formula : Formula σ bound free) :
-    Formula σ bound (introduced :: free) :=
-  formula.rename (Renaming.weakenFree introduced)
-
-/-- 交换公式 free 上下文顶部的两个变量。 -/
-def swapFreeTop {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} {first second : σ.SortSymbol}
-    (body : Formula σ bound (first :: second :: free)) :
-    Formula σ bound (second :: first :: free) :=
-  body.renameFree VariableRenaming.swapTop
-
-/-- 将闭句嵌入任意 free 上下文。 -/
-def fromSentence {σ : Signature.{u, v, w}}
-    {free : SortContext σ} (sentence : Sentence σ) :
-    OpenFormula σ free :=
-  sentence.rename Renaming.emptyFree
-
-/-- 右结合有限合取；空列表解释为真。 -/
-def conjunctionList {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} :
-    List (Formula σ bound free) → Formula σ bound free
-  | [] => .truth
-  | [formula] => formula
-  | formula :: rest => .conj formula (conjunctionList rest)
-
-/-- 右结合有限析取；空列表解释为假。 -/
-def disjunctionList {σ : Signature.{u, v, w}}
-    {bound free : SortContext σ} :
-    List (Formula σ bound free) → Formula σ bound free
-  | [] => .falsum
-  | [formula] => formula
-  | formula :: rest => .disj formula (disjunctionList rest)
-
-end Formula
 
 mutual
 
@@ -545,67 +37,52 @@ def Arguments.strengthenFreeTop? {σ : Signature.{u, v, w}}
         Option (Arguments σ bound free sorts)
   | _, .nil => some .nil
   | _, .cons term rest =>
-      match term.strengthenFreeTop? introduced,
-          Arguments.strengthenFreeTop? introduced rest with
-      | some strengthenedTerm, some strengthenedRest =>
-          some (.cons strengthenedTerm strengthenedRest)
-      | _, _ => none
+      match term.strengthenFreeTop? introduced with
+      | none => none
+      | some strengthenedTerm =>
+          match Arguments.strengthenFreeTop? introduced rest with
+          | none => none
+          | some strengthenedRest => some (.cons strengthenedTerm strengthenedRest)
 
 end
 
 
+/-- 对任意源上下文结构递归，随后核对待删除的头变量。 -/
+private def Formula.strengthenFreeTopAux {σ : Signature.{u, v, w}}
+    {bound sourceFree : SortContext σ} :
+    (formula : Formula σ bound sourceFree) → ∀ {introduced free},
+    sourceFree = introduced :: free → Option (Formula σ bound free)
+  | .falsum, _, _, _ => some .falsum
+  | .truth, _, _, _ => some .truth
+  | .rel relation arguments, introduced, _, h => by
+      cases h
+      exact (arguments.strengthenFreeTop? introduced).map (Formula.rel relation)
+  | .equal left right, introduced, _, h => by
+      cases h
+      exact (left.strengthenFreeTop? introduced).bind
+        (fun reduced => (right.strengthenFreeTop? introduced).map (Formula.equal reduced))
+  | .neg f, _, _, h => (Formula.strengthenFreeTopAux f h).map Formula.neg
+  | .conj left right, _, _, h =>
+      (Formula.strengthenFreeTopAux left h).bind
+        (fun reduced => (Formula.strengthenFreeTopAux right h).map (Formula.conj reduced))
+  | .disj left right, _, _, h =>
+      (Formula.strengthenFreeTopAux left h).bind
+        (fun reduced => (Formula.strengthenFreeTopAux right h).map (Formula.disj reduced))
+  | .imp left right, _, _, h =>
+      (Formula.strengthenFreeTopAux left h).bind
+        (fun reduced => (Formula.strengthenFreeTopAux right h).map (Formula.imp reduced))
+  | .iff left right, _, _, h =>
+      (Formula.strengthenFreeTopAux left h).bind
+        (fun reduced => (Formula.strengthenFreeTopAux right h).map (Formula.iff reduced))
+  | .forallE s f, _, _, h => (Formula.strengthenFreeTopAux f h).map (Formula.forallE s)
+  | .existsE s f, _, _, h => (Formula.strengthenFreeTopAux f h).map (Formula.existsE s)
+termination_by structural formula => formula
+
 /-- 公式的可计算 free-context strengthening。 -/
 def Formula.strengthenFreeTop? {σ : Signature.{u, v, w}}
     {bound free : SortContext σ} (introduced : σ.SortSymbol) :
-    Formula σ bound (introduced :: free) → Option (Formula σ bound free)
-  | .falsum => some .falsum
-  | .truth => some .truth
-  | .rel relation arguments =>
-      match Arguments.strengthenFreeTop? introduced arguments with
-      | some strengthened => some (.rel relation strengthened)
-      | none => none
-  | .equal left right =>
-      match left.strengthenFreeTop? introduced,
-          right.strengthenFreeTop? introduced with
-      | some strengthenedLeft, some strengthenedRight =>
-          some (.equal strengthenedLeft strengthenedRight)
-      | _, _ => none
-  | .neg body =>
-      match body.strengthenFreeTop? introduced with
-      | some strengthened => some (.neg strengthened)
-      | none => none
-  | .conj left right =>
-      match left.strengthenFreeTop? introduced,
-          right.strengthenFreeTop? introduced with
-      | some strengthenedLeft, some strengthenedRight =>
-          some (.conj strengthenedLeft strengthenedRight)
-      | _, _ => none
-  | .disj left right =>
-      match left.strengthenFreeTop? introduced,
-          right.strengthenFreeTop? introduced with
-      | some strengthenedLeft, some strengthenedRight =>
-          some (.disj strengthenedLeft strengthenedRight)
-      | _, _ => none
-  | .imp left right =>
-      match left.strengthenFreeTop? introduced,
-          right.strengthenFreeTop? introduced with
-      | some strengthenedLeft, some strengthenedRight =>
-          some (.imp strengthenedLeft strengthenedRight)
-      | _, _ => none
-  | .iff left right =>
-      match left.strengthenFreeTop? introduced,
-          right.strengthenFreeTop? introduced with
-      | some strengthenedLeft, some strengthenedRight =>
-          some (.iff strengthenedLeft strengthenedRight)
-      | _, _ => none
-  | .forallE sort body =>
-      match body.strengthenFreeTop? introduced with
-      | some strengthened => some (.forallE sort strengthened)
-      | none => none
-  | .existsE sort body =>
-      match body.strengthenFreeTop? introduced with
-      | some strengthened => some (.existsE sort strengthened)
-      | none => none
+    Formula σ bound (introduced :: free) → Option (Formula σ bound free) :=
+  fun formula => Formula.strengthenFreeTopAux formula rfl
 
 /-- 将一个变量上下文解释为目标上下文中的同排序项。 -/
 abbrev VariableSubstitution (σ : Signature.{u, v, w})
@@ -1037,6 +514,177 @@ def size {σ : Signature.{u, v, w}}
 
 end Formula
 
+private theorem congrArg₂ {α : Sort u} {β : Sort v} {γ : Sort w}
+    (f : α → β → γ) {left₁ left₂ : α} {right₁ right₂ : β}
+    (hLeft : left₁ = left₂) (hRight : right₁ = right₂) :
+    f left₁ right₁ = f left₂ right₂ :=
+  congr (congrArg f hLeft) hRight
+
+mutual
+
+/-- 逐变量相等的映射在有限项上给出相同结果，无需映射函数外延。 -/
+theorem Term.renameMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableRenaming sourceBound targetBound}
+    {leftFree rightFree : VariableRenaming sourceFree targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    {sort : σ.SortSymbol} → (term : Term σ sourceBound sourceFree sort) →
+      term.renameMapped leftBound leftFree = term.renameMapped rightBound rightFree
+  | _, .bvar entry => congrArg Term.bvar (hBound entry)
+  | _, .fvar entry => congrArg Term.fvar (hFree entry)
+  | _, .app function arguments =>
+      congrArg (Term.app function) (Arguments.renameMapped_congr hBound hFree arguments)
+
+/-- 逐变量相等的映射在异质参数列上给出相同结果。 -/
+theorem Arguments.renameMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableRenaming sourceBound targetBound}
+    {leftFree rightFree : VariableRenaming sourceFree targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    {sorts : List σ.SortSymbol} →
+      (arguments : Arguments σ sourceBound sourceFree sorts) →
+      arguments.renameMapped leftBound leftFree = arguments.renameMapped rightBound rightFree
+  | _, .nil => rfl
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons (Term.renameMapped_congr hBound hFree term)
+        (Arguments.renameMapped_congr hBound hFree rest)
+
+end
+
+/-- 逐变量相等的映射在公式上给出相同结果；量词只提升逐点证书。 -/
+theorem Formula.renameMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableRenaming sourceBound targetBound}
+    {leftFree rightFree : VariableRenaming sourceFree targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    (formula : Formula σ sourceBound sourceFree) →
+      formula.renameMapped leftBound leftFree = formula.renameMapped rightBound rightFree
+  | .falsum => rfl
+  | .truth => rfl
+  | .rel relation arguments =>
+      congrArg (Formula.rel relation) (Arguments.renameMapped_congr hBound hFree arguments)
+  | .equal left right =>
+      congrArg₂ Formula.equal (Term.renameMapped_congr hBound hFree left)
+        (Term.renameMapped_congr hBound hFree right)
+  | .neg body => congrArg Formula.neg (Formula.renameMapped_congr hBound hFree body)
+  | .conj left right =>
+      congrArg₂ Formula.conj (Formula.renameMapped_congr hBound hFree left)
+        (Formula.renameMapped_congr hBound hFree right)
+  | .disj left right =>
+      congrArg₂ Formula.disj (Formula.renameMapped_congr hBound hFree left)
+        (Formula.renameMapped_congr hBound hFree right)
+  | .imp left right =>
+      congrArg₂ Formula.imp (Formula.renameMapped_congr hBound hFree left)
+        (Formula.renameMapped_congr hBound hFree right)
+  | .iff left right =>
+      congrArg₂ Formula.iff (Formula.renameMapped_congr hBound hFree left)
+        (Formula.renameMapped_congr hBound hFree right)
+  | .forallE sort body => by
+      apply congrArg (Formula.forallE sort)
+      apply Formula.renameMapped_congr (hFree := hFree)
+      intro resultSort entry
+      cases entry with
+      | here => rfl
+      | there previous => exact congrArg Variable.there (hBound previous)
+  | .existsE sort body => by
+      apply congrArg (Formula.existsE sort)
+      apply Formula.renameMapped_congr (hFree := hFree)
+      intro resultSort entry
+      cases entry with
+      | here => rfl
+      | there previous => exact congrArg Variable.there (hBound previous)
+mutual
+
+/-- 逐变量相等的映射在有限项上给出相同结果，无需映射函数外延。 -/
+theorem Term.substituteMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableSubstitution σ sourceBound targetBound targetFree}
+    {leftFree rightFree : VariableSubstitution σ sourceFree targetBound targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    {sort : σ.SortSymbol} → (term : Term σ sourceBound sourceFree sort) →
+      term.substituteMapped leftBound leftFree = term.substituteMapped rightBound rightFree
+  | _, .bvar entry => hBound entry
+  | _, .fvar entry => hFree entry
+  | _, .app function arguments =>
+      congrArg (Term.app function) (Arguments.substituteMapped_congr hBound hFree arguments)
+
+/-- 逐变量相等的映射在异质参数列上给出相同结果。 -/
+theorem Arguments.substituteMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableSubstitution σ sourceBound targetBound targetFree}
+    {leftFree rightFree : VariableSubstitution σ sourceFree targetBound targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    {sorts : List σ.SortSymbol} →
+      (arguments : Arguments σ sourceBound sourceFree sorts) →
+      arguments.substituteMapped leftBound leftFree = arguments.substituteMapped rightBound rightFree
+  | _, .nil => rfl
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons (Term.substituteMapped_congr hBound hFree term)
+        (Arguments.substituteMapped_congr hBound hFree rest)
+
+end
+
+/-- 逐变量相等的映射在公式上给出相同结果；量词只提升逐点证书。 -/
+theorem Formula.substituteMapped_congr {σ : Signature.{u, v, w}}
+    {sourceBound sourceFree targetBound targetFree : SortContext σ}
+    {leftBound rightBound : VariableSubstitution σ sourceBound targetBound targetFree}
+    {leftFree rightFree : VariableSubstitution σ sourceFree targetBound targetFree}
+    (hBound : ∀ {sort} (entry : Variable sourceBound sort),
+      leftBound entry = rightBound entry)
+    (hFree : ∀ {sort} (entry : Variable sourceFree sort),
+      leftFree entry = rightFree entry) :
+    (formula : Formula σ sourceBound sourceFree) →
+      formula.substituteMapped leftBound leftFree = formula.substituteMapped rightBound rightFree
+  | .falsum => rfl
+  | .truth => rfl
+  | .rel relation arguments =>
+      congrArg (Formula.rel relation) (Arguments.substituteMapped_congr hBound hFree arguments)
+  | .equal left right =>
+      congrArg₂ Formula.equal (Term.substituteMapped_congr hBound hFree left)
+        (Term.substituteMapped_congr hBound hFree right)
+  | .neg body => congrArg Formula.neg (Formula.substituteMapped_congr hBound hFree body)
+  | .conj left right =>
+      congrArg₂ Formula.conj (Formula.substituteMapped_congr hBound hFree left)
+        (Formula.substituteMapped_congr hBound hFree right)
+  | .disj left right =>
+      congrArg₂ Formula.disj (Formula.substituteMapped_congr hBound hFree left)
+        (Formula.substituteMapped_congr hBound hFree right)
+  | .imp left right =>
+      congrArg₂ Formula.imp (Formula.substituteMapped_congr hBound hFree left)
+        (Formula.substituteMapped_congr hBound hFree right)
+  | .iff left right =>
+      congrArg₂ Formula.iff (Formula.substituteMapped_congr hBound hFree left)
+        (Formula.substituteMapped_congr hBound hFree right)
+  | .forallE sort body => by
+      apply congrArg (Formula.forallE sort)
+      apply Formula.substituteMapped_congr (hFree := (fun entry => congrArg (Term.weakenBound sort) (hFree entry)))
+      intro resultSort entry
+      cases entry with
+      | here => rfl
+      | there previous => exact congrArg (Term.weakenBound sort) (hBound previous)
+  | .existsE sort body => by
+      apply congrArg (Formula.existsE sort)
+      apply Formula.substituteMapped_congr (hFree := (fun entry => congrArg (Term.weakenBound sort) (hFree entry)))
+      intro resultSort entry
+      cases entry with
+      | here => rfl
+      | there previous => exact congrArg (Term.weakenBound sort) (hBound previous)
+
 namespace VariableRenaming
 
 /-- 顶部交换是自身的逆。 -/
@@ -1125,7 +773,7 @@ end VariableRenaming
   induction targetBound with
   | nil => rfl
   | cons introduced rest ih =>
-      simp [Term.embedBoundClosed, ih]
+      exact congrArg (Term.weakenBound introduced) ih
 
 @[simp] theorem Term.embedBoundClosed_app {σ : Signature.{u, v, w}}
     {free : SortContext σ} (targetBound : SortContext σ)
@@ -1136,7 +784,7 @@ end VariableRenaming
   induction targetBound with
   | nil => rfl
   | cons introduced rest ih =>
-      simp [Term.embedBoundClosed, Arguments.embedBoundClosed, ih]
+      exact congrArg (Term.weakenBound introduced) ih
 
 @[simp] theorem Arguments.embedBoundClosed_nil {σ : Signature.{u, v, w}}
     {free : SortContext σ} (targetBound : SortContext σ) :
@@ -1145,7 +793,7 @@ end VariableRenaming
   induction targetBound with
   | nil => rfl
   | cons introduced rest ih =>
-      simp [Arguments.embedBoundClosed, ih]
+      exact congrArg (Arguments.weakenBound introduced) ih
 
 @[simp] theorem Arguments.embedBoundClosed_cons {σ : Signature.{u, v, w}}
     {free : SortContext σ} {sort : σ.SortSymbol}
@@ -1157,7 +805,7 @@ end VariableRenaming
   induction targetBound with
   | nil => rfl
   | cons introduced targetBound ih =>
-      simp [Arguments.embedBoundClosed, Term.embedBoundClosed, ih]
+      exact congrArg (Arguments.weakenBound introduced) ih
 
 /-- bound 变量不受 free weakening 影响。 -/
 @[simp] theorem Term.weakenFree_bvar {σ : Signature.{u, v, w}}
@@ -1272,8 +920,10 @@ theorem Term.renameMapped_id_weaken {σ : Signature.{u, v, w}}
     (Formula.forallE sort body).weakenFree introduced =
       .forallE sort (body.weakenFree introduced) :=
   by
-    simp [Formula.weakenFree, Formula.rename, Renaming.weakenFree,
-      Renaming.free, Formula.renameMapped]
+    apply congrArg (Formula.forallE sort)
+    apply Formula.renameMapped_congr (hFree := fun _ => rfl)
+    intro resultSort entry
+    cases entry <;> rfl
 
 @[simp] theorem Formula.weakenFree_existsE {σ : Signature.{u, v, w}}
     {bound free : SortContext σ} {introduced sort : σ.SortSymbol}
@@ -1281,8 +931,10 @@ theorem Term.renameMapped_id_weaken {σ : Signature.{u, v, w}}
     (Formula.existsE sort body).weakenFree introduced =
       .existsE sort (body.weakenFree introduced) :=
   by
-    simp [Formula.weakenFree, Formula.rename, Renaming.weakenFree,
-      Renaming.free, Formula.renameMapped]
+    apply congrArg (Formula.existsE sort)
+    apply Formula.renameMapped_congr (hFree := fun _ => rfl)
+    intro resultSort entry
+    cases entry <;> rfl
 
 /-!
 ## 基础代数律
@@ -1342,8 +994,9 @@ mutual
           (VariableRenaming.comp outerFree innerFree)
   | _, .bvar _ => rfl
   | _, .fvar _ => rfl
-  | _, .app function arguments => by
-      simp [Term.renameMapped, Arguments.renameMapped_comp]
+  | _, .app function arguments =>
+      congrArg (Term.app function)
+        (Arguments.renameMapped_comp outerBound outerFree innerBound innerFree arguments)
 
 /-- 两次非恒等参数列重命名可合并为一次遍历。 -/
 @[simp] theorem Arguments.renameMapped_comp {σ : Signature.{u, v, w}}
@@ -1361,9 +1014,10 @@ mutual
             (VariableRenaming.comp outerBound innerBound)
             (VariableRenaming.comp outerFree innerFree)
   | _, .nil => rfl
-  | _, .cons term rest => by
-      simp [Arguments.renameMapped, Term.renameMapped_comp,
-        Arguments.renameMapped_comp]
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons
+        (Term.renameMapped_comp outerBound outerFree innerBound innerFree term)
+        (Arguments.renameMapped_comp outerBound outerFree innerBound innerFree rest)
 
 end
 
@@ -1383,24 +1037,45 @@ end
           (VariableRenaming.comp outerFree innerFree)
   | .falsum => rfl
   | .truth => rfl
-  | .rel relation arguments => by
-      simp [Formula.renameMapped]
-  | .equal left right => by
-      simp [Formula.renameMapped]
-  | .neg body => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
-  | .conj left right => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
-  | .disj left right => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
-  | .imp left right => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
-  | .iff left right => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
+  | .rel relation arguments =>
+      congrArg (Formula.rel relation)
+        (Arguments.renameMapped_comp outerBound outerFree innerBound innerFree arguments)
+  | .equal left right =>
+      congrArg₂ Formula.equal
+        (Term.renameMapped_comp outerBound outerFree innerBound innerFree left)
+        (Term.renameMapped_comp outerBound outerFree innerBound innerFree right)
+  | .neg body => congrArg Formula.neg
+      (Formula.renameMapped_comp outerBound outerFree innerBound innerFree body)
+  | .conj left right =>
+      congrArg₂ Formula.conj
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree right)
+  | .disj left right =>
+      congrArg₂ Formula.disj
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree right)
+  | .imp left right =>
+      congrArg₂ Formula.imp
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree right)
+  | .iff left right =>
+      congrArg₂ Formula.iff
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.renameMapped_comp outerBound outerFree innerBound innerFree right)
   | .forallE sort body => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
+      apply congrArg (Formula.forallE sort)
+      refine (Formula.renameMapped_comp (VariableRenaming.lift outerBound) outerFree
+        (VariableRenaming.lift innerBound) innerFree body).trans ?_
+      apply Formula.renameMapped_congr (hFree := fun _ => rfl)
+      intro resultSort entry
+      cases entry <;> rfl
   | .existsE sort body => by
-      simp [Formula.renameMapped, Formula.renameMapped_comp]
+      apply congrArg (Formula.existsE sort)
+      refine (Formula.renameMapped_comp (VariableRenaming.lift outerBound) outerFree
+        (VariableRenaming.lift innerBound) innerFree body).trans ?_
+      apply Formula.renameMapped_congr (hFree := fun _ => rfl)
+      intro resultSort entry
+      cases entry <;> rfl
 
 /-- 连续项重命名先复合变换对象，因此只需一次 AST 遍历。 -/
 @[simp] theorem Term.rename_comp {σ : Signature.{u, v, w}}
@@ -1410,8 +1085,13 @@ end
     (inner : Renaming σ sourceBound sourceFree middleBound middleFree)
     {sort : σ.SortSymbol} (term : Term σ sourceBound sourceFree sort) :
     (term.rename inner).rename outer = term.rename (Renaming.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Term.rename, Renaming.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Term.renameMapped_comp outerBound outerFree innerBound innerFree term
 
 /-- 连续参数列重命名先复合变换对象，因此只需一次 AST 遍历。 -/
 @[simp] theorem Arguments.rename_comp {σ : Signature.{u, v, w}}
@@ -1423,8 +1103,13 @@ end
     (arguments : Arguments σ sourceBound sourceFree sorts) :
     (arguments.rename inner).rename outer =
       arguments.rename (Renaming.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Arguments.rename, Renaming.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Arguments.renameMapped_comp outerBound outerFree innerBound innerFree arguments
 
 /-- 连续公式重命名先复合变换对象，因此只需一次 AST 遍历。 -/
 @[simp] theorem Formula.rename_comp {σ : Signature.{u, v, w}}
@@ -1435,8 +1120,13 @@ end
     (formula : Formula σ sourceBound sourceFree) :
     (formula.rename inner).rename outer =
       formula.rename (Renaming.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Formula.rename, Renaming.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Formula.renameMapped_comp outerBound outerFree innerBound innerFree formula
 
 mutual
 
@@ -1458,8 +1148,9 @@ mutual
             outerBound outerFree)
   | _, .bvar _ => rfl
   | _, .fvar _ => rfl
-  | _, .app function arguments => by
-      simp [Term.substituteMapped, Arguments.substituteMapped_comp]
+  | _, .app function arguments =>
+      congrArg (Term.app function)
+        (Arguments.substituteMapped_comp outerBound outerFree innerBound innerFree arguments)
 
 /-- 两次非恒等参数列替换可合并为一次遍历。 -/
 @[simp] theorem Arguments.substituteMapped_comp {σ : Signature.{u, v, w}}
@@ -1479,9 +1170,10 @@ mutual
             (fun entry => (innerFree entry).substituteMapped
               outerBound outerFree)
   | _, .nil => rfl
-  | _, .cons term rest => by
-      simp [Arguments.substituteMapped, Term.substituteMapped_comp,
-        Arguments.substituteMapped_comp]
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons
+        (Term.substituteMapped_comp outerBound outerFree innerBound innerFree term)
+        (Arguments.substituteMapped_comp outerBound outerFree innerBound innerFree rest)
 
 end
 
@@ -1502,13 +1194,12 @@ mutual
           (VariableSubstitution.weakenBound introduced freeSubstitution) =
         (term.substituteMapped boundSubstitution freeSubstitution).weakenBound
           introduced
-  | _, .bvar entry => by
-      simp [Term.substituteMapped, VariableSubstitution.liftBound]
-  | _, .fvar entry => by
-      simp [Term.substituteMapped, VariableSubstitution.weakenBound]
-  | _, .app function arguments => by
-      simp [Term.substituteMapped,
-        Arguments.substituteMapped_weakenBound]
+  | _, .bvar _ => rfl
+  | _, .fvar _ => rfl
+  | _, .app function arguments =>
+      congrArg (Term.app function)
+        (Arguments.substituteMapped_weakenBound introduced
+          boundSubstitution freeSubstitution arguments)
 
 /-- 非恒等参数列替换与 bound weakening 交换。 -/
 @[simp] theorem Arguments.substituteMapped_weakenBound
@@ -1527,10 +1218,10 @@ mutual
           (arguments.substituteMapped boundSubstitution
             freeSubstitution).weakenBound introduced
   | _, .nil => rfl
-  | _, .cons term rest => by
-      simp [Arguments.substituteMapped,
-        Term.substituteMapped_weakenBound,
-        Arguments.substituteMapped_weakenBound]
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons
+        (Term.substituteMapped_weakenBound introduced boundSubstitution freeSubstitution term)
+        (Arguments.substituteMapped_weakenBound introduced boundSubstitution freeSubstitution rest)
 
 end
 
@@ -1543,8 +1234,13 @@ end
     {sort : σ.SortSymbol} (term : Term σ sourceBound sourceFree sort) :
     (term.substitute inner).substitute outer =
       term.substitute (Substitution.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Term.substitute, Substitution.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Term.substituteMapped_comp outerBound outerFree innerBound innerFree term
 
 /-- 连续参数列替换先复合变量像，因此只需一次 AST 遍历。 -/
 @[simp] theorem Arguments.substitute_comp {σ : Signature.{u, v, w}}
@@ -1556,8 +1252,13 @@ end
     (arguments : Arguments σ sourceBound sourceFree sorts) :
     (arguments.substitute inner).substitute outer =
       arguments.substitute (Substitution.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Arguments.substitute, Substitution.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Arguments.substituteMapped_comp outerBound outerFree innerBound innerFree arguments
 
 namespace VariableSubstitution
 
@@ -1571,10 +1272,7 @@ namespace VariableSubstitution
         VariableSubstitution σ (introduced :: bound)
           (introduced :: bound) free) := by
   funext sort entry
-  cases entry <;>
-    simp [liftBound, boundId, Term.weakenBound, Term.rename,
-      Renaming.weakenBound, Renaming.bound, Term.renameMapped,
-      VariableRenaming.weaken]
+  cases entry <;> rfl
 
 /-- free 恒等替换的结果穿过 binder 后仍是 free 恒等替换。 -/
 @[simp] theorem weakenBound_freeId {σ : Signature.{u, v, w}}
@@ -1582,11 +1280,8 @@ namespace VariableSubstitution
     (weakenBound introduced (freeId (bound := bound) (free := free)) :
       VariableSubstitution σ free (introduced :: bound) free) =
       (freeId (bound := introduced :: bound) (free := free) :
-        VariableSubstitution σ free (introduced :: bound) free) := by
-  funext sort entry
-  simp [weakenBound, freeId, Term.weakenBound, Term.rename,
-    Renaming.weakenBound, Renaming.bound, Term.renameMapped,
-    VariableRenaming.id]
+        VariableSubstitution σ free (introduced :: bound) free) :=
+  rfl
 
 /-- 顶部 free 实例化穿过 binder 时，只需提升替换项。 -/
 @[simp] theorem weakenBound_instantiateFreeTop
@@ -1599,10 +1294,7 @@ namespace VariableSubstitution
       (instantiateFreeTop (replacement.weakenBound introduced) :
         VariableSubstitution σ (sort :: free) (introduced :: bound) free) := by
   funext resultSort entry
-  cases entry <;>
-    simp [weakenBound, instantiateFreeTop, Term.weakenBound, Term.rename,
-      Renaming.weakenBound, Renaming.bound, Term.renameMapped,
-      VariableRenaming.id]
+  cases entry <;> rfl
 
 /-- lifted 变量替换保持非恒等替换复合。 -/
 @[simp] theorem liftBound_substituteMapped
@@ -1627,7 +1319,7 @@ namespace VariableSubstitution
   cases entry with
   | here => rfl
   | there previous =>
-      simp [liftBound, Term.substituteMapped_weakenBound]
+      exact (Term.substituteMapped_weakenBound introduced outerBound outerFree (inner previous)).symm
 
 /-- weakened 变量替换保持非恒等替换复合。 -/
 @[simp] theorem weakenBound_substituteMapped
@@ -1647,7 +1339,7 @@ namespace VariableSubstitution
           (weakenBound introduced outerFree) :
         VariableSubstitution σ source (introduced :: targetBound) targetFree) := by
   funext sort entry
-  simp [weakenBound, Term.substituteMapped_weakenBound]
+  exact (Term.substituteMapped_weakenBound introduced outerBound outerFree (inner entry)).symm
 
 end VariableSubstitution
 
@@ -1669,24 +1361,59 @@ end VariableSubstitution
             outerBound outerFree)
   | .falsum => rfl
   | .truth => rfl
-  | .rel relation arguments => by
-      simp [Formula.substituteMapped]
-  | .equal left right => by
-      simp [Formula.substituteMapped]
-  | .neg body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
-  | .conj left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
-  | .disj left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
-  | .imp left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
-  | .iff left right => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
+  | .rel relation arguments =>
+      congrArg (Formula.rel relation)
+        (Arguments.substituteMapped_comp outerBound outerFree innerBound innerFree arguments)
+  | .equal left right =>
+      congrArg₂ Formula.equal
+        (Term.substituteMapped_comp outerBound outerFree innerBound innerFree left)
+        (Term.substituteMapped_comp outerBound outerFree innerBound innerFree right)
+  | .neg body => congrArg Formula.neg
+      (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree body)
+  | .conj left right =>
+      congrArg₂ Formula.conj
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree right)
+  | .disj left right =>
+      congrArg₂ Formula.disj
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree right)
+  | .imp left right =>
+      congrArg₂ Formula.imp
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree right)
+  | .iff left right =>
+      congrArg₂ Formula.iff
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree left)
+        (Formula.substituteMapped_comp outerBound outerFree innerBound innerFree right)
   | .forallE sort body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
+      apply congrArg (Formula.forallE sort)
+      refine (Formula.substituteMapped_comp (VariableSubstitution.liftBound sort outerBound)
+        (VariableSubstitution.weakenBound sort outerFree)
+        (VariableSubstitution.liftBound sort innerBound)
+        (VariableSubstitution.weakenBound sort innerFree) body).trans ?_
+      apply Formula.substituteMapped_congr
+      · intro resultSort entry
+        cases entry with
+        | here => rfl
+        | there previous =>
+            exact Term.substituteMapped_weakenBound sort outerBound outerFree (innerBound previous)
+      · intro resultSort entry
+        exact Term.substituteMapped_weakenBound sort outerBound outerFree (innerFree entry)
   | .existsE sort body => by
-      simp [Formula.substituteMapped, Formula.substituteMapped_comp]
+      apply congrArg (Formula.existsE sort)
+      refine (Formula.substituteMapped_comp (VariableSubstitution.liftBound sort outerBound)
+        (VariableSubstitution.weakenBound sort outerFree)
+        (VariableSubstitution.liftBound sort innerBound)
+        (VariableSubstitution.weakenBound sort innerFree) body).trans ?_
+      apply Formula.substituteMapped_congr
+      · intro resultSort entry
+        cases entry with
+        | here => rfl
+        | there previous =>
+            exact Term.substituteMapped_weakenBound sort outerBound outerFree (innerBound previous)
+      · intro resultSort entry
+        exact Term.substituteMapped_weakenBound sort outerBound outerFree (innerFree entry)
 
 /-- 连续公式替换先复合变量像，因此只需一次 AST 遍历。 -/
 @[simp] theorem Formula.substitute_comp {σ : Signature.{u, v, w}}
@@ -1697,8 +1424,13 @@ end VariableSubstitution
     (formula : Formula σ sourceBound sourceFree) :
     (formula.substitute inner).substitute outer =
       formula.substitute (Substitution.comp outer inner) := by
-  cases outer <;> cases inner <;>
-    simp [Formula.substitute, Substitution.comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact Formula.substituteMapped_comp outerBound outerFree innerBound innerFree formula
 
 namespace Substitution
 
@@ -1711,8 +1443,15 @@ namespace Substitution
     (inner : Substitution σ sourceBound sourceFree middleBound middleFree) :
     liftBound introduced (comp outer inner) =
       comp (liftBound introduced outer) (liftBound introduced inner) := by
-  cases outer <;> cases inner <;>
-    simp [liftBound, comp]
+  cases outer with
+  | id => rfl
+  | map outerBound outerFree =>
+      cases inner with
+      | id => rfl
+      | map innerBound innerFree =>
+          exact congrArg₂ Substitution.map
+            (VariableSubstitution.liftBound_substituteMapped introduced outerBound outerFree innerBound)
+            (VariableSubstitution.weakenBound_substituteMapped introduced outerBound outerFree innerFree)
 
 /-- 恒等替换穿过 binder 后仍由同一个 `.id` 构造子表示。 -/
 @[simp] theorem liftBound_id {σ : Signature.{u, v, w}}
@@ -1732,7 +1471,9 @@ namespace Substitution
     (replacement : Term σ bound free sort) :
     liftBound introduced (instantiateFreeTop replacement) =
       instantiateFreeTop (replacement.weakenBound introduced) := by
-  simp [liftBound, instantiateFreeTop]
+  exact congrArg₂ Substitution.map
+    (VariableSubstitution.liftBound_boundId introduced)
+    (VariableSubstitution.weakenBound_instantiateFreeTop introduced replacement)
 
 end Substitution
 
@@ -1767,14 +1508,11 @@ mutual
       (term.weakenFree introduced).substituteMapped
           VariableSubstitution.boundId
           (VariableSubstitution.instantiateFreeTop replacement) = term
-  | _, .bvar _ => by
-      simp [Term.substituteMapped, VariableSubstitution.boundId]
-  | _, .fvar _ => by
-      simp [Term.substituteMapped,
-        VariableSubstitution.instantiateFreeTop]
-  | _, .app function arguments => by
-      simp [Term.substituteMapped,
-        Arguments.substituteMapped_weakenFree_instantiateFreeTop]
+  | _, .bvar _ => rfl
+  | _, .fvar _ => rfl
+  | _, .app function arguments =>
+      congrArg (Term.app function)
+        (Arguments.substituteMapped_weakenFree_instantiateFreeTop introduced replacement arguments)
 
 /-- 非恒等执行器对 weakened 旧参数列实例化顶部 free 变量时恢复原参数列。 -/
 @[simp] theorem Arguments.substituteMapped_weakenFree_instantiateFreeTop
@@ -1786,12 +1524,11 @@ mutual
         (arguments.weakenFree introduced).substituteMapped
             VariableSubstitution.boundId
             (VariableSubstitution.instantiateFreeTop replacement) = arguments
-  | _, .nil => by
-      simp [Arguments.substituteMapped]
-  | _, .cons term rest => by
-      simp [Arguments.substituteMapped,
-        Term.substituteMapped_weakenFree_instantiateFreeTop,
-        Arguments.substituteMapped_weakenFree_instantiateFreeTop]
+  | _, .nil => rfl
+  | _, .cons term rest =>
+      congrArg₂ Arguments.cons
+        (Term.substituteMapped_weakenFree_instantiateFreeTop introduced replacement term)
+        (Arguments.substituteMapped_weakenFree_instantiateFreeTop introduced replacement rest)
 
 end
 
@@ -1803,7 +1540,7 @@ end
     {sort : σ.SortSymbol} (term : Term σ bound free sort) :
     (term.weakenFree introduced).substitute
         (Substitution.instantiateFreeTop replacement) = term := by
-  simp [Substitution.instantiateFreeTop, Term.substitute]
+  exact Term.substituteMapped_weakenFree_instantiateFreeTop introduced replacement term
 
 /-- 公共替换入口对 weakened 旧参数列实例化顶部 free 变量时恢复原参数列。 -/
 @[simp] theorem Arguments.substitute_weakenFree_instantiateFreeTop
@@ -1814,7 +1551,7 @@ end
     (arguments : Arguments σ bound free sorts) :
     (arguments.weakenFree introduced).substitute
         (Substitution.instantiateFreeTop replacement) = arguments := by
-  simp [Substitution.instantiateFreeTop, Arguments.substitute]
+  exact Arguments.substituteMapped_weakenFree_instantiateFreeTop introduced replacement arguments
 
 
 /--
@@ -1828,11 +1565,47 @@ end
         (formula.weakenFree introduced).instantiateFreeTop replacement =
           formula := by
   intro formula
-  induction formula <;> intro replacement <;>
-    simp_all [Formula.instantiateFreeTop, Formula.substitute,
-      Formula.substituteMapped, Substitution.instantiateFreeTop,
-      Term.substituteMapped_weakenFree_instantiateFreeTop,
-      Arguments.substituteMapped_weakenFree_instantiateFreeTop]
+  induction formula with
+  | falsum => intro replacement; rfl
+  | truth => intro replacement; rfl
+  | rel relation arguments =>
+      intro replacement
+      exact congrArg (Formula.rel relation)
+        (Arguments.substituteMapped_weakenFree_instantiateFreeTop introduced replacement arguments)
+  | equal left right =>
+      intro replacement
+      exact congrArg₂ Formula.equal
+        (Term.substituteMapped_weakenFree_instantiateFreeTop introduced replacement left)
+        (Term.substituteMapped_weakenFree_instantiateFreeTop introduced replacement right)
+  | neg body ih => intro replacement; exact congrArg Formula.neg (ih replacement)
+  | conj left right ihLeft ihRight =>
+      intro replacement
+      exact congrArg₂ Formula.conj (ihLeft replacement) (ihRight replacement)
+  | disj left right ihLeft ihRight =>
+      intro replacement
+      exact congrArg₂ Formula.disj (ihLeft replacement) (ihRight replacement)
+  | imp left right ihLeft ihRight =>
+      intro replacement
+      exact congrArg₂ Formula.imp (ihLeft replacement) (ihRight replacement)
+  | iff left right ihLeft ihRight =>
+      intro replacement
+      exact congrArg₂ Formula.iff (ihLeft replacement) (ihRight replacement)
+  | forallE sort body ih =>
+      intro replacement
+      rw [Formula.weakenFree_forallE]
+      apply congrArg (Formula.forallE sort)
+      refine Eq.trans ?_ (ih (replacement.weakenBound sort))
+      apply Formula.substituteMapped_congr
+      · intro resultSort entry; cases entry <;> rfl
+      · intro resultSort entry; cases entry <;> rfl
+  | existsE sort body ih =>
+      intro replacement
+      rw [Formula.weakenFree_existsE]
+      apply congrArg (Formula.existsE sort)
+      refine Eq.trans ?_ (ih (replacement.weakenBound sort))
+      apply Formula.substituteMapped_congr
+      · intro resultSort entry; cases entry <;> rfl
+      · intro resultSort entry; cases entry <;> rfl
 
 /-- 非恒等执行器对 weakened 旧公式实例化顶部 free 变量时恢复原公式。 -/
 @[simp] theorem Formula.substituteMapped_weakenFree_instantiateFreeTop
@@ -1871,13 +1644,13 @@ mutual
     {bound free : SortContext σ} (introduced : σ.SortSymbol) :
     {sort : σ.SortSymbol} → (term : Term σ bound free sort) →
       (term.weakenFree introduced).strengthenFreeTop? introduced = some term
-  | _, .bvar _ => by
-      simp [Term.strengthenFreeTop?]
-  | _, .fvar _ => by
-      simp [Term.strengthenFreeTop?]
+  | _, .bvar _ => rfl
+  | _, .fvar _ => rfl
   | _, .app function arguments => by
-      simp [Term.strengthenFreeTop?,
-        Arguments.strengthenFreeTop?_weakenFree]
+      change (match (arguments.weakenFree introduced).strengthenFreeTop? introduced with
+        | some reduced => some (Term.app function reduced)
+        | none => none) = some (Term.app function arguments)
+      rw [Arguments.strengthenFreeTop?_weakenFree introduced arguments]
 
 /-- 参数列穿过新 free 变量后，strengthening 精确恢复原参数列。 -/
 @[simp] theorem Arguments.strengthenFreeTop?_weakenFree
@@ -1887,12 +1660,17 @@ mutual
       (arguments : Arguments σ bound free sorts) →
         (arguments.weakenFree introduced).strengthenFreeTop? introduced =
           some arguments
-  | _, .nil => by
-      simp [Arguments.strengthenFreeTop?]
+  | _, .nil => rfl
   | _, .cons term rest => by
-      simp [Arguments.strengthenFreeTop?,
-        Term.strengthenFreeTop?_weakenFree,
-        Arguments.strengthenFreeTop?_weakenFree]
+      change (match (term.weakenFree introduced).strengthenFreeTop? introduced with
+        | none => none
+        | some reducedTerm =>
+            match (rest.weakenFree introduced).strengthenFreeTop? introduced with
+            | none => none
+            | some reducedRest => some (Arguments.cons reducedTerm reducedRest)) =
+        some (Arguments.cons term rest)
+      rw [Term.strengthenFreeTop?_weakenFree introduced term,
+        Arguments.strengthenFreeTop?_weakenFree introduced rest]
 
 end
 
@@ -1905,8 +1683,54 @@ end
       (formula.weakenFree introduced).strengthenFreeTop? introduced =
         some formula := by
   intro formula
-  induction formula <;>
-    simp_all [Formula.strengthenFreeTop?]
+  induction formula with
+  | falsum => rfl
+  | truth => rfl
+  | rel relation arguments =>
+      change ((arguments.weakenFree introduced).strengthenFreeTop? introduced).map
+        (Formula.rel relation) = _
+      rw [Arguments.strengthenFreeTop?_weakenFree introduced arguments]
+      rfl
+  | equal left right =>
+      change ((left.weakenFree introduced).strengthenFreeTop? introduced).bind
+        (fun l => ((right.weakenFree introduced).strengthenFreeTop? introduced).map
+          (Formula.equal l)) = _
+      rw [Term.strengthenFreeTop?_weakenFree introduced left,
+        Term.strengthenFreeTop?_weakenFree introduced right]
+      rfl
+  | neg body ih =>
+      change ((body.weakenFree introduced).strengthenFreeTop? introduced).map Formula.neg = _
+      rw [ih]; rfl
+  | conj left right ihLeft ihRight =>
+      change ((left.weakenFree introduced).strengthenFreeTop? introduced).bind
+        (fun l => ((right.weakenFree introduced).strengthenFreeTop? introduced).map
+          (Formula.conj l)) = _
+      rw [ihLeft, ihRight]; rfl
+  | disj left right ihLeft ihRight =>
+      change ((left.weakenFree introduced).strengthenFreeTop? introduced).bind
+        (fun l => ((right.weakenFree introduced).strengthenFreeTop? introduced).map
+          (Formula.disj l)) = _
+      rw [ihLeft, ihRight]; rfl
+  | imp left right ihLeft ihRight =>
+      change ((left.weakenFree introduced).strengthenFreeTop? introduced).bind
+        (fun l => ((right.weakenFree introduced).strengthenFreeTop? introduced).map
+          (Formula.imp l)) = _
+      rw [ihLeft, ihRight]; rfl
+  | iff left right ihLeft ihRight =>
+      change ((left.weakenFree introduced).strengthenFreeTop? introduced).bind
+        (fun l => ((right.weakenFree introduced).strengthenFreeTop? introduced).map
+          (Formula.iff l)) = _
+      rw [ihLeft, ihRight]; rfl
+  | forallE sort body ih =>
+      rw [Formula.weakenFree_forallE]
+      change ((body.weakenFree introduced).strengthenFreeTop? introduced).map
+        (Formula.forallE sort) = _
+      rw [ih]; rfl
+  | existsE sort body ih =>
+      rw [Formula.weakenFree_existsE]
+      change ((body.weakenFree introduced).strengthenFreeTop? introduced).map
+        (Formula.existsE sort) = _
+      rw [ih]; rfl
 
 mutual
 
@@ -1920,25 +1744,24 @@ theorem Term.weakenFree_of_strengthenFreeTop?_eq_some
       expanded.strengthenFreeTop? introduced = some strengthened →
         strengthened.weakenFree introduced = expanded
   | _, .bvar entry, strengthened, h => by
-      simp [Term.strengthenFreeTop?] at h
-      subst strengthened
-      simp
-  | _, .fvar .here, _, h => by
-      simp [Term.strengthenFreeTop?] at h
+      cases h
+      rfl
+  | _, .fvar .here, _, h => by cases h
   | _, .fvar (.there entry), strengthened, h => by
-      simp [Term.strengthenFreeTop?] at h
-      subst strengthened
-      simp
+      cases h
+      rfl
   | _, .app function arguments, strengthened, h => by
-      cases hArguments :
-          Arguments.strengthenFreeTop? introduced arguments with
-      | none =>
-          simp [Term.strengthenFreeTop?, hArguments] at h
+      change (match arguments.strengthenFreeTop? introduced with
+        | some reduced => some (Term.app function reduced)
+        | none => none) = some strengthened at h
+      cases hArguments : arguments.strengthenFreeTop? introduced with
+      | none => rw [hArguments] at h; cases h
       | some reducedArguments =>
-          simp [Term.strengthenFreeTop?, hArguments] at h
-          subst strengthened
-          simp [Arguments.weakenFree_of_strengthenFreeTop?_eq_some
-              introduced arguments reducedArguments hArguments]
+          rw [hArguments] at h
+          cases h
+          exact congrArg (Term.app function)
+            (Arguments.weakenFree_of_strengthenFreeTop?_eq_some
+              introduced arguments reducedArguments hArguments)
 
 /-- 参数列 strengthening 成功时，其结果重新 weakening 后等于原参数列。 -/
 theorem Arguments.weakenFree_of_strengthenFreeTop?_eq_some
@@ -1950,27 +1773,168 @@ theorem Arguments.weakenFree_of_strengthenFreeTop?_eq_some
       expanded.strengthenFreeTop? introduced = some strengthened →
         strengthened.weakenFree introduced = expanded
   | _, .nil, strengthened, h => by
-      simp [Arguments.strengthenFreeTop?] at h
-      subst strengthened
-      simp
+      cases h
+      rfl
   | _, .cons term rest, strengthened, h => by
+      change (match term.strengthenFreeTop? introduced with
+        | none => none
+        | some reducedTerm =>
+            match rest.strengthenFreeTop? introduced with
+            | none => none
+            | some reducedRest => some (Arguments.cons reducedTerm reducedRest)) =
+        some strengthened at h
       cases hTerm : term.strengthenFreeTop? introduced with
-      | none =>
-          simp [Arguments.strengthenFreeTop?, hTerm] at h
+      | none => rw [hTerm] at h; cases h
       | some reducedTerm =>
+          rw [hTerm] at h
           cases hRest : rest.strengthenFreeTop? introduced with
-          | none =>
-              simp [Arguments.strengthenFreeTop?, hTerm, hRest] at h
+          | none => rw [hRest] at h; cases h
           | some reducedRest =>
-              simp [Arguments.strengthenFreeTop?, hTerm, hRest] at h
-              subst strengthened
-              simp [Term.weakenFree_of_strengthenFreeTop?_eq_some
-                  introduced term reducedTerm hTerm,
-                Arguments.weakenFree_of_strengthenFreeTop?_eq_some
-                  introduced rest reducedRest hRest]
+              rw [hRest] at h
+              cases h
+              exact congrArg₂ Arguments.cons
+                (Term.weakenFree_of_strengthenFreeTop?_eq_some
+                  introduced term reducedTerm hTerm)
+                (Arguments.weakenFree_of_strengthenFreeTop?_eq_some
+                  introduced rest reducedRest hRest)
 
 end
 
+
+private theorem Formula.weakenFree_of_strengthenFreeTopAux_eq_some
+    {σ : Signature.{u, v, w}} {bound sourceFree : SortContext σ}
+    (expanded : Formula σ bound sourceFree) :
+    ∀ {introduced free} (hFree : sourceFree = introduced :: free)
+      (strengthened : Formula σ bound free),
+      expanded.strengthenFreeTopAux hFree = some strengthened →
+        (hFree.symm ▸ strengthened.weakenFree introduced) = expanded := by
+  induction expanded with
+  | falsum => intro introduced free hFree strengthened h; cases hFree; cases h; rfl
+  | truth => intro introduced free hFree strengthened h; cases hFree; cases h; rfl
+  | rel relation arguments =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (arguments.strengthenFreeTop? introduced).map (Formula.rel relation) = some strengthened at h
+      cases hArguments : arguments.strengthenFreeTop? introduced with
+      | none => rw [hArguments] at h; cases h
+      | some reduced =>
+          rw [hArguments] at h
+          cases h
+          exact congrArg (Formula.rel relation)
+            (Arguments.weakenFree_of_strengthenFreeTop?_eq_some introduced arguments reduced hArguments)
+  | equal left right =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (left.strengthenFreeTop? introduced).bind
+        (fun l => (right.strengthenFreeTop? introduced).map (Formula.equal l)) = some strengthened at h
+      cases hLeft : left.strengthenFreeTop? introduced with
+      | none => rw [hLeft] at h; cases h
+      | some reducedLeft =>
+          rw [hLeft] at h
+          cases hRight : right.strengthenFreeTop? introduced with
+          | none => rw [hRight] at h; cases h
+          | some reducedRight =>
+              rw [hRight] at h
+              cases h
+              exact congrArg₂ Formula.equal
+                (Term.weakenFree_of_strengthenFreeTop?_eq_some introduced left reducedLeft hLeft)
+                (Term.weakenFree_of_strengthenFreeTop?_eq_some introduced right reducedRight hRight)
+  | neg body ih =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (body.strengthenFreeTop? introduced).map Formula.neg = some strengthened at h
+      cases hBody : body.strengthenFreeTop? introduced with
+      | none => rw [hBody] at h; cases h
+      | some reduced =>
+          rw [hBody] at h
+          cases h
+          exact congrArg Formula.neg (ih rfl reduced hBody)
+  | conj left right ihLeft ihRight =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (left.strengthenFreeTop? introduced).bind
+        (fun l => (right.strengthenFreeTop? introduced).map (Formula.conj l)) = some strengthened at h
+      cases hLeft : left.strengthenFreeTop? introduced with
+      | none => rw [hLeft] at h; cases h
+      | some reducedLeft =>
+          rw [hLeft] at h
+          cases hRight : right.strengthenFreeTop? introduced with
+          | none => rw [hRight] at h; cases h
+          | some reducedRight =>
+              rw [hRight] at h
+              cases h
+              exact congrArg₂ Formula.conj
+                (ihLeft rfl reducedLeft hLeft) (ihRight rfl reducedRight hRight)
+  | disj left right ihLeft ihRight =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (left.strengthenFreeTop? introduced).bind
+        (fun l => (right.strengthenFreeTop? introduced).map (Formula.disj l)) = some strengthened at h
+      cases hLeft : left.strengthenFreeTop? introduced with
+      | none => rw [hLeft] at h; cases h
+      | some reducedLeft =>
+          rw [hLeft] at h
+          cases hRight : right.strengthenFreeTop? introduced with
+          | none => rw [hRight] at h; cases h
+          | some reducedRight =>
+              rw [hRight] at h
+              cases h
+              exact congrArg₂ Formula.disj
+                (ihLeft rfl reducedLeft hLeft) (ihRight rfl reducedRight hRight)
+  | imp left right ihLeft ihRight =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (left.strengthenFreeTop? introduced).bind
+        (fun l => (right.strengthenFreeTop? introduced).map (Formula.imp l)) = some strengthened at h
+      cases hLeft : left.strengthenFreeTop? introduced with
+      | none => rw [hLeft] at h; cases h
+      | some reducedLeft =>
+          rw [hLeft] at h
+          cases hRight : right.strengthenFreeTop? introduced with
+          | none => rw [hRight] at h; cases h
+          | some reducedRight =>
+              rw [hRight] at h
+              cases h
+              exact congrArg₂ Formula.imp
+                (ihLeft rfl reducedLeft hLeft) (ihRight rfl reducedRight hRight)
+  | iff left right ihLeft ihRight =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (left.strengthenFreeTop? introduced).bind
+        (fun l => (right.strengthenFreeTop? introduced).map (Formula.iff l)) = some strengthened at h
+      cases hLeft : left.strengthenFreeTop? introduced with
+      | none => rw [hLeft] at h; cases h
+      | some reducedLeft =>
+          rw [hLeft] at h
+          cases hRight : right.strengthenFreeTop? introduced with
+          | none => rw [hRight] at h; cases h
+          | some reducedRight =>
+              rw [hRight] at h
+              cases h
+              exact congrArg₂ Formula.iff
+                (ihLeft rfl reducedLeft hLeft) (ihRight rfl reducedRight hRight)
+  | forallE sort body ih =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (body.strengthenFreeTop? introduced).map (Formula.forallE sort) = some strengthened at h
+      cases hBody : body.strengthenFreeTop? introduced with
+      | none => rw [hBody] at h; cases h
+      | some reduced =>
+          rw [hBody] at h
+          cases h
+          rw [Formula.weakenFree_forallE]
+          exact congrArg (Formula.forallE sort) (ih rfl reduced hBody)
+  | existsE sort body ih =>
+      intro introduced free hFree strengthened h
+      cases hFree
+      change (body.strengthenFreeTop? introduced).map (Formula.existsE sort) = some strengthened at h
+      cases hBody : body.strengthenFreeTop? introduced with
+      | none => rw [hBody] at h; cases h
+      | some reduced =>
+          rw [hBody] at h
+          cases h
+          rw [Formula.weakenFree_existsE]
+          exact congrArg (Formula.existsE sort) (ih rfl reduced hBody)
 
 /-- 公式 strengthening 成功时，其结果重新 weakening 后等于原公式。 -/
 theorem Formula.weakenFree_of_strengthenFreeTop?_eq_some
@@ -1981,14 +1945,7 @@ theorem Formula.weakenFree_of_strengthenFreeTop?_eq_some
     expanded.strengthenFreeTop? introduced = some strengthened →
       strengthened.weakenFree introduced = expanded := by
   intro expanded strengthened h
-  fun_induction Formula.strengthenFreeTop? introduced expanded <;>
-    cases h <;>
-    simp_all
-  all_goals
-    first
-    | solve_by_elim [Arguments.weakenFree_of_strengthenFreeTop?_eq_some]
-    | constructor <;>
-        solve_by_elim [Term.weakenFree_of_strengthenFreeTop?_eq_some]
+  exact Formula.weakenFree_of_strengthenFreeTopAux_eq_some expanded rfl strengthened h
 
 end FirstOrder
 end Logic

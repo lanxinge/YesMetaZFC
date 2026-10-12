@@ -43,7 +43,7 @@ theorem numeral_mem_of_lt
       numₘ(m) ∈ₘ numₘ(n)) := by
   induction n with
   | zero =>
-      omega
+      exact False.elim (Nat.not_lt_zero m h)
   | succ n ih =>
       by_cases hmn : m = n
       · subst m

@@ -156,7 +156,7 @@ theorem Ic_history_d.nice_l {ω c T Q G E L H Q' G' o X₀ A₀ π₀ c' Z₀ α
     (fun i a hi ha => (cs a).mpr ⟨i, hi, ha⟩)
   have levels i a : Rd_entry_d i a L' ↔ ∃ p κ F, Rd_entry_d i p E' ∧ It_payload_d p κ a F := (ls' i a).trans
     ⟨fun h => (ls i a).mp h.2, fun h => ⟨by obtain ⟨p, _, _, hp, _⟩ := h; exact ef.input_mem_of_pairMember hp, (ls i a).mpr h⟩⟩
-  refine ⟨E', L', ⟨tree, lf.1, levels, active, ?_, ?_⟩, moves⟩
+  refine ⟨E', L', ⟨⟨tree, lf.1, levels, ?_, ?_⟩, active⟩, moves⟩
   · intro i q κ' ρ' F' c U V hq pq hc mu
     obtain ⟨X, A, π, z, Z, α, p, κ, ρ, F, k, r, f, here, hp, pay, hκ, hρ, hF, pay'⟩ := (moves i q).mp hq
     obtain ⟨e₁, e₂, e₃⟩ := pay'.unique_l pq

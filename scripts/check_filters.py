@@ -37,9 +37,8 @@ CHOICE_FREE = [
     "YesMetaZFC.SetTheory.BooleanZF.generated_filter_exists_d",
     "YesMetaZFC.SetTheory.BooleanZF.generated_ideal_exists_d",
 ]
-# 原 ZF 公理正文自由闭合性已有的 native_decide 依赖；不允许增加新项目。
-BASELINE = [f"YesMetaZFC.SetTheory.Axioms.{n}._native.native_decide.ax_1" for n in
-            ("emptySet", "extensionality", "foundation", "infinity", "pairing", "powerSet", "union")]
+# 当前生产句子的闭合性由内核检查；不再允许原有 native_decide 公理。
+BASELINE = []
 
 
 def names(values):
@@ -52,9 +51,11 @@ def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
     files = [ROOT / (m.replace(".", "/") + ".lean") for m in modules]
     hashes = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     env = {**os.environ, "LEAN_NUM_THREADS": os.environ.get("LEAN_NUM_THREADS", "1")}
-    result = subprocess.run(["lake", "--wfail", "build", *modules], cwd=ROOT, env=env)
-    if result.returncode:
-        return result.returncode
+    # 与全源构建入口相同：分批保持全部目标，避免 Windows 命令行长度限制。
+    for start in range(0, len(modules), 128):
+        result = subprocess.run(["lake", "--wfail", "build", *modules[start:start + 128]], cwd=ROOT, env=env)
+        if result.returncode:
+            return result.returncode
     # 同一模块可包含不同理论强度的端点，逐声明另给更窄的可信边界。
     bounds = "#[" + ", ".join(
         f"(`{name}, {names(bound + ['propext', 'Quot.sound', 'Classical.choice'])})"

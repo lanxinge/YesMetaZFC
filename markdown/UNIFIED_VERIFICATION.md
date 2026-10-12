@@ -1,6 +1,7 @@
 # 公理验证与不完备性接口指路表
 
-> 文中旧基点的构建数量、耗时和扫描器结果属于历史证据。当前主项目已移出通用证明器；当前边界与验证见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
+本页记录数学接口、理论强度与可信依赖边界。构建入口见 [RESTORE.md](RESTORE.md)，
+轻量策略及模块职责见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
 
 验证对象是原 `intrinsic_proof_theory`、`intrinsic_zfc_theory` 及纯语言中的
 `PureModel.theory`。裸 ZFC 的 Rosser、原编码表示的 D1–D3、Löb 与哥二实例已完成；
@@ -14,6 +15,23 @@
 任意原模型及每一组参数赋值。`PureTarskiSource` 另已给出保留源编码的裸 ZFC 版本；
 其合同按源公式索引。`PureTarski` 现已完成只量化纯公式、使用最终纯公式自身编码的版本。
 
+## 当前 Lean 公理边界
+
+公理解耦的源码基点、验证命令与计数方法见 [解耦审计报告](AXIOM_DECOUPLING_20261006.md)。
+
+2026-10-06 对源码基点 `1e89850` 的全生产声明审计覆盖 1,751 个源模块、46,361 条声明。
+逐声明原始传递依赖闭包的公理并集仅为 `propext`、`Quot.sound`、`Classical.choice`；
+没有生产自定义公理、原生决策公理或 `sorryAx`。这表示依赖并集，不表示每个端点均依赖三者。
+原 13 处 `sentence!` 闭合性原生公理已移除，当前审计不再放行这些旧证书。
+各端点的精确集合以对应源码基点的原始依赖闭包为准，修改后须重新运行相关审计。
+
+[`sentence!`](../YesMetaZFC/SetTheory/Notation/Surface.lean) 先尝试 `decide +kernel`，
+仍为内核不能约化的 opaque 输入保留 `native_decide` 后备分支；上述结论针对已审计的
+生产声明，不是对该语法未来所有输入的全局禁用声明。
+[闭合性兼容测试](../scripts/test_sentence_closedness.py) 区分透明输入、opaque 后备与开放公式拒绝；
+[精确公理守卫](../scripts/check_axiom_decoupling.py) 及[端点清单](../scripts/axiom_decoupling_bounds.json)
+维护生产切片的实际依赖边界。
+
 ## 内模型与弱齐性比较的核验
 
 当前内模型端点及理论强度统一见[内模型进度](../YesMetaZFC/SetTheory/InnerModel/README.md)。
@@ -25,6 +43,99 @@ J 的递归与局部良序消费 KPi；L 的 ZFC＋GCH、OD/HOD 参数模型及�
 [Relative](../YesMetaZFC/SetTheory/InnerModel/Relative/README.md) 和
 [LargeCardinal](../YesMetaZFC/SetTheory/LargeCardinal/README.md)。`lr_model_zf_l` 仅需 ZF；
 统一层界、有界分离、序数包含和公式相对化仅需 KPi。
+
+[TypeOneStep](../YesMetaZFC/SetTheory/LargeCardinal/TypeOneStep.lean) 的 `ee_one_step_l`
+完成 Neeman 3.23：实际构造 τ+ω、源和不可达最大强度扩展器，保留原固定子类型程序、
+内部任意有限元数与排列。[WoodinTypeStep](../YesMetaZFC/SetTheory/LargeCardinal/WoodinTypeStep.lean)
+的 `woodin_elastic_step_l` 从武丁假设自动产生同一元组的两份弹性类型和一步实例。
+两个证明的 Lean 公理均仅为 `propext`、`Quot.sound`、`Classical.choice`；
+纯结果关系 `Ee_one_step_d` 仅依赖前两者，原定义的子类型查询 `Ts_subtype_d` 无公理依赖。
+完整实现及编译证书中既有平坦配对实例的经典依赖位于 Prop 证明字段，未引入不可计算数据。
+该层已通过 `lake --wfail build` 的默认公共导入图和 `scripts/check_internal_models.py`
+四组声明审计：内部模型 710 模块／11989 声明，HOD 2／42，小壳 41／360，Łoś 106／1095。
+两份新证明模块分别为 76、55 行，编译约 3 秒；这项核验不包含尚未完成的 L(ℝ)⊨AD。
+
+[LocalIndiscernibles](../YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscernibles.lean)
+在 ZF 中实际构造参数带 V(δ+ω) 和全部内部查询域。类型值属于同一幂集；
+`ordinal_unbounded_fiber_l` 通过原公式收集取得无界纤维，产生任意下界以上、
+满足 ν+ω<μ 的完整类型相同的序数对。`Li_pair_d.read_l` 将它读取为原公式的
+逐参数真值对应。[LocalIndiscerniblesLeast](../YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscerniblesLeast.lean)
+按原 δ<ν 条件、第二坐标优先的顺序构造最小对，并证明唯一性及原公式表示，不把额外间隔条件
+加入最小化。固定查询关系、原公式及赋值数据另经无选择依赖检查。
+这一层已纳入上述四组审计。五份构造模块共 354 行，单模块 39–95 行，正常编译约 2–5 秒。
+
+[LocalTypeTransportTuple](../YesMetaZFC/SetTheory/LargeCardinal/LocalTypeTransportTuple.lean)
+的 `Li_pair_d.transport_l` 已完成有限后继秩层的完整类型搬运。k>0 与元组长度都取自
+内部 ω；源元组逐项自动生成原名字列，固定对象可以来自整个共同极限参数带。
+`li_canonical_transport_l` 从任意 θ≥δ 自动产生最小不可分辨对，固定参数带 V(θ+ω)，
+而指定常量仍为 δ。新元组在 V(μ+k) 实现原 V(ν+k) 中字面相同的 κ 型，
+包括原常量域与全部内部查询。背景只需 ZF、ω<δ 且 δ 为极限序数；未对源秩层附加 ZF。
+原加法递归历史和内部有限函数的秩闭包均实际证明。八份搬运模块共 716 行，单模块
+48–137 行，编译约 2–4 秒。原名字、矩阵、读取公式与结果关系额外通过无选择依赖审计；
+全部新增声明无新公理、`sorryAx` 或不可计算数据。
+
+[TypeGameDecoding](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean) 已把一张图恢复
+接入实际子类型见证。内部有限集合公式完整核验中间坐标的两个包含方向；节点谓词再检查
+坐标图的函数性、精确定义域和三元组图属于树。源绝对性只使用传递性。
+`tg_one_graph_recovery_l` 自动构造三个实际查询，保留任意双射排列及逐项对应，恢复原树、
+末位和恰好一个新增标签；高度由最大序数查询推出为 α+1。
+[TypeGameReset](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameReset.lean) 实际构造二元重置
+类型，连同完整节点、空根和最大序数查询的语义证书及真值。规范局部不可分辨对的最小化
+同时校正为原 5.12 的第二坐标优先约定，已重验其存在性、唯一性及完整类型搬运。
+本层十一模块共 775 行，单模块 42–120 行，正常编译约 3 秒，均少于一分钟。
+全部新增声明已纳入上述四组审计；14 个关系、原公式及查询证书另经无选择依赖检查。
+
+[TypeDrop](../YesMetaZFC/Model/SetTheory/Internal/TypeDrop.lean) 已实际构造内部前缀投影和
+dcp。查询的自然数公式码不变，名字列只将指定常量 δ 的元数标记从小元数重编码为大元数；
+裸类型的投影是该纯语法关系的逆像。结果由实际限制元组实现，增加末位后再取 dcp
+字面返回原完整类型。[TypeGameReply](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameReply.lean)
+装配规则 (7) 的子类型、空根、严格秩界及加二最大序数；实际语言工厂和低层回答构造均已实现。
+严格秩界另已与原集合秩公式证明等价，实现高度由查询准确读取为末位加三。
+[TypeElasticDomain](../YesMetaZFC/SetTheory/LargeCardinal/TypeElasticDomain.lean) 将原定义域
+查询的独立读取纳入既有弹性语言，不需要完整弹性或 ZFC；
+[TypeGameRigidity](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameRigidity.lean) 只用 ZF、
+超过关系和 dcp⁻ 定义域，就证明新类型的末位为最大序数。
+[WoodinGameReset](../YesMetaZFC/SetTheory/LargeCardinal/WoodinGameReset.lean) 在原 ZFC 武丁
+假设下实际生成任意参数域下界以上的重置类型，完整节点、根、最大序数和 dcp 弹性同时为真。
+本层十四模块共 855 行，单模块 34–91 行，编译约 3 秒；全部模块仍少于 2000 行。
+新增关系、公式、游戏约束及语言证书中 21 个声明另通过无选择依赖检查；全部新增
+声明已通过上述四组审计，无新增公理、`sorryAx` 或不可计算数据。
+两张图恢复及 5.15 的迭代获胜论证仍待完成，最终 L(ℝ)⊨AD 仍待证明。
+
+[TypeGame](../YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 的 `tg_game_l` 已完成原 5.13
+辅助闭博弈的实际装配。先从 max(δ,rank(S)) 自动选择原最小局部不可分辨点，再在模型内部
+统一化三张固定代码表；弹性表、节点／端点表的图包含于 Vδ，仅依赖内部元数的子类型程序表
+的图包含于 Vω。原函数图、名字列及完整编译性质都有原语言公式和精确解码定理。
+合法性只读取同一固定表项及查询字面成员性，不给裸类型假定逻辑闭包或可实现性。
+
+[TypeGameHistory](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameHistory.lean) 构造全部内部
+有限历史与逐步检查集合，完整合法历史另形成前缀树。七条规则保留域增长、原重置类型、
+回读较早轮、pred(t) 及任意排列的 subtype／exceeds；唯一额外坐标条件为空根。
+[TypeGameStages](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameStages.lean) 用内部序数除法
+对每个时刻恢复唯一轮号、阶段、责任玩家及相应规则，保留 II 辅助、I 回答、原实数落子的因果顺序。
+[FirstViolationMinimum](../YesMetaZFC/SetTheory/Descriptive/FirstViolationMinimum.lean) 在模型内
+最小化失败前缀的长度，不使用外部 ω 的良基性。`Tg_game_d.payoff_l` 精确证明 I 获胜当且仅当
+全程合法或首次违规属于 II；闭收益集及其开补集都是实际集合。策略空间及常值策略实例也实际构造。
+获胜策略由下述闭博弈定理另行取得。
+
+完整博弈装配层含 31 个新增模块、2336 行，每模块 29–125 行，正常检查约 2–9 秒。
+66 个纯公式和数据接口另经无选择依赖检查；全部新声明纳入上述四组审计。
+
+[ClosedDeterminacy](../YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 的
+`cg_closed_det_l` 在 ZFC 中证明任意非空集合字母表、任意固定玩家时序上的闭博弈决定性。
+证明遵循 Neeman 4.16 的获胜局面集合：内部策略量词定义 II 获胜区，ZF 构造按首项拼接的
+策略图，模型内选择提供子策略族及 I 的可走字母，再以最早进入获胜区的内部长度证明避让。
+整个论证不要求 ω 外部标准或外部良基。
+[TypeGameDeterminacy](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 的
+`Tg_game_d.determined_l` 返回原三阶段游戏策略空间中某一方的实际获胜策略。
+5.15 从辅助博弈中 II 的获胜策略出发，通过迭代树构造原博弈中 II 的获胜策略，仍须后续证明。
+
+决定性层新增 8 个模块、483 行，每模块 30–80 行，最终检查约 3–5 秒。
+11 个纯关系和原公式通过无选择依赖检查；内部模型切片的无选择依赖清单现有 1129 个接口。
+上述四组审计全部通过，无新公理、`sorryAx` 或不可计算数据。
+公共导入图已通过 `lake --wfail build` 的 2444 项构建；
+`python scripts/lean_cache.py build` 已完成全部 2555 个独立 Lean 模块的 20 批构建。
+
 `scripts/check_internal_models.py` 覆盖这些模块以及嵌入读取、派生超滤、有限支撑测度图
 和共同纤维完备性证明的全部实际声明；博弈、谓词嵌入、武丁基数与测度族的原定义
 另检查无选择依赖。有限支撑测度构造的背景仍为 ZF，图的定义域唯一性仅需外延性，
@@ -187,7 +298,7 @@ nice 树的全前驱 Pₙ 递归、内部下降反证、整树 Skolem 回拉、�
 `Smap_d.countable_fixed_l` 固定源内可数传递集合；`sc_domain_numbering_l` 从已有可数函数图
 直接回收精确定义域及其编号，旧调用已迁移。`ep_countable_ultra_l` 在包含源内构造全部
 原代表、测度一关系及满射呈示，回收原超幂和它的内部可数编号；原复制后继直接消费此结果。
-提交 `93b98769` 已保存严格秩截断、Pₙ 全前驱历史、内部下降反证及到 j(A) 的完整初等复制。
+严格秩截断、Pₙ 全前驱历史、内部下降反证及到 j(A) 的完整初等复制均已实现。
 历史延伸直接由原树读取并构造下一行，内部 ω 递归不消费另行假设的可延伸接口。
 `ja_failure_l` 现从可数根模型构造整树公共编号、联合尝试关系及正则基数值下降秩；
 下降链解码为实际共尾枝、完整初等腿和传递直接极限，且满足原根复合式。
@@ -220,12 +331,7 @@ nice 树的全前驱 Pₙ 递归、内部下降反证、整树 Skolem 回拉、�
 状态取并、规范商投影及其腿、前缀重放与公开策略输出对应均保留原图。
 获胜证书覆盖直到实际 Hartogs(ω) 的全部初始对局；运行唯一性只用 ZF 和局部单值性。
 最终 L(R) 的 AD 尚未证明。
-最近一次全库核验覆盖 2332 个 Lean 模块：`python scripts/lean_cache.py build` 调用
-19 批 `lake --wfail build`，零警告、零错误；本轮冷重建记录最长单模块约 58 秒，
-最终全库复验中的重建记录最长 5.9 秒。此记录不代表远端 CI。
-四组声明审计全部通过：内部模型 512 模块／8431 声明、HOD 2／42、小壳 41／360、Łoś 99／1062。
 有限矩阵、内部源闭性和正则下降秩的关系操作按 ZF 边界核验；实际超幂、赋值代表选择和正则化使用 ZFC。
-未新增公理、sorry 或不可计算数据，纯数据定义保持无经典选择。全部改动已纳入相应审计，全仓最长模块为 1995 行。
 短扩展器层全部按 ZF 边界审计：`Ex_pre_d`、`Ex_short_d` 及原公式对应已实现，
 正规性、临界点种子、布尔运算、有限坐标乘积、有界投影、可数纤维和长度截断均已证明。
 有界投影的见证使用序数最小值统一化，未调用对象选择公理。
@@ -243,24 +349,13 @@ ZF 中只要像集合的全部子集包含于目标，就能沿完整初等嵌�
 H(χ) 中的见证统一化与小集合封闭单独按 ZFC 审计。
 统一函数图的代码现已构造，两个实参使用不同坐标；实际函数图和值域界经初等嵌入回到源。
 H(χ) 的配对与乘积封闭已迁至集合论层，原力迫调用直接迁移，不保留旧命名空间转发。
-2026-10-04 的后继源保持与接口迁移已通过全部 2,007 个独立 Lean 模块的 `lake --wfail build`。
-内部模型 ZF 审计覆盖 267 个模块、4,644 条声明，HOD 选择覆盖 2 个模块、42 条声明；
-初始源／司寇伦 ZFC 审计覆盖 23 个模块、102 条声明，Łoś／装配 ZFC 审计覆盖 25 个模块、165 条声明。
 混合模块中的后继保持、源内函数与分量模型、模式正向传输及因子接口另逐条收紧到 ZF。
-全部审计通过，无新增公理、sorryAx 或不可计算数据；新纯定义无经典选择依赖。
-此前常值与分量初等映射接入时，完整力迫公理审计的七个切片也均通过。
 核验不包含尚未实现的“真类个武丁基数 ⇒ L(ℝ) 满足 AD”证明。
 
-2026-10-02 的源码核验覆盖全部 1,842 个 Lean 模块和 `prove_auto_sweep`，均通过
-`lake --wfail build`；使用 `python scripts/lean_cache.py build` 枚举独立模块。
-HOD 比较增量另审计 18 个模块、217 个实际声明，包括生成的私有声明，
-并对 15 个坍塌语法、解释及传输端点排除 `Classical.choice`。
-该数字表示此次比较切片，不表示对全库所有声明作了同一强度的公理审计。
-
-`whom_hod_comparison_l`、`whom_hb_comparison_l`、`cohen_hod_comparison_l` 的递归依赖
-仅包含 Lean 的 `propext`、`Quot.sound`、`Classical.choice` 与原七条 ZF 公理正文的
-自由闭合性证书，没有 `sorryAx`、新增公理或不可计算数据声明。这里的命题内经典证明
-不等于假定背景模型满足 AC；上述三个定理也不依赖原选择公理正文的闭合性证书。
+`whom_hod_comparison_l`、`whom_hb_comparison_l`、`cohen_hod_comparison_l` 在上述
+`1e89850` 原始依赖审计中均只依赖 Lean 的 `propext`、`Quot.sound`、`Classical.choice`，
+没有原生闭合性公理或 `sorryAx`。这里的命题内经典证明不等于假定背景模型满足 AC；
+上述三个定理的对象理论前提仍为 ZF。
 临时审计模块及其产物已移除，生产审计清单维护在
 [check_internal_models.py](../scripts/check_internal_models.py) 和 [check_forcing.py](../scripts/check_forcing.py)。
 
@@ -287,24 +382,24 @@ HOD 比较增量另审计 18 个模块、217 个实际声明，包括生成的�
 
 小图层新增的 38 个关键接口已审计。`sg_model` 仅依赖 `propext`；集合存在性及
 一致性证明使用已有 `propext`、`Quot.sound`、`Classical.choice`。`zfc_consistent`
-还继承原八条固定公理的 `sentence!` 自由闭合性 `native_decide` 依赖：外延、空集、配对、
-并集、幂集、无穷、基础及选择各一处。没有新增公理常量、`sorryAx` 或原生验证依赖。
+在 `1e89850` 原始依赖审计中的精确集合为上述三项，不再继承原八条固定公理的
+`sentence!` 原生闭合性证书，没有自定义公理、`sorryAx` 或原生决策公理。
 全库构建的当前范围见上节；代码范围及载体边界见
 [模型论指南](../YesMetaZFC/Model/README.md)。
 
 布尔层新增 50 个关键依赖入口并交叉复核 8 个小图入口。`name_structure`、名称等号的
 递归定义、图并合、混合和 ω 数据均无公理依赖；一般布尔值六规则可靠性以及名称的
 等词、分离、幂集、无穷、基础证明仅涉及 `propext`、`Quot.sound`。最大值、收集、选择及
-ZFC 终点仍依赖 `Classical.choice`；原八处句法闭合性原生依赖与小图终点相同。
-未新增 `sorryAx`、自定义公理或原生计算可信依赖。将对象理论限制到 ZF，不改变这些
-模型构造与一致性端点的元层依赖。
+ZFC 终点仍依赖 `Classical.choice`；`Boolean.zfc_consistent` 在 `1e89850` 原始依赖
+审计中与小图一致性终点同为上述三项，没有 `sorryAx`、自定义公理或原生决策公理。
+将对象理论限制到 ZF，不改变这些模型构造与一致性端点的元层依赖。
 
 集合结构的内部编码由 `scripts/check_internal_models.py` 单独审计，ZF 基础覆盖
 65 个模块、1170 条实际声明；司寇伦、club 闭包、遗传小集合、初等模型装配与
 类上依赖选择另覆盖 13 个模块、50 条声明。结构码、变量赋值、
 非标准有限指令码、递归真值表、统一满足关系及编码理论模型性均有实际原公式。
-ZF 基础的存在性只消费原七条既有句法证书；数据与
-定义端点严格排除 `Classical.choice`。`smdl_table_l` 给出唯一真值表及精确成员真值，
+ZF 基础的存在性已不再继承原生句法闭合性公理；数据与
+定义端点继续严格排除 `Classical.choice`。`smdl_table_l` 给出唯一真值表及精确成员真值，
 `smdl_satisfaction_l` 将全部满足对收集成内部集合；没有新增公理或不可计算数据。
 `source_compile_l`、`source_satisfaction_l` 已完成原 Project AST 的编译及任意有限
 参数下的精确语义对应，不要求解码结构外延。`ZF.countable_fseq_l` 通过内部 ω 递归
@@ -313,8 +408,8 @@ ZF 基础的存在性只消费原七条既有句法证书；数据与
 `ssk_hull_l` 从原 ZFC 自动构造整张内部司寇伦选择图及任意可数种子的最小可数闭包，
 并证明所有内部有限参数下的存在见证闭性；假公式的零元运算确保空种子的闭包也非空。
 选择图、有限参数延拓、闭包及见证闭性均有实际原公式。通用闭包存在性、最小性、
-有限参数阶段截取与单步可数性仍逐声明保持 ZF 边界；自动选择与完整装配允许原选择
-公理证书，其余端点另作 ZF 上界核验。
+有限参数阶段截取与单步可数性仍逐声明保持 ZF 边界；自动选择与完整装配使用 ZFC，
+其余端点另作 ZF 核验；各切片均不再允许原生句法闭合性公理。
 `sbound_exists_l`、`ssat_agree_l` 在原公式归纳中证明内部有限坐标界及支撑一致性；
 `ssk_full_l` 把司寇伦见证闭性提升到全部内部赋值。`selem_iff_tv_l` 给出完整内部
 Tarski–Vaught 双向等价，`Selem_d` 与 `selem_m` 量化全部内部公式码和 ω→N 赋值，
@@ -332,7 +427,7 @@ club 内得到包含可数种子的内部初等模型，所有新接口均有实
 实际构造包含任意指定集合的累积层，统一反射有限原公式族的全部层内参数；
 `ZF.lr_reflect_l` 自动处理单公式的量词子公式。见证界由实际赋值空间上的收集
 构造，最早累积层给出唯一增长步，内部 ω 递归与累积层族之并完成存在性。
-`lr_model_l` 对应到实际内部隶属结构。该层只继承原七条 ZF 证书，全部语法和
+`lr_model_l` 对应到实际内部隶属结构。该层保持 ZF 强度且无原生闭合性公理，全部语法和
 结构数据排除经典选择；没有新增反射公理或不可计算实例。公式族是给定的有限
 生产 AST，未宣称对全部非标准内部公式码或全宇宙的一次统一反射。
 
@@ -350,8 +445,8 @@ N[G] 的内部求值满射图；`ng_countable_l` 用最小原像编号证明可�
 将两种闭性与 proper club 相交。`ng_elementary_hull_l` 自动构造同一个内部初等 N
 和主加强，对全部接受该加强的泛型给出完整内部 `N[G]≺X[G]`，两边均有精确
 名称成员方程，且 X[G] 传递、N[G] 内部可数。有限列与语法码保持、名称装配及
-`ng_elementary_l` 的提升端点限制在原七条 ZF 证书；选择图和自动装配允许原选择
-公理证书。数据定义严格排除经典选择。
+`ng_elementary_l` 的提升端点保持 ZF 强度；选择图和自动装配使用 ZFC，
+均无原生闭合性公理。数据定义严格排除经典选择。
 `h_generic_l` 已通过内部小名称降阶证明地 H(χ) 与扩张 H(eχ) 的双向对应，并保持 χ 正则；
 `ng_hchi_hull_l` 自动装配 N[G]≺H(eχ)。实际 club 的内部捕获及 `pr_base_master_l`
 支持固定 N 中的主加强，`ng_next_master_l` 进一步自动取得各泛型中 N[G] 的后继主加强。
@@ -421,8 +516,8 @@ N[G]≺H(eχ)，共同选择图及各阶段切片均有实际集合构造。`ng_
 ZF 的 `indexed_iteration_l` 为实际确定函数图构造带指标内部 ω 序列，旧依赖选择
 接口已迁移为先单值化、再确定递归。`cc_strict_cofinal_l` 取最小共同上界，实际
 构造可数共尾集中的严格 ω 共尾列；`cf_omega_countable_l` 给出精确等价刻画。
-共尾序列的值域外延性及长度极限性改为直接内核证明，相关模块按原七条 ZF
-证书审计，不增加原生 DAG 编译证书。旧序数反射与共尾集传输另按无原公理上界检查。
+共尾序列的值域外延性及长度极限性改为直接内核证明，相关模块按 ZF 切片
+审计，不允许原生 DAG 编译证书。旧序数反射与共尾集传输另按无原公理上界检查。
 单射名称证书已迁入通用 `InternalInjection`，其整个模块按 ZF 边界审计，CCC
 和 proper 证明均直接调用该模块。
 
@@ -457,8 +552,8 @@ N 与完整区间引理。闭扩张及全阶段保持装配复用分配性层的
 力迫层的 `scripts/check_forcing.py` 审计 403 个生产模块、6727 条声明，包括名称泛型商、
 内部基础公理、完整真值、任意地模型的 ZFC 保持、CH 塌缩、参数化 Cohen 添加、
 CCC 基数保持、¬CH 模型及原推导核中的 CH 独立性。商载体、解释关系与隶属定义无
-经典选择依赖。两侧模型只继承 `propext`、`Quot.sound`、Prop 内选择及原八条固定
-公理的句法闭合证书；CH 与 ¬CH 句子的闭合性直接证明，没有新增原生计算公理。
+经典选择依赖。两侧模型的 Lean 公理依赖限制在 `propext`、`Quot.sound` 与 Prop 内
+选择；CH、¬CH 及原固定公理均不再引入原生闭合性公理。
 迭代切片的 220 个模块、2929 条声明包含内部力迫规则、等号替换、有界见证、混合与
 最大值、任意外延结构的有限参数初等反射，以及分别处于 ZF、ZFC 强度的原公理
 全局力迫证书，还有内部二步构造、泛型双向
@@ -472,7 +567,7 @@ CCC 基数保持、¬CH 模型及原推导核中的 CH 独立性。商载体、�
 构造。带实际原模型公式条件的全局泛型判据，进一步给出配对、有序对与第二阶段
 名称性的首阶段力迫证书。双重求值已装配为原二步名称上的函数，满足总性、唯一性
 与组合滤子下的精确成员递归；条件域内关系不变则全部名称力迫和泛型性均不变。
-这些 ZF 端点另行核验七条既有 ZF 句法证书的上界，不能继承选择公理的证书；
+这些 ZF 端点继续单独核验；Lean 依赖上界仅为三项标准公理，不再允许原生句法证书；
 本次逐端点检查覆盖 169 个入口，并检查所有审计名称实际存在。
 二步等号经实际公式的内部条目归纳传至嵌套等号，反向则在原模型闭支撑上分离
 实际双模拟，并用有限参数泛型反射取得匹配见证。因此双重求值已在单次二步商类上
@@ -506,7 +601,7 @@ CCC 基数保持、¬CH 模型及原推导核中的 CH 独立性。商载体、�
 装配与两个坐标系统消费者已降低到 ZF，并新增逐端点依赖上界检查。
 完整规范三元组与整个 Cohen 坐标后继现在都有原公式规格和字面唯一性；构造
 接口已统一返回这些证书。新增公式和满足关系严格排除经典选择，两个唯一性
-端点另核验原七条 ZF 证书上界。
+端点继续单独核验，排除原生句法闭合性公理。
 完整内部递归现以实际 `row_op_s` 和 `row_invariant_s` 实现：历史双投影由原
 替换模式构造，投影与限制交换；原公式的内部序数归纳排除无效历史分支。
 `row_iteration_l`、唯一性、前缀方程和一键 Cohen 实例均在 ZF 端点上界内审计。
@@ -721,105 +816,9 @@ CCC properness 实例及参数化 Cohen 名称的全局 properness 证书已经�
 
 当前源码包含原理论及裸 ZFC 的 Löb、第二不完备定理，原支撑理论的 Tarski 实例，
 以及保留源编码和最终纯公式自身编码的裸 ZFC 带参数 Tarski 实例。
-`lake --wfail build` 完成 947 个任务。
-`bash scripts/check-all.sh` 检查全部 950 个 Lean 模块，完成 952 个全源构建任务及
-320 个扫描工具任务，零错误、零警告。
-这些核验在恢复环境中实际运行；没有运行远端 CI。
-
-最新 `#print axioms` 检查覆盖 530 个入口，包括 D1–D3、Löb、哥二、Rosser、原理论及纯语言表示的 Tarski 终点。
-上一状态的 440 个入口依赖集合逐项不变；90 个新增核验入口覆盖通用语义外壳、表达式迭代、
-最小输出、纯 AST 编解码、数码求值、自身编码图、固定点及纯 Tarski。
-全部新增依赖均未超出保存的 Rosser 32 项可信基，没有新可信依赖或 `sorryAx`：
-
-| 核验入口 | 依赖数量及比较 |
-| --- | --- |
-| `DerivabilityConditions_m.imp_m`、`iff_m` | 各 0 项 |
-| `DerivabilityConditions_m.loeb_axiom_m`、`loeb_m` | 各 1 项，仅 `propext` |
-| `ObjectLoeb.reflection_apply_m`、`fixed_point_m` | 分别为 2 项、3 项，仅既有 Lean 基础依赖 |
-| `ReducedProvability.loeb_fixed_point_m` | 11 项，包含于既有 Rosser 可信基 |
-| `ReducedProvability.derivability_m`、`loeb_axiom_m`、`loeb_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `DerivabilityConditions_m.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 1 项，仅 `propext` |
-| `ReducedProvability.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `PureSentenceTransfer.translate_embed_m`、`derives_iff_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `PureProvability.checked_iff_m`、`source_canonical_m`、`source_roundtrip_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `PureProvability.necessitation_m`、`distribution_m`、`introspection_m`、`derivability_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `PureProvability.loeb_fixed_point_m`、`loeb_axiom_m`、`loeb_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `PureProvability.consistency_translation_m` | 11 项，包含于既有 Rosser 可信基 |
-| `PureProvability.second_incompleteness_internal_m`、`second_incompleteness_m` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `Tarski.liar_refutes_m`、`biconditional_unprovable_m`、`not_truth_schema_m` | 各 1 项，仅 `propext` |
-| `Tarski.not_defines_truth_m`、`ObjectTarski.liar_fixed_point_m` | 各 3 项，仅既有 Lean 基础依赖 |
-| `ReducedTarski.liar_fixed_point_m`、`liar_refutes_m`、`biconditional_unprovable_m` | 各 10 项，均包含于既有 Rosser 可信基 |
-| `ReducedTarski.undefinable_syntax_m`、`undefinable_semantics_m` | 各 10 项，均包含于既有 Rosser 可信基 |
-| `ObjectNumeralSyntax.value_encode_m` | 0 项 |
-| `ObjectParameterDiagonal.fixed_point_m`、`ObjectTarski.Parameters.liar_fixed_point_m` | 各 3 项，仅既有 Lean 基础依赖 |
-| `Tarski.not_defines_satisfaction_m` | 3 项，仅既有 Lean 基础依赖 |
-| `ReducedTarski.Parameters.liar_fixed_point_m`、`liar_refutes_closed_m`、`liar_fails_at_m` | 各 10 项，均包含于既有 Rosser 可信基 |
-| `ReducedTarski.Parameters.undefinable_syntax_m`、`undefinable_at_m`、`undefinable_parameters_m` | 各 10 项，均包含于既有 Rosser 可信基 |
-| `SemanticTransfer.derives_open_m`、`consistent_open_m` | 各 3 项，仅既有 Lean 基础依赖 |
-| `PureOpenTransfer.embed_canonical_m`、`translate_embed_m`、`derives_iff_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `PureTarskiSource.predicate_satisfies_m`、`liar_fixed_point_m`、`liar_refutes_closed_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `PureTarskiSource.undefinable_syntax_m`、`undefinable_at_m`、`undefinable_parameters_m`、`undefinable_source_at_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `PureQuotation.self_code_m`、`code_injective_m`、`decode_tree_m` | 各 3 项，仅既有 Lean 基础依赖 |
-| `PureDiagonalGraph.source_satisfies_m` | 10 项，均包含于既有 Rosser 可信基 |
-| `PureQuotation.numeral_satisfies_m`、`PureDiagonalGraph.satisfies_m`、`PureFixedPoint.fixed_point_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `PureTarski.liar_fixed_point_m`、`liar_refutes_closed_m`、`undefinable_syntax_m`、`undefinable_parameters_m` | 各 31 项，均包含于既有 Rosser 可信基 |
-| `ObjectCodeInstantiation.formula_values_congr` | 1 项，为既有 Rosser 32 项依赖的子集 |
-| `PureSourceTraceComposition.witness_agrees`；`PureSourceNumeralSyntax.graph_transform` | 各 31 项，均包含于同一既有可信基 |
-| `PureSourceInstantiation.formula_mapped_transform`、`numeral_point`、`numeral_wellFormed` | 各 31 项，均包含于同一既有可信基 |
-| `InternalNumeralProof.forall_elimination`、`specialize_values`、`specialize_finite`、`specialize`、`values_modus_ponens` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| `InternalNumeralReflection.equal`、`successor_inequality`、`unequalAll_agrees`、`unequal`、`unequal_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| `InternalNumeralReflection.natural`；`ReducedProvability.matrix_of_verification` | 重新核验后仍为同一组 32 项依赖；后者仍须提供检查器正文证明 |
-| `ReducedProvability.distribution`、`PureRosser.independent` | 重新核验后仍为同一组 32 项依赖 |
-| `PureSourceArithmetic.at_zero`、`at_successor`；`InternalNumeralReflection.source_complete` | 前两项各 31 项，开放完备性入口 10 项，均为既有可信基的子集 |
-| `InternalNumeralReflection.orderAll_agrees`、`order`、`weak_order`、`order_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| `InternalNumeralReflection.evaluationAll_agrees`、`evaluation_induction`、`evaluation_zero`、`evaluation_successor` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| `InternalNumeralReflection.addition_evaluation`、`multiplication_evaluation`、`exponentiation_evaluation`、`arithmetic_evaluation_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| `ObjectCodeInstantiation.term_mapped`、`term_weakenFree`；`InternalNumeralReflection.composition_derives` | 分别为 0、1、10 项，均包含于既有可信基 |
-| `InternalNumeralReflection.binary_term_evaluation`、`arithmetic_term_evaluation`；配对多项式求值、`pairing_evaluation`、`pairing_evaluation_derives` | 各 32 项，与此前 Rosser 依赖集合相同 |
-| 字段列、节点、Horn 表达式、参数化项／参数列／公式、quotation 树与 `quotation_evaluation` | 八个入口各 32 项，与此前 Rosser 依赖集合相同 |
-| `ObjectCodeInstantiation.term_weakenBound`、`formula_renamed`、`formula_weakenFree` | 分别为 1、2、2 项，均包含于既有可信基 |
-| 原子同余、全称零点／后继／反例的源推导 | 四个入口各 10 项；内部原子反射、逻辑组合、量词见证及实际有界反射均为原 32 项依赖 |
-| `bounded_bundle_parameters`、`bounded_bundle`、`bundleAt_agrees` | 各 32 项；`parameterValues_agrees` 为 31 项，均包含于既有可信基 |
-| `finite_trace_derives`、`verificationMatrix_trace` | 分别为 9、11 项，均包含于既有可信基 |
-| `allOf_values`、`natural_term_proof`、`finite_trace_values`、`checked_trace_values`、`finite_verification` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `term_embedBoundClosed`；`formula_mapped_of_depth`、`formula_substituteFree`、`binary_template` | 前者 1 项，其余各 2 项；自由重命名改为复用该遍历后，旧入口依赖集合不变 |
-| 数码图 `template_apply`；`predicate_terms_code`、`predicate_names_code` | 各 2 项，均包含于既有可信基 |
-| `predicate_transport_derives`；`predicate_transport`、`nextTerm_evaluation` | 分别为 10、32、32 项，均包含于既有可信基 |
-| `numeral_trace_zero_derives`、`numeral_trace_step_derives`、`numeral_trace_reject_derives` | 各 31 项，均包含于既有可信基 |
-| `numeral_trace_zero`、`numeral_trace_step`、`numeralTraceAt_agrees`、`numeral_trace_positive`、`numeral_trace_positive_derives`、`numeral_trace_negative`、`numeral_trace_reflection` | 七个入口各 32 项，与既有 Rosser 依赖集合相同 |
-| Horn `template_apply`、`horn_satisfies`；`hornAt_satisfies`、`projectionGet_satisfies` | 前两项各 2 项，后两项各 11 项，均包含于既有可信基 |
-| `rule_cases`、`node_head_injective`、`horn_rule_derives` | 各 31 项，均包含于既有可信基 |
-| `horn_term_transfer`、`horn_rule_terms`、`horn_rule_values`、`hornProv_agrees` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `projectionGet_agrees`、`projection_get_step`、`projection_get_positive`、`projection_positive`、`projection_term_positive`、`projection_positive_derives` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
-| `ObjectSyntaxReflection.Row.map_tag`、`map_fields`、`map_input`；`PureSourceSyntaxRank.value_map` | 四个入口均为 0 项依赖 |
-| `ObjectSyntaxReflection.Row.input_mem`、`PureSourceSyntaxRank.input_natural` | 各 1 项，均包含于既有可信基 |
-| `ObjectSyntaxReflection.ranked`、`head_variables` | 各 2 项，纯规则形状及变量出现证明 |
-| `PureSourceSyntaxRank.value_natural`、`map_natural` | 各 10 项，均包含于既有可信基 |
-| `PureSourceInduction.strong_induction`；`PureSourceSyntaxRank.rank_unique`、`below_value`、`rule_ranked` | 四个入口各 31 项，均包含于既有可信基 |
-| `syntaxAt_satisfies` | 11 项，实际同时归纳公式的语义接口 |
-| `syntaxAt_agrees`、`syntax_step`、`syntax_at_positive`、`syntax_positive`、`syntax_term_positive`、`syntax_positive_derives` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
-| 分层规则 `transform_valid`、`iteration_valid`、`project_valid`；schema 三项 `*_valid` 和 packet `shapes` | 各 2 项，由内核核验原固定规则表 |
-| `rule_intro_bounds`、`rule_cases_bounds`；`affine_bounds` | 分别为 10、31、31 项，均包含于既有可信基 |
-| `rankedAt_satisfies`；`rankedAt_agrees`、`horn_ranked_positive`、`horn_valid_positive` | 语义接口为 11 项，其余各 32 项，均包含于既有可信基 |
-| `transform_positive_derives`；`InternalPositiveFormula.boundedExists`、`positive_derives` | 各 32 项，与既有 Rosser 依赖集合相同 |
-| `axiom_query_positive`、`axiom_query_named`、`axiom_query_positive_derives` | 各 32 项，实际一元公理行查询的内部与普通推导终点 |
-| `InternalPositiveFormula.localMatrix`、`localRule`、`localTest` | 三个公共局部规则组合入口，各 32 项 |
-| `InternalProofQueryReflection.logical`、`query`、`node`、`row`、`currentNode`、`currentRow` | 六个原局部查询反射入口，各 32 项 |
-| `logical_term_positive`、`node_term_positive`、`row_term_positive`、`row_named_positive` 及三项 `*_positive_derives` | 七个复合项、数码及普通推导终点，各 32 项 |
-| `checked_step_values`、`proof_step_values`、`finite_verification_of_links` | 三个实际步骤／矩阵装配入口，各 32 项；仍显式保留连边证明输入 |
-
-| checked `template_apply`、`proof_valid`、`step_satisfies`、`checked_satisfies` | 四个入口各 2 项，由原公式语义及内核规则核验给出 |
-| checked `rule_cases_bounds`、`checked_step_agrees` | 各 31 项，均包含于既有可信基 |
-| checked `rule_intro_bounds`、`checked_rule_bounded_derives` | 各 10 项，内部集合构造及源规则推导 |
-| `checkedAt_satisfies`、`checkedRankedAt_satisfies` | 各 11 项，原反射公式的语义接口 |
-| `checked_term_transfer`、`checked_rule_bounded_terms`、`checked_rule_bounded_values`、`checkedProv_agrees`、`checkedRankedAt_agrees`、`checked_valid_positive` | 六个入口各 32 项，与既有 Rosser 依赖集合相同 |
-| `proof_trace_positive`、`proof_trace_values`、`proofTrace`、`proof_trace_positive_derives` | 四个任意内部原证明树轨迹终点，各 32 项 |
-| `verificationRoot_evaluation`、`verification_reflection`、`proof_matrix_reflection`、`ReducedProvability.introspection` | 四个原矩阵／D3 终点，各 32 项；无新增可信依赖 |
-
-
-此前数码、节点装配、模式 2 变换与逻辑公理入口的审计也未超出上述可信基。
-新增源码无 `sorry`、`admit`、自定义公理或原生验证调用；这里保留原有原生
-支撑依赖，不声称整个仓库没有原生依赖。
+终点的准确参数见 [TROPHIES.md](TROPHIES.md)，反射链和编码格式见
+[NAT_DECODING.md](NAT_DECODING.md)，公共证明入口见 [ENGINEERING.md](ENGINEERING.md)。
+公理范围按本页开头列出的精确守卫及实际源码核验。
 
 数码的 `graph_term` 使用带 bound/free 参数的实际对象公式归纳，旧闭项接口
 作为零上下文特例保留。自由代入和点实例化共用 `formula_mapped_transform` 的
@@ -1048,37 +1047,15 @@ $P(\ulcorner\varphi\urcorner,\bar a)\leftrightarrow\varphi^{\mathcal M^+}(\bar a
 合同包含使用这些参数的所有宿主开放公式；不将它改称只判定无参数闭句的带参数合同，
 也不声称已构造非标准内部语法的满足关系。
 
-## D1、D2 增量核验
+## 复跑核验
 
-在 `9045935` 基础上新增普通可证明性与内部 MP 构造，入口为
-[ReducedDerivability](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/ProofT/ZFC/ReducedDerivability.lean)。
-`lake --wfail build` 完成 820 个任务；`bash scripts/check-all.sh` 检查全部
-823 个 Lean 模块，完成 825 个全源构建任务及 320 个扫描工具任务，零错误、零警告。
-这是恢复环境中的增量内核构建，不声称冷构建或远端 CI 已运行。
+默认入口使用 `lake --wfail build`，全部独立模块使用
+`python scripts/lean_cache.py build`；原生对象与库另加 `--native`。
 
-新增源码没有 `sorry`、`admit`、自定义公理或原生计算验证调用。
-实际 `#print axioms` 核验显示：通用 D1 依赖 `propext`、`Quot.sound`；
-源理论 D1 的 11 项依赖是既有 Rosser 终点依赖的子集；D2 和内部 MP 构造的
-32 项依赖集合均与 `PureRosser.independent` 相同。这里保留仓库已有的原生
-支撑依赖，不把“无新增依赖”表述为“没有原生依赖”。
-原有证明图、quotation、公理和 Rosser 终点的源码均未修改。
+- 生产端点的精确 Lean 公理依赖：`python scripts/check_axiom_decoupling.py`。
+- 内部模型、HOD、司寇伦及 Łoś 的分层边界：`python scripts/check_internal_models.py`。
+- 力迫模块及其公共依赖：`python scripts/check_forcing.py`。
+- 算术、滤子、初等子结构与超幂分别使用 `scripts/check_arithmetic.py`、
+  `scripts/check_filters.py`、`scripts/check_elementary.py`、`scripts/check_ultrapower.py`。
 
-## Rosser 与既有声明的核验基点
-
-源码基点为 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)。
-该源码的全源检查完成 808 个构建任务、扫描工具检查完成 320 个任务，零错误、零警告。
-
-公开声明审计保留全部 13,662 项基线声明；13,658 项原始编译类型相同，4 项仅有
-相互递归生成的 binder 显示名差别。6,955 项数据定义中，6,953 项原始表达式相同；
-`HilbertBaseAxiom.lower` 另经 Lean 证明任意输入的完整返回证书与旧实现相等，
-`FirstOrderDerives.try_close` 是已实施的自动化改进。
-
-60 项辅助声明因公共接口复用增加对既有 `propext`、`Quot.sound`、`Classical.choice`
-的部分引用；审计范围内全仓公理并集未增加，Rosser 两个终点的类型和完整依赖集合
-保持，没有新增对象公理、Lean 公理常量、原生验证依赖或 `sorryAx`。
-最终审计覆盖 13,893 项，包括新增及补充纳入项；不把新增覆盖项冒充旧基线。
-
-日常入口：`lake --wfail build`、`bash scripts/check-all.sh`。
-本次文档整理沿用该源码核验结果，不声称重新构建或远端 CI 通过。
-独立数学待办仍是原递归序列族之并在合法递归器下的 ω 全域性，见
-[ELIMINATION.md](ELIMINATION.md)。
+覆盖数量、耗时和成功状态以本次运行输出为准；记录结果时注明源码基点及检查范围。

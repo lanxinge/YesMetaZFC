@@ -247,22 +247,12 @@ theorem bounded_exists_body_openBoundTop
       (FreshVariable.newest (σ := signature) (free := free) SetSort.set ∈ₘ
         bound.weakenFree SetSort.set) ∧ₘ
         Formula.openBoundTop (σ := signature) SetSort.set body := by
-  have hBound :
-      (bound.weakenBound SetSort.set).substituteMapped
-          (VariableSubstitution.instantiateTop
-            (FreshVariable.newest (σ := signature) (free := free)
-              SetSort.set))
-          (VariableSubstitution.of_renaming
-            (VariableRenaming.weaken SetSort.set)) =
-        bound.weakenFree SetSort.set := by
-    simpa [Term.openBoundTop] using
-      (Term.openBoundTop_weakenBound
-        (σ := signature) SetSort.set bound)
-  simp [bounded_exists_body, Formula.openBoundTop,
-    Formula.LevyBound.membership, set_levy_bound,
-    Formula.substituteMapped,
-    Term.substituteMapped, Arguments.substituteMapped,
-    VariableSubstitution.instantiateTop, hBound]
+  exact congrArg
+    (fun currentBound : SetOpenTerm (SetSort.set :: free) =>
+      (FreshVariable.newest (σ := signature) (free := free) SetSort.set ∈ₘ
+        currentBound) ∧ₘ
+        Formula.openBoundTop (σ := signature) SetSort.set body)
+    (Term.openBoundTop_weakenBound (σ := signature) SetSort.set bound)
 
 @[simp] theorem bounded_exists_openBoundLast
     {free prefixContext : SetContext}

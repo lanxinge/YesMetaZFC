@@ -111,10 +111,12 @@ theorem arguments_reject (bound free sorts : SetContext) (input : List Tree)
     simp only [List.cons.injEq, and_true] at h
     obtain ⟨head, tail, rfl, hHeadCode, hTailCode⟩ := forest_cons_shape input _ _ h.2.2.2
     cases sorts with
-    | nil => simp at h
+    | nil =>
+        have hZero : (0 : Nat) = Nat.succ (values 2) := h.2.2.1
+        cases hZero
     | cons sort sorts =>
       cases sort
-      have hCount : sorts.length = values 2 := by simpa using h.2.2.1
+      have hCount : sorts.length = values 2 := Nat.succ.inj h.2.2.1
       cases hTerm : SyntaxDecode.term bound free head with
       | none =>
         refine ⟨node 0 [.var 0, .var 1, .var 3] , List.mem_cons_self, ?_⟩

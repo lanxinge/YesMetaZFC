@@ -98,6 +98,7 @@ theorem formula_correct {𝒩 : Structure.{0,0,0,x} S}
       cases symbol with
       | extensionalEq =>
           simp only [Project.fo_formula, project_formula, Formula.satisfies, term_correct]
+          rfl
       | subset =>
           simp only [Project.fo_formula, Project.fo_mem, project_formula, Formula.satisfies,
             Arguments.eval, weakened_term_correct]

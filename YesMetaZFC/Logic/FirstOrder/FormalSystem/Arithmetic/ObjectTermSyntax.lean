@@ -89,25 +89,13 @@ theorem accept_rule (rule : Rule) (hRule : rule ∈ rules) (values : Fin rule.ar
   Acceptance.of_rule rule hRule values
     (fun i => rule.head.variable_le values (head_variables rule hRule i)) hGuards hPremises
 
-theorem rulesFor_zero : rulesFor rules 0 = termRules := by
-  simp [rulesFor, rules, termRules, argumentRules, parameterRules, variableRule,
-    applicationRule, nilRule, consRule, parameterNilRule, parameterConsRule, envelopeRule,
-    node, Expr.node, Expr.tag?]
+theorem rulesFor_zero : rulesFor rules 0 = termRules := rfl
 
-theorem rulesFor_one : rulesFor rules 1 = argumentRules := by
-  simp [rulesFor, rules, termRules, argumentRules, parameterRules, variableRule,
-    applicationRule, nilRule, consRule, parameterNilRule, parameterConsRule, envelopeRule,
-    node, Expr.node, Expr.tag?]
+theorem rulesFor_one : rulesFor rules 1 = argumentRules := rfl
 
-theorem rulesFor_two : rulesFor rules 2 = [parameterNilRule, parameterConsRule] := by
-  simp [rulesFor, rules, termRules, argumentRules, parameterRules, variableRule,
-    applicationRule, nilRule, consRule, parameterNilRule, parameterConsRule, envelopeRule,
-    node, Expr.node, Expr.tag?]
+theorem rulesFor_two : rulesFor rules 2 = [parameterNilRule, parameterConsRule] := rfl
 
-theorem rulesFor_three : rulesFor rules 3 = [envelopeRule] := by
-  simp [rulesFor, rules, termRules, argumentRules, parameterRules, variableRule,
-    applicationRule, nilRule, consRule, parameterNilRule, parameterConsRule, envelopeRule,
-    node, Expr.node, Expr.tag?]
+theorem rulesFor_three : rulesFor rules 3 = [envelopeRule] := rfl
 
 def termCondition {bound free : SetContext} (boundCount freeCount input : SetTerm bound free) :
     SetFormula bound free := ObjectHorn.condition rules (IntrinsicQuotation.node 0 [boundCount, freeCount, input])

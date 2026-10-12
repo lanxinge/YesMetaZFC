@@ -1,31 +1,31 @@
-# Forcing 功能目录与构造脉络
+# Forcing 功能目录与阅读顺序
 
-382 个 Lean 模块按数学职责归入 11 个一级目录。各子目录的 README 列出全部文件、原平铺文件名和用途，并按导入依赖排列。
+模块按数学职责归入下列目录，各子目录的 README 列出文件及用途，并按导入依赖排列。
 
-总入口仍为 `import YesMetaZFC.Model.Forcing`。细分导入使用下面的新路径；数学声明保持 `YesMetaZFC.Model.Forcing` 及其原有命名空间。
+总入口仍为 `import YesMetaZFC.Model.Forcing`。细分导入使用下面的路径；数学声明保持 `YesMetaZFC.Model.Forcing` 及其原有命名空间。
 
 [语义边界与使用说明](README.md) · [迭代证明与调用接口](ITERATION.md)
 
 ## 功能导航
 
-| 目录 | 模块数 | 内容 |
-| --- | ---: | --- |
-| [Order](Order/README.md) | 4 | 预序、相容性、稠密映射、分离商和有限序列条件。 |
-| [Boolean](Boolean/README.md) | 5 | 非零布尔条件、正则开完备化、规范稠密映射及模型内编码。 |
-| [External](External/README.md) | 11 | 早期外部名称求值、相对名称域、公式真值与可数泛型设施；保留其实际语义边界。 |
-| [Internal](Internal/README.md) | 85 | 内部名称、泛型商、真值、ZFC 保持、自同构、不增加序数及弱齐性 OD/HOD 比较。 |
-| [Stage](Stage/README.md) | 17 | 完全嵌入、复合、名称搬运、原子对应、泛型回拉及扩张嵌入。 |
-| [TwoStep](TwoStep/README.md) | 51 | 实际二步偏序、名称转换、泛型分解、扩张同构及 CCC、proper、可数闭保持。 |
-| [CCC](CCC/README.md) | 5 | CCC 原公式、有限部分函数实例、基数界和可数预稠密子族。 |
-| [Proper](Proper/README.md) | 62 | 主条件、内部初等闭包、N[G] 提升、H(χ) 对应及 proper 扩张保持。 |
-| [Closed](Closed/README.md) | 8 | ZF＋DC 下可数闭推出分配；名称下降链及 ZFC 下的实际 proper club。 |
-| [Distributive](Distributive/README.md) | 6 | ZF 下不新增实数、旧值序列与可数子集，反射可数性并保持 ω₁。 |
-| [Iteration](Iteration/README.md) | 97 | 共同条件表示、内部超限递归、支撑极限，以及有限支撑 CCC、可数支撑 proper 和闭性保持。 |
-| [Applications](Applications/README.md) | 33 | Cohen 添加、弱齐性与 OD/HOD 比较，可数部分函数塌缩和 CH 独立性；各实例接入对应的支撑迭代接口。 |
+| 目录 | 内容 |
+| --- | --- |
+| [Order](Order/README.md) | 预序、相容性、稠密映射、分离商和有限序列条件。 |
+| [Boolean](Boolean/README.md) | 非零布尔条件、正则开完备化、规范稠密映射及模型内编码。 |
+| [External](External/README.md) | 早期外部名称求值、相对名称域、公式真值与可数泛型设施；保留其实际语义边界。 |
+| [Internal](Internal/README.md) | 内部名称、泛型商、真值、ZFC 保持、自同构、不增加序数及弱齐性 OD/HOD 比较。 |
+| [Stage](Stage/README.md) | 完全嵌入、复合、名称搬运、原子对应、泛型回拉及扩张嵌入。 |
+| [TwoStep](TwoStep/README.md) | 实际二步偏序、名称转换、泛型分解、扩张同构及 CCC、proper、可数闭保持。 |
+| [CCC](CCC/README.md) | CCC 原公式、有限部分函数实例、基数界和可数预稠密子族。 |
+| [Proper](Proper/README.md) | 主条件、内部初等闭包、N[G] 提升、H(χ) 对应及 proper 扩张保持。 |
+| [Closed](Closed/README.md) | ZF＋DC 下可数闭推出分配；名称下降链及 ZFC 下的实际 proper club。 |
+| [Distributive](Distributive/README.md) | ZF 下不新增实数、旧值序列与可数子集，反射可数性并保持 ω₁。 |
+| [Iteration](Iteration/README.md) | 共同条件表示、内部超限递归、支撑极限，以及有限支撑 CCC、可数支撑 proper 和闭性保持。 |
+| [Applications](Applications/README.md) | Cohen 添加、弱齐性与 OD/HOD 比较，可数部分函数塌缩和 CH 独立性；各实例接入对应的支撑迭代接口。 |
 
-## 沿构造历史阅读
+## 按依赖顺序阅读
 
-这里按本层实际发展的数学路线组织阅读，不把目录名当作额外的公理层级。单个定理的理论强度仍由参数和审计切片确定。
+这里按数学依赖关系组织阅读，不把目录名当作额外的公理层级。单个定理的理论强度仍由参数和审计切片确定。
 
 | 阶段 | 先读 | 随后得到 |
 | --- | --- | --- |

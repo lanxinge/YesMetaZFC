@@ -154,8 +154,7 @@ theorem Term.eval_eq_of_agreesOn {σ : Signature.{u, v, w}}
   | bvar entry =>
       exact hEnv.1 entry
   | fvar entry =>
-      exact hEnv.2 entry (by
-        simp [Term.freeSupport])
+      exact hEnv.2 entry (FreeSupport.contains_singleton_self entry)
   | app function arguments =>
       exact congrArg (M.funcInterp function)
         (Arguments.eval_eq_of_agreesOn arguments hEnv)
@@ -178,8 +177,10 @@ theorem Arguments.eval_eq_of_agreesOn {σ : Signature.{u, v, w}}
       have hRest : Env.AgreesOn rest.freeSupport left right :=
         hEnv.mono (fun position hMem =>
           FreeSupport.contains_union.mpr (Or.inr hMem))
-      simp [Arguments.eval, Term.eval_eq_of_agreesOn term hTerm,
-        Arguments.eval_eq_of_agreesOn rest hRest]
+      change Values.cons (term.eval left) (rest.eval left) =
+        Values.cons (term.eval right) (rest.eval right)
+      exact congr (congrArg Values.cons (Term.eval_eq_of_agreesOn term hTerm))
+        (Arguments.eval_eq_of_agreesOn rest hRest)
 
 end
 
@@ -194,11 +195,12 @@ theorem satisfies_iff_of_agreesOn {σ : Signature.{u, v, w}}
     satisfies left φ ↔ satisfies right φ := by
   induction φ with
   | falsum =>
-      simp [satisfies]
+      exact Iff.rfl
   | truth =>
-      simp [satisfies]
+      exact Iff.rfl
   | rel relation arguments =>
-      simp [satisfies, Arguments.eval_eq_of_agreesOn arguments hEnv]
+      exact Iff.of_eq (congrArg (M.relInterp relation)
+        (Arguments.eval_eq_of_agreesOn arguments hEnv))
   | equal leftTerm rightTerm =>
       have hLeft : Env.AgreesOn leftTerm.freeSupport left right :=
         hEnv.mono (fun position hMem =>
@@ -206,10 +208,12 @@ theorem satisfies_iff_of_agreesOn {σ : Signature.{u, v, w}}
       have hRight : Env.AgreesOn rightTerm.freeSupport left right :=
         hEnv.mono (fun position hMem =>
           FreeSupport.contains_union.mpr (Or.inr hMem))
-      simp [satisfies, Term.eval_eq_of_agreesOn leftTerm hLeft,
-        Term.eval_eq_of_agreesOn rightTerm hRight]
+      change (leftTerm.eval left = rightTerm.eval left) ↔
+        (leftTerm.eval right = rightTerm.eval right)
+      exact Iff.of_eq (congr (congrArg Eq (Term.eval_eq_of_agreesOn leftTerm hLeft))
+        (Term.eval_eq_of_agreesOn rightTerm hRight))
   | neg body ih =>
-      simpa [satisfies] using not_congr (ih hEnv)
+      exact not_congr (ih hEnv)
   | conj leftFormula rightFormula ihLeft ihRight
   | disj leftFormula rightFormula ihLeft ihRight
   | imp leftFormula rightFormula ihLeft ihRight
@@ -220,7 +224,12 @@ theorem satisfies_iff_of_agreesOn {σ : Signature.{u, v, w}}
       have hRight : Env.AgreesOn rightFormula.freeSupport left right :=
         hEnv.mono (fun position hMem =>
           FreeSupport.contains_union.mpr (Or.inr hMem))
-      simp [satisfies, ihLeft hLeft, ihRight hRight]
+      first
+      | exact and_congr (ihLeft hLeft) (ihRight hRight)
+      | exact or_congr (ihLeft hLeft) (ihRight hRight)
+      | exact imp_congr (ihLeft hLeft) (ihRight hRight)
+      | exact ⟨fun h => (ihLeft hLeft).symm.trans (h.trans (ihRight hRight)),
+          fun h => (ihLeft hLeft).trans (h.trans (ihRight hRight).symm)⟩
   | forallE sort body ih =>
       constructor
       · intro hSat value
@@ -292,7 +301,10 @@ theorem overlay_agreesOn_source {σ : Signature.{u, v, w}}
   · exact hBound
   · intro sort entry hMem
     change support entry.position = true at hMem
-    simp [overlay, hMem]
+    change (match support entry.position with
+      | true => source.freeVal entry
+      | false => base.freeVal entry) = source.freeVal entry
+    rw [hMem]
 
 /-- 若局部支持与覆盖支持不交，overlay 在局部支持上投影回基环境。 -/
 theorem overlay_agreesOn_base_of_disjoint {σ : Signature.{u, v, w}}
@@ -310,7 +322,10 @@ theorem overlay_agreesOn_base_of_disjoint {σ : Signature.{u, v, w}}
     change ¬ overlaySupport entry.position = true at hNotMem
     cases hValue : overlaySupport entry.position with
     | false =>
-        simp [overlay, hValue]
+        change (match overlaySupport entry.position with
+          | true => source.freeVal entry
+          | false => base.freeVal entry) = base.freeVal entry
+        rw [hValue]
     | true =>
         exact False.elim (hNotMem hValue)
 
@@ -357,7 +372,11 @@ theorem merge_freeVal_of_not_mem {σ : Signature.{u, v, w}}
       change ¬ entry.support freeEntry.position = true at hHead
       cases hValue : entry.support freeEntry.position with
       | false =>
-          simpa [merge, overlay, hValue] using ih hRest
+          change (match entry.support freeEntry.position with
+            | true => entry.env.freeVal freeEntry
+            | false => (merge base rest).freeVal freeEntry) = base.freeVal freeEntry
+          rw [hValue]
+          exact ih hRest
       | true =>
           exact False.elim (hHead hValue)
 
@@ -380,7 +399,11 @@ private theorem agreesOn_merge_cons_of_disjoint
     change ¬ first.support entry.position = true at hNotMem
     cases hValue : first.support entry.position with
     | false =>
-        simpa [merge, overlay, hValue] using hEnv.2 entry hMem
+        change (match first.support entry.position with
+          | true => first.env.freeVal entry
+          | false => (merge base rest).freeVal entry) = source.freeVal entry
+        rw [hValue]
+        exact hEnv.2 entry hMem
     | true =>
         exact False.elim (hNotMem hValue)
 
@@ -406,16 +429,20 @@ theorem merge_agreesOn {σ : Signature.{u, v, w}}
         intro other hOther
         exact hBound other (List.mem_cons_of_mem first hOther)
       intro entry hMem
-      rcases List.mem_cons.mp hMem with hEq | hRestMem
-      · cases hEq
+      cases hMem with
+      | head =>
         constructor
         · exact Env.SameBoundStack.trans
             (merge_sameBoundStack base (first :: rest))
             (hBound first List.mem_cons_self)
         · intro sort freeEntry hSupport
           change first.support freeEntry.position = true at hSupport
-          simp [merge, overlay, hSupport]
-      · apply agreesOn_merge_cons_of_disjoint
+          change (match first.support freeEntry.position with
+            | true => first.env.freeVal freeEntry
+            | false => (merge base rest).freeVal freeEntry) = first.env.freeVal freeEntry
+          rw [hSupport]
+      | tail _ hRestMem =>
+        apply agreesOn_merge_cons_of_disjoint
           (hFirstDisjoint entry hRestMem)
         exact ih hRestDisjoint hRestBound entry hRestMem
 

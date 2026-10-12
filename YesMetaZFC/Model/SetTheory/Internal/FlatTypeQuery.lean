@@ -1,8 +1,8 @@
 import YesMetaZFC.Model.SetTheory.Internal.FlatTypeNames
-import YesMetaZFC.Model.SetTheory.Internal.CanonicalPredecessor
+import YesMetaZFC.Model.SetTheory.Internal.CanonicalRank
 import YesMetaZFC.Model.SetTheory.Internal.TypeTruth
 
-/-! # 后继秩层内读取原完整类型查询
+/-! # 任意外层中读取较低秩层的原完整类型查询
 
 查询码和名字列保持原编码。名字列的定义域及平坦赋值由有界矩阵检验，
 原 Kuratowski 元组、中间列和完整赋值仅用于背景证明，不作为源内见证。
@@ -50,7 +50,7 @@ def tf_query_s : UnarySchema 6 where
     (∃ g, ⌜Formula.isFunctionFromTo FlatPairing.convention⌝ₚ(g, ⌜(.bound 6 : Term 7)⌝ₛ, ⌜(.bound 5 : Term 7)⌝ₛ) ∧
       ⌜tf_fill0_m⌝ₚ(⌜(.bound 6 : Term 7)⌝ₛ, ⌜(.bound 5 : Term 7)⌝ₛ, ⌜(.bound 4 : Term 7)⌝ₛ,
         ⌜(.bound 3 : Term 7)⌝ₛ, ⌜(.bound 2 : Term 7)⌝ₛ, ⌜(.bound 1 : Term 7)⌝ₛ, b, e, g) ∧
-      ⌜sc_prev_m⌝ₚ(⌜(.bound 6 : Term 7)⌝ₛ, ⌜(.bound 1 : Term 7)⌝ₛ, z, g))⟫
+      ⌜sc_lower_m⌝ₚ(⌜(.bound 6 : Term 7)⌝ₛ, ⌜(.bound 4 : Term 7)⌝ₛ, ⌜(.bound 5 : Term 7)⌝ₛ, z, g))⟫
 
 def tf_query_m {d} (ω X Z n h δ p : Term d) : Formula 1 d :=
   pred_m tf_query_s (Fin.cases δ (Fin.cases h (Fin.cases n (Fin.cases Z (Fin.cases X (fun _ => ω)))))) p
@@ -61,8 +61,8 @@ def tf_query_m {d} (ω X Z n h δ p : Term d) : Formula 1 d :=
     (tf_query_m ω X Z n h δ p).FreeClosed :=
   pred_m_freeClosed tf_query_s _ _ (Fin.cases hδ (Fin.cases hh (Fin.cases hn (Fin.cases hZ (Fin.cases hX (fun _ => hω)))))) hp
 
-variable (hZF : M.Models ZF) {ω ν μ Y : M.Domain} (hω : M.IsOmega ω)
-  (hW : V_d (kp_pair_l (ZF.modelsKP hZF)) μ Y) (hs : M.SuccessorOf μ ν) (hωY : M.mem ω Y)
+variable (hZF : M.Models ZF) {ω μ Y : M.Domain} (hω : M.IsOmega ω)
+  (hW : V_d (kp_pair_l (ZF.modelsKP hZF)) μ Y) (hωY : M.mem ω Y)
 local notation "Q" => kp_pair_l (ZF.modelsKP hZF)
 local notation "K" => fp_interpretation_l (ZF.models_kpi_l hZF)
 local notation "T" => ZF.v_transitive_l Q hZF hW
@@ -70,9 +70,10 @@ local notation "nz" => Nonempty.intro (Subtype.mk ω hωY)
 local notation "N" => rt_model_l Y nz
 local notation "J" => fp_rank_interpretation_l Q hZF hω hW hωY
 
-include hω hW hs in
-private theorem tf_query_values_l (A B n h δ p : (N).Domain) (hV : V_d Q ν A.val)
-    (hZ : V_d Q δ.val B.val) (hδ : M.IsLimitOrdinal δ.val) (hωδ : M.mem ω δ.val)
+include hω hW in
+private theorem tf_query_values_l (A B n h δ p : (N).Domain) {ν ξ : M.Domain}
+    (hV : V_d Q ν A.val) (hων : M.MemberSubset ω ν)
+    (hZ : V_d Q ξ B.val) (hξ : M.IsLimitOrdinal ξ) (hωξ : M.mem ω ξ)
     {c R s U D : M.Domain} (hm : Smem_d Q c A.val R) (hn : M.mem n.val ω)
     (tuple : Fn0_d n.val A.val s) (point : M.mem δ.val A.val) (constants : M.MemberSubset U A.val)
     (pool : Tt_pool_d Q ω n.val U D) (hp : M.mem p.val D) (hpZ : M.mem p.val B.val)
@@ -80,13 +81,9 @@ private theorem tf_query_values_l (A B n h δ p : (N).Domain) (hV : V_d Q ν A.v
     tf_query_s.denote (⟨Fin.cases δ (Fin.cases h (Fin.cases n (Fin.cases B
       (Fin.cases A (fun _ => ⟨ω, hωY⟩))))), fun _ => h⟩ : Env N 6) p ↔
       Tt_query_d Q ω c n.val s δ.val p.val := by
-  let ρ : Env N 7 := ⟨Fin.cases p (Fin.cases δ (Fin.cases h (Fin.cases n (Fin.cases B
-    (Fin.cases A (fun _ => ⟨ω, hωY⟩)))))), fun _ => h⟩
+  let ρ : Env N 7 := (⟨Fin.cases δ (Fin.cases h (Fin.cases n (Fin.cases B
+    (Fin.cases A (fun _ => ⟨ω, hωY⟩))))), fun _ => h⟩ : Env N 6).push p
   have trans := ZF.v_transitive_l Q hZF hZ
-  have hων : M.MemberSubset ω ν := by
-    rcases (hs ω).mp (ZF.v_ordinal_height_l hZF hW (hω.isOrdinal hZF) hωY) with lt | eq
-    · exact (v_ordinal_l Q hV).transitive ω lt
-    · exact fun i hi => (eq i).mp hi
   obtain ⟨z₀, b₀, e₀, r₀, f₀, code, hz₀, hb₀, dom, assign, fill, fn, query⟩ :=
     pool.realize_l hZF hω (c := c) hn tuple point constants hp
   have he₀ := (code.mem_l M trans hpZ).2
@@ -109,10 +106,10 @@ private theorem tf_query_values_l (A B n h δ p : (N).Domain) (hV : V_d Q ν A.v
   have prev (z b e g : (N).Domain) (hz : M.mem z.val ω) (hg : M.IsSetFunctionFromTo K g.val ω A.val)
       (fg : Sx_graph_d Q K f₀ g.val) :
       Formula.satisfies ((((ρ.push z).push b).push e).push g)
-        (sc_prev_m (.bound 10) (.bound 5) (.bound 3) .newest) ↔ Sc_sat_d Q ω c z.val f₀ :=
-    sc_prev_source_l hZF hω hV hW hs hωY ((((ρ.push z).push b).push e).push g)
-      (.bound 10) (.bound 5) (.bound 3) .newest rfl hδ hωδ hz hm ff hg fg
-  change Formula.satisfies ρ tf_query_s.body ↔ _
+        (sc_lower_m (.bound 10) (.bound 8) (.bound 9) (.bound 3) .newest) ↔ Sc_sat_d Q ω c z.val f₀ :=
+    sc_lower_source_l hZF hω hW hωY ((((ρ.push z).push b).push e).push g)
+      (.bound 10) (.bound 8) (.bound 9) (.bound 3) .newest rfl hZ hξ hωξ hV hων hz hm ff hg fg
+  dsimp only [UnarySchema.denote]
   simp only [tf_query_s, Formula.satisfies_existsMem_iff, Formula.satisfies_conj_iff,
     Formula.satisfies_exists_iff, Formula.satisfies_isFunctionFromTo_iff J (rt_model_ext_l hZF.1 T nz),
     Definitional.Term.eval_weaken]
@@ -132,7 +129,7 @@ private theorem tf_query_values_l (A B n h δ p : (N).Domain) (hV : V_d Q ν A.v
     -- 只把重编码后的完整赋值送入 Y；原 r₀、f₀ 仍留在背景中。
     obtain ⟨g, hg, fg⟩ := fn_recode_l Q K hZF ff
     have nat : M.MemberSubset ω A.val := fun i hi => ZF.v_ordinal_mem_l Q hZF hV (hων i hi)
-    have hG := (ZF.v_successor_l Q hZF hV hW hs g).mpr (fp_function_rank_l Q hZF hω hV hων nat hg)
+    have hG := ZF.v_subset_mem_l Q hZF hW A.property (fp_function_rank_l Q hZF hω hV hων nat hg)
     let z : (N).Domain := ⟨z₀, T ω hωY z₀ hz₀⟩
     let b : (N).Domain := ⟨b₀, T ω hωY b₀ hb₀⟩
     let e : (N).Domain := ⟨e₀, T B.val B.property e₀ he₀⟩
@@ -143,10 +140,10 @@ private theorem tf_query_values_l (A B n h δ p : (N).Domain) (hV : V_d Q ν A.v
       (matrix z b e g').mpr ((tf_fill_iff_l hZF trans he₀ agree assign fill ff hg).mpr fg),
       (prev z b e g' hz₀ hg fg).mpr (query.mp truth)⟩
 
-include hω hW hs in
+include hω hW in
 theorem tf_query_source_l {d} (ρ : Env N d) (w A B n h δ p : Term d) (hw : w.eval ρ = ⟨ω, hωY⟩)
-    (hV : V_d Q ν (A.eval ρ).val) (hZ : V_d Q (δ.eval ρ).val (B.eval ρ).val)
-    (hδ : M.IsLimitOrdinal (δ.eval ρ).val) (hωδ : M.mem ω (δ.eval ρ).val)
+    {ν ξ : M.Domain} (hV : V_d Q ν (A.eval ρ).val) (hων : M.MemberSubset ω ν)
+    (hZ : V_d Q ξ (B.eval ρ).val) (hξ : M.IsLimitOrdinal ξ) (hωξ : M.mem ω ξ)
     {c R s U D : M.Domain} (hm : Smem_d Q c (A.eval ρ).val R) (hn : M.mem (n.eval ρ).val ω)
     (tuple : Fn0_d (n.eval ρ).val (A.eval ρ).val s) (point : M.mem (δ.eval ρ).val (A.eval ρ).val)
     (constants : M.MemberSubset U (A.eval ρ).val) (pool : Tt_pool_d Q ω (n.eval ρ).val U D)
@@ -162,7 +159,7 @@ theorem tf_query_source_l {d} (ρ : Env N d) (w A B n h δ p : Term d) (hw : w.e
       (Fin.cases rfl (Fin.cases rfl (fun _ => hw)))))) i
   exact (Formula.satisfies_bind _ _ _).trans
     ((Formula.closed_env_l tf_query_s.body tf_query_s.freeClosed env).trans
-      (tf_query_values_l hZF hω hW hs hωY (A.eval ρ) (B.eval ρ) (n.eval ρ) (h.eval ρ) (δ.eval ρ) (p.eval ρ)
-        hV hZ hδ hωδ hm hn tuple point constants pool hp hpZ agree))
+      (tf_query_values_l hZF hω hW hωY (A.eval ρ) (B.eval ρ) (n.eval ρ) (h.eval ρ) (δ.eval ρ) (p.eval ρ)
+        hV hων hZ hξ hωξ hm hn tuple point constants pool hp hpZ agree))
 
 end YesMetaZFC.SetTheory.Internal

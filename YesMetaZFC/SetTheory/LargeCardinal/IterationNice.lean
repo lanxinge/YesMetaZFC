@@ -20,14 +20,34 @@ theorem It_payload_d.unique_l {p κ L F κ' L' F' : M.Domain}
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp gp
   exact ⟨rfl, kpair_injective_l M hr gs⟩
 
-structure It_nice_d (ω c α T Q G E L : M.Domain) : Prop where
+/-- 支撑列只记录实际扩展器；恒等 padding 不添加虚假的支撑。 -/
+structure It_pnice_d (ω c α T Q G E L : M.Domain) : Prop where
   tree : It_tree_d hZF ω c α T Q G E
   function : M.IsSetFunction I L
   levels : ∀ i ρ, Rd_entry_d i ρ L ↔ ∃ p κ F, Rd_entry_d i p E ∧ It_payload_d p κ ρ F
-  active : ∀ i p, Rd_entry_d i p E → ∃ κ ρ F, It_payload_d p κ ρ F
   exactness : ∀ i p κ ρ F a X R, Rd_entry_d i p E → It_payload_d p κ ρ F → Rd_entry_d i a Q →
     Smem_d I a X R → Ex_strength_d hZF ω κ ρ X F ∧ Sc_inaccessible_d ω X ρ
   increasing : ∀ i j ρ φ, Rd_entry_d i ρ L → Rd_entry_d j φ L → M.mem i j → M.mem ρ φ
+
+/-- 无 padding 的子类用于逐项复制；共同强度条件全部继承自一般树。 -/
+structure It_nice_d (ω c α T Q G E L : M.Domain) : Prop extends It_pnice_d hZF ω c α T Q G E L where
+  active : ∀ i p, Rd_entry_d i p E → ∃ κ ρ F, It_payload_d p κ ρ F
+
+/-- 有限树的末项支撑界住整列；最后一项允许等号。 -/
+theorem It_pnice_d.last_bound_l {ω c β α ξ T Q G E H L : M.Domain}
+    (h : It_pnice_d hZF ω c β T Q G E H) (hb : M.SuccessorOf β α) (ha : M.SuccessorOf α ξ)
+    (last : Rd_entry_d ξ L H) : ∀ i μ, Rd_entry_d i μ H → M.mem μ L ∨ μ = L := by
+  intro i μ hi
+  obtain ⟨p, _, _, hp, _⟩ := (h.levels i μ).mp hi
+  obtain ⟨j, hj, sj⟩ := (h.tree.move_domain i).mp ⟨p, hp⟩
+  have oa := h.tree.diagram.order.ordinal.mem hb.predecessor_mem
+  have hia : M.mem i α := ((hb j).mp hj).elim
+    (fun hj => oa.transitive j hj i sj.predecessor_mem)
+    (fun eq => (hZF.1.eq_of_same_members j α eq) ▸ sj.predecessor_mem)
+  rcases (ha i).mp hia with lt | eq
+  · exact Or.inl (h.increasing i ξ μ L hi last lt)
+  · have eq := hZF.1.eq_of_same_members i ξ eq
+    exact Or.inr (h.function.2 ξ μ L (eq ▸ hi) last)
 
 /-- 原树步中的 padding 与非空扩展器码矛盾，故读取的是同一条实际超幂边。 -/
 theorem It_nice_d.step_l {ω c₀ α T Q G E L i j : M.Domain}
@@ -49,19 +69,19 @@ theorem it_nice_root_l {ω c : M.Domain} (source : It_source_d hZF ω c) :
     ∃ z α T Q G, (∀ x, ¬ M.mem x z) ∧ M.SuccessorOf α z ∧ It_nice_d hZF ω c α T Q G z z := by
   obtain ⟨z, α, T, Q, G, hz, hα, tree⟩ := it_root_l hZF source
   have no i p (h : Rd_entry_d i p z) : False := h.elim fun r hr => hz r hr.2
-  exact ⟨z, α, T, Q, G, hz, hα, tree, tree.move_function,
+  exact ⟨z, α, T, Q, G, hz, hα, ⟨tree, tree.move_function,
     fun i ρ => ⟨fun h => (no i ρ h).elim, fun ⟨p, _, _, h, _⟩ => (no i p h).elim⟩,
-    fun i p h => (no i p h).elim, fun i p _ _ _ _ _ _ h => (no i p h).elim,
-    fun i _ ρ _ h => (no i ρ h).elim⟩
+    fun i p _ _ _ _ _ _ h => (no i p h).elim,
+    fun i _ ρ _ h => (no i ρ h).elim⟩, fun i p h => (no i p h).elim⟩
 
 /-- 同一个真实扩展器添枝，同时延长其最大强度列。 -/
-theorem it_nice_apply_l {ω c₀ α ξ T Q G E L k c d b j X R Y S κ ρ F : M.Domain}
-    (h : It_nice_d hZF ω c₀ α T Q G E L) (hα : M.SuccessorOf α ξ)
+theorem it_pnice_apply_l {ω c₀ α ξ T Q G E L k c d b j X R Y S κ ρ F : M.Domain}
+    (h : It_pnice_d hZF ω c₀ α T Q G E L) (hα : M.SuccessorOf α ξ)
     (hc : Rd_entry_d ξ c Q) (hd : Rd_entry_d k d Q) (mx : Smem_d I c X R) (my : Smem_d I d Y S)
     (loc : It_local_d ω X κ ρ F) (agree : Ea_agree_d ω κ X Y) (ultra : It_ultra_d hZF ω κ ρ F d b j)
     (source : It_source_d hZF ω b) (strength : Ex_strength_d hZF ω κ ρ X F)
     (inaccessible : Sc_inaccessible_d ω X ρ) (above : ∀ i φ, Rd_entry_d i φ L → M.mem φ ρ) :
-    ∃ β U Q' G' E' L' p, It_nice_d hZF ω c₀ β U Q' G' E' L' ∧
+    ∃ β U Q' G' E' L' p, It_pnice_d hZF ω c₀ β U Q' G' E' L' ∧
       It_extension_d α ξ k T Q G E β U Q' G' E' ∧ Rd_entry_d α b Q' ∧ It_map_d G' k α j ∧
       It_payload_d p κ ρ F ∧ Rd_entry_d ξ p E' ∧ Rd_entry_d ξ ρ L' := by
   classical
@@ -94,10 +114,8 @@ theorem it_nice_apply_l {ω c₀ α ξ T Q G E L k c d b j X R Y S κ ρ F : M.D
       rcases (moves i q).mp hq with hq | ⟨rfl, rfl⟩
       · exact Or.inl ((h.levels i φ).mpr ⟨q, μ, H, hq, pay⟩)
       · exact Or.inr ⟨rfl, (payload.unique_l pay).2.1.symm⟩
-  refine ⟨β, U, Q', G', E', L', p, ⟨tree, lf, levels, ?_, ?_, ?_⟩,
+  refine ⟨β, U, Q', G', E', L', p, ⟨tree, lf, levels, ?_, ?_⟩,
     extension, hb, hj, payload, hp, (ls ξ ρ).mpr (Or.inr ⟨rfl, rfl⟩)⟩
-  · intro i q hq
-    exact ((moves i q).mp hq).elim (h.active i q) (fun ⟨_, eq⟩ => eq.symm ▸ ⟨κ, ρ, F, payload⟩)
   · intro i q μ φ H a N V hq pay ha mn
     rcases (moves i q).mp hq with hq | ⟨rfl, rfl⟩
     · have hi := h.tree.diagram.order.ordinal.transitive ξ hα.predecessor_mem i (old i q hq)
@@ -118,5 +136,33 @@ theorem it_nice_apply_l {ω c₀ α ξ T Q G E L k c d b j X R Y S κ ρ F : M.D
       · obtain ⟨q, _, _, hq, _⟩ := (h.levels m ψ).mp hm
         exact (ir _ ((h.tree.diagram.order.ordinal.mem hα.predecessor_mem).transitive m (old m q hq) _ him)).elim
       · exact (ir _ him).elim
+
+/-- 恒等延长保存原模型与全部旧图，支撑列保持原值。 -/
+theorem It_pnice_d.pad_l {ω c₀ α ξ T Q G E L : M.Domain}
+    (h : It_pnice_d hZF ω c₀ α T Q G E L) (succ : M.SuccessorOf α ξ) :
+    ∃ β U Q' G' E' c j, It_pnice_d hZF ω c₀ β U Q' G' E' L ∧
+      It_extension_d α ξ ξ T Q G E β U Q' G' E' ∧ Rd_entry_d ξ c Q ∧ Rd_entry_d α c Q' ∧
+      It_map_d G' ξ α j ∧ (∀ x y, Rd_entry_d x y j → x = y) ∧
+      ∀ p, Rd_entry_d ξ p E' → ∀ x, ¬ M.mem x p := by
+  classical
+  obtain ⟨β, U, Q', G', E', c, j, _, tree, ext, hc, hc', edge, identity, keep, empty⟩ := it_pad_l hZF h.tree succ
+  have old {i p κ ρ F} (hp : Rd_entry_d i p E') (pay : It_payload_d p κ ρ F) : Rd_entry_d i p E := by
+    by_cases eq : i = ξ
+    · subst i
+      obtain ⟨r, ⟨u, v, _, _, pair⟩, _⟩ := pay
+      exact (empty p hp u ((pair u).mpr (Or.inl rfl))).elim
+    · exact (ext.2.2.2.2.2 i p eq).mp hp
+  refine ⟨β, U, Q', G', E', c, j, ⟨tree, h.function, ?_, ?_, h.increasing⟩,
+    ext, hc, hc', edge, identity, empty⟩
+  · intro i ρ
+    exact (h.levels i ρ).trans ⟨fun ⟨p, κ, F, hp, pay⟩ => ⟨p, κ, F, keep i p hp, pay⟩,
+      fun ⟨p, κ, F, hp, pay⟩ => ⟨p, κ, F, old hp pay, pay⟩⟩
+  · intro i p κ ρ F a X R hp pay ha mx
+    have hp := old hp pay
+    obtain ⟨n, hn, sn⟩ := (h.tree.move_domain i).mp ⟨p, hp⟩
+    have hi := h.tree.diagram.order.ordinal.transitive n hn i sn.predecessor_mem
+    obtain ⟨b, hb⟩ := (h.tree.diagram.model_domain i).mp hi
+    have eq := tree.diagram.model_function.2 i a b ha (ext.2.2.1 i b hb)
+    exact h.exactness i p κ ρ F a X R hp pay (eq.symm ▸ hb) mx
 
 end YesMetaZFC.SetTheory.LargeCardinal

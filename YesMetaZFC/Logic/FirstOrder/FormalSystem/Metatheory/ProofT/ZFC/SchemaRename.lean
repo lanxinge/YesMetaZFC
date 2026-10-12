@@ -184,7 +184,28 @@ def valid (targetDepth : Nat) (table : List Nat) : Bool :=
 
 theorem valid_eq_true_iff (targetDepth : Nat) (table : List Nat) :
     valid targetDepth table = true ↔ ∀ index, index ∈ table → index < targetDepth := by
-  simp [valid]
+  have and_true : ∀ left right : Bool, (left && right) = true → left = true ∧ right = true := by
+    intro left right h
+    cases left <;> cases right <;> cases h <;> exact ⟨rfl, rfl⟩
+  induction table with
+  | nil =>
+    constructor
+    · intro _ index h
+      cases h
+    · intro _
+      rfl
+  | cons head tail ih =>
+    constructor
+    · intro h index hIndex
+      have hParts := and_true _ _ h
+      cases hIndex with
+      | head => exact of_decide_eq_true hParts.1
+      | tail _ hIndex => exact ih.mp hParts.2 index hIndex
+    · intro h
+      change (decide (head < targetDepth) && valid targetDepth tail) = true
+      rw [decide_eq_true (h head (.head _)),
+        ih.mpr (fun index hIndex => h index (.tail _ hIndex))]
+      rfl
 
 def indexMap (targetDepth : Nat) (table : List Nat) (hValid : valid targetDepth table = true) :
     Fin table.length → Fin targetDepth := fun index =>

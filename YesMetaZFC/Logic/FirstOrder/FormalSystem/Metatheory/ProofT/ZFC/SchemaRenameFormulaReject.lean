@@ -7,6 +7,12 @@ open _root_.YesMetaZFC.Automation ObjectHorn
 open scoped Nonlogical.BasicSetTheory.Symbols
 set_option autoImplicit false
 
+/-- 通过原树数值码的单射，构造树的可判定相等；只在下述有限分支中使用。 -/
+private def treeDecidableEq (left right : Tree) : Decidable (left = right) :=
+  match Nat.decEq (treeValue left) (treeValue right) with
+  | .isTrue h => .isTrue (treeValue_injective h)
+  | .isFalse h => .isFalse (fun hEq => h (congrArg treeValue hEq))
+
 private theorem atom_success (tag : Nat) (table : List Nat) (left right leftOut rightOut : Tree)
     (hTag : tag = 2 ∨ tag = 3 ∨ tag = 11)
     (hLeft : SchemaRename.term table left = some leftOut) (hRight : SchemaRename.term table right = some rightOut) :
@@ -36,7 +42,7 @@ private theorem reject_atom_matched (tag : Nat) (table : List Nat) (cutoff : Nat
       nodeValue tag [values 2, values 3] , nodeValue tag [values 4, values 5]])
     (hBad : SchemaRename.formula (lifted cutoff table) input ≠ some output) :
     ∃ premise, premise ∈ (binaryRule tag 3).premises ∧ Rejection rules (premise.eval values) := by
-  classical
+  letI : DecidableEq Tree := treeDecidableEq
   have hFields := ((nodeValue_eq_iff 2 2 [listValue table, cutoff, treeValue input, treeValue output]
     [values 0, values 1, nodeValue tag [values 2, values 3] , nodeValue tag [values 4, values 5]]).mp hHead).2
   simp only [List.cons.injEq, and_true] at hFields
@@ -65,7 +71,7 @@ private theorem reject_binary_matched (tag : Nat) (table : List Nat) (cutoff : N
       SchemaRename.formula (lifted nextCutoff table) child ≠ some childOut →
       Rejection rules (formulaRow table nextCutoff child childOut)) :
     ∃ premise, premise ∈ (binaryRule tag 2).premises ∧ Rejection rules (premise.eval values) := by
-  classical
+  letI : DecidableEq Tree := treeDecidableEq
   have hFields := ((nodeValue_eq_iff 2 2 [listValue table, cutoff, treeValue input, treeValue output]
     [values 0, values 1, nodeValue tag [values 2, values 3] , nodeValue tag [values 4, values 5]]).mp hHead).2
   simp only [List.cons.injEq, and_true] at hFields

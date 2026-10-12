@@ -58,22 +58,34 @@ theorem decode_eq_some_iff (tag count : Nat) (input body : Tree) :
   cases input with
   | node inputTag fields =>
     cases fields with
-    | nil => simp [decode]
+    | nil => constructor <;> intro h <;> cases h
     | cons head tail =>
       cases head with
       | node parameter fields =>
         cases fields with
-        | cons _ _ => simp [decode, leaf]
+        | cons _ _ => constructor <;> intro h <;> cases h
         | nil =>
           cases tail with
-          | nil => simp [decode, leaf]
+          | nil => constructor <;> intro h <;> cases h
           | cons candidate tail =>
             cases tail with
-            | cons _ _ => simp [decode, leaf]
+            | cons _ _ => constructor <;> intro h <;> cases h
             | nil =>
               by_cases h : inputTag = tag
-              · subst inputTag; simp [decode, leaf]
-              · simp [decode, leaf, h]
+              · subst inputTag
+                change (if decide (tag = tag) then some (parameter, candidate) else none) =
+                  some (count, body) ↔ _
+                rw [decide_eq_true (rfl : tag = tag)]
+                constructor <;> intro h <;> cases h <;> rfl
+              · constructor
+                · intro hDecoded
+                  change (if decide (inputTag = tag) then some (parameter, candidate) else none) =
+                    some (count, body) at hDecoded
+                  rw [decide_eq_false h] at hDecoded
+                  cases hDecoded
+                · intro hShape
+                  cases hShape
+                  exact False.elim (h rfl)
 
 theorem check_eq_true_iff (tag : Nat) (input : Tree) :
     check tag input = true ↔ ∃ count body, input = .node tag [leaf count, body] := by

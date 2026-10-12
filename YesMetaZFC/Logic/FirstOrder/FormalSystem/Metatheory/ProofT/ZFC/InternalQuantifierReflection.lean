@@ -34,12 +34,21 @@ theorem exists_values (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
 
 theorem exists_neg_forall_derives (body : SetOpenFormula (.set :: free)) :
     Derives intrinsic_zfc_theory [] (.imp ((Formula.neg body).existsFreeTop SetSort.set) (.neg (body.forallFreeTop SetSort.set))) := by
-  apply source_complete
-  intro 𝒩 _ env
-  simp only [Formula.satisfies, Formula.satisfies_existsFreeTop, Formula.satisfies_forallFreeTop]
-  intro h hn
-  obtain ⟨input, hi⟩ := h
-  exact hi (hn input)
+  apply Derives.imp_intro
+  apply Derives.neg_intro
+  have hUniversal : Derives intrinsic_zfc_theory
+      [body.forallFreeTop SetSort.set, (Formula.neg body).existsFreeTop SetSort.set]
+      (body.forallFreeTop SetSort.set) :=
+    Derives.assumption List.mem_cons_self
+  have hExistential : Derives intrinsic_zfc_theory
+      [body.forallFreeTop SetSort.set, (Formula.neg body).existsFreeTop SetSort.set]
+      ((Formula.neg body).existsFreeTop SetSort.set) :=
+    Derives.assumption (List.mem_cons_of_mem _ List.mem_cons_self)
+  apply Derives.exists_elim hExistential
+  change Derives intrinsic_zfc_theory _ .falsum
+  exact Derives.neg_elim
+    (Derives.forall_elim_newest hUniversal).context_weaken_cons
+    (Derives.assumption List.mem_cons_self)
 
 theorem forall_counterexample (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     (body : SetOpenFormula (.set :: free)) (values : Nat → 𝒩.Carrier .set) (hv : NumeralValues 𝒩 values)

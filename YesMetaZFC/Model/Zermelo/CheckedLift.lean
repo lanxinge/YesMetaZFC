@@ -143,7 +143,7 @@ theorem cp_collect_rebuild {n} (s : Project.Sentence) (φ : Project.BinarySchema
 /-- info: 'YesMetaZFC.Model.Zermelo.cp_proofs_sound' depends on axioms: [propext, Quot.sound] -/
 #guard_msgs in
 #print axioms cp_proofs_sound
-/-- info: 'YesMetaZFC.Model.Zermelo.cp_proofs_complete' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+/-- info: 'YesMetaZFC.Model.Zermelo.cp_proofs_complete' depends on axioms: [propext, Quot.sound] -/
 #guard_msgs in
 #print axioms cp_proofs_complete
 /-- info: 'YesMetaZFC.Model.Zermelo.cp_matrix_lift' depends on axioms: [propext, Quot.sound] -/

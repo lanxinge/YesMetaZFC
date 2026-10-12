@@ -36,7 +36,7 @@ theorem Ic_history_d.attempt_l {ω T Q G E L H Q' G' U C ι o X₀ A₀ π₀ z�
   have hω := full₀.source.omega
   have hi := (tree.model_domain i).mpr ⟨c, hc⟩
   have hoω := (tree.model_domain o).mpr ⟨c₀, hc₀⟩
-  have root := tree.order.omega_root_l hZF hω ho i hi
+  have root := tree.order.root_l hZF ho i hi
   obtain ⟨g, hg⟩ := hist.diagram.map_l hZF root
   have j := hist.diagram.elementary o i g z₀ Z₀ R₀ z Z Rz hg hz₀ hz mz₀.1 mz.1
   obtain ⟨cc, point, tt, qq, gg, uu⟩ := it_countable_fixed_l hZF hω tree en

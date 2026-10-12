@@ -100,7 +100,6 @@ theorem fn_name_eq_l {b T w f p s t v} (h : Fn_name_d M B R z b T w f)
         (force_entry_l hZF.1 _ p _ _ _).mpr hsv⟩)
   exact (code_eq_l M hZF.1 B R z _ _ _ p).mp h₂
 
-set_option maxHeartbeats 600000 in
 /-- 给定条件下的名称成员，其函数值可在该条件以下决定为规范旧索引。 -/
 theorem fn_name_index_l {b c T w f μ p s} (h : Fn_name_d M B R z b T w f)
     (hb : M.mem b B) (hc : M.mem c B) (hw : Check_d M c μ w) (hp : Below_d M B R z p b)
@@ -117,16 +116,23 @@ theorem fn_name_index_l {b c T w f μ p s} (h : Fn_name_d M B R z b T w f)
     (forces_regular_l O hZF _ _ (push_l hρ hs)) hp.1 hp.2.1 h₁ ((forces_mem_l hZF.1 _ _ _ p).mpr hsT)
   obtain ⟨q, hqp, v, hv, hq⟩ := forces_exists_dense_l hZF.1 h₂ p (below_refl_l O hp.1 hp.2.1)
   obtain ⟨hcm, hfc⟩ := (forces_conj_l _ _ _ q).mp hq
-  have hcW := (forces_mem_l hZF.1 _ _ _ q).mp hcm
+  have hcW : Mem_force_d M B R z q v w :=
+    (forces_mem_l hZF.1 .newest (.bound 4) ((ρ.push s).push v) q).mp hcm
   obtain ⟨r, a, d, hrq, had, hrd, hca⟩ := hcW.2 q (below_refl_l O hqp.1 hqp.2.1)
   obtain ⟨_, i, hi, hia⟩ := (check_entry_l M hZF.1 (check_ind_l M hZF)
     (KP.exists_pair (ZF.modelsKP hZF)) hw a d).mp had
   have ha := check_name_l M (check_range_l M hZF) hc hia
-  have hfc' : Rel_force_d M B R z f q s v := (force_entry_l hZF.1 _ q _ _ _).mp hfc
+  have hfc' : Rel_force_d M B R z f q s v :=
+    (force_entry_l hZF.1 ((ρ.push s).push v) q (.bound 1) .newest (.bound 2)).mp hfc
   have hfr := (rel_force_regular_l O hZF h.2.2.1 hs hv).1 q r hqp.1 hrq hfc'
   let φ : UnarySchema 2 := { body := entry_m (.bound 1) .newest (.bound 2) }
-  have hfa : Rel_force_d M B R z f r s a := (forces_name_congr_l O hZF φ (ord_env_l M s f)
-    (Fin.cases hs (fun _ => h.2.2.1)) hv ha hrq.1 hrq.2.1 hca).mp hfr
+  -- 先转成原 entry 公式，再沿名称相等运输。
+  have hφ : Forces_d M B R z φ.body ((ord_env_l M s f).push v) r :=
+    (force_entry_l hZF.1 ((ord_env_l M s f).push v) r (.bound 1) .newest (.bound 2)).mpr hfr
+  have hφ' := (forces_name_congr_l O hZF φ (ord_env_l M s f)
+    (Fin.cases hs (fun _ => h.2.2.1)) hv ha hrq.1 hrq.2.1 hca).mp hφ
+  have hfa : Rel_force_d M B R z f r s a :=
+    (force_entry_l hZF.1 ((ord_env_l M s f).push a) r (.bound 1) .newest (.bound 2)).mp hφ'
   exact ⟨r, i, below_trans_l O hp.1 hrq hqp, hi, a, hia, hfa⟩
 
 /-- 将规范目标的标签移到当前条件；只替换目标名称，不改变单射或定义域。 -/

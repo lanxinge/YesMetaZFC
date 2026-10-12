@@ -1,6 +1,6 @@
 """审计内部模型、公式编译、司寇伦闭包、有限反射及 OD/HOD。
 
-ZF 基础逐声明限制在原七条证书；司寇伦选择与闭包装配另允许原选择公理证书。
+各切片仅允许既有标准 Lean 公理，不再放行原生句法闭合性公理。
 编码和解码数据排除经典选择，司寇伦模块的 ZF 端点另逐项收紧。
 复用实际声明审计，不生成常驻测试模块。
 """
@@ -44,9 +44,58 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
              "ProgramRecodeSemantics", "ProgramRecodeSource", "CanonicalFlat",
              "TypeRolesSyntax", "TypeRolesCode", "TypeRoles")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
-            ("CanonicalPredecessor", "FlatTypeNames", "FlatTypeQuery", "FlatTypePredecessor", "FlatTypeRead")]
+            ("PowerRelativization", "LowerSatisfaction", "CanonicalRank", "FlatTypeNames", "FlatTypeQuery",
+             "FlatTypePredecessor", "FlatTypeRead")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("TuplePackSyntax", "TuplePackStep", "TuplePackCode", "TupleUnpack", "TupleCode", "TypePredecessorCode")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("FiniteSpaceBounded", "TypePoolBounded", "TypeDomain", "TypeKappaSource", "TypeKappaCode")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("ExtenderBoundedConst", "ExtenderLocalFormula", "ExtenderQuality", "TypeStretch",
+             "TypeStretchCode", "TypeStretchBounded", "TypeStretchFormula", "TypeStretchSource",
+             "TypeStretchQuality", "TypeElasticStep", "TypeElasticSource", "TypeElasticCode")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("TypeElasticColumn", "TypeElasticQuery", "TypeElasticClauses", "TypeElastic", "TypeElasticRead")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TuplePackBinder", "TypeColumn", "TypePackedQuery", "TypeLowerSource", "TypePermutation",
+             "SubtypeClause", "SubtypeWitness", "SubtypeQuery", "SubtypeCode", "Subtype",
+             "SubtypeUp", "SubtypeClosure", "SubtypeEmbedding", "SubtypeLift", "TypeExceeds")]
+MODULES += ["YesMetaZFC.SetTheory.Card.Cofinality.OmegaAddition"]
+MODULES += ["YesMetaZFC.SetTheory.Ord.UnboundedFiber"]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("LocalType", "LocalTypeRead")]
+MODULES += ["YesMetaZFC.SetTheory.CumulativeFinite"]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("OrdinalAdditionSource", "TypeMove", "TypeMoveSource", "TypeMoveRead", "TypeMoveQuote")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("LocalIndiscernibles", "LocalIndiscerniblesLeast", "LocalTypeTransport", "LocalTypeTransportTuple")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("FiniteEnumeration", "FiniteSetCode", "TypeGameNode", "TypeGameNodeSource", "TypeGameNodeCode",
+             "TypeGameNodeQuery", "TypeGameRoot", "TypeGameMax", "TypeGameGraph")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("TypeGameDecoding", "TypeGameReset")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TypeDropNames", "TypeDropSyntax", "TypeDropRead", "TypeDrop", "TypeDropAppend", "TypeGameBound", "TypeGameHeight")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("TypeElasticDomain", "TypeGameElastic", "TypeGameRigidity", "TypeGameReply", "TypeGameReplyBuild")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TypeTruthSyntax", "SourceRelative", "SourceInaccessibleSyntax", "SubtypeProgramMatrix",
+             "SubtypeProgramSyntax", "TypeGameQuerySyntax", "TypeExceedsSyntax", "SubtypeSyntax")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("TypeElasticSyntax", "TypeElasticReadSyntax", "TypeElasticLanguageSyntax", "TypeElasticCatalog",
+             "TypeGameProgramCatalog", "TypeGameQueryPacket", "TypeGameQueryCatalog", "TypeGameData",
+             "TypeGameCatalogRead", "TypeGameClock", "TypeGameParameters", "TypeGameHistoryRules",
+             "TypeGameAuxiliary", "TypeGameAnswer", "TypeGameHistory", "TypeGameSetup", "TypeGame", "TypeGameStages", "TypeGameDeterminacy")]
+MODULES += ["YesMetaZFC.SetTheory.Ord.FiniteTail"]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("FiniteTailSource", "SubtypeColumn", "SubtypeRebound", "TypePoolImage", "SubtypeReboundImage",
+             "TypeDropSource", "TypeDropEmbedding", "SubtypeSource")]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("LocalIndiscerniblesGap", "TypeRenewal", "TypeGameRenewal", "ExtenderCriticalPoint",
+             "TypeOneStepImage", "TypeGameStepImage", "IterationWorkingApply",
+             "TypeGameTreeStep", "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
+             "TypeGameReplySource", "TypeGameImageRead")]
+MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
+            ("FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
+             "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
@@ -96,7 +145,8 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("EmbeddingSmallRestriction", "EmbeddingCountableBound", "ExtenderCopyRestriction", "EmbeddingSetRestriction", "ExtenderSourceInclusion", "ExtenderRankLocal", "ExtenderSuccessorUnique")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("EmbeddingOrdinal", "SourceOmegaBound", "SourceHierarchy")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
-            ("TransitiveSource", "TransitiveCardinal", "SourceInaccessible", "SourceInaccessibleRank", "SourceInaccessibleUp")]
+            ("TransitiveSource", "TransitiveFunctionFormula", "TransitiveCofinalFormula", "TransitiveCardinal",
+             "SourceInaccessible", "SourceInaccessibleRead", "SourceInaccessibleRank", "SourceInaccessibleUp")]
 MODULES += ["YesMetaZFC.SetTheory.Card.Syntax", "YesMetaZFC.SetTheory.Card.Properties.Syntax",
             "YesMetaZFC.SetTheory.LargeCardinal.ExtenderInitial"]
 MODULES += ["YesMetaZFC.SetTheory.CumulativeRelativeAlgebra", "YesMetaZFC.SetTheory.LargeCardinal.ExtenderTreeBranch"]
@@ -197,7 +247,7 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderFiniteSyntax", "ExtenderFiniteEvaluation", "ExtenderEmbeddingTree", "ExtenderEmbeddingCountable")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in ("FiniteWitness", "SmallSkolemSyntax")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
-            ("EmbeddingCountable", "EmbeddingFixed", "RegularRankImage", "CollapseCountable", "SourceEnumeration", "SourceFunctionSize", "RelativeCountable")]
+            ("EmbeddingCountable", "EmbeddingFixed", "EmbeddingRankFixed", "RegularRankImage", "CollapseCountable", "SourceEnumeration", "SourceFunctionSize", "RelativeCountable")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("IterationCountableFixed", "IterationCopyAttempt", "IterationAttemptShift", "IterationRankValue",
              "IterationCopyRank", "IterationCopyCut")]
@@ -240,6 +290,18 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("IterationEmbeddingLaws", "IterationLinearOrder", "IterationLimitSyntax", "IterationWeakState",
              "IterationWeakAppend", "IterationWeakHistory", "IterationWeakUnion", "IterationWeakSyntax",
              "IterationWeakAnswerSyntax", "IterationWeakReplay", "IterationWeakPublicWinning")]
+
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("TypeGameCrossImage", "TypeGameReplyReflect", "TypeGameRoundScope", "TypeGameRound",
+             "TypeImageSyntax", "TypeImageRead", "TypeContinueSyntax", "TypeGameContinue", "TypeGameQueryBase",
+             "TypeElasticProgramSyntax", "TypeElasticCodeTransfer", "TypeElasticNumericTransfer",
+             "TypePoolRead", "TypeGameLanguageTransfer", "TypeGameCandidate", "TypeGameSubtype",
+             "TypeContinueRealizeSyntax", "TypeGameRealization", "TypeGameReplyBase", "TypeGameAnchor",
+             "TypeGameQueryTransfer", "TypeGameRigidRead", "TypeGameRecoverySyntax", "TypeGameRecovery",
+             "TypeGameRestart")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("TypeNamesSource", "SubtypeReflect", "TypeGameQueryScope",
+             "TypeProgramSyntax", "TypeProgramSource", "TypeProgramReflect", "SubtypeProgramTransfer")]
 
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Internal." + name for name in
                ("Num_d", "num_m", "num_unique_l", "Smdl_d", "smdl_m", "smdl_structure_l",
@@ -418,7 +480,7 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                  "Er_stage_d", "er_stage_m", "Er_hit_d", "er_hit_m", "Er_hit_d.bound_l", "Eb_collapse_d", "Eb_trace_d")]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory." + name for name in
                    ("InaccessibleHierarchy", "HereditaryFunction", "HereditarySequences")]
-ZFC_BASELINE = BASELINE + ["YesMetaZFC.SetTheory.Axioms.choice._native.native_decide.ax_1"]
+ZFC_BASELINE = BASELINE
 SKOLEM_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial"]
 SKOLEM_MODULES += ["YesMetaZFC.SetTheory.Collapse.RegularRank", "YesMetaZFC.SetTheory.LargeCardinal.IterationAttemptRegular",
                    "YesMetaZFC.SetTheory.LargeCardinal.IterationCountableCover"]
@@ -449,6 +511,9 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("Itera
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("RankEnumeration", "RankCover", "RankLength", "MeasurableInaccessible",
                 "ExtenderPredicateComponent", "ExtenderPredicateLimit", "ExtenderStrengthBound", "ExtenderExactStrength", "ExtenderStrength", "WoodinStrength", "WoodinTrace", "WoodinTypes")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("SubtypeStretch", "TypeOneStep", "WoodinTypeStep")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("WoodinGameTypes", "WoodinGameReset")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in ("ExtenderBranch", "ExtenderLocalRead")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderSourceLimit", "ExtenderSourceNode", "IterationLocalApply", "IterationLocalAgreement",
@@ -600,11 +665,79 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                  "Tr_tag_d", "tr_tag_m", "Tr_zero_d", "Tr_step_d", "tr_zero_m", "tr_step_m",
                  "Tr_roles_d", "tr_roles_m", "Tr_prog_d", "tr_prog_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
-                ("sc_prev_s", "sc_prev_m", "sc_prev_local_m", "fp_entry0_m", "Tf_value_d", "tf_value0_m",
+                ("lp_rel_m", "ft_lower_m", "sc_lower_s", "sc_lower_m", "fp_entry0_m", "Tf_value_d", "tf_value0_m",
                  "Tf_fill_d", "tf_fill0_m", "Tf_dom_d", "tf_dom0_m", "tf_query_s", "tf_query_m",
                  "tf_prev_s", "tf_prev_m", "tf_type_m", "tf_type_local_m", "St_pack_d", "st_pack_m", "st_unpack_s")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Et_stretch_d"]
-# HOD 的 AC 定理仅需原选择句子的自由闭合性证书，不假设背景 AC。
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("fs_space0_m", "tn_names0_m", "tt_pool0_m", "tt_constants0_m", "tf_kappa_s", "tf_kappa_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("Eb_const_d", "eb_const_m", "ex_local_m", "ex_inaccessible_m", "ex_strength_m", "ex_quality_m",
+                 "Eb_stretch_d", "et_stretch0_m", "et_stretch_m", "et_quality_m", "Ee_step_d", "ee_step_s", "ee_step_m",
+                 "Ee_realized_d", "ee_realized_s", "ee_realized_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+                ("Ee_queries_d", "Ee_defined_d", "Ee_elastic_d", "Ee_minus_d", "ee_elastic_m", "Ee_language_d")]
+# 完整实现及编译证书含已有平坦配对的 Prop 证明，适用通用公理边界；纯查询和关系数据另禁选择。
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+                ("Tp_perm_d", "tp_perm0_m", "ts_guard_m", "ts_below_s",
+                 "ts_below_m", "ts_template_m",
+                 "Ts_names_d", "Ts_query_d", "Ts_subtype_d", "Ts_up_d", "ts_up0_m")]
+LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Ee_one_step_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Li_type_d", "li_type_m", "Tt_realized_d.point_env_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Tm_assign_d", "tm_assign0_m", "tm_type_m", "tm_type_f", "tm_params_l", "Tm_move_d", "Tm_quote_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Li_pair_d", "li_pair_m", "Li_least_d", "li_least_m", "Li_finite_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Sg_any_d", "sg_any_m", "Sg_set_d", "sg_set_m", "Tg_graph_d", "tg_graph_m",
+                "Tg_join_d", "tg_join_m", "Tg_node_d", "tg_node_m", "Tg_node_query_d",
+                "Tg_root_query_d", "tg_root_m", "Tg_max_query_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Td_name_d", "td_name_m", "Td_column_d", "td_column_m", "Td_query_d", "td_query_m",
+                "Td_project_d", "td_project_m", "Td_dcp_d", "td_dcp_m", "Tg_bound_d", "tg_bound_m",
+                "Tg_bound_query_d", "Tg_height_d", "tg_height_m", "Tg_height_query_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tg_elastic_d", "tg_elastic_m", "Tg_reply_queries_d", "Tg_reply_d", "Tg_reply_language_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("tt_pool_m", "tt_truth_m", "tt_realized_m", "sr_rel_m", "sc_inaccessible_raw_m",
+                "ts_values_m", "ts_compile_m", "ts_columns_m", "ts_program_m", "tg_node_query_m",
+                "tg_root_query_m", "tg_max_query_m", "tg_bound_raw_m", "tg_height_raw_m", "tg_bound_query_m",
+                "tg_height_query_m", "tp_perm_raw_m", "ts_at_m", "tx_exceeds_m", "ts_names_m", "ts_query_m", "ts_subtype_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("et_stretch_raw_m", "ee_step0_m", "ee_read_m", "ee_successor_m", "ee_domain_m", "ee_inacc_m",
+                "ee_language_m", "ee_packet_m", "tg_program_packet_m", "tg_reply_language_m", "tg_query_request_m",
+                "tg_query_packet_m", "tg_query_key_m", "tg_aux_data_m", "tg_ee_data_m", "tg_query_data_m",
+                "tg_program_data_m", "tg_event_m", "tg_digits_m", "tg_reset_m", "tg_growth_m", "tg_continue_m",
+                "tg_aux_m", "tg_reply_m", "tg_answer_m", "tg_step_m", "tg_check_m", "Tg_aux_data_d",
+                "Tg_ee_data_d", "Tg_query_data_d", "Tg_program_data_d", "Tg_params_d", "Tg_params_d.map_l", "Tg_params_d.closed_l")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
+               ("Cg_first_d", "cg_first_m", "Cg_bad_d", "Cg_safe_d", "Cg_payoff_d", "Cg_legal_d",
+                "Cg_follows_d", "Cg_win_d", "cg_follows_m", "cg_win_m",
+                "Cg_tail_follows_d", "cg_tail_follows_m", "Cg_tail_win_d", "cg_tail_win_m", "Cg_ii_d",
+                "Cg_splice_d", "cg_splice_m", "Cg_avoid_d", "cg_avoid_m", "Cg_det_d", "cg_det_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("woodin0_m", "tg_low0_m", "tg_low_m", "tg_image_m", "tg_seed_m", "tg_seed0_m", "tg_successor_m", "tg_successor0_m",
+                "tg_renewal_m", "tg_context_m", "Tg_context_d", "tg_reply0_m", "Tg_reply_in_d",
+                "tg_round_m", "tg_witness0_m", "tg_round0_m", "tg_round_env_d", "tg_kernel_m",
+                "ti_image_m", "tc_image_m", "tc_seed0_m", "tc_result0_m", "tc_transfer_m",
+                "Tg_query_base_d", "tg_query_base_m", "Ee_numeric_d", "Ee_stretch_read_d", "Ee_stretch_program_d",
+                "Ee_stretch_code_d", "Ee_largest_program_d", "Ee_inacc_program_d", "ee_numeric0_m", "ee_numeric_m",
+                "ee_largest_program0_m", "ee_largest_program_m", "ee_inacc_program0_m", "ee_inacc_program_m",
+                "ee_stretch_program0_m", "ee_stretch_program_m", "ee_stretch_code_m", "ee_stretch_read_m",
+                "ee_realized0_m", "ee_language0_m", "ee_rebuild_seed_m", "ee_rebuild_m",
+                "tg_candidate0_m", "tg_subtype0_m", "Tg_subtype_in_d", "Tg_realized_in_d",
+                "tc_realize_seed0_m", "tc_realize_result0_m", "tc_realize_m", "Tg_anchor_d",
+                "Tg_reply_base_d", "tg_reply_base0_m", "tg_reply_base_m", "tq_basis_m", "tg_query_base0_m", "tg_query_row0_m",
+                "ee_domain_pack0_m", "ee_domain_pack_m", "tc_rigid_seed0_m", "tc_rigid_m",
+                "tc_recover_seed0_m", "tc_recovered_m", "tc_recovered0_m", "tc_recover_result0_m", "tc_recover_m",
+                "tg_restart_env_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
+               ("Ts_column_d", "ts_column_m", "Ts_rebound_d", "ts_rebound_m", "Tt_program_d", "Tt_code_d",
+                "Tg_guard_program_d", "Tg_guard_code_d", "tt_code0_m", "tt_code2_m", "tg_guard_code_m",
+                "tg_guard_program0_m", "tg_guard_program_m", "ts_program0_m", "ts_numeric0_m", "ts_numeric_m",
+                "Ts_program_in_d", "tt_realized0_m", "ts_at0_m", "tx_exceeds0_m")]
+# HOD 的对象 AC 定理保持原背景假设；选择句子的闭合性证书由内核检查。
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
                  ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}

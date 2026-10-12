@@ -83,7 +83,8 @@ theorem it_root_l {ω c : M.Domain} (ready : It_source_d hZF ω c) :
 theorem it_pad_l {ω c₀ α ξ T Q G E : M.Domain} (tree : It_tree_d hZF ω c₀ α T Q G E)
     (hα : M.SuccessorOf α ξ) : ∃ β U Q' G' E' c j, M.SuccessorOf β α ∧ It_tree_d hZF ω c₀ β U Q' G' E' ∧
       It_extension_d α ξ ξ T Q G E β U Q' G' E' ∧ Rd_entry_d ξ c Q ∧ Rd_entry_d α c Q' ∧ It_map_d G' ξ α j ∧
-      (∀ x y, Rd_entry_d x y j → x = y) ∧ (∀ i f, Rd_entry_d i f E → Rd_entry_d i f E') := by
+      (∀ x y, Rd_entry_d x y j → x = y) ∧ (∀ i f, Rd_entry_d i f E → Rd_entry_d i f E') ∧
+      ∀ p, Rd_entry_d ξ p E' → ∀ x, ¬ M.mem x p := by
   obtain ⟨c, hc⟩ := (tree.diagram.model_domain ξ).mp hα.predecessor_mem
   obtain ⟨X, R, K, code, source⟩ := tree.sources ξ c hc
   obtain ⟨j, hj, js⟩ := smap_identity_l I hZF (c := c) (X := X) tree.omega
@@ -93,7 +94,10 @@ theorem it_pad_l {ω c₀ α ξ T Q G E : M.Domain} (tree : It_tree_d hZF ω c�
     ⟨X, R, K, code, source⟩ (Or.inl ⟨hp, rfl, rfl, idj⟩)
   refine ⟨β, U, Q', G', E', c, j, hβ, h', ⟨hβ, us, fun i a hi => (qs i a).mpr (Or.inl hi), gs,
     fun i a hi => (es i a).mpr (Or.inl hi), ?_⟩, hc, (qs α c).mpr (Or.inr ⟨rfl, rfl⟩), edge, idj,
-    fun i f hi => (es i f).mpr (Or.inl hi)⟩
-  exact fun i a hi => (es i a).trans ⟨fun hh => hh.elim id (fun hh => (hi hh.1).elim), Or.inl⟩
+    fun i f hi => (es i f).mpr (Or.inl hi), ?_⟩
+  · exact fun i a hi => (es i a).trans ⟨fun hh => hh.elim id (fun hh => (hi hh.1).elim), Or.inl⟩
+  · intro q hq
+    have eq := h'.move_function.2 ξ q p hq ((es ξ p).mpr (Or.inr ⟨rfl, rfl⟩))
+    exact eq.symm ▸ hp
 
 end YesMetaZFC.SetTheory.LargeCardinal

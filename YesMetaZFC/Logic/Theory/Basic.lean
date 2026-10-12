@@ -61,7 +61,7 @@ theorem finitely_axiomatized_empty
     FinitelyAxiomatized (empty : Theory σ) := by
   refine ⟨[], ?_⟩
   intro sentence
-  simp [empty]
+  exact ⟨False.elim, fun h => nomatch h⟩
 
 /-- 单公理理论是有限公理化的。 -/
 theorem finitely_axiomatized_singleton
@@ -69,7 +69,14 @@ theorem finitely_axiomatized_singleton
     FinitelyAxiomatized (singleton sentence) := by
   refine ⟨[sentence], ?_⟩
   intro candidate
-  simp [singleton]
+  constructor
+  · intro h
+    cases h
+    exact .head []
+  · intro h
+    cases h with
+    | head => rfl
+    | tail _ h => exact nomatch h
 
 /-- 在有限公理化理论中加入闭句仍然有限公理化。 -/
 theorem finitely_axiomatized_insert
@@ -80,7 +87,15 @@ theorem finitely_axiomatized_insert
   rcases hT with ⟨axioms, hAxioms⟩
   refine ⟨sentence :: axioms, ?_⟩
   intro candidate
-  simp [insert, hAxioms]
+  constructor
+  · intro h
+    cases h with
+    | inl h => cases h; exact .head axioms
+    | inr h => exact .tail sentence ((hAxioms candidate).mp h)
+  · intro h
+    cases h with
+    | head => exact Or.inl rfl
+    | tail _ h => exact Or.inr ((hAxioms candidate).mpr h)
 
 /-- 有限公理化理论的并仍然有限公理化。 -/
 theorem finitely_axiomatized_union
@@ -93,7 +108,28 @@ theorem finitely_axiomatized_union
   rcases hU with ⟨right, hRight⟩
   refine ⟨left ++ right, ?_⟩
   intro sentence
-  simp [union, hLeft, hRight]
+  constructor
+  · intro h
+    cases h with
+    | inl h => exact List.mem_append_left right ((hLeft sentence).mp h)
+    | inr h => exact List.mem_append_right left ((hRight sentence).mp h)
+  · intro h
+    have split_mem : ∀ (xs : List (Sentence σ)),
+        sentence ∈ xs ++ right → sentence ∈ xs ∨ sentence ∈ right := by
+      intro xs
+      induction xs with
+      | nil => exact fun hx => Or.inr hx
+      | cons x xs ih =>
+          intro hx
+          cases hx with
+          | head => exact Or.inl (.head xs)
+          | tail _ hx =>
+              cases ih hx with
+              | inl hxs => exact Or.inl (.tail x hxs)
+              | inr hr => exact Or.inr hr
+    cases split_mem left h with
+    | inl h => exact Or.inl ((hLeft sentence).mpr h)
+    | inr h => exact Or.inr ((hRight sentence).mpr h)
 
 end Theory
 end FirstOrder

@@ -116,7 +116,7 @@ theorem valid_reject (target : Nat) (table : List Nat) (hBad : SchemaRename.vali
     change Rejection rules (nodeValue 4 [values 0, values 2])
     rw [← hFields.1, ← hTail]
     apply valid_reject target tail
-    simpa [SchemaRename.valid, hLt] using hBad
+    simpa only [SchemaRename.valid, List.all_cons, decide_eq_true hLt, Bool.true_and] using hBad
 termination_by table.length
 
 theorem term_reject (table : List Nat) (cutoff : Nat) (input output : Tree)

@@ -106,10 +106,10 @@ theorem Term.substituteMapped_emptyFree
     {bound : SortContext σ} {sort : σ.SortSymbol}
     (f : VariableSubstitution σ [] bound []) (term : Term σ bound [] sort) :
     term.substituteMapped VariableSubstitution.boundId f = term := by
-  have hf : @f = (VariableSubstitution.freeId : VariableSubstitution σ [] bound []) := by
-    funext sort entry
-    exact nomatch entry
-  rw [hf, Term.substituteMapped_id]
+  refine Eq.trans ?_ (Term.substituteMapped_id term)
+  apply Term.substituteMapped_congr (hBound := fun _ => rfl)
+  intro resultSort entry
+  exact nomatch entry
 
 /-- 多次自由替换先复合槽位，公式结构只遍历一次。 -/
 theorem Formula.substituteFree_comp

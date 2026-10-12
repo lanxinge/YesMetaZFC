@@ -3,7 +3,20 @@
 本文核对的是 Itay Neeman, *Determinacy in L(R)* 的
 [2007 年 7 月 10 日作者预印本](https://www.math.ucla.edu/~ineeman/detLR.pdf/)，
 页码沿用该 PDF。以下是本仓库采用的修补论证，不是作者勘误；未核对出版版本。
-完整游戏与 Claim 5.10 尚未在 Lean 中实现，已核验的代码范围见末节。
+当前优化路线的完整游戏已在 Lean 中装配；下文旧 Gk 路线的 Claim 5.10 仍未作为该主线实现。
+
+本文保留逐坐标 Gk 修补及其反例。当前 L(ℝ)⊨AD 主线按用户 2026-10-10 的改良稿，
+采用固定根公式与实际函数图的角色恢复，不再把 Gk 作为游戏的额外排序规则；
+具体依赖见 [大基数主线](../YesMetaZFC/SetTheory/LargeCardinal/README.md)。
+已完成的标签查询仍是独立可复用的语法接口。
+当前主线的 [TypeGameDecoding](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean)
+已实际编译完整节点、空根与最大序数查询，并从任意子类型排列恢复一张图的单点延长；
+保留原排列及坐标对应，高度由最大序数查询反推。
+[TypeGame](../YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 现已装配原七条规则和仅含额外空根条件的闭博弈，
+固定代码表覆盖全部内部元数；最早违规、合法历史树及三阶段时序均已核验。
+[TypeGameDeterminacy](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 已由 4.16
+给出原策略空间中某一方的获胜策略；5.15 的迭代获胜论证仍待完成。以下 Gk 论证作为旧路线记录，
+不是当前游戏的附加规则。
 
 ## 问题与最小改动
 

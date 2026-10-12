@@ -1,4 +1,5 @@
 import YesMetaZFC.Logic.FirstOrder.FormalSystem.Arithmetic.ObjectPacketDerives
+import YesMetaZFC.Logic.FirstOrder.FormalSystem.Metatheory.ProofT.IntrinsicQuotationDecode
 
 /-! # 传输图排除任意自然数候选码
 
@@ -43,7 +44,6 @@ decreasing_by
 theorem malformed_forest_reject (code count tail output : Nat)
     (hBad : ¬ ∃ input : List Tree, forestCode input = code) :
     Rejection rules (nodeValue 4 [code, count, tail, output]) := by
-  classical
   apply Rejection.of_tagged heads_tagged 4 [code, count, tail, output]
   intro rule hRule values _ hHead _
   rw [rulesFor_four] at hRule
@@ -60,16 +60,21 @@ theorem malformed_forest_reject (code count tail output : Nat)
       [godel_pair_value 1 (godel_pair_value (values 0) (values 1)) + 1,
         values 2 + 1, values 3, values 4]).mp hHead).2
     simp only [List.cons.injEq, and_true] at h
-    by_cases hTree : ∃ input : Tree, treeValue input = values 0
-    · refine ⟨node (n := 6) 4 [.var 1, .var 2, .var 3, .var 5] , List.mem_cons_self, ?_⟩
+    cases hTree : decodeTree (values 0) with
+    | some head =>
+      refine ⟨node (n := 6) 4 [.var 1, .var 2, .var 3, .var 5] , List.mem_cons_self, ?_⟩
       apply malformed_forest_reject (values 1)
       intro hForest
-      obtain ⟨head, hHead⟩ := hTree
+      have hHead := treeValue_of_decode hTree
       obtain ⟨rest, hRest⟩ := hForest
       apply hBad
       exact ⟨head :: rest, by rw [forestCode_cons, hHead, hRest, h.1]⟩
-    · refine ⟨node (n := 6) 3 [.var 0, .var 5, .var 4] , List.mem_cons_of_mem _ List.mem_cons_self, ?_⟩
-      exact malformed_tree_reject (values 0) _ _ hTree
+    | none =>
+      refine ⟨node (n := 6) 3 [.var 0, .var 5, .var 4] , List.mem_cons_of_mem _ List.mem_cons_self, ?_⟩
+      apply malformed_tree_reject (values 0)
+      rintro ⟨input, hInput⟩
+      rw [← hInput, decode_treeValue] at hTree
+      cases hTree
 termination_by code
 decreasing_by
   all_goals
@@ -87,15 +92,17 @@ end
 theorem packet_number_reject (packet code : Nat)
     (hBad : (NatPacket.decode packet).map treeValue ≠ some code) :
     Rejection rules (nodeValue 5 [packet, code]) := by
-  classical
-  by_cases hTree : ∃ input : Tree, treeValue input = code
-  · obtain ⟨input, rfl⟩ := hTree
+  cases hTree : decodeTree code with
+  | some input =>
+    have hCode := treeValue_of_decode hTree
+    subst code
     apply packet_reject packet input
     intro hEncode
     apply hBad
     rw [(NatPacket.decode_eq_some_iff packet input).mpr hEncode]
     rfl
-  · apply Rejection.of_tagged heads_tagged 5 [packet, code]
+  | none =>
+    apply Rejection.of_tagged heads_tagged 5 [packet, code]
     intro rule hRule values _ hHead _
     rw [rulesFor_five] at hRule
     have hRule := List.mem_singleton.mp hRule
@@ -106,7 +113,10 @@ theorem packet_number_reject (packet code : Nat)
     refine ⟨node (n := 3) 3 [.var 0, .literal 1, .var 2] , List.mem_cons_of_mem _ List.mem_cons_self, ?_⟩
     change Rejection rules (nodeValue 3 [values 0, 1, values 2])
     rw [← h.2]
-    exact malformed_tree_reject code _ _ hTree
+    apply malformed_tree_reject code
+    rintro ⟨input, hInput⟩
+    rw [← hInput, decode_treeValue] at hTree
+    cases hTree
 
 theorem negative_number {T : SetTheory} (C : CertificateCore T) (A : ArithmeticSupport T)
     (packet code : Nat) (h : (NatPacket.decode packet).map treeValue ≠ some code) :

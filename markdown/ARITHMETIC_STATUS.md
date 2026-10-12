@@ -1,7 +1,5 @@
 # 算术子库接口与来源
 
-> 文中旧基点的构建数量、耗时和扫描器结果属于历史证据。当前主项目已移出通用证明器；当前边界与验证见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
-
 Q、PA、Z₂ 核心、内部有限编码和逐程序原始递归表示已经实现。
 本页是接口导航；历史分批记录保留在 Git 历史，扩展边界见 [工作规划](ARITHMETIC_PLAN.md)。
 
@@ -59,11 +57,11 @@ Z₂ 采用多排序一阶演算呈现二阶算术。Henkin 完备性不是 Full
 坐标函数或结构。配对、最大坐标和反配对因此采用关系接口，而不是非可计算的宿主函数。
 这不要求模型内部序可判定，也不把任意 PA 模型限制为标准模型。
 
-| 原接口 | 当前接口 |
+| 操作 | 关系接口 |
 | --- | --- |
-| `Pairing.value_l m n = p` | `Pairing.graph_l m n p`；用 `total_m` 在命题内取见证，`unique_m` 比较输出 |
-| `PA.Pairing.max_l m n` 返回模型数 | `PA.Pairing.max_l m n k : Prop`，平方区间定理显式接收关系证据 |
-| `PA.Unpairing.value_l hPA z` 返回坐标对 | `left_l z m`、`right_l z n`，以及 `total_m/left_unique_m/right_unique_m` |
+| 配对 | `Pairing.graph_l m n p`；用 `total_m` 在命题内取见证，`unique_m` 比较输出 |
+| 最大坐标 | `PA.Pairing.max_l m n k : Prop`；平方区间定理显式接收关系证据 |
+| 反配对 | `left_l z m`、`right_l z n`；用 `total_m/left_unique_m/right_unique_m` 取得并比较坐标 |
 
 原始递归关系和 Z₂ 函数图已同步迁移：配对码显式存在量化，集合成员合同显式接收
 配对关系证据。总性、唯一性、数码表示及对象推导结论仍保留；没有留下旧选择函数别名。
@@ -138,39 +136,15 @@ PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规�
 
 ## 验证
 
-当前算术切片：96 个 Lean 文件，5,457 行（含空行及注释），439 个显式公开声明。
-关系接口重构后的联合构建 152 jobs，退出码 0、无警告；公开声明公理审计通过。
-公理依赖并集仅 `propext`、`Classical.choice`、`Quot.sound`，禁止标记／依赖为空，审计前后源码哈希一致。
-数据边界审计另按实际所属模块检查 1,165 个声明，包含私有及编译器生成声明，
-不按公开名称猜测归属；未发现 `noncomputable` 声明或新增公理。
-生成声明的公理传递依赖仍由公开声明审计覆盖。
-
-仓库内可复跑命令：
-
 ```bash
 python scripts/lean_cache.py build --native
 python scripts/test_arithmetic_guard.py
 python scripts/check_arithmetic.py
 ```
 
-CI 枚举全部独立模块（包括可选 Provability），随后测试并执行算术公理／数据边界审计。
-`check_arithmetic.py` 自身也先构建全部算术模块，不能只凭旧缓存通过。
-边界测试覆盖命题内经典推理、直接数据选择、私有数据选择、其他命名空间及新增公理。
-本轮证据位于工作区 `outputs/yesmetazfc-arithmetic/choice-relational-audit.log`、
-`choice-guard-tests.log`；后述 Stage 4a 文件是迁移前的历史证据。
-重构后全仓 1,100 个模块及原生目标亦已通过增量构建，证据为 `choice-native-build.log`；
-5 项数据边界正反例和 19 项缓存脚本测试通过。未作全仓冷构建。
-外部开发证据位于工作区 `outputs/yesmetazfc-arithmetic/`：
-`stage4a-final-build.log`、`stage4a-consumer.log`、`stage4a-audit.json`、`stage4a-portable-audit.log`。
-一次性消费者与失败日志不进入正式库；历史分批证据仍保留在该目录。
+全源构建枚举全部独立模块，包括可选 Provability 模块。
+`check_arithmetic.py` 自身先构建全部算术模块，再检查公开声明的公理依赖及实际模块的数据边界。
+数据边界测试覆盖命题内经典推理、直接数据选择、私有数据选择、其他命名空间及新增公理。
+精确覆盖数量以本次脚本输出为准，不沿用旧模块数或旧工作区日志。
 
-全仓／原生构建已在 Windows 上通过：枚举 1,100 个 Lean 模块及其原生对象，
-并校验静态库、共享库与扫描器。原有模块复用上游基点的官方 full 缓存，
-先在独立基线核对提交、平台、工具链、源码指纹、归档 SHA-256 及全部 no-build 目标；
-确认本次未修改上游原有 Lean 源码或构建配置后，只补入缺失产物，不覆盖本地产物。
-新增算术证明在本机编译；这不是一次完整冷构建。证据为 `complete-native-cached-build.log`。
-
-扫描器帮助与单目标扫描均正常退出；实际目标 `SetTheory.Ordinal.transitive` 的结果仍是
-`not_closed`，不把工具运行成功解释为新增自动证明能力。19 项缓存／发布脚本测试通过。
-本地验证不替代 GitHub 多平台 CI；远端工作流仍受维护者的 fork 运行批准控制。
-贡献通过现有上游 PR #1，不直接推送上游 main、不自行合并。
+一次性消费者和失败探针留在库外；本地验证与远端多平台 CI 分别报告。

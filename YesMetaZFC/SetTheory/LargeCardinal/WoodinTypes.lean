@@ -4,7 +4,7 @@ import YesMetaZFC.Model.SetTheory.Internal.TypeSource
 import YesMetaZFC.Model.SetTheory.Internal.TypeEmbedding
 import YesMetaZFC.Model.SetTheory.Internal.TypeGuard
 import YesMetaZFC.Model.SetTheory.Internal.FlatTypeRead
-import YesMetaZFC.SetTheory.LargeCardinal.TypeStretchFormula
+import YesMetaZFC.SetTheory.LargeCardinal.TypeElastic
 
 /-! # 强扩展器中的完整类型像
 
@@ -94,7 +94,7 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
           Tt_realized_d I ω c Z Q n s θ U₀ D₀ v ∧ Et_stretch_d hZF ω κ L F X R t D₀ v ∧
           ∀ z, Formula.satisfies (⟨Fin.cases z (Fin.cases D₀ (Fin.cases t (Fin.cases F
             (Fin.cases X (Fin.cases L (Fin.cases κ (fun _ => ω))))))), fun _ => t⟩ : Env M 8)
-              (et_stretch_m (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest) ↔
+              (et_quality_m (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest) ↔
             Et_stretch_d hZF ω κ L F X R t D₀ z := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
@@ -169,25 +169,64 @@ theorem woodin_type_stretch_l (hZFC : M.Models ZFC) {θ η : M.Domain}
   have projection p : M.mem p v ↔ M.mem p D₀ ∧ M.mem p t' := (type₀ p).trans
     ⟨fun hh => ⟨hh.1, (image p (vt D₀ hD₀V p hh.1)).mpr ⟨domain_cover p hh.1, hh.2⟩⟩,
       fun hh => ⟨hh.1, ((image p (vt D₀ hD₀V p hh.1)).mp hh.2).2⟩⟩
-  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, strength, level, inaccessible, locality⟩ := strong
-  -- 原 κ 型低于不可达支撑层；同一有界矩阵因此识别全部候选伸展。
-  obtain ⟨B₁, U₁, hB₁, hU₁, constants₁⟩ := tt_constants_exists_l hZF hV rL.isLimitOrdinal hκL
-  have eqB := ZF.v_unique_l I hZF hB₁ hB
-  subst B₁
-  have eqU := hZF.1.eq_of_same_members U₁ U (fun x => (constants₁ x).trans (constants x).symm)
-  have hUV : M.mem U V := eqU ▸ hU₁
-  have hDV := pool.rank_mem_l hZF hω hV rL.isLimitOrdinal (ZF.v_ordinal_mem_l I hZF hV hωL) hn hUV
-  have htV := ZF.v_subset_mem_l I hZF hV hDV (fun p hp => ((type p).mp hp).1)
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, strength, _, inaccessible, locality⟩ := strong
+  -- 合并公式自行检验扩展器并构造超幂，调用端只保留原类型及查询域。
   let ξ (z : M.Domain) : Env M 8 := ⟨Fin.cases z (Fin.cases D₀ (Fin.cases t (Fin.cases F
     (Fin.cases X (Fin.cases L (Fin.cases κ (fun _ => ω))))))), fun _ => t⟩
-  have read (z : M.Domain) := et_stretch_sat_l hZF (ξ z)
+  have read (z : M.Domain) := (et_quality_sat_l hZFC (ξ z)
     (.bound 7) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest
-    source (sc_v_power_l hZF hθ hX) (short.measures.source_l hZF X) hm hm' ultra
-    (ZF.v_ordinal_mem_l I hZF hX hL) strength.2.2.2.1 rL.isLimitOrdinal level
-    (ZF.v_ordinal_mem_l I hZF hV hκL) htV
+    source hX hθ hκL hn hB constants pool (fun p hp => ((type p).mp hp).1)).trans
+    (show (_ ∧ _ ∧ _ ∧ Et_stretch_d hZF ω κ L F X R t D₀ z) ↔ Et_stretch_d hZF ω κ L F X R t D₀ z from
+      ⟨fun h => h.2.2.2, fun h => ⟨locality, inaccessible, strength, h⟩⟩)
   exact ⟨L, K, F, R, V, B₀, U₀, D₀, v, hL, hκL, hτL, hωL, rL, sL, hV, short, source, strength,
     inaccessible, locality, hB₀, constants₀,
     ⟨code.1, hn, hs, hθZ, fun x hx => hXZ x (hVX x (vt U₀ hU₀V x hx)), pool₀, type₀⟩,
     ⟨b, d, N, S, i, t', hm, hm', ultra, htt, projection⟩, read⟩
+
+/-- Neeman 3.22：任意内部有限元组在 V(η+1) 的完整 κ 型，对无界多个 κ 弹性。
+    四查询及其统一读取证书一并给出；原类型和前驱类型使用同一编译语言。 -/
+theorem woodin_elastic_l (hZFC : M.Models ZFC) {θ η : M.Domain}
+    (hd : Woodin_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) θ)
+    (hη : M.IsOrdinal η) (hθη : M.mem θ η) :
+    let hZF := ZFC.models_zf_l hZFC
+    let I := kp_pair_l (ZF.modelsKP hZF)
+    ∃ ω X Z μ W c Q d S, M.IsOmega ω ∧ V_d I θ X ∧ V_d I η Z ∧
+      M.SuccessorOf μ η ∧ V_d I μ W ∧ Smem_d I c Z Q ∧ Smem_d I d W S ∧
+      ∀ n s, M.mem n ω → Fn0_d n Z s → ∀ α, M.mem α θ →
+        ∃ κ K R B U D, ∃ q : Ee_queries_d M, ∃ t u,
+          M.mem α κ ∧ M.mem κ θ ∧ M.IsLimitOrdinal κ ∧ Ep_source_d hZF ω κ K X R ∧
+          Ee_language_d hZF ω κ n B U D q ∧ Tt_realized_d I ω c Z Q n s θ U D t ∧
+          Tt_realized_d I ω d W S n s θ U D u ∧ Ee_minus_d I ω D q u t ∧ Ee_elastic_d q u := by
+  let hZF := ZFC.models_zf_l hZFC
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  obtain ⟨ω, X, Z, μ, W, c, Q, d, S, hω, hX, hZ, hμ, hW, hc, upper, all⟩ := woodin_type_stretch_l hZFC hd hη hθη
+  obtain ⟨ω₀, _, hω₀, above, regular, strong, _⟩ := hd
+  have eqω := hZF.1.eq_of_same_members ω₀ ω (fun x => ⟨hω₀.2 ω hω.1 x, hω.2 ω₀ hω₀.1 x⟩)
+  subst ω₀
+  have inacc := sc_v_inaccessible_l hZF hW (ZF.v_ordinal_mem_l I hZF hW ((hμ θ).mpr (Or.inl hθη))) above regular strong
+  refine ⟨ω, X, Z, μ, W, c, Q, d, S, hω, hX, hZ, hμ, hW, hc, upper, fun n s hn hs α hα => ?_⟩
+  obtain ⟨κ, B, U, D, t, u, bound, hk, hB, constants, lower, lifted, minus, _, steps⟩ := all n s hn hs α hα
+  obtain ⟨_, K, _, R, _, _, _, _, _, _, _, _, _, _, _, _, short, source, _⟩ := steps α hα
+  have limit := ZF.infiniteCardinal_isLimitOrdinal hZF I hω (ZF.omega_cardinal_l I hZF hω)
+    ⟨short.critical, ZF.exists_inclusionInjection hZF I (short.critical.1.transitive ω short.uncountable)⟩
+  obtain ⟨B', U', D', q, language⟩ := ee_definition_l hZF hω hn limit
+  have eb := ZF.v_unique_l I hZF language.rank hB
+  subst B'
+  have eu := hZF.1.eq_of_same_members U' U (fun x => (language.constants x).trans (constants x).symm)
+  subst U'
+  have ed := language.pool.unique_l hZF.1 I lower.pool
+  subst D'
+  have allτ : ∀ τ, M.mem τ θ → Ee_step_d hZF ω κ θ n s c X R t τ := by
+    intro τ hτ
+    obtain ⟨L, _, F, R', _, B', U', D', v, hl, hκL, hτL, _, _, _, _, _, source', strength,
+      inacc, loc, hB', constants', type, stretch, _⟩ := steps τ hτ
+    obtain ⟨b, hb⟩ := source.code
+    obtain ⟨b', hb'⟩ := source'.code
+    have eqR := (smem_unique_l I hZF.1 hb' hb).2
+    exact ⟨L, F, B', U', D', v, hl, hκL, hτL, hB', constants', type.pool, type.truth,
+      loc, inacc, strength, eqR ▸ stretch⟩
+  have elastic : Ee_elastic_d q u := (language.read hZFC η μ Z W X d S θ K R s u
+    hZ hW hμ hX regular.isLimitOrdinal above hk source upper lifted).mpr ⟨inacc, c, Q, t, hc, minus, lower, allτ⟩
+  exact ⟨κ, K, R, B, U, D, q, t, u, bound, hk, limit, source, language, lower, lifted, ⟨elastic.1, minus⟩, elastic⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

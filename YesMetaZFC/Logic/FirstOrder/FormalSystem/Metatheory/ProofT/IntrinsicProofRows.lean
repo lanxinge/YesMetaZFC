@@ -282,13 +282,16 @@ theorem nat_sequence_graph_ne
   · have hWitness :
         ∃ (index : Nat) (hLeftIndex : index < left.length)
           (hRightIndex : index < right.length),
-          left[index] ≠ right[index] :=
-      Classical.byContradiction fun hNoWitness => by
-        apply hNe
-        apply List.ext_getElem hLength
-        intro index hLeftIndex hRightIndex
-        exact Classical.byContradiction fun hToken =>
-          hNoWitness ⟨index, hLeftIndex, hRightIndex, hToken⟩
+          left[index] ≠ right[index] := by
+        have hNot : ¬ ∀ i : Fin left.length,
+            left[i.val] = right[i.val]'(hLength ▸ i.isLt) := by
+          intro h
+          apply hNe
+          apply List.ext_getElem hLength
+          intro index hLeftIndex _
+          exact h ⟨index, hLeftIndex⟩
+        obtain ⟨i, hi⟩ := Decidable.not_forall.mp hNot
+        exact ⟨i.val, i.isLt, hLength ▸ i.isLt, hi⟩
     rcases hWitness with
       ⟨index, hLeftIndex, hRightIndex, hToken⟩
     let leftToken := left[index]

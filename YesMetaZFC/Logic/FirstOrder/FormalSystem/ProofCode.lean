@@ -30,29 +30,36 @@ theorem max_square_le_godel_pair_value (left right : Nat) :
     max left right ^ 2 ≤
       godel_pair_value left right := by
   by_cases hOrder : left < right
-  · have hMax : max left right = right := by
-      omega
-    simp [godel_pair_value, hOrder, hMax]
+  · rw [Nat.max_eq_right (Nat.le_of_lt hOrder),
+      godel_pair_value, if_pos hOrder]
+    exact Nat.le_add_right _ left
   · have hMax : max left right = left := by
-      omega
-    simp [godel_pair_value, hOrder, hMax]
-    omega
+      by_cases hLe : left ≤ right
+      · exact (Nat.max_eq_right hLe).trans
+          (Nat.le_antisymm (Nat.le_of_not_lt hOrder) hLe)
+      · exact if_neg hLe
+    rw [hMax, godel_pair_value, if_neg hOrder]
+    exact Nat.le_trans (Nat.le_add_right _ left)
+      (Nat.le_add_right _ right)
 /-- 配对值严格落在下一平方数之前。 -/
 theorem godel_pair_value_lt_max_succ_square (left right : Nat) :
     godel_pair_value left right < (max left right + 1) ^ 2 := by
+  have hSquare (n : Nat) : (n + 1) ^ 2 = (n ^ 2 + n) + (n + 1) := by
+    have hPow (k : Nat) : k ^ 2 = k * k := by
+      rw [Nat.pow_succ, Nat.pow_succ, Nat.pow_zero, Nat.one_mul]
+    rw [hPow, hPow, Nat.mul_succ, Nat.succ_mul]
   by_cases hOrder : left < right
-  · have hMax : max left right = right := by
-      omega
-    simp only [godel_pair_value, hOrder, if_pos, hMax]
-    simp [Nat.pow_succ, Nat.mul_add, Nat.add_mul]
-    omega
-  · have hReverse : right ≤ left := by
-      omega
+  · rw [Nat.max_eq_right (Nat.le_of_lt hOrder),
+      godel_pair_value, if_pos hOrder, hSquare]
+    exact Nat.lt_of_lt_of_le (Nat.add_lt_add_left hOrder _)
+      (Nat.le_add_right _ (right + 1))
+  · have hReverse : right ≤ left := Nat.le_of_not_lt hOrder
     have hMax : max left right = left := by
-      omega
-    simp [godel_pair_value, hOrder, hMax]
-    simp [Nat.pow_succ, Nat.mul_add, Nat.add_mul]
-    omega
+      by_cases hLe : left ≤ right
+      · exact (Nat.max_eq_right hLe).trans (Nat.le_antisymm hReverse hLe)
+      · exact if_neg hLe
+    rw [hMax, godel_pair_value, if_neg hOrder, hSquare]
+    exact Nat.add_lt_add_left (Nat.lt_succ_of_le hReverse) _
 /-- 相等的配对值必定位于同一个平方壳层。 -/
 theorem max_eq_of_godel_pair_value_eq
     {left₁ right₁ left₂ right₂ : Nat} (hCode :
@@ -69,33 +76,26 @@ theorem max_eq_of_godel_pair_value_eq
     godel_pair_value_lt_max_succ_square left₁ right₁
   have hUpper₂ :=
     godel_pair_value_lt_max_succ_square left₂ right₂
+  have hPow (n : Nat) : n ^ 2 = n * n := by
+    rw [Nat.pow_succ, Nat.pow_succ, Nat.pow_zero, Nat.one_mul]
   by_cases hShell : shell₁ = shell₂
   · exact hShell
-  · rcases Nat.lt_or_gt_of_ne hShell with
-      hShellLt | hShellGt
+  · rcases Nat.lt_or_gt_of_ne hShell with hShellLt | hShellGt
     · have hSquares : (shell₁ + 1) ^ 2 ≤ shell₂ ^ 2 := by
-        have hSucc : shell₁ + 1 ≤ shell₂ := by
-          omega
-        simpa [Nat.pow_succ] using
-          Nat.mul_le_mul hSucc hSucc
+        rw [hPow, hPow]
+        exact Nat.mul_le_mul hShellLt hShellLt
       have hStrict :
           godel_pair_value left₁ right₁ <
-            godel_pair_value left₂ right₂ := by
-        exact Nat.lt_of_lt_of_le hUpper₁ (Nat.le_trans (by
-            simpa [shell₁, shell₂] using hSquares)
-            hLower₂)
+            godel_pair_value left₂ right₂ :=
+        Nat.lt_of_lt_of_le hUpper₁ (Nat.le_trans hSquares hLower₂)
       exact False.elim ((Nat.ne_of_lt hStrict) hCode)
     · have hSquares : (shell₂ + 1) ^ 2 ≤ shell₁ ^ 2 := by
-        have hSucc : shell₂ + 1 ≤ shell₁ := by
-          omega
-        simpa [Nat.pow_succ] using
-          Nat.mul_le_mul hSucc hSucc
+        rw [hPow, hPow]
+        exact Nat.mul_le_mul hShellGt hShellGt
       have hStrict :
           godel_pair_value left₂ right₂ <
-            godel_pair_value left₁ right₁ := by
-        exact Nat.lt_of_lt_of_le hUpper₂ (Nat.le_trans (by
-            simpa [shell₁, shell₂] using hSquares)
-            hLower₁)
+            godel_pair_value left₁ right₁ :=
+        Nat.lt_of_lt_of_le hUpper₂ (Nat.le_trans hSquares hLower₁)
       exact False.elim ((Nat.ne_of_lt hStrict) hCode.symm)
 /-- Gödel 配对值相等当且仅当两个坐标分别相等。 -/
 theorem godel_pair_value_eq_iff
@@ -103,62 +103,51 @@ theorem godel_pair_value_eq_iff
     godel_pair_value left₁ right₁ =
         godel_pair_value left₂ right₂ ↔
       left₁ = left₂ ∧ right₁ = right₂ := by
+  have hMaxLeft {a b : Nat} (h : ¬a < b) : max a b = a := by
+    by_cases hLe : a ≤ b
+    · exact (Nat.max_eq_right hLe).trans
+        (Nat.le_antisymm (Nat.le_of_not_lt h) hLe)
+    · exact if_neg hLe
+  have hCancel {a b c : Nat} (h : a + b = a + c) : b = c := by
+    by_cases hEq : b = c
+    · exact hEq
+    · rcases Nat.lt_or_gt_of_ne hEq with hLt | hGt
+      · exact False.elim ((Nat.ne_of_lt (Nat.add_lt_add_left hLt a)) h)
+      · exact False.elim ((Nat.ne_of_lt (Nat.add_lt_add_left hGt a)) h.symm)
   constructor
   · intro hCode
-    have hMax :=
-      max_eq_of_godel_pair_value_eq hCode
+    have hMax := max_eq_of_godel_pair_value_eq hCode
     by_cases hOrder₁ : left₁ < right₁
-    · have hOrder₂ : left₂ < right₂ := by
-        by_cases hOrder₂ : left₂ < right₂
-        · exact hOrder₂
-        · have hReverse₂ : right₂ ≤ left₂ := by
-            omega
-          have hRight₁ : max left₁ right₁ = right₁ := by
-            omega
-          have hLeft₂ : max left₂ right₂ = left₂ := by
-            omega
-          have hShell : right₁ = left₂ := by
-            omega
-          subst left₂
-          simp [godel_pair_value, hOrder₁, hOrder₂] at hCode
-          omega
-      have hRight₁ : max left₁ right₁ = right₁ := by
-        omega
-      have hRight₂ : max left₂ right₂ = right₂ := by
-        omega
-      have hRight : right₁ = right₂ := by
-        omega
-      subst right₂
-      have hLeft : left₁ = left₂ := by
-        simp [godel_pair_value, hOrder₁, hOrder₂] at hCode
-        omega
-      exact ⟨hLeft, rfl⟩
-    · have hReverse₁ : right₁ ≤ left₁ := by
-        omega
-      have hOrder₂ : ¬left₂ < right₂ := by
-        intro hOrder₂
-        have hLeft₁ : max left₁ right₁ = left₁ := by
-          omega
-        have hRight₂ : max left₂ right₂ = right₂ := by
-          omega
-        have hShell : left₁ = right₂ := by
-          omega
+    · rw [Nat.max_eq_right (Nat.le_of_lt hOrder₁)] at hMax
+      by_cases hOrder₂ : left₂ < right₂
+      · rw [Nat.max_eq_right (Nat.le_of_lt hOrder₂)] at hMax
         subst right₂
-        simp [godel_pair_value, hOrder₁, hOrder₂] at hCode
-        omega
-      have hReverse₂ : right₂ ≤ left₂ := by
-        omega
-      have hLeft₁ : max left₁ right₁ = left₁ := by
-        omega
-      have hLeft₂ : max left₂ right₂ = left₂ := by
-        omega
-      have hLeft : left₁ = left₂ := by
-        omega
-      subst left₂
-      have hRight : right₁ = right₂ := by
-        simp [godel_pair_value, hOrder₁, hOrder₂] at hCode
-        omega
-      exact ⟨rfl, hRight⟩
+        rw [godel_pair_value, if_pos hOrder₁,
+          godel_pair_value, if_pos hOrder₂] at hCode
+        exact ⟨hCancel hCode, rfl⟩
+      · rw [hMaxLeft hOrder₂] at hMax
+        subst left₂
+        rw [godel_pair_value, if_pos hOrder₁,
+          godel_pair_value, if_neg hOrder₂] at hCode
+        have hStrict : right₁ ^ 2 + left₁ < right₁ ^ 2 + right₁ + right₂ :=
+          Nat.lt_of_lt_of_le (Nat.add_lt_add_left hOrder₁ _)
+            (Nat.le_add_right _ right₂)
+        exact False.elim ((Nat.ne_of_lt hStrict) hCode)
+    · rw [hMaxLeft hOrder₁] at hMax
+      by_cases hOrder₂ : left₂ < right₂
+      · rw [Nat.max_eq_right (Nat.le_of_lt hOrder₂)] at hMax
+        subst right₂
+        rw [godel_pair_value, if_neg hOrder₁,
+          godel_pair_value, if_pos hOrder₂] at hCode
+        have hStrict : left₁ ^ 2 + left₂ < left₁ ^ 2 + left₁ + right₁ :=
+          Nat.lt_of_lt_of_le (Nat.add_lt_add_left hOrder₂ _)
+            (Nat.le_add_right _ right₁)
+        exact False.elim ((Nat.ne_of_lt hStrict) hCode.symm)
+      · rw [hMaxLeft hOrder₂] at hMax
+        subst left₂
+        rw [godel_pair_value, if_neg hOrder₁,
+          godel_pair_value, if_neg hOrder₂] at hCode
+        exact ⟨rfl, hCancel hCode⟩
   · intro hCoordinates
     rcases hCoordinates with ⟨rfl, rfl⟩
     rfl
@@ -199,57 +188,46 @@ theorem godel_unpair_value_spec (code : Nat) :
     godel_pair_value (godel_unpair_value code).1 (godel_unpair_value code).2 =
       code := by
   induction code with
-  | zero =>
-      simp [godel_unpair_value, godel_pair_value]
+  | zero => rfl
   | succ code ih =>
       rcases hPair : godel_unpair_value code with
         ⟨left, right⟩
-      have hCode :
-          godel_pair_value left right = code := by
-        simpa [hPair] using ih
+      have hCode : godel_pair_value left right = code := by
+        rw [hPair] at ih
+        exact ih
+      rw [godel_unpair_value, hPair, godel_unpair_next]
       by_cases hOrder : left < right
-      · by_cases hGap : left + 1 < right
-        · simp only [godel_unpair_value, godel_unpair_next,
-            hPair, hOrder, hGap, if_pos]
-          simp only [godel_pair_value, hOrder, if_pos] at hCode
-          simp only [godel_pair_value, hGap, if_pos]
-          omega
-        · have hAdjacent : left + 1 = right := by
-            omega
-          simp only [godel_unpair_value, godel_unpair_next,
-            hPair, hOrder, hGap, if_pos, if_false]
-          subst right
-          simp only [godel_pair_value,
-            Nat.not_lt_zero, if_false]
-          simp only [godel_pair_value,
-            hOrder, if_pos] at hCode
-          simp [Nat.pow_succ, Nat.mul_add,
-            Nat.add_mul] at hCode ⊢
-          omega
-      · have hReverse : right ≤ left := by
-          omega
+      · rw [if_pos hOrder]
+        rw [godel_pair_value, if_pos hOrder] at hCode
+        by_cases hGap : left + 1 < right
+        · rw [if_pos hGap, godel_pair_value, if_pos hGap]
+          exact congrArg Nat.succ hCode
+        · have hAdjacent : left + 1 = right :=
+            Nat.le_antisymm hOrder (Nat.le_of_not_lt hGap)
+          rw [if_neg hGap, godel_pair_value,
+            if_neg (Nat.not_lt_zero right), Nat.add_zero]
+          calc
+            right ^ 2 + right = right ^ 2 + (left + 1) :=
+              congrArg (fun n => right ^ 2 + n) hAdjacent.symm
+            _ = code + 1 := congrArg Nat.succ hCode
+      · rw [if_neg hOrder]
+        rw [godel_pair_value, if_neg hOrder] at hCode
         by_cases hGap : right < left
-        · have hNextOrder : ¬left < right + 1 := by
-            omega
-          simp only [godel_unpair_value, godel_unpair_next,
-            hPair, hOrder, hGap, if_false, if_pos]
-          simp only [godel_pair_value,
-            hOrder, if_false] at hCode
-          simp only [godel_pair_value,
-            hNextOrder, if_false]
-          omega
-        · have hEqual : right = left := by
-            omega
-          simp only [godel_unpair_value, godel_unpair_next,
-            hPair, hOrder, hGap, if_false]
-          subst right
-          simp only [godel_pair_value,
-            hOrder, if_false] at hCode
-          simp only [godel_pair_value,
-            Nat.zero_lt_succ, if_pos]
-          simp [Nat.pow_succ, Nat.mul_add,
-            Nat.add_mul] at hCode ⊢
-          omega
+        · have hNextOrder : ¬left < right + 1 :=
+            Nat.not_lt_of_ge hGap
+          rw [if_pos hGap, godel_pair_value, if_neg hNextOrder]
+          exact congrArg Nat.succ hCode
+        · have hEqual : right = left :=
+            Nat.le_antisymm (Nat.le_of_not_lt hOrder) (Nat.le_of_not_lt hGap)
+          rw [if_neg hGap, godel_pair_value, if_pos (Nat.zero_lt_succ left),
+            Nat.add_zero]
+          rw [hEqual] at hCode
+          have hPow (n : Nat) : n ^ 2 = n * n := by
+            rw [Nat.pow_succ, Nat.pow_succ, Nat.pow_zero, Nat.one_mul]
+          calc
+            (left + 1) ^ 2 = (left ^ 2 + left) + (left + 1) := by
+              rw [hPow, hPow, Nat.mul_succ, Nat.succ_mul]
+            _ = code + 1 := congrArg Nat.succ hCode
 /-- Gödel 配对覆盖全部自然数。 -/
 theorem godel_pair_value_surjective :
     Function.Surjective (fun pair : Nat × Nat =>
@@ -270,24 +248,27 @@ theorem godel_unpair_value_pair (left right : Nat) :
 theorem left_le_godel_pair_value (left right : Nat) :
     left ≤ godel_pair_value left right := by
   by_cases hOrder : left < right
-  · simp [godel_pair_value, hOrder]
-  · simp [godel_pair_value, hOrder]
-    omega
+  · rw [godel_pair_value, if_pos hOrder]
+    exact Nat.le_add_left left (right ^ 2)
+  · rw [godel_pair_value, if_neg hOrder]
+    exact Nat.le_trans (Nat.le_add_left left (left ^ 2))
+      (Nat.le_add_right _ right)
 /-- Gödel 配对值不小于右坐标。 -/
 theorem right_le_godel_pair_value (left right : Nat) :
     right ≤ godel_pair_value left right := by
   by_cases hOrder : left < right
-  · have hRightPositive : 0 < right := by
-      omega
+  · have hRightPositive : 0 < right := Nat.zero_lt_of_lt hOrder
     have hSquare : right ≤ right ^ 2 := by
       calc
-        right = right * 1 := by simp
+        right = right * 1 := (Nat.mul_one right).symm
         _ ≤ right * right :=
           Nat.mul_le_mul_left right hRightPositive
-        _ = right ^ 2 := by simp [Nat.pow_succ]
-    simp only [godel_pair_value, hOrder, if_pos]
-    omega
-  · simp [godel_pair_value, hOrder]
+        _ = right ^ 2 := by
+          rw [Nat.pow_succ, Nat.pow_succ, Nat.pow_zero, Nat.one_mul]
+    rw [godel_pair_value, if_pos hOrder]
+    exact Nat.le_trans hSquare (Nat.le_add_right _ left)
+  · rw [godel_pair_value, if_neg hOrder]
+    exact Nat.le_add_left right _
 /-- 规范反配对的左分量不超过原代码。 -/
 theorem godel_unpair_value_left_le (code : Nat) : (godel_unpair_value code).1 ≤ code := by
   calc (godel_unpair_value code).1 ≤
@@ -341,25 +322,28 @@ theorem seed_add_length_le_nat_sequence_code_from (seed : Nat) (sequence : List 
       nat_sequence_code_from seed sequence := by
   induction sequence generalizing seed with
   | nil =>
-      simp [nat_sequence_code_from]
+      exact Nat.le_refl seed
   | cons item rest ih =>
       change
         seed + (rest.length + 1) ≤
           nat_sequence_code_from (nat_sequence_code_step seed item) rest
       have hStep :
           seed + 1 ≤
-            nat_sequence_code_step seed item := by
-        have hStrict :=
-          accumulator_lt_nat_sequence_code_step seed item
-        omega
-      have hRest :=
-        ih (seed := nat_sequence_code_step seed item)
-      omega
+            nat_sequence_code_step seed item :=
+        accumulator_lt_nat_sequence_code_step seed item
+      calc
+        seed + (rest.length + 1) = (seed + 1) + rest.length := by
+          rw [Nat.add_assoc, Nat.add_comm 1 rest.length]
+        _ ≤ nat_sequence_code_step seed item + rest.length :=
+          Nat.add_le_add_right hStep rest.length
+        _ ≤ nat_sequence_code_from (nat_sequence_code_step seed item) rest :=
+          ih (seed := nat_sequence_code_step seed item)
 /-- 规范自然数序列代码控制源序列的长度。 -/
 theorem nat_sequence_length_le_code (sequence : List Nat) :
     sequence.length ≤ nat_sequence_code_value sequence := by
-  simpa [nat_sequence_code_value] using
-    seed_add_length_le_nat_sequence_code_from 0 sequence
+  have hBound := seed_add_length_le_nat_sequence_code_from 0 sequence
+  rw [Nat.zero_add] at hBound
+  exact hBound
 /-- 源序列中的每个元素都严格小于最终折叠代码。 -/
 theorem mem_lt_nat_sequence_code_from
     {seed item : Nat} {sequence : List Nat} (hItem : item ∈ sequence) :
@@ -449,26 +433,39 @@ theorem nat_sequence_code_trace_from_eq_scanl (seed : Nat) (sequence : List Nat)
 @[simp]
 theorem nat_sequence_code_trace_from_length (seed : Nat) (sequence : List Nat) : (nat_sequence_code_trace_from seed sequence).length =
       sequence.length + 1 := by
-  rw [nat_sequence_code_trace_from_eq_scanl, List.length_scanl]
+  induction sequence generalizing seed with
+  | nil => rfl
+  | cons item rest ih =>
+      exact congrArg Nat.succ (ih (nat_sequence_code_step seed item))
 /-- 初值为零时的规范轨迹长度。 -/
 @[simp]
 theorem nat_sequence_code_trace_length (sequence : List Nat) : (nat_sequence_code_trace sequence).length =
       sequence.length + 1 := by
-  simp [nat_sequence_code_trace]
+  exact nat_sequence_code_trace_from_length 0 sequence
 /--
 规范轨迹第 `index` 项等于源序列前 `index` 项从 `seed` 开始的折叠值。
 -/
 theorem nat_sequence_code_trace_from_getElem? (seed : Nat) (sequence : List Nat) (index : Nat) (hIndex : index ≤ sequence.length) :
     (nat_sequence_code_trace_from seed sequence)[index]? =
       some (nat_sequence_code_from seed (sequence.take index)) := by
-  simp only [nat_sequence_code_trace_from_eq_scanl, List.getElem?_scanl,
-    hIndex, if_true, nat_sequence_code_from]
+  induction sequence generalizing seed index with
+  | nil =>
+      have hZero := Nat.eq_zero_of_le_zero hIndex
+      subst index
+      rfl
+  | cons item rest ih =>
+      cases index with
+      | zero => rfl
+      | succ index =>
+          exact ih (nat_sequence_code_step seed item) index
+            (Nat.le_of_succ_le_succ hIndex)
 /-- 规范轨迹的最后一项就是整个源序列的折叠值。 -/
 theorem nat_sequence_code_trace_from_last (seed : Nat) (sequence : List Nat) : (nat_sequence_code_trace_from seed sequence)[sequence.length]? =
       some (nat_sequence_code_from seed sequence) := by
-  simpa using
-    nat_sequence_code_trace_from_getElem?
-      seed sequence sequence.length (by omega)
+  induction sequence generalizing seed with
+  | nil => rfl
+  | cons item rest ih =>
+      exact ih (nat_sequence_code_step seed item)
 /-- 初值为零时，规范轨迹的最后一项就是规范序列代码。 -/
 theorem nat_sequence_code_trace_last (sequence : List Nat) : (nat_sequence_code_trace sequence)[sequence.length]? =
       some (nat_sequence_code_value sequence) := by
@@ -482,12 +479,18 @@ theorem nat_sequence_code_trace_from_step (seed : Nat) (sequence : List Nat) (in
     (nat_sequence_code_trace_from seed sequence)[index + 1]? =
       some (nat_sequence_code_step (nat_sequence_code_from seed (sequence.take index))
           item) := by
-  obtain ⟨hIndex, _⟩ := List.getElem_of_getElem? hItem
-  rw [nat_sequence_code_trace_from_eq_scanl, List.getElem?_succ_scanl,
-    ← nat_sequence_code_trace_from_eq_scanl,
-    nat_sequence_code_trace_from_getElem? seed sequence index
-      (Nat.le_of_lt hIndex), hItem]
-  rfl
+  induction sequence generalizing seed index with
+  | nil =>
+      rw [List.getElem?_nil] at hItem
+      cases hItem
+  | cons head rest ih =>
+      cases index with
+      | zero =>
+          have hHead : head = item := Option.some.inj hItem
+          subst item
+          cases rest <;> rfl
+      | succ index =>
+          exact ih (nat_sequence_code_step seed head) index hItem
 /-- 初值为零时的规范轨迹递归步。 -/
 theorem nat_sequence_code_trace_step (sequence : List Nat) (index item : Nat) (hItem : sequence[index]? = some item) :
     (nat_sequence_code_trace sequence)[index + 1]? =
@@ -570,24 +573,20 @@ private theorem nat_sequence_reverse_code_injective :
       | nil =>
           rfl
       | cons head tail =>
-          simp only [nat_sequence_reverse_code_from,
-            nat_sequence_code_step] at hCode
-          omega
+          exact Nat.noConfusion hCode
   | cons head tail ih =>
       intro right hCode
       cases right with
       | nil =>
-          simp only [nat_sequence_reverse_code_from,
-            nat_sequence_code_step] at hCode
-          omega
+          exact Nat.noConfusion hCode
       | cons otherHead otherTail =>
           simp only [nat_sequence_reverse_code_from,
             nat_sequence_code_step] at hCode
           have hPair :
               godel_pair_value (nat_sequence_reverse_code_from 0 tail) head =
                 godel_pair_value (nat_sequence_reverse_code_from 0 otherTail)
-                  otherHead := by
-            omega
+                  otherHead :=
+            Nat.succ.inj hCode
           rcases godel_pair_value_eq_iff.mp hPair with
             ⟨hTailCode, hHead⟩
           have hTail := ih hTailCode
@@ -767,12 +766,16 @@ def proof_sequence_code_trace (sequence : List (List Nat)) :
 @[simp]
 theorem proof_sequence_code_trace_from_length (seed : Nat) (sequence : List (List Nat)) : (proof_sequence_code_trace_from seed sequence).length =
       sequence.length + 1 := by
-  simp [proof_sequence_code_trace_from]
+  induction sequence generalizing seed with
+  | nil => rfl
+  | cons row rest ih =>
+      exact congrArg Nat.succ
+        (ih (nat_sequence_code_step seed (nat_sequence_code_value row)))
 /-- 初值为零时的二维规范轨迹长度。 -/
 @[simp]
 theorem proof_sequence_code_trace_length (sequence : List (List Nat)) : (proof_sequence_code_trace sequence).length =
       sequence.length + 1 := by
-  simp [proof_sequence_code_trace]
+  exact proof_sequence_code_trace_from_length 0 sequence
 /--
 二维规范轨迹第 `index` 项是前 `index` 行从 `seed` 开始的折叠代码。
 -/
@@ -786,9 +789,10 @@ theorem proof_sequence_code_trace_from_getElem? (seed : Nat) (sequence : List (L
 /-- 二维规范轨迹的最后一项就是整条证明序列的折叠代码。 -/
 theorem proof_sequence_code_trace_from_last (seed : Nat) (sequence : List (List Nat)) : (proof_sequence_code_trace_from seed sequence)[sequence.length]? =
       some (proof_sequence_code_from seed sequence) := by
-  simpa using
-    proof_sequence_code_trace_from_getElem?
-      seed sequence sequence.length (by omega)
+  induction sequence generalizing seed with
+  | nil => rfl
+  | cons row rest ih =>
+      exact ih (nat_sequence_code_step seed (nat_sequence_code_value row))
 /-- 初值为零时，二维规范轨迹的最后一项就是规范证明序列代码。 -/
 theorem proof_sequence_code_trace_last (sequence : List (List Nat)) : (proof_sequence_code_trace sequence)[sequence.length]? =
       some (proof_sequence_code_value sequence) := by
@@ -803,18 +807,17 @@ theorem proof_sequence_code_trace_from_step (seed : Nat) (sequence : List (List 
       some (nat_sequence_code_step (proof_sequence_code_from seed (sequence.take index)) (nat_sequence_code_value row)) := by
   have hRowCode : (sequence.map nat_sequence_code_value)[index]? =
         some (nat_sequence_code_value row) := by
-    simpa using congrArg (Option.map nat_sequence_code_value) hRow
-  simpa [proof_sequence_code_trace_from,
-    proof_sequence_code_from] using (nat_sequence_code_trace_from_step
+    rw [List.getElem?_map, hRow]
+    rfl
+  simpa only [proof_sequence_code_trace_from,
+    proof_sequence_code_from, List.map_take] using (nat_sequence_code_trace_from_step
       seed (sequence.map nat_sequence_code_value)
       index (nat_sequence_code_value row) hRowCode)
 /-- 初值为零时的二维规范轨迹递归步。 -/
 theorem proof_sequence_code_trace_step (sequence : List (List Nat)) (index : Nat) (row : List Nat) (hRow : sequence[index]? = some row) :
     (proof_sequence_code_trace sequence)[index + 1]? =
       some (nat_sequence_code_step (proof_sequence_code_from 0 (sequence.take index)) (nat_sequence_code_value row)) := by
-  simpa [proof_sequence_code_trace] using
-    proof_sequence_code_trace_from_step
-      0 sequence index row hRow
+  exact proof_sequence_code_trace_from_step 0 sequence index row hRow
 /-- 二维证明序列代码控制证明的行数。 -/
 theorem proof_sequence_length_le_code (sequence : List (List Nat)) :
     sequence.length ≤ proof_sequence_code_value sequence := by

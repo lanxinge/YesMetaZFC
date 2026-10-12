@@ -3,12 +3,15 @@ import YesMetaZFC.SetTheory.Descriptive.Borel
 import YesMetaZFC.SetTheory.Descriptive.Projective
 import YesMetaZFC.SetTheory.Descriptive.BorelRank
 import YesMetaZFC.SetTheory.Descriptive.Determinacy
+import YesMetaZFC.SetTheory.Descriptive.ClosedDeterminacy
 import YesMetaZFC.SetTheory.Descriptive.TreeBounded
 
 /-! # 内部描述集合论：空间、Borel、解析、射影层与博弈
 
 `Gm_win_d` 用内部有限局面、内部策略图和 ω 长对局定义双方获胜；
 `AD_d` 量化全部内部收益子集。`Axioms.ad_axiom` 是语义对应已核验的原句子。
+`cg_closed_det_l` 在 ZFC 中证明任意非空集合字母表、任意固定玩家时序的闭博弈决定性，
+返回模型内的实际获胜策略；策略拼接只用 ZF，两个选择步骤单独使用对象选择公理。
 
 `Descriptive.baire_cantor_l` 在任意 ZF 模型内实际构造 Baire、Cantor、全部有限
 前缀及其拓扑。`ds_countable_basis_l` 返回实际可数基；`ds_separate_l`、
@@ -84,5 +87,5 @@ Borel 关系的内部 Baire 投影，`Coan_d` 为其补。解析码解释唯一�
 一般射影可数并交的选择条件在接口中单独列出。
 射影层号取模型自己的 ω，标准层比较不缩小内部量词或见证的范围。
 超限 Borel 层号与码树秩取模型自己的序数，不要求外部良基。
-尚未实现统一化与决定性；未断言 ZF 中无统一码族的集合式 Borel 类都满足完美集定理。
+一般统一化与 Borel 决定性尚未实现；未断言 ZF 中无统一码族的集合式 Borel 类都满足完美集定理。
 -/

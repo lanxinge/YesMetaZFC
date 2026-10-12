@@ -35,14 +35,6 @@ theorem Fs_trace_d.zero_code_l (hE : Extensional M) {ω X f H e p : M.Domain}
     have eq := hE.eq_of_same_members e p (fun x => iff_of_false (he x) (hp x))
     exact ⟨H, h, eq ▸ h.2.1 e he⟩
 
-theorem Fs_code_d.transport_l (hZF : M.Models ZF) {ω X f g G n p : M.Domain} (hω : M.IsOmega ω)
-    (hf : M.IsSetFunctionFromTo I f ω X) (hg : M.IsSetFunctionFromTo I g ω X)
-    (trace : Fs_trace_d I ω X g G) (h : Fs_code_d I ω X f n p) (agree : Senv_agree_d I n f g) :
-    Fs_code_d I ω X g n p := by
-  obtain ⟨q, _, hq⟩ := trace.1.2.2 n (h.bound_l I).1
-  have code : Fs_code_d I ω X g n q := ⟨G, trace, hq⟩
-  exact ((h.prefix_l I hZF hω hf hg code).mpr agree).symm ▸ code
-
 namespace Internal
 variable (Q : kpair_convention_l.Interpretation M) (K : FlatPairing.convention.Interpretation M)
 

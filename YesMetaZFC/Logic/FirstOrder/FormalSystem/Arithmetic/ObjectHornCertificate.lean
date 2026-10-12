@@ -36,26 +36,57 @@ theorem Acceptance.of_rule {rules : List Rule} (rule : Rule) (hRule : rule ∈ r
     (hGuards : ∀ guard, guard ∈ rule.guards → guard.1.eval values < guard.2.eval values)
     (hPremises : ∀ premise, premise ∈ rule.premises → Acceptance rules (premise.eval values)) :
     Acceptance rules (rule.head.eval values) := by
-  classical
-  let parts := rule.premises.attach.map (fun premise => (hPremises premise.1 premise.2).choose)
-  have hParts : ∀ part, part ∈ parts → ClosedRows rules part := by
-    intro part hPart
-    obtain ⟨premise, _, rfl⟩ := List.mem_map.mp hPart
-    exact (hPremises premise.1 premise.2).choose_spec.2
-  have hMember : ∀ premise, premise ∈ rule.premises → premise.eval values ∈ parts.flatten := by
-    intro premise hPremise
-    exact List.mem_flatten.mpr ⟨(hPremises premise hPremise).choose,
-      List.mem_map.mpr ⟨⟨premise, hPremise⟩, List.mem_attach _ _, rfl⟩,
-      (hPremises premise hPremise).choose_spec.1⟩
-  refine ⟨rule.head.eval values :: parts.flatten, List.mem_cons_self, ?_⟩
+  have splitAppend : ∀ (left right : List Nat) {root : Nat},
+      root ∈ left ++ right → root ∈ left ∨ root ∈ right := by
+    intro left right root
+    induction left with
+    | nil => exact fun h => Or.inr h
+    | cons head tail ih =>
+        intro h
+        cases h with
+        | head => exact Or.inl (List.Mem.head _)
+        | tail _ h =>
+            cases ih h with
+            | inl h => exact Or.inl (List.Mem.tail _ h)
+            | inr h => exact Or.inr h
+  have gather : ∀ premises : List (Expr rule.arity),
+      (∀ premise, premise ∈ premises → Acceptance rules (premise.eval values)) →
+      ∃ rows, ClosedRows rules rows ∧ ∀ premise, premise ∈ premises → premise.eval values ∈ rows := by
+    intro premises
+    induction premises with
+    | nil =>
+      intro _
+      refine ⟨(List.nil : List Nat), ?_, ?_⟩
+      · intro _ h
+        cases h
+      · intro _ h
+        cases h
+    | cons premise premises ih =>
+      intro h
+      obtain ⟨head, hHead, hClosedHead⟩ := h premise List.mem_cons_self
+      obtain ⟨tail, hClosedTail, hTail⟩ := ih (fun p hp => h p (List.mem_cons_of_mem _ hp))
+      refine ⟨head ++ tail, ?_, ?_⟩
+      · intro root hRoot
+        rcases splitAppend head tail hRoot with hRoot | hRoot
+        · obtain ⟨r, hr, env, hb, he, hg, hp⟩ := hClosedHead root hRoot
+          exact ⟨r, hr, env, hb, he, hg, fun p h => List.mem_append_left _ (hp p h)⟩
+        · obtain ⟨r, hr, env, hb, he, hg, hp⟩ := hClosedTail root hRoot
+          exact ⟨r, hr, env, hb, he, hg, fun p h => List.mem_append_right _ (hp p h)⟩
+      · intro p hp
+        cases hp with
+        | head => exact List.mem_append_left _ hHead
+        | tail _ hp => exact List.mem_append_right _ (hTail p hp)
+  obtain ⟨rows, hClosed, hMember⟩ := gather rule.premises hPremises
+  refine ⟨rule.head.eval values :: rows, List.mem_cons_self, ?_⟩
   intro root hRoot
-  rcases List.mem_cons.mp hRoot with rfl | hRoot
-  · exact ⟨rule, hRule, values, hBound, rfl, hGuards,
-      fun premise hPremise => List.mem_cons_of_mem _ (hMember premise hPremise)⟩
-  · obtain ⟨other, hOther, env, hBound, hHead, hGuards, hPremises⟩ :=
-      ClosedRows.flatten parts hParts root hRoot
-    exact ⟨other, hOther, env, hBound, hHead, hGuards,
-      fun premise hPremise => List.mem_cons_of_mem _ (hPremises premise hPremise)⟩
+  cases hRoot with
+  | head =>
+      exact ⟨rule, hRule, values, hBound, rfl, hGuards,
+        fun premise hPremise => List.mem_cons_of_mem _ (hMember premise hPremise)⟩
+  | tail _ hRoot =>
+      obtain ⟨other, hOther, env, hBound, hHead, hGuards, hPremises⟩ := hClosed root hRoot
+      exact ⟨other, hOther, env, hBound, hHead, hGuards,
+        fun premise hPremise => List.mem_cons_of_mem _ (hPremises premise hPremise)⟩
 
 inductive Rejection (rules : List Rule) : Nat → Prop where
   | intro (root : Nat) (children : Nat → Prop)

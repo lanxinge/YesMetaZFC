@@ -77,6 +77,11 @@ jobs:
         run: cygpath -w "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build all modules and native targets
         run: python scripts/lean_cache.py build --native
+      - name: Audit exact Lean axiom decoupling
+        run: |
+          python scripts/test_sentence_closedness.py
+          python scripts/test_axiom_decoupling_guard.py
+          python scripts/check_axiom_decoupling.py
       - name: Audit arithmetic axioms and data boundary
         run: |
           python scripts/test_arithmetic_guard.py

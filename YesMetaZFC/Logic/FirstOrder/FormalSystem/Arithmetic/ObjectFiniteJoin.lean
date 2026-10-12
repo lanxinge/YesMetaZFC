@@ -19,12 +19,13 @@ theorem allOf_negative_of_member {T : SetTheory} {free : SetContext} {Γ : Conte
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (IntrinsicQuotation.node tag fields).substituteMapped bs fs =
       IntrinsicQuotation.node tag (fields.map (fun t => t.substituteMapped bs fs)) := by
-  simp [IntrinsicQuotation.node, structural_list_code_term_substituteMapped,
-    Term.substituteMapped, Arguments.substituteMapped]
+  exact congr (congrArg (fun (head tail : SetTerm tb tf) => Sₘ(godel_pairₘ(head, tail)))
+    (finite_numeral_term_substituteMapped bs fs tag))
+    (structural_list_code_term_substituteMapped bs fs fields)
 
 @[simp] theorem condition_substituteMapped (rules : List Rule) {sb sf tb tf : SetContext} (row : SetTerm sb sf)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (condition rules row).substituteMapped bs fs = condition rules (row.substituteMapped bs fs) := by
-  simp [condition, Term.substituteMapped, Arguments.substituteMapped]
+  exact ObjectTrace.condition_substituteMapped (step rules) (ωₘ : SetTerm sb sf) row bs fs
 
 end YesMetaZFC.Automation.ObjectHorn

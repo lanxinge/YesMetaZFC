@@ -38,4 +38,16 @@ theorem Tt_pool_d.unique_l (hE : Extensional M) (I : kpair_convention_l.Interpre
     {ω n U D E : M.Domain} (h : Tt_pool_d I ω n U D) (k : Tt_pool_d I ω n U E) : D = E :=
   hE.eq_of_same_members D E (fun p => ⟨h.mono_l I k (fun _ h => h) p, k.mono_l I h (fun _ h => h) p⟩)
 
+/-- 非零极限域已有 ω 与每个内部自然数的合法常量名字。 -/
+theorem tt_constants_finite_l (hZF : M.Models ZF) {ω κ n B U : M.Domain} (hω : M.IsOmega ω) (hn : M.mem n ω)
+    (hκ : M.IsLimitOrdinal κ) (hB : V_d (kp_pair_l (ZF.modelsKP hZF)) κ B) (hc : ∀ x, M.mem x U ↔ M.mem x B ∨ x = κ) :
+    M.mem ω U ∧ M.mem n U := by
+  have sub := hω.subset_limitOrdinal hZF hκ
+  refine ⟨(hc ω).mpr ?_, (hc n).mpr (Or.inl (ZF.v_ordinal_mem_l (kp_pair_l (ZF.modelsKP hZF)) hZF hB (sub n hn)))⟩
+  rcases (hω.isOrdinal hZF).trichotomy hZF.1 hκ.1 (KP.difference_exists_d (ZF.modelsKP hZF))
+    (KP.intersection_exists_d (ZF.modelsKP hZF) ω κ) with eq | lt | gt
+  · exact Or.inr (hZF.1.eq_of_same_members ω κ eq)
+  · exact Or.inl (ZF.v_ordinal_mem_l (kp_pair_l (ZF.modelsKP hZF)) hZF hB lt)
+  · exact (KP.mem_irrefl_d (ZF.modelsKP hZF) κ (sub κ gt)).elim
+
 end YesMetaZFC.SetTheory.Internal

@@ -45,6 +45,22 @@ theorem ord0_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (a : Term n) :
     Formula.satisfies_mem_iff, Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
   rfl
 
+/-- 非零极限性的有界刻画，可随任意传递成员模型的初等映射运输。 -/
+def limit0_m {n} (a : Term n) : Formula 1 n := .conj (ord0_m a)
+  (.conj (Formula.existsMem a (.neg .falsum))
+    (Formula.forallMem a (Formula.existsMem a.weaken (.mem (.bound 1) .newest))))
+derive_free_closed limit0_m
+
+theorem limit0_delta_l {n} (a : Term n) : (limit0_m a).IsDelta0 :=
+  .conj (ord0_delta_l ..) (.conj (.existsMem _ (.neg .falsum)) (.forallMem _ (.existsMem _ (.mem ..))))
+
+theorem limit0_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (a : Term n) :
+    Formula.satisfies ρ (limit0_m a) ↔ M.IsLimitOrdinal (a.eval ρ) := by
+  simp only [limit0_m, Formula.satisfies_conj_iff, ord0_sat_l hKP,
+    Formula.satisfies_existsMem_iff, Formula.satisfies_neg_iff, Formula.satisfies_falsum_iff,
+    not_false_eq_true, and_true, Formula.satisfies_forallMem_iff,
+    Formula.satisfies_mem_iff, Definitional.Term.eval_weaken]; rfl
+
 theorem ordinal_successor_l (hKP : M.Models KP) {a : M.Domain} (ha : M.IsOrdinal a) :
     ∃ s, M.IsOrdinal s ∧ M.SuccessorOf s a := by
   obtain ⟨s, hs⟩ := exists_insert hKP a a

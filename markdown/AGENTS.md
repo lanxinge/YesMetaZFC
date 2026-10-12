@@ -13,26 +13,27 @@
 | 成果入口、命名规范 | [TROPHIES.md](TROPHIES.md)、[ProofNaming.md](ProofNaming.md) |
 | Q／PA／Z₂、内部编码、原始递归表示 | [ARITHMETIC_STATUS.md](ARITHMETIC_STATUS.md)、[ARITHMETIC_PLAN.md](ARITHMETIC_PLAN.md) |
 
-裸 ZFC Rosser 实例已经完成：`PureRosser.agreement` 有实际证明，
-`PureRosser.independent` 仅假定裸 ZFC 一致。相关重构必须保留这一终点、
-源句子、签名、公理、quotation 与既定可信基；进入对应层时先读上表的使用边界。
-本文件维护长期规范，完成的计划改写为接口导航，不追加逐轮日志。
-`PureProvability` 已在裸 ZFC 中完成原编码表示的 D1–D3、Löb 与哥二；
-纯句子的双向推导及源句子往返所需的对应条件见 `PureSentenceTransfer` 和上述指南。
-`ReducedTarski` 已完成原支撑理论的无参数真值不可定义性；`ReducedTarski.Parameters`
-进一步排除每组任意有限参数下的开放公式真值定义。实际 liar 构造复用
-`ObjectDiagonal` 的原自代入图。`PureTarskiSource` 已把保留原编码的带参数实例落到裸 ZFC；
-候选和反例均为纯公式，真值合同按源公式索引。`PureQuotation`、`PureFixedPoint` 和
-`PureTarski` 另已完成最终纯公式自身完整 AST 编码、带参数固定点及裸 ZFC 真不可定义性。
-开放公式的环境往返和双向推导见 `PureOpenTransfer`，精确边界见成果表和编码指南。
-原生小图模型入口为 `YesMetaZFC.Model.SmallGraph`；`sg_models_zfc` 已核验原 ZFC
-全部公理与模式，`zfc_consistent` 在 Lean 元层无模型存在或一致性前提地给出裸 ZFC 一致性。
-小图节点固定在 `Type u`，图商载体固定在 `Type (u+1)`；后续构造遵守模型论指南中的层级边界。
-标准布尔名称入口为 `YesMetaZFC.Model.Boolean`；`bv_models_zfc` 对任意 `CB_alg B`
-核验原 ZFC，`Boolean.zfc_consistent` 在实际命题布尔代数上得到一致性。通用语义单独
-导入 `Boolean.Native`：`BV_str.rules` 连接原六规则，`native_models` 恢复原生模型性。
-名称节点与 `B` 同在 `Type u`，名称载体固定在 `Type (u+1)`。现有收集仍使用元层选择；
-对象理论的限制不改变模型构造与一致性端点的元层可信依赖。
+本文件只维护长期工作规则。已完成结果、接口边界和核验方法由上表对应文档维护；
+不在这里追加逐轮进度、旧构建统计或临时环境记录。
+
+## 工作约束
+
+- 严格按用户指定路线证明，先解决最难部分；没有实质进展时直接报告，
+  不用无效 helper、桥接层或旁路实现充当进展。
+- 以高复用、可泛化和数学论文式可读性组织证明；优先信息密度高的代码。
+  注释使用中文，证明通过后再做一轮人类数学可读性清理。
+- 定理只使用所需的最弱数学前提；参数必须有仓库中已实现的真实实例，
+  并能形成可自动调用的接口，不引入虚空参数或伪造实例。
+- 证明缺口只能用 `sorry` 明示，不用新公理、虚空假设或占位实例隐藏；
+  不把含缺口的结果报告为完成。未经用户允许，不新增不可计算构造实例。
+- 范式重构按完整模块或层迁移全部调用方，直接移除旧层，不留下兼容转发层。
+- 名称优先采用前缀缩写与下划线，局部变量尽量使用单个数学符号；
+  层后缀和数学词根见 [ProofNaming.md](ProofNaming.md)。
+- 单模块始终少于 2000 行；相对上次提交基点的工作区代码增量不超过 3000 行。
+  如确需超出，先向用户说明并论证额外增量的必要性。
+- 单模块编译或类型检查超过一分钟时，立即优化检查开销。
+  `smoke` 只用于临时测试，不进入长期编译层。
+- 未经用户允许，不执行 Git 提交。
 
 ## 元数学内核
 
@@ -40,8 +41,7 @@
   推导、演绎、全域化或常用逻辑定理主接口，不重启 `BoundedDerives` 主线。
 - 文献的级别、表达式长度等有限护栏只进入显式兼容／审计层；`Formula.level` 和
   `mf1_level` 不阻塞核心自动化，不把纸面提纲限制传播到公共 API。
-- Skolem 选择使用 Lean 元层 `Classical.choice` / `Classical.choose` 的证书构造，
-  不向对象核心加入 `ε` 公理。
+- 区分现有 Skolem 证书的元层选择依赖与对象理论公理，不向对象核心加入 `ε` 公理。
 - 精简必须保持公开接口的适用范围、排序、上下文、量词、guard、数据格式和算法行为。
   不通过更强假设、新公理、`sorry`、额外原生计算可信依赖或删除数学内容换取行数。
 - 完整 AST quotation 使用 `IntrinsicQuotation`；旧 Hilbert quotation 及其 verifier
@@ -96,13 +96,11 @@
   `ObjectDiagonal.fixedPoint_shape`，码域使用已有接口，不展开巨大一元数码。
 - 大模型等式替换先固定参数和目标类型；例如 `PureSyntaxFixedPoint.tag_injective`
   使用 `congrArg (membership ℳ input)`。布尔覆盖可用 `decide +kernel`。
-- 注释使用中文。证明通过后清理人类数学可读性；接口迁移按完整模块或层完成，
-  同步命名参数调用，不保留旧变量名兼容层。
 
 ## 验证
 
-- 正常构建使用 `lake build`；稳定节点用 `lake --wfail build` 和
-  `bash scripts/check-all.sh` 检查全部独立模块。
+- 正常构建使用 `lake build`；`lake env` 不会自动构建依赖。
+  稳定节点用 `lake --wfail build` 和 `python scripts/lean_cache.py build` 检查全部独立模块。
 - 不仅凭默认导入图不可达删除数学模块。全源脚本继续枚举每个独立模块；
   原生验证使用 `python scripts/lean_cache.py build --native`。
 - 已由通用定理证明的性质使用正常内核构建验证，不维护枚举样本、`#eval` 回归
@@ -134,16 +132,12 @@
   也不通过 `Classical.choose` 固定全局模型相关的 `ω`。
 - 接口迁移按完整模块或完整层进行，同时更新命名参数调用；不保留旧变量名兼容层。
 
-## 稳定源码与文件维护
+## 源码与文档维护
 
-- 恢复地址和工具链校验和以 RESTORE 为准。Drive 二进制运行时在根目录，
-  不因源码目录或全文搜索无结果就断言不存在。
-- 更新规范源码包时保持同一 Drive 文件身份；报告更新保持各自身份和版本历史。
-  不创建按日期、轮次、版本号命名的平行包，不以早期来源包覆盖当前工作。
-- 源码修改在工作区进行。回写稳定源码前确认正常构建及相关独立模块通过，
-  没有新引入未说明的 `sorry`、`admit` 或自定义公理，并更新必要文档。
-- 源码包只含源码、配置和文档；排除 `.lake/`、运行时、编译产物、缓存、
-  临时日志、探针、兼容 shim、备份和旧压缩包。一次性分析留在 scratch。
-- 无法确认原文件、遇到版本冲突或缺少替换权限时保留当前工作并说明阻碍，
-  不以另存平行文件绕过。不删除或覆盖来源不明的用户文件；其他历史文件的
-  删除需要明确授权。
+- 以当前 Git 工作区、`lean-toolchain` 和实际构建配置为准；环境恢复见 [RESTORE.md](RESTORE.md)。
+  开始前检查已有未提交改动，不以旧归档或远端快照覆盖当前工作。
+- 文档记录当前接口、数学边界和可复跑命令；完成的计划改为接口导航，
+  过程日志交由 Git 历史保存。来源署名和必要的审计基点保留。
+- 构建结果只对实际核验的源码有效；报告须说明未完成项，不沿用旧日志宣称本次通过。
+- 临时日志、探针、兼容 shim、备份、运行时和编译缓存不进入源码交付。
+- 遇到来源不明的文件或版本冲突时保留用户工作并说明阻碍。

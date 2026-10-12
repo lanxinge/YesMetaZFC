@@ -61,7 +61,14 @@ def project_bound_index
     {depth : Nat} {sort : SetSort}
     (entry : Variable (project_bound_context depth) sort) : Fin depth :=
   ⟨entry.index, by
-    simpa [project_bound_context] using entry.index_lt_length⟩
+    have hLength : ∀ count : Nat, (project_bound_context count).length = count := by
+      intro count
+      induction count with
+      | zero => rfl
+      | succ count ih => exact congrArg Nat.succ ih
+    exact Eq.mp
+      (congrArg (fun size : Nat => entry.index < size) (hLength depth))
+      entry.index_lt_length⟩
 
 @[simp] theorem project_bound_index_variable
     {depth : Nat} (entry : Fin depth) :
@@ -211,13 +218,17 @@ def project_formula {availableStage : Nat} :
   | _, .atom .extensionalEq _ arguments, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .equal
-        (project_term (arguments 0) (hClosed 0))
-        (project_term (arguments 1) (hClosed 1))
+        (project_term (arguments ⟨0, Nat.zero_lt_succ 1⟩)
+          (hClosed ⟨0, Nat.zero_lt_succ 1⟩))
+        (project_term (arguments ⟨1, Nat.lt_succ_self 1⟩)
+          (hClosed ⟨1, Nat.lt_succ_self 1⟩))
   | _, .atom .subset _ arguments, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact subset_formula
-        (project_term (arguments 0) (hClosed 0))
-        (project_term (arguments 1) (hClosed 1))
+        (project_term (arguments ⟨0, Nat.zero_lt_succ 1⟩)
+          (hClosed ⟨0, Nat.zero_lt_succ 1⟩))
+        (project_term (arguments ⟨1, Nat.lt_succ_self 1⟩)
+          (hClosed ⟨1, Nat.lt_succ_self 1⟩))
   | _, .neg body, hClosed => by
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .neg (project_formula body hClosed)
@@ -248,6 +259,7 @@ def project_formula {availableStage : Nat} :
       simp only [_root_.YesMetaZFC.SetTheory.Definitional.Formula.FreeClosed] at hClosed
       exact .existsE SetSort.set (project_formula body hClosed)
 termination_by structural _ formula _ => formula
+
 
 theorem project_formula_rename
     {availableStage sourceDepth targetDepth : Nat}

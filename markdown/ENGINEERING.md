@@ -235,7 +235,7 @@ Löb 推导复用 [Loeb](../YesMetaZFC/Logic/FirstOrder/FormalSystem/Metatheory/
 对象算术化模块位于 `Logic/FirstOrder/FormalSystem/Arithmetic/`；
 quotation 归纳位于 `QuineEncoding/Induction`，公式 binder 语义位于
 `Model/FirstOrder/FormulaBinderSemantics`。迁移保留既有数学声明名称，
-旧模块路径已移除。通用搜索证明器的源码留档和拆分边界见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
+旧模块路径已移除。轻量策略与当前模块边界见 [PROVER_SPLIT.md](PROVER_SPLIT.md)。
 
 ## 通用模型语义
 
@@ -264,12 +264,14 @@ bash scripts/check-all.sh
 全源脚本覆盖全部独立模块；`python scripts/lean_cache.py build --native`
 另检查全部模块的原生对象及库目标。主项目不再构建独立扫描器。
 
-当前规模、本轮基点、净减量与同条件耗时对照见
-[PROOF_REDUCTION.md](PROOF_REDUCTION.md)。计数包含注释和空行，排除缓存、探针和文档；
-新增公共接口必须计入净减量。构建结果只对应该记录标明的源码指纹。
-数学成果与原节点可信依赖审计见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)。
-此前 [4ae86c1](https://github.com/lanxinge/YesMetaZFC/commit/4ae86c1b38c756e95d3dee7e8de50a9c60db292b)
-的 806 个 Lean 文件、225,346 行总代码是重构历史基点，不是当前规模。
+规模统计以当前工作区实际源码为准，包含交付中的新增模块、注释和空行，
+排除缓存、探针和文档。比较时明确基点及文件范围，新增公共接口计入代码净增量；
+字节比较统一使用 LF 换行和无 BOM UTF-8，避免换行差异掩盖真实变化。
+
+性能比较固定工具链、线程数、检查选项与依赖缓存，交替测量后比较中位数。
+增量构建耗时不与冷构建直接比较，局部模块提速不推断为全库提速。
+单模块检查超过一分钟时先定位并优化热点。数学成果与可信依赖边界见
+[UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md)；核验结论只对实际检查的源码有效。
 
 Lean 4.33.1 适配约定：必要的类型别名使用 `@[implicit_reducible]`，定义相等转换
 可用 `simpa ... using!`，自由闭合性消费 `code_freeClosed`。
@@ -285,5 +287,6 @@ Lean 4.33.1 适配约定：必要的类型别名使用 `@[implicit_reducible]`�
 | 集合图与双射的数学复用 | [FunctionSpaceAlgebra](../YesMetaZFC/SetTheory/FunctionSpaceAlgebra.lean)、[Card/Arithmetic/Equinumerosity](../YesMetaZFC/SetTheory/Card/Arithmetic/Equinumerosity.lean) | 用模型内部可定义映射及复合消除重复，宿主 `Equiv` 不能替代集合图 |
 | 大公式核验性能 | [PureLogicalSchemaSets](../YesMetaZFC/Model/ZFC/Pure/PureLogicalSchemaSets.lean) 的 `condition_bounded`、[PureFinalSyntax](../YesMetaZFC/Model/ZFC/Pure/PureFinalSyntax.lean) 及 [PureSyntaxTransform](../YesMetaZFC/Model/ZFC/Pure/PureSyntaxTransform.lean) | 先作声明级测量，将语义形状与具体解释分开，保留原公式及证明前提 |
 
-测量示例：`lake env lean --profile -Dprofiler.threshold=50 <模块路径>`。
+先用 `lake build <模块名>` 构建依赖，再用
+`lake env lean --profile -Dprofiler.threshold=50 <模块路径>` 作声明级测量。
 日常构建不开启全量 `Meta.isDefEq` 或 `simp.rewrite` 追踪。

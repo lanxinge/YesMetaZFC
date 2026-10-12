@@ -49,31 +49,52 @@ def Expr.variables {n : Nat} : Expr n → List (Fin n)
 
 theorem Expr.variable_le {n : Nat} (expr : Expr n) (env : Fin n → Nat)
     {index : Fin n} (h : index ∈ expr.variables) : env index ≤ expr.eval env := by
+  have append_cases (left right : List (Fin n))
+      (h : index ∈ left ++ right) : index ∈ left ∨ index ∈ right := by
+    induction left with
+    | nil => exact Or.inr h
+    | cons head tail ih =>
+      cases h with
+      | head => exact Or.inl (.head _)
+      | tail _ h =>
+        cases ih h with
+        | inl h => exact Or.inl (.tail _ h)
+        | inr h => exact Or.inr h
   induction expr with
-  | literal _ => simp [variables] at h
-  | var value =>
-    have : index = value := List.mem_singleton.mp h
-    subst index
-    exact Nat.le_refl _
+  | literal _ => cases h
+  | var _ =>
+    cases h with
+    | head => exact Nat.le_refl _
+    | tail _ h => cases h
   | succ body ih => exact Nat.le_trans (ih h) (Nat.le_succ _)
   | pair left right ihLeft ihRight =>
-    rcases List.mem_append.mp h with h | h
-    · exact Nat.le_trans (ihLeft h) (ProofCode.left_le_godel_pair_value _ _)
-    · exact Nat.le_trans (ihRight h) (ProofCode.right_le_godel_pair_value _ _)
+    cases append_cases left.variables right.variables h with
+    | inl h => exact Nat.le_trans (ihLeft h) (ProofCode.left_le_godel_pair_value _ _)
+    | inr h => exact Nat.le_trans (ihRight h) (ProofCode.right_le_godel_pair_value _ _)
 
 @[simp] theorem Expr.term_substituteMapped {n : Nat} (expr : Expr n)
     {sb sf tb tf : SetContext} (env : Fin n → SetTerm sb sf)
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (expr.term env).substituteMapped bs fs =
       expr.term (fun index => (env index).substituteMapped bs fs) := by
-  induction expr <;> simp_all [Expr.term, Term.substituteMapped, Arguments.substituteMapped]
+  induction expr with
+  | literal value => exact finite_numeral_term_substituteMapped bs fs value
+  | var _ => rfl
+  | succ _ ih => exact congrArg successor_term ih
+  | pair _ _ ihLeft ihRight =>
+      exact congr (congrArg (fun left right => godel_pairₘ(left, right)) ihLeft) ihRight
 
 @[simp] theorem Expr.term_renameMapped {n : Nat} (expr : Expr n)
     {sb sf tb tf : SetContext} (env : Fin n → SetTerm sb sf)
     (bs : VariableRenaming sb tb) (fs : VariableRenaming sf tf) :
     (expr.term env).renameMapped bs fs =
       expr.term (fun index => (env index).renameMapped bs fs) := by
-  induction expr <;> simp_all [Expr.term, Term.renameMapped, Arguments.renameMapped]
+  induction expr with
+  | literal value => exact finite_numeral_term_renameMapped bs fs value
+  | var _ => rfl
+  | succ _ ih => exact congrArg successor_term ih
+  | pair _ _ ihLeft ihRight =>
+      exact congr (congrArg (fun left right => godel_pairₘ(left, right)) ihLeft) ihRight
 
 theorem Expr.evaluate {T : SetTheory} (C : CertificateCore T)
     {n : Nat} (expr : Expr n) (env : Fin n → Nat) :
@@ -97,13 +118,19 @@ def anyOf {bound free : SetContext} : List (SetFormula bound free) → SetFormul
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (allOf formulas).substituteMapped bs fs =
       allOf (formulas.map (fun φ => φ.substituteMapped bs fs)) := by
-  induction formulas <;> simp_all [allOf, Formula.substituteMapped]
+  induction formulas with
+  | nil => rfl
+  | cons head _ ih =>
+      exact congrArg (Formula.conj (head.substituteMapped bs fs)) ih
 
 @[simp] theorem anyOf_substituteMapped {sb sf tb tf : SetContext} (formulas : List (SetFormula sb sf))
     (bs : VariableSubstitution signature sb tb tf) (fs : VariableSubstitution signature sf tb tf) :
     (anyOf formulas).substituteMapped bs fs =
       anyOf (formulas.map (fun φ => φ.substituteMapped bs fs)) := by
-  induction formulas <;> simp_all [anyOf, Formula.substituteMapped]
+  induction formulas with
+  | nil => rfl
+  | cons head _ ih =>
+      exact congrArg (Formula.disj (head.substituteMapped bs fs)) ih
 
 theorem allOf_delta0 {bound free : SetContext} (formulas : List (SetFormula bound free))
     (h : ∀ φ, φ ∈ formulas → Formula.IsDelta0 set_levy_bound φ) :
@@ -163,17 +190,48 @@ def Rule.template (rule : Rule) : FormulaTemplate.Binary where
     (rule.matrix env row trace).substituteMapped bs fs =
       rule.matrix (fun index => (env index).substituteMapped bs fs)
         (row.substituteMapped bs fs) (trace.substituteMapped bs fs) := by
-  simp [Rule.matrix, Formula.substituteMapped, Arguments.substituteMapped, Function.comp_def]
+  have hGuards : ∀ guards : List (Expr rule.arity × Expr rule.arity),
+      (allOf (guards.map (fun guard => guard.1.term env ∈ₘ guard.2.term env))).substituteMapped bs fs =
+        allOf (guards.map (fun guard =>
+          guard.1.term (fun index => (env index).substituteMapped bs fs) ∈ₘ
+            guard.2.term (fun index => (env index).substituteMapped bs fs))) := by
+    intro guards
+    induction guards with
+    | nil => rfl
+    | cons guard _ ih =>
+        exact congr (congrArg Formula.conj
+          (congr (congrArg membership_formula
+            (guard.1.term_substituteMapped env bs fs))
+            (guard.2.term_substituteMapped env bs fs))) ih
+  have hPremises : ∀ premises : List (Expr rule.arity),
+      (allOf (premises.map (fun premise => premise.term env ∈ₘ trace))).substituteMapped bs fs =
+        allOf (premises.map (fun premise =>
+          premise.term (fun index => (env index).substituteMapped bs fs) ∈ₘ
+            trace.substituteMapped bs fs)) := by
+    intro premises
+    induction premises with
+    | nil => rfl
+    | cons premise _ ih =>
+        exact congr (congrArg Formula.conj
+          (congrArg (fun term => term ∈ₘ trace.substituteMapped bs fs)
+            (premise.term_substituteMapped env bs fs))) ih
+  exact congr (congrArg Formula.conj
+    (congrArg (fun term => row.substituteMapped bs fs ≐ₘ term)
+      (rule.head.term_substituteMapped env bs fs)))
+    (congr (congrArg Formula.conj (hGuards rule.guards)) (hPremises rule.premises))
 
 theorem Rule.matrix_delta0 (rule : Rule) {bound free : SetContext}
     (env : Fin rule.arity → SetTerm bound free) (row trace : SetTerm bound free) :
     Formula.IsDelta0 set_levy_bound (rule.matrix env row trace) := by
   apply Formula.IsDelta0.conj (.equal _ _) (Formula.IsDelta0.conj ?_ ?_)
-  all_goals
-    apply allOf_delta0
-    intro φ hφ
-    obtain ⟨entry, _, rfl⟩ := List.mem_map.mp hφ
-    exact .rel _ _
+  · generalize rule.guards = guards
+    induction guards with
+    | nil => exact .truth
+    | cons guard _ ih => exact .conj (.rel _ _) ih
+  · generalize rule.premises = premises
+    induction premises with
+    | nil => exact .truth
+    | cons premise _ ih => exact .conj (.rel _ _) ih
 
 theorem Rule.template_delta0 (rule : Rule) :
     Formula.IsDelta0 set_levy_bound rule.template.body :=
@@ -185,13 +243,14 @@ def step (rules : List Rule) : FormulaTemplate.Binary where
 @[simp] theorem step_apply (rules : List Rule) {bound free : SetContext}
     (row trace : SetTerm bound free) :
     step rules row trace = anyOf (rules.map (fun rule => rule.template row trace)) := by
-  simp [step, FormulaTemplate.apply_two, FormulaTemplate.instantiate, Function.comp_def]
+  induction rules with
+  | nil => rfl
+  | cons rule _ ih => exact congrArg (Formula.disj (rule.template row trace)) ih
 
 theorem step_delta0 (rules : List Rule) : Formula.IsDelta0 set_levy_bound (step rules).body := by
-  apply anyOf_delta0
-  intro φ hφ
-  obtain ⟨rule, _, rfl⟩ := List.mem_map.mp hφ
-  exact rule.template_delta0
+  induction rules with
+  | nil => exact .falsum
+  | cons rule _ ih => exact .disj rule.template_delta0 ih
 
 def condition (rules : List Rule) {bound free : SetContext} (row : SetTerm bound free) :
     SetFormula bound free := ObjectTrace.condition (step rules) ωₘ row

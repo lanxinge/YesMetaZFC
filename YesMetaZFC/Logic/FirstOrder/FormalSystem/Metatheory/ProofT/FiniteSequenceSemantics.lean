@@ -355,24 +355,20 @@ private theorem standard_sequence_member_condition_is_ordered_pair
           (numₘ(start)) head hEquality
       have hTail : ([] : Context signature free) ⊢ₘ[T]
           tailCase ⟶ₘ is_ordered_pair_formula member := by
-        simpa [tailCase] using ih (start + 1)
+        exact ih (start + 1)
       apply FirstOrder.Derives.imp_intro
       let source : SetOpenFormula free := headCase ∨ₘ tailCase
       have hSource : [source] ⊢ₘ[T] source :=
         FirstOrder.Derives.assumption List.mem_cons_self
-      apply FirstOrder.Derives.disj_elim
-        (by simpa [source, headCase, tailCase,
-          standard_sequence_member_condition] using hSource)
-      · simpa [source, headCase, tailCase] using!
-          FirstOrder.Derives.imp_elim
-            (hHead.context_weaken_prefix
-              (initial := [headCase, source]))
-            (FirstOrder.Derives.assumption List.mem_cons_self)
-      · simpa [source, headCase, tailCase] using!
-          FirstOrder.Derives.imp_elim
-            (hTail.context_weaken_prefix
-              (initial := [tailCase, source]))
-            (FirstOrder.Derives.assumption List.mem_cons_self)
+      apply FirstOrder.Derives.disj_elim hSource
+      · exact FirstOrder.Derives.imp_elim
+          (hHead.context_weaken_prefix
+            (initial := [headCase, source]))
+          (FirstOrder.Derives.assumption List.mem_cons_self)
+      · exact FirstOrder.Derives.imp_elim
+          (hTail.context_weaken_prefix
+            (initial := [tailCase, source]))
+          (FirstOrder.Derives.assumption List.mem_cons_self)
 
 end FiniteSequenceSemantics
 

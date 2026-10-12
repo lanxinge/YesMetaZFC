@@ -11,21 +11,6 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}}
 
-private def rr_limit_m {n} (δ : Term n) : Formula 1 n := .conj (KP.ord0_m δ)
-  (.conj (Formula.existsMem δ (.neg .falsum))
-    (Formula.forallMem δ (Formula.existsMem δ.weaken (.mem (.bound 1) .newest))))
-derive_free_closed rr_limit_m
-
-private theorem rr_limit_delta_l {n} (δ : Term n) : (rr_limit_m δ).IsDelta0 :=
-  .conj (KP.ord0_delta_l ..) (.conj (.existsMem _ (.neg .falsum)) (.forallMem _ (.existsMem _ (.mem ..))))
-
-private theorem rr_limit_sat_l (hKP : M.Models KP) {n} (ρ : Env M n) (δ : Term n) :
-    Formula.satisfies ρ (rr_limit_m δ) ↔ M.IsLimitOrdinal (δ.eval ρ) := by
-  simp only [rr_limit_m, Formula.satisfies_conj_iff, KP.ord0_sat_l hKP,
-    Formula.satisfies_existsMem_iff, Formula.satisfies_neg_iff, Formula.satisfies_falsum_iff,
-    not_false_eq_true, and_true, Formula.satisfies_forallMem_iff,
-    Formula.satisfies_mem_iff, Definitional.Term.eval_weaken]; rfl
-
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
@@ -46,14 +31,14 @@ theorem _root_.YesMetaZFC.SetTheory.Rr_d.image_l {ω c d X R Y S j A A' E E' η 
   have fn' := (hj.function_l hZF hω hX hY hm hn aa bb ff).mp fn
   -- 极限性和下界由同一个有界全称句子保持。
   let φ : Formula 1 4 := Formula.forallMem (.bound 3) (Formula.forallMem (.bound 3)
-    (.imp (rd_entry0_m (.bound 1) .newest (.bound 2)) (.conj (rr_limit_m .newest) (.mem (.bound 3) .newest))))
+    (.imp (rd_entry0_m (.bound 1) .newest (.bound 2)) (.conj (KP.limit0_m .newest) (.mem (.bound 3) .newest))))
   let ρ (A B η F : M.Domain) : Env M 4 := ⟨Fin.cases F (Fin.cases η (Fin.cases B (fun _ => A))), fun _ => A⟩
   have read A B η F : Formula.satisfies (ρ A B η F) φ ↔ ∀ a, M.mem a A → ∀ δ, M.mem δ B →
       Rd_entry_d a δ F → M.IsLimitOrdinal δ ∧ M.mem η δ := by
     simp only [φ, Formula.satisfies_forallMem_iff, Formula.satisfies_imp_iff, rd_entry0_sat_l hZF.1,
-      Formula.satisfies_conj_iff, rr_limit_sat_l (ZF.modelsKP hZF), Formula.satisfies_mem_iff]; rfl
+      Formula.satisfies_conj_iff, KP.limit0_sat_l (ZF.modelsKP hZF), Formula.satisfies_mem_iff]; rfl
   have tr := smap_delta_l I hZF hω hX hY hm hn hj φ (by simp -implicitDefEqProofs [φ, Definitional.Formula.FreeClosed])
-    (.forallMem _ (.forallMem _ (.imp (rd_entry0_delta_l ..) (.conj (rr_limit_delta_l ..) (.mem ..)))))
+    (.forallMem _ (.forallMem _ (.imp (rd_entry0_delta_l ..) (.conj (KP.limit0_delta_l ..) (.mem ..)))))
     (ρ A B η F) (ρ A' B' η' F') (Fin.cases ff (Fin.cases hh (Fin.cases bb (fun _ => aa))))
   have limits := (read A' B' η' F').mp (tr.mp ((read A B η F).mpr
     (fun a _ δ _ hd => ⟨(rank.regular a δ hd).1.isLimitOrdinal, (rank.regular a δ hd).2⟩)))

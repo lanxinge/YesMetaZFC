@@ -88,7 +88,7 @@ private theorem lift_expression_derives
     (hφ : ([] : Context signature []) ⊢ₘ[expression_encoding_theory] φ) :
     Γ ⊢ₘ[T] φ :=
   FirstOrder.Derives.context_weaken
-    (Γ := ([] : Context signature [])) (Δ := Γ) (by simp)
+    (Γ := ([] : Context signature [])) (Δ := Γ) (by intro φ hφ; cases hφ)
     (FirstOrder.Derives.theory_weaken hExpression hφ)
 
 private theorem lift_formal_derives

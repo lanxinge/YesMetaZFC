@@ -29,7 +29,7 @@ theorem Vr_d.of_rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
 theorem Vr_d.rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
     (hZ : M.TransitiveSet Z) (hV : M.mem V Z) (hv : Vr_d Z α V) (hα : M.IsLimitOrdinal α)
     (hβ : M.mem β V) (hW : M.mem W Z) (hw : Vr_d Z β W) : M.mem W V ∧ Vr_d V β W := by
-  have ho : M.IsOrdinal β := by obtain ⟨_, _, _, _, cert⟩ := hw; exact (cert W hW).1
+  have ho := hw.ordinal_l hW
   have hβα := hv.ordinal_height_l hZF hZ hV ho hβ
   have hWV := (hv.compare_l hZF hZ hV hW hw (hα.1.transitive β hβα)).2 hβα
   obtain ⟨B, F, hB, hF, cert⟩ := hw

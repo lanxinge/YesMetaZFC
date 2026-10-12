@@ -24,8 +24,15 @@ theorem variable_index {free : SetContext} {index : Nat} {entry : Variable free 
     cases index with
     | zero => cases h; rfl
     | succ index =>
-      obtain ⟨value, hValue, rfl⟩ := Option.map_eq_some_iff.mp h
-      exact congrArg Nat.succ (ih hValue)
+      change (decodeVariable tail index).map Variable.there = some entry at h
+      cases hValue : decodeVariable tail index with
+      | none =>
+        rw [hValue] at h
+        cases h
+      | some value =>
+        rw [hValue] at h
+        cases h
+        exact congrArg Nat.succ (ih hValue)
 
 theorem variable_exists (free : SetContext) (index : Nat) (h : index < free.length) :
     ∃ entry, decodeVariable free index = some entry := by
