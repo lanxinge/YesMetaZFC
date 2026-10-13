@@ -5,6 +5,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeContinueRealizeSyntax
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRecoverySyntax
 import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyModel
+import YesMetaZFC.SetTheory.LargeCardinal.IterationHistorySyntax
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderReadSource
 import YesMetaZFC.Model.SetTheory.LevyReflection
 import YesMetaZFC.SetTheory.CumulativeRegularCover
@@ -43,6 +44,30 @@ structure Tg_context_d (ω X η C : M.Domain) : Prop where
   limit : M.IsLimitOrdinal η
   omega : M.mem ω C
   kernel : Formula.satisfies ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C) tg_context_m
+
+/-- 存入内部历史的完整上下文；更新核仍是原来的有限反射句子。 -/
+def tg_context_data_m {d} (ω X η C : Term d) : Formula 1 d := .conj
+  (set[d] ⟪⌜η⌝ₛ ∈ ⌜X⌝ₛ ∧ ⌜C⌝ₛ ∈ ⌜X⌝ₛ ∧ ⌜pn_rank_m⌝ₚ(⌜X⌝ₛ, ⌜η⌝ₛ, ⌜C⌝ₛ) ∧
+    ⌜Formula.isLimitOrdinal⌝ₚ(⌜η⌝ₛ) ∧ ⌜ω⌝ₛ ∈ ⌜C⌝ₛ⟫)
+  (tg_context_m.bind (fun _ => C))
+
+@[simp] theorem tg_context_data_closed_l {d} (ω X η C : Term d)
+    (hw : ω.freeSupport = []) (hX : X.freeSupport = []) (hη : η.freeSupport = []) (hC : C.freeSupport = []) :
+    (tg_context_data_m ω X η C).FreeClosed := by
+  simp -implicitDefEqProofs [tg_context_data_m, Definitional.Formula.FreeClosed, hw, hX, hη, hC]
+  exact tg_context_closed_l
+
+theorem tg_context_data_sat_l (hKP : M.Models KP) {d} (ρ : Env M d) (ω X η C : Term d) :
+    Formula.satisfies ρ (tg_context_data_m ω X η C) ↔
+      Tg_context_d (ω.eval ρ) (X.eval ρ) (η.eval ρ) (C.eval ρ) := by
+  simp only [tg_context_data_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
+    pn_rank_sat_l hKP, Formula.satisfies_isLimitOrdinal_iff, Formula.satisfies_bind]
+  have eq := Formula.closed_env_l tg_context_m tg_context_closed_l
+    (ρ := Definitional.Env.substitute ρ (fun _ => C))
+    (η := ((⟨Fin.elim0, fun _ => ω.eval ρ⟩ : Env M 0).push (C.eval ρ)))
+    (funext (Fin.cases rfl (fun i => Fin.elim0 i)))
+  exact ⟨fun ⟨⟨a, b, c, d, e⟩, f⟩ => ⟨a, b, c, d, e, eq.mp f⟩,
+    fun h => ⟨⟨h.height, h.member, h.rank, h.limit, h.omega⟩, eq.mpr h.kernel⟩⟩
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)

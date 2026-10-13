@@ -37,7 +37,9 @@ def tg_tables_m {d} (ω e δ E P Q : Term d) : Formula 1 d := .conj (set[d] ⟪
     ⌜tg_reply_language_m⌝ₚ(⌜ω⌝ₛ, ⌜e⌝ₛ, l, n, κ, B, U, D, r, b, h) ∧
     ⌜tg_max_query_m⌝ₚ(⌜ω⌝ₛ, l, n, U, D, m) ∧
     ⌜tg_node_query_m⌝ₚ(⌜ω⌝ₛ, ⌜e⌝ₛ, n, l, U, D, s, t, k, q) ∧
-    ⌜tg_query_base_m⌝ₚ(⌜ω⌝ₛ, ⌜e⌝ₛ, l, n, k, s, t, r, m, b, h, q))⟫) (tg_query_total_m ω e δ Q)
+    ⌜tg_query_base_m⌝ₚ(⌜ω⌝ₛ, ⌜e⌝ₛ, l, n, k, s, t, r, m, b, h, q))⟫)
+  (.conj (tg_query_total_m ω e δ Q)
+    (.conj (Formula.isFunction kpair_convention_l E) (Formula.isFunction kpair_convention_l P)))
 @[simp] theorem tg_tables_closed_l {d} (ω e δ E P Q : Term d)
     (hw : ω.freeSupport = []) (he : e.freeSupport = []) (hd : δ.freeSupport = [])
     (hE : E.freeSupport = []) (hP : P.freeSupport = []) (hQ : Q.freeSupport = []) :
@@ -59,8 +61,11 @@ theorem Tg_setup_d.tables_l (hZFC : M.Models ZFC) {p : Tg_params_d M.Domain} {X 
     ts_program_sat_l hZF, tg_query_request_sat_l hZF, tg_query_data_sat_l hZF.1,
     tg_reply_language_sat_l hZF, tg_max_query_sat_l I (ZF.modelsKP hZF),
     tg_node_query_sat_l I (ZF.modelsKP hZF), tg_query_base_sat_l I (ZF.modelsKP hZF),
+    Formula.satisfies_isFunction_iff I hZF.1,
     Definitional.Term.eval_weaken, tt_eval_cases_l, hw, he, hd, hE, hP, hQ]
-  refine ⟨⟨?_, ?_, ?_, ?_⟩, setup.query_total_l hZFC ρ ω e δ Q hw he hd hQ⟩
+  refine ⟨⟨?_, ?_, ?_, ?_⟩, setup.query_total_l hZFC ρ ω e δ Q hw he hd hQ,
+    setup.elastic.elim (fun _ h => (fn0_function_l (ZF.modelsKP hZF) h.2.1).1),
+    setup.programs.elim (fun _ h => (fn0_function_l (ZF.modelsKP hZF) h.2.1.1).1)⟩
   · intro κ hk n hn B U D g h i z limit row
     exact setup.elastic.elim fun _ table => table.read_l hZFC hk hn limit row
   · intro n b z s₀ s₁ s₂ s₃ s₄ s₅ s₆ row

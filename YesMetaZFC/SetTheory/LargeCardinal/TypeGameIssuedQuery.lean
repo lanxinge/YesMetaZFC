@@ -30,8 +30,11 @@ theorem tg_issued_query_l (ρ : Env M 46) (valid : Formula.satisfies ρ tg_issue
         ρ.bound 4, ρ.bound 5, ρ.bound 19, h, ρ.bound 22, ρ.bound 23, ρ.bound 24, ρ.bound 26,
         ρ.bound 28, U, D, ρ.bound 25].get i, ρ.free⟩ : Env M 15) tg_continue0_m) ∧
       M.mem (ρ.bound 26) (ρ.bound 0) ∧ M.mem (ρ.bound 27) (ρ.bound 0) ∧ M.mem (ρ.bound 28) (ρ.bound 0) ∧
-      ∃ χ : Env M 12, (∀ i : Fin 5, χ.bound (i.castAdd 7) =
-        [ρ.bound 25, ρ.bound 28, ρ.bound 0, ρ.bound 24, ρ.bound 27].get i) ∧ Formula.satisfies χ tg_candidate0_m := by
+      ∃ χ : Env M 12, (∀ i : Fin 12, χ.bound i =
+        [ρ.bound 25, ρ.bound 28, ρ.bound 0, ρ.bound 24, ρ.bound 27, ρ.bound 29,
+          ρ.bound 30, ρ.bound 31, ρ.bound 32, ρ.bound 33, ρ.bound 34, ρ.bound 35].get i) ∧ Formula.satisfies χ tg_candidate0_m ∧
+        Formula.satisfies (⟨fun i => [ρ.bound 0, ρ.bound 1, ρ.bound 27, ρ.bound 28, ρ.bound 24,
+          B, U, D, r, b, q].get i, ρ.free⟩ : Env M 11) tg_reply_language0_m := by
   have state := (tg_issued_sat_l I hE ρ).mp valid
   have original := state.auxiliary
   simp only [tg_issued_aux0_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
@@ -64,7 +67,7 @@ theorem tg_issued_query_l (ρ : Env M 46) (valid : Formula.satisfies ρ tg_issue
     tg_query_data_sat_l hE, Formula.satisfies_isSuccessor_iff, tg_query_request_m,
     Formula.satisfies_bind, tg_query_base_m] at query
   simp only [tg_query_request_m, Formula.satisfies_bind] at request
-  obtain ⟨l, N, first, last, _, _, _, base⟩ :=
+  obtain ⟨l, N, first, last, replyLanguage, _, _, base⟩ :=
     query (ρ.bound 24) state.bound (ρ.bound 26) s (ρ.bound 23) B U D r m b q f (by
       apply (Formula.closed_env_l tg_query_request0_m tg_query_request0_closed_l (ρ := _) (η := _) ?_).mp request
       funext i
@@ -117,13 +120,24 @@ theorem tg_issued_query_l (ρ : Env M 46) (valid : Formula.satisfies ρ tg_issue
         (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))))))))))))) i
   · let χ : Env M 12 := ⟨fun i => [ρ.bound 25, ρ.bound 28, ρ.bound 0, ρ.bound 24, ρ.bound 27,
       C, V, W, g₀, g₁, g₂, g₃].get i, ρ.free⟩
-    refine ⟨χ, ?_, (Formula.satisfies_conj_iff ..).mpr ⟨?_, (tg_elastic_sat_l I hE ..).mpr drop⟩⟩
+    have fn := (Formula.satisfies_isFunction_iff I hE ..).mp tables.2.2.1
+    obtain ⟨eC, eV, eW, eq⟩ := elastic.unique_l hE fn state.elastic
+    refine ⟨χ, ?_, (Formula.satisfies_conj_iff ..).mpr ⟨?_, (tg_elastic_sat_l I hE ..).mpr drop⟩, ?_⟩
     · intro i
-      exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))) i
+      exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+        (Fin.cases eC (Fin.cases eV (Fin.cases eW (Fin.cases (congrArg Ee_queries_d.largest eq)
+          (Fin.cases (congrArg Ee_queries_d.domain eq) (Fin.cases (congrArg Ee_queries_d.inaccessible eq)
+            (Fin.cases (congrArg Ee_queries_d.stretch eq) (fun j => Fin.elim0 j)))))))))))) i
     · apply (Formula.satisfies_rename ..).mpr
       apply (Formula.closed_env_l ee_language0_m ee_language0_closed_l (ρ := _) (η := _) ?_).mp language
       funext i
       exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
         (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j)))))))))) i
+    · simp only [tg_reply_language_m, Formula.satisfies_bind] at replyLanguage
+      apply (Formula.closed_env_l tg_reply_language0_m tg_reply_language0_closed_l (ρ := _) (η := _) ?_).mp replyLanguage
+      funext i
+      exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+        (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+          (Fin.cases rfl (fun j => Fin.elim0 j))))))))))) i
 
 end YesMetaZFC.SetTheory.LargeCardinal

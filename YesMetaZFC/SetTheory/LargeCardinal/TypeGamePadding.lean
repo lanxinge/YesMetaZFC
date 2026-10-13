@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRound
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastStep
 
 /-! # 重置轮的 padding 与回到偶数枝的实际超幂
 
@@ -48,7 +49,9 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
         (∀ ν, M.mem ν L → Ea_agree_d ω ν X N) ∧
         (∃ V₀, M.mem V₀ X ∧ Vr_d X (p 5) V₀ ∧ M.mem V₀ N ∧ Vr_d N (p 5) V₀ ∧
           ∀ x, M.mem x V₀ → Rd_entry_d x x j) ∧
-        ∃ π₂, It_map_d G₂ o β π₂ ∧ Rd_entry_d Cᵣ C' π₂ ∧ Tg_anchor_d γ Z₀ N π₂ := by
+        ∃ π₂, It_map_d G₂ o β π₂ ∧ Rd_entry_d Cᵣ C' π₂ ∧ Tg_anchor_d γ Z₀ N π₂ ∧
+          Tg_past_update_d hZF ω X (p 5) α X R μ K η C L W N κ' j J J₂
+            (fun i => ((tg_round_env_d ρ v).bound i).val) := by
   obtain ⟨v, valid⟩ := tg_successor_read_l ρ seed (context.renew_l hZF owner.source nc ρ seed)
   let ε := tg_round_env_d ρ v
   obtain ⟨β, T₁, J₁, G₁, E₁, c₁, id, padded, pad, hc₁, nextNode, edge₁, identity, empty⟩ := tree.pad_l hZF succ
@@ -82,10 +85,14 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
   have anchor₂ := anchor.extend_l hZF owner.source.transitive owner.source.transitive ready.source.transitive
     anchor.member anchor.rank hW common level.member level.hierarchy limit hκL lower
     hV₀ rank₀ pointwise result.tree.diagram oldRoot₂ edge root₂
+  have past := context.past_update_l hZF owner nc ε valid hw owner.source.transitive hW common hW common limit
+    (limit.1.transitive _ hκL) limit hWC common bound hwW (limit.1.transitive _ hκL)
+    ready.source.transitive level.member level.hierarchy subset hV₀ rank₀ pointwise
+    (fun i d hi => ext.2.2.1 i d (pad.2.2.1 i d hi)) (ext.2.2.1 α c nextNode) mx
   exact ⟨v, valid, β, T₁, J₁, G₁, E₁, id, π₁, padded, pad, nextNode, edge₁, identity, empty,
     root₁, iRoot₁, anchor₁, β₂, T₂, J₂, G₂, E₂, H₂, d, j, N, R', K₀, L, F, κ', U', D', u', η', C', W,
     result, ext, target, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
     hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, fixedV,
-    π₂, root₂, iRoot₂, anchor₂⟩
+    π₂, root₂, iRoot₂, anchor₂, past⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

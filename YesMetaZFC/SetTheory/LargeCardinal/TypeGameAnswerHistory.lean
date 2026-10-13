@@ -2,6 +2,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnswerTable
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssuedAnswer
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyReflect
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePositionNext
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTrace
 
 /-! # 跨模型回答实际推进原策略历史
 
@@ -44,6 +45,7 @@ theorem Tg_context_d.answer_history_l {Y S μ' K' η' D B T r c d π σ C₀ γ 
         ⟨fun i => θ.bound (i.castAdd 27), fun _ => θ.bound 0⟩ (θ.bound 19) t q) (tg_position0_m 2) ∧
       Formula.satisfies (⟨fun i => [θ.bound 0, t, θ.bound 20, v].get i, fun _ => v⟩ :
         Env (rt_model_l D nd) 4) (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
+      Tg_trace_d ω D (θ.bound 4).val (θ.bound 1).val (θ.bound 2).val (θ.bound 19).val t.val (θ.bound 23).val (p 15) (p 11) ∧
       let ψ := tg_position_env_d
         (⟨fun i => θ.bound (i.castAdd 27), fun _ => θ.bound 0⟩ : Env (rt_model_l D nd) 19) (θ.bound 19) t q
       ∀ x, (rt_model_l D nd).mem x (ψ.bound 6) → ∃ v' t' j' n',
@@ -60,7 +62,11 @@ theorem Tg_context_d.answer_history_l {Y S μ' K' η' D B T r c d π σ C₀ γ 
           ε.bound 19 = n' ∧ Formula.satisfies ε tg_issued0_m ∧ Rd_entry_d t' (ε.bound 21) (ψ.bound 17) ∧
           Formula.satisfies (⟨fun i => [ψ.bound 0, ε.bound 20, t', ε.bound 21].get i, fun _ => ε.bound 21⟩ :
             Env (rt_model_l D nd) 4)
-            (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) := by
+            (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
+          (rt_model_l D nd).mem (θ.bound 24) (ε.bound 24) ∧
+          M.MemberSubset (θ.bound 20).val (ε.bound 20).val ∧
+          Tg_trace_d ω D (θ.bound 4).val (θ.bound 1).val (θ.bound 2).val (θ.bound 19).val
+            (ε.bound 20).val (θ.bound 23).val (p 15) (p 11) := by
   have fs := (current.read_l hZF source).1
   let J := rt_pair_l fs.transitive nd hZF.1 fs.pair
   have ext := rt_model_ext_l hZF.1 fs.transitive nd
@@ -124,13 +130,42 @@ theorem Tg_context_d.answer_history_l {Y S μ' K' η' D B T r c d π σ C₀ γ 
     funext i
     exact Fin.cases (Subtype.ext ωθ.symm) (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
       (Fin.cases rfl (fun a => Fin.elim0 a))))) i
-  obtain ⟨v, t, q, pair, _, endt, hq, _, fn, position, clock, _⟩ :=
+  obtain ⟨v, t, q, pair, _, endt, hq, _, fn, position, clock, event⟩ :=
     tg_issued_answer_l J ext θ issued (τ := τ) (w := w) below request row legal
   have pair' := (rt_model_delta_l fs.transitive nd (kpair0_delta_l (.bound 0) (.bound 1) (.bound 2))
     (⟨fun i => [v, τ, w].get i, fun _ => v⟩ : Env (rt_model_l D nd) 3)).mp
     ((kpair0_sat_l ext ..).mpr pair)
   have next := tg_position_build_l J ext 2 χ (θ.bound 19) t q state.control state.round hq fn position clock
-  exact ⟨v, t, q, (kpair0_sat_l hZF.1 ..).mp pair', next,
-    (fseq_end_sat_l J ext ..).mpr endt, fun x hx => tg_position_next_l J ext _ next x hx⟩
+  have trace : Tg_round_event_d J (θ.bound 4) (θ.bound 1) (θ.bound 2) (θ.bound 19) t (θ.bound 23) v :=
+    ⟨⟨θ.bound 21, θ.bound 22, θ.bound 24, θ.bound 25, state.event.end_l endt, state.move⟩, event⟩
+  have labels : Fn0_d (θ.bound 26).val ω (θ.bound 23).val := ωθ ▸
+    (fn0_sat_l hZF.1 ..).mp ((rt_model_delta_l fs.transitive nd (fn0_delta_l (.bound 0) (.bound 1) (.bound 2))
+      (⟨fun i => [θ.bound 26, θ.bound 0, θ.bound 23].get i, fun _ => θ.bound 0⟩ : Env (rt_model_l D nd) 3)).mp
+        ((fn0_sat_l ext ..).mpr state.labels))
+  have traced := tg_trace_build_l hZF fs.transitive nd (θ.bound 4) (θ.bound 1) (θ.bound 2) (θ.bound 19)
+    t (θ.bound 23) v finite labels ((kpair0_sat_l hZF.1 ..).mp pair') ((tg_round_event_sat_l J ext ..).mpr trace)
+  refine ⟨v, t, q, (kpair0_sat_l hZF.1 ..).mp pair', next,
+    (fseq_end_sat_l J ext ..).mpr endt, traced, ?_⟩
+  dsimp only
+  intro x hx
+  obtain ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε, head, num, issued', value, aux⟩ :=
+    tg_position_next_l J ext _ next x hx
+  have digit' := (fseq_end_sat_l J ext ..).mp digit
+  have aux' := (fseq_end_sat_l J ext ..).mp aux
+  have keep : (rt_model_l D nd).MemberSubset t (ε.bound 20) :=
+    fun s hs => aux'.subset_l J s (digit'.subset_l J s hs)
+  have keep' : (rt_model_l D nd).MemberSubset (θ.bound 20) (ε.bound 20) :=
+    fun s hs => keep s (endt.subset_l J s hs)
+  have same' : ∀ i : Fin 19, ε.bound (i.castAdd 27) = θ.bound (i.castAdd 27) := by
+    intro i
+    exact (head i).trans (by simp only [tg_position_env_d, Fin.addCases_left, χ])
+  have succ' : (rt_model_l D nd).SuccessorOf (ε.bound 19) (θ.bound 19) := num.symm ▸ succ
+  have keepM : M.MemberSubset t.val (ε.bound 20).val :=
+    fun s hs => keep ⟨s, fs.transitive t.val t.property s hs⟩ hs
+  have keepM' : M.MemberSubset (θ.bound 20).val (ε.bound 20).val :=
+    fun s hs => keep' ⟨s, fs.transitive _ (θ.bound 20).property s hs⟩ hs
+  exact ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε, head, num, issued', value, aux,
+    tg_issued_growth_l J ext θ ε issued issued' same' succ' keep', keepM',
+    traced.mono_l hZF fs.transitive nd J (θ.bound 4) (θ.bound 1) (θ.bound 2) t (ε.bound 20) keepM⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

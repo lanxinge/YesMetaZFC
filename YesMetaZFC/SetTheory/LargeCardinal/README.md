@@ -895,11 +895,11 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 已将同一个完整回答接入后继模型的原查询表。查询沿共同根图回到实际实现所在层核验，
 再在后继反射层内构造回答有序对并追加原策略历史，得到实数落子阶段的控制位置。
 该接口允许任意内部轮号；反射层只使用已有闭包和控制记录，不假定其满足 ZF。
-[TypeGameTreeStep](TypeGameTreeStep.lean) 的 `Tg_game_d.tree_step_l` 已从原 II 获胜策略
+[TypeGameTreeStep](TypeGameTreeStep.lean) 的 `Tg_game_d.run_start_l` 已从原 II 获胜策略
 自动产生实际首轮实例，包括 padding、超幂及回答后的历史。
 [TypeGamePositionNext](TypeGamePositionNext.lean) 和 [TypeGamePositionIssue](TypeGamePositionIssue.lean)
 已对任意内部轮号继续完成实数落子、轮号递增、原策略的下一辅助走法及原程序表读取；
-这些结果直接由 `answer_history_l` 和 `tree_step_l` 返回，不要求下一轮额外给定合法走法。
+这些结果直接由 `answer_history_l` 和 `run_start_l` 返回，不要求下一轮额外给定合法走法。
 已发出记录同时保存产生该走法的原前缀及完整辅助合法性，仍使用四十六个坐标。
 [TypeGameIssuedReset](TypeGameIssuedReset.lean) 对任意轮的空标签走法直接构造完整重置输入。
 [TypeGameIssuedQuery](TypeGameIssuedQuery.lean) 由同一原表项恢复节点查询、实数前缀、
@@ -909,6 +909,27 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 候选合法性或七个低层参数的成员证明。继续分支的旧回答弹性、共同秩段和支撑界
 仍须由统一历史不变量提供，尚不能从一个孤立的已发出记录推出。
 
+[TypeGameSaved](TypeGameSaved.lean) 在回答的原反射层内实际打包完整五十四坐标记录，
+附带共同秩段及域、常量域、查询域、回答的低层成员证书。存档编码与本轮原坐标
+逐项相同，读回时保留这一字面对应。[TypeGamePast](TypeGamePast.lean) 将所有旧轮
+保存为内部序数长度函数图，并给出纯一阶历史公式、按轮号选择、旧模型结点对应、
+整列共同秩段迁移及低层逐点固定性。
+[TypeGamePastStep](TypeGamePastStep.lean) 的 `past_update_l` 已被重置与继续两种实际
+树更新调用：在旧历史界低于新临界点时，保存全部旧行并追加本轮原证书，保持与
+模型列的对应。旧回答的四个低坐标及其有序对均固定。`run_start_l` 已从空历史
+实际构造第一行存档，返回相同原坐标的编码和真实树结点，不另设初值存在前提。
+
+[TypeGameEventHistory](TypeGameEventHistory.lean) 由原控制记录中的时钟单值性识别同一事件，
+三次实际追加保留旧历史，规则 (4) 因而推出相邻辅助域严格增长。
+[TypeGameTrace](TypeGameTrace.lean) 将旧标签列及回答写成背景 Δ₀ 对应公式；
+自然数标签列沿实际初等图固定，域与类型由共同秩段固定，整份对应随当前历史搬运。
+[TypeGamePastEvents](TypeGamePastEvents.lean) 将该对应接到所有完整存档行，给出内部一阶公式，
+并证明偶数嵌入、历史追加和新行加入时的保持性。首轮实际构造已返回整列对应，
+且在实数落子和下一辅助请求之后继续成立。
+[TypeGameHistorySelect](TypeGameHistorySelect.lean) 从非空请求的原继续条件取得较早轮号，
+自动读取真实旧工作源和完整原记录；事件单值性证明所引用的标签、域与类型均为存档原值。
+原超过公式仍在当前反射层内，工作层不需要额外的 ZF 模型性。
+
 [GameAttemptRank](../Descriptive/GameAttemptRank.lean) 的 `Cg_control_d.rank_l` 在 ZF＋DC 中
 从原 II 获胜策略证明合法尝试树无枝，实际构造序数值秩函数。任意集合字母表上的
 无枝性到良基性由 [TreeDependentChoice](../Descriptive/TreeDependentChoice.lean) 完成，
@@ -917,8 +938,23 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 [TypeGameRank](TypeGameRank.lean) 在 KP 背景下读取其 Δ₀ 证书，ZF 中排除传递目标内
 控制树的背景内部无限合法延长链；不对反射层附加 ZF 或 DC。
 这完成了 5.19 所需的尝试树秩与绝对性步骤，但仍须构造统一历史并把它送入偶数极限。
-有限历史的统一递归、偶数分支非良基性的完整应用及奇数返回分支仍未完成。
-统一历史还须编码并保持各旧回答在全部后续模型中的固定性和共同秩段。
+[TypeGameContinueSeed](TypeGameContinueSeed.lean) 已从选中旧轮的完整语言、原弹性、
+当前超过见证及事件对应自动装配 `tc_seed0_m`；[TypeGameContinueAuto](TypeGameContinueAuto.lean)
+按实际旧回答域重定基源，并调用两条真实树边。原查询表的单值性进入同一控制记录，
+重置和继续均保留原请求与完整回答的十九项字面对应。
+[TypeGameHistoryStep](TypeGameHistoryStep.lean) 的 `tree_successor_l` 按标签是否为空
+统一两种构造。[TypeGameRunAdvance](TypeGameRunAdvance.lean) 的 `Tg_run_d.advance_l`
+完成偶数边上的整份历史搬运、回答追加、实数落子和下一辅助请求，并保持所有历史行、
+共同根图、锚点、事件对应及支撑界。初值由 `Tg_game_d.run_start_l` 直接产生。
+[IterationTreeSyntax](IterationTreeSyntax.lean) 精确编码含 padding 的实际树及最大强度；
+[TypeGameRunSequence](TypeGameRunSequence.lean) 的 `Tg_game_d.history_sequence_l`
+已经在背景内部的 ω 上构造整列合法历史。初值和总后继均调用上述实际实现，
+相邻项保留两次树扩张、偶数边、全部十九项控制参数的像及历史包含性。
+该定理在原字母表非空时给出合法历史序列，尚未输出原游戏的获胜策略。
+[TypeGameOdd](TypeGameOdd.lean) 将原请求选中的旧历史行、实际奇数嵌入和新存档绑定。
+`Tg_run_next_d` 保留旧树与旧图的嵌入像，并证明恢复图恰好增加一个点；
+空标签分支保留原偶数前驱和空图。该加强已由同一 `history_sequence_l` 递归实现。
+尚待对这列有限树取并，完成偶数极限的秩下降矛盾和奇数无限返回分支。
 奇数返回部分还须处理重置产生的 padding；当前 `it_nice_return_l` 接受的是每一步
 都有实际扩展器的 `It_nice_d`，不能直接用于此处的 `It_pnice_d`。
 

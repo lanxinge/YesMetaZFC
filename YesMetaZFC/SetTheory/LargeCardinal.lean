@@ -11,9 +11,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.WoodinGameReset
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTreeStep
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameContinue
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssuedReset
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunSequence
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -66,7 +64,7 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 `Tg_low_d.step_l` 从原节点构造弹性回答及满足规则 (7) 的真实超幂像；
 `Tg_context_d.round_l` 把给定回答的原扩展器加入当前完整模型的 nice 树，
 从原武丁公式和回答支撑自动取得所需正则性、共同秩段及原类型成员性；目标层内的同一规则 (7) 已验证。
-`Tg_game_d.tree_step_l` 从原 II 获胜策略自动提取首轮，添加 padding 后沿实际偶数边搬运策略控制记录与历史，
+`Tg_game_d.run_start_l` 从原 II 获胜策略自动提取首轮，添加 padding 后沿实际偶数边搬运策略控制记录与历史，
 再用同一个超幂回答追加历史，进入实数落子阶段。`Tg_context_d.answer_history_l` 对一般内部轮号读取
 后继模型的原查询表，经共同根图核验完整回答，构造实际回答有序对及下一控制位置，
 再由原策略完成实数落子并生成下一份辅助记录，保留原程序表及原内部轮号。
@@ -82,7 +80,16 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 `Tg_context_d.restart_l` 直接把这些见证与原程序组成下一轮输入，并在同一层产生完整回答；
 `continue_tree_l` 已直接消费该回答并建立下一条奇数树边，保存两条边的根图复合及原字母表锚点。
 支撑列界由实际 nice 树末项推出，更新下界允许等号。
+`Tg_past_d` 将全部原回答及其工作源存为内部函数图；两种树更新均保持旧行、
+共同秩段、回答固定性及原模型结点对应，再追加本轮的同一完整记录。
+`Tg_past_events_d` 将完整存档与当前三阶段历史逐轮对应；真实偶数嵌入和历史追加均保持对应，
+`run_start_l` 已实际构造首行及其对应。`tg_issued_growth_l` 从原规则 (4) 推出相邻辅助域严格增长；
+`Tg_past_events_d.continue_tree_l` 从原规则 (6) 自动选择旧完整源，构造 `tc_seed0_m` 并完成两条实际树边。
+`Tg_run_d.advance_l` 对两种分支统一保持全部历史不变量，并自动产生下一请求。
+`Tg_game_d.history_sequence_l` 已用背景内部的类依赖选择构造整列合法历史；每个内部轮号
+都具有完整工作源、有限迭代树、全部旧回答、根图及事件对应，相邻项保存原控制记录的实际像。
 两侧共享的相对 Vκ 中每个对象均由临界点性质固定，不以整个工作模型满足 ZF 为前提。
-工作模型无须满足整个 ZFC；整个有限历史的递归与偶数枝良基性矛盾尚待接合。
+工作模型无须满足整个 ZFC；仍须对这列历史取树并，将控制树的秩用于偶数极限，
+并证明适用于含 padding 树的奇数返回分支。当前序列定理不声称已完成这两个无限分支结论。
 后续采用双树坍缩穷尽的直接决定性路线；5.15 的迭代论证、实数吸收和 AD 蕴涵仍待证明。
 -/

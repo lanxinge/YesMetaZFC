@@ -23,6 +23,7 @@ theorem tg_control_query_l (ρ : Env M 19) (ε : Env M 5)
         ρ.free⟩ : Env M 12) tg_query_row0_m := by
   have tables := (Formula.satisfies_conj_iff ..).mp valid |>.1
   have total := (Formula.satisfies_conj_iff ..).mp tables |>.2
+  have total := (Formula.satisfies_conj_iff ..).mp total |>.1
   simp only [tg_query_total_m, Formula.satisfies_forallMem_iff, Formula.satisfies_forall_iff,
     Formula.satisfies_imp_iff, tg_query_request_m, Formula.satisfies_bind] at total
   have packet := total (ε.bound 1) hk (ε.bound 2) (ε.bound 3) (ε.bound 4) (by

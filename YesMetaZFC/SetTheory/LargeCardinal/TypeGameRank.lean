@@ -18,7 +18,7 @@ include hKP in
 theorem tg_control_rank_l (valid : Formula.satisfies ρ tg_control0_m) :
     ∃ α F, M.mem α C ∧ M.mem F C ∧ Cg_rank_d (ρ.bound 0).val (ρ.bound 12).val (ρ.bound 18).val α F := by
   simp only [tg_control0_m, Formula.satisfies_conj_iff] at valid
-  have rank := valid.2.2.2.2.2.2.2.2
+  have rank := valid.2.2.2.2.2.2.2.2.1
   simp only [cg_rank_m, Formula.satisfies_exists_iff] at rank
   obtain ⟨α, F, rank⟩ := rank
   have lifted := (rt_model_delta_l trans nc (cg_rank0_delta_l ..) ((ρ.push α).push F)).mp rank

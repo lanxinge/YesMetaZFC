@@ -58,6 +58,15 @@ theorem fseq_end_rebuild_l (hE : Extensional M) {ω F G f p}
   subst n'
   exact h.sequence_unique_of_components hE k
 
+/-- 追加一项保留前缀中的每个有序对；不需要自然数归纳或集合论公理。 -/
+theorem Fseq_end_d.subset_l {ω F f a : M.Domain} (h : Fseq_end_d I ω F f a) :
+    M.MemberSubset f F := by
+  obtain ⟨n, m, h⟩ := h
+  intro p hp
+  obtain ⟨i, v, pair⟩ := h.prefix_sequence.2.2.1.1 p hp
+  obtain ⟨q, code, hq⟩ := ((h.prefix_restriction.2 i v).mp ⟨p, pair, hp⟩).2
+  exact (I.unique pair code).symm ▸ hq
+
 /-- 将一项追加到内部有限参数列；新增图仍取值于同一集合。 -/
 theorem ZF.fseq_end_exists_l (hZF : M.Models ZF) {ω n f X p} (hω : M.IsOmega ω)
     (hn : M.mem n ω) (hf : M.IsSetFunctionFromTo I f n X) (hp : M.mem p X) :

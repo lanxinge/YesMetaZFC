@@ -163,7 +163,8 @@ def tg_control0_m : Formula 1 19 :=
       (.conj (tg_aux_control_m p (v 12) (v 17) (v 18))
         (.conj (tg_reset_control_m p) (.conj (tg_start_control_m p (v 12) (v 17) (v 18))
           (.conj (tg_answer_control_m p (v 12) (v 18))
-            (.conj (tg_digit_control_m p (v 12) (v 17) (v 18)) (cg_rank_m p.ω (v 12) (v 18)))))))))
+            (.conj (tg_digit_control_m p (v 12) (v 17) (v 18))
+              (.conj (cg_rank_m p.ω (v 12) (v 18)) (tg_index_m p.c)))))))))
 
 theorem tg_control0_closed_l : tg_control0_m.FreeClosed := by
   simp -implicitDefEqProofs [tg_control0_m, tg_control_params_d, Definitional.Formula.FreeClosed]
@@ -199,6 +200,11 @@ theorem Tg_game_d.control_l (hZFC : M.Models ZFC)
   have ranked : Formula.satisfies ρ (cg_rank_m (.bound 0) (.bound 12) (.bound 18)) := by
     simp only [cg_rank_m, Formula.satisfies_exists_iff]
     exact ⟨α, H, (cg_rank0_sat_l (ZF.modelsKP hZF) ..).mpr rank⟩
+  have indexed : Formula.satisfies ρ (tg_index_m (.bound 4)) := by
+    obtain ⟨hc, _⟩ := tg_clock_l hZF game.setup.omega game.setup.empty game.setup.one game.setup.two
+      game.setup.three (num_mem_l hZF.1 game.setup.omega (show Num_d 0 p.e from game.setup.empty))
+    exact (tg_index_sat_l I hZF.1 ..).mpr fun _ _ _ _ =>
+      tg_index_unique_l hZF (game.setup.omega.members_areOrdinals hZF p.c hc)
   have valid : Formula.satisfies ρ tg_control0_m := by
     apply (Formula.satisfies_conj_iff ..).mpr
     refine ⟨game.setup.tables_l hZFC ρ (.bound 0) (.bound 1) (.bound 5) (.bound 9) (.bound 10) (.bound 11)
@@ -218,7 +224,7 @@ theorem Tg_game_d.control_l (hZFC : M.Models ZFC)
                   ⟨tg_answer_control_l hZFC ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) (.bound 17) _ game.setup rules control,
                     (Formula.satisfies_conj_iff ..).mpr
                       ⟨tg_digit_control_l hZF ρ _ _ (.bound 13) (.bound 14) (.bound 15) (.bound 16) _ _ rules control,
-                        ranked⟩⟩⟩⟩⟩⟩
+                        (Formula.satisfies_conj_iff ..).mpr ⟨ranked, indexed⟩⟩⟩⟩⟩⟩⟩
   exact ⟨R, r, tuple, valid, (rt_record_sat_l hZF.1 _ _ _ tg_control0_closed_l).mpr ⟨v, tuple, valid⟩⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

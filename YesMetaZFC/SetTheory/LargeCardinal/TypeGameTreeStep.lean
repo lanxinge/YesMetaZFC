@@ -1,14 +1,18 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameControlRoot
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePadding
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnswerHistory
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastEvents
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastRoots
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRank
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunState
 
 /-! # 原获胜策略产生带 padding 的实际首轮
 
 原策略的首个合法走法自动给出重置输入。先加恒等边 0→1，再从原偶数根
 作超幂 0→2；原控制记录与已经走出的历史也沿这条实际边进入新反射层，
-并用同一个完整回答推进到实数落子及下一辅助阶段。后继控制记录的实际
-尝试秩由原获胜策略自动提供，反射层无需满足 ZF。
+并用同一个完整回答推进到实数落子及下一辅助阶段。第一份内部历史同时
+保存原模型、完整回答和实际奇数结点，全部坐标与本次原记录一致。后继
+控制记录的尝试秩由原获胜策略自动提供，反射层无需满足 ZF。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive
@@ -17,83 +21,12 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ B₀ W₀ O Z g σ : M.Domain}
+theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ B₀ W₀ O Z g σ : M.Domain}
     (game : Tg_game_d hZFC p A F₀ L₀ G₀ J₀ B₀ W₀ O Z g) (woodin : Woodin_d I p.δ) (root : M.mem p.e p.S)
     (win : Cg_win_d I false p.ω A F₀ J₀ B₀ W₀ σ) :
-    ∃ H r θ X R c K η C, M.IsRegularCardinal I θ ∧ V_d I θ X ∧ Smem_d I c X R ∧
-      Ic_model_d hZF p.ω p.ω K X R ∧ Tg_context_d p.ω X η C ∧ Rt_record_in_d tg_control0_m C r ∧
-      ∃ nc : Nonempty {x // M.mem x C}, ∃ ρ : Env (rt_model_l C nc) 19,
-        Formula.satisfies ρ tg_control0_m ∧
-        (∀ i, (ρ.bound i).val = [p.ω, p.e, p.a, p.b, p.c, p.δ, p.A, p.S, p.ν, p.E, p.P, p.Q, A, F₀, L₀, G₀, J₀, σ, H].get i) ∧
-      ∃ a h : (rt_model_l C nc).Domain, Rd_entry_d p.e a.val σ ∧ Fn0_d p.a A h.val ∧ M.mem h.val H ∧
-      Formula.satisfies (⟨fun i => [ρ.bound 4, ρ.bound 1, ρ.bound 1, h, a].get i, ρ.free⟩ : Env (rt_model_l C nc) 5)
-        (tg_event_m (.bound 0) (.bound 1) (.bound 2) (.bound 3) (.bound 4)) ∧
-      ∃ ε : Env (rt_model_l C nc) 38,
-        let v : Fin 38 → M.Domain := fun i => (ε.bound i).val
-        let s : Fin 7 → M.Domain := Fin.cases (v 31) (Fin.cases (v 32) (Fin.cases (v 33)
-          (Fin.cases (v 34) (Fin.cases (v 35) (Fin.cases (v 36) (fun _ => v 37))))))
-        Formula.satisfies ε tg_seed0_m ∧ v 0 = p.ω ∧ v 1 = p.e ∧ v 2 = p.δ ∧ v 3 = p.S ∧ v 4 = p.ν ∧
-        v 6 = p.e ∧ v 23 = v 5 ∧ v 24 = p.e ∧ v 25 = p.e ∧ v 26 = p.e ∧
-        (∃ ℓ, Tg_aux_data_d a ℓ (ε.bound 25) (ε.bound 5) (ε.bound 18)) ∧
-        Tg_ee_data_d (ρ.bound 9) (ε.bound 5) (ε.bound 7) (ε.bound 14) (ε.bound 15) (ε.bound 16)
-          ⟨ε.bound 27, ε.bound 28, ε.bound 29, ε.bound 30⟩ ∧
-        Tg_program_data_d (ρ.bound 10) (ε.bound 7) (ε.bound 20) (ε.bound 22)
-          (Fin.cases (ε.bound 31) (Fin.cases (ε.bound 32) (Fin.cases (ε.bound 33) (Fin.cases (ε.bound 34)
-            (Fin.cases (ε.bound 35) (Fin.cases (ε.bound 36) (fun _ => ε.bound 37))))))) ∧
-        M.IsLimitOrdinal (v 5) ∧ M.mem p.A (v 14) ∧
-        ∃ ℓ₀, Formula.satisfies (tg_issued_start_env_d ρ ε a h ℓ₀ (ρ.bound 2)) tg_issued0_m ∧
-        ∃ w : Fin 16 → (rt_model_l C nc).Domain,
-          Formula.satisfies (tg_round_env_d ε w) tg_round0_m ∧
-          ∃ α β γ T Q D E L id c' j N R' K' ℓ F κ U' D' u' η' C' W π,
-            M.SuccessorOf α p.e ∧ M.SuccessorOf β α ∧ M.SuccessorOf γ β ∧ It_pnice_d hZF p.ω c γ T Q D E L ∧
-            Rd_entry_d p.e c Q ∧ Rd_entry_d α c Q ∧ It_map_d D p.e α id ∧
-            (∀ x y, Rd_entry_d x y id → x = y) ∧ (∀ q, Rd_entry_d p.e q E → ∀ x, ¬ M.mem x q) ∧
-            Rd_entry_d β c' Q ∧ It_map_d D p.e β j ∧ Smem_d I c' N R' ∧ Ic_model_d hZF p.ω ℓ K' N R' ∧
-            It_ultra_d hZF p.ω (v 5) ℓ F c c' j ∧ Wd_crit_d I X j (v 5) κ ∧
-            M.IsLimitOrdinal ℓ ∧ M.mem (w 15).val ℓ ∧ M.MemberSubset ℓ κ ∧
-            (∀ i μ, Rd_entry_d i μ L → M.mem μ κ ∨ μ = κ) ∧
-            Rd_entry_d (v 15) U' j ∧ Rd_entry_d (v 16) D' j ∧ Rd_entry_d (v 18) u' j ∧
-            Tg_reply_d I p.ω (v 7) (v 8) κ (w 15).val U' D' (w 12).val u' (w 11).val (v 20) s (v 22)
-              ⟨(w 2).val, (w 1).val, (w 0).val⟩ ∧
-            Rd_entry_d η η' j ∧ Rd_entry_d C C' j ∧ Tg_context_d p.ω N η' C' ∧
-            Tg_reply_in_d p.ω (v 7) (v 8) κ (w 15).val U' D' (w 12).val u' (w 11).val (v 20) (v 22)
-              (w 2).val (w 1).val (w 0).val s C' ∧
-            M.mem W X ∧ M.mem W C ∧ Vr_d X ℓ W ∧ Er_level_d N ℓ W ∧ M.mem (w 12).val W ∧ M.mem (w 11).val W ∧
-            (∀ μ, M.mem μ ℓ → Ea_agree_d p.ω μ X N) ∧
-            It_map_d D p.e p.e π ∧ Rd_entry_d C C π ∧ M.mem p.ω (v 14) ∧
-            Tg_anchor_d (v 5) (v 14) X π ∧ Tg_anchor_d (v 5) (v 14) X id ∧ Tg_anchor_d (v 5) (v 14) N j ∧
-            ∃ r', Rd_entry_d r r' j ∧ Rt_record_in_d tg_control0_m C' r' ∧
-            ∃ nv : Nonempty {x // M.mem x C'}, ∃ ρ' : Env (rt_model_l C' nv) 19,
-              (∀ i, Rd_entry_d (ρ.bound i).val (ρ'.bound i).val j) ∧ Formula.satisfies ρ' tg_control0_m ∧
-              (∃ θ' f, M.mem θ' C' ∧ M.mem f C' ∧ Cg_rank_d (ρ'.bound 0).val (ρ'.bound 12).val (ρ'.bound 18).val θ' f) ∧
-              ∃ h' : (rt_model_l C' nv).Domain, Rd_entry_d h.val h'.val j ∧
-                Fn0_d p.a (ρ'.bound 12).val h'.val ∧ M.mem h'.val (ρ'.bound 18).val ∧
-                ∃ ζ : Env (rt_model_l C' nv) 46,
-                  (∀ i, Rd_entry_d ((tg_issued_start_env_d ρ ε a h ℓ₀ (ρ.bound 2)).bound i).val (ζ.bound i).val j) ∧
-                  Formula.satisfies ζ tg_issued0_m ∧
-                  ∃ v t q : (rt_model_l C' nv).Domain, KPair_d M v.val (w 15).val (w 11).val ∧
-                    Formula.satisfies (tg_position_env_d
-                      ⟨fun i => ζ.bound (i.castAdd 27), fun _ => ζ.bound 0⟩ (ζ.bound 19) t q) (tg_position0_m 2) ∧
-                    Formula.satisfies (⟨fun i => [ζ.bound 0, t, ζ.bound 20, v].get i, fun _ => v⟩ :
-                      Env (rt_model_l C' nv) 4)
-                      (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
-                    let ψ := tg_position_env_d
-                      (⟨fun i => ζ.bound (i.castAdd 27), fun _ => ζ.bound 0⟩ : Env (rt_model_l C' nv) 19) (ζ.bound 19) t q
-                    ∀ x, (rt_model_l C' nv).mem x (ψ.bound 6) → ∃ v' t' j' n',
-                      (rt_model_l C' nv).mem v' (ψ.bound 6) ∧
-                      (Formula.satisfies ψ (gm_even_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 19)) → v' = x) ∧
-                      (¬ Formula.satisfies ψ (gm_even_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 19)) →
-                        Rd_entry_d (ψ.bound 20) v' (ψ.bound 17)) ∧
-                      Formula.satisfies (⟨fun i => [ψ.bound 0, t', ψ.bound 20, v'].get i, fun _ => v'⟩ : Env (rt_model_l C' nv) 4)
-                        (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
-                      (rt_model_l C' nv).SuccessorOf n' (ψ.bound 19) ∧
-                      Formula.satisfies (tg_position_env_d ⟨fun i => ψ.bound (i.castAdd 3), fun _ => ψ.bound 0⟩ n' t' j')
-                        (tg_position0_m 0) ∧
-                      ∃ ε' : Env (rt_model_l C' nv) 46, (∀ i : Fin 19, ε'.bound (i.castAdd 27) = ψ.bound (i.castAdd 3)) ∧
-                        ε'.bound 19 = n' ∧ Formula.satisfies ε' tg_issued0_m ∧ Rd_entry_d t' (ε'.bound 21) (ψ.bound 17) ∧
-                        Formula.satisfies (⟨fun i => [ψ.bound 0, ε'.bound 20, t', ε'.bound 21].get i,
-                          fun _ => ε'.bound 21⟩ : Env (rt_model_l C' nv) 4)
-                          (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) := by
+    ∃ θ X R c C γ V, M.IsRegularCardinal I θ ∧ V_d I θ X ∧ Smem_d I c X R ∧
+      M.IsLimitOrdinal γ ∧ M.mem p.ω V ∧ M.mem p.A V ∧
+      ∀ x, M.mem x p.A → ∃ v u, Tg_run_d hZF p.ω c p.e C γ V p.A v u ∧ u 19 = p.a := by
   obtain ⟨H, r, θ, X, R, c, K, η, C, regular, rank, code, source, context, record, nc, ρ, valid, eqρ,
     a, h, value, fn, next, event, ε, seed, hw, he, hd, hS, hν, hk, hb, hs, ht, hg, move, elastic, program, limit₀, letters,
     α, T, Q, D, π, hα, tree, hc, self, iRoot, anchor, ℓ₀, issued⟩ := game.root_l hZFC woodin root win
@@ -105,7 +38,7 @@ theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
   obtain ⟨w, round, β, T₁, Q₁, D₁, E₁, id, π₁, padded, pad, hc₁, edge₁, idFixed, empty,
     root₁, iRoot₁, anchor₁, γ, T', Q', D', E', L', c', j, N, R', K', ℓ, F, κ, U', D'', u', η', C', W,
     result, ext, target, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
-    hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, _, π₂, root₂, _, anchor₂⟩ := step
+    hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, _, π₂, root₂, _, anchor₂, past⟩ := step
   have eq₁ := padded.tree.diagram.map_unique_l hZF root₁ edge₁
   subst π₁
   have eq₂ := result.tree.diagram.map_unique_l hZF root₂ edge
@@ -193,15 +126,61 @@ theorem Tg_game_d.tree_step_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
     nv ζ (issued'.mp issued) hw same below round (by
       rw [zκ, zU, zD, zu]
       exact reply)
-  exact ⟨H, r, θ, X, R, c, K, η, C, regular, rank, code, source, context, record, nc, ρ, valid, eqρ,
-    a, h, value, fn, next, event, ε, seed, hw, he, hd, hS, hν, hk, congrArg Subtype.val hb, hs, ht, hg,
-    move, elastic, program, limit₀, letters, ℓ₀, issued, w, round, α, β, γ, T', Q', D', E', L', id, c', j, N, R', K', ℓ, F, κ, U', D'', u', η', C', W, π,
-    hα, pad.1, ext.1, result, ext.2.2.1 p.e c oldRoot, ext.2.2.1 α c hc₁,
-    (ext.2.2.2.1 p.e α id pad.1.predecessor_mem).mpr edge₁, idFixed, empty₂, target, edge, mn, ready,
-    ultra, critical, limit, bound, subset, heights, hU, hD, hu, reply, iη, iC, context', legal,
-    hW, hWC, common, level, hQW, hwW, agreement, self₂, iRoot, hwB, anchor, anchor₁, anchor₂,
-    r', ir, record', nv, ρ', images, valid'.mp valid,
-    tg_control_rank_l (ZF.modelsKP hZF) fs'.transitive nv ρ' (valid'.mp valid),
-    ⟨h', hh'⟩, ih, fn', next', ζ, carried, issued'.mp issued, response⟩
+  have initial : Tg_past_d hZF p.ω p.e p.e X p.e := tg_past_empty_l hZF game.setup.empty
+  have heκ := limit₀.1.empty_mem_of_nonempty (ZF.modelsKP hZF) limit₀.2.1 game.setup.empty
+  obtain ⟨n, P₀, q₀, _, sn, history, _, savedCode, newest, entries, _, links⟩ :=
+    past p.e p.e p.e heω initial heκ (tg_past_links_empty_l I game.setup.empty)
+  have en : n = p.a := sn.eq hZF.1 game.setup.one
+  subst n
+  have body := (Formula.satisfies_conj_iff ..).mp round |>.2
+  simp only [tg_witness0_m, tg_round_m, Formula.satisfies_conj_iff] at body
+  have low : M.MemberSubset (ε.bound 5).val (w 15).val := (limit.1.mem bound).transitive _ body.2.1
+  have roots := Tg_past_roots_d.push_l hZF history sn newest entries
+    (tg_past_roots_empty_l game.setup.empty)
+    ((ext.2.2.2.1 p.e α id pad.1.predecessor_mem).mpr root₁) iRoot₁ anchor₁ ⟨_, savedCode, low⟩
+  have zn : (ζ.bound 19).val = p.e := fixed heω ((show (ρ.bound 1).val = p.e from eqρ 1) ▸ carried 19)
+  have zt : (ζ.bound 23).val = (ξ.bound 41).val :=
+    (fixed heω (ht ▸ carried 23)).trans ht.symm
+  have add {s : M.Domain}
+      (trace : Tg_trace_d p.ω C' (ζ.bound 4).val (ζ.bound 1).val (ζ.bound 2).val
+        (ζ.bound 19).val s (ζ.bound 23).val (w 15).val (w 11).val) :
+      Tg_past_events_d p.ω P₀ C' (ζ.bound 4).val (ζ.bound 1).val (ζ.bound 2).val s := by
+    apply Tg_past_events_d.push_l hZF history sn newest entries
+      (tg_past_events_empty_l game.setup.empty) _ savedCode
+    exact zn ▸ zt ▸ trace
+  obtain ⟨v, t, q, pair, position, endt, trace, advance⟩ := response
+  refine ⟨θ, X, R, c, C, (ε.bound 5).val, (ε.bound 14).val, regular, rank, code, limit₀, hwB, letters, ?_⟩
+  intro x hx
+  have iA : Rd_entry_d p.A (ζ.bound 6).val j := (show (ρ.bound 6).val = p.A from eqρ 6) ▸ carried 6
+  have Aζ := hj.1.1.1.2 p.A (ζ.bound 6).val p.A iA (anchor₂.fixed p.A letters)
+  have hxζ : M.mem x (ζ.bound 6).val := Aζ.symm ▸ hx
+  let x' : (rt_model_l C' nv).Domain := ⟨x, fs'.transitive _ (ζ.bound 6).property x hxζ⟩
+  obtain ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε', head, num, issued', value, aux, growth, keep, trace'⟩ := advance x' hxζ
+  have control (i : Fin 19) : ε'.bound (i.castAdd 27) = ζ.bound (i.castAdd 27) :=
+    (head i).trans (by simp only [tg_position_env_d, Fin.addCases_left])
+  have sn' := (rt_successor_l fs'.transitive nv hZF.1 (ε'.bound 19) (ζ.bound 19)).mp (num.symm ▸ succ)
+  have en' : (ε'.bound 19).val = p.a := (show M.SuccessorOf (ε'.bound 19).val p.e from zn ▸ sn').eq hZF.1 game.setup.one
+  have events := add trace'
+  have events : Tg_past_events_d p.ω P₀ C' (ε'.bound 4).val (ε'.bound 1).val (ε'.bound 2).val (ε'.bound 20).val :=
+    (congrArg Subtype.val (control 4)).symm ▸ (congrArg Subtype.val (control 1)).symm ▸
+      (congrArg Subtype.val (control 2)).symm ▸ events
+  obtain ⟨r₂, record₂, values₂⟩ := context'.save_issued_l hZF ready.source nv ε' issued'
+  let J := rt_pair_l fs'.transitive nv hZF.1 fs'.pair
+  have extC := rt_model_ext_l hZF.1 fs'.transitive nv
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, lang⟩ :=
+    tg_issued_query_l J extC ε' issued'
+  simp only [tg_reply_language0_m, Formula.satisfies_conj_iff] at lang
+  have κlimit := (rt_limit_l fs'.transitive nv (ZF.modelsKP hZF) (ε'.bound 24)).mp
+    ((Formula.satisfies_isLimitOrdinal_iff ..).mp lang.2.2.2.1)
+  have growing : M.mem κ (ε'.bound 24).val := zκ ▸ growth
+  have high : M.MemberSubset (ε.bound 5).val κ := fun y hy => subset y (limit.1.transitive _ bound y (low y hy))
+  have nextω {a b : M.Domain} (ha : M.mem a p.ω) (hs : M.SuccessorOf b a) : M.mem b p.ω := by
+    obtain ⟨b', hs', hb'⟩ := game.setup.omega.1.2 a ha
+    exact hs'.eq hZF.1 hs ▸ hb'
+  let v₂ : Fin 18 → M.Domain := fun i => [N, R', ℓ, K', η', C', γ, β, T', Q', D', E', L', P₀, κ, c', j, r₂].get i
+  exact ⟨v₂, (fun i => (ε'.bound i).val),
+    ⟨ready, context', nextω (nextω heω hα) pad.1, ext.1, result, target, mn, edge, iC, anchor₂, record₂, values₂,
+      (congrArg Subtype.val (control 0)).trans zω, (congrArg Subtype.val (control 6)).trans Aζ,
+      fun y hy => κlimit.1.transitive κ growing y (high y hy), en'.symm ▸ history, links, roots, events, growing, heights⟩, en'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.Descriptive.Game
+import YesMetaZFC.SetTheory.Card.FiniteSequenceEnd
 import YesMetaZFC.SetTheory.Ord.NaturalPrime
 import YesMetaZFC.Model.SetTheory.Internal.TypeGameNode
 
@@ -41,6 +42,27 @@ theorem tg_index_unique_l {c n r i j : M.Domain} (hc : M.IsOrdinal c)
   subst q
   obtain ⟨s, _, unique⟩ := ZF.ordinalAddition_existsUnique hZF I p (hc.mem hr)
   exact (unique i ai).trans (unique j aj).symm
+
+/-- 原时钟的单值性一并反射，供只具有有限读出闭性的后继层使用。 -/
+def tg_index_m {d} (c : Term d) : Formula 1 d := set[d] ⟪∀ n r i j,
+  ⌜Formula.isOrdinalDivision kpair_convention_l⌝ₚ(i, ⌜c⌝ₛ, n, r) →
+  ⌜Formula.isOrdinalDivision kpair_convention_l⌝ₚ(j, ⌜c⌝ₛ, n, r) → i = j⟫
+derive_free_closed tg_index_m
+
+theorem tg_index_sat_l (J : kpair_convention_l.Interpretation M) (hE : Extensional M)
+    {d} (ρ : Env M d) (c : Term d) : Formula.satisfies ρ (tg_index_m c) ↔
+      ∀ n r i j, M.IsOrdinalDivision J i (c.eval ρ) n r →
+        M.IsOrdinalDivision J j (c.eval ρ) n r → i = j := by
+  simp only [tg_index_m, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
+    Formula.satisfies_isOrdinalDivision_iff J hE, Formula.satisfies_extensionalEq_iff_eq hE,
+    Definitional.Term.eval_weaken]
+  rfl
+
+/-- 追加任意一种走法都保留此前事件，包含非标准内部轮号。 -/
+theorem Tg_event_d.end_l {J : kpair_convention_l.Interpretation M} {ω c n r h t v a : M.Domain}
+    (event : Tg_event_d J c n r h v) (step : Fseq_end_d J ω t h a) : Tg_event_d J c n r t v := by
+  obtain ⟨i, clock, p, pair, hp⟩ := event
+  exact ⟨i, clock, p, pair, step.subset_l J p hp⟩
 
 theorem Tg_event_d.unique_l {c n r h v w : M.Domain} (hc : M.IsOrdinal c) (fn : M.IsSetFunction I h)
     (a : Tg_event_d I c n r h v) (b : Tg_event_d I c n r h w) : v = w := by

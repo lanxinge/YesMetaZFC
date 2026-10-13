@@ -42,6 +42,25 @@ def tg_ee_data_m {d} (Γ κ n B U D g h i e : Term d) : Formula 1 d := set[d] �
   ⌜rd_quad_m⌝ₚ(c, ⌜B⌝ₛ, ⌜U⌝ₛ, ⌜D⌝ₛ, p) ∧ ⌜rd_quad_m⌝ₚ(p, ⌜g⌝ₛ, ⌜h⌝ₛ, ⌜i⌝ₛ, ⌜e⌝ₛ)⟫
 derive_free_closed tg_ee_data_m
 
+/-- 同一实际函数表的同一个键只能读出同一整行。 -/
+theorem Tg_ee_data_d.unique_l {I : kpair_convention_l.Interpretation M} (hE : Extensional M)
+    {Γ κ n B U D B' U' D' : M.Domain} {q q' : Ee_queries_d M}
+    (fn : M.IsSetFunction I Γ) (h : Tg_ee_data_d Γ κ n B U D q) (h' : Tg_ee_data_d Γ κ n B' U' D' q') :
+    B = B' ∧ U = U' ∧ D = D' ∧ q = q' := by
+  obtain ⟨x, c, p, key, entry, row, codes⟩ := h
+  obtain ⟨x', c', p', key', entry', row', codes'⟩ := h'
+  have ex := kpair_unique_l M hE key' key
+  subst x'
+  have read a b : Rd_entry_d a b Γ → M.PairMember I a b Γ := by
+    let ρ : Env M 3 := ⟨fun i => [a, b, Γ].get i, fun _ => a⟩
+    exact fun h => (Formula.satisfies_orderedPairMem_iff I ρ (.bound 0) (.bound 1) (.bound 2)).mp
+      ((rd_entry_sat_l hE ρ (.bound 0) (.bound 1) (.bound 2)).mpr h)
+  have ec := fn.2 x c c' (read x c entry) (read x c' entry')
+  subst c'
+  obtain ⟨rfl, rfl, rfl, rfl⟩ := row.unique_l row'
+  obtain ⟨a, b, c, d⟩ := codes.unique_l codes'
+  exact ⟨rfl, rfl, rfl, by cases q; cases q'; cases a; cases b; cases c; cases d; rfl⟩
+
 theorem tg_ee_data_sat_l (hE : Extensional M) {d} (ρ : Env M d) (Γ κ n B U D g h i e : Term d) :
     Formula.satisfies ρ (tg_ee_data_m Γ κ n B U D g h i e) ↔
       Tg_ee_data_d (Γ.eval ρ) (κ.eval ρ) (n.eval ρ) (B.eval ρ) (U.eval ρ) (D.eval ρ)
@@ -70,6 +89,24 @@ theorem tg_query_data_sat_l (hE : Extensional M) {d} (ρ : Env M d) (Γ κ k s t
 def Tg_program_data_d (Γ n b z : M.Domain) (σ : Fin 7 → M.Domain) : Prop :=
   ∃ c p q, Rd_entry_d n c Γ ∧ Rd_quad_d c b z p q ∧
     Rd_quad_d p (σ 0) (σ 1) (σ 2) (σ 3) ∧ Rd_triple_d q (σ 4) (σ 5) (σ 6)
+
+theorem Tg_program_data_d.unique_l {I : kpair_convention_l.Interpretation M} (hE : Extensional M)
+    {Γ n b z b' z' : M.Domain} {σ σ' : Fin 7 → M.Domain} (fn : M.IsSetFunction I Γ)
+    (h : Tg_program_data_d Γ n b z σ) (h' : Tg_program_data_d Γ n b' z' σ') : b = b' ∧ z = z' ∧ σ = σ' := by
+  obtain ⟨c, p, q, entry, row, first, last⟩ := h
+  obtain ⟨c', p', q', entry', row', first', last'⟩ := h'
+  have read a b : Rd_entry_d a b Γ → M.PairMember I a b Γ := by
+    let ρ : Env M 3 := ⟨fun i => [a, b, Γ].get i, fun _ => a⟩
+    exact fun h => (Formula.satisfies_orderedPairMem_iff I ρ (.bound 0) (.bound 1) (.bound 2)).mp
+      ((rd_entry_sat_l hE ρ (.bound 0) (.bound 1) (.bound 2)).mpr h)
+  have ec := fn.2 n c c' (read n c entry) (read n c' entry')
+  subst c'
+  obtain ⟨rfl, rfl, rfl, rfl⟩ := row.unique_l row'
+  obtain ⟨a, b, c, d⟩ := first.unique_l first'
+  obtain ⟨e, f, g⟩ := last.unique_l last'
+  refine ⟨rfl, rfl, funext ?_⟩
+  exact Fin.cases a (Fin.cases b (Fin.cases c (Fin.cases d (Fin.cases e
+    (Fin.cases f (Fin.cases g (fun i => Fin.elim0 i)))))))
 
 def tg_program_data_m {d} (Γ n b z : Term d) (σ : Fin 7 → Term d) : Formula 1 d := set[d] ⟪∃ c p q,
   ⌜rd_entry0_m⌝ₚ(⌜n⌝ₛ, c, ⌜Γ⌝ₛ) ∧ ⌜rd_quad_m⌝ₚ(c, ⌜b⌝ₛ, ⌜z⌝ₛ, p, q) ∧

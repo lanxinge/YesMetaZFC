@@ -16,6 +16,11 @@ def tg_issued_slots_d {α : Type u} (v : Fin 46 → α) : Fin 7 → α :=
   Fin.cases (v 38) (Fin.cases (v 39) (Fin.cases (v 40)
     (Fin.cases (v 41) (Fin.cases (v 42) (Fin.cases (v 43) (fun _ => v 44))))))
 
+/-- 实际回答沿用原请求：十四个自然数参数、临界点、两域、候选及标签图。 -/
+def Tg_request_d (v : Fin 46 → M.Domain) (q : Fin 54 → M.Domain) : Prop :=
+  ∀ i : Fin 19, q ([16, 17, 22, 23, 24, 36, 38, 47, 48, 49, 50, 51, 52, 53, 21, 31, 32, 34, 41].get i) =
+    v ([0, 1, 26, 27, 28, 36, 37, 38, 39, 40, 41, 42, 43, 44, 24, 30, 31, 25, 23].get i)
+
 def tg_issued_aux0_m : Formula 1 46 := .existsE (.conj
   (fseq_end_m (𝒞 := kpair_convention_l) (.bound 1) (.bound 21) .newest (.bound 22))
   (tg_aux_m (tg_control_params_d (fun i => (.bound (i.castAdd 27).succ : Term 47)))

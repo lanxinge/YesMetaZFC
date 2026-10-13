@@ -20,18 +20,18 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
     (omega : M.mem ω Z) (letters : M.mem (ρ.bound 6).val Z) :
     ∃ ψ χ : Env (rt_model_l C nc) 12,
       Formula.satisfies ψ tg_query_row0_m ∧
-      (∀ i : Fin 5, (ψ.bound (i.castAdd 7)).val =
-        [(ρ.bound 0).val, (ρ.bound 1).val, (ρ.bound 27).val, (ρ.bound 28).val, (ρ.bound 26).val].get i) ∧
+      (∀ i : Fin 6, (ψ.bound ([0, 1, 2, 3, 4, 6].get i)).val =
+        (ρ.bound ([0, 1, 27, 28, 26, 23].get i)).val) ∧
       M.mem (ψ.bound 11).val (ρ.bound 25).val ∧ (∀ i : Fin 7, M.mem (ψ.bound (i.castAdd 5)).val Z) ∧
       Formula.satisfies χ tg_candidate0_m ∧
-      (∀ i : Fin 5, (χ.bound (i.castAdd 7)).val =
-        [(ρ.bound 25).val, (ρ.bound 28).val, (ρ.bound 0).val, (ρ.bound 24).val, (ρ.bound 27).val].get i) := by
+      (∀ i : Fin 12, (χ.bound i).val =
+        (ρ.bound ([25, 28, 0, 24, 27, 29, 30, 31, 32, 33, 34, 35].get i)).val) := by
   have fs := (context.read_l hZF source).1
   let J := rt_pair_l fs.transitive nc hZF.1 fs.pair
   have ext := rt_model_ext_l hZF.1 fs.transitive nc
   have state := (tg_issued_sat_l J ext ρ).mp valid
   obtain ⟨_, x, s, _, _, _, r, m, b, q, f, _, digits, rest, _, _, node, query, _, _, hk, hl, hN,
-    χ, same, candidate⟩ := tg_issued_query_l J ext ρ valid
+    χ, same, candidate, _⟩ := tg_issued_query_l J ext ρ valid
   have fn {a b f : (rt_model_l C nc).Domain} (h : Fn0_d a b f) : Fn0_d a.val b.val f.val := by
     let ε : Env (rt_model_l C nc) 3 := ⟨fun i => [a, b, f].get i, fun _ => a⟩
     exact (fn0_sat_l hZF.1 _ (.bound 0) (.bound 1) (.bound 2)).mp
@@ -66,13 +66,18 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
     ρ.bound 26, s, ρ.bound 23, r, m, b, q, f].get i, ρ.free⟩
   refine ⟨ψ, χ, query, ?_, node, ?_, candidate, ?_⟩
   · intro i
-    exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))) i
+    exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
+      (Fin.cases rfl (fun j => Fin.elim0 j)))))) i
   · intro i
     exact Fin.cases (hw.symm ▸ omega) (Fin.cases (trans ω omega _ heω) (Fin.cases (natural _ hl)
       (Fin.cases (natural _ hN) (Fin.cases (natural _ hk) (Fin.cases hs (Fin.cases ht (fun j => Fin.elim0 j))))))) i
   · intro i
     exact Fin.cases (congrArg Subtype.val (same 0)) (Fin.cases (congrArg Subtype.val (same 1))
       (Fin.cases (congrArg Subtype.val (same 2)) (Fin.cases (congrArg Subtype.val (same 3))
-        (Fin.cases (congrArg Subtype.val (same 4)) (fun j => Fin.elim0 j))))) i
+        (Fin.cases (congrArg Subtype.val (same 4)) (Fin.cases (congrArg Subtype.val (same 5))
+          (Fin.cases (congrArg Subtype.val (same 6)) (Fin.cases (congrArg Subtype.val (same 7))
+            (Fin.cases (congrArg Subtype.val (same 8)) (Fin.cases (congrArg Subtype.val (same 9))
+              (Fin.cases (congrArg Subtype.val (same 10)) (Fin.cases (congrArg Subtype.val (same 11))
+                (fun j => Fin.elim0 j)))))))))))) i
 
 end YesMetaZFC.SetTheory.LargeCardinal

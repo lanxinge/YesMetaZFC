@@ -94,6 +94,11 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "TypeGameTreeStep", "TypeGameIssuedAnswer", "TypeGameAnswerHistory",
              "TypeGameControlMove", "TypeGamePositionIssue", "TypeGamePositionNext", "TypeGameRank",
              "TypeGameIssuedReset", "TypeGameIssuedQuery", "TypeGameIssuedLow",
+             "TypeGameSaved", "TypeGamePast", "TypeGamePastStep",
+             "TypeGameEventHistory", "TypeGameTrace", "TypeGamePastEvents", "TypeGameHistorySelect",
+             "TypeGameContinueSeed", "TypeGameContinueAuto", "TypeGameControlCard", "TypeGamePastRoots",
+             "TypeGameStepResult", "TypeGameHistoryContinue", "TypeGameHistoryStep", "IterationTreeSyntax",
+             "TypeGameRunState", "TypeGameRunAdvance", "TypeGameRunSyntax", "TypeGameRunNext", "TypeGameRunSequence", "TypeGameOdd",
              "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
@@ -714,6 +719,17 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 "tg_query_packet_m", "tg_query_key_m", "tg_aux_data_m", "tg_ee_data_m", "tg_query_data_m",
                 "tg_program_data_m", "tg_event_m", "tg_digits_m", "tg_reset_m", "tg_growth_m", "tg_continue_m",
                 "tg_aux_m", "tg_aux0_m", "tg_continue0_m", "tg_issued_aux0_m", "tg_issued0_m",
+                "tg_context_data_m", "tg_saved_record0_m", "Tg_saved_code_d", "tg_saved_m",
+                "tg_past_cell_m", "tg_past_at_m", "tg_past_links_m", "tg_past_m", "Tg_past_fixed_d", "Tg_past_update_d",
+                "tg_index_m", "Tg_round_event_d", "tg_round_event_m", "tg_round_event0_m", "tg_event_in0_m",
+                "tg_trace0_m", "Tg_trace_d", "tg_trace_m", "Tg_saved_trace_d", "tg_saved_trace0_m",
+                "tg_saved_trace_m", "Tg_past_events_d", "tg_past_events_m",
+                "Tg_request_d", "Tg_saved_high_d", "tg_saved_high0_m", "tg_saved_high_m", "tg_anchor_m",
+                "Tg_past_roots_d", "tg_past_roots_m", "Tg_tree_step_d", "Tg_run_d", "Tg_run_next_d",
+                "Tg_saved_branch_d", "tg_saved_branch0_m", "tg_saved_branch_m", "Tg_odd_d", "tg_odd_m",
+                "it_strength_m", "it_active_m", "it_tree_m", "it_pnice_m", "it_extension_m",
+                "tg_run_m", "Tg_run_code_d", "tg_run_code0_m", "tg_run_code_m", "tg_run_next_m",
+                "Tg_run_edge_d", "tg_run_edge0_m", "tg_run_edge_m", "tg_run_index_m",
                 "tg_reply_m", "tg_answer_m", "tg_step_m", "tg_check_m", "Tg_aux_data_d",
                 "Tg_ee_data_d", "Tg_query_data_d", "Tg_program_data_d", "Tg_params_d", "Tg_params_d.map_l", "Tg_params_d.closed_l")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
