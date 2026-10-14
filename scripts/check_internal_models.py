@@ -19,7 +19,7 @@ MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection." + name for name in
             ("Parameters", "WitnessSyntax", "Collection", "Step", "Chain", "Closure", "Relativization", "Decode", "Bounded")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection", "YesMetaZFC.SetTheory.CumulativeUnion"]
-MODULES += ["YesMetaZFC.SetTheory.RelationChain"]
+MODULES += ["YesMetaZFC.SetTheory.RelationChain", "YesMetaZFC.Model.SetTheory.ClassResponse"]
 MODULES += ["YesMetaZFC.SetTheory.FlatPairing"]
 MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
             ("Shift", "Tag", "Pair", "Rank", "Source", "Sequence", "Finite", "RankObjects",
@@ -101,10 +101,17 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "TypeGameRunState", "TypeGameRunAdvance", "TypeGameRunSyntax", "TypeGameRunNext", "TypeGameRunSequence", "TypeGameOdd",
              "TypeGameRunOrder", "TypeGameRunUnion", "TypeGameEvenBranch", "TypeGameOddBranch", "TypeGameOddRecords",
              "TypeGameOddCompatibility", "TypeGameOddLimit", "TypeGameLimitValues", "TypeGameLimitControl", "TypeGameEvenLimit",
+             "IterationBranchSequence", "TypeGameRootTree", "TypeGameRunRoot", "TypeGamePlayTrace", "TypeGamePastPlay",
+             "TypeGameReturnSyntax", "TypeGameReturnSequence", "TypeGameReturnTree", "TypeGameReturnUnion", "TypeGameReturnBranch",
+             "FiniteArithmeticSource", "TypeGameRealPrefix", "TypeGameRunMove", "TypeGameRunChoice",
+             "TypeGameStrategy", "TypeGameStrategyPlay", "TypeGameArchivePlay", "TypeGameTransfer",
+             "TypeGameReplyDescent", "TypeGameGenericExtension", "TypeGameGenericMove", "TypeGameGenericDense",
              "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("FiniteRecordCoordinate", "TypeGameGraphUnion", "SubtypeInsertion", "TypeGameNodeRank")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
-            ("Path", "TreeDependentChoice", "GameAttemptRank", "TreeRankPrefix",
+            ("InputIteration", "Path", "TreeDependentChoice", "GameAttemptRank", "TreeRankPrefix",
              "FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
              "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
@@ -734,7 +741,7 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 "Tg_saved_branch_d", "tg_saved_branch0_m", "tg_saved_branch_m", "Tg_odd_d", "tg_odd_m",
                 "it_strength_m", "it_active_m", "it_tree_m", "it_pnice_m", "it_extension_m",
                 "tg_run_m", "Tg_run_code_d", "tg_run_code0_m", "tg_run_code_m", "tg_run_next_m",
-                "Tg_run_edge_d", "tg_run_edge0_m", "tg_run_edge_m", "tg_run_index_m",
+                "Tg_run_edge_d", "tg_run_edge0_m", "tg_run_edge_m",
                 "Tg_tree_keep_d", "tg_tree_keep_m", "Tg_run_keep_d", "tg_run_keep0_m", "tg_run_keep_m",
                 "Tg_run_value_d", "tg_run_value0_m", "Tg_sequence_d", "Tg_even_d", "tg_even0_m",
                 "Tg_limit_value_d", "tg_limit_value0_m", "tg_limit_value_m",
@@ -769,6 +776,17 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in
                 "tg_guard_program0_m", "tg_guard_program_m", "ts_program0_m", "ts_numeric0_m", "ts_numeric_m",
                 "Ts_program_in_d", "tt_realized0_m", "ts_at0_m", "tx_exceeds0_m")]
 # HOD 的对象 AC 定理保持原背景假设；选择句子的闭合性证书由内核检查。
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in ("Rt_coord_d", "rt_coord0_m", "rt_coord_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tg_root_tree_d", "tg_root_tree_m", "Tg_common_tree_d", "tg_common_tree_m",
+                "Tg_run_name_d", "tg_run_name0_m", "tg_run_name_m", "tg_play_body0_m", "tg_play0_m", "Tg_play_d", "tg_play_m",
+                "Tg_saved_play_d", "tg_saved_play0_m", "tg_saved_play_m", "Tg_past_play_d", "tg_past_play_m",
+                "tg_return_node0_m", "tg_return_node_m", "Tg_return_row_d", "tg_return_row_m", "Tg_return_sequence_d",
+                "Tg_return_union_d", "Tg_return_tree_d", "Tg_cofinal_branch_d",
+                "Tg_real_d", "tg_real_m", "Tg_turn_move_d", "tg_turn_move_m",
+                "Tg_run_real_d", "tg_run_real_m", "Tg_run_move_d", "tg_run_move_m", "Tg_run_choice_d",
+                "Tg_response_d", "tg_response_m", "Tg_archive_play_d", "Tg_projection_d", "tg_projection_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in ("Gi_input_d", "gi_input_m", "Gi_d", "gi_m")]
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
                  ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}

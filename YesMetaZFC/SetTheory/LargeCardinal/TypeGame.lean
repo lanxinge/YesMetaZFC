@@ -6,7 +6,7 @@ import YesMetaZFC.SetTheory.Descriptive.FirstViolationMinimum
 
 由原数学输入构造固定语言、全部内部有限历史、七条规则、三阶段归属和
 闭收益集合。返回的四元组是模型内的游戏码；策略空间也由模型内幂集构造。
-本层装配游戏；决定性见 TypeGameDeterminacy，5.15 的迭代论证仍待完成。
+本层装配游戏；决定性见 TypeGameDeterminacy，5.15 的 II 策略转移见 TypeGameTransfer。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive

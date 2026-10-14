@@ -30,6 +30,8 @@ theorem Tg_context_d.continue_tree_l {ω X η C Y η₀ C₀ μ μ₀ K K₀ R S
     (ne : ι.bound 23 ≠ ι.bound 1) (letters : M.mem (ι.bound 6).val Z₀)
     (row : Tg_past_at_d H₀ (ι.bound 22).val k Y S μ₀ K₀ η₀ C₀ Lᵣ Vᵣ qᵣ)
     (code : Tg_saved_code_d ω Vᵣ qᵣ (fun i => (ρ₀.bound i).val))
+    (lowS : M.mem (ρ₀.bound 40).val Z₀)
+    (played : Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ₀.bound 40).val)
     (trace : Tg_trace_d ω C (ι.bound 4).val (ι.bound 1).val (ι.bound 2).val (ι.bound 22).val
       (ι.bound 20).val (ρ₀.bound 41).val (ρ₀.bound 15).val (ρ₀.bound 11).val)
     (hV : M.mem V X) (rank : Vr_d X ζ V) (hV' : M.mem V Y) (rank' : Vr_d Y ζ V)
@@ -82,7 +84,7 @@ theorem Tg_context_d.continue_tree_l {ω X η C Y η₀ C₀ μ μ₀ K K₀ R S
   obtain ⟨B, R₀, Kᵣ, mb, rootSource⟩ := tree.tree.sources o c₀ (tree.tree.root o ho)
   have j := tree.tree.diagram.elementary o k π₀ c₀ B R₀ d Y S root₀ (tree.tree.root o ho) hd mb.1 my.1
   have k' := tree.tree.diagram.elementary o ξ π c₀ B R₀ c X R root (tree.tree.root o ho) hc mb.1 mx.1
-  obtain ⟨ρ, seed, oldEq, typeEq, arity, newEq⟩ := prior.continue_seed_l hZF nc₀ ρ₀ nc ι context source.source owner.source
+  obtain ⟨ρ, seed, oldEq, typeEq, arity, newEq, labelSub⟩ := prior.continue_seed_l hZF nc₀ ρ₀ nc ι context source.source owner.source
     rootSource.transitive mb my mx j k' rootSource.omega_mem iRoot₀ iRoot
     hV' rank' hV rank hζ hωV hκV hVC' hw₀ old hw issued ne trace
   have h0 : (ρ.bound 0).val = ω := (oldEq 0).trans hw₀
@@ -118,7 +120,7 @@ theorem Tg_context_d.continue_tree_l {ω X η C Y η₀ C₀ μ μ₀ K K₀ R S
   exact ⟨ρ, seed, oldEq, typeEq, arity, newEq,
     context.continue_image_tree_l hZFC nc ρ prior nc₀ ρ₀ old typeEq.symm h1.symm h3.symm h5.symm
       (h1.symm ▸ owner') (h1.symm ▸ source') tree succ hc hd mx my ho root root₀ iRoot iRoot₀ anchor priorAnchor
-      lower' hγ hωZ ι issued ne row code links codes letters h0 δlimit' δregular'
+      lower' hγ hωZ ι issued ne row code lowS played labelSub links codes letters h0 δlimit' δregular'
       hV rank hV' rank' hζ hVC hζδ' hκV' hU' hD' hu' above' seed⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

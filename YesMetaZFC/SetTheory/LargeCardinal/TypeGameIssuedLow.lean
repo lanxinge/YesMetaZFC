@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssuedQuery
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePlayTrace
 
 /-! # 实际下一走法的全部节点参数留在共同低层
 
@@ -25,12 +26,13 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
       M.mem (ψ.bound 11).val (ρ.bound 25).val ∧ (∀ i : Fin 7, M.mem (ψ.bound (i.castAdd 5)).val Z) ∧
       Formula.satisfies χ tg_candidate0_m ∧
       (∀ i : Fin 12, (χ.bound i).val =
-        (ρ.bound ([25, 28, 0, 24, 27, 29, 30, 31, 32, 33, 34, 35].get i)).val) := by
+        (ρ.bound ([25, 28, 0, 24, 27, 29, 30, 31, 32, 33, 34, 35].get i)).val) ∧
+      Tg_play_d C (ρ.bound 4).val (ρ.bound 3).val (ρ.bound 20).val (ψ.bound 5).val := by
   have fs := (context.read_l hZF source).1
   let J := rt_pair_l fs.transitive nc hZF.1 fs.pair
   have ext := rt_model_ext_l hZF.1 fs.transitive nc
   have state := (tg_issued_sat_l J ext ρ).mp valid
-  obtain ⟨_, x, s, _, _, _, r, m, b, q, f, _, digits, rest, _, _, node, query, _, _, hk, hl, hN,
+  obtain ⟨h, x, s, _, _, _, r, m, b, q, f, endt, digits, rest, _, _, node, query, _, _, hk, hl, hN,
     χ, same, candidate, _⟩ := tg_issued_query_l J ext ρ valid
   have fn {a b f : (rt_model_l C nc).Domain} (h : Fn0_d a b f) : Fn0_d a.val b.val f.val := by
     let ε : Env (rt_model_l C nc) 3 := ⟨fun i => [a, b, f].get i, fun _ => a⟩
@@ -39,6 +41,11 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
         ((fn0_sat_l ext ε (.bound 0) (.bound 1) (.bound 2)).mpr h))
   have fx := fn digits.1
   have ft := fn state.labels
+  have play : Tg_play_d C (ρ.bound 4).val (ρ.bound 3).val (ρ.bound 20).val s.val := by
+    apply (tg_play_read_l hZF fs.transitive nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) s).mpr
+    intro i v hi
+    have entry := ((rest.2 i v).mp hi).2
+    exact ((digits.2 i v (digits.1.bound_l entry).1).mp entry).end_l endt
   have rest := (rt_restriction_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) fs.transitive nc fs.pair s x (ρ.bound 26)).mp rest
   have trans := rank.transitive_l hZF source.transitive hZ
   have natural (v : (rt_model_l C nc).Domain) (hv : (rt_model_l C nc).mem v (ρ.bound 0)) : M.mem v.val Z :=
@@ -64,7 +71,7 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
   have heω := num_mem_l hZF.1 source.omega (show Num_d 0 (ρ.bound 1).val from he)
   let ψ : Env (rt_model_l C nc) 12 := ⟨fun i => [ρ.bound 0, ρ.bound 1, ρ.bound 27, ρ.bound 28,
     ρ.bound 26, s, ρ.bound 23, r, m, b, q, f].get i, ρ.free⟩
-  refine ⟨ψ, χ, query, ?_, node, ?_, candidate, ?_⟩
+  refine ⟨ψ, χ, query, ?_, node, ?_, candidate, ?_, play⟩
   · intro i
     exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
       (Fin.cases rfl (fun j => Fin.elim0 j)))))) i

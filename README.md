@@ -44,7 +44,7 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 [有限后继秩层的完整类型搬运](YesMetaZFC/SetTheory/LargeCardinal/LocalTypeTransportTuple.lean) 已接通该最小对：内部任意正有限层高和有限元组均可自动搬运，整个 V(θ+ω) 参数带保持原值，原 κ 型集合与全部内部查询不变。
 [类型游戏的图恢复](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean) 已接到实际子类型见证：完整节点、空根和高度查询均自动编译，任意有限排列下恢复原树、末位及函数图的单点延长；重置位置的完整类型也已实际构造。
 [dcp 与规则 (7)](YesMetaZFC/SetTheory/LargeCardinal/TypeGameReply.lean) 已接通原语法投影、严格秩界和加二最大序数查询；后继高度刚性只需 ZF。[武丁重置工厂](YesMetaZFC/SetTheory/LargeCardinal/WoodinGameReset.lean) 自动产生任意参数域下界以上、dcp 弹性的实际重置类型。
-[完整辅助闭博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 已装配原七条规则、全部内部有限历史、固定三阶段时序和策略空间。三张编码表在开局前实际构造，裸类型只检查既定查询的字面成员性；已证明首次违规者输、无限合法对局由 I 获胜及收益集闭。[闭博弈决定性](YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 已按 Neeman 4.16 的获胜局面集合证明，并在[类型博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 中给出某一方的实际获胜策略；5.15 将辅助博弈中 II 的获胜策略经迭代转成原博弈中 II 的获胜策略，这一转移仍待完成。
+[完整辅助闭博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 已装配原七条规则、全部内部有限历史、固定三阶段时序和策略空间。三张编码表在开局前实际构造，裸类型只检查既定查询的字面成员性；已证明首次违规者输、无限合法对局由 I 获胜及收益集闭。[闭博弈决定性](YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 已按 Neeman 4.16 的获胜局面集合证明，并在[类型博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 中给出某一方的实际获胜策略。[统一历史递归](YesMetaZFC/SetTheory/LargeCardinal/TypeGameRunSequence.lean) 已完成有限树取并、偶数枝排除、奇数返回、共同树识别及三张坐标图的相容取并；[5.15 策略转移](YesMetaZFC/SetTheory/LargeCardinal/TypeGameTransfer.lean) 的 `Tg_game_d.transfer_l` 已从辅助博弈中 II 的获胜策略，统一构造原博弈中 II 的获胜策略：任意服从对局都是原树分支的第一坐标。后续实数吸收及 L(ℝ)⊨AD 仍待完成。
 
 ## 描述集合论基础
 

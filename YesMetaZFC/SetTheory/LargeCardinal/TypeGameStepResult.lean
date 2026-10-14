@@ -3,6 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastStep
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssued
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameOdd
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastPlay
 
 /-! # 两种实际树后继共用的完整回答证书
 
@@ -26,7 +27,8 @@ def Tg_tree_step_d (ω X η c₀ α ξ T J G E c o Cᵣ γ Z H : M.Domain)
       let σ := Fin.cases (q 47) (Fin.cases (q 48) (Fin.cases (q 49)
         (Fin.cases (q 50) (Fin.cases (q 51) (Fin.cases (q 52) (fun _ => q 53))))))
       Formula.satisfies ρ tg_round0_m ∧ Tg_request_d (fun i => (ι.bound i).val) q ∧ M.MemberSubset γ (q 15) ∧
-      Tg_odd_d ω H ξ α k G₁ (ι.bound 1).val (ι.bound 23).val (ι.bound 22).val (q 19) (q 22) (q 42) ∧
+      Tg_odd_d ω H ξ α k G₁ (ι.bound 1).val (ι.bound 23).val (ι.bound 22).val (ι.bound 7).val (q 19) (q 22) (q 40) (q 42) ∧
+      (M.mem (q 40) Z ∧ Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (q 40)) ∧
       ∃ β₂ T₂ J₂ G₂ E₂ H₂ d j N R₂ K₂ L F κ U D u η₂ C₂ W π₂,
         It_pnice_d hZF ω c₀ β₂ T₂ J₂ G₂ E₂ H₂ ∧ It_extension_d β α ξ T₁ J₁ G₁ E₁ β₂ T₂ J₂ G₂ E₂ ∧
         Rd_entry_d β d J₂ ∧ It_map_d G₂ ξ β j ∧ Smem_d I d N R₂ ∧ Ic_model_d hZF ω L K₂ N R₂ ∧

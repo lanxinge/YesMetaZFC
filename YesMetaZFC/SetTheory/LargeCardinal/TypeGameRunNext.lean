@@ -23,9 +23,9 @@ def tg_run_next_m {d} (ω c₀ : Term d) (v w : Fin 18 → Term d) (u t : Fin 46
      ⌜rd_entry0_m⌝ₚ(⌜u 16⌝ₛ, ⌜t 16⌝ₛ, j) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 17⌝ₛ, ⌜t 17⌝ₛ, j) ∧
      ⌜rd_entry0_m⌝ₚ(⌜u 18⌝ₛ, ⌜t 18⌝ₛ, j)) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 20⌝ₛ, h, j) ∧ h ⊆ ⌜t 20⌝ₛ ∧
     ¬ (h = ⌜t 20⌝ₛ) ∧ ⌜v 13⌝ₛ ⊆ ⌜w 13⌝ₛ ∧
-    (∃ Y R μ K η C L V q S n g, ⌜tg_past_at_m⌝ₚ(⌜w 13⌝ₛ, ⌜u 19⌝ₛ, ⌜v 6⌝ₛ, Y, R, μ, K, η, C, L, V, q) ∧
-      ⌜tg_saved_branch_m⌝ₚ(⌜ω⌝ₛ, V, q, S, n, g) ∧
-      ⌜tg_odd_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 7⌝ₛ, ⌜v 6⌝ₛ, k, G, ⌜u 1⌝ₛ, ⌜u 23⌝ₛ, ⌜u 22⌝ₛ, S, n, g))⟫
+    (∃ Y R μ K η C L V q S n s g, ⌜tg_past_at_m⌝ₚ(⌜w 13⌝ₛ, ⌜u 19⌝ₛ, ⌜v 6⌝ₛ, Y, R, μ, K, η, C, L, V, q) ∧
+      ⌜tg_saved_branch_m⌝ₚ(⌜ω⌝ₛ, V, q, S, n, s, ⌜u 23⌝ₛ, g) ∧
+      ⌜tg_odd_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 7⌝ₛ, ⌜v 6⌝ₛ, k, G, ⌜u 1⌝ₛ, ⌜u 23⌝ₛ, ⌜u 22⌝ₛ, ⌜u 7⌝ₛ, S, n, s, g))⟫
 
 @[simp] theorem tg_run_next_closed_l {d} (ω c₀ : Term d) (v w : Fin 18 → Term d) (u t : Fin 46 → Term d)
     (hw : ω.freeSupport = []) (hc : c₀.freeSupport = [])

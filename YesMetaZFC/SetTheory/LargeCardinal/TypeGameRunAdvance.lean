@@ -1,5 +1,7 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunState
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnswerHistory
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRealPrefix
+import YesMetaZFC.SetTheory.LargeCardinal.FiniteArithmeticSource
 
 /-! # 两条树边之后闭合整份递归历史
 
@@ -16,7 +18,8 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → M.Domain} {u : Fin 46 → M.Domain}
     (h : Tg_run_d hZF ω c₀ o Cᵣ γ Z A v u) (ho : ∀ z, ¬ M.mem z o)
     (hγ : M.IsLimitOrdinal γ) (hωZ : M.mem ω Z) (hAZ : M.mem A Z) (hx : M.mem x A) :
-    ∃ w t, Tg_run_d hZF ω c₀ o Cᵣ γ Z A w t ∧ Tg_run_next_d hZF ω c₀ v u w t := by
+    ∃ w t, Tg_run_d hZF ω c₀ o Cᵣ γ Z A w t ∧ Tg_run_next_d hZF ω c₀ v u w t ∧
+      Tg_turn_move_d I ω A (v 5) (u 4) (u 3) (u 19) (u 20) (w 5) (t 4) (t 3) (t 19) (t 20) x := by
   let nc : Nonempty {z // M.mem z (v 5)} := ⟨⟨ω, h.context.omega⟩⟩
   obtain ⟨ι, eu, issued⟩ := h.read_l hZF nc
   have eq : (fun i => (ι.bound i).val) = u := funext eu
@@ -27,13 +30,20 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   have ext := rt_model_ext_l hZF.1 fs.transitive nc
   have state := (tg_issued_sat_l J ext ι).mp issued
   have hn : M.mem (ι.bound 19).val ω := h.omega ▸ state.round
+  obtain ⟨s, real⟩ := tg_issued_real_l hZF fs nc ι issued
+  have real : Tg_real_d A (v 5) (ι.bound 4).val (ι.bound 3).val (ι.bound 19).val (ι.bound 20).val s := h.alphabet ▸ real
+  have lowReal : M.mem s Z := h.anchor.rank.relation_mem_l hZF h.source.source.transitive h.anchor.member hγ hωZ hAZ
+    (h.source.source.transitive _ h.context.member s ((Formula.satisfies_conj_iff ..).mp real.2).1) (by
+      intro p hp
+      obtain ⟨i,hi,y,hy,pair⟩ := real.1.1 p hp
+      exact ⟨i,h.source.source.omega.transitive hZF _ hn i hi,y,hy,pair⟩)
   obtain ⟨k, β, T₁, Q₁, G₁, E₁, H₁, a, Y, R, μ, K, η₁, C₁, π₁,
-    nice₁, ext₁, node₁, my, sy, cy, root₁, image₁, anchor₁, n₁, ρ, round, request, high, odd,
+    nice₁, ext₁, node₁, my, sy, cy, root₁, image₁, anchor₁, n₁, ρ, round, request, high, odd, ⟨lowS, played⟩,
     β₂, T₂, Q₂, G₂, E₂, H₂, d, j, N, R₂, K₂, L, F, κ, U, D, u₀, η₂, C₂, W, π₂,
     nice₂, ext₂, node₂, edge, mn, sn, ultra, crit, limit, bound, subset, heights,
     iU, iD, iu, reply, iη, iC, cn, hW, common, level, root₂, image₂, anchor₂, update⟩ :=
     h.context.tree_successor_l hZFC h.source nc ι issued h.omega h.tree h.successor h.node h.model ho
-      h.root h.image h.anchor hγ hωZ (h.alphabet.symm ▸ hAZ) h.lower h.past h.links h.roots h.events h.below h.bounds
+      h.root h.image h.anchor hγ hωZ (h.alphabet.symm ▸ hAZ) h.lower h.past h.links h.roots h.events h.play h.below h.bounds
   have hj := ultra.elementary_l hZF h.model.1 mn.1
   have fn := hj.1.1.1.2
   have natural := hj.natural_l hZF h.source.source.omega h.source.source.transitive sn.source.transitive
@@ -110,6 +120,12 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
       ((ext₁.2.2.2.1 o i f (h.tree.tree.diagram.order.bound o i (h.tree.tree.diagram.map_bound_l hZF hf)).2).mpr hf)
   have roots := Tg_past_roots_d.push_l hZF past ns newest entries (h.roots.extend_l keepRoot)
     ((ext₂.2.2.2.1 o (v 6) π₁ ext₁.1.predecessor_mem).mpr root₁) image₁ anchor₁ ⟨_, code, high⟩
+  obtain ⟨S₀, treeImage, treeNames⟩ := h.tree_name
+  have keep₁ i f (hf : It_map_d (v 10) o i f) :=
+    (ext₁.2.2.2.1 o i f (h.tree.tree.diagram.order.bound o i (h.tree.tree.diagram.map_bound_l hZF hf)).2).mpr hf
+  have oddTree := treeNames.odd_l hZF keep₁ nice₁.tree.diagram (keep₁ _ _ h.root) treeImage root₁ odd
+  have treeNames := Tg_root_tree_d.push_l hZF past ns newest entries (treeNames.extend_l keepRoot)
+    ⟨_, code, rfl, rfl, rfl, rfl, rfl⟩ ((ext₂.2.2.2.1 o (v 6) π₁ ext₁.1.predecessor_mem).mpr root₁) oddTree
   have rules := (Formula.satisfies_conj_iff ..).mp state.control |>.2.2.1
   simp only [tg_rules_m] at rules
   have ze : ∀ z, ¬ M.mem z (ι.bound 1).val := fun z hz =>
@@ -144,13 +160,22 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
       (h.source.source.transitive _ h.context.member _ (ι.bound 23).property) labels)
   have et : (θ.bound 23).val = (ρ.bound 41).val := et.trans (request 18).symm
   have oldRoot := keepRoot (v 7) (v 16) h.root
+  have fixedZ z (hz : M.mem z Z) : Rd_entry_d z z j := by
+    obtain ⟨z', _, iz⟩ := hj.1.1.2.2 z (h.source.source.transitive Z h.anchor.member z hz)
+    have eq := jn.1.1.1.2 z z' z (nice₂.tree.diagram.comp o (v 7) β (v 16) j π₂ oldRoot edge root₂
+      z z z' (h.anchor.fixed z hz) iz) (anchor₂.fixed z hz)
+    exact eq ▸ iz
+  have plays := h.play.map_l hZF h.source.source.omega h.source.source.transitive sn.source.transitive
+    h.model mn hj iC (images 4) (images 3) (images 20) fixedZ
+  have played := played.map_l hZF h.source.source.omega h.source.source.transitive sn.source.transitive
+    h.model mn hj iC (images 4) (images 3) (images 20) (fixedZ _ lowS)
   have eA := (nice₂.tree.diagram.elementary o β π₂ c₀ B S d N R₂ root₂ (nice₂.tree.root o ho) node₂ mb.1 mn.1).1.1.1.2
     A (θ.bound 6).val A (nice₂.tree.diagram.comp o (v 7) β (v 16) j π₂ oldRoot edge root₂
       A A (θ.bound 6).val (h.anchor.fixed A hAZ) (h.alphabet ▸ images 6)) (anchor₂.fixed A hAZ)
-  obtain ⟨_, t₀, _, _, _, _, _, advance⟩ := answer
+  obtain ⟨_, t₀, j₀, _, position, _, _, advance⟩ := answer
   have xC : M.mem x C₂ := ft.transitive _ (θ.bound 6).property x (eA.symm ▸ hx)
   have hxθ : M.mem x (θ.bound 6).val := eA.symm ▸ hx
-  obtain ⟨_, t, _, m, _, _, _, _, next, _, ε, head, num, legal, _, _, growth, keep, proper, trace⟩ :=
+  obtain ⟨y, t, _, m, _, even, _, digit, next, _, ε, head, num, legal, _, aux, growth, keep, proper, trace⟩ :=
     advance ⟨x, xC⟩ hxθ
   have control (i : Fin 19) : ε.bound (i.castAdd 27) = θ.bound (i.castAdd 27) :=
     (head i).trans (by simp only [tg_position_env_d, Fin.addCases_left])
@@ -164,6 +189,49 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   have events : Tg_past_events_d ω H C₂ (ε.bound 4).val (ε.bound 1).val (ε.bound 2).val (ε.bound 20).val :=
     (congrArg Subtype.val (control 4)).symm ▸ (congrArg Subtype.val (control 1)).symm ▸
       (congrArg Subtype.val (control 2)).symm ▸ events
+  have plays := plays.mono_l hZF ft.transitive n₂ P (θ.bound 4) (θ.bound 3) (θ.bound 20) (ε.bound 20) keep
+  have played := played.mono_l hZF ft.transitive n₂ P (θ.bound 4) (θ.bound 3) (θ.bound 20) (ε.bound 20) keep
+  have plays := Tg_past_play_d.push_l hZF past ns newest entries plays _ code lowS played
+  have plays : Tg_past_play_d ω H Z C₂ (ε.bound 4).val (ε.bound 3).val (ε.bound 20).val :=
+    (congrArg Subtype.val (control 4)).symm ▸ (congrArg Subtype.val (control 3)).symm ▸ plays
+  have oldPlay := real.2.map_l hZF h.source.source.omega h.source.source.transitive sn.source.transitive h.model mn hj
+    iC (images 4) (images 3) (images 20) (fixedZ _ lowReal)
+  have oldPlay := oldPlay.mono_l hZF ft.transitive n₂ P (θ.bound 4) (θ.bound 3) (θ.bound 20) (ε.bound 20) keep
+  have oldPlay : Tg_play_d C₂ (ε.bound 4).val (ε.bound 3).val (ε.bound 20).val s :=
+    (congrArg Subtype.val (control 4)).symm ▸ (congrArg Subtype.val (control 3)).symm ▸ oldPlay
+  obtain ⟨r₁, real₁⟩ := tg_issued_real_l hZF ft n₂ ε legal
+  have Aε : (ε.bound 6).val = A := (congrArg Subtype.val (control 6)).trans eA
+  have real₁ : Tg_real_d A C₂ (ε.bound 4).val (ε.bound 3).val (ε.bound 19).val (ε.bound 20).val r₁ := Aε ▸ real₁
+  have fn := fn0_function_l (ZF.modelsKP hZF) real.1
+  have fn₁ := fn0_function_l (ZF.modelsKP hZF) real₁.1
+  have sub := oldPlay.subset_l hZF ft.transitive n₂ P ε legal real₁.2 ⟨fn.1,fn.2.1⟩ ⟨fn₁.1,fn₁.2.1⟩
+    (fun i hi => (sm i).mpr (Or.inl hi))
+  let ψ := tg_position_env_d (⟨fun i => θ.bound (i.castAdd 27),fun _ => θ.bound 0⟩ : Env (rt_model_l C₂ n₂) 19)
+    (θ.bound 19) t₀ j₀
+  have event := tg_position_digit_event_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ψ position
+    ((fseq_end_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ..).mp digit)
+    ((fseq_end_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ..).mp aux)
+  have qC : M.mem r₁ C₂ := ((Formula.satisfies_conj_iff ..).mp real₁.2).1
+  obtain ⟨z, _, hz⟩ := real₁.1.2.1 _ sm.predecessor_mem
+  have zC := (rd_entry_transitive_l ft.transitive qC hz).2
+  have ev := (tg_play_read_l hZF ft.transitive n₂ P (ε.bound 4) (ε.bound 3) (ε.bound 20) ⟨r₁,qC⟩).mp real₁.2
+    (θ.bound 19) ⟨z,zC⟩ ((rt_entry_l ft.transitive n₂ hZF.1 ..).mpr (en.symm ▸ hz))
+  have event : Tg_event_d P (ε.bound 4) (θ.bound 19) (ε.bound 3) (ε.bound 20) y :=
+    (control 4).symm ▸ (control 3).symm ▸ event
+  have zy : z = y.val := congrArg Subtype.val (tg_control_event_unique_l P (rt_model_ext_l hZF.1 ft.transitive n₂)
+    _ (tg_issued_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ε |>.mp legal).control
+    (tg_issued_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ε |>.mp legal).history ev event)
+  have hmω := (h.source.source.omega.1.2 _ hn).elim fun k hk => hk.1.eq hZF.1 sm ▸ hk.2
+  have move : Tg_turn_move_d I ω A (v 5) (ι.bound 4).val (ι.bound 3).val (ι.bound 19).val (ι.bound 20).val
+      C₂ (ε.bound 4).val (ε.bound 3).val (ε.bound 19).val (ε.bound 20).val x := by
+    refine ⟨s,r₁,y.val,real,real₁,?_,?_⟩
+    · exact ⟨(ε.bound 19).val,(ι.bound 19).val,
+        ⟨⟨hmω,h.source.source.omega.members_areOrdinals hZF _ hmω,fn₁.1,fn₁.2.1⟩,hn,sm,
+          ⟨hn,h.source.source.omega.members_areOrdinals hZF _ hn,fn.1,fn.2.1⟩,
+          (Descriptive.ds_restrict_iff_l I fn fn₁.1).mpr sub,zy ▸ hz⟩⟩
+    · intro he
+      have he := (fs_even_l hZF h.source.source.omega ft n₂ (θ.bound 0) (θ.bound 19) ωθ).mpr (en.symm ▸ he)
+      exact congrArg Subtype.val (even ((Descriptive.gm_even_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ψ (.bound 0) (.bound 19)).mpr he))
   obtain ⟨r, record, values⟩ := cn.save_issued_l hZF sn.source n₂ ε legal
   let w : Fin 18 → M.Domain := fun i => [N, R₂, L, K₂, η₂, C₂, β₂, β, T₂, Q₂, G₂, E₂, H₂, H, κ, d, π₂, r].get i
   have growing : M.mem κ (ε.bound 24).val := eκ ▸ growth
@@ -174,6 +242,8 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   have images' (i : Fin 19) : Rd_entry_d (ι.bound (i.castAdd 27)).val (ε.bound (i.castAdd 27)).val j :=
     Eq.mpr (congrArg (fun z => Rd_entry_d (ι.bound (i.castAdd 27)).val z j)
       (congrArg Subtype.val (control i))) (images (i.castAdd 27))
+  have treeImage := nice₂.tree.diagram.comp o (v 7) β (v 16) j π₂ oldRoot edge root₂
+    S₀ (ι.bound 7).val (ε.bound 7).val treeImage (images' 7)
   have historyKeep : M.MemberSubset (v 13) H := by
     intro p hp
     obtain ⟨a, b, pair⟩ := h.past.sequence.2.1.1 p hp
@@ -189,9 +259,10 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   refine ⟨w, (fun i => (ε.bound i).val), ⟨sn, cn, succω (succω h.finite h.successor) ext₁.1,
     ext₂.1, nice₂, node₂, mn, root₂, image₂, anchor₂, record, values,
     (congrArg Subtype.val (control 0)).trans ωθ, (congrArg Subtype.val (control 6)).trans eA,
-    fun z hz => κlimit.1.transitive κ growing z (highκ z hz), em.symm ▸ past, links, roots, events, growing, heights, span⟩,
-    k, β, T₁, Q₁, G₁, E₁, H₁, j, (θ.bound 20).val, nice₁, ext₁, ext₂, rfl, sm, edge,
+    fun z hz => κlimit.1.transitive κ growing z (highκ z hz), em.symm ▸ past, links, roots, events, growing, heights, span,
+    ⟨S₀, treeImage, treeNames⟩, plays⟩,
+    ⟨k, β, T₁, Q₁, G₁, E₁, H₁, j, (θ.bound 20).val, nice₁, ext₁, ext₂, rfl, sm, edge,
     images', images 20, keep, proper, historyKeep, Y, R, μ, K, η₁, C₁, L, W, q,
-    (ρ.bound 19).val, (ρ.bound 22).val, (ρ.bound 42).val, newest, ⟨_, code, rfl, rfl, rfl⟩, odd⟩
+    (ρ.bound 19).val, (ρ.bound 22).val, (ρ.bound 40).val, (ρ.bound 42).val, newest, ⟨_, code, rfl, rfl, rfl, request 18, rfl⟩, odd⟩, move⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

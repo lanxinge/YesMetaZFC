@@ -34,7 +34,8 @@ theorem Tg_context_d.continue_seed_l {B T r c d π σ C₀ L W : M.Domain}
         p ([16, 15, 24, 14, 13, 12, 6, 5, 4, 3].get i)) ∧
       (ε.bound 7).val = p 11 ∧ ε.bound 3 = ι.bound 27 ∧
       (∀ i : Fin 14, ε.bound ([0, 2, 8, 9, 13, 14, 16, 21, 22, 23, 24, 25, 26, 27].get i) =
-        ι.bound ([0, 5, 24, 28, 25, 36, 37, 38, 39, 40, 41, 42, 43, 44].get i)) := by
+        ι.bound ([0, 5, 24, 28, 25, 36, 37, 38, 39, 40, 41, 42, 43, 44].get i)) ∧
+      M.MemberSubset (p 41) (ι.bound 23).val := by
   have fs := (context.read_l hZF owner).1
   have ft := (current.read_l hZF source).1
   let J := rt_pair_l ft.transitive nd hZF.1 ft.pair
@@ -68,7 +69,7 @@ theorem Tg_context_d.continue_seed_l {B T r c d π σ C₀ L W : M.Domain}
     Formula.satisfies_mem_iff, tg_event_sat_l J ext, tg_aux_data_sat_l ext, kpair0_sat_l ext,
     fn0_sat_l ext, Formula.satisfies_isSuccessor_iff, Formula.satisfies_isRestriction_iff J] at cont
   obtain ⟨_, v, z, l₀, t₀, κ₀, u₀, τ, w, a, l, m, B₀, V, P,
-    aux, move, answer, pair, labels, sk, _, sl, sm, limit, base, constants, pool, exceeds⟩ := cont
+    aux, move, answer, pair, labels, sk, restriction, sl, sm, limit, base, constants, pool, exceeds⟩ := cont
   obtain ⟨_, _, _, n', t', z', en, ht, oldPair, traced⟩ :=
     trace.read_l hZF ft.transitive nd (ι.bound 4) (ι.bound 1) (ι.bound 2) (ι.bound 20)
   have en : n' = ι.bound 22 := Subtype.ext en
@@ -76,6 +77,12 @@ theorem Tg_context_d.continue_seed_l {B T r c d π σ C₀ L W : M.Domain}
   obtain ⟨⟨v', l', κ', u', oldAux, oldMove⟩, oldAnswer⟩ := (tg_round_event_sat_l J ext ..).mp traced
   have ev := tg_control_event_unique_l J ext _ state.control state.history (aux.end_l endt) oldAux
   have tEq : t₀.val = p 41 := (congrArg Subtype.val (move.unique_l (ev.symm ▸ oldMove)).2.1).trans ht
+  have labelSub : M.MemberSubset (p 41) (ι.bound 23).val := by
+    have rest := (rt_restriction_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) ft.transitive nd ft.pair t₀ (ι.bound 23) a).mp restriction
+    intro z hz
+    obtain ⟨i, x, pair⟩ := rest.1 z (tEq.symm ▸ hz)
+    obtain ⟨q, qp, hq⟩ := ((rest.2 i x).mp ⟨z,pair,tEq.symm ▸ hz⟩).2
+    exact kpair_unique_l M hZF.1 qp pair ▸ hq
   have ez := tg_control_event_unique_l J ext _ state.control state.history (answer.end_l endt) oldAnswer
   have pairM := (kpair0_sat_l hZF.1 ..).mp ((rt_model_delta_l ft.transitive nd (kpair0_delta_l (.bound 0) (.bound 1) (.bound 2))
     (⟨fun i => [z, τ, w].get i, fun _ => z⟩ : Env (rt_model_l D nd) 3)).mp ((kpair0_sat_l ext ..).mpr pair))
@@ -126,7 +133,7 @@ theorem Tg_context_d.continue_seed_l {B T r c d π σ C₀ L W : M.Domain}
     ι.bound 24, ι.bound 28, B', U, Q, ι.bound 25, ι.bound 36, b, ι.bound 37,
     θ.bound 6, θ.bound 7, θ.bound 8, θ.bound 9, ι.bound 38, ι.bound 39, ι.bound 40,
     ι.bound 41, ι.bound 42, ι.bound 43, ι.bound 44].get i, ι.free⟩
-  refine ⟨ε, ?_, ?_, wEq, mEq', ?_⟩
+  refine ⟨ε, ?_, ?_, wEq, mEq', ?_, labelSub⟩
   · simp only [tc_seed0_m, Formula.satisfies_conj_iff]
     have rules := control.2.2.1
     simp only [tg_rules_m, Formula.satisfies_conj_iff] at rules

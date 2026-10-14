@@ -33,4 +33,14 @@ theorem Ee_language_d.realized_l {ω κ n B U D δ η Y c S s t : M.Domain} {q :
     (language.read hZFC ν η A Y X c S δ K R s t hA hY succ hX regular.isLimitOrdinal above hk source model type).mp elastic
   exact ⟨above, regular, strong, ν, A, X, K, R, b, Q, w, succ, hA, hX, source, lower, ⟨elastic.1, minus⟩, realized, all⟩
 
+/-- 同一实际完整类型的弹性与查询编译的选择无关，可直接接入开局时固定的表。 -/
+theorem Ee_language_d.elastic_transfer_l {ω κ n B U D δ η Y c R s t : M.Domain} {q q' : Ee_queries_d M}
+    (source : Ee_language_d hZF ω κ n B U D q) (target : Ee_language_d hZF ω κ n B U D q')
+    (hω : M.IsOmega ω) (hk : M.mem κ δ) (hY : V_d I η Y) (model : Smem_d I c Y R)
+    (type : Tt_realized_d I ω c Y R n s δ U D t) (elastic : Ee_elastic_d q t) : Ee_elastic_d q' t := by
+  obtain ⟨above, regular, _, ν, A, X, K, S, b, Q, w, succ, hA, hX, base, lower, minus, realized, all⟩ :=
+    source.realized_l hZFC hω hk hY model type elastic
+  exact (target.read hZFC ν η A Y X c R δ K S s t hA hY succ hX regular.isLimitOrdinal above hk base model type).mpr
+    ⟨(source.inaccessible c Y R s δ t model type).mp elastic.2.1, b, Q, w, lower, minus.2, realized, all⟩
+
 end YesMetaZFC.SetTheory.LargeCardinal

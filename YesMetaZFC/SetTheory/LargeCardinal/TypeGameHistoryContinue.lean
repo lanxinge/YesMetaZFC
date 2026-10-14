@@ -24,6 +24,7 @@ theorem Tg_past_events_d.continue_tree_l {ω X R μ K η C c₀ α ξ T Q G E L 
     (past : Tg_past_d hZF ω (ι.bound 19).val H X b) (links : Tg_past_links_d I H Q)
     (roots : Tg_past_roots_d ω H G o Cᵣ γ Z)
     (events : Tg_past_events_d ω H C (ι.bound 4).val (ι.bound 1).val (ι.bound 2).val (ι.bound 20).val)
+    (plays : Tg_past_play_d ω H Z C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val)
     (below : M.mem b (ι.bound 24).val) (bounds : ∀ i ν, Rd_entry_d i ν L → M.mem ν b ∨ ν = b) :
     Tg_tree_step_d hZF ω X η c₀ α ξ T Q G E c o Cᵣ γ Z H nc ι := by
   have fs := (context.read_l hZF source.source).1
@@ -53,12 +54,16 @@ theorem Tg_past_events_d.continue_tree_l {ω X R μ K η C c₀ α ξ T Q G E L 
   have ew : v 11 = (ρ₀.bound 11).val := congrFun eq 13
   have trace : Tg_trace_d ω C (ι.bound 4).val (ι.bound 1).val (ι.bound 2).val (ι.bound 22).val
       (ι.bound 20).val (ρ₀.bound 41).val (ρ₀.bound 15).val (ρ₀.bound 11).val := et ▸ eτ ▸ ew ▸ traced
+  obtain ⟨v, code', lowS, played⟩ := plays _ _ _ _ _ _ _ _ _ _ _ row
+  have eq : v 40 = (ρ₀.bound 40).val := congrFun (rt_tuple_inj_l code' code) 42
+  have lowS := eq ▸ lowS
+  have played := eq ▸ played
   have hℓκ := ordinal_down_l (ZF.modelsKP hZF) saved.limit.1 κlimit.1 bound below
   have hℓδ := δlimit.1.transitive (ι.bound 24).val state.bound ℓ hℓκ
   have above i ν (hn : Rd_entry_d i ν L) : M.mem ν (ι.bound 24).val :=
     (bounds i ν hn).elim (κlimit.1.transitive b below ν) (fun eq => eq.symm ▸ below)
   obtain ⟨_, _, _, _, _, _, step⟩ := context.continue_tree_l hZFC saved.context source saved.source nc nc₀ ρ₀ round hw₀ tree succ hc node mx model
-    ho root root₀ image image₀ anchor anchor₀ high hγ hωZ ι issued hw ne letters row code trace member rank
+    ho root root₀ image image₀ anchor anchor₀ high hγ hωZ ι issued hw ne letters row code lowS played trace member rank
     (saved.source.source.transitive C₀ saved.context.member V saved.member) saved.rank saved.limit saved.member
     hℓδ hκV hU hD hu above
   exact step

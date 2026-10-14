@@ -21,12 +21,13 @@ def Tg_return_node_d (ω H π P m i n S s t g : M.Domain) : Prop :=
       Rd_entry_d a S j ∧ Rd_entry_d b s j ∧ Rd_entry_d c t j ∧ Rd_entry_d d g j
 
 /-- 按同一轮号读取恢复图；归档函数性排除另选记录。 -/
-theorem Tg_return_node_d.graph_l (hZF : M.Models ZF) {ω H π P m i n S s t g Y R μ K η C L V q S' n' g' : M.Domain}
+theorem Tg_return_node_d.graphs_l (hZF : M.Models ZF) {ω H π P m i n S s t g Y R μ K η C L V q S' n' s' t' g' : M.Domain}
     (h : Tg_return_node_d ω H π P m i n S s t g) (hf : M.IsSetFunction (kp_pair_l (ZF.modelsKP hZF)) H)
-    (row : Tg_past_at_d H m i Y R μ K η C L V q) (br : Tg_saved_branch_d ω V q S' n' g') :
-    n = n' ∧ ∃ a j, Rd_entry_d a g' π ∧ Rd_entry_d i j P ∧ Rd_entry_d a g j := by
+    (row : Tg_past_at_d H m i Y R μ K η C L V q) (br : Tg_saved_branch_d ω V q S' n' s' t' g') :
+    n = n' ∧ ∀ a : Fin 3, ∃ x j, Rd_entry_d x ([s',t',g'].get a) π ∧
+      Rd_entry_d i j P ∧ Rd_entry_d x ([s,t,g].get a) j := by
   obtain ⟨Y₀, R₀, μ₀, K₀, η₀, C₀, L₀, V₀, q₀, v, old, code, num,
-    _, _, _, a, j, _, _, _, image, leg, _, _, _, value⟩ := h
+    _, a, b, c, j, _, ia, ib, ic, leg, _, va, vb, vc⟩ := h
   obtain ⟨r, hr, cell⟩ := row
   obtain ⟨r₀, hr₀, cell₀⟩ := old
   have eq := hf.2 m r₀ r hr₀ hr
@@ -35,22 +36,26 @@ theorem Tg_return_node_d.graph_l (hZF : M.Models ZF) {ω H π P m i n S s t g Y 
   have eV : V₀ = V := congrFun eq 8
   have eq : q₀ = q := congrFun eq 9
   subst V₀ q₀
-  obtain ⟨w, cw, _, hn, hg⟩ := br
+  obtain ⟨w, cw, _, hn, hs, ht, hg⟩ := br
   have eq := rt_tuple_inj_l code cw
   have en : v 22 = w 22 := congrFun eq 24
+  have es : v 40 = w 40 := congrFun eq 42
+  have et : v 41 = w 41 := congrFun eq 43
   have eg : v 42 = w 42 := congrFun eq 44
-  exact ⟨num.trans (en.trans hn), a, j, eg.trans hg ▸ image, leg, value⟩
+  refine ⟨num.trans (en.trans hn), fun k => ?_⟩
+  exact Fin.cases ⟨a,j,es.trans hs ▸ ia,leg,va⟩
+    (Fin.cases ⟨b,j,et.trans ht ▸ ib,leg,vb⟩ (Fin.cases ⟨c,j,eg.trans hg ▸ ic,leg,vc⟩ (fun k => Fin.elim0 k))) k
 
 def Tg_return_growth_d (hZF : M.Models ZF) (ω H π P N m i ℓ k : M.Domain) : Prop :=
   ∃ n S s t g n₀ S₀ s₀ t₀ g₀, M.mem n ω ∧ M.mem n₀ ω ∧ M.mem g N ∧ M.mem g₀ N ∧
     M.SuccessorOf n n₀ ∧ Tg_node_d (kp_pair_l (ZF.modelsKP hZF)) n S s t g ∧
     Tg_node_d (kp_pair_l (ZF.modelsKP hZF)) n₀ S₀ s₀ t₀ g₀ ∧
     Tg_return_node_d ω H π P m i n S s t g ∧ Tg_return_node_d ω H π P ℓ k n₀ S₀ s₀ t₀ g₀ ∧
-    M.MemberSubset g₀ g ∧ g₀ ≠ g
+    (∀ a : Fin 3, M.MemberSubset ([s₀,t₀,g₀].get a) ([s,t,g].get a)) ∧ g₀ ≠ g
 
-def Tg_odd_limit_d (hZF : M.Models ZF) (ω o c X T Q G b H : M.Domain) : Prop :=
-  ∃ A Rₐ a U Rᵤ u π Q₀ G₀ H₀ c₀ X₀ R₀ π₀ d N W P σ,
-    M.TransitiveSet A ∧ M.TransitiveSet U ∧
+def Tg_odd_limit_d (hZF : M.Models ZF) (ω o c X T Q G b H π N P : M.Domain) : Prop :=
+  ∃ A Rₐ a U Rᵤ u Q₀ G₀ H₀ c₀ X₀ R₀ π₀ d W σ,
+    M.TransitiveSet A ∧ M.TransitiveSet U ∧ M.mem ω A ∧
     Smem_d (kp_pair_l (ZF.modelsKP hZF)) a A Rₐ ∧ Smem_d (kp_pair_l (ZF.modelsKP hZF)) u U Rᵤ ∧
     Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω a u A U π ∧
     Rd_entry_d Q₀ Q π ∧ Rd_entry_d G₀ G π ∧ Rd_entry_d H₀ H π ∧
@@ -64,22 +69,24 @@ def Tg_odd_limit_d (hZF : M.Models ZF) (ω o c X T Q G b H : M.Domain) : Prop :=
     (∀ m i r t₀, M.mem i b → Rd_entry_d m r H → KPair_d M r i t₀ → ∃ n S s t g,
       M.mem n ω ∧ M.mem S N ∧ M.mem s N ∧ M.mem t N ∧ M.mem g N ∧
       Tg_node_d (kp_pair_l (ZF.modelsKP hZF)) n S s t g ∧ Tg_return_node_d ω H π P m i n S s t g) ∧
-    ∀ m ξ α k e t ℓ Y R μ K η C L V q S n g,
-      M.mem α b → Tg_past_at_d H m α Y R μ K η C L V q → Tg_saved_branch_d ω V q S n g →
-      Tg_odd_d ω H ξ α k G e t ℓ S n g → It_pred_d T k α → t ≠ e →
+    ∀ m ξ α k e t ℓ Sₑ Y R μ K η C L V q S n s g,
+      M.mem α b → Tg_past_at_d H m α Y R μ K η C L V q → Tg_saved_branch_d ω V q S n s t g →
+      Tg_odd_d ω H ξ α k G e t ℓ Sₑ S n s g → It_pred_d T k α → t ≠ e →
         Tg_return_growth_d hZF ω H π P N m α ℓ k
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem Tg_sequence_d.odd_limit_l {ω c o C γ Z A D f X B b : M.Domain} {U : Fin 6 → M.Domain}
+    {k} {v : Fin k → M.Domain}
     (h : Tg_sequence_d hZF ω c o C γ Z A D f)
     (tree : It_pnice_d hZF ω c ω (U 0) (U 1) (U 2) (U 3) (U 4))
     (archive : M.IsSetFunction I (U 5))
     (columns : ∀ a x, M.mem x (U a) ↔ Tg_run_value_d ⟨8+a.val, by omega⟩ f x)
     (back : It_hull_return_d hZF ω o c X (U 0) (U 1) (U 2) (U 3) (U 4) B b
-      (Fin.cases (U 5) (fun _ : Fin 1 => f))) :
-    Tg_odd_limit_d hZF ω o c X (U 0) (U 1) (U 2) b (U 5) := by
+      (Fin.cases (U 5) v)) :
+    ∃ π N P, Tg_odd_limit_d hZF ω o c X (U 0) (U 1) (U 2) b (U 5) π N P ∧
+      ∀ i, ∃ x, Rd_entry_d x (v i) π := by
   obtain ⟨B₀, Rₐ, a, K, V₀, Rᵤ, u, J, π, c₀, X₀, R₀, π₀, Q₀, G₀, E₀, L₀,
     sb, su, mb, mu, hj, _, mx₀, hcc, hXX, restrict, _, small, hQ, hG, _, _, ret, _, params⟩ := back
   obtain ⟨H₀, _, hH⟩ := params 0
@@ -105,13 +112,14 @@ theorem Tg_sequence_d.odd_limit_l {ω c o C γ Z A D f X B b : M.Domain} {U : Fi
   suffices nodes : ∀ m i r t₀, M.mem i b → Rd_entry_d m r (U 5) → KPair_d M r i t₀ → ∃ n S s t g,
       M.mem n ω ∧ M.mem S N ∧ M.mem s N ∧ M.mem t N ∧ M.mem g N ∧
       Tg_node_d I n S s t g ∧ Tg_return_node_d ω (U 5) π P m i n S s t g by
-    refine ⟨B₀, Rₐ, a, V₀, Rᵤ, u, π, Q₀, G₀, H₀, c₀, X₀, R₀, π₀, d, N, W, P, σ,
-      sb.transitive, su.transitive, mb, mu, hj, hQ, hG, hH, mx₀, hcc, hXX, restrict,
-      small.tree.diagram, mn, cone, ready', hs, root, hf, growth, nodes, ?_⟩
-    intro m ξ α k e t ℓ Y R μ K η C L V q S n g hi row br odd pred ne
+    refine ⟨π, N, P, ⟨B₀, Rₐ, a, V₀, Rᵤ, u, Q₀, G₀, H₀, c₀, X₀, R₀, π₀, d, W, σ,
+      sb.transitive, su.transitive, sb.omega_mem, mb, mu, hj, hQ, hG, hH, mx₀, hcc, hXX, restrict,
+      small.tree.diagram, mn, cone, ready', hs, root, hf, growth, nodes, ?_⟩,
+      fun i => (params i.succ).elim fun x h => ⟨x, h.2⟩⟩
+    intro m ξ α k e t ℓ Sₑ Y R μ K η C L V q S n s g hi row br odd pred ne
     have hk := branch.down k α ((pred.2 k).mpr (Or.inr (tree.tree.diagram.order.refl k
       (hw.transitive hZF α (branch.subset α hi) k pred.1)))) hi
-    rcases growth ξ α k e t ℓ S n g odd with reset | ⟨Y₁, R₁, μ₁, K₁, η₁, C₁, L₁, V₁, q₁, S₁, n₁, g₁, row₁, br₁, _, succ, sub⟩
+    rcases growth ξ α k e t ℓ Sₑ S n s g odd with reset | ⟨Y₁, R₁, μ₁, K₁, η₁, C₁, L₁, V₁, q₁, S₁, n₁, s₁, t₁, g₁, row₁, br₁, _, succ, sub⟩
     · exact (ne reset.1).elim
     · have get {m i Y R μ K η C L V q} (hi : M.mem i b)
           (row : Tg_past_at_d (U 5) m i Y R μ K η C L V q) : ∃ n S s t g,
@@ -121,14 +129,18 @@ theorem Tg_sequence_d.odd_limit_l {ω c o C γ Z A D f X B b : M.Domain} {U : Fi
         exact nodes m i r cell.choose hi hr cell.choose_spec.1
       obtain ⟨n', S', s', t', g', hn', _, _, _, hg', node', trace'⟩ := get hi row
       obtain ⟨n₀, S₀, s₀, t₀, g₀, hn₀, _, _, _, hg₀, node₀, trace₀⟩ := get hk row₁
-      obtain ⟨en, a', j', hga', hj', image'⟩ := trace'.graph_l hZF archive row br
-      obtain ⟨en₀, a₀, j₀, hga₀, hj₀, image₀⟩ := trace₀.graph_l hZF archive row₁ br₁
+      obtain ⟨en, images'⟩ := trace'.graphs_l hZF archive row br
+      obtain ⟨en₀, images₀⟩ := trace₀.graphs_l hZF archive row₁ br₁
       have succ : M.SuccessorOf n' n₀ := en.symm ▸ en₀.symm ▸ succ
       refine ⟨n', S', s', t', g', n₀, S₀, s₀, t₀, g₀, hn', hn₀, hg', hg₀, succ,
-        node', node₀, trace', trace₀, sub a₀ a' j₀ j' g₀ g' hga₀ hga' hj₀ hj' image₀ image', ?_⟩
-      intro eq
-      obtain ⟨z, hz⟩ := (node'.2.2.1.2 n₀).mp succ.predecessor_mem
-      exact KP.mem_irrefl_d (ZF.modelsKP hZF) n₀ ((node₀.2.2.1.2 n₀).mpr ⟨z, eq.symm ▸ hz⟩)
+        node', node₀, trace', trace₀, ?_, ?_⟩
+      · intro a
+        obtain ⟨x, j₀, ix, hj₀, vx⟩ := images₀ a
+        obtain ⟨y, j', iy, hj', vy⟩ := images' a
+        exact sub a x y j₀ j' _ _ ix iy hj₀ hj' vx vy
+      · intro eq
+        obtain ⟨z, hz⟩ := (node'.2.2.1.2 n₀).mp succ.predecessor_mem
+        exact KP.mem_irrefl_d (ZF.modelsKP hZF) n₀ ((node₀.2.2.1.2 n₀).mpr ⟨z, eq.symm ▸ hz⟩)
   intro m i r t₀ hi hr pair
   have hm := (ar.1 m).mpr ⟨r, hr⟩
   obtain ⟨r₀, hr₀⟩ := (hf.2 m).mp hm

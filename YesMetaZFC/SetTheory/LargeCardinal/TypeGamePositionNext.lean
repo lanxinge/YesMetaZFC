@@ -12,6 +12,24 @@ universe u
 variable {M : Structure.{u}} (I : kpair_convention_l.Interpretation M) (hE : Extensional M)
 include I hE
 
+theorem tg_position_digit_event_l (ρ : Env M 22) (valid : Formula.satisfies ρ (tg_position0_m 2))
+    {t h v a : M.Domain} (digit : Fseq_end_d I (ρ.bound 0) t (ρ.bound 20) v)
+    (aux : Fseq_end_d I (ρ.bound 0) h t a) : Tg_event_d I (ρ.bound 4) (ρ.bound 19) (ρ.bound 3) h v := by
+  have state := (tg_position_sat_l I hE 2 ρ).mp valid
+  obtain ⟨n,m,endt⟩ := digit
+  have ent (a b f : M.Domain) : M.PairMember I a b f ↔ Rd_entry_d a b f := by
+    apply exists_congr
+    intro p
+    let η : Env M 3 := ⟨fun i => [p,a,b].get i,fun _ => p⟩
+    exact and_congr ((I.realizes η (.bound 0) (.bound 1) (.bound 2)).symm.trans
+      (kpair_sat_l M hE η (.bound 0) (.bound 1) (.bound 2))) Iff.rfl
+  have domain : M.IsDomainOf I (ρ.bound 21) (ρ.bound 20) := fun i =>
+    ⟨fun hi => (state.history.2.1 i hi).imp fun _ h => (ent ..).mpr h.2,
+      fun ⟨v,hv⟩ => (state.history.bound_l ((ent ..).mp hv)).1⟩
+  have eq := endt.prefix_sequence.2.2.2.eq hE domain
+  exact (show Tg_event_d I (ρ.bound 4) (ρ.bound 19) (ρ.bound 3) t v from
+    ⟨ρ.bound 21,state.clock,eq ▸ (ent ..).mp endt.last_value⟩).end_l aux
+
 theorem tg_position_next_l (ρ : Env M 22) (valid : Formula.satisfies ρ (tg_position0_m 2))
     (x : M.Domain) (hx : M.mem x (ρ.bound 6)) :
     ∃ v t j n, M.mem v (ρ.bound 6) ∧

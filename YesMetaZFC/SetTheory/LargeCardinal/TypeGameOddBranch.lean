@@ -16,9 +16,9 @@ def Tg_odd_cofinal_d (ω b H : M.Domain) : Prop := ∀ i, M.mem i ω →
   ∃ j, M.mem j b ∧ (i = j ∨ M.mem i j) ∧ Tg_odd_node_d H j
 
 def Tg_odd_edge_d (ω H T G B y : M.Domain) : Prop := Tg_odd_node_d H y ∧
-  ∃ m ξ k e t ℓ Y R μ K η C L V q S n g,
-    Tg_past_at_d H m y Y R μ K η C L V q ∧ Tg_saved_branch_d ω V q S n g ∧
-    Tg_odd_d ω H ξ y k G e t ℓ S n g ∧ It_pred_d T k y ∧ M.mem ξ B
+  ∃ m ξ k e t ℓ Sₑ Y R μ K η C L V q S n a g,
+    Tg_past_at_d H m y Y R μ K η C L V q ∧ Tg_saved_branch_d ω V q S n a t g ∧
+    Tg_odd_d ω H ξ y k G e t ℓ Sₑ S n a g ∧ It_pred_d T k y ∧ M.mem ξ B
 
 def Tg_odd_tail_d (ω H T G B b : M.Domain) : Prop := ∃ z,
   M.mem z b ∧ ¬ M.mem z B ∧ Tg_odd_node_d H z ∧ ∀ y, M.mem y b → M.mem z y →
@@ -94,7 +94,7 @@ theorem Tg_sequence_d.late_odd_l {ω c o C γ Z A D f B e s₀ y : M.Domain} {U 
   obtain ⟨_, _, w, ct, _⟩ := h.rows l t ht
   have old : ¬ M.mem y (w 6) := fun hy => least l ((stages l).mpr ⟨w, t, ht, ct, hy⟩) succ.predecessor_mem
   obtain ⟨a, β, T, Q, G, E, L₀, _, _, mid, ext₁, ext₂, head, _, _, _, _, _, _, _,
-    Y, R, μ, K, η, C, L, V, q, S, n, g, saved, br, odd⟩ := (h.steps l k t s succ ht hs).read_l hZF ct code
+    Y, R, μ, K, η, C, L, V, q, S, n, digits, g, saved, br, odd⟩ := (h.steps l k t s succ ht hs).read_l hZF ct code
   rcases (ext₂.1 y).mp hyv with hyβ | eq
   · rcases (ext₁.1 y).mp hyβ with hyold | eq
     · exact (old hyold).elim
@@ -105,7 +105,7 @@ theorem Tg_sequence_d.late_odd_l {ω c o C γ Z A D f B e s₀ y : M.Domain} {U 
       have inside a := fun z hz => (columns a z).mpr ⟨v, k, s, hs, code, hz⟩
       have oldInside a := fun z hz => (columns a z).mpr ⟨w, l, t, ht, ct, hz⟩
       have ha : M.mem a (w 6) := by
-        rcases odd with ⟨_, eq, _⟩ | ⟨_, Y, R, μ, K, η, C, L, V, q, _, _, _, _, _, _, _, row, _⟩
+        rcases odd with ⟨_, eq, _⟩ | ⟨_, Y, R, μ, K, η, C, L, V, q, _, _, _, _, _, _, _, _, _, row, _⟩
         · exact eq ▸ oldRun.successor.predecessor_mem
         · obtain ⟨d, hd, _⟩ := oldRun.links _ _ _ _ _ _ _ _ _ _ _ row
           exact (oldRun.tree.tree.diagram.model_domain a).mpr ⟨d, hd⟩
@@ -122,19 +122,23 @@ theorem Tg_sequence_d.late_odd_l {ω c o C γ Z A D f B e s₀ y : M.Domain} {U 
         (h.order_l hZF hw columns hs code hyv).trans ((keep₂.1 i _ hyβ).trans
           ((tip i).trans (or_congr Iff.rfl ((keep₁.1 i a ha).symm.trans
             ((keep₂.1 i a ((ext₁.1 a).mpr (Or.inl ha))).symm.trans (h.order_l hZF hw columns hs code hav).symm)))))⟩
-      have moved : Tg_odd_d ω (U 5) (w 7) (w 6) a (U 2) (w 19) (w 41) (w 40) S n g := by
-        rcases odd with reset | ⟨ne, Y, R, μ, K, η, C, L, V, q, S₀, n₀, g₀, j, x, b, z, row, br, hj, rest⟩
-        · exact Or.inl reset
+      have liftMap {i j} (hj : It_map_d G i (w 6) j) : It_map_d (U 2) i (w 6) j := by
+        obtain ⟨r, pair, p, pp, hp⟩ := (ext₂.2.2.2.1 i (w 6) j hyβ).mpr hj
+        exact ⟨r, pair, p, pp, inside 2 p hp⟩
+      have moved : Tg_odd_d ω (U 5) (w 7) (w 6) a (U 2) (w 19) (w 41) (w 40) (w 25) S n digits g := by
+        rcases odd with reset | ⟨ne, Y, R, μ, K, η, C, L, V, q, S₀, n₀, s₀, t₀, g₀, j, x, b, z, row, br, hj, rest⟩
+        · obtain ⟨he, hk, hg, j, edge, image⟩ := reset
+          exact Or.inl ⟨he, hk, hg, j, liftMap edge, image⟩
         · obtain ⟨r, ⟨p, pair, hp⟩, cell⟩ := row
           have hj := (ext₂.2.2.2.1 a (w 6) j hyβ).mpr hj
           obtain ⟨r', pair', p', pp, hp'⟩ := hj
-          exact Or.inr ⟨ne, Y, R, μ, K, η, C, L, V, q, S₀, n₀, g₀, j, x, b, z,
+          exact Or.inr ⟨ne, Y, R, μ, K, η, C, L, V, q, S₀, n₀, s₀, t₀, g₀, j, x, b, z,
             ⟨r, ⟨p, pair, oldInside 5 p hp⟩, cell⟩, br, ⟨r', pair', p', pp, inside 2 p' hp'⟩, rest⟩
       obtain ⟨r, ⟨p, pair, hp⟩, cell⟩ := saved
       have row : Tg_past_at_d (U 5) (w 37) (w 6) Y R μ K η C L V q :=
         ⟨r, ⟨p, pair, inside 5 p hp⟩, cell⟩
       exact ⟨⟨w 37, r, cell.choose, ⟨p, pair, inside 5 p hp⟩, cell.choose_spec.1⟩,
-        w 37, w 7, a, w 19, w 41, w 40, Y, R, μ, K, η, C, L, V, q, S, n, g,
+        w 37, w 7, a, w 19, w 41, w 40, w 25, Y, R, μ, K, η, C, L, V, q, S, n, digits, g,
         row, br, moved, pred, (even (w 7)).mpr ⟨w, l, t, ht, ct,
           tree.tree.diagram.order.refl (w 7) oldRun.finite⟩⟩
   · have eq := hZF.1.eq_of_same_members y β eq

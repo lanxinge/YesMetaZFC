@@ -49,6 +49,9 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
     (ne : ι.bound 23 ≠ ι.bound 1)
     (row : Tg_past_at_d H₀ (ι.bound 22).val k Y S μᵣ Kₕ η₀ C₀ Lᵣ Vᵣ qᵣ)
     (code : Tg_saved_code_d ω Vᵣ qᵣ (fun i => (ρ₀.bound i).val))
+    (lowS : M.mem (ρ₀.bound 40).val Z₀)
+    (oldPlayed : Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ₀.bound 40).val)
+    (labelSub : M.MemberSubset (ρ₀.bound 41).val (ι.bound 23).val)
     (links : ∀ i : Fin 6, (ι.bound ([0, 1, 27, 28, 24, 25].get i)).val =
       [ω, (ρ₀.bound 17).val, p 3, p 9, p 8, p 13].get i)
     (codes : ∀ i : Fin 9, p ([14, 16, 21, 22, 23, 24, 25, 26, 27].get i) =
@@ -62,7 +65,7 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
     (above : ∀ i μ, Rd_entry_d i μ H → M.mem μ (p 8))
     (seed : Formula.satisfies ρ tc_seed0_m) :
     Tg_tree_step_d hZF ω X η c₀ α ξ T J G E c o Cᵣ γ Z₀ H₀ nc ι := by
-  obtain ⟨ψ, χ, queries, eqψ, node, queryLow, candidate, eqχ⟩ :=
+  obtain ⟨ψ, χ, queries, eqψ, node, queryLow, candidate, eqχ, played⟩ :=
     context.issued_queries_l hZF owner.source nc ι issued (links 0) anchor.member anchor.rank hγ hωZ letters
   have queryRequest := eqψ
   have candidateRequest := eqχ
@@ -199,6 +202,14 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have anchor' := priorAnchor.extend_l hZF owner.source.transitive source.source.transitive ready.source.transitive
     anchor.member anchor.rank hW common level.member level.hierarchy hLimit hκL lower
     hV₀ rank₀ pointwise next.tree.diagram oldRoot edge root'
+  have fixedZ z (hz : M.mem z Z₀) : Rd_entry_d z z j := by
+    obtain ⟨z', _, iz⟩ := hj.1.1.2.2 z (source.source.transitive Z₀ priorAnchor.member z hz)
+    have eq := kRoot.1.1.1.2 z z' z (next.tree.diagram.comp o k α π₀ j π' oldRoot edge root'
+      z z z' (priorAnchor.fixed z hz) iz) (anchor'.fixed z hz)
+    exact eq ▸ iz
+  have lowT : M.mem (ρ₀.bound 41).val Z₀ := priorAnchor.rank.subset_mem_l source.source.transitive
+    priorAnchor.member (queryRequest 5 ▸ queryLow 6)
+    (source.source.transitive C₀ prior.member _ (ρ₀.bound 41).property) labelSub
   obtain ⟨allQueries, ψ', eqψ, movedψ⟩ := anchor.query_peer_l hZF nc ψ anchor' nv owner.source context.member fs
     rootSource.transitive ready.source.transitive (context'.read_l hZF ready.source).1.transitive mb mx mn jRoot kRoot
     iRoot iRoot' hγ ωψ queryLow queries
@@ -279,11 +290,13 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have os := (Formula.satisfies_conj_iff ..).mp (moved.mp old) |>.1
   simp only [tg_seed0_m, Formula.satisfies_rename, tg_seed_m, Formula.satisfies_conj_iff] at os
   obtain ⟨_, _, _, _, _, _, _, oldSucc, _, _, _, _, _, _, _, _, _, _, _, oldNode, _⟩ := os
-  have oldGraph := (tg_node_source_l ft.transitive nv hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) _ _ _ _ _ _).mp oldNode |>.2.2.1
+  have oldNode := (tg_node_source_l ft.transitive nv hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) _ _ _ _ _ _).mp oldNode
+  have oldGraph := oldNode.2.2.1
   have nr := recovered
   simp only [tc_recovered0_m, tc_recovered_m, Formula.satisfies_conj_iff] at nr
   obtain ⟨_, _, _, _, _, _, _, _, _, newNode, _, keep⟩ := nr
-  have newGraph := (tg_node_source_l ft.transitive nv hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) _ _ _ _ _ _).mp newNode |>.2.2.1
+  have newNode := (tg_node_source_l ft.transitive nv hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) _ _ _ _ _ _).mp newNode
+  have newGraph := newNode.2.2.1
   have hs := (rt_successor_l ft.transitive nv hZF.1 (θ.bound 23) (θ.bound 22)).mp
     ((Formula.satisfies_isSuccessor_iff ..).mp oldSucc)
   have en : (εr.bound 10).val = (θ.bound 23).val := eqr 3
@@ -295,11 +308,20 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
     exact (Formula.satisfies_iff_iff ..).mp ((Formula.satisfies_forall_iff ..).mp keep x) |>.mpr
       ((Formula.satisfies_disj_iff ..).mpr (Or.inl hr'))
   obtain ⟨z, hz, push⟩ := tg_graph_extend_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) hs oldGraph newGraph sub
-  have odd : Tg_odd_d ω H₀ ξ α k G' (ι.bound 1).val (ι.bound 23).val (ι.bound 22).val
-      (ρ₂.bound 19).val (ρ₂.bound 22).val (ρ₂.bound 42).val :=
+  have digits : (ρ₂.bound 40).val = (ψ.bound 5).val := (eqr 8).trans (eqψ 5)
+  have oldDigits := hj.1.1.1.2 _ _ _ (images 40) (fixedZ _ lowS)
+  have gs : Tg_graph_d I (θ.bound 22).val (ρ₀.bound 40).val := oldDigits ▸ oldNode.1
+  have gt : Tg_graph_d I (θ.bound 23).val (ρ₂.bound 40).val := en ▸ newNode.1
+  have played' : Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ₂.bound 40).val := by
+    rw [digits]; exact played
+  have digitSub := oldPlayed.subset_l hZF fs.transitive nc (rt_pair_l fs.transitive nc hZF.1 fs.pair) ι issued
+    played' gs gt (fun x hx => (hs x).mpr (Or.inl hx))
+  have odd : Tg_odd_d ω H₀ ξ α k G' (ι.bound 1).val (ι.bound 23).val (ι.bound 22).val (ι.bound 7).val
+      (ρ₂.bound 19).val (ρ₂.bound 22).val (ρ₂.bound 40).val (ρ₂.bound 42).val :=
     Or.inr ⟨fun eq => ne (Subtype.ext eq), Y, S, μᵣ, Kₕ, η₀, C₀, Lᵣ, Vᵣ, qᵣ,
-      (ρ₀.bound 19).val, (ρ₀.bound 22).val, (ρ₀.bound 42).val, j, (θ.bound 42).val, (θ.bound 22).val, z,
-      row, ⟨_, code, rfl, rfl, rfl⟩, edge, images 19, images 22, images 42, hs, hz, push⟩
+      (ρ₀.bound 19).val, (ρ₀.bound 22).val, (ρ₀.bound 40).val, (ρ₀.bound 41).val, (ρ₀.bound 42).val, j, (θ.bound 42).val, (θ.bound 22).val, z,
+      row, ⟨_, code, rfl, rfl, rfl, rfl, rfl⟩, edge, images 19, images 22, images 42, hs, hz, push,
+      fixedZ _ lowS, digitSub, fixedZ _ lowT, labelSub⟩
   have nextSeed := seed₂
   simp only [tg_seed0_m, tg_seed_m, Formula.satisfies_conj_iff] at nextSeed
   have first := (rt_successor_l (context'.read_l hZF ready.source).1.transitive nv hZF.1
@@ -383,6 +405,8 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have eu : (ρ₂.bound 34).val = (ι.bound 25).val := request 17
   exact ⟨k, β, T', J', G', E', H', d', N, R', L.val, K₀, η', C', π',
     next, ext, target, mn, ready, context', root', iRoot', anchor', nv, ρ₂, round₂, request, high, odd,
+    ⟨by change M.mem (ρ₂.bound 40).val Z₀; rw [digits]; exact queryLow 5,
+      by change Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ₂.bound 40).val; rw [digits]; exact played⟩,
     β₂, T₂, J₂, G₂, E₂, H₂, c₂, j₂, N₂, R₂, K₂, L₂, F₂, κ₂, U₂, D₂, u₂, η₂, C₂, W₂,
     π₂, next₂, ext₂, target₂, edge₂, mn₂, ready₂, eκ ▸ ultra₂, eκ ▸ critical₂, limit₂, bound₂, subset₂, heights₂,
     eU ▸ iU₂, eD ▸ iD₂, eu ▸ iu₂, reply₂, iη₂, iC₂, context₂, hW₂, common₂, level₂,

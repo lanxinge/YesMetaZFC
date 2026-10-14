@@ -877,7 +877,7 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 证明覆盖非标准 ω，策略拼接仅用 ZF；选择公理分别用于选取子策略和可走字母。
 [TypeGameDeterminacy](TypeGameDeterminacy.lean) 的 `Tg_game_d.determined_l` 将此结论直接
 用于原三阶段游戏，返回原策略空间中的获胜策略及其玩家。
-尚待完成 5.15 将 II 的获胜策略从辅助博弈转到原博弈的完整迭代论证。
+5.15 的完整 II 策略转移由下述 `Tg_game_d.transfer_l` 实现。
 
 [TypeGameContinue](TypeGameContinue.lean) 已把继续扩展器施加到指定较早节点，
 并在同一目标反射层内得到候选实现与一张图恢复。旧回答查询和任意落子字母表
@@ -897,10 +897,10 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 再在后继反射层内构造回答有序对并追加原策略历史，得到实数落子阶段的控制位置。
 该接口允许任意内部轮号；反射层只使用已有闭包和控制记录，不假定其满足 ZF。
 [TypeGameTreeStep](TypeGameTreeStep.lean) 的 `Tg_game_d.run_start_l` 已从原 II 获胜策略
-自动产生实际首轮实例，包括 padding、超幂及回答后的历史。
+在任何原实数落子之前构造零轮状态，固定根模型、控制记录、首个请求及空历史。
 [TypeGamePositionNext](TypeGamePositionNext.lean) 和 [TypeGamePositionIssue](TypeGamePositionIssue.lean)
 已对任意内部轮号继续完成实数落子、轮号递增、原策略的下一辅助走法及原程序表读取；
-这些结果直接由 `answer_history_l` 和 `run_start_l` 返回，不要求下一轮额外给定合法走法。
+这些结果由 `answer_history_l` 和统一后继直接返回，不要求下一轮额外给定合法走法。
 已发出记录同时保存产生该走法的原前缀及完整辅助合法性，仍使用四十六个坐标。
 [TypeGameIssuedReset](TypeGameIssuedReset.lean) 对任意轮的空标签走法直接构造完整重置输入。
 [TypeGameIssuedQuery](TypeGameIssuedQuery.lean) 由同一原表项恢复节点查询、实数前缀、
@@ -917,8 +917,8 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 整列共同秩段迁移及低层逐点固定性。
 [TypeGamePastStep](TypeGamePastStep.lean) 的 `past_update_l` 已被重置与继续两种实际
 树更新调用：在旧历史界低于新临界点时，保存全部旧行并追加本轮原证书，保持与
-模型列的对应。旧回答的四个低坐标及其有序对均固定。`run_start_l` 已从空历史
-实际构造第一行存档，返回相同原坐标的编码和真实树结点，不另设初值存在前提。
+模型列的对应。旧回答的四个低坐标及其有序对均固定。零轮使用空历史，
+第一行存档与其他各行均由同一个 `advance_l` 实际构造。
 
 [TypeGameEventHistory](TypeGameEventHistory.lean) 由原控制记录中的时钟单值性识别同一事件，
 三次实际追加保留旧历史，规则 (4) 因而推出相邻辅助域严格增长。
@@ -949,13 +949,16 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 完成偶数边上的整份历史搬运、回答追加、实数落子和下一辅助请求，并保持所有历史行、
 共同根图、锚点、事件对应及支撑界。初值由 `Tg_game_d.run_start_l` 直接产生。
 [IterationTreeSyntax](IterationTreeSyntax.lean) 精确编码含 padding 的实际树及最大强度；
-[TypeGameRunSequence](TypeGameRunSequence.lean) 的 `Tg_game_d.history_sequence_l`
-已经在背景内部的 ω 上构造整列合法历史。初值和总后继均调用上述实际实现，
-相邻项保留两次树扩张、偶数边、全部十九项控制参数的像及历史包含性。
-该定理在原字母表非空时给出合法历史序列，尚未输出原游戏的获胜策略。
+[TypeGameRunChoice](TypeGameRunChoice.lean) 先对原一阶状态及后继关系构造实际反射闭包，
+在所有状态与字母上统一选择一张响应表，不依赖未来的无限原对局。
+[InputIteration](../Descriptive/InputIteration.lean) 在 ZF 中实现确定递归，只读取偶数位置的输入；
+内部 ω 归纳证明有限前缀相同的对局具有相同当前状态。
+[TypeGameStrategy](TypeGameStrategy.lean) 由此构造全部内部有限局面上的策略函数，
+[TypeGameStrategyPlay](TypeGameStrategyPlay.lean) 证明每个服从对局与递归保存的原前缀一致，
+并输出具有完整工作源、两条实际树边及全部历史不变量的统一内部序列。
 [TypeGameOdd](TypeGameOdd.lean) 将原请求选中的旧历史行、实际奇数嵌入和新存档绑定。
 `Tg_run_next_d` 保留旧树与旧图的嵌入像，并证明恢复图恰好增加一个点；
-空标签分支保留原偶数前驱和空图。该加强已由同一 `history_sequence_l` 递归实现。
+空标签分支保留原偶数前驱和空图。该加强已由同一 `Tg_run_choice_d.sequence_l` 递归实现。
 [TypeGameRunOrder](TypeGameRunOrder.lean) 证明六列数据、旧终点的全部前驱及当前偶数
 节点的前驱逐阶段保持。轮号小于树长的实际不变量保证这些有限树覆盖整个内部 ω。
 [TypeGameRunUnion](TypeGameRunUnion.lean) 的 `Tg_sequence_d.union_l` 从记录值域的
@@ -965,7 +968,7 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 已有直接极限坍塌得到真实传递目标和锥；[TypeGameLimitValues](TypeGameLimitValues.lean)
 构造历史像函数，[TypeGameLimitControl](TypeGameLimitControl.lean) 用锥交换律和内部
 ω 归纳识别共同控制树。相邻历史像真延长，原秩函数给出隶属下降链，与基础矛盾。
-`history_sequence_l` 现在同时返回实际并树、偶数共尾分支及其非良基结论。
+`Tg_sequence_d.branch_l` 在同一递归列上装配实际并树、偶数共尾分支及其非良基结论。
 `even_limit_l` 自动构造该枝的原始直接极限；`It_ill_branch_d` 保存实际带标号系统、
 投影、商模型及商关系的不良基性。
 [IterationCopyPadding](IterationCopyPadding.lean) 把恒等边接入同一复制历史；活动支撑、
@@ -977,7 +980,7 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 [IterationHullReturn](IterationHullReturn.lean) 将它与整树、完整存档和递归序列放入同一可数壳。
 返回枝因同一下降证书而不同于偶数枝；[TypeGameOddBranch](TypeGameOddBranch.lean)
 用结点首次进入有限树的内部最小阶段，证明该返回枝具有共尾的实际奇数保存结点。
-`history_sequence_l` 已自动输出 `It_hull_return_d`、真实返回因子和 `Tg_odd_cofinal_d`。
+`Tg_sequence_d.branch_l` 自动装配 `It_hull_return_d`、真实返回因子和 `Tg_odd_cofinal_d`。
 [TypeGameOddRecords](TypeGameOddRecords.lean) 证明并历史的定义域恰为内部 ω，
 从原保存码读取恢复图的精确有限定义域及完整树节点。
 [TypeGameOddLimit](TypeGameOddLimit.lean) 把全部这些原记录回拉到同一可数壳，
@@ -986,11 +989,45 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 证明其长度恰差一、两者都是完整树节点、旧图严格包含于新图。
 [TypeGameOddCompatibility](TypeGameOddCompatibility.lean) 证明每条继续奇数边上长度恰增一，
 并利用 [IterationConePull](IterationConePull.lean) 的实际交换方块，把旧恢复图的包含关系传到返回极限。
-`late_odd_l` 同时保留原奇数前驱与该边的一致性；这些证书已由 `history_sequence_l` 的
+`late_odd_l` 同时保留原奇数前驱与该边的一致性；这些证书已由 `Tg_sequence_d.branch_l` 中的
 `Tg_odd_limit_d` 自动装配。`odd_tail_l` 还给出一段真实尾枝：起点是存档结点，
 其后每个结点及其前驱都留在这段奇数尾枝上，故不会再次重置。
-尚需沿整条奇数尾枝传播相容性、证明长度无界，
-完成图的取并及返回因子对原树的识别；原树上的无限图枝及完整 5.15 获胜策略仍未完成。
+[IterationBranchSequence](IterationBranchSequence.lean) 用分支上的最小后继构造实际内部 ω 列，
+相邻项是原树的真正前驱关系。[TypeGameReturnSequence](TypeGameReturnSequence.lean)
+由完整存档的唯一性收集有限节点，三张坐标图沿该列相容且长度每次恰增一。
+[TypeGameGraphUnion](../../Model/SetTheory/Internal/TypeGameGraphUnion.lean) 通过内部归纳证明长度无界，
+[TypeGameReturnUnion](TypeGameReturnUnion.lean) 因而给出三张定义域恰为 ω 的并图及每份有限图的精确限制。
+[TypeGameRunRoot](TypeGameRunRoot.lean) 将原树名称沿统一递归传到并树；
+[TypeGameReturnTree](TypeGameReturnTree.lean) 用实际根图及锥交换律识别返回极限中的共同树，
+并证明返回因子把它送回原树。[TypeGamePlayTrace](TypeGamePlayTrace.lean) 与
+[TypeGamePastPlay](TypeGamePastPlay.lean) 将实数前缀逐点接回同一原历史；标签前缀来自原继续规则。
+[TypeGameReturnBranch](TypeGameReturnBranch.lean) 对三张并图的值逐点施加返回因子，
+得到原树中的共尾前缀；不假定整个并图属于极限模型。
+[TypeGameArchivePlay](TypeGameArchivePlay.lean) 将每份存档与任意足够晚的原轮次合并，
+通过事件单值性证明其为原对局前缀。根图固定这些前缀，返回锥交换律因而识别第一坐标的像。
+`Tg_sequence_d.branch_l` 输出原树中的内部无限分支，并证明第一坐标恰为输入对局。
+[TypeGameTransfer](TypeGameTransfer.lean) 的 `Tg_game_d.transfer_l` 已完成 5.15 的 II 策略转移，
+自动构造原有限局面空间、偶数时序、无限对局空间、树体第一投影的补集，以及 `Cg_win_d false` 获胜策略。
+原实数落子可以任意变化；不假定内部 ω 外部标准，也不为工作反射层附加 ZF 或 ZFC。
+
+[TypeGameReplyDescent](TypeGameReplyDescent.lean) 的 `Tg_reply_d.descend_l` 在 ZF 中
+从规则 (7) 的实际子类型见证恢复同一原树和同一标签图，并证明回答高度严格下降。
+原排列保留：新末位为序数，不能来自非序数原树或标签对，故排列固定末位；
+空根再固定树坐标，剩余位置恰为原标签。
+[SubtypeInsertion](../../Model/SetTheory/Internal/SubtypeInsertion.lean) 实际构造交换末两位的
+内部排列与全赋值图。[TypeGameNodeRank](../../Model/SetTheory/Internal/TypeGameNodeRank.lean)
+证明节点标签低于原树秩界，不要求该界为极限序数。
+[TypeGameGenericExtension](TypeGameGenericExtension.lean) 据此在武丁基数下构造任意参数域下界
+以上、包含下一枚真实分支标签的完整弹性类型，并证明原 `Tx_exceeds_d`。
+[TypeGameGenericMove](TypeGameGenericMove.lean) 的 `Tg_setup_d.generic_continue_l`
+将它接入原固定查询表，返回属于 Vδ 的实际请求，以及所有满足原轮保留、实数前缀相符和
+域增长条件的后续局面中的 `Tg_aux_d` 合法性。这是 6.5 使用的继续请求。
+[TypeGameGenericDense](TypeGameGenericDense.lean) 的 `Tg_setup_d.generic_dense_l`
+完成 6.4 的有限条件延长构造：任意 Vδ 值内部有限序列及编号界，都可延长到该界之后
+出现上述请求，且所有较早值属于新 Vκ。请求的完整类型、原标签图和实现高度一起保留。
+尚须把条件分离成地模型稠密集，经 δ 与 Vδ 的实际编号接入 Col(ω,δ) 泛型性，
+构造 6.3 的最小请求因果策略，证明 6.6 首达捕获并拼接内部 ω 上的下降反证。
+因此 6.1 的泛型 I 获胜端点、6.7、6.10 与双树决定性端点尚未完成。
 
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
 及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，
@@ -1021,7 +1058,8 @@ nice 树的 ω₁ 弱迭代策略、定义 3.13、引理 3.22–3.23，以及局
 实际存在性、真值对应、规范最小选取及有限后继秩层的完整类型搬运已完成；类型游戏的
 完整节点查询、一张图恢复、原 dcp、弹性重置类型、规则 (7) 的类型约束及后继高度刚性
 也已完成。完整辅助闭博弈、有限历史、首次违规胜负与决定性已完成；
-5.15 的迭代获胜论证、泛型迭代、双侧树证书及最终 L(ℝ) 的 AD 蕴涵仍待证明。
+5.15 的 II 迭代获胜策略转移已完成；6.1 的回答下降、继续请求合法性及有限条件延长已实现。
+泛型 I 获胜策略、双侧树证书及最终 L(ℝ) 的 AD 蕴涵仍待证明。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；

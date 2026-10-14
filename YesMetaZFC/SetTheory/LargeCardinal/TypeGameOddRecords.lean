@@ -73,4 +73,53 @@ theorem Tg_sequence_d.archive_l {ω c o C γ Z A D f : M.Domain} {U : Fin 6 → 
     have hn := (hw.1.2 k (h.function.bound_l hs).1).elim fun m h => (h.1.eq hZF.1 succ) ▸ h.2
     exact hw.transitive hZF n hn i (num ▸ (run.past.sequence.2.2 i).mpr ⟨r, p, pair, hp⟩)
 
+/-- 较晚轮的奇数结点是前一有限树的高度，严格高于该树中所有旧存档结点。 -/
+theorem Tg_sequence_d.archive_order_l {ω c o C γ Z A D f m n r s i j t u : M.Domain} {U : Fin 6 → M.Domain}
+    (h : Tg_sequence_d hZF ω c o C γ Z A D f) (hw : M.IsOmega ω)
+    (columns : ∀ a x, M.mem x (U a) ↔ Tg_run_value_d ⟨8+a.val, by omega⟩ f x)
+    (archive : M.IsSetFunction I (U 5)) (hr : Rd_entry_d m r (U 5)) (hs : Rd_entry_d n s (U 5))
+    (ri : KPair_d M r i t) (sj : KPair_d M s j u) (lt : M.mem m n) : M.mem i j := by
+  have hn := ((h.archive_l hZF hw columns).1 n).mpr ⟨s, hs⟩
+  obtain ⟨k, hk, succ⟩ := hw.exists_predecessor_of_mem_of_nonempty hZF hn ⟨m, lt⟩
+  obtain ⟨a, _, ha⟩ := h.function.2.1 k hk
+  obtain ⟨n', ns, v, code, run, num⟩ := h.rows k a ha
+  have round : v 37 = n := num.trans (ns.eq hZF.1 succ)
+  obtain ⟨r', hmr⟩ := (run.past.sequence.2.2 m).mp (round.symm ▸ lt)
+  have keep {m r} (hr : Rd_entry_d m r (v 13)) : Rd_entry_d m r (U 5) := by
+    obtain ⟨p, pair, hp⟩ := hr
+    exact ⟨p, pair, (columns 5 p).mpr ⟨v, k, a, ha, code, hp⟩⟩
+  have eq := archive.2 m r' r (keep hmr) hr
+  subst r'
+  obtain ⟨i', Y, R, μ, K, η, C, L, V, q, cell, _⟩ := run.past.rows m r hmr
+  have eq : i' = i := (kpair_injective_l M cell.choose_spec.1 ri).1
+  subst i'
+  obtain ⟨d, hd, _⟩ := run.links m i Y R μ K η C L V q ⟨r, hmr, cell⟩
+  have hi := (run.tree.tree.diagram.model_domain i).mpr ⟨d, hd⟩
+  obtain ⟨b, _, hb⟩ := h.function.2.1 n hn
+  obtain ⟨_, _, w, pack, _⟩ := h.rows n b hb
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
+    Y', R', μ', K', η', C', L', V', q', _, _, _, _, row, _⟩ := (h.steps k n a b succ ha hb).read_l hZF code pack
+  obtain ⟨r', ⟨p, pair, hp⟩, cell'⟩ := row
+  have image : Rd_entry_d n r' (U 5) := round ▸
+    (show Rd_entry_d (v 37) r' (U 5) from ⟨p, pair, (columns 5 p).mpr ⟨w, n, b, hb, pack, hp⟩⟩)
+  have eq := archive.2 n r' s image hs
+  subst r'
+  have eq : v 6 = j := (kpair_injective_l M cell'.choose_spec.1 sj).1
+  exact eq ▸ hi
+
+/-- 原轮号的严格保序性保证一个奇数结点只有一份完整存档。 -/
+theorem Tg_sequence_d.archive_unique_l {ω c o C γ Z A D f m n r s i t u : M.Domain} {U : Fin 6 → M.Domain}
+    (h : Tg_sequence_d hZF ω c o C γ Z A D f) (hw : M.IsOmega ω)
+    (columns : ∀ a x, M.mem x (U a) ↔ Tg_run_value_d ⟨8+a.val, by omega⟩ f x)
+    (archive : M.IsSetFunction I (U 5)) (hr : Rd_entry_d m r (U 5)) (hs : Rd_entry_d n s (U 5))
+    (ri : KPair_d M r i t) (si : KPair_d M s i u) : m = n ∧ r = s := by
+  have domain := (h.archive_l hZF hw columns).1
+  have hm := (domain m).mpr ⟨r, hr⟩
+  have hn := (domain n).mpr ⟨s, hs⟩
+  rcases (hw.isOrdinal hZF).wellOrder.linear.compare m hm n hn with eq | lt | gt
+  · have eq := hZF.1.eq_of_same_members m n eq
+    exact ⟨eq, archive.2 n r s (eq ▸ hr) hs⟩
+  · exact (KP.mem_irrefl_d (ZF.modelsKP hZF) i (h.archive_order_l hZF hw columns archive hr hs ri si lt)).elim
+  · exact (KP.mem_irrefl_d (ZF.modelsKP hZF) i (h.archive_order_l hZF hw columns archive hs hr si ri gt)).elim
+
 end YesMetaZFC.SetTheory.LargeCardinal

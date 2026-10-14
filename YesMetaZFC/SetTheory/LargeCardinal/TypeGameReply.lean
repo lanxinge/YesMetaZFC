@@ -62,23 +62,35 @@ theorem Tg_reply_d.read_l {ω κ τ e l n B C U V D P W u w b a z δ η Y c R r 
     (source : Ee_language_d hZF ω κ l B U D q) (target : Tg_reply_language_d hZF ω e l n τ C V W p)
     (hY : V_d I η Y) (model : Smem_d I c Y R) (type : Tt_realized_d I ω c Y R n r δ U P u)
     (reply : Tg_reply_d I ω l n κ τ U D W u w b σ z p) :
-    ∃ s v ν A d H r' S α, M.IsRestrictionOf I s r l ∧ Td_dcp_d I l n D u v ∧
+    ∃ s v ν A d H r' S α π, M.IsRestrictionOf I s r l ∧ Td_dcp_d I l n D u v ∧
       Tt_realized_d I ω c Y R l s δ U D v ∧ M.mem ν η ∧ Ts_at_d hZF ω δ l s n V W w ν ∧
       V_d I ν A ∧ Smem_d I d A H ∧ Tt_realized_d I ω d A H n r' δ V W w ∧
-      Rd_entry_d e S r' ∧ Rd_entry_d l α r' ∧ M.mem e S ∧ Tg_bound_d I δ S α ∧ Tg_height_d α ν := by
+      Rd_entry_d e S r' ∧ Rd_entry_d l α r' ∧ M.mem e S ∧ Tg_bound_d I δ S α ∧ Tg_height_d α ν ∧
+      M.IsSetBijectionFromTo I π n n ∧
+      (∀ i j x, Rd_entry_d j i π → M.mem i l → (Rd_entry_d i x s ↔ Rd_entry_d j x r')) := by
   obtain ⟨sub, v, drop, subtype, root, bound, height⟩ := reply
   obtain ⟨s, v', cut, drop', prefixType⟩ := type.dcp_l hZF hω drop.1 source.pool
   have eq := drop'.unique_l I hZF.1 drop
   subst v'
   obtain ⟨_, ν, hν, witness⟩ := (ts_subtype_realized_l hZF hω prog hY model prefixType source.limit target.limit subtype.1
     target.finite source.rank source.constants target.rank target.constants target.pool sub).mp subtype
-  obtain ⟨A, d, H, r', f, g, π, hA, lower, realized, rest⟩ := witness
+  obtain ⟨A, d, H, r', f, g, π, hA, lower, realized, ff, fg, graph, orig, bij, perm⟩ := witness
   obtain ⟨S, _, rS⟩ := realized.tuple.2.1 e target.root_slot
   obtain ⟨α, _, rα⟩ := realized.tuple.2.1 l target.last_slot
-  exact ⟨s, v, ν, A, d, H, r', S, α, cut, drop, prefixType, hν,
-    ⟨A, d, H, r', f, g, π, hA, lower, realized, rest⟩, hA, lower, realized, rS, rα,
+  refine ⟨s, v, ν, A, d, H, r', S, α, π, cut, drop, prefixType, hν,
+    ⟨A, d, H, r', f, g, π, hA, lower, realized, ff, fg, graph, orig, bij, perm⟩, hA, lower, realized, rS, rα,
     (target.root.2 d A H r' δ w S lower (ZF.v_transitive_l I hZF hA) realized rS).mp root,
     (target.bound.2 ν A d H r' δ w S α hA lower realized rS rα).mp bound,
-    (target.height.2 ν A d H r' δ w α hA lower realized rα).mp height⟩
+    (target.height.2 ν A d H r' δ w α hA lower realized rα).mp height, bij, ?_⟩
+  intro i j x ji hi
+  have hj := bij.1.1.input_mem_of_pairMember ji
+  constructor
+  · intro hx
+    have fx := (orig i x hi).mp hx
+    exact (graph j x).mp ((perm j hj x (ff.output_mem_of_pairMember fx)).mpr
+      ⟨i, bij.1.1.output_mem_of_pairMember ji, ji, fx⟩)
+  · intro hx
+    obtain ⟨i', _, ji', fx⟩ := (perm j hj x (realized.tuple.bound_l hx).2).mp ((graph j x).mpr hx)
+    exact (orig i x hi).mpr (bij.1.1.1.2 j i' i ji' ji ▸ fx)
 
 end YesMetaZFC.SetTheory.LargeCardinal

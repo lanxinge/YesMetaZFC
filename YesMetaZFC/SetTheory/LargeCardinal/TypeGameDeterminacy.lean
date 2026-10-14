@@ -4,7 +4,7 @@ import YesMetaZFC.SetTheory.Descriptive.ClosedDeterminacy
 /-! # 完整辅助闭博弈的决定性
 
 直接对已经装配的三阶段游戏应用闭博弈定理，返回原策略空间中的获胜策略。
-本结论确定有一方获胜；5.15 将 II 的策略从辅助博弈转到原博弈，仍待完成。
+本结论确定有一方获胜；TypeGameTransfer 已完成 5.15 从辅助博弈到原博弈的 II 策略转移。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive
