@@ -1,10 +1,11 @@
 import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyRow
+import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyPast
 import YesMetaZFC.SetTheory.LargeCardinal.IterationDiagramSyntax
 import YesMetaZFC.SetTheory.LargeCardinal.IterationStepSyntax
 
 /-! # 保留全部前驱和实际超幂的有限复制历史
 
-历史中的图列以原树序的初段为指标。模型行、全前驱秩段一致性、每个交换
+历史中的图列以原树序的初段为指标。模型行、全前驱秩段一致性、恒等段的相同历史行、每个交换
 方块及每条原扩展器的实际复制边均有原公式，供内部类依赖选择直接消费。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
@@ -81,7 +82,7 @@ structure Ic_history_d (ω T Q G E L n H S Q' G' : M.Domain) : Prop where
   rows : ∀ i r, Rd_entry_d i r H → ∃ c X A π z Z α, Ic_cell_d r X A π z Z α ∧
     Rd_entry_d i c Q ∧ Rd_entry_d i z Q' ∧ Ic_row_d hZF ω c X A π z Z α
   past : ∀ i j X A π z Z α Y B σ u U β, Ic_at_d H i X A π z Z α → Ic_at_d H j Y B σ u U β →
-    M.mem i j → ∃ ρ φ, Rd_entry_d i ρ L ∧ Pn_agree_d X A π Y B σ ρ φ ∧ Es_strength_d X ρ Y
+    M.mem i j → Ic_past_d L i j X A π Y B σ
   cuts : ∀ i j X A π z Z α Y B σ u U β g, Ic_at_d H i X A π z Z α → Ic_at_d H j Y B σ u U β →
     It_map_d G' i j g → Rd_entry_d A B g
   squares : ∀ i j X A π z Z α Y B σ u U β f g, Ic_at_d H i X A π z Z α → Ic_at_d H j Y B σ u U β →
@@ -91,6 +92,9 @@ structure Ic_history_d (ω T Q G E L n H S Q' G' : M.Domain) : Prop where
     M.SuccessorOf j i → It_pred_d T k j → Ic_at_d H i H₀ B σ u U β → Ic_at_d H k X A π z Z α →
     Ic_at_d H j P C τ v V γ → Rd_entry_d i p E → It_payload_d p κ ρ F → It_map_d G' k j f →
       Ic_edge_d hZF ω κ ρ F σ U Z z v f
+  pads : ∀ i j p, M.SuccessorOf j i → M.mem j n → Rd_entry_d i p E → (∀ x, ¬ M.mem x p) →
+    (∀ r, Rd_entry_d i r H ↔ Rd_entry_d j r H) ∧
+      ∀ f x y, It_map_d G' i j f → Rd_entry_d x y f → x = y
 
 def ic_history_m {d} (ω T Q G E L n H S Q' G' : Term d) : Formula 1 d := set[d] ⟪
   ⌜it_diagram_m⌝ₚ(⌜ω⌝ₛ, ⌜n⌝ₛ, ⌜S⌝ₛ, ⌜Q'⌝ₛ, ⌜G'⌝ₛ) ∧
@@ -100,7 +104,7 @@ def ic_history_m {d} (ω T Q G E L n H S Q' G' : Term d) : Formula 1 d := set[d]
     ⌜rd_entry0_m⌝ₚ(i, c, ⌜Q⌝ₛ) ∧ ⌜rd_entry0_m⌝ₚ(i, z, ⌜Q'⌝ₛ) ∧ ⌜ic_row_m⌝ₚ(⌜ω⌝ₛ, c, X, A, π, z, Z, α)) ∧
   (∀ i j X A π z Z α Y B σ u U β,
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, i, X, A, π, z, Z, α) → ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, j, Y, B, σ, u, U, β) → i ∈ j →
-    ∃ ρ φ, ⌜rd_entry0_m⌝ₚ(i, ρ, ⌜L⌝ₛ) ∧ ⌜pn_agree_m⌝ₚ(X, A, π, Y, B, σ, ρ, φ) ∧ ⌜es_strength0_m⌝ₚ(X, ρ, Y)) ∧
+    ⌜ic_past_m⌝ₚ(⌜L⌝ₛ, i, j, X, A, π, Y, B, σ)) ∧
   (∀ i j X A π z Z α Y B σ u U β g,
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, i, X, A, π, z, Z, α) → ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, j, Y, B, σ, u, U, β) →
     ⌜it_map_m⌝ₚ(⌜G'⌝ₛ, i, j, g) → ⌜rd_entry0_m⌝ₚ(A, B, g)) ∧
@@ -112,7 +116,10 @@ def ic_history_m {d} (ω T Q G E L n H S Q' G' : Term d) : Formula 1 d := set[d]
     ⌜KP.succ0_m⌝ₚ(j, i) → ⌜it_pred_m⌝ₚ(⌜T⌝ₛ, k, j) →
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, i, H₀, B, σ, u, U, β) → ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, k, X, A, π, z, Z, α) →
     ⌜ic_at_m⌝ₚ(⌜H⌝ₛ, j, P, C, τ, v, V, γ) → ⌜rd_entry0_m⌝ₚ(i, p, ⌜E⌝ₛ) → ⌜it_payload_m⌝ₚ(p, κ, ρ, F) →
-    ⌜it_map_m⌝ₚ(⌜G'⌝ₛ, k, j, f) → ⌜ic_edge_m⌝ₚ(⌜ω⌝ₛ, κ, ρ, F, σ, U, Z, z, v, f))⟫
+    ⌜it_map_m⌝ₚ(⌜G'⌝ₛ, k, j, f) → ⌜ic_edge_m⌝ₚ(⌜ω⌝ₛ, κ, ρ, F, σ, U, Z, z, v, f)) ∧
+  (∀ i j p, ⌜KP.succ0_m⌝ₚ(j, i) → j ∈ ⌜n⌝ₛ → ⌜rd_entry0_m⌝ₚ(i, p, ⌜E⌝ₛ) → (∀ x, ¬ x ∈ p) →
+    (∀ r, ⌜rd_entry0_m⌝ₚ(i, r, ⌜H⌝ₛ) ↔ ⌜rd_entry0_m⌝ₚ(j, r, ⌜H⌝ₛ)) ∧
+      (∀ f x y, ⌜it_map_m⌝ₚ(⌜G'⌝ₛ, i, j, f) → ⌜rd_entry0_m⌝ₚ(x, y, f) → x = y))⟫
 derive_free_closed ic_history_m
 
 theorem ic_history_sat_l {d} (η : Env M d) (ω T Q G E L n H S Q' G' : Term d) :
@@ -123,10 +130,11 @@ theorem ic_history_sat_l {d} (η : Env M d) (ω T Q G E L n H S Q' G' : Term d) 
     Formula.satisfies_exists_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff,
     Formula.satisfies_isFunction_iff I hZF.1, Formula.satisfies_isDomain_iff I, KP.succ0_sat_l hZF.1,
     rd_entry0_sat_l hZF.1, it_diagram_sat_l hZF, ic_cell_sat_l hZF.1, ic_row_sat_l hZF, ic_at_sat_l hZF.1,
-    pn_agree_sat_l (ZF.modelsKP hZF), es_strength0_sat_l, it_map_sat_l hZF.1, it_pred_sat_l hZF.1,
-    it_payload_sat_l hZF.1, ic_edge_sat_l hZF, Definitional.Term.eval_weaken]
-  exact ⟨fun ⟨a, b, c, d, e, f, g, h, i⟩ => ⟨a, b, c, d, e, f, g, h, i⟩,
-    fun h => ⟨h.diagram, h.order, h.function, h.domain, h.rows, h.past, h.cuts, h.squares, h.steps⟩⟩
+    it_map_sat_l hZF.1, it_pred_sat_l hZF.1,
+    it_payload_sat_l hZF.1, ic_edge_sat_l hZF, ic_past_sat_l (ZF.modelsKP hZF),
+    Formula.satisfies_neg_iff, Formula.satisfies_extensionalEq_iff_eq hZF.1, Definitional.Term.eval_weaken]
+  exact ⟨fun ⟨a, b, c, d, e, f, g, h, i, j⟩ => ⟨a, b, c, d, e, f, g, h, i, j⟩,
+    fun h => ⟨h.diagram, h.order, h.function, h.domain, h.rows, h.past, h.cuts, h.squares, h.steps, h.pads⟩⟩
 
 theorem Ic_history_d.row_l {ω T Q G E L n H S Q' G' i X A π z Z α : M.Domain}
     (h : Ic_history_d hZF ω T Q G E L n H S Q' G') (hi : Ic_at_d H i X A π z Z α) :

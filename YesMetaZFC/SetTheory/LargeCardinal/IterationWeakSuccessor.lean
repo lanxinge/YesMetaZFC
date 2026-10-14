@@ -27,7 +27,7 @@ theorem Wi_state_d.successor_l {ω α ξ T Q G a A S P θ c T₀ Q₀ G₀ E₀ 
   obtain ⟨π, hπ⟩ := (h.returns.domain ξ).mp hα.predecessor_mem
   have embed := h.returns.elementary ξ π c X R hπ hc mx.1
   obtain ⟨B, L, D, p, F, V, r, d, N, W, H, σ, branch, system, limit, mn, cone, ready, hs, projects, j, hj, square⟩ :=
-    it_nice_return_l hZFC nice mx (h.count ξ c X R hc mx.1.1) ho rank ma embed
+    it_pnice_return_l hZFC nice.toIt_pnice_d mx (h.count ξ c X R hc mx.1.1) ho rank ma embed
   have count := cone.countable_l hZFC hw nice.tree.diagram branch.subset
     (ZF.exists_inclusionInjection hZF I branch.subset) (it_countable_l hZF nice.tree mx.1 (h.count ξ c X R hc mx.1.1))
   have jj := cone.elementary o j c X R hj (nice.tree.root o ho) mx.1

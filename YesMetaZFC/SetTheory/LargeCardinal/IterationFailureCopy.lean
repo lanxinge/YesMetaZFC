@@ -15,15 +15,16 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem it_nice_failure_copy_l {ω c X R T Q G E L o θ A a S π : M.Domain}
-    (nice : It_nice_d hZF ω c ω T Q G E L) (mx : Smem_d I c X R)
+theorem it_pnice_failure_copy_l {ω c X R T Q G E L o θ A a S π : M.Domain}
+    (nice : It_pnice_d hZF ω c ω T Q G E L) (mx : Smem_d I c X R)
     (count : M.CardinalLessOrEqual I X ω) (ho : ∀ x, ¬ M.mem x o)
     (rank : V_d I θ A) (ma : Smem_d I a A S)
     (embed : Smap_d I ω c a X A π) (bad : ¬ It_return_d hZF ω o T Q G a A π) :
     ∃ δ Z z Rz Q' G' E' L' D N, M.IsRegularCardinal I δ ∧ M.mem ω δ ∧ V_d I δ Z ∧ Smem_d I z Z Rz ∧
-      It_nice_d hZF ω z ω T Q' G' E' L' ∧
+      It_pnice_d hZF ω z ω T Q' G' E' L' ∧
       (∀ i a Y S, Rd_entry_d i a Q' → Smem_d I a Y S → Sc_power_d Y) ∧ It_cut_d hZF ω ω Q' E' D N ∧
       (∀ β, Rd_entry_d o β D → M.IsRegularCardinal I β ∧ M.mem θ β) ∧
+      (∀ i p, Rd_entry_d i p E' → (∀ x, ¬ M.mem x p) → Rd_entry_d i p E) ∧
       ∀ k l g β γ, It_map_d G' k l g → M.mem k l → Rd_entry_d k β D → Rd_entry_d l γ D →
         ∃ ε, Rd_entry_d β ε g ∧ M.mem γ ε := by
   have hω := nice.tree.omega
@@ -55,11 +56,11 @@ theorem it_nice_failure_copy_l {ω c X R T Q G E L o θ A a S π : M.Domain}
   have relative : Vr_d Z θ A := ⟨B₀, F₀, hB₀, hF₀, fun t _ => cert t⟩
   obtain ⟨z, row⟩ := ic_initial_row_l hZFC source mx ma embed above hδ outer (owned 7) relative limit
   obtain ⟨H, Q', G', _, _, hist, _, start, _⟩ := row.copy_l hZFC nice ho
-  obtain ⟨E', L', D, N, copied, cut, root, drop⟩ := hist.rank_cut_l hZF nice en start ho ma space regular
+  obtain ⟨E', L', D, N, copied, cut, root, pads, drop⟩ := hist.rank_cut_l hZF nice en start ho ma space regular
     (owned 8) (owned 11) (owned 0) (owned 1) trans inj cover
     (owned 2) (owned 3) (owned 4) (owned 5) (owned 6) (owned 9) (owned 10)
   obtain ⟨_, _, Rz, _, _, _, _, _, _, mz, _⟩ := row
-  refine ⟨δ, Z, z, Rz, Q', G', E', L', D, N, hδ, above, outer, mz, copied, ?_, cut, root, drop⟩
+  refine ⟨δ, Z, z, Rz, Q', G', E', L', D, N, hδ, above, outer, mz, copied, ?_, cut, root, pads, drop⟩
   intro i a Y S ha my
   obtain ⟨_, _, _, _, a₀, Y₀, _, _, _, ha₀, row⟩ := hist.at_l hZF ((hist.diagram.model_domain i).mpr ⟨a, ha⟩)
   have eq := hist.diagram.model_function.2 i a₀ a ha₀ ha

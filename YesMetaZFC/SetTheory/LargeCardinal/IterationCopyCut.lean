@@ -34,7 +34,7 @@ local notation "J" => kp_pair_l (ZF.modelsKP hZF)
 
 theorem Ic_history_d.rank_cut_l {ω c T Q G E L H Q' G' U C ι o X₀ A₀ π₀ z₀ Z₀ α₀ a₀ S₀ B R F : M.Domain}
     (hist : Ic_history_d hZF ω T Q G E L ω H T Q' G')
-    (nice : It_nice_d hZF ω c ω T Q G E L) (en : Ja_enum_d J ω ω Q U)
+    (nice : It_pnice_d hZF ω c ω T Q G E L) (en : Ja_enum_d J ω ω Q U)
     (start : Ic_at_d H o X₀ A₀ π₀ z₀ Z₀ α₀) (ho : ∀ x, ¬ M.mem x o)
     (first : Smem_d J a₀ A₀ S₀) (space : Ja_space_d J ω T Q G U A₀ S₀ o π₀ B R)
     (rank : Rr_d J B R α₀ F) (hα : M.mem α₀ Z₀) (hF : M.mem F Z₀)
@@ -42,8 +42,9 @@ theorem Ic_history_d.rank_cut_l {ω c T Q G E L H Q' G' U C ι o X₀ A₀ π₀
     (cover : ∀ i a X R, Rd_entry_d i a Q → KPair_d M a X R → M.MemberSubset X C)
     (hT : M.mem T Z₀) (hQ : M.mem Q Z₀) (hG : M.mem G Z₀) (hU : M.mem U Z₀)
     (hπ : M.mem π₀ Z₀) (hB : M.mem B Z₀) (hR : M.mem R Z₀) :
-    ∃ E' L' D N, It_nice_d hZF ω z₀ ω T Q' G' E' L' ∧ It_cut_d hZF ω ω Q' E' D N ∧
+    ∃ E' L' D N, It_pnice_d hZF ω z₀ ω T Q' G' E' L' ∧ It_cut_d hZF ω ω Q' E' D N ∧
       (∀ δ, Rd_entry_d o δ D → M.IsRegularCardinal J δ ∧ M.mem α₀ δ) ∧
+      (∀ i p, Rd_entry_d i p E' → (∀ x, ¬ M.mem x p) → Rd_entry_d i p E) ∧
       ∀ k l g δ ε, It_map_d G' k l g → M.mem k l → Rd_entry_d k δ D → Rd_entry_d l ε D →
         ∃ γ, Rd_entry_d δ γ g ∧ M.mem ε γ := by
   obtain ⟨D, df, dom, values, heights, drop⟩ := hist.rank_l hZF nice.tree.diagram en start ho first space rank
@@ -92,7 +93,7 @@ theorem Ic_history_d.rank_cut_l {ω c T Q G E L H Q' G' U C ι o X₀ A₀ π₀
     (fun i _ a b ha hb => unique i a b ((read i a).mp ha) ((read i b).mp hb))
     (fun i a hi ha => (vs a).mpr ⟨i, hi, ha⟩)
   have cut i a (ha : Rd_entry_d i a N) := (read i a).mp ((ns i a).mp ha).2
-  refine ⟨E', L', D, N, copied, ⟨df, dom, nf.1, nf.2.1, ?_, ?_⟩, ?_, drop⟩
+  refine ⟨E', L', D, N, copied, ⟨df, dom, nf.1, nf.2.1, ?_, ?_, ?_⟩, ?_, ?_, drop⟩
   · intro i z a δ Z R hz ha hd mz
     obtain ⟨X, A, π, z₁, Z₁, α, δ₁, V, S, here, hd₁, ma, hV, rv, hw, _⟩ := cut i a ha
     obtain ⟨_, _, hz₁, row⟩ := hist.row_l hZF here
@@ -105,7 +106,7 @@ theorem Ic_history_d.rank_cut_l {ω c T Q G E L H Q' G' U C ι o X₀ A₀ π₀
     subst δ₁
     exact ⟨V, S, ma, hV, rv, (heights i X A π z Z α δ here hd).2.2.1, hw⟩
   · intro i p κ ρ F a V S hp pay ha ma
-    obtain ⟨X, A, π, z, Z, α, p₀, κ₀, ρ₀, F₀, κ₁, ρ₁, F₁, here, _, _, _, hρ, hF, pay₁⟩ := (moves i p).mp hp
+    obtain ⟨X, A, π, z, Z, α, p₀, κ₀, ρ₀, F₀, κ₁, ρ₁, F₁, here, _, _, _, hρ, hF, pay₁⟩ := ((moves i p).mp hp).active_l pay
     obtain ⟨e₁, e₂, e₃⟩ := pay₁.unique_l pay
     subst κ₁ ρ₁ F₁
     obtain ⟨X₁, A₁, π₁, z₁, Z₁, α₁, _, V₁, _, here₁, _, ma₁, _, _, _, sub⟩ := cut i a ha
@@ -116,9 +117,29 @@ theorem Ic_history_d.rank_cut_l {ω c T Q G E L H Q' G' U C ι o X₀ A₀ π₀
     obtain ⟨_, _, _, row⟩ := hist.row_l hZF here
     obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, pi⟩ := row
     exact ⟨sub ρ (pi.1.1.output_mem_of_pairMember hρ), sub F (pi.1.1.output_mem_of_pairMember hF)⟩
+  · intro i j p κ ρ F a V S succ hp pay ha ma
+    obtain ⟨X, A, π, z, Z, α, p₀, κ₀, ρ₀, F₀, κ₁, ρ₁, F₁, ai, hp₀, pay₀, _, hρ, _, pay₁⟩ := ((moves i p).mp hp).active_l pay
+    have eq := (pay₁.unique_l pay).2.1
+    subst ρ₁
+    obtain ⟨Y, B, σ, u, U, β, _, V₁, _, aj, _, ma₁, _, _, _, sub⟩ := cut j a ha
+    obtain ⟨eq, _⟩ := smdl_unique_l J ma₁.1 ma.1
+    subst V₁
+    obtain ⟨φ, same, _⟩ := (hist.past i j X A π z Z α Y B σ u U β ai aj succ.predecessor_mem).active_l
+      (ZF.modelsKP hZF) nice.function ((nice.levels i ρ₀).mpr ⟨p₀, κ₀, F₀, hp₀, pay₀⟩)
+    obtain ⟨_, _, _, row⟩ := hist.row_l hZF ai
+    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, ep⟩ := row
+    have eq := ep.1.1.1.2 ρ₀ φ ρ same.left_end hρ
+    subst φ
+    obtain ⟨_, _, _, row'⟩ := hist.row_l hZF aj
+    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, es⟩ := row'
+    exact sub ρ (es.1.1.output_mem_of_pairMember same.right_end)
   · intro δ hd
     obtain ⟨_, _, _, _, _, _, g, F', _, s, _, hg, ff, _, _, value⟩ := (values o δ).mp hd
     have eq := hist.diagram.identity o g hg F F' ff
     exact rank.regular s δ (eq.symm ▸ value)
+  · intro i p hp empty
+    rcases (moves i p).mp hp with ⟨hp, _⟩ | ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, r, ⟨u, v, _, _, pair⟩, _⟩
+    · exact hp
+    · exact (empty u ((pair u).mpr (Or.inl rfl))).elim
 
 end YesMetaZFC.SetTheory.LargeCardinal

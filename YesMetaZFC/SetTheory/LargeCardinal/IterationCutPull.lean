@@ -38,7 +38,7 @@ theorem it_cut_pull_l {ω B R b K U S u J C V π T Q Q' G' E E' A A' D D' : M.Do
     obtain ⟨rfl, rfl⟩ := smdl_unique_l I mx₀.1 mx.1
     exact ⟨a', Y, W, ha', my, hXY⟩
   refine ⟨(fn0_function_l (ZF.modelsKP hZF) af).1, (fn0_function_l (ZF.modelsKP hZF) af).2.1,
-    (fn0_function_l (ZF.modelsKP hZF) df).1, (fn0_function_l (ZF.modelsKP hZF) df).2.1, ?_, ?_⟩
+    (fn0_function_l (ZF.modelsKP hZF) df).1, (fn0_function_l (ZF.modelsKP hZF) df).2.1, ?_, ?_, ?_⟩
   · intro i q a β X P hq ha hβ mx
     have hi := (af.bound_l hβ).1
     obtain ⟨q', hq', hqq⟩ := image hQ hQQ hi hq
@@ -73,6 +73,22 @@ theorem it_cut_pull_l {ω B R b K U S u J C V π T Q Q' G' E E' A A' D D' : M.Do
       (hj.kpair_l hZF hw sb.transitive su.transitive mb mu hr hρ hF).mp rf⟩
     have h := cuts.contains i p' κ' ρ' F' a' Y W hp' pay' ha' my
     exact ⟨(hj.member_l I hZF hw mb mu hρ hXY).mpr h.1, (hj.member_l I hZF hw mb mu hF hXY).mpr h.2⟩
+  · intro i j p κ ρ F a X P succ hp pay ha mx
+    have hi := hw.transitive hZF j (df.bound_l ha).1 i succ.predecessor_mem
+    obtain ⟨p', hp', hpp⟩ := image hE hEE hi hp
+    obtain ⟨a', Y, W, ha', my, hXY⟩ := code ha mx
+    obtain ⟨r, pr, rf⟩ := pay
+    have own := pr.mem_l M ct (rd_entry_transitive_l ct hE hp).2
+    have own' := rf.mem_l M ct own.2
+    obtain ⟨κ', _, hκ⟩ := hj.1.1.2.2 κ (cb κ own.1)
+    obtain ⟨r', _, hr⟩ := hj.1.1.2.2 r (cb r own.2)
+    obtain ⟨ρ', _, hρ⟩ := hj.1.1.2.2 ρ (cb ρ own'.1)
+    obtain ⟨F', _, hF⟩ := hj.1.1.2.2 F (cb F own'.2)
+    have pay' : It_payload_d p' κ' ρ' F' := ⟨r',
+      (hj.kpair_l hZF hw sb.transitive su.transitive mb mu hpp hκ hr).mp pr,
+      (hj.kpair_l hZF hw sb.transitive su.transitive mb mu hr hρ hF).mp rf⟩
+    have h := cuts.next i j p' κ' ρ' F' a' Y W succ hp' pay' ha' my
+    exact (hj.member_l I hZF hw mb mu hρ hXY).mpr h
 
 /-- 下降值属于给定边图所在的传递模型，故原存在见证也可回拉。 -/
 theorem it_drop_pull_l {ω B R b U S u π G G' A A' : M.Domain}

@@ -35,6 +35,7 @@ structure Tg_run_d (ω c₀ o Cᵣ γ Z A : M.Domain) (v : Fin 18 → M.Domain) 
   events : Tg_past_events_d ω (v 13) (v 5) (u 4) (u 1) (u 2) (u 20)
   below : M.mem (v 14) (u 24)
   bounds : ∀ i ν, Rd_entry_d i ν (v 12) → M.mem ν (v 14) ∨ ν = v 14
+  span : M.mem (u 19) (v 6)
 
 theorem Tg_run_d.read_l {ω c₀ o Cᵣ γ Z A : M.Domain} {v : Fin 18 → M.Domain} {u : Fin 46 → M.Domain}
     (h : Tg_run_d hZF ω c₀ o Cᵣ γ Z A v u) (nc : Nonempty {x // M.mem x (v 5)}) :
@@ -51,7 +52,7 @@ def Tg_run_next_d (ω c₀ : M.Domain) (v : Fin 18 → M.Domain) (u : Fin 46 →
     It_extension_d β (v 6) (v 7) T Q G E (w 6) (w 8) (w 9) (w 10) (w 11) ∧
     w 7 = β ∧ M.SuccessorOf (t 19) (u 19) ∧ It_map_d (w 10) (v 7) (w 7) j ∧
     (∀ i : Fin 19, Rd_entry_d (u (i.castAdd 27)) (t (i.castAdd 27)) j) ∧
-    Rd_entry_d (u 20) h j ∧ M.MemberSubset h (t 20) ∧ M.MemberSubset (v 13) (w 13) ∧
+    Rd_entry_d (u 20) h j ∧ M.MemberSubset h (t 20) ∧ h ≠ t 20 ∧ M.MemberSubset (v 13) (w 13) ∧
     ∃ Y R μ K η C L V q S n g, Tg_past_at_d (w 13) (u 19) (v 6) Y R μ K η C L V q ∧
       Tg_saved_branch_d ω V q S n g ∧ Tg_odd_d ω (v 13) (v 7) (v 6) k G (u 1) (u 23) (u 22) S n g
 

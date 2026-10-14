@@ -150,7 +150,7 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   obtain ⟨_, t₀, _, _, _, _, _, advance⟩ := answer
   have xC : M.mem x C₂ := ft.transitive _ (θ.bound 6).property x (eA.symm ▸ hx)
   have hxθ : M.mem x (θ.bound 6).val := eA.symm ▸ hx
-  obtain ⟨_, t, _, m, _, _, _, _, next, _, ε, head, num, legal, _, _, growth, keep, trace⟩ :=
+  obtain ⟨_, t, _, m, _, _, _, _, next, _, ε, head, num, legal, _, _, growth, keep, proper, trace⟩ :=
     advance ⟨x, xC⟩ hxθ
   have control (i : Fin 19) : ε.bound (i.castAdd 27) = θ.bound (i.castAdd 27) :=
     (head i).trans (by simp only [tg_position_env_d, Fin.addCases_left])
@@ -180,12 +180,18 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
     have old : Rd_entry_d a b (v 13) := ⟨p, pair, hp⟩
     obtain ⟨r, rp, hr⟩ := (entries a b ((h.past.sequence.2.2 a).mpr ⟨b, old⟩)).mpr old
     exact kpair_unique_l M hZF.1 rp pair ▸ hr
+  have span : M.mem (ε.bound 19).val β₂ := ordinal_down_l (ZF.modelsKP hZF)
+    (KP.successor_isOrdinal (ZF.modelsKP hZF) (h.source.source.omega.members_areOrdinals hZF _ hn) sm)
+    nice₂.tree.diagram.order.ordinal (fun z hz => ((sm z).mp hz).elim
+      (h.tree.tree.diagram.order.ordinal.transitive _ h.span z)
+      (fun eq => (hZF.1.eq_of_same_members z _ eq).symm ▸ h.span))
+    (nice₂.tree.diagram.order.ordinal.transitive β ext₂.1.predecessor_mem _ ext₁.1.predecessor_mem)
   refine ⟨w, (fun i => (ε.bound i).val), ⟨sn, cn, succω (succω h.finite h.successor) ext₁.1,
     ext₂.1, nice₂, node₂, mn, root₂, image₂, anchor₂, record, values,
     (congrArg Subtype.val (control 0)).trans ωθ, (congrArg Subtype.val (control 6)).trans eA,
-    fun z hz => κlimit.1.transitive κ growing z (highκ z hz), em.symm ▸ past, links, roots, events, growing, heights⟩,
+    fun z hz => κlimit.1.transitive κ growing z (highκ z hz), em.symm ▸ past, links, roots, events, growing, heights, span⟩,
     k, β, T₁, Q₁, G₁, E₁, H₁, j, (θ.bound 20).val, nice₁, ext₁, ext₂, rfl, sm, edge,
-    images', images 20, keep, historyKeep, Y, R, μ, K, η₁, C₁, L, W, q,
+    images', images 20, keep, proper, historyKeep, Y, R, μ, K, η₁, C₁, L, W, q,
     (ρ.bound 19).val, (ρ.bound 22).val, (ρ.bound 42).val, newest, ⟨_, code, rfl, rfl, rfl⟩, odd⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

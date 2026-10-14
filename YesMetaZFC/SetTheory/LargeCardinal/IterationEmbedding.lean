@@ -44,11 +44,14 @@ theorem it_embedding_factor_l {ω α T Q G B L A p H R q c C V d Y W P : M.Domai
   exact ⟨e, he, fun a i x f z y hp hf hz hy => law a z y hz
     ((rs a y).mpr ⟨(limit.projection.bound_l hz).1, i, x, f, hp, hf, hy⟩)⟩
 
-def It_return_d (ω z T Q G d Y π : M.Domain) : Prop := ∃ B L A p H R r c N V P σ,
+def It_return_at_d (ω z T Q G d Y π B : M.Domain) : Prop := ∃ L A p H R r c N V P σ,
   It_branch_d ω T B ∧ It_system_d B L Q G A p H R ∧ Di_limit_d A p H R r N V ∧
     Smem_d I c N V ∧ It_cone_d hZF ω B Q G c N V P ∧ It_source_d hZF ω c ∧
     Smap_d I ω c d N Y σ ∧ (∀ i f, Rd_entry_d i f P ↔ M.mem i B ∧ It_project_d r i f) ∧
     ∃ j, Rd_entry_d z j P ∧ It_comp_d j σ π
+
+/-- 不指定分支的返回存在性。 -/
+def It_return_d (ω z T Q G d Y π : M.Domain) : Prop := ∃ B, It_return_at_d hZF ω z T Q G d Y π B
 
 /-- 任意长度的相容初等列都有实际传递极限，返回因子与每一条腿交换。 -/
 theorem it_embedding_limit_l {ω α T Q G B z c₀ d Y W P : M.Domain}

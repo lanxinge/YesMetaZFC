@@ -21,7 +21,8 @@ def tg_run_next_m {d} (ω c₀ : Term d) (v w : Fin 18 → Term d) (u t : Fin 46
      ⌜rd_entry0_m⌝ₚ(⌜u 12⌝ₛ, ⌜t 12⌝ₛ, j) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 13⌝ₛ, ⌜t 13⌝ₛ, j) ∧
      ⌜rd_entry0_m⌝ₚ(⌜u 14⌝ₛ, ⌜t 14⌝ₛ, j) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 15⌝ₛ, ⌜t 15⌝ₛ, j) ∧
      ⌜rd_entry0_m⌝ₚ(⌜u 16⌝ₛ, ⌜t 16⌝ₛ, j) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 17⌝ₛ, ⌜t 17⌝ₛ, j) ∧
-     ⌜rd_entry0_m⌝ₚ(⌜u 18⌝ₛ, ⌜t 18⌝ₛ, j)) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 20⌝ₛ, h, j) ∧ h ⊆ ⌜t 20⌝ₛ ∧ ⌜v 13⌝ₛ ⊆ ⌜w 13⌝ₛ ∧
+     ⌜rd_entry0_m⌝ₚ(⌜u 18⌝ₛ, ⌜t 18⌝ₛ, j)) ∧ ⌜rd_entry0_m⌝ₚ(⌜u 20⌝ₛ, h, j) ∧ h ⊆ ⌜t 20⌝ₛ ∧
+    ¬ (h = ⌜t 20⌝ₛ) ∧ ⌜v 13⌝ₛ ⊆ ⌜w 13⌝ₛ ∧
     (∃ Y R μ K η C L V q S n g, ⌜tg_past_at_m⌝ₚ(⌜w 13⌝ₛ, ⌜u 19⌝ₛ, ⌜v 6⌝ₛ, Y, R, μ, K, η, C, L, V, q) ∧
       ⌜tg_saved_branch_m⌝ₚ(⌜ω⌝ₛ, V, q, S, n, g) ∧
       ⌜tg_odd_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 7⌝ₛ, ⌜v 6⌝ₛ, k, G, ⌜u 1⌝ₛ, ⌜u 23⌝ₛ, ⌜u 22⌝ₛ, S, n, g))⟫
@@ -38,7 +39,7 @@ theorem tg_run_next_sat_l {d} (η : Env M d) (ω c₀ : Term d) (v w : Fin 18 �
   simp only [tg_run_next_m, Tg_run_next_d, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     it_pnice_sat_l hZF, it_extension_sat_l hZF.1, Formula.satisfies_extensionalEq_iff_eq hZF.1,
     KP.succ0_sat_l hZF.1, it_map_sat_l hZF.1, rd_entry0_sat_l hZF.1, Formula.satisfies_subset_iff, tg_past_at_sat_l hZF.1,
-    tg_saved_branch_sat_l hZF.1, tg_odd_sat_l hZF.1,
+    tg_saved_branch_sat_l hZF.1, tg_odd_sat_l hZF.1, Formula.satisfies_neg_iff,
     Definitional.Term.eval_weaken, Definitional.Term.eval_newest, Fin.forall_fin_succ, Fin.forall_fin_zero, and_true]
   rfl
 
@@ -55,6 +56,15 @@ def tg_run_edge0_m : Formula 1 4 := rt_exists_m 128
         (fun i => .bound ((Fin.natAdd 64 (i.castAdd 46)).castAdd 4))
         (fun i => .bound (((Fin.natAdd 18 i).castAdd 64).castAdd 4))
         (fun i => .bound ((Fin.natAdd 64 (Fin.natAdd 18 i)).castAdd 4)))))
+
+theorem Tg_run_edge_d.read_l {ω c s t : M.Domain} {v w : Fin 64 → M.Domain}
+    (edge : Tg_run_edge_d hZF ω c s t) (ps : Rt_tuple_d v s) (pt : Rt_tuple_d w t) :
+    Tg_run_next_d hZF ω c (fun i => v (i.castAdd 46)) (fun i => v (Fin.natAdd 18 i))
+      (fun i => w (i.castAdd 46)) (fun i => w (Fin.natAdd 18 i)) := by
+  obtain ⟨q, ps', pt', step⟩ := edge
+  have ev := rt_tuple_inj_l ps' ps
+  have ew := rt_tuple_inj_l pt' pt
+  exact ev ▸ ew ▸ step
 
 theorem tg_run_edge0_closed_l : tg_run_edge0_m.FreeClosed := by
   apply (rt_exists_closed_l _).mpr

@@ -29,7 +29,7 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 下降模型、嵌入行和全部内部有限历史均有一阶编码；`pn_initial_row_l` 从可数
 传递域的给定初等图自动回收模型内图和可数编号。`pn_history_extend_l` 从原树
 及实际正则秩段列延伸每段历史，保持所有前驱的一致性及缺失子集。
-`it_nice_no_drop_l` 用内部依赖选择构造 ω 历史列，再由基础公理排除末模型下降。
+`it_pnice_no_drop_l` 在恒等段保持同一秩段，对全部有限历史先取末模型、再取原高度的隶属极小值，排除连续下降。
 `ja_failure_l` 从返回嵌入的失败实际构造联合尝试关系及正则基数值下降秩。
 尝试链解码得到共尾枝、完整初等腿和实际传递直接极限，根复合式精确保留。
 `Ic_model_d` 编码可数闭工作模型，正规秩层提供实际初值；`rank_apply_l` 将拥有
@@ -41,11 +41,11 @@ import YesMetaZFC.Model.SetTheory.Internal.SourceRankSizeInitial
 `it_countable_fixed_l` 固定原树序、模型列、嵌入列及枚举列；`Ic_history_d.rank_l`
 构造定义域恰为内部 ω 的移位高度列，在每条严格树边上证明新高度小于旧高度的像。
 高度在所属模型内正则；`rank_cut_l` 构造包含同一扩展器与支撑的实际秩段列。
-`it_nice_failure_copy_l` 从可数 nice 树的返回失败自动装配正规根上的完整下降反例。
+`it_pnice_failure_copy_l` 从可数 nice 树的返回失败自动装配正规根上的完整下降反例。
 `it_ultra_read_l` 从传递有限闭源中的相对超幂证书恢复原指定超幂边；有限幂、商类、
 直接极限、常值图、坍塌和复合图全部保留，完整初等性由原 Łoś 定理重新证明。
 `rank_read_source_l` 为任意包含 ω 的拥有极限秩段提供读取闭性，不要求高度正则。
-`it_nice_return_l` 对整棵反例取有限反射层与可数壳，恢复原 nice 树和实际下降秩段，
+`it_pnice_return_l` 对整棵反例取有限反射层与可数壳，恢复原 nice 树和实际下降秩段，
 由原正则根构造 Pₙ 初始行，最后调用下降反证。因而任意可数 nice ω 树的给定
 根嵌入都沿某条共尾良基枝返回原 Vθ，根复合式精确保留，无需额外高度假设。
 `it_nice_weakly_iterable_l` 自动构造实际 ω₁ 及公开枝策略。后继应答使用原 nice 树返回定理，

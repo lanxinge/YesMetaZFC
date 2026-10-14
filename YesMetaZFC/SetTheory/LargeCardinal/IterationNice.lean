@@ -20,6 +20,18 @@ theorem It_payload_d.unique_l {p κ L F κ' L' F' : M.Domain}
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M hp gp
   exact ⟨rfl, kpair_injective_l M hr gs⟩
 
+/-- 每个已有操作只有原树定义中的空操作或真实扩展器两种情形。 -/
+theorem It_tree_d.move_cases_l {ω c α T Q G E i p : M.Domain}
+    (tree : It_tree_d hZF ω c α T Q G E) (hp : Rd_entry_d i p E) :
+    (∀ x, ¬ M.mem x p) ∨ ∃ κ ρ F, It_payload_d p κ ρ F := by
+  obtain ⟨j, hj, succ⟩ := (tree.move_domain i).mp ⟨p, hp⟩
+  obtain ⟨_, _, _, _, _, q, _, _, _, _, _, hq, step⟩ := tree.steps i j hj succ
+  have eq := tree.move_function.2 i q p hq hp
+  subst q
+  rcases step with ⟨empty, _⟩ | ⟨κ, ρ, F, _, _, _, _, pay, _⟩
+  · exact Or.inl empty
+  · exact Or.inr ⟨κ, ρ, F, pay⟩
+
 /-- 支撑列只记录实际扩展器；恒等 padding 不添加虚假的支撑。 -/
 structure It_pnice_d (ω c α T Q G E L : M.Domain) : Prop where
   tree : It_tree_d hZF ω c α T Q G E
@@ -50,8 +62,8 @@ theorem It_pnice_d.last_bound_l {ω c β α ξ T Q G E H L : M.Domain}
     exact Or.inr (h.function.2 ξ μ L (eq ▸ hi) last)
 
 /-- 原树步中的 padding 与非空扩展器码矛盾，故读取的是同一条实际超幂边。 -/
-theorem It_nice_d.step_l {ω c₀ α T Q G E L i j : M.Domain}
-    (h : It_nice_d hZF ω c₀ α T Q G E L) (hj : M.mem j α) (succ : M.SuccessorOf j i) :
+theorem It_pnice_d.step_l {ω c₀ α T Q G E L i j : M.Domain}
+    (h : It_pnice_d hZF ω c₀ α T Q G E L) (hj : M.mem j α) (succ : M.SuccessorOf j i) (active : ∃ ρ, Rd_entry_d i ρ L) :
     ∃ k c d b f p κ ρ F X R Y S,
       It_pred_d T k j ∧ Rd_entry_d i c Q ∧ Rd_entry_d k d Q ∧ Rd_entry_d j b Q ∧ It_map_d G k j f ∧
       Rd_entry_d i p E ∧ It_payload_d p κ ρ F ∧ Smem_d I c X R ∧ Smem_d I d Y S ∧
@@ -59,11 +71,26 @@ theorem It_nice_d.step_l {ω c₀ α T Q G E L i j : M.Domain}
       Ex_strength_d hZF ω κ ρ X F ∧ Sc_inaccessible_d ω X ρ ∧ Rd_entry_d i ρ L := by
   obtain ⟨k, c, d, b, f, p, pred, hc, hd, hb, hf, hp, step⟩ := h.tree.steps i j hj succ
   rcases step with ⟨empty, _⟩ | ⟨κ, ρ, F, X, R, Y, S, payload, mx, my, loc, agree, ultra⟩
-  · obtain ⟨_, _, _, r, ⟨u, v, _, _, pair⟩, _⟩ := h.active i p hp
+  · obtain ⟨ρ, hl⟩ := active
+    obtain ⟨q, κ, F, hq, pay⟩ := (h.levels i ρ).mp hl
+    have eq := h.tree.move_function.2 i q p hq hp
+    obtain ⟨r, ⟨u, v, _, _, pair⟩, _⟩ := eq ▸ pay
     exact (empty u ((pair u).mpr (Or.inl rfl))).elim
   · obtain ⟨strength, inaccessible⟩ := h.exactness i p κ ρ F c X R hp payload hc mx
     exact ⟨k, c, d, b, f, p, κ, ρ, F, X, R, Y, S, pred, hc, hd, hb, hf, hp, payload, mx, my,
       loc, agree, ultra, strength, inaccessible, (h.levels i ρ).mpr ⟨p, κ, F, hp, payload⟩⟩
+
+/-- 原树步中的 padding 与非空扩展器码矛盾，故读取的是同一条实际超幂边。 -/
+theorem It_nice_d.step_l {ω c₀ α T Q G E L i j : M.Domain}
+    (h : It_nice_d hZF ω c₀ α T Q G E L) (hj : M.mem j α) (succ : M.SuccessorOf j i) :
+    ∃ k c d b f p κ ρ F X R Y S,
+      It_pred_d T k j ∧ Rd_entry_d i c Q ∧ Rd_entry_d k d Q ∧ Rd_entry_d j b Q ∧ It_map_d G k j f ∧
+      Rd_entry_d i p E ∧ It_payload_d p κ ρ F ∧ Smem_d I c X R ∧ Smem_d I d Y S ∧
+      It_local_d ω X κ ρ F ∧ Ea_agree_d ω κ X Y ∧ It_ultra_d hZF ω κ ρ F d b f ∧
+      Ex_strength_d hZF ω κ ρ X F ∧ Sc_inaccessible_d ω X ρ ∧ Rd_entry_d i ρ L := by
+  obtain ⟨p, hp⟩ := (h.tree.move_domain i).mpr ⟨j, hj, succ⟩
+  obtain ⟨κ, ρ, F, pay⟩ := h.active i p hp
+  exact h.toIt_pnice_d.step_l hZF hj succ ⟨ρ, (h.levels i ρ).mpr ⟨p, κ, F, hp, pay⟩⟩
 
 theorem it_nice_root_l {ω c : M.Domain} (source : It_source_d hZF ω c) :
     ∃ z α T Q G, (∀ x, ¬ M.mem x z) ∧ M.SuccessorOf α z ∧ It_nice_d hZF ω c α T Q G z z := by

@@ -65,6 +65,7 @@ theorem Tg_context_d.answer_history_l {Y S μ' K' η' D B T r c d π σ C₀ γ 
             (fseq_end_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3)) ∧
           (rt_model_l D nd).mem (θ.bound 24) (ε.bound 24) ∧
           M.MemberSubset (θ.bound 20).val (ε.bound 20).val ∧
+          (θ.bound 20).val ≠ (ε.bound 20).val ∧
           Tg_trace_d ω D (θ.bound 4).val (θ.bound 1).val (θ.bound 2).val (θ.bound 19).val
             (ε.bound 20).val (θ.bound 23).val (p 15) (p 11) := by
   have fs := (current.read_l hZF source).1
@@ -164,8 +165,15 @@ theorem Tg_context_d.answer_history_l {Y S μ' K' η' D B T r c d π σ C₀ γ 
     fun s hs => keep ⟨s, fs.transitive t.val t.property s hs⟩ hs
   have keepM' : M.MemberSubset (θ.bound 20).val (ε.bound 20).val :=
     fun s hs => keep' ⟨s, fs.transitive _ (θ.bound 20).property s hs⟩ hs
+  have proper : (θ.bound 20).val ≠ (ε.bound 20).val := by
+    intro eq
+    obtain ⟨_, m, d⟩ := endt
+    obtain ⟨r, pair, hr⟩ := d.last_value
+    have eq : ε.bound 20 = θ.bound 20 := Subtype.ext eq.symm
+    exact KP.mem_irrefl_d (ZF.modelsKP hZF) m.val
+      ((d.prefix_sequence.2.2.2 m).mpr ⟨v, r, pair, eq ▸ keep r hr⟩)
   exact ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε, head, num, issued', value, aux,
-    tg_issued_growth_l J ext θ ε issued issued' same' succ' keep', keepM',
+    tg_issued_growth_l J ext θ ε issued issued' same' succ' keep', keepM', proper,
     traced.mono_l hZF fs.transitive nd J (θ.bound 4) (θ.bound 1) (θ.bound 2) t (ε.bound 20) keepM⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

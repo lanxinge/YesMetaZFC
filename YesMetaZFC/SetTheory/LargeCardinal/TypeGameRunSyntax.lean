@@ -19,7 +19,8 @@ def tg_run_m {d} (ω c₀ o C γ Z A : Term d) (v : Fin 18 → Term d) (u : Fin 
   ⌜tg_past_m⌝ₚ(⌜ω⌝ₛ, ⌜u 19⌝ₛ, ⌜v 13⌝ₛ, ⌜v 0⌝ₛ, ⌜v 14⌝ₛ) ∧ ⌜tg_past_links_m⌝ₚ(⌜v 13⌝ₛ, ⌜v 9⌝ₛ) ∧
   ⌜tg_past_roots_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 10⌝ₛ, ⌜o⌝ₛ, ⌜C⌝ₛ, ⌜γ⌝ₛ, ⌜Z⌝ₛ) ∧
   ⌜tg_past_events_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 5⌝ₛ, ⌜u 4⌝ₛ, ⌜u 1⌝ₛ, ⌜u 2⌝ₛ, ⌜u 20⌝ₛ) ∧
-  ⌜v 14⌝ₛ ∈ ⌜u 24⌝ₛ ∧ (∀ i ν, ⌜rd_entry0_m⌝ₚ(i, ν, ⌜v 12⌝ₛ) → ν ∈ ⌜v 14⌝ₛ ∨ ν = ⌜v 14⌝ₛ)⟫
+  ⌜v 14⌝ₛ ∈ ⌜u 24⌝ₛ ∧ (∀ i ν, ⌜rd_entry0_m⌝ₚ(i, ν, ⌜v 12⌝ₛ) → ν ∈ ⌜v 14⌝ₛ ∨ ν = ⌜v 14⌝ₛ) ∧
+  ⌜u 19⌝ₛ ∈ ⌜v 6⌝ₛ⟫
 
 @[simp] theorem tg_run_closed_l {d} (ω c₀ o C γ Z A : Term d) (v : Fin 18 → Term d) (u : Fin 46 → Term d)
     (hw : ω.freeSupport = []) (hc : c₀.freeSupport = []) (ho : o.freeSupport = []) (hC : C.freeSupport = [])
@@ -39,9 +40,9 @@ theorem tg_run_sat_l {d} (η : Env M d) (ω c₀ o C γ Z A : Term d) (v : Fin 1
     tg_past_sat_l hZF, tg_past_links_sat_l I hZF.1, tg_past_roots_sat_l (ZF.modelsKP hZF),
     tg_past_events_sat_l hZF.1, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
     Formula.satisfies_disj_iff, Definitional.Term.eval_weaken]
-  exact ⟨fun ⟨a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u⟩ => ⟨a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u⟩,
+  exact ⟨fun ⟨a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v⟩ => ⟨a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v⟩,
     fun h => ⟨h.source,h.context,h.finite,h.successor,h.tree,h.node,h.model,h.root,h.image,h.anchor,
-      h.record,h.values,h.omega,h.alphabet,h.lower,h.past,h.links,h.roots,h.events,h.below,h.bounds⟩⟩
+      h.record,h.values,h.omega,h.alphabet,h.lower,h.past,h.links,h.roots,h.events,h.below,h.bounds,h.span⟩⟩
 
 def Tg_run_code_d (ω c₀ o C γ Z A n s : M.Domain) : Prop := ∃ q : Fin 64 → M.Domain,
   Rt_tuple_d q s ∧ Tg_run_d hZF ω c₀ o C γ Z A (fun i => q (i.castAdd 46)) (fun i => q (Fin.natAdd 18 i)) ∧ q 37 = n

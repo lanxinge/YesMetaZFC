@@ -74,6 +74,13 @@ def It_wf_branch_d (hZF : M.Models ZF) (ω α T Q G B : M.Domain) : Prop := It_b
     It_system_d B L Q G A p H R ∧ Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω L A p H R ∧
     Di_limit_d A p H R q C V ∧ Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ Wf_rel_d C V
 
+/-- 实际非良基极限的证书保留原带标号系统、投影及商模型。 -/
+def It_ill_branch_d (hZF : M.Models ZF) (ω α T Q G B : M.Domain) : Prop := It_branch_d α T B ∧
+  ∃ L A p H R q c C V,
+    (∀ i j, Rd_entry_d i j L ↔ M.mem i B ∧ M.mem j B ∧ Rd_entry_d i j T) ∧
+    It_system_d B L Q G A p H R ∧ Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω L A p H R ∧
+    Di_limit_d A p H R q C V ∧ Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V ∧ ¬ Wf_rel_d C V
+
 theorem it_sigma_branch_l (hZF : M.Models ZF) {ω α κ T Q G B : M.Domain}
     (hω : M.IsOmega ω) (h : It_diagram_d hZF ω α T Q G) (b : It_branch_d α T B)
     (hκ : M.IsCofinality (kp_pair_l (ZF.modelsKP hZF)) κ α) (hωκ : M.mem ω κ)

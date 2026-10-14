@@ -1,4 +1,10 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunNext
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunUnion
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameEvenBranch
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameEvenLimit
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameOddBranch
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameOddLimit
+import YesMetaZFC.SetTheory.LargeCardinal.IterationHullReturn
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRunAdvance
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTreeStep
 import YesMetaZFC.Model.SetTheory.ClassChoice
@@ -7,6 +13,8 @@ import YesMetaZFC.Model.SetTheory.ClassChoice
 
 原策略给出首轮，已证明的完整后继同时处理重置和继续。类依赖选择对这条
 原一阶关系收集整列模型、树和历史，不预设统一秩界，也不假定外部 ω 标准。
+有限树的并与共尾偶数分支自动装配；回拉实际下降见证后，得到不再重置的
+奇数尾枝，并在同一返回极限中装配各轮有限图及相邻图的严格扩张。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive
@@ -45,15 +53,25 @@ theorem tg_run_index_sat_l (h : M.Models ZF) {d} (η : Env M d) (ω c₀ o C γ 
   simp only [tg_run_index_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     KP.succ0_sat_l h.1, tg_run_code_sat_l h, Definitional.Term.eval_weaken, Definitional.Term.eval_newest]
 
-/-- 从原 II 获胜策略出发，统一构造所有内部有限轮，并保留每次真实的两边扩张。 -/
+/-- 原 II 策略构造实际 ω 树、偶数不良基枝及保留全部历史的奇数共尾返回。 -/
 theorem Tg_game_d.history_sequence_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ B₀ W₀ O Z g σ x : M.Domain}
     (game : Tg_game_d hZFC p A F₀ L₀ G₀ J₀ B₀ W₀ O Z g) (woodin : Woodin_d I p.δ) (root : M.mem p.e p.S)
     (win : Cg_win_d I false p.ω A F₀ J₀ B₀ W₀ σ) (hx : M.mem x p.A) :
-    ∃ θ X R c C γ V D f s₀, M.IsRegularCardinal I θ ∧ V_d I θ X ∧ Smem_d I c X R ∧
+    ∃ θ X R c C γ V D f s₀, ∃ U : Fin 6 → M.Domain, ∃ B,
+      M.IsRegularCardinal I θ ∧ V_d I θ X ∧ Smem_d I c X R ∧
       M.IsLimitOrdinal γ ∧ M.mem p.ω V ∧ M.mem p.A V ∧ Fn0_d p.ω D f ∧ Rd_entry_d p.e s₀ f ∧
       Tg_run_code_d hZF p.ω c p.e C γ V p.A p.a s₀ ∧
       (∀ i s, Rd_entry_d i s f → ∃ n, M.SuccessorOf n i ∧ Tg_run_code_d hZF p.ω c p.e C γ V p.A n s) ∧
-      ∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s f → Rd_entry_d j t f → Tg_run_edge_d hZF p.ω c s t := by
+      (∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s f → Rd_entry_d j t f → Tg_run_edge_d hZF p.ω c s t) ∧
+      It_pnice_d hZF p.ω c p.ω (U 0) (U 1) (U 2) (U 3) (U 4) ∧ M.IsSetFunction I (U 5) ∧
+      (∀ a z, M.mem z (U a) ↔ Tg_run_value_d ⟨8+a.val, by omega⟩ f z) ∧
+      It_branch_d p.ω (U 0) B ∧ (∀ z, M.mem z B ↔ Tg_even_d f (U 0) z) ∧
+      (¬ It_wf_branch_d hZF p.ω p.ω (U 0) (U 1) (U 2) B) ∧
+      It_ill_branch_d hZF p.ω p.ω (U 0) (U 1) (U 2) B ∧
+      ∃ b, It_hull_return_d hZF p.ω p.e c X (U 0) (U 1) (U 2) (U 3) (U 4) B b
+        (Fin.cases (U 5) (fun _ : Fin 1 => f)) ∧ Tg_odd_cofinal_d p.ω b (U 5) ∧
+        Tg_odd_tail_d p.ω (U 5) (U 0) (U 2) B b ∧
+        Tg_odd_limit_d hZF p.ω p.e c X (U 0) (U 1) (U 2) b (U 5) := by
   obtain ⟨θ, X, R, c, C, γ, V, regular, rank, model, limit, hωV, hAV, initial⟩ := game.run_start_l hZFC woodin root win
   obtain ⟨v, u, run, num⟩ := initial x hx
   obtain ⟨s₀, start⟩ := run.pack_l hZF
@@ -71,8 +89,20 @@ theorem Tg_game_d.history_sequence_l {p : Tg_params_d M.Domain} {A F₀ L₀ G�
       obtain ⟨m, t, mt, next, edge⟩ := run.advance_l hZFC game.setup.empty limit hωV hAV hx
       have en : n = j := ns.eq hZF.1 succ
       exact ⟨t, (valid j t).mpr ⟨m, en ▸ mt, next⟩, (step i s t).mpr edge⟩)
-  exact ⟨θ, X, R, c, C, γ, V, D, f, s₀, regular, rank, model, limit, hωV, hAV,
-    fn0_of_function_l (ZF.modelsKP hZF) fn, first, start, fun i s hs => (valid i s).mp (all i s hs),
-    fun i j s t succ hs ht => (step i s t).mp (edges i j s t succ hs ht)⟩
+  have seq : Tg_sequence_d hZF p.ω c p.e C γ V p.A D f :=
+    ⟨fn0_of_function_l (ZF.modelsKP hZF) fn, fun i s hs => (valid i s).mp (all i s hs),
+      fun i j s t succ hs ht => (step i s t).mp (edges i j s t succ hs ht)⟩
+  obtain ⟨U, tree, archive, columns⟩ := seq.union_l hZF game.setup.omega
+  obtain ⟨B, branch, bs⟩ := seq.even_branch_l hZF tree columns
+  have ill := seq.even_limit_l hZF tree columns branch bs
+  obtain ⟨b, back⟩ := it_hull_return_l hZFC tree model rank game.setup.empty ill
+    (Fin.cases (U 5) (fun _ : Fin 1 => f))
+  obtain ⟨odd, different⟩ := back.branch_l hZF
+  obtain ⟨cofinal, tail⟩ := seq.odd_tail_l hZF tree columns branch bs odd different
+  exact ⟨θ, X, R, c, C, γ, V, D, f, s₀, U, B, regular, rank, model, limit, hωV, hAV,
+    seq.function, first, start, seq.rows, seq.steps, tree, archive, columns, branch, bs,
+    seq.even_illfounded_l hZF tree columns bs, ill, b, back,
+    cofinal, tail,
+    seq.odd_limit_l hZF tree archive columns back⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

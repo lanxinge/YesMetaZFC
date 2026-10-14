@@ -579,12 +579,13 @@ Neeman 定理 2.3 的坏枝归约与推论 2.4 的公开弱迭代策略由下述
 [IterationCutHistory](IterationCutHistory.lean) 的 `pn_history_extend_l` 从原 nice 树及
 严格下降的正则秩段列延伸任意合法历史，同时保留每个前驱的一致性和缺失子集。
 
-[IterationDescent](IterationDescent.lean) 的 `it_nice_no_drop_l` 用 ZFC 内部依赖选择
-构造 ω 历史列，投影出实际隶属下降图，再由基础公理导出矛盾。其输入是原 nice 树、
-实际正则秩段列和首行；首行由 [IterationInitial](IterationInitial.lean) 从可数传递域
+[IterationCutNormalize](IterationCutNormalize.lean) 用内部递归在恒等段保持同一正则秩段。
+[IterationDescent](IterationDescent.lean) 的 `it_pnice_no_drop_l` 对全部有限历史先取末模型、
+再取原高度的隶属极小值：活动步迫使模型下降，恒等步迫使高度下降，均与基础矛盾。
+其输入是含 padding 的原 nice 树、实际正则秩段列和首行；首行由 [IterationInitial](IterationInitial.lean) 从可数传递域
 到正则秩层的给定初等嵌入构造。[IterationNice](IterationNice.lean) 的单根与实际
 超幂添枝已给出 nice 条件的实例。[IterationNiceReturn](IterationNiceReturn.lean) 的
-`it_nice_return_l` 现已接通返回失败、联合尝试秩、整树复制、正则截断与可数 Skolem 回拉，
+`it_pnice_return_l` 现已接通返回失败、联合尝试秩、整树复制、正则截断与可数 Skolem 回拉，
 构造上述反证所需的全部实际输入。可数 nice ω 树因此有共尾良基枝及返回原 Vθ 的完整
 初等因子，保持根嵌入的精确复合式，无需目标高度的额外正则性或极限性假设。
 这完成定理 2.3，并作为下述弱迭代策略的后继步骤。
@@ -937,7 +938,8 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 原控制记录已包含这份秩的存在性，并随原初等图搬运。
 [TypeGameRank](TypeGameRank.lean) 在 KP 背景下读取其 Δ₀ 证书，ZF 中排除传递目标内
 控制树的背景内部无限合法延长链；不对反射层附加 ZF 或 DC。
-这完成了 5.19 所需的尝试树秩与绝对性步骤，但仍须构造统一历史并把它送入偶数极限。
+[TreeRankPrefix](../Descriptive/TreeRankPrefix.lean) 对内部有限长度归纳，将逐步降秩
+加强为任意真前缀延长降秩；原控制树秩的实际构造和 Δ₀ 证书都已包含这一结论。
 [TypeGameContinueSeed](TypeGameContinueSeed.lean) 已从选中旧轮的完整语言、原弹性、
 当前超过见证及事件对应自动装配 `tc_seed0_m`；[TypeGameContinueAuto](TypeGameContinueAuto.lean)
 按实际旧回答域重定基源，并调用两条真实树边。原查询表的单值性进入同一控制记录，
@@ -954,9 +956,41 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 [TypeGameOdd](TypeGameOdd.lean) 将原请求选中的旧历史行、实际奇数嵌入和新存档绑定。
 `Tg_run_next_d` 保留旧树与旧图的嵌入像，并证明恢复图恰好增加一个点；
 空标签分支保留原偶数前驱和空图。该加强已由同一 `history_sequence_l` 递归实现。
-尚待对这列有限树取并，完成偶数极限的秩下降矛盾和奇数无限返回分支。
-奇数返回部分还须处理重置产生的 padding；当前 `it_nice_return_l` 接受的是每一步
-都有实际扩展器的 `It_nice_d`，不能直接用于此处的 `It_pnice_d`。
+[TypeGameRunOrder](TypeGameRunOrder.lean) 证明六列数据、旧终点的全部前驱及当前偶数
+节点的前驱逐阶段保持。轮号小于树长的实际不变量保证这些有限树覆盖整个内部 ω。
+[TypeGameRunUnion](TypeGameRunUnion.lean) 的 `Tg_sequence_d.union_l` 从记录值域的
+传递闭包分离六列，证明其并是长度 ω 的 `It_pnice_d`，存档并仍为函数。
+[TypeGameEvenBranch](TypeGameEvenBranch.lean) 构造当前偶数节点前驱集组成的共尾分支。
+[TypeGameEvenLimit](TypeGameEvenLimit.lean) 的 `even_illfounded_l` 假设该枝良基，调用
+已有直接极限坍塌得到真实传递目标和锥；[TypeGameLimitValues](TypeGameLimitValues.lean)
+构造历史像函数，[TypeGameLimitControl](TypeGameLimitControl.lean) 用锥交换律和内部
+ω 归纳识别共同控制树。相邻历史像真延长，原秩函数给出隶属下降链，与基础矛盾。
+`history_sequence_l` 现在同时返回实际并树、偶数共尾分支及其非良基结论。
+`even_limit_l` 自动构造该枝的原始直接极限；`It_ill_branch_d` 保存实际带标号系统、
+投影、商模型及商关系的不良基性。
+[IterationCopyPadding](IterationCopyPadding.lean) 把恒等边接入同一复制历史；活动支撑、
+交换方块和空操作均在内部 ω 取并后保持。部分支撑列沿可数壳回拉，不给 padding 添加支撑。
+[IterationCutNormalize](IterationCutNormalize.lean) 在恒等段保留原秩段；
+[IterationDescent](IterationDescent.lean) 对全部有限历史先取末模型、再取原高度的隶属极小值，
+分别排除活动步和恒等步。因此 `it_pnice_return_l` 已直接覆盖含 padding 的实际树。
+[IterationLadder](IterationLadder.lean) 从实际不良基极限提取有集合界的 Δ₀ 下降证书，
+[IterationHullReturn](IterationHullReturn.lean) 将它与整树、完整存档和递归序列放入同一可数壳。
+返回枝因同一下降证书而不同于偶数枝；[TypeGameOddBranch](TypeGameOddBranch.lean)
+用结点首次进入有限树的内部最小阶段，证明该返回枝具有共尾的实际奇数保存结点。
+`history_sequence_l` 已自动输出 `It_hull_return_d`、真实返回因子和 `Tg_odd_cofinal_d`。
+[TypeGameOddRecords](TypeGameOddRecords.lean) 证明并历史的定义域恰为内部 ω，
+从原保存码读取恢复图的精确有限定义域及完整树节点。
+[TypeGameOddLimit](TypeGameOddLimit.lean) 把全部这些原记录回拉到同一可数壳，
+再沿同一返回锥投影；`Tg_return_node_d` 保留原轮号、原存档和两层图条目。
+`Tg_return_growth_d` 自动给出指定前驱和当前轮的两张实际极限图，
+证明其长度恰差一、两者都是完整树节点、旧图严格包含于新图。
+[TypeGameOddCompatibility](TypeGameOddCompatibility.lean) 证明每条继续奇数边上长度恰增一，
+并利用 [IterationConePull](IterationConePull.lean) 的实际交换方块，把旧恢复图的包含关系传到返回极限。
+`late_odd_l` 同时保留原奇数前驱与该边的一致性；这些证书已由 `history_sequence_l` 的
+`Tg_odd_limit_d` 自动装配。`odd_tail_l` 还给出一段真实尾枝：起点是存档结点，
+其后每个结点及其前驱都留在这段奇数尾枝上，故不会再次重置。
+尚需沿整条奇数尾枝传播相容性、证明长度无界，
+完成图的取并及返回因子对原树的识别；原树上的无限图枝及完整 5.15 获胜策略仍未完成。
 
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
 及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，

@@ -155,7 +155,7 @@ theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
   have Aζ := hj.1.1.1.2 p.A (ζ.bound 6).val p.A iA (anchor₂.fixed p.A letters)
   have hxζ : M.mem x (ζ.bound 6).val := Aζ.symm ▸ hx
   let x' : (rt_model_l C' nv).Domain := ⟨x, fs'.transitive _ (ζ.bound 6).property x hxζ⟩
-  obtain ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε', head, num, issued', value, aux, growth, keep, trace'⟩ := advance x' hxζ
+  obtain ⟨v', t', j', n', hv, even, odd, digit, succ, start, ε', head, num, issued', value, aux, growth, keep, _, trace'⟩ := advance x' hxζ
   have control (i : Fin 19) : ε'.bound (i.castAdd 27) = ζ.bound (i.castAdd 27) :=
     (head i).trans (by simp only [tg_position_env_d, Fin.addCases_left])
   have sn' := (rt_successor_l fs'.transitive nv hZF.1 (ε'.bound 19) (ζ.bound 19)).mp (num.symm ▸ succ)
@@ -178,9 +178,12 @@ theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
     obtain ⟨b', hs', hb'⟩ := game.setup.omega.1.2 a ha
     exact hs'.eq hZF.1 hs ▸ hb'
   let v₂ : Fin 18 → M.Domain := fun i => [N, R', ℓ, K', η', C', γ, β, T', Q', D', E', L', P₀, κ, c', j, r₂].get i
+  have span : M.mem (ε'.bound 19).val γ := en'.symm ▸
+    (show M.mem p.a γ from (hα.eq hZF.1 game.setup.one) ▸
+      result.tree.diagram.order.ordinal.transitive β ext.1.predecessor_mem α pad.1.predecessor_mem)
   exact ⟨v₂, (fun i => (ε'.bound i).val),
     ⟨ready, context', nextω (nextω heω hα) pad.1, ext.1, result, target, mn, edge, iC, anchor₂, record₂, values₂,
       (congrArg Subtype.val (control 0)).trans zω, (congrArg Subtype.val (control 6)).trans Aζ,
-      fun y hy => κlimit.1.transitive κ growing y (high y hy), en'.symm ▸ history, links, roots, events, growing, heights⟩, en'⟩
+      fun y hy => κlimit.1.transitive κ growing y (high y hy), en'.symm ▸ history, links, roots, events, growing, heights, span⟩, en'⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

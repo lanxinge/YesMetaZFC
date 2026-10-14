@@ -13,9 +13,9 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
-    (nice : It_nice_d hZF ω c ω T Q G E L) (hist : Ic_history_d hZF ω T Q G E L m H S Q' G')
-    (hn : M.mem n ω) (hm : M.SuccessorOf m n) :
+theorem Ic_history_d.active_extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
+    (nice : It_pnice_d hZF ω c ω T Q G E L) (hist : Ic_history_d hZF ω T Q G E L m H S Q' G')
+    (hn : M.mem n ω) (hm : M.SuccessorOf m n) (active : ∃ ρ, Rd_entry_d n ρ L) :
     ∃ l J S' Q'' G'', M.SuccessorOf l m ∧ Ic_history_d hZF ω T Q G E L l J S' Q'' G'' ∧
       M.MemberSubset H J ∧ M.MemberSubset Q' Q'' ∧ M.MemberSubset G' G'' := by
   have hω := nice.tree.omega
@@ -24,7 +24,7 @@ theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
   have eq := hm₀.eq hZF.1 hm
   subst m₀
   obtain ⟨k, b, a, d, j₀, p, κ, ρ, F, N₀, R₀, X₀, R₁, pred, hb, ha, hd, hj₀, he, payload, mn, mx,
-    loc, agree, ultra, strength, card, hρ⟩ := nice.step_l hZF hmω hm
+    loc, agree, ultra, strength, card, hρ⟩ := nice.step_l hZF hmω hm active
   obtain ⟨r, hr⟩ := (hist.domain n).mp hm.predecessor_mem
   obtain ⟨b₀, N, B, σ, u, U, β, cr, hb₀, hu, own⟩ := hist.rows n r hr
   have eq := nice.tree.diagram.model_function.2 n b₀ b hb₀ hb
@@ -45,8 +45,7 @@ theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
   have as : Ic_at_d H k X A π z Z α := ⟨s, hs, cs⟩
   have prior : (X = N ∧ A = B ∧ π = σ) ∨ ∃ ρ φ, Pn_agree_d X A π N B σ ρ φ ∧ Es_strength_d X ρ N := by
     rcases (hm k).mp pred.1 with hk | eq
-    · obtain ⟨μ, ν, _, same, exactness⟩ := hist.past k n X A π z Z α N B σ u U β as ar hk
-      exact Or.inr ⟨μ, ν, same, exactness⟩
+    · exact (hist.past k n X A π z Z α N B σ u U β as ar hk).prior_l
     · have eq := hZF.1.eq_of_same_members k n eq
       subst k
       have eq := as.unique_l (ZF.modelsKP hZF) hist.function ar
@@ -104,7 +103,7 @@ theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
     obtain ⟨i, j, pair⟩ := hist.diagram.order.relation r ((hist.diagram.map_domain r).mpr ⟨f, hr⟩)
     obtain ⟨q, qp, hq⟩ := (gs i j f).mpr (Or.inl ⟨r, pair, hr⟩)
     exact kpair_unique_l M hZF.1 qp pair ▸ hq
-  refine ⟨l, J, S', Q'', G'', hl, ⟨diagram, order, jf.2.1, jf.2.2, rows, ?_, ?_, ?_, ?_⟩,
+  refine ⟨l, J, S', Q'', G'', hl, ⟨diagram, order, jf.2.1, jf.2.2, rows, ?_, ?_, ?_, ?_, ?_⟩,
     sub hist.function.1 jm, sub hist.diagram.model_function.1 (fun i a ha => (qs i a).mpr (Or.inl ha)),
     sub hist.diagram.map_function.1 gm⟩
   · intro i j X₁ A₁ π₁ z₁ Z₁ α₁ X₂ A₂ π₂ z₂ Z₂ α₂ ai aj hij
@@ -116,16 +115,20 @@ theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
       subst X₂ A₂ π₂ z₂ Z₂ α₂
       have ai := (old hij).mp ai
       rcases (hm i).mp hij with hi | eq
-      · obtain ⟨μ, ν, hμ, same, missing⟩ := hist.past i n X₁ A₁ π₁ z₁ Z₁ α₁ N B σ u U β ai ar hi
-        have lt := nice.increasing i n μ ρ hμ hρ hi
+      · rcases hist.past i n X₁ A₁ π₁ z₁ Z₁ α₁ N B σ u U β ai ar hi with
+          ⟨rfl, rfl, rfl, no⟩ | ⟨k, μ, ν, hik, hk, hμ, first, same, missing⟩
+        · exact Or.inr ⟨n, ρ, ρ', Or.inr hi, hm.predecessor_mem, hρ,
+            fun ν hν => (no ν hν).elim, adjacent, exactness⟩
+        have lt := nice.increasing k n μ ρ hμ hρ hk
         have lt' := ((mb.2 ν ρ').mp ((hσ.relation_l I hZF hω mn₀.1 mb.1 same.right_end hρσ).mp
           ((mn₀.2 μ ρ).mpr ⟨hσ.1.1.input_mem_of_pairMember same.right_end, hσ.1.1.input_mem_of_pairMember hρσ, lt⟩))).2.2
-        exact ⟨μ, ν, hμ, same.trans_l hZF adjacent lt lt', adjacent.strength_l hZF lt missing⟩
+        exact Or.inr ⟨k, μ, ν, hik, (hm k).mpr (Or.inl hk), hμ, first,
+          same.trans_l hZF adjacent lt lt', adjacent.strength_l hZF lt missing⟩
       · have eq := hZF.1.eq_of_same_members i n eq
         subst i
         obtain ⟨e₁, e₂, e₃, e₄, e₅, e₆⟩ := ai.unique_l (ZF.modelsKP hZF) hist.function ar
         subst X₁ A₁ π₁ z₁ Z₁ α₁
-        exact ⟨ρ, ρ', hρ, adjacent, exactness⟩
+        exact Or.inr ⟨n, ρ, ρ', Or.inl rfl, hm.predecessor_mem, hρ, fun _ _ => rfl, adjacent, exactness⟩
   · intro i j X₁ A₁ π₁ z₁ Z₁ α₁ X₂ A₂ π₂ z₂ Z₂ α₂ g ai aj hg
     rcases (split j).mp (bound aj) with hj' | eq
     · have hi : M.mem i m := (diagram.order.forward i j (diagram.map_bound_l hZF hg)).elim
@@ -202,5 +205,17 @@ theorem Ic_history_d.extend_l {ω c T Q G E L n m H S Q' G' : M.Domain}
       obtain ⟨e₁, e₂, e₃⟩ := pay.unique_l payload
       subst κ₁ ρ₁ F₁
       exact ⟨κ', ρ', F', hκσ, hρσ, hFσ, diagram.map_unique_l hZF hj hf ▸ big, compatible⟩
+  · intro i j p' succ hjl hp empty
+    rcases (split j).mp hjl with hj' | rfl
+    · have hi := hist.diagram.order.ordinal.transitive j hj' i succ.predecessor_mem
+      obtain ⟨same, ident⟩ := hist.pads i j p' succ hj' hp empty
+      exact ⟨fun r => ((js i r).trans ⟨fun h => h.elim id (fun e => (ir m (e.1 ▸ hi)).elim), Or.inl⟩).trans
+        ((same r).trans ((js j r).trans ⟨fun h => h.elim id (fun e => (ir m (e.1 ▸ hj')).elim), Or.inl⟩).symm),
+        fun f x y hf => ident f x y (gold hj' hf)⟩
+    · have eq := succ.predecessor_eq hZF.1 (hist.diagram.order.ordinal.mem succ.predecessor_mem) hm
+      subst i
+      have eq := nice.tree.move_function.2 n p p' he hp
+      obtain ⟨r, ⟨u, v, _, _, pair⟩, _⟩ := eq ▸ payload
+      exact (empty u ((pair u).mpr (Or.inl rfl))).elim
 
 end YesMetaZFC.SetTheory.LargeCardinal

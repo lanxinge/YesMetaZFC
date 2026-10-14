@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.Rudimentary.Tuple
-import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyExtend
+import YesMetaZFC.SetTheory.LargeCardinal.IterationCopyPadding
 import YesMetaZFC.Model.SetTheory.ClassChoice
 
 /-! # 全部内部有限复制历史的实际 ω 序列
@@ -46,7 +46,7 @@ theorem Ic_row_d.start_l {ω c X A π z Z α o T Q G E L : M.Domain}
       have ei := (tree.order.forward i o hij).elim id (fun hi => (ho i hi).elim)
       subst i
       exact root.diagram.order.refl o hm.predecessor_mem
-  refine ⟨m, H, S, Q', G', hm, ⟨root.diagram, order, hf.1, hf.2.1, ?_, ?_, ?_, ?_, ?_⟩, top⟩
+  refine ⟨m, H, S, Q', G', hm, ⟨root.diagram, order, hf.1, hf.2.1, ?_, ?_, ?_, ?_, ?_, ?_⟩, top⟩
   · intro i t ht
     obtain ⟨hi, et⟩ := (hs i t).mp ht
     have ei := one i hi
@@ -70,6 +70,8 @@ theorem Ic_row_d.start_l {ω c X A π z Z α o T Q G E L : M.Domain}
     exact tree.identity o f hfi x y hxy ▸ root.diagram.identity o g hgi x' y' hyy ▸ eq.2.2.1 ▸ hxx
   · intro i j k _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ succ _ _ _ aj
     exact (ho i (index aj ▸ succ.predecessor_mem)).elim
+  · intro i j p succ hj _ _
+    exact (ho i (one j hj ▸ succ.predecessor_mem)).elim
 
 def Ic_state_d (ω T Q G E L i s : M.Domain) : Prop := ∃ m H S Q' G',
   M.SuccessorOf m i ∧ Rd_quad_d s H S Q' G' ∧ Ic_history_d hZF ω T Q G E L m H S Q' G'
@@ -117,7 +119,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
 /-- 类选择的转移见证由实际复制定理提供；所得序列从指定首行出发。 -/
 theorem Ic_row_d.sequence_l {ω c X A π z Z α o T Q G E L : M.Domain}
-    (nice : It_nice_d hZF ω c ω T Q G E L) (row : Ic_row_d hZF ω c X A π z Z α) (ho : ∀ x, ¬ M.mem x o) :
+    (nice : It_pnice_d hZF ω c ω T Q G E L) (row : Ic_row_d hZF ω c X A π z Z α) (ho : ∀ x, ¬ M.mem x o) :
     ∃ D f s₀ H₀ S₀ Q₀ G₀, Fn0_d ω D f ∧ Rd_entry_d o s₀ f ∧ Rd_quad_d s₀ H₀ S₀ Q₀ G₀ ∧
       Ic_at_d H₀ o X A π z Z α ∧ (∀ i s, Rd_entry_d i s f → Ic_state_d hZF ω T Q G E L i s) ∧
       ∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s f → Rd_entry_d j t f → Ic_extend_d s t := by

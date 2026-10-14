@@ -213,7 +213,7 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
       Ic_at_d H i X P π z Z α ↔ Ic_at_d A i X P π z Z α :=
     exists_congr fun r => and_congr (h i hi r) Iff.rfl
   refine ⟨H, Q', G', ⟨diagram, fun i j => ⟨fun hij => ⟨hij, (original.order.bound i j hij).2⟩, And.left⟩,
-    hf, hdom, ?_, ?_, ?_, ?_, ?_⟩, fun _ _ _ _ _ _ hs hp => inside hs hp⟩
+    hf, hdom, ?_, ?_, ?_, ?_, ?_, ?_⟩, fun _ _ _ _ _ _ hs hp => inside hs hp⟩
   · intro i r hr
     obtain ⟨m, A, B, C, D, hm, hist, h, q, _⟩ := stage i ((hdom i).mpr ⟨r, hr⟩)
     obtain ⟨c, X, P, π, z, Z, α, cell, hc, hz, row⟩ := hist.rows i r ((h i hm.predecessor_mem r).mp hr)
@@ -240,5 +240,11 @@ theorem ic_sequence_union_l {ω T Q G E L D f : M.Domain} (hω : M.IsOmega ω)
       ((at_stage h ((hm i).mpr (Or.inl succ.predecessor_mem))).mp ai)
       ((at_stage h ((hm k).mpr (Or.inl pred.1))).mp ak) ((at_stage h hm.predecessor_mem).mp aj)
       hp pay ((maps k j hm.predecessor_mem g).mp hg)
+  · intro i j p succ hj hp empty
+    obtain ⟨m, A, B, C, D, hm, hist, h, _, maps⟩ := stage j hj
+    have hi := (hm i).mpr (Or.inl succ.predecessor_mem)
+    obtain ⟨same, ident⟩ := hist.pads i j p succ hm.predecessor_mem hp empty
+    exact ⟨fun r => (h i hi r).trans ((same r).trans (h j hm.predecessor_mem r).symm),
+      fun f x y hf => ident f x y ((maps i j hm.predecessor_mem f).mp hf)⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal
