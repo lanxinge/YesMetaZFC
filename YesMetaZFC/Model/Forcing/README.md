@@ -359,6 +359,13 @@ have hConcrete := Internal.two_extension_zfc_l
 这条路线与 [Isabelle/ZF 的 CH 塌缩构造](https://isa-afp.org/browser_info/current/AFP/Independence_CH/CH.html)
 使用的可数部分函数塌缩一致。
 
+[Collapse/FiniteSequence](Applications/Collapse/FiniteSequence.lean) 实现另一条有限初段坍缩：
+条件为 X 值内部有限序列，反向包含为序；实际泛型并图给出 ω→X 满射并保留图边的条件来源。
+[Collapse/FiniteRecode](Applications/Collapse/FiniteRecode.lean) 沿模型内字母双射保持条件包含序，
+通过实际完全嵌入回拉泛型滤子，同时逐项重编码泛型并图。
+[TypeGameCollapse](../../SetTheory/LargeCardinal/TypeGameCollapse.lean) 的 `tg_lemma61_l` 利用 δ≅Vδ 将此构造接入原 Col(ω,δ)，
+不需要改变名称扩张或额外假定泛型枚举满足请求公平性。
+
 模型存在的地模型由 `SetTheory.countable_ground_l` 实际提供：对原小图 ZFC 模型
 逐层加入原公式的有限参数见证，复用 `Substructure_m.tarski_vaught_m` 得到可数
 初等子模型；其隶属关系继承小图模型的外部良基性。公式查询编码与原力迫调度

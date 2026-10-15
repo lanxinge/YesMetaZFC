@@ -44,9 +44,9 @@ theorem cons_unique_l (hE : Extensional M) {z a s t u : M.Domain} (h : Cons_d I 
     (k : Cons_d I z a s u) : t = u := h.1.eq_of_pairMember_iff hE k.1 (fun j x => (h.2 j x).trans (k.2 j x).symm)
 
 /-- 首项拼接生成后继长度的实际函数图。 -/
-theorem cons_exists_l (hZF : M.Models ZF) {ω z a s n} (hω : M.IsOmega ω) (hz : ∀ x, ¬ M.mem x z)
-    (ha : M.mem a ω) (hn : M.mem n ω) (hs : M.IsSetFunctionFromTo I s n ω) :
-    ∃ k t, M.mem k ω ∧ M.SuccessorOf k n ∧ M.IsSetFunctionFromTo I t k ω ∧ Cons_d I z a s t := by
+theorem cons_exists_l (hZF : M.Models ZF) {ω X z a s n} (hω : M.IsOmega ω) (hz : ∀ x, ¬ M.mem x z)
+    (ha : M.mem a X) (hn : M.mem n ω) (hs : M.IsSetFunctionFromTo I s n X) :
+    ∃ k t, M.mem k ω ∧ M.SuccessorOf k n ∧ M.IsSetFunctionFromTo I t k X ∧ Cons_d I z a s t := by
   obtain ⟨k, hk, hkω⟩ := hω.1.2 n hn
   have hzK := Structure.IsOrdinal.empty_mem_of_nonempty (ZF.modelsKP hZF)
     ((hω.isOrdinal hZF).mem hkω) ⟨n, hk.predecessor_mem⟩ hz
@@ -59,7 +59,7 @@ theorem cons_exists_l (hZF : M.Models ZF) {ω z a s n} (hω : M.IsOmega ω) (hz 
     simp only [φ, BinarySchema.denote, Formula.satisfies_disj_iff, Formula.satisfies_conj_iff,
       Formula.satisfies_extensionalEq_iff_eq hZF.1, Formula.satisfies_exists_iff,
       Formula.satisfies_orderedPairMem_iff I, Formula.satisfies_isSuccessor_iff]; rfl
-  obtain ⟨t, ht, he⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := k) (target := ω)
+  obtain ⟨t, ht, he⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := k) (target := X)
     (by
       intro j hj
       classical
@@ -95,8 +95,8 @@ theorem cons_exists_l (hZF : M.Models ZF) {ω z a s n} (hω : M.IsOmega ω) (hz 
       (fun e => e.symm ▸ hk.predecessor_mem) (fun h => (hk j).mpr (Or.inl h))
 
 /-- 拼接的图包含恰好对应首项相同和尾列包含。 -/
-theorem cons_subset_l (hZF : M.Models ZF) {ω z a b s t u v n} (hω : M.IsOmega ω)
-    (hz : ∀ x, ¬ M.mem x z) (hn : M.mem n ω) (hs : M.IsSetFunctionFromTo I s n ω)
+theorem cons_subset_l (hZF : M.Models ZF) {ω X z a b s t u v n} (hω : M.IsOmega ω)
+    (hz : ∀ x, ¬ M.mem x z) (hn : M.mem n ω) (hs : M.IsSetFunctionFromTo I s n X)
     (hu : Cons_d I z a s u) (hv : Cons_d I z b t v) :
     M.MemberSubset u v ↔ a = b ∧ M.MemberSubset s t := by
   have lift {P Q i x} (h : M.MemberSubset P Q) (hp : M.PairMember I i x P) : M.PairMember I i x Q :=
@@ -125,16 +125,16 @@ theorem cons_subset_l (hZF : M.Models ZF) {ω z a b s t u v n} (hω : M.IsOmega 
     obtain ⟨q, hq, hqv⟩ := hxt
     exact (I.unique hc hq).symm ▸ hqv
 
-theorem cons_type_l (hZF : M.Models ZF) {ω z a s t n} (hω : M.IsOmega ω)
-    (hz : ∀ x, ¬ M.mem x z) (ha : M.mem a ω) (hn : M.mem n ω)
-    (hs : M.IsSetFunctionFromTo I s n ω) (ht : Cons_d I z a s t) :
-    ∃ k, M.mem k ω ∧ M.SuccessorOf k n ∧ M.IsSetFunctionFromTo I t k ω := by
+theorem cons_type_l (hZF : M.Models ZF) {ω X z a s t n} (hω : M.IsOmega ω)
+    (hz : ∀ x, ¬ M.mem x z) (ha : M.mem a X) (hn : M.mem n ω)
+    (hs : M.IsSetFunctionFromTo I s n X) (ht : Cons_d I z a s t) :
+    ∃ k, M.mem k ω ∧ M.SuccessorOf k n ∧ M.IsSetFunctionFromTo I t k X := by
   obtain ⟨k, u, hk, hkn, hu, hc⟩ := cons_exists_l I hZF hω hz ha hn hs
   exact ⟨k, hk, hkn, cons_unique_l I hZF.1 hc ht ▸ hu⟩
 
-theorem cons_injective_l (hZF : M.Models ZF) {ω z a b s t v n m} (hω : M.IsOmega ω)
+theorem cons_injective_l (hZF : M.Models ZF) {ω X z a b s t v n m} (hω : M.IsOmega ω)
     (hz : ∀ x, ¬ M.mem x z) (hn : M.mem n ω) (hm : M.mem m ω)
-    (hs : M.IsSetFunctionFromTo I s n ω) (ht : M.IsSetFunctionFromTo I t m ω)
+    (hs : M.IsSetFunctionFromTo I s n X) (ht : M.IsSetFunctionFromTo I t m X)
     (hu : Cons_d I z a s v) (hv : Cons_d I z b t v) : a = b ∧ s = t := by
   have h := (cons_subset_l I hZF hω hz hn hs hu hv).mp (fun _ => id)
   have k := (cons_subset_l I hZF hω hz hm ht hv hu).mp (fun _ => id)
@@ -158,10 +158,10 @@ theorem tree_step_iff_l (hZF : M.Models ZF) {ω X s t n m} (hω : M.IsOmega ω)
       ⟨hn, (hω.isOrdinal hZF).mem hn, hs.1, hs.2.1⟩,
       (ds_restrict_iff_l I hs ht.1).mpr hst, ha⟩⟩
 
-theorem cons_step_l (hZF : M.Models ZF) {ω z a b s t u v n m} (hω : M.IsOmega ω)
-    (hz : ∀ x, ¬ M.mem x z) (ha : M.mem a ω) (hb : M.mem b ω)
-    (hn : M.mem n ω) (hm : M.mem m ω) (hs : M.IsSetFunctionFromTo I s n ω)
-    (ht : M.IsSetFunctionFromTo I t m ω) (hu : Cons_d I z a s u) (hv : Cons_d I z b t v) :
+theorem cons_step_l (hZF : M.Models ZF) {ω X z a b s t u v n m} (hω : M.IsOmega ω)
+    (hz : ∀ x, ¬ M.mem x z) (ha : M.mem a X) (hb : M.mem b X)
+    (hn : M.mem n ω) (hm : M.mem m ω) (hs : M.IsSetFunctionFromTo I s n X)
+    (ht : M.IsSetFunctionFromTo I t m X) (hu : Cons_d I z a s u) (hv : Cons_d I z b t v) :
     Step_d I ω u v ↔ a = b ∧ Step_d I ω s t := by
   obtain ⟨j, hj, hjn, huf⟩ := cons_type_l I hZF hω hz ha hn hs hu
   obtain ⟨k, hk, hkm, hvf⟩ := cons_type_l I hZF hω hz hb hm ht hv

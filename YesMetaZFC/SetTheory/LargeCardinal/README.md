@@ -1025,9 +1025,40 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 [TypeGameGenericDense](TypeGameGenericDense.lean) 的 `Tg_setup_d.generic_dense_l`
 完成 6.4 的有限条件延长构造：任意 Vδ 值内部有限序列及编号界，都可延长到该界之后
 出现上述请求，且所有较早值属于新 Vκ。请求的完整类型、原标签图和实现高度一起保留。
-尚须把条件分离成地模型稠密集，经 δ 与 Vδ 的实际编号接入 Col(ω,δ) 泛型性，
-构造 6.3 的最小请求因果策略，证明 6.6 首达捕获并拼接内部 ω 上的下降反证。
-因此 6.1 的泛型 I 获胜端点、6.7、6.10 与双树决定性端点尚未完成。
+[TypeGameGenericMeet](TypeGameGenericMeet.lean) 把条件分离为实际地模型稠密集并调用泛型性。
+[TypeGameGenericRun](TypeGameGenericRun.lean) 构造 6.3 的最小编号策略及全部输入的内部递归；
+[TypeGameGenericPlay](TypeGameGenericPlay.lean) 证明原实数对局与辅助历史的坐标一致。
+[TypeGameGenericCatch](TypeGameGenericCatch.lean) 的 `capture_threshold_l` 自动界定旧轮和前缀之前的
+全部编号，在首达时刻保留旧请求、回答和真实前缀，完成 6.6 的整段捕获。
+[TypeGameLevel](TypeGameLevel.lean) 在地模型收集有界的旧请求实现关系；
+[TypeGameTracked](TypeGameTracked.lean) 用扩张内部原公式读取其像并取已捕获高度的最小元。
+[TypeGameLevelReply](TypeGameLevelReply.lean) 从实际回答得到严格更低的高度；
+[TypeGameGenericAvoid](TypeGameGenericAvoid.lean) 再调用原稠密集与 6.6 捕获更低请求，产生矛盾。
+此处只需扩张满足 ZF，不把旧 Vα 重新解释成扩张的 Vα，也不使用外部 ω 良基性。
+
+[TypeGameCollapse](TypeGameCollapse.lean) 的 `tg_lemma61_l` 已闭合 6.1：
+从原树、非空 A∈Vδ 和 Woodin δ 自动得到地模型 II 获胜策略，或原 Col(ω,δ) 的每个实际
+泛型名称扩张中的 I 获胜策略。`Tg_collapse_win_d` 保留规范名称求值方程，固定旧参数的像。
+δ≅Vδ 的双射来自 `ZFC.inaccessible_enumeration_l`；
+[FiniteRecode](../../Model/Forcing/Applications/Collapse/FiniteRecode.lean) 精确保持有限条件包含序，
+回拉实际泛型滤子并重编码其满射。空根不属于树的退化情形由实际常值策略处理。
+[TypeGameCorollary67](TypeGameCorollary67.lean) 的 `tg_corollary67_l` 已完成 6.7。
+原树位于 A×Γ；[TypeGameVacuous](TypeGameVacuous.lean) 构造实际删除映射
+(a,(n,γ))↦(a,γ)，并由 [TreePullback](../Descriptive/TreePullback.lean) 分离出逆像树。
+`tv_projection_l` 用删除坐标与插入常值零列证明两投影相同，`vacuous_l` 保留原获胜策略。
+[Ground/TreePullback](../../Model/Forcing/Internal/Ground/TreePullback.lean) 证明此构造与规范地模型
+嵌入交换，故同一个等价在泛型扩张内覆盖全部新分支；不把地面投影当作扩张投影。
+标签 Γ 无需小于 δ，也无需附加序数条件；原文的序数标签是该一般结论的实例。
+[TypeGameCorollary610](TypeGameCorollary610.lean) 的 `tg_corollary610_l` 已完成 6.10。
+先构造在每个节点前允许任意首项的树，再调用 6.7；
+[GameShift](../Descriptive/GameShift.lean) 用实际集合函数定义 τ(s)=σ(a⌢s)，并证明服从性换手。
+旧策略属于 I 时，a 必须是 σ 在空局面上的输出；属于 II 时使用给定字母。
+[GameParity](../Descriptive/GameParity.lean) 以内部除二商余证明后继奇偶翻转，
+[TypeGameShiftProjection](TypeGameShiftProjection.lean) 证明插入首手前后的投影对应。
+首个标签从已有分支读取，故不增加 Γ 非空的前提。
+该树构造沿规范地嵌入保持，泛型分支直接在原名称扩张中得到 II 获胜策略。
+`Tp_win_d` 和 `Tp_collapse_win_d` 统一记录玩家及投影／补投影两种收益，6.7 的原调用已迁移。
+双树决定性端点仍待完成。
 
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
 及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，
@@ -1058,8 +1089,8 @@ nice 树的 ω₁ 弱迭代策略、定义 3.13、引理 3.22–3.23，以及局
 实际存在性、真值对应、规范最小选取及有限后继秩层的完整类型搬运已完成；类型游戏的
 完整节点查询、一张图恢复、原 dcp、弹性重置类型、规则 (7) 的类型约束及后继高度刚性
 也已完成。完整辅助闭博弈、有限历史、首次违规胜负与决定性已完成；
-5.15 的 II 迭代获胜策略转移已完成；6.1 的回答下降、继续请求合法性及有限条件延长已实现。
-泛型 I 获胜策略、双侧树证书及最终 L(ℝ) 的 AD 蕴涵仍待证明。
+5.15 的 II 迭代获胜策略转移、6.1 的原坍缩二择一及 6.7、6.10 的二坐标树结论已完成。
+双树决定性、双侧树证书及最终 L(ℝ) 的 AD 蕴涵仍待证明。
 后续迭代使用的源内部超幂，不能直接用全背景函数版本替代。
 
 当前武丁定义到具有上述强性的实际短扩展器的方向已实现；

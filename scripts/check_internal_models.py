@@ -108,12 +108,16 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "TypeGameReplyDescent", "TypeGameGenericExtension", "TypeGameGenericMove", "TypeGameGenericDense",
              "TypeGameGenericTarget", "TypeGameGenericMeet", "TypeGameGenericCapture", "TypeGameResetMove",
              "TypeGameReady", "TypeGameReadyStep", "TypeGameRoundSet", "TypeGameGenericStep", "TypeGameGenericRun", "TypeGameGenericIndices",
+             "TypeGameProjection", "TypeGameGenericPlay", "TypeGameGenericCatch", "TypeGameGenericBranch",
+             "TypeGameLevel", "TypeGameLevelReply", "TypeGameTracked", "TypeGameGenericAvoid", "TypeGameGenericTransfer", "TypeGameCollapse",
+             "TypeGameVacuous", "TypeGameCorollary67", "TypeGameShiftProjection", "TypeGameCorollary610",
              "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("FiniteRecordCoordinate", "TypeGameGraphUnion", "SubtypeInsertion", "TypeGameNodeRank")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
-            ("InputIteration", "Path", "TreeDependentChoice", "GameAttemptRank", "TreeRankPrefix",
+            ("InputIteration", "Path", "TreeDependentChoice", "TreePullback", "GameAttemptRank", "TreeRankPrefix",
+             "TreeTail", "SequenceCons", "GameParity", "GameShift", "TreeShift",
              "LeastLegalMove", "LegalMoveBounded", "ScanResponse", "ScanStrategy", "GameCompletion", "GameLegalStep", "GameControl",
              "FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
              "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
@@ -123,7 +127,7 @@ MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
 MODULES += ["YesMetaZFC.SetTheory.Card." + name for name in
             ("FiniteSequenceSyntax", "FiniteSequenceRecursion", "FiniteSequenceNumbering",
-             "FiniteSequenceCountable", "FiniteSequenceLift", "FiniteSequenceEnd", "OrdinalImage")]
+             "FiniteSequenceCountable", "FiniteSequenceLift", "FiniteSequenceEnd", "FiniteSequenceRecode", "OrdinalImage")]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("CountableChain", "FinitaryHullSyntax", "FinitaryHullStep", "FinitaryHull")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal", "YesMetaZFC.Model.SetTheory.Internal.ReducedPower"]
@@ -791,6 +795,13 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 "Tg_run_real_d", "tg_run_real_m", "Tg_run_move_d", "tg_run_move_m", "Tg_run_choice_d",
                 "Tg_response_d", "tg_response_m", "Tg_archive_play_d", "Tg_projection_d", "tg_projection_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in ("Gi_input_d", "gi_input_m", "Gi_d", "gi_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory." + name for name in ("Fseq_recode_d", "fseq_recode_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tg_level_d", "tg_level_m", "Tg_level_key_d", "tg_level_key_m", "Tg_level_table_d",
+                "Tg_tracked_d", "tg_tracked_m", "Tg_projection_win_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in ("Tr_pull_d", "tr_pull_m", "Tr_shift_d", "tr_shift_m")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tv_drop_value_d", "tv_drop_value_m", "Tv_drop_d", "Tp_projection_d", "tp_projection_m", "Tp_win_d")]
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
                  ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}

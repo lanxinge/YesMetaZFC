@@ -17,9 +17,9 @@ theorem tree_empty_domain_l (hE : Extensional M) {z t X} (hz : ∀ x, ¬ M.mem x
     hz i (ht.input_mem_of_pairMember ⟨p, hc, hp⟩)) (hz p)
 
 /-- 空列或唯一的首项加尾列；尾列仍属于同一内部有限列空间。 -/
-theorem cons_cases_l (hZF : M.Models ZF) {ω A z t} (hω : M.IsOmega ω)
-    (hA : Fseq_space_d I ω ω A) (hz : ∀ x, ¬ M.mem x z) (ht : M.mem t A) :
-    t = z ∨ ∃ a s, M.mem a ω ∧ M.mem s A ∧ Cons_d I z a s t := by
+theorem cons_cases_l (hZF : M.Models ZF) {ω X A z t} (hω : M.IsOmega ω)
+    (hA : Fseq_space_d I ω X A) (hz : ∀ x, ¬ M.mem x z) (ht : M.mem t A) :
+    t = z ∨ ∃ a s, M.mem a X ∧ M.mem s A ∧ Cons_d I z a s t := by
   classical
   obtain ⟨n, hn, ht⟩ := (hA t).mp ht
   by_cases h0 : ∀ x, ¬ M.mem x n
@@ -35,7 +35,7 @@ theorem cons_cases_l (hZF : M.Models ZF) {ω A z t} (hω : M.IsOmega ω)
   have hp i x : φ.denote ρ i x ↔ ∃ j, M.SuccessorOf j i ∧ M.PairMember I j x t := by
     simp only [φ, BinarySchema.denote, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
       Formula.satisfies_isSuccessor_iff, Formula.satisfies_orderedPairMem_iff I]; rfl
-  obtain ⟨s, hs, he⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := m) (target := ω)
+  obtain ⟨s, hs, he⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := m) (target := X)
     (by
       intro i hi
       obtain ⟨j, hj, _⟩ := hω.1.2 i (hω.transitive hZF m hm i hi)

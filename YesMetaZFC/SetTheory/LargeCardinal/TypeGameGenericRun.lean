@@ -72,7 +72,8 @@ theorem Tg_setup_d.generic_round_l {p : Tg_params_d M.Domain} {X F L G O σ R a 
     ∃ n₀ m₀ h₀ t₀ a₀ i, e n₀ = n ∧ M.SuccessorOf m₀ n₀ ∧ M.mem n₀ p.ω ∧
       Rd_entry_d n (e h₀) H ∧ Rd_entry_d (e m₀) (e t₀) H ∧ M.IsSetFunction I h₀ ∧
       Tg_aux_d hM p n₀ h₀ a₀ ∧ Tg_event_d I p.c n₀ p.e t₀ a₀ ∧
-      Rd_entry_d (e h₀) i K ∧ Rd_entry_d i (e a₀) g ∧ Cg_scan_d hN (e p.ω) (e L) g (e h₀) i := by
+      Rd_entry_d (e h₀) i K ∧ Rd_entry_d i (e a₀) g ∧ Cg_scan_d hN (e p.ω) (e L) g (e h₀) i ∧
+      ∃ h₁ b, M.IsSetFunction I h₁ ∧ Tg_answer_d hM p n₀ h₁ b ∧ Tg_event_d I p.c n₀ p.e h₁ a₀ ∧ Tg_event_d I p.c n₀ p.a t₀ b := by
   obtain ⟨h, _, nh⟩ := run.1.2.1 n hn
   obtain ⟨n₀, h₀, en, eh, hh, ready⟩ := setup.generic_states_l hZFC hN e hi he hd root histories owner control ha hw c surj ff run n h nh
   subst n h
@@ -82,9 +83,9 @@ theorem Tg_setup_d.generic_round_l {p : Tg_params_d M.Domain} {X F L G O σ R a 
     (image_successor_l (hEN := hN.1) e hi he hM.1 succ) nh mt
   have hx : N.mem x (e p.A) := input.elim (fun h => (ff.bound_l h.2).2)
     (fun h => h.2.symm ▸ (image_member_l e hi he).mpr ha)
-  obtain ⟨t₀, i, a₀, et, _, _, aux, event, ki, ga, scan⟩ := ready.generic_step_l hZFC hN e hi he setup hd root histories owner control hw c surj hh succ hx pair qt
+  obtain ⟨t₀, i, a₀, et, _, _, aux, event, ki, ga, scan, _, _, _, _, _, _, reply⟩ := ready.generic_step_l hZFC hN e hi he setup hd root histories owner control hw c surj hh succ hx pair qt
   obtain ⟨_, _, fh⟩ := (histories.1 h₀).mp (((control.legal h₀).mp ((control.positions h₀).mp hh).1).1)
-  exact ⟨n₀, m₀, h₀, t₀, a₀, i, rfl, succ, ready.1, nh, et.symm ▸ mt, fh.1, aux, event, ki, ga, scan⟩
+  exact ⟨n₀, m₀, h₀, t₀, a₀, i, rfl, succ, ready.1, nh, et.symm ▸ mt, fh.1, aux, event, ki, ga, scan, reply⟩
 
 /-- 从原 I 获胜策略与实际枚举直接构造原有限历史策略；全部输入递归都保持地状态。 -/
 theorem Tg_game_d.generic_strategy_l {p : Tg_params_d M.Domain} {X F L G O B W C Z v σ a : M.Domain}

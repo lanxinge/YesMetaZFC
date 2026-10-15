@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRoundSet
 import YesMetaZFC.SetTheory.Descriptive.ScanStrategy
+import YesMetaZFC.Model.Forcing.Internal.Ground.Arithmetic
 
 /-! # 扩张中的最小编号响应仍产生真实地状态
 
@@ -33,7 +34,10 @@ theorem Tg_ready_d.generic_step_l {p : Tg_params_d M.Domain} {X F L G O σ R n m
     (hh : M.mem h R) (succ : M.SuccessorOf m n) (hx : N.mem x (e p.A))
     (pair : (J).Codes q (e h) x) (qt : Rd_entry_d q t T) :
     ∃ t₀ i a, e t₀ = t ∧ M.mem t₀ R ∧ Tg_ready_d hM p X m t₀ ∧ Tg_aux_d hM p n h a ∧ Tg_event_d I p.c n p.e t₀ a ∧
-      Rd_entry_d (e h) i K ∧ Rd_entry_d i (e a) g ∧ Cg_scan_d hN (e p.ω) (e L) g (e h) i := by
+      Rd_entry_d (e h) i K ∧ Rd_entry_d i (e a) g ∧ Cg_scan_d hN (e p.ω) (e L) g (e h) i ∧
+      ∃ z y, Fseq_end_d J (e p.ω) t z y ∧ N.mem y (e p.A) ∧ Tg_event_d J (e p.c) (e n) (e p.b) t y ∧
+        (¬ Gm_even_d J (e p.ω) (e n) → y = x) ∧
+        ∃ h₁ b, M.IsSetFunction I h₁ ∧ Tg_answer_d hM p n h₁ b ∧ Tg_event_d I p.c n p.e h₁ a ∧ Tg_event_d I p.c n p.a t₀ b := by
   have hhF := ((control.legal h).mp ((control.positions h).mp hh).1).1
   have legalImage (a : M.Domain) := image_admit_l hM hN e hi he (a := a) setup.omega hw histories.1
     (fun s hs => ((histories.2 s).mp hs).1) hhF
@@ -70,8 +74,23 @@ theorem Tg_ready_d.generic_step_l {p : Tg_params_d M.Domain} {X F L G O σ R n m
         (image_entry_iff_l e hi he (KP.exists_pair (ZF.modelsKP hM)) hN.1 s₂ y₀ σ).mpr val⟩
     · exact Or.inr ⟨fun h => turn ((image_member_l e hi he).mpr h),
         (image_member_l e hi he).mp (val.symm ▸ hx)⟩
-  obtain ⟨next, state, aux, event⟩ := ready.advance_l hZFC setup histories owner control hh succ hs₁ hs₂ hs₃
+  obtain ⟨next, state, aux, event, hyA, j, fj, clock, answer, ae, be⟩ := ready.advance_l hZFC setup histories owner control hh succ hs₁ hs₂ hs₃
     end₁ end₂ end₃ ((legalImage a₁).mpr legal) value ⟨k₂, fn0_of_function_l (ZF.modelsKP hM) fs₂, digit⟩
-  exact ⟨s₃, i, a₁, rfl, next, state, aux, event, ki, ga, scan⟩
+  have eqj := fj.domain_eq_l hM.1 (fn0_of_function_l (ZF.modelsKP hM) fs₂); subst j
+  obtain ⟨hc, _⟩ := tg_clock_l hM setup.omega setup.empty setup.one setup.two setup.three ready.1
+  refine ⟨s₃, i, a₁, rfl, next, state, aux, event, ki, ga, scan, e s₂, e y₀, ⟨d, b, dec⟩,
+    (image_member_l e hi he).mpr hyA,
+    ⟨e k₂, image_nat_div_l hM hN e hi he setup.omega hc ready.1 clock, last⟩, ?_, s₁, w₀, ?_, answer, ae, be⟩
+  · intro odd
+    have notOwn : ¬ N.mem (e k₂) (e O) := by
+      intro yes
+      have phase := (owner.read_l hM (setup.omega.isOrdinal hM) (setup.omega.members_areOrdinals hM p.c hc)
+        ⟨p.b, setup.three.predecessor_mem⟩ hk₂ ready.1 clock).mp ((image_member_l e hi he).mp yes)
+      rcases phase with eq | even
+      · exact KP.mem_irrefl_d (ZF.modelsKP hM) p.a (eq ▸ setup.two.predecessor_mem)
+      · exact odd ((image_even_l hM hN e hi he setup.omega).mp even.2)
+    exact own.elim (fun h => (notOwn h.1).elim) And.right
+  · obtain ⟨_, _, fs₁⟩ := (histories.1 s₁).mp hs₁
+    exact fs₁.1
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -1,6 +1,8 @@
 import YesMetaZFC.SetTheory.Card.Omega
 import YesMetaZFC.SetTheory.Ord.DefinableMinimum
 import YesMetaZFC.SetTheory.InnerModel.Recursion.Graph
+import YesMetaZFC.SetTheory.Card.FiniteOrdinal
+import YesMetaZFC.SetTheory.Card.OrdinalImage
 
 /-! # 内部自然数单射首次越过给定界
 
@@ -12,6 +14,29 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kpair_interpretation_l M (And.left hZF) (KP.exists_pair (modelsKP hZF))
+
+/-- 任意已给定有限轮以前的全部编号都有一个内部自然数严格上界。 -/
+theorem omega_prefix_bound_l {ω E ℓ : M.Domain} (hw : M.IsOmega ω)
+    (fn : M.IsSetFunctionFromTo I E ω ω) (hℓ : M.mem ℓ ω) :
+    ∃ B, M.mem B ω ∧ ∀ n v, (M.mem n ℓ ∨ n = ℓ) → Rd_entry_d n v E → M.mem v B := by
+  obtain ⟨m, succ, hm⟩ := hw.1.2 ℓ hℓ
+  obtain ⟨F, cut⟩ := exists_restriction hZF I E m
+  have ff := cut.isSetFunctionFromTo fn (hw.transitive hZF m hm)
+  obtain ⟨R, range⟩ := exists_range_of_setFunction hZF I ff.1 ff.2.1
+  have fr : M.IsSetFunctionFromTo I F m R := ⟨ff.1, ff.2.1,
+    fun n hn => (ff.2.2 n hn).imp fun v hv => ⟨(range v).mpr ⟨n, hv.2⟩, hv.2⟩⟩
+  have finite : Finite_d I ω R := ⟨m, hm, ordinal_image_bound_l I hZF (hw.members_areOrdinals hZF m hm)
+    (exists_inclusionInjection hZF I (source := m) (fun _ h => h)) fr
+    (fun v hv => ((range v).mp hv).imp fun n hn => ⟨ff.input_mem_of_pairMember hn, hn⟩)⟩
+  obtain ⟨v, _, lv⟩ := ff.2.2 ℓ succ.predecessor_mem
+  obtain ⟨a, ha, max⟩ := finite_max_l I hZF hw (hw.isOrdinal hZF) finite
+    (fun v hv => ((range v).mp hv).elim fun _ h => ff.output_mem_of_pairMember h) ⟨v, (range v).mpr ⟨ℓ, lv⟩⟩
+  have haω := ((range a).mp ha).elim fun _ h => ff.output_mem_of_pairMember h
+  obtain ⟨B, next, hB⟩ := hw.1.2 a haω
+  refine ⟨B, hB, fun n v hn nv => ?_⟩
+  have nm : M.mem n m := hn.elim (fun h => (succ n).mpr (Or.inl h)) (fun eq => eq.symm ▸ succ.predecessor_mem)
+  have hv := max v ((range v).mpr ⟨n, (cut.2 n v).mpr ⟨nm, nv⟩⟩)
+  exact hv.elim (fun h => (next v).mpr (Or.inl h)) (fun eq => eq.symm ▸ next.predecessor_mem)
 
 theorem omega_first_crossing_l {ω E i : M.Domain} (hw : M.IsOmega ω)
     (f : M.IsSetInjectionFromTo I E ω ω) (hi : M.mem i ω) :

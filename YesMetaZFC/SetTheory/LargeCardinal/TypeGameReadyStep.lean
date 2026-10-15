@@ -45,7 +45,9 @@ theorem Tg_ready_d.advance_l {p : Tg_params_d M.Domain} {X F L G J σ R n m h h�
     (e₁ : Fseq_end_d K p.ω h₁ h a) (e₂ : Fseq_end_d K p.ω h₂ h₁ w) (e₃ : Fseq_end_d K p.ω t h₂ y)
     (legal : Cg_admit_d hZ p.ω L h a) (value : Rd_entry_d h₁ w σ)
     (digit : ∃ j, Fn0_d j X h₂ ∧ ((M.mem j J ∧ Rd_entry_d h₂ y σ) ∨ (¬ M.mem j J ∧ M.mem y p.A))) :
-    M.mem t R ∧ Tg_ready_d hZ p X m t ∧ Tg_aux_d hZ p n h a ∧ Tg_event_d K p.c n p.e t a := by
+    M.mem t R ∧ Tg_ready_d hZ p X m t ∧ Tg_aux_d hZ p n h a ∧ Tg_event_d K p.c n p.e t a ∧
+      M.mem y p.A ∧ ∃ j, Fn0_d j X h₂ ∧ M.IsOrdinalDivision K j p.c n p.b ∧
+        Tg_answer_d hZ p n h₁ w ∧ Tg_event_d K p.c n p.e h₁ a ∧ Tg_event_d K p.c n p.a t w := by
   obtain ⟨hn, i, z, hi, fh, div, digits, _⟩ := ready
   obtain ⟨j₁, hj₁, fh₁⟩ := (histories.1 h₁).mp h₁F
   obtain ⟨j₂, hj₂, fh₂⟩ := (histories.1 h₂).mp h₂F
@@ -74,6 +76,12 @@ theorem Tg_ready_d.advance_l {p : Tg_params_d M.Domain} {X F L G J σ R n m h h�
   have turn₁ := (owner.read_l hZ (setup.omega.isOrdinal hZ) oc ⟨p.b, setup.three.predecessor_mem⟩ hj₁ hn div₁).mpr (Or.inl rfl)
   have h₂R := control.step j₁ h₁ w h₂ hj₁ h₁R (fh₂.output_mem_of_pairMember v₂)
     (fn0_of_function_l (ZF.modelsKP hZ) fh₁) e₂ (Or.inr ⟨turn₁, value⟩)
+  have replyStep := (tg_step_read_l hZ (setup.omega.members_areOrdinals hZ j₁ hj₁) oc
+    ⟨p.b, setup.three.predecessor_mem⟩ hn div₁).mp
+    (((histories.2 h₂).mp (control.legal.current_l ((control.positions h₂).mp h₂R).1)).2.end_l hZ
+      (fn0_of_function_l (ZF.modelsKP hZ) fh₁) e₂)
+  have answer : Tg_answer_d hZ p n h₁ w := replyStep.elim (fun h => (ne₀ h.1.symm).elim)
+    (fun h => h.elim And.right (fun h => (KP.mem_irrefl_d (ZF.modelsKP hZ) p.a (h.1.symm ▸ setup.two.predecessor_mem)).elim))
   obtain ⟨j, fj, digit⟩ := digit
   have eq := fj.domain_eq_l hZ.1 (fn0_of_function_l (ZF.modelsKP hZ) fh₂); subst j
   have tR : M.mem t R := by
@@ -104,6 +112,7 @@ theorem Tg_ready_d.advance_l {p : Tg_params_d M.Domain} {X F L G J σ R n m h h�
   exact ⟨tR, ⟨eq ▸ hm', j₃, z', hj₃, fn0_of_function_l (ZF.modelsKP hZ) ft,
     tg_division_cycle_l hZ oc div₂ setup.three succ s₃ setup.empty, digits',
     Or.inr ⟨n, a, ℓ, q, κ, u, succ, (Tg_event_d.end_l (Tg_event_d.end_l ⟨i, div, v₁⟩ e₂) e₃), data, hκ⟩⟩,
-    aux, (Tg_event_d.end_l (Tg_event_d.end_l ⟨i, div, v₁⟩ e₂) e₃)⟩
+    aux, (Tg_event_d.end_l (Tg_event_d.end_l ⟨i, div, v₁⟩ e₂) e₃), hy, j₂,
+    fn0_of_function_l (ZF.modelsKP hZ) fh₂, div₂, answer, ⟨i, div, v₁⟩, Tg_event_d.end_l ⟨j₁, div₁, v₂⟩ e₃⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

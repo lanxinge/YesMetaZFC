@@ -1,5 +1,6 @@
 import YesMetaZFC.SetTheory.Descriptive.ScanResponse
 import YesMetaZFC.SetTheory.Descriptive.Path
+import YesMetaZFC.SetTheory.RelationChain
 
 /-! # 最小请求递归产生原有限历史策略
 
@@ -100,5 +101,21 @@ theorem cg_scan_answer_prefix_l {ω A F T e a s f H n h p t z v y : M.Domain}
   have eq := ft.2 p t' t pt' pt; subst t'
   have eq := (fseq_end_unique_l I hZF.1 endt' endt).2; subst v'
   exact output.elim And.right (fun h => (h.1 hv).elim)
+
+/-- 三步响应只追加历史，故任何较早轮的全部事件都保留到以后。 -/
+theorem Cg_scanner_d.history_mono_l {b : Bool} {ω A X F L O σ g K D T r a f H : M.Domain}
+    (c : Cg_scanner_d hZF ω A X F L O σ g K D T) (hw : M.IsOmega ω)
+    (run : Gi_d hZF b ω F T r a f H) :
+    ∀ n m h t, (M.mem n m ∨ n = m) → Rd_entry_d n h H → Rd_entry_d m t H → M.MemberSubset h t := by
+  let φ : BinarySchema 0 := { body := .subset (.bound 1) .newest }
+  have fn := fn0_function_l (ZF.modelsKP hZF) run.1
+  have chain := ZF.rel_chain_l I hZF φ ⟨Fin.elim0, fun _ => H⟩ hw fn
+    (fun _ _ _ _ _ _ xy yz z hz => yz z (xy z hz)) (by
+      intro n m h t succ nh mt
+      obtain ⟨x, q, _, pair, qt⟩ := run.2.2 n m h t succ nh mt
+      obtain ⟨_, _, _, _, _, _, _, _, _, _, e₁, _, _, e₂, _, _, _, e₃⟩ := c.step h x q t pair qt
+      exact fun z hz => e₃.subset_l I z (e₂.subset_l I z (e₁.subset_l I z hz)))
+  intro n m h t nm nh mt
+  exact nm.elim (fun lt => chain n m h t lt nh mt) (fun eq => (fn.1.2 m h t (eq ▸ nh) mt) ▸ fun _ hz => hz)
 
 end YesMetaZFC.SetTheory.Descriptive

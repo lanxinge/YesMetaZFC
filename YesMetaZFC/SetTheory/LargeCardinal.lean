@@ -12,7 +12,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTransfer
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameGenericIndices
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameCorollary610
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -103,8 +103,12 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 均来自地模型的原 I 控制集合。`generic_indices_l` 从参数域严格增长推出实际编号单射，
 再以内部 ω 的基数性构造首达时刻；`Tg_generic_target_d.capture_l` 证明首达局面的目标请求
 一旦具备原实数前缀和旧事件，就被最小编号规则准确选中。
-尚须证明原策略服从对局与递归实数坐标一致，把首达捕获接到反例分支，
-将旧实现关系集合化后在扩张内部构造严格下降高度列，并识别 Vδ 枚举与原 Col(ω,δ)。
-因此 6.1、6.7、6.10 及双树决定性端点仍未闭合。
+`generic_play_l` 已证明原策略对局与递归实数坐标一致；`capture_threshold_l` 自动补齐
+首达捕获的旧事件和前缀条件。旧实现关系先集合化，再在扩张内部对已捕获高度取最小元；
+实际回答下降和地稠密集再次捕获给出矛盾。`tg_lemma61_l` 经实际 δ≅Vδ 双射及泛型回拉，
+已闭合原 Col(ω,δ) 的二择一。`tg_corollary67_l` 自动插入无约束 ω 坐标，
+分别在地面和实际扩张内证明二坐标投影相同，沿同一策略完成 6.7。
+`tg_corollary610_l` 通过插入首手反转后继回合的归属，并在地面及原坍缩扩张内保留
+相应投影，已完成原投影博弈的地 I／泛型 II 二择一。双树决定性端点仍待证明。
 后续采用双树坍缩穷尽的直接决定性路线；实数吸收及 L(ℝ)⊨AD 蕴涵仍待证明。
 -/
