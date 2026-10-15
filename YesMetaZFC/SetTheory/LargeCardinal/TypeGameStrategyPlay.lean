@@ -11,7 +11,7 @@ theorem Tg_run_choice_d.play_l {ω c o C γ Z A S r X D K a F σ f H : M.Domain}
     (h : Tg_run_choice_d hZF ω c o C γ Z A S r X D K) (hw : M.IsOmega ω) (ho : ∀ z, ¬ M.mem z o)
     (ha : M.mem a A) (space : Fseq_space_d I ω A F) (sf : Fn0_d F A σ)
     (values : ∀ s y, Rd_entry_d s y σ ↔ M.mem s F ∧ Tg_response_d hZF ω A X K r a s y)
-    (ff : Fn0_d ω A f) (follows : Gm_follows_d I false ω σ f) (run : Gi_d hZF ω X K r a f H) :
+    (ff : Fn0_d ω A f) (follows : Gm_follows_d I false ω σ f) (run : Gi_d hZF true ω X K r a f H) :
     ∀ n u s, Rd_entry_d n u H → Tg_run_real_d A n u s → M.IsRestrictionOf I s f n := by
   classical
   have fn := fn0_function_l (ZF.modelsKP hZF) ff
@@ -47,7 +47,7 @@ theorem Tg_run_choice_d.play_l {ω c o C γ Z A S r X D K a F σ f H : M.Domain}
         by_cases he : Gm_even_d I ω n
         · exact (even he).trans (inp.elim (fun hx => fn.1.2 n x z hx.2 nz) (fun hx => (hx.1 ⟨he,z,nz⟩).elim))
         · have xa : x = a := inp.elim (fun hx => (he hx.1).elim) And.right
-          obtain ⟨G,grun⟩ := gi_exists_l hZF hw h.product h.function h.member ha fs.1 (fun _ _ hs => fs.output_mem_of_pairMember hs)
+          obtain ⟨G,grun⟩ := gi_exists_l hZF (b := true) hw h.product h.function h.member ha fs.1 (fun _ _ hs => fs.output_mem_of_pairMember hs)
           obtain ⟨u',_,nu'⟩ := grun.1.2.1 n hn
           have uu := run.prefix_l hZF hw (fn0_function_l (ZF.modelsKP hZF) h.function).1 fn.1 grun hn cut u u' nu nu'
           have response : Tg_response_d hZF ω A X K r a s y :=
@@ -79,7 +79,7 @@ theorem Tg_run_choice_d.sequence_l {ω c o C γ Z A S r X D K a F σ f : M.Domai
       Tg_sequence_d hZF ω c o C γ Z A X H ∧ (∀ i u, Rd_entry_d i u H → Tg_run_name_d S u) ∧
       ∀ i u, Rd_entry_d i u H → ∃ n s, M.SuccessorOf n i ∧ Tg_run_real_d A n u s ∧ M.IsRestrictionOf I s f n := by
   have fn := fn0_function_l (ZF.modelsKP hZF) ff
-  obtain ⟨G,run⟩ := gi_exists_l hZF hw h.product h.function h.member ha fn.1 (fun _ _ hi => fn.output_mem_of_pairMember hi)
+  obtain ⟨G,run⟩ := gi_exists_l hZF (b := true) hw h.product h.function h.member ha fn.1 (fun _ _ hi => fn.output_mem_of_pairMember hi)
   let ρ : Env M 1 := ⟨fun _ => G,fun _ => G⟩
   let φ : BinarySchema 1 := { body := set[3] ⟪∃ n, ⌜KP.succ0_m⌝ₚ(n,⌜(.bound 1 : Term 3)⌝ₛ) ∧
     ⌜rd_entry0_m⌝ₚ(n,⌜(.newest : Term 3)⌝ₛ,⌜(.bound 2 : Term 3)⌝ₛ)⟫ }

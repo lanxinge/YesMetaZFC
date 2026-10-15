@@ -106,15 +106,19 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "FiniteArithmeticSource", "TypeGameRealPrefix", "TypeGameRunMove", "TypeGameRunChoice",
              "TypeGameStrategy", "TypeGameStrategyPlay", "TypeGameArchivePlay", "TypeGameTransfer",
              "TypeGameReplyDescent", "TypeGameGenericExtension", "TypeGameGenericMove", "TypeGameGenericDense",
+             "TypeGameGenericTarget", "TypeGameGenericMeet", "TypeGameGenericCapture", "TypeGameResetMove",
+             "TypeGameReady", "TypeGameReadyStep", "TypeGameRoundSet", "TypeGameGenericStep", "TypeGameGenericRun", "TypeGameGenericIndices",
              "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("FiniteRecordCoordinate", "TypeGameGraphUnion", "SubtypeInsertion", "TypeGameNodeRank")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
             ("InputIteration", "Path", "TreeDependentChoice", "GameAttemptRank", "TreeRankPrefix",
+             "LeastLegalMove", "LegalMoveBounded", "ScanResponse", "ScanStrategy", "GameCompletion", "GameLegalStep", "GameControl",
              "FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
              "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
 MODULES += ["YesMetaZFC.SetTheory.IndexedIteration"]
+MODULES += ["YesMetaZFC.SetTheory.Ord.FirstCrossing"]
 MODULES += ["YesMetaZFC.SetTheory." + name for name in
             ("FinitaryTraceSyntax", "FinitaryFamily", "Card.FiniteParameters")]
 MODULES += ["YesMetaZFC.SetTheory.Card." + name for name in

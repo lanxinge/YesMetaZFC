@@ -4,7 +4,7 @@ import YesMetaZFC.SetTheory.InnerModel.Recursion.Graph
 
 /-! # 交替博弈输入的确定递归及有限前缀因果性
 
-只读取偶数位置的对手输入；奇数位置及尚未给出的输入统一使用固定字母。
+读取指定一方的输入；另一方的位置及尚未给出的输入统一使用固定字母。
 响应表预先固定后，递归仅用 ZF。相同有限输入必定产生相同的当前状态。
 -/
 namespace YesMetaZFC.SetTheory.Descriptive
@@ -12,60 +12,61 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+variable {b : Bool}
 
-def Gi_input_d (ω a f n x : M.Domain) : Prop := (Gm_even_d I ω n ∧ Rd_entry_d n x f) ∨
-  (¬ (Gm_even_d I ω n ∧ ∃ y, Rd_entry_d n y f)) ∧ x = a
-def gi_input_m {d} (ω a f n x : Term d) : Formula 1 d := set[d] ⟪
-  (⌜gm_even_m (𝒞 := kpair_convention_l)⌝ₚ(⌜ω⌝ₛ,⌜n⌝ₛ) ∧ ⌜rd_entry0_m⌝ₚ(⌜n⌝ₛ,⌜x⌝ₛ,⌜f⌝ₛ)) ∨
-  (¬ (⌜gm_even_m (𝒞 := kpair_convention_l)⌝ₚ(⌜ω⌝ₛ,⌜n⌝ₛ) ∧ (∃ y, ⌜rd_entry0_m⌝ₚ(⌜n⌝ₛ,y,⌜f⌝ₛ)))) ∧ ⌜x⌝ₛ = ⌜a⌝ₛ⟫
+def Gi_input_d (b : Bool) (ω a f n x : M.Domain) : Prop := (Gm_turn_d I b ω n ∧ Rd_entry_d n x f) ∨
+  (¬ (Gm_turn_d I b ω n ∧ ∃ y, Rd_entry_d n y f)) ∧ x = a
+def gi_input_m (b : Bool) {d} (ω a f n x : Term d) : Formula 1 d := set[d] ⟪
+  (⌜gm_turn_m (𝒞 := kpair_convention_l) b⌝ₚ(⌜ω⌝ₛ,⌜n⌝ₛ) ∧ ⌜rd_entry0_m⌝ₚ(⌜n⌝ₛ,⌜x⌝ₛ,⌜f⌝ₛ)) ∨
+  (¬ (⌜gm_turn_m (𝒞 := kpair_convention_l) b⌝ₚ(⌜ω⌝ₛ,⌜n⌝ₛ) ∧ (∃ y, ⌜rd_entry0_m⌝ₚ(⌜n⌝ₛ,y,⌜f⌝ₛ)))) ∧ ⌜x⌝ₛ = ⌜a⌝ₛ⟫
 derive_free_closed gi_input_m
-theorem gi_input_sat_l {d} (ρ : Env M d) (ω a f n x : Term d) :
-    Formula.satisfies ρ (gi_input_m ω a f n x) ↔ Gi_input_d hZF (ω.eval ρ) (a.eval ρ) (f.eval ρ) (n.eval ρ) (x.eval ρ) := by
-  simp only [gi_input_m,Gi_input_d,Formula.satisfies_disj_iff,Formula.satisfies_conj_iff,gm_even_sat_l I hZF.1,
+theorem gi_input_sat_l (b : Bool) {d} (ρ : Env M d) (ω a f n x : Term d) :
+    Formula.satisfies ρ (gi_input_m b ω a f n x) ↔ Gi_input_d hZF b (ω.eval ρ) (a.eval ρ) (f.eval ρ) (n.eval ρ) (x.eval ρ) := by
+  simp only [gi_input_m,Gi_input_d,Formula.satisfies_disj_iff,Formula.satisfies_conj_iff,gm_turn_sat_l I hZF.1 b,
     rd_entry0_sat_l hZF.1,Formula.satisfies_neg_iff,Formula.satisfies_exists_iff,
     Formula.satisfies_extensionalEq_iff_eq hZF.1,Definitional.Term.eval_weaken]; rfl
 theorem Gi_input_d.unique_l {ω a f n x y : M.Domain} (fn : M.IsSetFunction I f)
-    (h : Gi_input_d hZF ω a f n x) (g : Gi_input_d hZF ω a f n y) : x = y := by
+    (h : Gi_input_d hZF b ω a f n x) (g : Gi_input_d hZF b ω a f n y) : x = y := by
   rcases h with ⟨he,hx⟩ | ⟨hn,rfl⟩ <;> rcases g with ⟨he',hy⟩ | ⟨hn',rfl⟩
   · exact fn.2 n x y hx hy
   · exact (hn' ⟨he,x,hx⟩).elim
   · exact (hn ⟨he',y,hy⟩).elim
   · rfl
 
-def Gi_d (ω X K r a f H : M.Domain) : Prop := Fn0_d ω X H ∧
+def Gi_d (b : Bool) (ω X K r a f H : M.Domain) : Prop := Fn0_d ω X H ∧
   (∀ o, (∀ z, ¬ M.mem z o) → Rd_entry_d o r H) ∧
   ∀ i j s t, M.SuccessorOf j i → Rd_entry_d i s H → Rd_entry_d j t H →
-    ∃ x p, Gi_input_d hZF ω a f i x ∧ (I).Codes p s x ∧ Rd_entry_d p t K
-def gi_m {d} (ω X K r a f H : Term d) : Formula 1 d := set[d] ⟪
+    ∃ x p, Gi_input_d hZF b ω a f i x ∧ (I).Codes p s x ∧ Rd_entry_d p t K
+def gi_m (b : Bool) {d} (ω X K r a f H : Term d) : Formula 1 d := set[d] ⟪
   ⌜fn0_m⌝ₚ(⌜ω⌝ₛ,⌜X⌝ₛ,⌜H⌝ₛ) ∧ (∀ o, (∀ z, ¬ z ∈ o) → ⌜rd_entry0_m⌝ₚ(o,⌜r⌝ₛ,⌜H⌝ₛ)) ∧
   (∀ i j s t, ⌜KP.succ0_m⌝ₚ(j,i) → ⌜rd_entry0_m⌝ₚ(i,s,⌜H⌝ₛ) → ⌜rd_entry0_m⌝ₚ(j,t,⌜H⌝ₛ) →
-    ∃ x p, ⌜gi_input_m⌝ₚ(⌜ω⌝ₛ,⌜a⌝ₛ,⌜f⌝ₛ,i,x) ∧ ⌜kpair_m⌝ₚ(p,s,x) ∧ ⌜rd_entry0_m⌝ₚ(p,t,⌜K⌝ₛ))⟫
+    ∃ x p, ⌜(gi_input_m b)⌝ₚ(⌜ω⌝ₛ,⌜a⌝ₛ,⌜f⌝ₛ,i,x) ∧ ⌜kpair_m⌝ₚ(p,s,x) ∧ ⌜rd_entry0_m⌝ₚ(p,t,⌜K⌝ₛ))⟫
 derive_free_closed gi_m
-theorem gi_sat_l {d} (ρ : Env M d) (ω X K r a f H : Term d) : Formula.satisfies ρ (gi_m ω X K r a f H) ↔
-    Gi_d hZF (ω.eval ρ) (X.eval ρ) (K.eval ρ) (r.eval ρ) (a.eval ρ) (f.eval ρ) (H.eval ρ) := by
+theorem gi_sat_l (b : Bool) {d} (ρ : Env M d) (ω X K r a f H : Term d) : Formula.satisfies ρ (gi_m b ω X K r a f H) ↔
+    Gi_d hZF b (ω.eval ρ) (X.eval ρ) (K.eval ρ) (r.eval ρ) (a.eval ρ) (f.eval ρ) (H.eval ρ) := by
   simp only [gi_m,Gi_d,Formula.satisfies_conj_iff,fn0_sat_l hZF.1,Formula.satisfies_forall_iff,
     Formula.satisfies_imp_iff,Formula.satisfies_neg_iff,Formula.satisfies_mem_iff,rd_entry0_sat_l hZF.1,
-    KP.succ0_sat_l hZF.1,Formula.satisfies_exists_iff,gi_input_sat_l hZF,kpair_sat_l M hZF.1,
+    KP.succ0_sat_l hZF.1,Formula.satisfies_exists_iff,gi_input_sat_l hZF b,kpair_sat_l M hZF.1,
     Definitional.Term.eval_weaken]; rfl
 
 theorem gi_exists_l {ω A X D K r a f : M.Domain} (hw : M.IsOmega ω)
     (prod : M.IsCartesianProduct I D X A) (fn : Fn0_d D X K) (hr : M.mem r X) (ha : M.mem a A)
-    (ff : M.IsSetFunction I f) (range : ∀ i x, Rd_entry_d i x f → M.mem x A) : ∃ H, Gi_d hZF ω X K r a f H := by
+    (ff : M.IsSetFunction I f) (range : ∀ i x, Rd_entry_d i x f → M.mem x A) : ∃ H, Gi_d hZF b ω X K r a f H := by
   classical
-  have input i : ∃ x, M.mem x A ∧ Gi_input_d hZF ω a f i x := by
-    by_cases h : Gm_even_d I ω i ∧ ∃ x, Rd_entry_d i x f
+  have input i : ∃ x, M.mem x A ∧ Gi_input_d hZF b ω a f i x := by
+    by_cases h : Gm_turn_d I b ω i ∧ ∃ x, Rd_entry_d i x f
     · obtain ⟨he,x,hx⟩ := h; exact ⟨x,range i x hx,Or.inl ⟨he,hx⟩⟩
     · exact ⟨a,ha,Or.inr ⟨h,rfl⟩⟩
   obtain ⟨E,ep⟩ := ZF.exists_cartesianProduct hZF I ω X
   let ρ : Env M 4 := ⟨fun i => [ω,a,f,K].get i,fun _ => ω⟩
   let φ : BinarySchema 4 := { body := set[6] ⟪∃ i s x p,
     ⌜kpair_m⌝ₚ(⌜(.bound 1 : Term 6)⌝ₛ,i,s) ∧
-    ⌜gi_input_m⌝ₚ(⌜(.bound 2 : Term 6)⌝ₛ,⌜(.bound 3 : Term 6)⌝ₛ,⌜(.bound 4 : Term 6)⌝ₛ,i,x) ∧
+    ⌜(gi_input_m b)⌝ₚ(⌜(.bound 2 : Term 6)⌝ₛ,⌜(.bound 3 : Term 6)⌝ₛ,⌜(.bound 4 : Term 6)⌝ₛ,i,x) ∧
     ⌜kpair_m⌝ₚ(p,s,x) ∧ ⌜rd_entry0_m⌝ₚ(p,⌜(.newest : Term 6)⌝ₛ,⌜(.bound 5 : Term 6)⌝ₛ)⟫ }
-  have sat q t : φ.denote ρ q t ↔ ∃ i s x p, (I).Codes q i s ∧ Gi_input_d hZF ω a f i x ∧
+  have sat q t : φ.denote ρ q t ↔ ∃ i s x p, (I).Codes q i s ∧ Gi_input_d hZF b ω a f i x ∧
       (I).Codes p s x ∧ Rd_entry_d p t K := by
     simp only [φ,BinarySchema.denote,Formula.satisfies_exists_iff,Formula.satisfies_conj_iff,
-      kpair_sat_l M hZF.1,gi_input_sat_l hZF,rd_entry0_sat_l hZF.1,Definitional.Term.eval_weaken]; rfl
+      kpair_sat_l M hZF.1,gi_input_sat_l hZF b,rd_entry0_sat_l hZF.1,Definitional.Term.eval_weaken]; rfl
   have fk := fn0_function_l (ZF.modelsKP hZF) fn
   obtain ⟨L,lf,ls⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := E) (target := X) (by
     intro q hq
@@ -92,9 +93,9 @@ theorem gi_exists_l {ω A X D K r a f : M.Domain} (hw : M.IsOmega ω)
   exact ⟨x,p,inp,px,pt⟩
 
 theorem Gi_d.agree_l {ω X K r a f g H G n : M.Domain} (hw : M.IsOmega ω)
-    (kf : M.IsSetFunction I K) (ff : M.IsSetFunction I f) (h : Gi_d hZF ω X K r a f H)
-    (g' : Gi_d hZF ω X K r a g G) (hn : M.mem n ω)
-    (same : ∀ i, M.mem i n → ∀ x, Gi_input_d hZF ω a f i x ↔ Gi_input_d hZF ω a g i x) :
+    (kf : M.IsSetFunction I K) (ff : M.IsSetFunction I f) (h : Gi_d hZF b ω X K r a f H)
+    (g' : Gi_d hZF b ω X K r a g G) (hn : M.mem n ω)
+    (same : ∀ i, M.mem i n → ∀ x, Gi_input_d hZF b ω a f i x ↔ Gi_input_d hZF b ω a g i x) :
     ∀ s t, Rd_entry_d n s H → Rd_entry_d n t G → s = t := by
   let ρ : Env M 3 := ⟨fun i => [n,H,G].get i,fun _ => n⟩
   let φ : UnarySchema 3 := { body := set[4] ⟪(⌜(.newest : Term 4)⌝ₛ ∈ ⌜(.bound 1 : Term 4)⌝ₛ ∨
@@ -125,8 +126,8 @@ theorem Gi_d.agree_l {ω X K r a f g H G n : M.Domain} (hw : M.IsOmega ω)
   exact all n hn (Or.inr rfl)
 
 theorem Gi_d.prefix_l {ω X K r a f g H G n : M.Domain} (hw : M.IsOmega ω)
-    (kf : M.IsSetFunction I K) (ff : M.IsSetFunction I f) (h : Gi_d hZF ω X K r a f H)
-    (g' : Gi_d hZF ω X K r a g G) (hn : M.mem n ω) (cut : M.IsRestrictionOf I g f n) :
+    (kf : M.IsSetFunction I K) (ff : M.IsSetFunction I f) (h : Gi_d hZF b ω X K r a f H)
+    (g' : Gi_d hZF b ω X K r a g G) (hn : M.mem n ω) (cut : M.IsRestrictionOf I g f n) :
     ∀ s t, Rd_entry_d n s H → Rd_entry_d n t G → s = t := by
   apply h.agree_l hZF hw kf ff g' hn
   intro i hi x

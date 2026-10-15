@@ -27,7 +27,7 @@ theorem Tg_setup_d.answer_member_l {p : Tg_params_d M.Domain} {X n h v : M.Domai
 
 theorem Tg_rules_d.answer_l {p : Tg_params_d M.Domain} {X F L G J σ R i n h v : M.Domain}
     (setup : Tg_setup_d hZFC p X) (rules : Tg_rules_d hZF p X F L J)
-    (control : Cg_control_d I p.ω p.e X F L G J σ R)
+    (control : Cg_control_d I false p.ω p.e X F L G J σ R)
     (hi : M.mem i p.ω) (hn : M.mem n p.ω) (hh : M.mem h R) (fh : Fn0_d i X h)
     (div : M.IsOrdinalDivision I i p.c n p.a) (answer : Tg_answer_d hZF p n h v) :
     ∃ t j, Fseq_end_d I p.ω t h v ∧ M.mem j p.ω ∧ M.SuccessorOf j i ∧ Fn0_d j X t ∧ M.mem t R ∧
@@ -71,7 +71,7 @@ def tg_answer_control_m {d} (p : Tg_params_d (Term d)) (X R : Term d) : Formula 
 theorem tg_answer_control_l {d} (ρ : Env M d) (p : Tg_params_d (Term d)) (X F L G J σ R : Term d)
     (setup : Tg_setup_d hZFC (p.map_l (fun t => t.eval ρ)) (X.eval ρ))
     (rules : Tg_rules_d hZF (p.map_l (fun t => t.eval ρ)) (X.eval ρ) (F.eval ρ) (L.eval ρ) (J.eval ρ))
-    (control : Cg_control_d I (p.ω.eval ρ) (p.e.eval ρ) (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ)
+    (control : Cg_control_d I false (p.ω.eval ρ) (p.e.eval ρ) (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ)
       (J.eval ρ) (σ.eval ρ) (R.eval ρ)) : Formula.satisfies ρ (tg_answer_control_m p X R) := by
   simp only [tg_answer_control_m, Formula.satisfies_forallMem_iff, Formula.satisfies_forall_iff,
     Formula.satisfies_imp_iff, fn0_sat_l hZF.1, Formula.satisfies_isOrdinalDivision_iff I hZF.1,

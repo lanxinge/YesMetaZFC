@@ -15,7 +15,7 @@ universe u
 variable {M : Structure.{u}}
 
 theorem Tg_rules_d.aux_l (hZF : M.Models ZF) {p : Tg_params_d M.Domain} {X F L G J σ R i n h : M.Domain}
-    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) p.ω p.e X F L G J σ R)
+    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) false p.ω p.e X F L G J σ R)
     (hi : M.mem i p.ω) (hn : M.mem n p.ω) (hh : M.mem h R) (fh : Fn0_d i X h)
     (div : M.IsOrdinalDivision (kp_pair_l (ZF.modelsKP hZF)) i p.c n p.e) :
     ∃ a t j, M.mem a X ∧ Rd_entry_d h a σ ∧ Fseq_end_d (kp_pair_l (ZF.modelsKP hZF)) p.ω t h a ∧
@@ -68,7 +68,7 @@ def tg_aux_control_m {d} (p : Tg_params_d (Term d)) (X σ R : Term d) : Formula 
 
 theorem tg_aux_control_l (hZF : M.Models ZF) {d} (ρ : Env M d) (p : Tg_params_d (Term d)) (X F L G J σ R : Term d)
     (rules : Tg_rules_d hZF (p.map_l (fun t => t.eval ρ)) (X.eval ρ) (F.eval ρ) (L.eval ρ) (J.eval ρ))
-    (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) (p.ω.eval ρ) (p.e.eval ρ)
+    (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) false (p.ω.eval ρ) (p.e.eval ρ)
       (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ) (J.eval ρ) (σ.eval ρ) (R.eval ρ)) :
     Formula.satisfies ρ (tg_aux_control_m p X σ R) := by
   simp only [tg_aux_control_m, Formula.satisfies_forallMem_iff, Formula.satisfies_imp_iff,
@@ -82,7 +82,7 @@ theorem tg_aux_control_l (hZF : M.Models ZF) {d} (ρ : Env M d) (p : Tg_params_d
 
 /-- 零轮不可能引用较早轮，因此原策略的首个合法辅助走法必为重置。 -/
 theorem Tg_rules_d.start_l (hZF : M.Models ZF) {p : Tg_params_d M.Domain} {X F L G J σ R : M.Domain}
-    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) p.ω p.e X F L G J σ R) :
+    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d (kp_pair_l (ZF.modelsKP hZF)) false p.ω p.e X F L G J σ R) :
     ∃ a h j, M.mem a X ∧ Rd_entry_d p.e a σ ∧ Fseq_end_d (kp_pair_l (ZF.modelsKP hZF)) p.ω h p.e a ∧
       M.mem j p.ω ∧ M.SuccessorOf j p.e ∧ Fn0_d j X h ∧ M.mem h R ∧
       M.IsOrdinalDivision (kp_pair_l (ZF.modelsKP hZF)) j p.c p.e p.a ∧ Tg_aux_d hZF p p.e p.e a ∧
@@ -131,7 +131,7 @@ theorem tg_start_control_closed_l {d} (p : Tg_params_d (Term d)) (X σ R : Term 
 theorem tg_start_control_l (hZFC : M.Models ZFC) {d} (ρ : Env M d) (p : Tg_params_d (Term d)) (X F L G J σ R : Term d)
     (setup : Tg_setup_d hZFC (p.map_l (fun t => t.eval ρ)) (X.eval ρ))
     (rules : Tg_rules_d (ZFC.models_zf_l hZFC) (p.map_l (fun t => t.eval ρ)) (X.eval ρ) (F.eval ρ) (L.eval ρ) (J.eval ρ))
-    (control : Cg_control_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) (p.ω.eval ρ) (p.e.eval ρ)
+    (control : Cg_control_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) false (p.ω.eval ρ) (p.e.eval ρ)
       (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ) (J.eval ρ) (σ.eval ρ) (R.eval ρ)) :
     Formula.satisfies ρ (tg_start_control_m p X σ R) := by
   let hZF := ZFC.models_zf_l hZFC
@@ -158,7 +158,7 @@ def tg_control0_m : Formula 1 19 :=
   let v : Fin 19 → Term 19 := Term.bound
   let p := tg_control_params_d v
   .conj (tg_tables_m p.ω p.e p.δ p.E p.P p.Q) (.conj
-    (cg_control_m p.ω p.e (v 12) (v 13) (v 14) (v 15) (v 16) (v 17) (v 18))
+    (cg_control_m false p.ω p.e (v 12) (v 13) (v 14) (v 15) (v 16) (v 17) (v 18))
     (.conj (tg_rules_m p (v 12) (v 13) (v 14) (v 16))
       (.conj (tg_aux_control_m p (v 12) (v 17) (v 18))
         (.conj (tg_reset_control_m p) (.conj (tg_start_control_m p (v 12) (v 17) (v 18))
@@ -210,7 +210,7 @@ theorem Tg_game_d.control_l (hZFC : M.Models ZFC)
     refine ⟨game.setup.tables_l hZFC ρ (.bound 0) (.bound 1) (.bound 5) (.bound 9) (.bound 10) (.bound 11)
       rfl rfl rfl rfl rfl rfl, ?_⟩
     apply (Formula.satisfies_conj_iff ..).mpr
-    refine ⟨(cg_control_sat_l I hZF.1 ..).mpr control, ?_⟩
+    refine ⟨(cg_control_sat_l I hZF.1 false ..).mpr control, ?_⟩
     have rules : Tg_rules_d hZF p X F L J :=
       ⟨game.setup.omega, game.setup.empty, game.setup.one, game.setup.two, game.setup.three,
         woodin, game.setup.rank, game.setup.letters, root, game.setup.low, game.histories.2, game.owner⟩

@@ -17,7 +17,7 @@ def Tg_digit_end_d (p : Tg_params_d M.Domain) (X R i n h v : M.Domain) : Prop :=
     Tg_event_d I p.c n p.b t v
 
 theorem Tg_rules_d.digit_l {p : Tg_params_d M.Domain} {X F L G J σ R i n h v : M.Domain}
-    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d I p.ω p.e X F L G J σ R)
+    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d I false p.ω p.e X F L G J σ R)
     (hi : M.mem i p.ω) (hn : M.mem n p.ω) (hh : M.mem h R) (fh : Fn0_d i X h)
     (div : M.IsOrdinalDivision I i p.c n p.b) (even : Gm_even_d I p.ω n) (hv : M.mem v p.A) :
     Tg_digit_end_d hZF p X R i n h v := by
@@ -40,7 +40,7 @@ theorem Tg_rules_d.digit_l {p : Tg_params_d M.Domain} {X F L G J σ R i n h v : 
     tg_division_cycle_l hZF oc div rules.three next succ rules.empty, i, div, ei ▸ d.last_value⟩
 
 theorem Tg_rules_d.digit_strategy_l {p : Tg_params_d M.Domain} {X F L G J σ R i n h : M.Domain}
-    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d I p.ω p.e X F L G J σ R)
+    (rules : Tg_rules_d hZF p X F L J) (control : Cg_control_d I false p.ω p.e X F L G J σ R)
     (hi : M.mem i p.ω) (hn : M.mem n p.ω) (hh : M.mem h R) (fh : Fn0_d i X h)
     (div : M.IsOrdinalDivision I i p.c n p.b) (odd : ¬ Gm_even_d I p.ω n) :
     ∃ v, M.mem v p.A ∧ Rd_entry_d h v σ ∧ Tg_digit_end_d hZF p X R i n h v := by
@@ -87,7 +87,7 @@ def tg_digit_control_m {d} (p : Tg_params_d (Term d)) (X σ R : Term d) : Formul
 
 theorem tg_digit_control_l {d} (ρ : Env M d) (p : Tg_params_d (Term d)) (X F L G J σ R : Term d)
     (rules : Tg_rules_d hZF (p.map_l (fun t => t.eval ρ)) (X.eval ρ) (F.eval ρ) (L.eval ρ) (J.eval ρ))
-    (control : Cg_control_d I (p.ω.eval ρ) (p.e.eval ρ) (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ)
+    (control : Cg_control_d I false (p.ω.eval ρ) (p.e.eval ρ) (X.eval ρ) (F.eval ρ) (L.eval ρ) (G.eval ρ)
       (J.eval ρ) (σ.eval ρ) (R.eval ρ)) : Formula.satisfies ρ (tg_digit_control_m p X σ R) := by
   simp only [tg_digit_control_m, tg_digit_end_m, Formula.satisfies_forallMem_iff,
     Formula.satisfies_imp_iff, Formula.satisfies_conj_iff, fn0_sat_l hZF.1,

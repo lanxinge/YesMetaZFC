@@ -29,7 +29,7 @@ theorem Tg_setup_d.generic_continue_l {p : Tg_params_d M.Domain}
     (node : Tg_node_d I k p.S s t g') (extend : ∀ a, M.mem a g' ↔ M.mem a g ∨ a = x)
     (hχ : M.mem χ p.δ) (hτχ : M.MemberSubset τ χ) (hZ : V_d I χ Z) (hs : M.mem s Z) (ht : M.mem t Z) :
     ∃ κ C a u μ A d H m V P r', M.mem χ κ ∧ M.mem κ p.δ ∧ V_d I κ C ∧ M.mem a X ∧ Tg_aux_data_d a ℓ t κ u ∧
-      M.SuccessorOf μ β ∧ V_d I μ A ∧ Smem_d I d A H ∧ M.SuccessorOf m N ∧
+      M.SuccessorOf μ β ∧ V_d I μ A ∧ Smem_d I d A H ∧ M.SuccessorOf m N ∧ (∀ x, M.mem x V ↔ M.mem x C ∨ x = κ) ∧
       Tt_realized_d I p.ω d A H m r' p.δ V P u ∧ Rd_entry_d p.e p.S r' ∧ Rd_entry_d N β r' ∧ Sg_set_d I p.e N r' g' ∧
       ∀ n h z, Tg_digits_d hZF p.c p.b n p.A h z → M.IsRestrictionOf I s z k → M.mem ℓ n →
         Tg_event_d I p.c ℓ p.e h a₀ → Tg_event_d I p.c ℓ p.a h b₀ →
@@ -97,7 +97,7 @@ theorem Tg_setup_d.generic_continue_l {p : Tg_params_d M.Domain}
     obtain ⟨y, _, v, _, hv⟩ := ft.2.1 j hk.predecessor_mem
     exact setup.empty v (eq ▸ hv)
   refine ⟨κ, C, a, u, μ, A, d, H, m, V, P, r', above, hκ, language.rank, ha, move,
-    hμ, hA, lower, hm, full, root, last', nextSet, fun n h z digits real hℓn old₀ old₁ growth => ?_⟩
+    hμ, hA, lower, hm, language.constants, full, root, last', nextSet, fun n h z digits real hℓn old₀ old₁ growth => ?_⟩
   exact ⟨ℓ, t, κ, u, k, N, m, z, s, C, V, P, qr, qm, qb, qh, qn, C, V, E,
     q'.largest, q'.domain, q'.inaccessible, q'.stretch,
     move, hκ, ft, hN, hm, digits, real, request, queryData, uu, data, elastic', truth, growth,

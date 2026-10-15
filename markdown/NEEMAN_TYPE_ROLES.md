@@ -15,7 +15,7 @@
 [TypeGame](../YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 现已装配原七条规则和仅含额外空根条件的闭博弈，
 固定代码表覆盖全部内部元数；最早违规、合法历史树及三阶段时序均已核验。
 [TypeGameDeterminacy](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 已由 4.16
-给出原策略空间中某一方的获胜策略；5.15 的迭代获胜论证仍待完成。以下 Gk 论证作为旧路线记录，
+给出原策略空间中某一方的获胜策略；5.15 的实际 II 策略转移现已完成于 TypeGameTransfer。以下 Gk 论证作为旧路线记录，
 不是当前游戏的附加规则。
 
 ## 问题与最小改动

@@ -15,8 +15,8 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Cg_control_d.tree_l {ω e X F L G J σ R : M.Domain} (hω : M.IsOmega ω)
-    (control : Cg_control_d I ω e X F L G J σ R) : Tree_d F R := by
+theorem Cg_control_d.tree_l {b : Bool} {ω e X F L G J σ R : M.Domain} (hω : M.IsOmega ω)
+    (control : Cg_control_d I b ω e X F L G J σ R) : Tree_d F R := by
   refine ⟨fun s hs => ((control.legal s).mp ((control.positions s).mp hs).1).1, ?_⟩
   intro s hs t ht sub
   obtain ⟨legal, follows⟩ := (control.positions s).mp hs
@@ -33,7 +33,7 @@ theorem Cg_control_d.tree_l {ω e X F L G J σ R : M.Domain} (hω : M.IsOmega ω
     (hv.elim fun p hp => ⟨p, hp.1, sub p hp.2⟩)
 
 theorem Cg_control_d.no_branch_l {ω e X F L G J B W σ R f : M.Domain} (hω : M.IsOmega ω)
-    (control : Cg_control_d I ω e X F L G J σ R) (runs : M.IsFunctionSpace I B ω X)
+    (control : Cg_control_d I false ω e X F L G J σ R) (runs : M.IsFunctionSpace I B ω X)
     (payoff : Cg_payoff_d (M := M) ω X F L J B W) (win : Cg_win_d I false ω X F J B W σ)
     (ff : M.IsSetFunctionFromTo I f ω X) : ¬ Branch_d F R f := by
   intro branch
@@ -91,7 +91,7 @@ def cg_rank_m {d} (ω X R : Term d) : Formula 1 d := .existsE (.existsE
 derive_free_closed cg_rank_m
 
 theorem Cg_control_d.rank_l {ω e X F L G J B W σ R : M.Domain} (hω : M.IsOmega ω) (dc : Dc_d I ω)
-    (control : Cg_control_d I ω e X F L G J σ R) (runs : M.IsFunctionSpace I B ω X)
+    (control : Cg_control_d I false ω e X F L G J σ R) (runs : M.IsFunctionSpace I B ω X)
     (payoff : Cg_payoff_d (M := M) ω X F L J B W) (win : Cg_win_d I false ω X F J B W σ) :
     ∃ α H, Cg_rank_d ω X R α H := by
   obtain ⟨E, edges⟩ := tree_edges_l I hZF ω R

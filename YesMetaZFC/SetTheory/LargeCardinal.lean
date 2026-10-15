@@ -12,7 +12,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTransfer
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameGenericDense
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameGenericIndices
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -88,7 +88,7 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 `Tg_past_events_d.continue_tree_l` 从原规则 (6) 自动选择旧完整源，构造 `tc_seed0_m` 并完成两条实际树边。
 `Tg_run_d.advance_l` 对两种分支统一保持全部历史不变量，并自动产生下一请求。
 `Tg_run_choice_d` 在对手落子前，对实际反射闭包中的全部状态与输入统一选择后继。
-`Gi_d` 只读取偶数位置的对手输入；其内部递归及有限前缀因果性仅使用 ZF。
+`Gi_d` 按指定玩家读取对手输入；其内部递归及有限前缀因果性仅使用 ZF。
 `Tg_run_choice_d.strategy_l` 构造全部有限局面上的实际策略，`play_l` 证明任何服从对局
 与递归保存的完整实数前缀逐轮相同，`sequence_l` 由此产生原统一历史列。
 工作模型不要求满足整个 ZFC。有限树取并、偶数枝排除及含 padding 的奇数返回
@@ -97,7 +97,14 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 把第一坐标的并图送回该对局。`Tg_sequence_d.branch_l` 输出这一实际原树分支。
 `Tg_game_d.transfer_l` 已完成 5.15：从辅助博弈 II 的获胜策略统一构造原博弈
 有限局面空间、偶数时序、无限对局空间、第一投影的补收益集合及 II 的获胜策略。
-泛型 I 方向已实现任意排列下的回答下降、无界弹性继续请求及有限条件的稠密延长；
-泛型最小请求策略与首达捕获尚未装配，6.1、6.7、6.10 及双树决定性端点仍待完成。
+泛型 I 方向的 `generic_meet_l` 已在地模型中实际分离稠密集并调用泛型性。
+`reset_move_l` 与 `ready_move_l` 构造原规则下任意合适有限状态的合法重置；
+`generic_strategy_l` 构造最小编号驱动的原有限历史策略，并对全部输入证明递归状态
+均来自地模型的原 I 控制集合。`generic_indices_l` 从参数域严格增长推出实际编号单射，
+再以内部 ω 的基数性构造首达时刻；`Tg_generic_target_d.capture_l` 证明首达局面的目标请求
+一旦具备原实数前缀和旧事件，就被最小编号规则准确选中。
+尚须证明原策略服从对局与递归实数坐标一致，把首达捕获接到反例分支，
+将旧实现关系集合化后在扩张内部构造严格下降高度列，并识别 Vδ 枚举与原 Col(ω,δ)。
+因此 6.1、6.7、6.10 及双树决定性端点仍未闭合。
 后续采用双树坍缩穷尽的直接决定性路线；实数吸收及 L(ℝ)⊨AD 蕴涵仍待证明。
 -/
