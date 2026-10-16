@@ -2,11 +2,12 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReturnUnion
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReturnTree
 import YesMetaZFC.SetTheory.Descriptive.Tree
 
-/-! # 三张并图沿返回因子给出原树中的共尾分支
+/-! # 三张并图沿初等图给出目标树中的共尾分支
 
-并图不必是极限模型的元素。对它们的值逐点施加实际返回映射，有限图
+并图不必是极限模型的元素。对它们的值逐点施加实际初等映射，有限图
 的初等像则由自然数固定性识别。三张图合成一个 ω 列，其共尾多个前缀
-属于原树；原树的前缀封闭性随后给出每个内部有限前缀。
+属于目标树；目标树的前缀封闭性随后给出每个内部有限前缀。
+5.15 使用返回因子；任意良基分支使用极限上的实际恒等图。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal Descriptive
@@ -17,7 +18,7 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 def Tg_cofinal_branch_d (ω X S f : M.Domain) : Prop := Fn0_d ω X f ∧
   ∀ n, M.mem n ω → ∃ m q, M.mem n m ∧ M.mem m ω ∧ M.mem q S ∧ Tg_graph_d I m q ∧ M.MemberSubset q f
 
-theorem Tg_return_sequence_d.original_l {ω H π P N b D J F c X R S S' σ x A : M.Domain} {g : Fin 3 → M.Domain}
+theorem Tg_return_sequence_d.image_l {ω H π P N b D J F c X R S S' σ x A : M.Domain} {g : Fin 3 → M.Domain}
     (h : Tg_return_sequence_d hZF ω H π P N b D J F) (xt : M.TransitiveSet X) (mx : Smem_d I c X R)
     (origin : Tg_return_tree_d hZF ω c X N H π P S S' σ x) (input : Fn0_d ω A x)
     (unions : ∀ a, Tg_return_union_d hZF ω N F a (g a)) :

@@ -80,6 +80,7 @@ theorem it_working_image_l {ω c₀ α ξ T Q G E H k c d X R Y S κ K K' δ A L
       It_pnice_d hZF ω c₀ β T' Q' G' E' H' ∧ It_extension_d α ξ k T Q G E β T' Q' G' E' ∧
       Rd_entry_d α d' Q' ∧ It_map_d G' k α j ∧ Smem_d I d' N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
       It_ultra_d hZF ω κ L F d d' j ∧ Wd_crit_d I Y j κ κ' ∧ M.MemberSubset L κ' ∧
+      (∃ p, Rd_entry_d ξ p E' ∧ It_payload_d p κ L F) ∧
       (∀ i μ, Rd_entry_d i μ H' → M.mem μ κ' ∨ μ = κ') ∧
       M.mem W X ∧ Vr_d X L W ∧ Er_level_d N L W ∧ (∀ μ, M.mem μ L → Ea_agree_d ω μ X N) ∧
       (∀ x y, M.mem x V → Rd_entry_d x y f → Rd_entry_d x y j) ∧
@@ -90,8 +91,8 @@ theorem it_working_image_l {ω c₀ α ξ T Q G E H k c d X R Y S κ K K' δ A L
   have agree : Ea_agree_d ω κ Y X := fun n D B hn hd sub =>
     ((source.source.rank_agree_l hZF hV' rank' hζ hκV n D B hn hd sub).symm).trans
       (owner.source.rank_agree_l hZF hV rank hζ hκV n D B hn hd sub)
-  obtain ⟨β, T', Q', G', E', H', d', j, _, N, R', K₀, W, κ', next, extension, target, edge, ultra,
-    _, _, support, mn, ready, critical, bound, hW, common, level, _, _, agreement⟩ :=
+  obtain ⟨β, T', Q', G', E', H', d', j, p, N, R', K₀, W, κ', next, extension, target, edge, ultra,
+    payload, entry, support, mn, ready, critical, bound, hW, common, level, _, _, agreement⟩ :=
     it_working_rank_apply_l hZFC tree succ hc hd mx my owner source agree hA cut hδ loc strength inacc above
   have powerA := owner.power.rank_l hZF owner.source.transitive hA cut hδ
   obtain ⟨P, hP, subsets⟩ := powerA K₁ small.finite_mem
@@ -119,6 +120,6 @@ theorem it_working_image_l {ω c₀ α ξ T Q G E H k c d X R Y S κ K K' δ A L
   have fixed := (ultra.elementary_l hZF my.1 mn.1).rank_fixed_l hZF source.source.omega
     source.source.transitive ready.source.transitive my mn critical.image critical.fixed hV₀Y rY hV₀N rN
   exact ⟨β, T', Q', G', E', H', d', j, N, R', K₀, W, κ', next, extension, target, edge, mn, ready,
-    ultra, critical, bound, heights, hW, common, level, agreement, same, V₀, hV₀Y, rY, hV₀N, rN, fixed⟩
+    ultra, critical, bound, ⟨p, entry, payload⟩, heights, hW, common, level, agreement, same, V₀, hV₀Y, rY, hV₀N, rN, fixed⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

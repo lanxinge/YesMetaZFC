@@ -32,7 +32,7 @@ theorem Tg_sequence_d.branch_l {ω c o C γ Z A D H θ X R S x Y F : M.Domain}
     (Fin.cases (U 5) (Fin.cases H (fun _ : Fin 1 => S)))
   obtain ⟨odd,different⟩ := back.branch_l hZF
   obtain ⟨_,tail⟩ := h.odd_tail_l hZF tree columns branch bs odd different
-  obtain ⟨π,N,P,limit,params⟩ := h.odd_limit_l hZF tree archive columns back
+  obtain ⟨π,N,P,returnedModel,limit,params⟩ := h.odd_limit_l hZF tree archive columns back
   obtain ⟨D',J,F',returned⟩ := h.return_sequence_l hZF tree archive columns odd tail limit
   obtain ⟨g₀,union₀⟩ := returned.union_l hZF 0
   obtain ⟨g₁,union₁⟩ := returned.union_l hZF 1
@@ -40,8 +40,8 @@ theorem Tg_sequence_d.branch_l {ω c o C γ Z A D H θ X R S x Y F : M.Domain}
   let g : Fin 3 → M.Domain := Fin.cases g₀ (Fin.cases g₁ (fun _ => g₂))
   have unions : ∀ a, Tg_return_union_d hZF ω N F' a (g a) :=
     Fin.cases union₀ (Fin.cases union₁ (Fin.cases union₂ (fun a => Fin.elim0 a)))
-  obtain ⟨S',σ,origin⟩ := limit.tree_l hZF hw ho tree.tree.diagram root memS (params 1) rootTree plays
-  obtain ⟨Y',q,t,u,cofinal,ft,fu,join⟩ := returned.original_l hZF (ZF.v_transitive_l I hZF rank) model origin input unions
+  obtain ⟨S',σ,origin⟩ := returnedModel.tree_l hZF hw ho tree.tree.diagram root memS (params 1) rootTree plays
+  obtain ⟨Y',q,t,u,cofinal,ft,fu,join⟩ := returned.image_l hZF (ZF.v_transitive_l I hZF rank) model origin input unions
   have full := cofinal.branch_l hZF hw space closed
   exact ⟨q,t,u,full.1,full.2,ft,fu,join⟩
 

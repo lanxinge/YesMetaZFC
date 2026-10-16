@@ -37,13 +37,21 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
       intro p hp
       obtain ⟨i,hi,y,hy,pair⟩ := real.1.1 p hp
       exact ⟨i,h.source.source.omega.transitive hZF _ hn i hi,y,hy,pair⟩)
-  obtain ⟨k, β, T₁, Q₁, G₁, E₁, H₁, a, Y, R, μ, K, η₁, C₁, π₁,
-    nice₁, ext₁, node₁, my, sy, cy, root₁, image₁, anchor₁, n₁, ρ, round, request, high, odd, ⟨lowS, played⟩,
-    β₂, T₂, Q₂, G₂, E₂, H₂, d, j, N, R₂, K₂, L, F, κ, U, D, u₀, η₂, C₂, W, π₂,
-    nice₂, ext₂, node₂, edge, mn, sn, ultra, crit, limit, bound, subset, heights,
-    iU, iD, iu, reply, iη, iC, cn, hW, common, level, root₂, image₂, anchor₂, update⟩ :=
-    h.context.tree_successor_l hZFC h.source nc ι issued h.omega h.tree h.successor h.node h.model ho
+  -- 记录已给出全部树参数；显式传入，避免从展开的长记录反推这些参数。
+  have step := h.context.tree_successor_l hZFC
+      (ω := ω) (X := v 0) (R := v 1) (μ := v 2) (K := v 3) (η := v 4) (C := v 5)
+      (c₀ := c₀) (α := v 6) (ξ := v 7) (T := v 8) (Q := v 9) (G := v 10) (E := v 11) (L := v 12)
+      (H := v 13) (b := v 14) (c := v 15) (o := o) (π := v 16) (Cᵣ := Cᵣ) (γ := γ) (Z := Z)
+      h.source nc ι issued h.omega h.tree h.successor h.node h.model ho
       h.root h.image h.anchor hγ hωZ (h.alphabet.symm ▸ hAZ) h.lower h.past h.links h.roots h.events h.play h.below h.bounds
+  obtain ⟨k, β, T₁, Q₁, G₁, E₁, H₁, a, Y, R, μ, K, η₁, C₁, π₁,
+    nice₁, ext₁, node₁, my, sy, cy, root₁, image₁, anchor₁, lower₁, n₁, ρ, round, request, high, odd, ⟨lowS, played⟩, step⟩ := step
+  obtain ⟨β₂, T₂, Q₂, G₂, E₂, H₂, d, j, N, R₂, K₂, L, F, κ, U, D, u₀, η₂, C₂, W, π₂,
+    nice₂, ext₂, node₂, edge, mn, sn, ultra, crit, payload₂, limit, bound, subset, heights,
+    iU, iD, iu, reply, iη, iC, cn, hW, common, level, root₂, image₂, anchor₂, update⟩ := step
+  obtain ⟨p₂, entry₂, pay₂⟩ := payload₂
+  have critical := ext₂.critical_bound_l (ext₁.critical_bound_l h.critical lower₁)
+    (it_payload_bound_l (ZF.modelsKP hZF) nice₂.tree.move_function entry₂ pay₂ h.lower)
   have hj := ultra.elementary_l hZF h.model.1 mn.1
   have fn := hj.1.1.1.2
   have natural := hj.natural_l hZF h.source.source.omega h.source.source.transitive sn.source.transitive
@@ -260,7 +268,7 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
     ext₂.1, nice₂, node₂, mn, root₂, image₂, anchor₂, record, values,
     (congrArg Subtype.val (control 0)).trans ωθ, (congrArg Subtype.val (control 6)).trans eA,
     fun z hz => κlimit.1.transitive κ growing z (highκ z hz), em.symm ▸ past, links, roots, events, growing, heights, span,
-    ⟨S₀, treeImage, treeNames⟩, plays⟩,
+    ⟨S₀, treeImage, treeNames⟩, plays, critical⟩,
     ⟨k, β, T₁, Q₁, G₁, E₁, H₁, j, (θ.bound 20).val, nice₁, ext₁, ext₂, rfl, sm, edge,
     images', images 20, keep, proper, historyKeep, Y, R, μ, K, η₁, C₁, L, W, q,
     (ρ.bound 19).val, (ρ.bound 22).val, (ρ.bound 40).val, (ρ.bound 42).val, newest, ⟨_, code, rfl, rfl, rfl, request 18, rfl⟩, odd⟩, move⟩

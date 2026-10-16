@@ -84,26 +84,22 @@ structure Tg_return_sequence_d (ω H π P N b D J F : M.Domain) : Prop where
     Rt_tuple_d v r → Rt_tuple_d w s → M.SuccessorOf (w 0) (v 0) ∧
       ∀ a : Fin 3, M.MemberSubset (v ([2,3,4].get a)) (w ([2,3,4].get a))
 
-theorem Tg_sequence_d.return_sequence_l {ω c o C γ Z A D f X B b π N P : M.Domain} {U : Fin 6 → M.Domain}
+theorem Tg_sequence_d.return_sequence_l {ω c o C γ Z A D f B b π N P : M.Domain} {U : Fin 6 → M.Domain}
     (h : Tg_sequence_d hZF ω c o C γ Z A D f)
     (tree : It_pnice_d hZF ω c ω (U 0) (U 1) (U 2) (U 3) (U 4)) (archive : M.IsSetFunction I (U 5))
     (columns : ∀ a x, M.mem x (U a) ↔ Tg_run_value_d ⟨8+a.val, by omega⟩ f x)
     (branch : It_branch_d ω (U 0) b) (tail : Tg_odd_tail_d ω (U 5) (U 0) (U 2) B b)
-    (limit : Tg_odd_limit_d hZF ω o c X (U 0) (U 1) (U 2) b (U 5) π N P) :
+    (limit : Tg_odd_limit_d hZF ω (U 0) (U 2) b (U 5) π N P) :
     ∃ D' J F, Tg_return_sequence_d hZF ω (U 5) π P N b D' J F := by
-  obtain ⟨B₀, Rₐ, a, U₀, Rᵤ, u, Q₀, G₀, H₀, c₀, X₀, R₀, π₀, d, W, σ,
-    _, _, _, _, _, hj, _, _, _, _, _, _, _, small, mn, cone, ready, _, _, _, _, nodes, proper⟩ := limit
+  have nodes := limit.nodes
+  have proper := limit.proper
   have hw := tree.tree.omega
   obtain ⟨z, hz, _, hzOdd, late⟩ := tail
   obtain ⟨J, jf, first, adjacent, above⟩ := branch.successor_sequence_l hZF hw tree.tree.diagram.order hz
-  have legs i j (hij : Rd_entry_d i j P) : M.IsSetFunction I j := by
-    have hi := branch.subset i ((cone.domain i).mpr ⟨j, hij⟩)
-    obtain ⟨c, X, R, hc, mx⟩ := small.model_l hZF hi
-    exact (cone.elementary i j c X R hij hc mx).1.1.1
   have unique {m n i} {v w : Fin 5 → M.Domain}
       (hv : Tg_return_node_d ω (U 5) π P m i (v 0) (v 1) (v 2) (v 3) (v 4))
       (hw' : Tg_return_node_d ω (U 5) π P n i (w 0) (w 1) (w 2) (w 3) (w 4)) : v = w :=
-    h.return_unique_l hZF hw columns archive hj.1.2 cone.function legs hv hw'
+    h.return_unique_l hZF hw columns archive limit.injective limit.function limit.legs hv hw'
   let ρ : Env M 5 := ⟨fun i => [ω, U 5, π, P, J].get i, fun _ => ω⟩
   let φ : BinarySchema 5 := { body := set[7] ⟪∃ k,
     ⌜rd_entry0_m⌝ₚ(⌜(.bound 1 : Term 7)⌝ₛ, k, ⌜(.bound 6 : Term 7)⌝ₛ) ∧
@@ -134,9 +130,6 @@ theorem Tg_sequence_d.return_sequence_l {ω c o C γ Z A D f X B b π N P : M.Do
   obtain ⟨D', ds⟩ := ZF.exists_functionalImage hZF φ ρ ω total one
   obtain ⟨F, ff, fs⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ total (fun i _ => one i)
     (fun i r hi hr => (ds r).mpr ⟨i, hi, hr⟩)
-  obtain ⟨N', W', _, mn', sn⟩ := ready
-  obtain ⟨eN, eW⟩ := smdl_unique_l I mn'.1 mn.1
-  subst N' W'
   have read i r (v : Fin 5 → M.Domain) (hr : Rd_entry_d i r F) (code : Rt_tuple_d v r) :
       ∃ k m, Rd_entry_d i k J ∧ Tg_return_node_d ω (U 5) π P m k (v 0) (v 1) (v 2) (v 3) (v 4) ∧
         M.mem (v 0) ω ∧ (∀ a, M.mem (v a) N) ∧ Tg_node_d I (v 0) (v 1) (v 2) (v 3) (v 4) := by
@@ -154,11 +147,11 @@ theorem Tg_sequence_d.return_sequence_l {ω c o C γ Z A D f X B b π N P : M.Do
     refine ⟨k, m, hk, trace, eq.symm ▸ hn, ?_, eq.symm ▸ node⟩
     intro a
     rw [eq]
-    exact Fin.cases (sn.transitive ω sn.omega_mem n' hn) (Fin.cases hS (Fin.cases hs (Fin.cases ht (Fin.cases hg (fun a => Fin.elim0 a))))) a
+    exact Fin.cases (limit.transitive ω limit.omega_mem n' hn) (Fin.cases hS (Fin.cases hs (Fin.cases ht (Fin.cases hg (fun a => Fin.elim0 a))))) a
   have coded i r (hr : Rd_entry_d i r F) : ∃ v : Fin 5 → M.Domain, Rt_tuple_d v r := by
     obtain ⟨_, _, _, n, S, s, t, g, _, pack⟩ := (sat i r).mp ((fs i r).mp hr).2
     exact ⟨_, pack⟩
-  refine ⟨D', J, F, ⟨hw, sn.transitive, sn.omega_mem, jf, fn0_of_function_l (ZF.modelsKP hZF) ff, coded, read, ?_⟩⟩
+  refine ⟨D', J, F, ⟨hw, limit.transitive, limit.omega_mem, jf, fn0_of_function_l (ZF.modelsKP hZF) ff, coded, read, ?_⟩⟩
   intro i j r s v w succ hr hs code pack
   obtain ⟨x, m, hx, tr, _, _, _⟩ := read i r v hr code
   obtain ⟨y, n, hy, tr', _, _, _⟩ := read j s w hs pack

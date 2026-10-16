@@ -17,17 +17,17 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
     (source : Ep_source_d hZF ω κ K X R) (hm : Smem_d I b X R)
     (family : Em_source_d ω κ L X F) (h : Ep_system_d I ω κ L X R F J O Z A p T S)
     (limit : Di_limit_d A p T S q C W) (model : Smdl_d I c C W)
-    (elementary : Di_elementary_d I ω O A p T S) (hY : M.TransitiveSet Y) (hn : Smem_d I d Y V)
+    (elementary : Di_elementary_d I ω O A p T S) (hn : Smdl_d I d Y V)
     (hj : Smap_d I ω c d C Y j) (φ : Formula 1 2) (hc : φ.FreeClosed) :
     ∃ Q U Z' S' e W', M.IsSetRelationOn I Q X ∧ M.IsSetRelationOn I U Y ∧
       (∀ x y : (smdl_structure_l I (R := R) hm.1.2.1).Domain, Rd_entry_d x.val y.val Q ↔
         Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := R) hm.1.2.1) x y) φ) ∧
-      (∀ x y : (smdl_structure_l I (R := V) hn.1.2.1).Domain, Rd_entry_d x.val y.val U ↔
-        Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := V) hn.1.2.1) x y) φ) ∧
+      (∀ x y : (smdl_structure_l I (R := V) hn.2.1).Domain, Rd_entry_d x.val y.val U ↔
+        Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := V) hn.2.1) x y) φ) ∧
       Ep_system_d I ω κ L X Q F J O Z' A p T S' ∧ Di_limit_d A p T S' q C W' ∧ Smdl_d I e C W' ∧
       ∀ E H x y, Rd_entry_d E x j → Rd_entry_d H y j → (Rd_entry_d E H W' ↔ Rd_entry_d x y U) := by
-  obtain ⟨Q, hQ, qs⟩ := smem_formula_relation_l hZF hm source.transitive φ hc
-  obtain ⟨U, hU, us⟩ := smem_formula_relation_l hZF hn hY φ hc
+  obtain ⟨Q, hQ, qs⟩ := smdl_formula_relation_l hZF hm.1 φ hc
+  obtain ⟨U, hU, us⟩ := smdl_formula_relation_l hZF hn φ hc
   obtain ⟨e, W', newModel, jr⟩ := smdl_pull_l hZF model.2.1 hj.1.1 U
   obtain ⟨S', diagram, newLimit, sr⟩ := di_relation_change_l hZF h.diagram limit newModel
   obtain ⟨Q₀, hz, models⟩ := h.models
@@ -72,9 +72,9 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
     have los := rs_formula_relation_l hZF source.omega source.transitive hm source.theory
       (source.uniform_l hZF hnω he₀) (source.space_mem_l hZF hnω he₀)
       (family.at_l hZF.1 haM ha he₀) hG old hf hg φ hc qs
-    have elem := smap_source_l I hZF source.omega old.code hn.1 hl φ hc
+    have elem := smap_source_l I hZF source.omega old.code hn hl φ hc
       (sr_pair_env_l (N := smdl_structure_l I (R := R₀) old.code.2.1) ⟨B, hB⟩ ⟨D, hD⟩)
-      (sr_pair_env_l (N := smdl_structure_l I (R := V) hn.1.2.1)
+      (sr_pair_env_l (N := smdl_structure_l I (R := V) hn.2.1)
         ⟨x, hj.1.1.output_mem_of_pairMember hEx⟩ ⟨y, hj.1.1.output_mem_of_pairMember hHy⟩)
       (Fin.cases hDy (fun _ => hBx))
     have eq := (new.relation f g B D hf hg).trans (los.symm.trans (elem.trans

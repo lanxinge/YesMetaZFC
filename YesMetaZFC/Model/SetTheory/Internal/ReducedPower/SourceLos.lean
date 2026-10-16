@@ -20,6 +20,8 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
     (hM : Rp_model_d I D X U R o G p C T) (hE : M.IsFunctionSpace I E ω X)
     (hK : M.IsFunctionSpace I K ω C) (hF : Sfm_d I ω n F)
     (hb : M.mem b ω) (hB : Sbound_d I F b) (hr : M.mem r n) : Rs_los_d I b D X R E F n U p C T K r := by
+  have ext := rf_ext_mem_l I hZF.1 hX hm
+  have point v (hv : M.mem v D) := (hm.2 v D).mpr ⟨hX D hD v hv, hD, hv⟩
   obtain ⟨V, hV⟩ := seval_exists_l I hZF X R E F hF.2.1.1
   obtain ⟨J, hJ⟩ := seval_exists_l I hZF C T K F hF.2.1.1
   let ρ : Env M 12 := ⟨Fin.cases K (Fin.cases T (Fin.cases C (Fin.cases p (Fin.cases U (Fin.cases n
@@ -56,10 +58,11 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
       intro hvW
       have hvD := hU.base.bounds W hW v hvW
       have read x y (hx : Rd_entry_d v x g) (hy : Rd_entry_d v y f) :=
-        pe_sat_atom_l I hZF hX hE hF hV hB bω ha repr hvD hm.1.2.1 hz false hs hig hjf hx hy
+        pe_sat_atom_l I hZF ext hE hF hV hB bω ha repr (hX D hD v hvD) (point v hvD) hz false hs hig hjf ((rf_val_mem_l I hZF.1 hX hm (hg.mem_l I)).mpr hx)
+          ((rf_val_mem_l I hZF.1 hX hm (hf.mem_l I)).mpr hy)
       refine ⟨fun ht => ?_, fun ⟨x, _, y, _, hx, hy, hxy⟩ => (read x y hx hy).mpr hxy⟩
-      obtain ⟨x, hx, hvx⟩ := (hg.function_l hX).2.1 v hvD
-      obtain ⟨y, hy, hvy⟩ := (hf.function_l hX).2.1 v hvD
+      obtain ⟨x, hx, hvx⟩ := (((rf_fun_mem_l I hZF.1 hX hm hD).mp hg).function_l hX).2.1 v hvD
+      obtain ⟨y, hy, hvy⟩ := (((rf_fun_mem_l I hZF.1 hX hm hD).mp hf).function_l hX).2.1 v hvD
       exact ⟨x, hx, y, hy, hvx, hvy, (read x y hvx hvy).mp ht⟩
     exact atom.trans ((hM.relation g f B A hgp hfp).symm.trans (ssat_rel_l I hZF hF hJ hz hs hK he hie hje).symm)
   · obtain ⟨hib, hjb⟩ := hB.operands_l I hz hs
@@ -76,10 +79,11 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
       intro hvW
       have hvD := hU.base.bounds W hW v hvW
       have read x y (hx : Rd_entry_d v x g) (hy : Rd_entry_d v y f) :=
-        pe_sat_atom_l I hZF hX hE hF hV hB bω ha repr hvD hm.1.2.1 hz true hs hig hjf hx hy
+        pe_sat_atom_l I hZF ext hE hF hV hB bω ha repr (hX D hD v hvD) (point v hvD) hz true hs hig hjf ((rf_val_mem_l I hZF.1 hX hm (hg.mem_l I)).mpr hx)
+          ((rf_val_mem_l I hZF.1 hX hm (hf.mem_l I)).mpr hy)
       refine ⟨fun ht => ?_, fun ⟨x, _, hx, hy⟩ => (read x x hx hy).mpr rfl⟩
-      obtain ⟨x, hx, hvx⟩ := (hg.function_l hX).2.1 v hvD
-      obtain ⟨y, _, hvy⟩ := (hf.function_l hX).2.1 v hvD
+      obtain ⟨x, hx, hvx⟩ := (((rf_fun_mem_l I hZF.1 hX hm hD).mp hg).function_l hX).2.1 v hvD
+      obtain ⟨y, _, hvy⟩ := (((rf_fun_mem_l I hZF.1 hX hm hD).mp hf).function_l hX).2.1 v hvD
       exact ⟨x, hx, hvx, ((read x y hvx hvy).mp ht).symm ▸ hvy⟩
     exact atom.trans ((rp_kernel_l I hZF.1 hU.base hM.map hgp hfp).symm.trans
       (ssat_eq_l I hZF hF hJ hz hs hK he hie hje).symm)
@@ -89,7 +93,7 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
     obtain ⟨B, hB', hb'⟩ := trace j hjn
     obtain ⟨W, hW, hw⟩ := trace r hr
     exact (pe_holds_nor_l I hU hA hB' hW hsA hb' hw
-      (fun v hvD => pe_sat_nor_l I hZF hX hE hF hV hB bω ha repr hvD hm.1.2.1 hz hs hin hjn)).trans
+      (fun v hvD => pe_sat_nor_l I hZF ext hE hF hV hB bω ha repr (hX D hD v hvD) (point v hvD) hz hs hin hjn)).trans
       ((not_congr (or_congr ((sat i).mp (ih i hi) a e ha he hv)
         ((sat j).mp (ih j hj) a e ha he hv))).trans (ssat_nor_l I hZF hF hJ hz hs he).symm)
   · have hjn := hF.2.1.1.transitive r hr j hj
@@ -102,15 +106,16 @@ theorem rs_los_l {ω c X R D P U o G p C T E K F n b r}
       obtain ⟨e', he', heK⟩ := senv_update_exists_l I hZF ((hK e).mp he) hi hBC
       exact ⟨B, e', hBC, he', ((sat j).mp (ih j hj) a' e'
         ((hE a').mpr (ha'.function_l I ((hE a).mp ha) hi hg.1)) ((hK e').mpr heK)
-        (hv.update_l I hg hgp ha' he')).mp ⟨A, hA, hs'⟩⟩
+        (hv.update_l I ((rf_fun_mem_l I hZF.1 hX hm hD).mpr hg) hgp ha' he')).mp ⟨A, hA, hs'⟩⟩
     · rintro ⟨B, e', hBC, he', ht⟩
       obtain ⟨g, hgp⟩ := (hM.map.range B).mp hBC
       obtain ⟨hgX, hgD⟩ := (hG g).mp (hM.map.projection.input_mem_of_pairMember hgp)
       have hg := sc_function_domain_l theory.algebra hgX hgD
       obtain ⟨a', ha', haE⟩ := senv_update_exists_l I hZF ((hE a).mp ha) hi hgX
       obtain ⟨A, hA, hA'⟩ := ((sat j).mp (ih j hj) a' e' ((hE a').mpr haE)
-        ((hK e').mpr (he'.function_l I ((hK e).mp he) hi hBC)) (hv.update_l I hg hgp ha' he')).mpr ht
-      exact ⟨A, hA, fun v hvA => pe_sat_ex_intro_l I hZF hX hE hF hV hB bω ha repr
-        (hU.base.bounds A hA v hvA) hm.1.2.1 hz hs hi hjn hg ha' (hA' v hvA)⟩
+        ((hK e').mpr (he'.function_l I ((hK e).mp he) hi hBC)) (hv.update_l I ((rf_fun_mem_l I hZF.1 hX hm hD).mpr hg) hgp ha' he')).mpr ht
+      exact ⟨A, hA, fun v hvA => pe_sat_ex_intro_l I hZF ext hE hF hV hB bω ha repr
+        (hX D hD v (hU.base.bounds A hA v hvA)) (point v (hU.base.bounds A hA v hvA)) hz hs hi hjn
+        ((rf_fun_mem_l I hZF.1 hX hm hD).mpr hg) ha' (hA' v hvA)⟩
 
 end YesMetaZFC.SetTheory.Internal

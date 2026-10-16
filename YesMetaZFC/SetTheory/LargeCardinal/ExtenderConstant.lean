@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderElementary
+import YesMetaZFC.Model.SetTheory.Internal.Extensionality
 
 /-! # 源到整个有限支撑极限的常值初等嵌入
 
@@ -46,5 +47,34 @@ theorem ep_constant_limit_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q
   · rintro ⟨f, B, u, hf, hc, hfr, hu, huE⟩
     exact ⟨B, (is x B).mpr ⟨hx, f, hf, hc, hfr⟩,
       (ks B E).mpr ⟨hm.map.projection.output_mem_of_pairMember hfr, u, hu, huE⟩⟩
+
+/-- 原始商的常值图与外延性先于任何良基性或坍塌构造。 -/
+theorem ep_constant_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q c C V : M.Domain}
+    (source : Ep_source_d hZF ω κ K X R) (family : Em_source_d ω κ L X F)
+    (system : Ep_system_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
+    (limit : Di_limit_d A p T S q C V) (model : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V)
+    (elementary : Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S) :
+    ∃ b i, Smem_d (kp_pair_l (ZF.modelsKP hZF)) b X R ∧
+      Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω b c X C i ∧ Ep_constants_d X q i ∧ Wc_ext_d C V := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  obtain ⟨B, hB⟩ := model.2.1
+  obtain ⟨u, hu⟩ := (limit.range B).mp hB
+  obtain ⟨a, ha, _⟩ := system.diagram.index.2.1 u (limit.projection.bound_l hu).1
+  obtain ⟨_, hz, _⟩ := system.models
+  obtain ⟨d, _, had⟩ := hz.2.1 a ha
+  obtain ⟨b, i, n, D, U, G, r, E, Q, hm, hi, hn, ha, hD, haU, hG, md, spec⟩ :=
+    ep_constant_limit_l hZF source family system limit model elementary had
+  have constants : Ep_constants_d X q i := by
+    intro x H hxH
+    obtain ⟨_, f, B, u, hf, hc, hfr, hu, huH⟩ := (spec x H).mp hxH
+    exact ⟨u, a, B, f, D, source.space_mem_l hZF hn hD,
+      source.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2,
+      hc, md.map.representative_l I (family.at_l hZF.1 haU ha hD).base hfr, hu, huH⟩
+  have extX : Wc_ext_d X R := fun x hx y hy same => hZF.1.eq_of_same_members x y (fun z =>
+    ⟨fun hz => ((hm.2 z y).mp ((same z (source.transitive x hx z hz)).mp
+      ((hm.2 z x).mpr ⟨source.transitive x hx z hz, hx, hz⟩))).2.2,
+     fun hz => ((hm.2 z x).mp ((same z (source.transitive y hy z hz)).mpr
+      ((hm.2 z y).mpr ⟨source.transitive y hy z hz, hy, hz⟩))).2.2⟩)
+  exact ⟨b, i, hm, hi, constants, hi.extensional_l hZF source.omega hm.1 model extX⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

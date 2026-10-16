@@ -58,6 +58,14 @@ theorem Tg_sequence_d.read_l {ω c o C γ Z A D f : M.Domain}
   subst q
   exact ⟨run, run.tree.tree.diagram.order.ordinal.transitive n (num ▸ run.span) i ns.predecessor_mem⟩
 
+/-- 并列中的每个真实扩展器来自某一有限轮，故保留同一个临界点下界。 -/
+theorem Tg_sequence_d.critical_bound_l {ω c o C γ Z A D f E : M.Domain}
+    (h : Tg_sequence_d hZF ω c o C γ Z A D f)
+    (column : ∀ x, M.mem x E ↔ Tg_run_value_d 11 f x) : It_critical_bound_d γ E := by
+  rintro i p κ L F ⟨q, pair, hq⟩ payload
+  obtain ⟨v, n, s, hs, code, hq⟩ := (column q).mp hq
+  exact (h.read_l hZF hs code).1.critical i p κ L F ⟨q, pair, hq⟩ payload
+
 theorem Tg_sequence_d.merge_l {ω c o C γ Z A D f : M.Domain}
     (h : Tg_sequence_d hZF ω c o C γ Z A D f) (hω : M.IsOmega ω) {i j s t} {v w : Fin 64 → M.Domain}
     (hs : Rd_entry_d i s f) (ht : Rd_entry_d j t f) (ps : Rt_tuple_d v s) (pt : Rt_tuple_d w t) :

@@ -30,7 +30,7 @@ theorem It_local_d.branch_l {ω κ K X R K' Y R' L F P J O Z A p T S q c C W d N
   obtain ⟨_, _, hL, hF, _⟩ := local_copy
   obtain ⟨b, code⟩ := source.code
   obtain ⟨Q, U, Z', S', e, W', _, _, qs, us, observed, observed_limit, _, rel⟩ :=
-    ep_formula_system_l hZF source code family system limit model elementary hN target hj sb_bad_m sb_bad_closed_l
+    ep_formula_system_l hZF source code family system limit model elementary target.1 hj sb_bad_m sb_bad_closed_l
   have sourceRel u v (hu : M.mem u X) (hv : M.mem v X) : Rd_entry_d u v Q ↔ Sb_bad_d ω X u v :=
     (qs ⟨u, hu⟩ ⟨v, hv⟩).trans (sb_bad_sat_l hZF source.omega source.transitive source.omega_mem code _)
   have targetRel u v (hu : M.mem u N) (hv : M.mem v N) : Rd_entry_d u v U ↔ Sb_bad_d ω N u v :=

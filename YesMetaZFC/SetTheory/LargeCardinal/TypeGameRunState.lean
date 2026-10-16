@@ -5,7 +5,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRootTree
 /-! # 统一递归的可编码不变量
 
 十八项保存当前模型、有限树、完整历史及原请求的记录码。所有旧轮由同一
-内部函数图索引；表、反射层、根图和共同层均是已实现对象。
+内部函数图索引；表、反射层、根图和共同层均是已实现对象。扩展器列逐项
+保留原低层高度以下无临界点的不变量，而不只保留偶数边的单步临界点。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -39,6 +40,7 @@ structure Tg_run_d (ω c₀ o Cᵣ γ Z A : M.Domain) (v : Fin 18 → M.Domain) 
   span : M.mem (u 19) (v 6)
   tree_name : Tg_common_tree_d ω (v 13) (v 10) o (v 16) (u 7)
   play : Tg_past_play_d ω (v 13) Z (v 5) (u 4) (u 3) (u 20)
+  critical : It_critical_bound_d γ (v 11)
 
 theorem Tg_run_d.read_l {ω c₀ o Cᵣ γ Z A : M.Domain} {v : Fin 18 → M.Domain} {u : Fin 46 → M.Domain}
     (h : Tg_run_d hZF ω c₀ o Cᵣ γ Z A v u) (nc : Nonempty {x // M.mem x (v 5)}) :

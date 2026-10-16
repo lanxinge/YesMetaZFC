@@ -36,6 +36,7 @@ theorem Tg_context_d.tree_image_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V η
       It_pnice_d hZF ω c₀ β T' J' G' E' H' ∧ It_extension_d α ξ k T J G E β T' J' G' E' ∧
       Rd_entry_d α d' J' ∧ It_map_d G' k α j ∧ Smem_d I d' N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
       It_ultra_d hZF ω (v κ) L F d d' j ∧ Wd_crit_d I Y j (v κ) κ' ∧
+      (∃ p, Rd_entry_d ξ p E' ∧ It_payload_d p (v κ) L F) ∧
       M.IsLimitOrdinal L ∧ M.mem (v τ) L ∧ M.MemberSubset L κ' ∧
       (∀ i μ, Rd_entry_d i μ H' → M.mem μ κ' ∨ μ = κ') ∧
       Rd_entry_d (v U) U' j ∧ Rd_entry_d (v D) D' j ∧ Rd_entry_d (v u) u' j ∧
@@ -53,7 +54,7 @@ theorem Tg_context_d.tree_image_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V η
     tg_image_read_l hZFC owner.source owner.power context nc ρ o κ δ l n U D u τ Q w b z r q h σ hw hδ regular valid
   have hL := inacc.limit_l (ZF.modelsKP hZF) small.transitive small.theory.algebra.pair
   obtain ⟨β, T', J', G', E', H', d', j, N, R', K₀, W, κ₀,
-    next, extension, target, edge, mn, ready, ultra, critical, bound, heights, hW, common, level, agreement, same₀, fixed⟩ :=
+    next, extension, target, edge, mn, ready, ultra, critical, bound, payload, heights, hW, common, level, agreement, same₀, fixed⟩ :=
     it_working_image_l hZFC tree succ hc hd mx my owner source hA cut hδ small ma mb smallUltra loc strength inacc
       hκL hV rank hV' rank' hζ hζδ hκV
       (fun i μ hm => hL.1.transitive (v τ) hτL μ (above i μ hm))
@@ -74,7 +75,7 @@ theorem Tg_context_d.tree_image_l {c₀ α ξ T J G E H k c d R Y S K K' ζ V η
   have hwW := common.subset_mem_l owner.source.transitive hW hQW₀
     (owner.source.transitive C context.member _ (w.eval ρ).property) reply.1
   exact ⟨β, T', J', G', E', H', d', j, N, R', K₀, L, F, κ', U', D', u', η', C', W,
-    next, extension, target, edge, mn, ready, ultra, critical, hL, hτL, bound, heights,
+    next, extension, target, edge, mn, ready, ultra, critical, payload, hL, hτL, bound, heights,
     same hU iU, same hD iD, same hu iu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW₀, hwW, agreement, fixed⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

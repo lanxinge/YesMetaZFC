@@ -75,26 +75,26 @@ theorem rs_constant_embedding_l {ω c X R D P U o G p C T}
   · obtain ⟨a, ha, hfa⟩ := ZF.exists_compositionFunction hZF I hf hK
     have haX : M.IsSetFunctionFromTo I a ω X := ⟨ha.1, ha.2.1, fun i hi =>
       (ha.2.2 i hi).imp fun g hg => ⟨((hG g).mp hg.1).1, hg.2⟩⟩
-    have sfun g (hg : M.mem g G) := sc_function_domain_l theory.algebra
-      ((hG g).mp hg).1 ((hG g).mp hg).2
-    have eval : Rs_eval_d I ω D X p a e := by
+    have sfun g (hg : M.mem g G) := (rf_fun_mem_l I hZF.1 hX hm hD).mpr
+      (sc_function_domain_l theory.algebra ((hG g).mp hg).1 ((hG g).mp hg).2)
+    have eval : Rs_eval_d I ω D X R p a e := by
       intro i hi
       obtain ⟨x, hx, hix⟩ := hf.2.2 i hi
       obtain ⟨g, hg, hxg⟩ := hK.2.2 x hx
       obtain ⟨B, _, hgp⟩ := hM.map.projection.2.2 g hg
       exact ⟨g, B, (hfa i g).mpr ⟨hi, x, hix, hxg⟩, sfun g hg, hgp,
         hfe i hi x B hix ((spec x B).mpr ⟨hx, g, hxg, hgp⟩)⟩
-    have point v (hv : M.mem v D) : Pe_assign_d I ω D X a f v := by
+    have point v (hv : M.mem v D) : Pe_assign_d I ω D X R a f v := by
       intro i hi
       obtain ⟨x, hx, hix⟩ := hf.2.2 i hi
       obtain ⟨g, hg, hxg⟩ := hK.2.2 x hx
-      exact ⟨g, x, (hfa i g).mpr ⟨hi, x, hix, hxg⟩, sfun g hg, value x g hxg v hv, hix⟩
+      exact ⟨g, x, (hfa i g).mpr ⟨hi, x, hix, hxg⟩, sfun g hg, (rf_val_mem_l I hZF.1 hX hm ((hG g).mp hg).1).mpr (value x g hxg v hv), hix⟩
     have los := rs_satisfies_l hZF hω hX hm theory uniform hD hP hU hG hM hE hA ((hE a).mpr haX) he eval hz
     refine ⟨fun hs => los.mpr ⟨D, hU.base.top, fun v hv => ⟨f, (hE f).mpr hf, point v hv, hs⟩⟩, fun hs => ?_⟩
     obtain ⟨B, hB, hb⟩ := los.mp hs
     obtain ⟨v, hv⟩ := hU.proper B hB
     obtain ⟨g, hg, hval, hs⟩ := hb v hv
-    have agree := hval.agree_right_l I (point v (hU.base.bounds B hB v hv)) haX.1 ((hE g).mp hg).1 hf.1
+    have agree := hval.agree_right_l I (point v (hU.base.bounds B hB v hv)) (rf_ext_mem_l I hZF.1 hX hm) haX.1 ((hE g).mp hg).1 hf.1
     have eq : g = f := ((hE g).mp hg).1.1.eq_of_pairMember_iff hZF.1 hf.1.1
       (fun i x => ⟨fun h => (agree i x (((hE g).mp hg).input_mem_of_pairMember h)).mp h,
         fun h => (agree i x (hf.input_mem_of_pairMember h)).mpr h⟩)

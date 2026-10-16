@@ -32,8 +32,8 @@ theorem Smap_d.pe_trace_l {ω c d X R Y S q D D' E K F n r b a a' : M.Domain}
     (source : Sc_theory_d I ω X R) (target : Sc_theory_d I ω Y S)
     (hD : M.PairMember I D D' q) (hE : M.IsFunctionSpace I E ω X) (hK : M.IsFunctionSpace I K ω Y)
     (hF : Sfm_d I ω n F) (hr : M.mem r n) (hb : M.mem b ω) (hB : Sbound_d I F b)
-    (ha : M.mem a E) (ha' : M.mem a' K) (repr : Pe_repr_d I b D X a)
-    (repr' : Pe_repr_d I b D' Y a') (assign : Smap_assign_d I ω q a a') :
+    (ha : M.mem a E) (ha' : M.mem a' K) (repr : Pe_repr_d I b D X R a)
+    (repr' : Pe_repr_d I b D' Y S a') (assign : Smap_assign_d I ω q a a') :
     ∃ A A', M.mem A X ∧ M.PairMember I A A' q ∧
       (∀ v, M.mem v A ↔ M.mem v D ∧ Pe_sat_d I b D X R E F n r a v) ∧
       (∀ v, M.mem v A' ↔ M.mem v D' ∧ Pe_sat_d I b D' Y S K F n r a' v) := by
@@ -49,7 +49,7 @@ theorem Smap_d.pe_trace_l {ω c d X R Y S q D D' E K F n r b a a' : M.Domain}
   have next := hq.separation_l I hZF hω hX hY hm hn hE hK build.1 hk htω
     ((hE aD).mpr haD) ((hK aD').mpr haD') (assign.update_l I hq.1.1.1 hD update update') hD hAA sep
   exact ⟨A, A', hAX, hAA,
-    (pe_separation_l hZF hω (sc_pe_context_l hZF hω hX hm source hDX hE) hb ht build hrk ha repr update).mp sep,
-    (pe_separation_l hZF hω (sc_pe_context_l hZF hω hY hn target hDY hK) hb ht build hrk ha' repr' update').mp next⟩
+    (pe_separation_mem_l hZF hω hX hm (sc_pe_context_l hZF hω hX hm source hDX hE) hAX hb ht build hrk ha repr update).mp sep,
+    (pe_separation_mem_l hZF hω hY hn (sc_pe_context_l hZF hω hY hn target hDY hK) (hq.1.1.output_mem_of_pairMember hAA) hb ht build hrk ha' repr' update').mp next⟩
 
 end YesMetaZFC.SetTheory.Internal

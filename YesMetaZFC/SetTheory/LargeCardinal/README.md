@@ -983,8 +983,9 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 `Tg_sequence_d.branch_l` 自动装配 `It_hull_return_d`、真实返回因子和 `Tg_odd_cofinal_d`。
 [TypeGameOddRecords](TypeGameOddRecords.lean) 证明并历史的定义域恰为内部 ω，
 从原保存码读取恢复图的精确有限定义域及完整树节点。
-[TypeGameOddLimit](TypeGameOddLimit.lean) 把全部这些原记录回拉到同一可数壳，
-再沿同一返回锥投影；`Tg_return_node_d` 保留原轮号、原存档和两层图条目。
+[TypeGameOddLimit](TypeGameOddLimit.lean) 的共享 `Tg_odd_limit_d` 只记录实际极限节点和增长，
+不再要求返回映射；5.15 另外使用的壳与返回因子保存在 `Tg_return_model_d`。
+`Tg_return_node_d` 保留原轮号、原存档和两层图条目。
 `Tg_return_growth_d` 自动给出指定前驱和当前轮的两张实际极限图，
 证明其长度恰差一、两者都是完整树节点、旧图严格包含于新图。
 [TypeGameOddCompatibility](TypeGameOddCompatibility.lean) 证明每条继续奇数边上长度恰增一，
@@ -1085,10 +1086,68 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 库内修补先保留被迫为稠密集的局部名称，再在其否定条件上混合全条件域，
 所得名称全局被迫为稠密集，且在原泛型中保持取值。
 
-**7.23 的实数吸收尚未闭合。** 仍需 5.23 的任意共尾良基分支版本、
-7.4 与 7.8 的要求第一辅助坐标满射的改造类型游戏及 7.12 的树上限制；
+[TypeGameBranchProjection](TypeGameBranchProjection.lean) 的 `Tg_sequence_d.wf_projection_l`
+已经证明统一历史在**任意指定的共尾良基分支**上产生完整移位投影。
+分支的直接极限由 `it_wf_branch_extend_l` 实际坍塌；
+[IterationConeFixed](IterationConeFixed.lean) 用锥覆盖和内部成员归纳，把共尾根图的低层固定性传到极限；
+[TypeGameBranchFixed](TypeGameBranchFixed.lean) 从现有奇数存档提供这些共尾锚点。
+[TypeGameBranchLimit](TypeGameBranchLimit.lean) 在该分支自己的锥内读取全部恢复图，
+[TypeGameBranchTree](TypeGameBranchTree.lean) 保持原第一坐标并识别根树的像。
+原 5.15 和此处的任意分支共用同一节点列、取并及 `image_l`，没有保留旧版取并接口。
+[TypeGameShiftedStrategy](TypeGameShiftedStrategy.lean) 从已有零轮状态自动构造一个策略，
+对其全部对局返回上述全分支结论。
+
+[IterationCriticalBound](IterationCriticalBound.lean) 现已补齐实际扩展器列的统一下界。
+`it_working_image_l` 保留新增列条目与原 κ、L、F 的编码对应；继续轮从旧回答域取得下界，
+偶数后继从当前请求域取得下界，padding 由空操作码排除。
+`Tg_run_d.critical` 保存每一轮的全部扩展器界；`Tg_sequence_d.critical_bound_l`
+从实际并列逐条回到有限阶段。`Tg_shifted_d` 现同时记录该界和任意共尾良基分支投影。
+
+**完整 5.23 和 7.23 的实数吸收尚未闭合。** 5.23 仍需从任意给定地模型 M 的原辅助胜策
+装配相对初值和后继。现有 `Tg_run_d.source` 使用 `Ic_model_d`，
+其中的 `Sc_omega_closed_d` 是对背景所有 ω 序列的闭性，不能直接加给任意 M。
+`It_local_d.apply_l` 已能形成原始关系超幂，但当前递归后继使用的 `It_ultra_d`
+还要求实际传递坍塌，`Ic_model_d` 还要求保留外部 ω 闭性。
+上述全分支定理和逐扩展器界不消除这个相对初值与后继问题。
+
+原始商方向现已推进到以下实际构造：
+
+- [ExtenderValue](ExtenderValue.lean) 的 `ep_formula_value_l` 在任意关系目标中调用原完整 Łoś，
+  不再把公式限为 Δ₀。旧 `ep_delta_value_l` 直接使用它；`ep_formula_system_l` 同步移除目标传递性。
+- [ExtenderFiniteRepresentative](ExtenderFiniteRepresentative.lean) 为任意有限组商对象取得共同支撑。
+  [ExtenderFunctionValue](ExtenderFunctionValue.lean) 据此在同一好集合上取源内函数值代表，
+  并证明商对任意新定义域、常值均拥有内部函数，不要求参数属于旧常值图的像。
+- [ExtenderSeedSegment](ExtenderSeedSegment.lean) 只识别支撑序数的初段，保留全部原关系前驱。
+  [ExtenderBoundedRaw](ExtenderBoundedRaw.lean) 将共同有界代表池满射到原常值像的全部成员；
+  [ExtenderBoundedRealization](ExtenderBoundedRealization.lean) 用所属模型已经构造的局部坍塌识别该部分。
+  原坐标坍塌、常值图和有界坍塌证明均已迁移到这些构造。
+- [RelationFunctionFamily](../../Model/SetTheory/Internal/RelationFunctionFamily.lean) 实际分离商模型
+  内部函数码读出的全部坐标图；[ExtenderRawReduced](ExtenderRawReduced.lean) 用这个代表集合构造
+  下一约化幂分量。有界识别图的限制直接提供其定义域坐标，保留每个代表的源内函数码。
+- [RelationUniformCode](../../Model/SetTheory/Internal/RelationUniformCode.lean) 在原程序后追加
+  关系模型的函数图、逐点存在和统一见证条件；[RelationCollection](../../Model/SetTheory/Internal/RelationCollection.lean)
+  从源的小域收集传输其带编号守卫的全称闭包，覆盖目标的新参数及非标准内部程序。
+  指定集合上的逐点存在经成员守卫扩展为全定义的模型内见证；`ep_raw_reduced_l`
+  已将该见证送入同一个实际代表集合。
+- [RelationSeparation](../../Model/SetTheory/Internal/RelationSeparation.lean) 构造原关系的全内部分离程序；
+  `sc_separation_raw_l` 自动取得目标内部的真值分离集。旧分离、统一化和收集传递定理
+  已改由这些关系证明读取传递特例，重复证明主体已移除。
+
+- [RelationEvaluation](../../Model/SetTheory/Internal/RelationEvaluation.lean) 将函数性和求值直接读作原关系公式。
+  `Pe_context_d`、`Pe_assign_d` 和同一逐点编译器已移除源载体传递性要求；原有常值、投影、复制和 Łoś 调用已同步迁移。
+- [RelationTraceFamily](../../Model/SetTheory/Internal/RelationTraceFamily.lean) 实际构造子集族 P：
+  A∈P 当且仅当 A 是某个原模型集合码沿既有坐标图的逆像。全部内部逐点真值集均已证明属于同一 P。
+- [RelationPointwiseWitness](../../Model/SetTheory/Internal/RelationPointwiseWitness.lean) 对原始关系源的存在行收集实际内部函数码。
+  [RelationLos](../../Model/SetTheory/Internal/ReducedPower/RelationLos.lean) 以此完成内部行归纳，并给出同一代表赋值上全部内部公式码的 `Satisfies_d` 方程。
+  该定理的测度条件是 `Rel_ultra_d D P U`；`ep_raw_reduced_l` 已将其接到同一实际代表族与商分量。
+
+**5.23 的原始后继尚未闭合。** 当前下一测度仅已传入 `Base_d D U`；还需用共同低秩段识别上述 P 与扩展器所属模型的可测子集族，
+从实际测度证明该特定 P 上的 `Rel_ultra_d`，才能无条件调用原始后继的 Łoś。此条件在定理中显式保留，
+没有从 `Base_d` 推出尚未证明的二择。随后仍需原关系源的有限支撑过渡、共同低秩段递归保持和后继状态迁移，再接任意地模型的相对初值。
+
+之后仍需 7.4 与 7.8 的要求第一辅助坐标满射的改造类型游戏及 7.12 的树上限制；
 随后构造原提示的 R、S，证明小／大坍缩分解以排除泛型 I 分支，
-并在每条良基分支上构造吸收指定实数的大泛型。当前 5.15 的单分支结论不能代替这些量词。
+并在每条良基分支上构造吸收指定实数的大泛型。
 
 后续沿 [Neeman《Determinacy in L(R)》](https://www.math.ucla.edu/~ineeman/detLR.pdf/)
 及用户 2026-10-10 的两份改良审阅稿推进。裸 L(ℝ)⊨AD 采用一次坍缩后的双树穷尽终点，

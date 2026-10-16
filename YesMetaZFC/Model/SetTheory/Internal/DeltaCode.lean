@@ -26,15 +26,23 @@ theorem Scompile_d.delta_l {d ω n F k v X R E c f} {φ : Formula 1 d}
     (smem_formula_l I hm hn φ η).symm.trans ((rt_model_delta_l hX hn hd η).trans (Formula.closed_env_l φ hφ rfl))
   exact (h X R hm.1.2.1 E hE f hf θ hp).trans hh
 
+/-- 固定模板的原关系语义；传递性只在下方读取背景 Δ₀ 公式时使用。 -/
+theorem sfm_template_l (hZF : M.Models ZF) {ω n F σ} (hω : M.IsOmega ω)
+    (hF : Sfm_d I ω n F) {d} (φ : Formula 1 d) (hφ : φ.FreeClosed)
+    (v : Fin d → M.Domain) (hσ : M.mem σ ω) (hv : ∀ i, M.mem (v i) σ) : ∃ m G k,
+    Sbuild_d I ω n F m G k ∧ Scompile_d I ω m G k v φ := by
+  obtain ⟨m, G, k, hg, hc⟩ := source_compile_core_l I hZF hω (source_core_l φ) (source_core_closed_l φ hφ) v hσ hv hF
+  have sem : Scompile_d I ω m G k v φ := fun X R hX E hE f hf ρ hp =>
+    (hc X R hX E hE f hf ρ hp).trans (source_core_sat_l φ ρ)
+  exact ⟨m, G, k, hg, sem⟩
+
 theorem sfm_delta_l (hZF : M.Models ZF) {ω n F σ} (hω : M.IsOmega ω)
     (hF : Sfm_d I ω n F) {d} (φ : Formula 1 d) (hφ : φ.FreeClosed) (hd : φ.IsDelta0)
     (v : Fin d → M.Domain) (hσ : M.mem σ ω) (hv : ∀ i, M.mem (v i) σ) : ∃ m G k,
     Sbuild_d I ω n F m G k ∧ ∀ X R E c f (ρ : Env M d), M.TransitiveSet X → Smem_d I c X R →
       M.IsFunctionSpace I E ω X → M.mem f E → (∀ i, M.PairMember I (v i) (ρ.bound i) f) →
       (Ssat_d I X R E G m k f ↔ Formula.satisfies ρ φ) := by
-  obtain ⟨m, G, k, hg, hc⟩ := source_compile_core_l I hZF hω (source_core_l φ) (source_core_closed_l φ hφ) v hσ hv hF
-  have h : Scompile_d I ω m G k v φ := fun X R hX E hE f hf ρ hp =>
-    (hc X R hX E hE f hf ρ hp).trans (source_core_sat_l φ ρ)
+  obtain ⟨m, G, k, hg, h⟩ := sfm_template_l I hZF hω hF φ hφ v hσ hv
   exact ⟨m, G, k, hg, fun _ _ _ _ _ ρ hX hm hE hf hp => h.delta_l I hφ hd ρ hX hm hE hf hp⟩
 
 end YesMetaZFC.SetTheory.Internal

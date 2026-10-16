@@ -4,6 +4,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameAnchor
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameIssued
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameOdd
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGamePastPlay
+import YesMetaZFC.SetTheory.LargeCardinal.IterationCriticalBound
 
 /-! # 两种实际树后继共用的完整回答证书
 
@@ -22,6 +23,7 @@ def Tg_tree_step_d (ω X η c₀ α ξ T J G E c o Cᵣ γ Z H : M.Domain)
     It_pnice_d hZF ω c₀ β T₁ J₁ G₁ E₁ H₁ ∧ It_extension_d α ξ k T J G E β T₁ J₁ G₁ E₁ ∧
     Rd_entry_d α a J₁ ∧ Smem_d I a Y R ∧ Ic_model_d hZF ω μ K Y R ∧ Tg_context_d ω Y η₁ C₁ ∧
     It_map_d G₁ o α π₁ ∧ Rd_entry_d Cᵣ C₁ π₁ ∧ Tg_anchor_d γ Z Y π₁ ∧
+    (∀ p κ L F, Rd_entry_d ξ p E₁ → It_payload_d p κ L F → M.MemberSubset γ κ) ∧
     ∃ n₁ : Nonempty {x // M.mem x C₁}, ∃ ρ : Env (rt_model_l C₁ n₁) 54,
       let q := fun i => (ρ.bound i).val
       let σ := Fin.cases (q 47) (Fin.cases (q 48) (Fin.cases (q 49)
@@ -33,6 +35,7 @@ def Tg_tree_step_d (ω X η c₀ α ξ T J G E c o Cᵣ γ Z H : M.Domain)
         It_pnice_d hZF ω c₀ β₂ T₂ J₂ G₂ E₂ H₂ ∧ It_extension_d β α ξ T₁ J₁ G₁ E₁ β₂ T₂ J₂ G₂ E₂ ∧
         Rd_entry_d β d J₂ ∧ It_map_d G₂ ξ β j ∧ Smem_d I d N R₂ ∧ Ic_model_d hZF ω L K₂ N R₂ ∧
         It_ultra_d hZF ω (ι.bound 24).val L F c d j ∧ Wd_crit_d I X j (ι.bound 24).val κ ∧
+        (∃ p, Rd_entry_d α p E₂ ∧ It_payload_d p (ι.bound 24).val L F) ∧
         M.IsLimitOrdinal L ∧ M.mem (q 15) L ∧ M.MemberSubset L κ ∧
         (∀ i ν, Rd_entry_d i ν H₂ → M.mem ν κ ∨ ν = κ) ∧
         Rd_entry_d (ι.bound 30).val U j ∧ Rd_entry_d (ι.bound 31).val D j ∧ Rd_entry_d (ι.bound 25).val u j ∧

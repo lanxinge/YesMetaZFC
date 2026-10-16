@@ -53,25 +53,34 @@ theorem sc_source_theory_l (hZFC : M.Models ZFC) {ω χ c d X R H S q : M.Domain
     exact smap_separation_l I hZF hω hX (ZF.h_transitive_l I hZF hH) hm hn hq hP
       (fun A hA => ZF.h_subsets_l I hZF hχ.isLimitOrdinal hH hD' A ((hP A).mp hA)) hE hF hr hi hf hDD
 
+/-- 分离的全称闭包传到任意关系目标，直接返回目标内部的分离集对象。 -/
+theorem sc_separation_raw_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
+    (hω : M.IsOmega ω) (hX : M.TransitiveSet X)
+    (hm : Smem_d I c X R) (hn : Smdl_d I d Y S) (hq : Smap_d I ω c d X Y q)
+    (source : Sc_theory_d I ω X R) {K F n r i g D : M.Domain}
+    (hK : M.IsFunctionSpace I K ω Y) (hF : Sfm_d I ω n F) (hr : M.mem r n)
+    (hi : M.mem i ω) (hg : M.mem g K) (hD : M.mem D Y) : ∃ A, M.mem A Y ∧ Sr_sep_d I Y S K F n r i g D A := by
+  obtain ⟨b, s, t, hb, hs, ht, hsi, hti, _, _, hst, hsb, htb⟩ := sbound_fresh_l I hZF hω hF hi hi
+  obtain ⟨m, G, k, build, code⟩ := sfm_sep_raw_l I hZF hω hF hr hi hs ht hsi hti hst hb htb
+  obtain ⟨E, hE⟩ := ZF.exists_functionSpace hZF I ω X
+  have valid f (hf : M.mem f E) : Ssat_d I X R E G m k f := by
+    obtain ⟨D, hD, hsD⟩ := ((hE f).mp hf).2.2 s hs
+    obtain ⟨A, hA, sep⟩ := source.separation E F n r i f D hE hF hr hi hf hD
+    exact (code X R E f D hE hf hsD).mpr ⟨A, hA, (ssep_relation_l I hX hm hD hA).mpr sep⟩
+  obtain ⟨g', update, hgf⟩ := senv_update_exists_l I hZF ((hK g).mp hg) hs hD
+  obtain ⟨A, hAY, hA⟩ := (code Y S K g' D hK ((hK g').mpr hgf)
+    ((update.2 s D).mpr (Or.inl ⟨rfl, rfl⟩))).mp
+    ((hq.valid_l I hZF hω hm.1 hn build.program build.root hE hK).mp valid g' ((hK g').mpr hgf))
+  exact ⟨A, hAY, (sr_sep_agree_l I hZF hF hb hr hi hK hg ((hK g').mpr hgf) (update.agree_l I hsb)).mpr hA⟩
+
 theorem sc_separation_forward_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
     (hm : Smem_d I c X R) (hn : Smem_d I d Y S) (hq : Smap_d I ω c d X Y q)
     (source : Sc_theory_d I ω X R) {K F n r i g D : M.Domain}
     (hK : M.IsFunctionSpace I K ω Y) (hF : Sfm_d I ω n F) (hr : M.mem r n)
     (hi : M.mem i ω) (hg : M.mem g K) (hD : M.mem D Y) : ∃ A, M.mem A Y ∧ Ssep_d I Y S K F n r i g D A := by
-  obtain ⟨b, s, t, hb, hs, ht, hsi, hti, _, _, hst, hsb, htb⟩ := sbound_fresh_l I hZF hω hF hi hi
-  obtain ⟨m, G, k, build, code⟩ := sfm_sep_l I hZF hω hF hr hi hs ht hsi hti hst hb htb
-  obtain ⟨E, hE⟩ := ZF.exists_functionSpace hZF I ω X
-  -- 源中的分离模式先变成对全部赋值有效的单一内部程序。
-  have valid f (hf : M.mem f E) : Ssat_d I X R E G m k f := by
-    obtain ⟨D, hD, hsD⟩ := ((hE f).mp hf).2.2 s hs
-    exact (code X R E c f D hX hm hE hf hsD).mpr (source.separation E F n r i f D hE hF hr hi hf hD)
-  obtain ⟨g', update, hgf⟩ := senv_update_exists_l I hZF ((hK g).mp hg) hs hD
-  obtain ⟨A, hAY, hA⟩ := (code Y S K d g' D hY hn hK ((hK g').mpr hgf)
-    ((update.2 s D).mpr (Or.inl ⟨rfl, rfl⟩))).mp
-    ((hq.valid_l I hZF hω hm.1 hn.1 build.program build.root hE hK).mp valid g' ((hK g').mpr hgf))
-  exact ⟨A, hAY, (ssep_agree_l I hZF hF hb hr hi hK hg ((hK g').mpr hgf)
-    (update.agree_l I hsb) (hY D hD)).mpr hA⟩
+  obtain ⟨A, hA, sep⟩ := sc_separation_raw_l I hZF hω hX hm hn.1 hq source hK hF hr hi hg hD
+  exact ⟨A, hA, (ssep_relation_l I hY hn hD hA).mp sep⟩
 
 /-- 理论保持覆盖后继模型的全部参数，不要求它们具有旧参数原像。 -/
 theorem Sc_theory_d.map_l (hZF : M.Models ZF) {ω c d X R Y S q : M.Domain}

@@ -12,27 +12,27 @@ universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
 def Pe_row_d (b t D X R E F n m G r u : M.Domain) : Prop := ∀ p a f,
-  M.mem p D → M.mem a E → M.mem f E → M.PairMember I b D a → M.PairMember I t p a →
-    Pe_assign_d I b D X a f p → (Ssat_d I X R E F n r f ↔ Ssat_d I X R E G m u a)
+  M.PairMember I p D R → M.mem a E → M.mem f E → M.PairMember I b D a → M.PairMember I t p a →
+    Pe_assign_d I b D X R a f p → (Ssat_d I X R E F n r f ↔ Ssat_d I X R E G m u a)
 
-def pe_row_m {d} (b t D X R E F n m G r u : Term d) : Formula 1 d := Formula.forallMem D
-  (Formula.forallMem E.weaken (Formula.forallMem E.weaken.weaken
+def pe_row_m {d} (b t D X R E F n m G r u : Term d) : Formula 1 d := .forallE
+  (.imp (Formula.orderedPairMem 𝒞 .newest D.weaken R.weaken) (Formula.forallMem E.weaken (Formula.forallMem E.weaken.weaken
     (.imp (Formula.orderedPairMem 𝒞 b.weaken.weaken.weaken D.weaken.weaken.weaken (.bound 1))
       (.imp (Formula.orderedPairMem 𝒞 t.weaken.weaken.weaken (.bound 2) (.bound 1))
-        (.imp (pe_assign_m (𝒞 := 𝒞) b.weaken.weaken.weaken D.weaken.weaken.weaken X.weaken.weaken.weaken
+        (.imp (pe_assign_m (𝒞 := 𝒞) b.weaken.weaken.weaken D.weaken.weaken.weaken X.weaken.weaken.weaken R.weaken.weaken.weaken
           (.bound 1) .newest (.bound 2))
           (.iff (ssat_m (𝒞 := 𝒞) X.weaken.weaken.weaken R.weaken.weaken.weaken E.weaken.weaken.weaken
             F.weaken.weaken.weaken n.weaken.weaken.weaken r.weaken.weaken.weaken .newest)
             (ssat_m (𝒞 := 𝒞) X.weaken.weaken.weaken R.weaken.weaken.weaken E.weaken.weaken.weaken
-              G.weaken.weaken.weaken m.weaken.weaken.weaken u.weaken.weaken.weaken (.bound 1))))))))
+              G.weaken.weaken.weaken m.weaken.weaken.weaken u.weaken.weaken.weaken (.bound 1)))))))))
 derive_free_closed pe_row_m
 
 theorem pe_row_sat_l (hE : Extensional M) {d} (ρ : Env M d) (b t D X R E F n m G r u : Term d) :
     Formula.satisfies ρ (pe_row_m (𝒞 := 𝒞) b t D X R E F n m G r u) ↔
       Pe_row_d I (b.eval ρ) (t.eval ρ) (D.eval ρ) (X.eval ρ) (R.eval ρ) (E.eval ρ)
         (F.eval ρ) (n.eval ρ) (m.eval ρ) (G.eval ρ) (r.eval ρ) (u.eval ρ) := by
-  simp only [pe_row_m, Pe_row_d, Formula.satisfies_forallMem_iff, Formula.satisfies_imp_iff,
-    Formula.satisfies_orderedPairMem_iff I, pe_assign_sat_l I hE, Formula.satisfies_iff_iff,
+  simp only [pe_row_m, Pe_row_d, Formula.satisfies_forall_iff, Formula.satisfies_forallMem_iff, Formula.satisfies_imp_iff,
+    Formula.satisfies_orderedPairMem_iff I, pe_assign_sat_l I, Formula.satisfies_iff_iff,
     ssat_sat_l I hE, Definitional.Term.eval_weaken]
   exact ⟨fun h p a f hp ha hf => h p hp a ha f hf, fun h p hp a ha f hf => h p a f hp ha hf⟩
 

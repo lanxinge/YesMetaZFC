@@ -48,7 +48,7 @@ theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
   refine ⟨source,context,he,ha,tree,hc,code,self,iC,anchor,record',values,eqρ 0,eqρ 6,
     fun _ h => h,?_,tg_past_links_empty_l I game.setup.empty,tg_past_roots_empty_l game.setup.empty,
     tg_past_events_empty_l game.setup.empty,below,?_,?_,⟨p.S,image,tg_root_tree_empty_l game.setup.empty⟩,
-    tg_past_play_empty_l game.setup.empty⟩
+    tg_past_play_empty_l game.setup.empty, It_critical_bound_d.empty_l game.setup.empty⟩
   · exact zero.symm ▸ tg_past_empty_l hZF game.setup.empty
   · rintro i ν ⟨q,_,hq⟩
     exact (game.setup.empty q hq).elim

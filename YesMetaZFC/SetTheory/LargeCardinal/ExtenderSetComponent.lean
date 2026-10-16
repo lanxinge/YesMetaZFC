@@ -30,6 +30,8 @@ theorem ep_set_component_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
     (component : Rp_model_d I D A₀ U R₀ o G p₀ C₀ T₀) (hk : M.IsSetInjectionFromTo I k C₀ A₁)
     (values : ∀ f B x, Rd_entry_d f B p₀ → Rd_entry_d B x k → Ep_value_d q e a f x) :
     Smap_d I ω o a₁ C₀ A₁ k := by
+  have ext := rf_ext_mem_l I hZF.1 small.transitive h₀
+  have hD₀ := small.space_mem_l hZF hnω space
   have inside := source.transitive A₀ (hj.1.1.input_mem_of_pairMember hA)
   have sub := target.transitive A₁ (hj.1.1.output_mem_of_pairMember hA)
   have ultra := (family.at_l hZF.1 haU ha space).transfer_l
@@ -47,8 +49,9 @@ theorem ep_set_component_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
   obtain ⟨g, fg, eval⟩ := rp_representatives_l I hZFC component.map fu
   have fg₀ : M.IsSetFunctionFromTo I g ω A₀ := ⟨fg.1, fg.2.1, fun m hm =>
     (fg.2.2 m hm).imp fun f hf => ⟨((hG f).mp hf.1).1, hf.2⟩⟩
-  have sf f (hf : M.mem f G) := small.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2
-  have evaluation : Rs_eval_d I ω D A₀ p₀ g u := by
+  have sf f (hf : M.mem f G) := (rf_fun_mem_l I hZF.1 small.transitive h₀ hD₀).mpr
+    (small.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2)
+  have evaluation : Rs_eval_d I ω D A₀ R₀ p₀ g u := by
     intro m hm
     obtain ⟨f, hf, hmf⟩ := fg.2.2 m hm
     obtain ⟨B, _, hfB⟩ := component.map.projection.2.2 f hf
@@ -73,14 +76,16 @@ theorem ep_set_component_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
     constants comp h₀ h₁ hA hnω haJ ha space haU code.2.1 hb bound code.2.2 mv
   have point s t (hsD : M.mem s D) (hst : Rd_entry_d s t H) :
       Pe_sat_d I b D A₀ R₀ Eω F₀ l r g s ↔ Ssat_d I A₀ R₀ E F₀ l r t := by
-    obtain ⟨w, hw, pw⟩ := pe_value_exists_l I hZF small.transitive hEω ((hEω g).mpr fg₀) bω hsD h₀.1.2.1
+    obtain ⟨w, hw, pw⟩ := pe_value_exists_l I hZF ext hEω ((hEω g).mpr fg₀) bω (small.transitive D hD₀ s hsD)
+      ((h₀.2 s D).mpr ⟨small.transitive D hD₀ s hsD, hD₀, hsD⟩)
       (fun m f hm => evaluation.repr_l I fg.1 m f (bω m hm))
     have ft := (fn0_of_function_l (ZF.modelsKP hZF) ((hE t).mp (fH.bound_l hst).2)).mono_target_l (small.transitive B hB)
     have same : Senv_agree_d I b w t := by
       intro m x hm
       obtain ⟨f, _, hmf⟩ := fg₁.2.1 m hm
-      exact (pw.value_l I fg.1 ((hEω w).mp hw).1 hm ((gr.2 m f).mp hmf).2).trans (matrix s t m f x hst hmf).symm
-    exact (pe_sat_value_l I hZF code.2.1 bound code.2.2 hEω ((hEω g).mpr fg₀) hw pw).trans
+      exact (pw.value_l I ext fg.1 ((hEω w).mp hw).1 hm ((gr.2 m f).mp hmf).2).trans
+        ((rf_val_mem_l I hZF.1 small.transitive h₀ (fg₁.bound_l hmf).2).trans (matrix s t m f x hst hmf).symm)
+    exact (pe_sat_value_l I hZF ext code.2.1 bound code.2.2 hEω ((hEω g).mpr fg₀) hw pw).trans
       (ssat_spaces_l I hZF code.2.1 bound hEω hs bω (fun _ h => h) code.2.2 hw
         ((hs t).mpr (fn0_function_l (ZF.modelsKP hZF) ft)) same)
   have measure : Pe_holds_d I b D A₀ R₀ Eω F₀ l r U₀ g ↔ Ssat_d I A₁ R₁ E' F₀ l r v₀ := by

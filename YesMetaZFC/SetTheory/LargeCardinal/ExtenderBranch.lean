@@ -32,7 +32,7 @@ theorem ep_branch_reflection_l (hZF : M.Models ZF)
     (onto : ∀ y, M.mem y Y → ∃ x, Rd_entry_d x y j) : Sc_branch_d ω Y := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   obtain ⟨Q, U, Z', S', e, W', _, _, qs, us, system, lim, _, rel⟩ :=
-    ep_formula_system_l hZF source hm (family.source_l hZF X) h limit model elementary hY hn hj sb_bad_m sb_bad_closed_l
+    ep_formula_system_l hZF source hm (family.source_l hZF X) h limit model elementary hn.1 hj sb_bad_m sb_bad_closed_l
   have sourceRel u v (hu : M.mem u X) (hv : M.mem v X) : Rd_entry_d u v Q ↔ Sb_bad_d ω X u v :=
     (qs ⟨u, hu⟩ ⟨v, hv⟩).trans (sb_bad_sat_l hZF source.omega source.transitive source.omega_mem hm _)
   have targetRel u v (hu : M.mem u Y) (hv : M.mem v Y) : Rd_entry_d u v U ↔ Sb_bad_d ω Y u v :=

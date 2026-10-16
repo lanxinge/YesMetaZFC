@@ -90,7 +90,7 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("FiniteTailSource", "SubtypeColumn", "SubtypeRebound", "TypePoolImage", "SubtypeReboundImage",
              "TypeDropSource", "TypeDropEmbedding", "SubtypeSource")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
-            ("LocalIndiscerniblesGap", "TypeRenewal", "TypeGameRenewal", "ExtenderCriticalPoint",
+            ("LocalIndiscerniblesGap", "TypeRenewal", "TypeGameRenewal", "ExtenderCriticalPoint", "IterationCriticalBound",
              "TypeOneStepImage", "TypeGameStepImage", "IterationWorkingApply",
              "TypeGameTreeStep", "TypeGameIssuedAnswer", "TypeGameAnswerHistory",
              "TypeGameControlMove", "TypeGamePositionIssue", "TypeGamePositionNext", "TypeGameRank",
@@ -102,6 +102,8 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "TypeGameRunState", "TypeGameRunAdvance", "TypeGameRunSyntax", "TypeGameRunNext", "TypeGameRunSequence", "TypeGameOdd",
              "TypeGameRunOrder", "TypeGameRunUnion", "TypeGameEvenBranch", "TypeGameOddBranch", "TypeGameOddRecords",
              "TypeGameOddCompatibility", "TypeGameOddLimit", "TypeGameLimitValues", "TypeGameLimitControl", "TypeGameEvenLimit",
+             "IterationConeFixed", "TypeGameBranchFixed", "TypeGameBranchLimit", "TypeGameBranchTree",
+             "TypeGameBranchProjection", "TypeGameShiftedStrategy",
              "IterationBranchSequence", "TypeGameRootTree", "TypeGameRunRoot", "TypeGamePlayTrace", "TypeGamePastPlay",
              "TypeGameReturnSyntax", "TypeGameReturnSequence", "TypeGameReturnTree", "TypeGameReturnUnion", "TypeGameReturnBranch",
              "FiniteArithmeticSource", "TypeGameRealPrefix", "TypeGameRunMove", "TypeGameRunChoice",
@@ -227,7 +229,16 @@ MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name 
 MODULES += ["YesMetaZFC.SetTheory.Filter.SourceUltrafilter"]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderRelative", "ExtenderTransport", "ExtenderCopyPull", "ExtenderCopySyntax")]
-MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in ("Bounded", "DeltaImage")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in ("Bounded", "FormulaImage", "DeltaImage")]
+MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+            ("SourceApplication", "RelationRelative", "RelationFunction", "RelationFunctionFamily",
+             "RelationSeparation", "RelationUniformCode", "SourceCollectionBasis", "RelationCollection",
+             "RelationEvaluation", "RelationConstant", "RelationTraceFamily", "RelationPointwiseWitness",
+             "ReducedPower.RelationSyntax", "ReducedPower.RelationLos")]
+MODULES += ["YesMetaZFC.SetTheory.Collapse.RelationRealization"]
+MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+            ("ExtenderFiniteRepresentative", "ExtenderFunctionValue", "ExtenderSeedSegment",
+             "ExtenderBoundedRaw", "ExtenderBoundedRealization", "ExtenderRawReduced")]
 MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
             ("ExtenderFunctionCode", "ExtenderNormalSource", "ExtenderRepresentative", "ExtenderCoordinateSource",
              "ExtenderSeed", "ExtenderSeedNormal", "ExtenderSeedCollapse", "ExtenderCopySeed", "ExtenderCopyCollapse",
@@ -524,6 +535,15 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 LOS_MODULES = ["YesMetaZFC.Model.SetTheory.Internal.ReducedPower." + name for name in
                ("Witness", "Los", "Lift", "Projection")]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal.SourceProjection"]
+LOS_MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
+               ("SourceApplication", "RelationRelative", "RelationFunction", "RelationFunctionFamily", "ReducedPower.FormulaImage",
+                "RelationSeparation", "RelationUniformCode", "SourceCollectionBasis", "RelationCollection",
+             "RelationEvaluation", "RelationConstant", "RelationTraceFamily", "RelationPointwiseWitness",
+             "ReducedPower.RelationSyntax", "ReducedPower.RelationLos")]
+LOS_MODULES += ["YesMetaZFC.SetTheory.Collapse.RelationRealization"]
+LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("ExtenderFiniteRepresentative", "ExtenderFunctionValue", "ExtenderSeedSegment",
+                "ExtenderBoundedRaw", "ExtenderBoundedRealization", "ExtenderRawReduced")]
 LOS_MODULES += ["YesMetaZFC.Model.SetTheory.Internal.TypeGameNodeEmbedding", "YesMetaZFC.SetTheory.LargeCardinal.IterationConePull"]
 LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("ExtenderSource", "ExtenderArrows", "ExtenderLaws",
@@ -571,6 +591,12 @@ LOS_MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("eb_pool_m", "ep_indices0_m", "eb_collapse_m", "es_strength0_m", "ex_strength0_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Pn_agree_d"]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.rr_rel_m", "YesMetaZFC.SetTheory.Internal.Sr_sep_d"]
+RELATION_CODES = ["YesMetaZFC.SetTheory.Internal." + name for name in
+                  ("Rf_ext_d", "rf_ext_m", "Rf_val_d", "rf_val_m", "Rf_fun_d", "rf_fun_m",
+                   "Rt_trace_d", "rt_trace_m", "Rt_source_d", "Rc_graph_d", "rc_graph_m",
+                   "Rc_eval_d", "rc_eval_m", "Rc_holds_d", "rc_holds_m", "Rc_los_d", "rc_los_m")]
+CHOICE_FREE += RELATION_CODES
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal.Fs_read_d"]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                 ("ep_source_m", "Pn_model_d", "pn_model_m", "Pn_row_d", "pn_row_m", "pn_agree_m",
@@ -581,6 +607,8 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                  "ea_agree_m", "ep_graph_m", "ep_lift_m", "ep_system_m", "ep_constants_m", "it_ultra_m", "it_source_m", "it_payload_m",
                  "Ja_lift_d", "ja_lift_m", "Jr_value_d", "jr_value_m", "It_ladder_d", "it_ladder_m", "Tg_odd_node_d", "Tg_odd_cofinal_d",
                  "Tg_odd_edge_d", "Tg_odd_tail_d", "It_pull_subset_d", "Tg_return_node_d", "Tg_return_growth_d", "Tg_odd_compatible_d", "Tg_odd_limit_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tg_return_model_d", "Tg_shifted_d", "It_critical_bound_d", "it_critical_bound_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal." + name for name in ("di_order_m", "di_system_m", "di_limit_m")]
 LOS_CHOICE_FREE = ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                    ("Ep_source_d", "Ep_component_d", "ep_component_m", "Ep_arrow_d", "ep_arrow_m", "Ep_limit_d",
@@ -588,7 +616,13 @@ LOS_CHOICE_FREE = ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                    ("Ep_constants_d", "Ep_realizer_d", "Ep_strength_d", "Ep_strong_limit_d", "Es_strength_d", "es_strength_m", "Ex_strength_d")]
 LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.rp_change_filter_l", "YesMetaZFC.SetTheory.Internal.rp_lift_unique_l"]
+LOS_CHOICE_FREE += ["YesMetaZFC.SetTheory.Internal.rr_rel_m", "YesMetaZFC.SetTheory.Internal.Sr_sep_d", *RELATION_CODES]
 LOS_ZF_BOUNDS = {"YesMetaZFC.SetTheory.LargeCardinal.ep_branch_reflection_l": BASELINE, "YesMetaZFC.SetTheory.Internal.rp_lift_exists_l": BASELINE}
+LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.Internal." + name: BASELINE for name in
+                     ("sfm_template_l", "sfm_total_raw_l", "sfm_function_raw_l", "sfm_uniform_raw_l",
+                      "sc_collection_raw_l", "sc_collection_on_raw_l", "sfm_sep_test_raw_l", "sfm_sep_raw_l", "sc_separation_raw_l",
+                      "sc_constant_raw_l", "Smap_d.pe_context_l", "pe_compile_bound_l", "pe_value_exists_l",
+                      "Smap_d.pe_trace_raw_l", "rt_source_exists_l", "sc_pe_witness_raw_l", "rc_los_l", "rc_satisfies_l") })
 LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for name in
                      ("Ep_strength_d.above_l", "Ep_strong_limit_d.type_image_l")})
 LOS_ZF_BOUNDS.update({"YesMetaZFC.SetTheory.LargeCardinal." + name: BASELINE for name in

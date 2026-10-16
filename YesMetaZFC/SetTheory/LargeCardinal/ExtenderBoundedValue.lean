@@ -1,6 +1,7 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedCollapse
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderFunctionCode
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderValue
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderBoundedRaw
 
 /-! # 所属源的求值图辨认施加超幂的实际临界点像
 
@@ -27,71 +28,33 @@ theorem Eb_pool_d.realize_l
     ∃ e, Wc_map_d D Q Γ e ∧
       (∀ u x, Rd_entry_d u x e ↔ M.mem u D ∧ ∃ a f, KPair_d M u a f ∧ Ep_value_d q g a f x) ∧
       ∀ u v x y, Rd_entry_d u x e → Rd_entry_d v y e → (Rd_entry_d u v Q ↔ M.mem x y) := by
-  have eq := hZF.1.eq_of_same_members K₀ K (fun f => (owner.finite f).trans (source.finite f).symm)
-  subst K₀
-  obtain ⟨v, vf, values⟩ := eb_projection_l hZF source family system limit
-    (source.transitive B hB) (fun u hu => by
-      obtain ⟨n, a, D', f, hn, ha, fn, space, hf, gf, pair⟩ := pool.read_l hZF owner hu
-      exact ⟨a, ha, f, (common n D' f hn space gf).mpr hf, pair,
-        n, hn, D', source.space_mem_l hZF hn space, fn,
-        (eb_space_iff_l (ZF.modelsKP hZF) source.finite hn).mpr space, gf⟩)
+  obtain ⟨v, vf, values, reads, covers⟩ := pool.raw_l hZF source owner common hB family system limit
+    ff constant fv range membership edges
   obtain ⟨t, tf, ts⟩ := ZF.exists_compositionFunction hZF I (fn0_function_l (ZF.modelsKP hZF) vf) bij.1.1
   have evaluation u x : Rd_entry_d u x t ↔ M.mem u D ∧ ∃ a f, KPair_d M u a f ∧ Ep_value_d q g a f x := by
     refine (ts u x).trans ⟨?_, ?_⟩
     · rintro ⟨hu, E, huE, hEx⟩
-      obtain ⟨_, a, f, pair, ev⟩ := (values u E).mp huE
-      exact ⟨hu, a, f, pair, E, ev, hEx⟩
-    · rintro ⟨hu, a, f, pair, E, ev, hEx⟩
-      exact ⟨hu, E, (values u E).mpr ⟨hu, a, f, pair, ev⟩, hEx⟩
-  obtain ⟨_, n₀, hn₀, ha₀, D₁, space₀, ff₀⟩ := fv.source_l hZF family system limit
-  have eq := ff₀.domain_eq_l hZF.1 ff
-  subst D₁
+      obtain ⟨_, a, f, pair, value⟩ := (values u E).mp huE
+      exact ⟨hu, a, f, pair, E, value, hEx⟩
+    · rintro ⟨hu, a, f, pair, E, value, hEx⟩
+      exact ⟨hu, E, (values u E).mpr ⟨hu, a, f, pair, value⟩, hEx⟩
   have into u x (hux : Rd_entry_d u x t) : M.mem x Γ := by
-    obtain ⟨hu, a, f, pair, E, ev, hEx⟩ := (evaluation u x).mp hux
-    obtain ⟨n, a', D', f', hn, _, ha, space, _, gf, pair'⟩ := pool.read_l hZF owner hu
-    obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair' pair
+    obtain ⟨hu, E, huE, hEx⟩ := (ts u x).mp hux
     exact (wc.member_l (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1) bij.1.2 hEx hHΓ).mp
-      (ep_repr_bound_mem_l hZF source family system limit ff constant fv hB hn ha space gf ev)
+      ((covers E).mp ⟨u, hu, huE⟩)
   have onto x (hx : M.mem x Γ) : ∃ u, M.mem u D ∧ Rd_entry_d u x t := by
     obtain ⟨E, _, edge, hEx⟩ := ((wc.2 H Γ hHΓ).2.2 x).mp hx
-    obtain ⟨n, a, D', f, hn, haJ, ha, space, hf, gf, ev⟩ :=
-      ep_repr_bounded_l hZF source family system limit hn₀ ha₀ space₀ ff constant fv hB edge
-    have hfN := (common n D' f hn space gf).mp hf
-    obtain ⟨u, pair⟩ := (I).total a f
-    have hu := pool.node_l hZF owner hn haJ ha space hfN gf pair
-    exact ⟨u, hu, (evaluation u x).mpr ⟨hu, a, f, pair, E, ev, hEx⟩⟩
-  have relation x y (hx : M.mem x B) (hy : M.mem y B) : Rd_entry_d x y V ↔ Rd_entry_d x y R := by
-    obtain ⟨c, code⟩ := source.code
-    have BX := source.transitive B hB
-    refine ⟨fun ⟨p, pair, hp⟩ => ?_, fun h => ?_⟩
-    · obtain ⟨a, b, ha, hb, hab, pair'⟩ := (membership p).mp hp
-      obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair' pair
-      exact (code.2 a b).mpr ⟨BX a ha, BX b hb, hab⟩
-    · obtain ⟨p, pair⟩ := (I).total x y
-      exact ⟨p, pair, (membership p).mpr ⟨x, y, hx, hy, ((code.2 x y).mp h).2.2, pair⟩⟩
+    obtain ⟨u, hu, huE⟩ := (covers E).mpr edge
+    exact ⟨u, hu, (ts u x).mpr ⟨hu, E, huE, hEx⟩⟩
   have member u w x y (hx : Rd_entry_d u x t) (hy : Rd_entry_d w y t) : Rd_entry_d u w Q ↔ M.mem x y := by
-    obtain ⟨hu, a, f, pair, E, ev, hEx⟩ := (evaluation u x).mp hx
-    obtain ⟨hw, b, k, pair', H, kv, hHy⟩ := (evaluation w y).mp hy
-    obtain ⟨a', ha, f', hf, up, _, _, D', _, _, _, gf⟩ := (pool.nodes u).mp hu
-    obtain ⟨b', hb, k', hk, wp, _, _, D'', _, _, _, kf⟩ := (pool.nodes w).mp hw
-    obtain ⟨ea, ef⟩ := kpair_injective_l M up pair
-    obtain ⟨eb, ek⟩ := kpair_injective_l M wp pair'
-    subst a' f' b' k'
-    have link : Eb_link_d ω κ L B J K U V F G u w ↔ Eb_edge_d ω κ L B J K U V F a f b k := by
-      refine ⟨?_, fun h => ⟨a, ha, f, hf, b, hb, k, hk, pair, pair', h⟩⟩
-      rintro ⟨a', _, f', _, b', _, k', _, up', wp', h⟩
-      obtain ⟨rfl, rfl⟩ := kpair_injective_l M up' pair
-      obtain ⟨rfl, rfl⟩ := kpair_injective_l M wp' pair'
-      exact h
-    exact (edges u w).trans ((Iff.intro (And.right ∘ And.right) (fun h => ⟨hu, hw, h⟩)).trans
-      (link.trans ((eb_edge_iff_l hZF source family system limit (source.transitive B hB)
-        (fun a U' h => (range U').mpr ⟨a, h⟩) relation gf kf ev kv).trans
-          (wc.member_l (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1) bij.1.2 hEx hHy))))
-  have map' : Wc_map_d D Q Γ t := ⟨hΓ, (fn0_of_function_l (ZF.modelsKP hZF) tf).retarget_l into, onto,
+    obtain ⟨_, E, huE, hEx⟩ := (ts u x).mp hx
+    obtain ⟨_, H, hwH, hHy⟩ := (ts w y).mp hy
+    exact (reads u w E H huE hwH).trans
+      (wc.member_l (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1) bij.1.2 hEx hHy)
+  exact ⟨t, ⟨hΓ, (fn0_of_function_l (ZF.modelsKP hZF) tf).retarget_l into, onto,
     fun u _ x _ hux y hy => ⟨fun hyx => (onto y hy).elim fun w hw =>
       ⟨w, hw.1, (member w u y x hw.2 hux).mpr hyx, hw.2⟩,
-      fun ⟨w, _, hwu, hwy⟩ => (member w u y x hwy hux).mp hwu⟩⟩
-  exact ⟨t, map', evaluation, member⟩
+      fun ⟨w, _, hwu, hwy⟩ => (member w u y x hwy hux).mp hwu⟩⟩, evaluation, member⟩
 
 /-- 任一所属源内的有界塌缩证书都恢复同一个施加超幂值及同一求值图。 -/
 theorem Eb_collapse_d.realize_l

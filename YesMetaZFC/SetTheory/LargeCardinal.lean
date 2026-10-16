@@ -3,6 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawReduced
 import YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch
 import YesMetaZFC.SetTheory.LargeCardinal.TypeElasticRead
 import YesMetaZFC.SetTheory.LargeCardinal.LocalTypeTransportTuple
@@ -12,6 +13,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTransfer
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameShiftedStrategy
 import YesMetaZFC.SetTheory.LargeCardinal.TwinTreeOutward
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
@@ -33,6 +35,10 @@ import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 通用初等极限与外延坍塌只需 ZF，良基性核心只需 ZF＋DC。
 按 ν 选择不可达 L>ν，恢复整个 V_L 覆盖与谓词强性，并用原代表计数证明最大强度恰为 L。
 所属源中的实际有界超幂及求值图记录这一强度，可沿完整初等图传输并由指定实际超幂读取。
+原始商的完整原公式 Łoś、源内求值代表和有界部分的前驱完整识别已构造；
+`ep_raw_reduced_l` 用商内部函数码的实际坐标图构造下一约化幂分量。
+同一构造已返回全内部分离和小定义域上的大集合见证，覆盖非标准内部程序。
+关系源的逐点赋值编译、完整 Łoś、支撑过渡和任意地模型的递归初值仍待完成。
 源内原始不可达性及初始短扩展器判断已构造；不可达性随完整初等图和严格极限秩截断保持。
 严格正则秩截断自动保留同一扩展器的最大强度、实际秩层枚举与全部所属判断。
 完整类型的实际伸展已实现：任意 Vη 中的内部有限元组有无界多个 κ，
@@ -95,6 +101,10 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 沿既有路线完成；三张有限坐标图在同一返回极限中相容取并。
 `Tg_archive_play_d` 将每份实数存档接回原对局，锚点固定性及锥交换律保证返回因子
 把第一坐标的并图送回该对局。`Tg_sequence_d.branch_l` 输出这一实际原树分支。
+`Tg_sequence_d.wf_projection_l` 直接处理任意指定的共尾良基分支：实际坍塌、
+极限锥、低层固定性和三图取并共同给出该分支的完整移位树投影。
+`Tg_run_code_d.shifted_strategy_l` 把这一结论接到已有零轮状态的统一策略上。
+5.23 对任意给定地模型的相对初值及后继仍待证明，不能增添外部 ω 闭性来调用现有初值。
 `Tg_game_d.transfer_l` 已完成 5.15：从辅助博弈 II 的获胜策略统一构造原博弈
 有限局面空间、偶数时序、无限对局空间、第一投影的补收益集合及 II 的获胜策略。
 泛型 I 方向的 `generic_meet_l` 已在地模型中实际分离稠密集并调用泛型性。

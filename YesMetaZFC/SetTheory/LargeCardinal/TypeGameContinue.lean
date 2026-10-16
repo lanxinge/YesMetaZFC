@@ -113,7 +113,7 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
     slots ▸ (hw ▸ subtype)
   have hL := (loc.ordinals_l (ZF.modelsKP hZF) small.transitive).2
   obtain ⟨β, T', J', G', E', H', d', j, N, R', K₀, W, κ₀, next, ext, target, edge, mn, ready,
-    ultra, critical, bound, heights, hW, common, level, agreement, same, fixed⟩ :=
+    ultra, critical, bound, payload, heights, hW, common, level, agreement, same, fixed⟩ :=
     it_working_image_l hZFC tree succ hc hd mx my owner source hA cut hδ small ma mb smallUltra loc strong card
       hκL hV rank hV' rank' hζ hζδ hκV (fun i μ hm => hL.transitive (p 8) hτL μ (above i μ hm))
   have eq := (ultra.elementary_l hZF my.1 mn.1).1.1.1.2 (p 1) κ₀ κ'.val critical.image (same _ _ hκV crit.image)
@@ -362,7 +362,7 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have hWCX := (context.rank.rank_l hZF owner.source.transitive context.member context.limit L.property hW common).1
   have evenNode := ext.2.2.1 ξ c hc
   obtain ⟨β₂, T₂, J₂, G₂, E₂, H₂, c₂, j₂, N₂, R₂, K₂, L₂, F₂, κ₂, U₂, D₂, u₂, η₂, C₂, W₂,
-    next₂, ext₂, target₂, edge₂, mn₂, ready₂, ultra₂, critical₂, limit₂, bound₂, subset₂, heights₂,
+    next₂, ext₂, target₂, edge₂, mn₂, ready₂, ultra₂, critical₂, payload₂, limit₂, bound₂, subset₂, heights₂,
     iU₂, iD₂, iu₂, reply₂, iη₂, iC₂, context₂, legal₂, hW₂, hWC₂, common₂, level₂, hQ₂, hw₂, agreement₂, fixed₂⟩ :=
     context'.round_l hZFC nv ρ₂ context ready owner next ext.1 target evenNode mn mx
       level.member level.hierarchy hW common hLimit hWCX hLδ₂ hκW₂ ωθ above₂ round₂
@@ -403,12 +403,14 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have eU : (ρ₂.bound 31).val = (ι.bound 30).val := request 15
   have eD : (ρ₂.bound 32).val = (ι.bound 31).val := request 16
   have eu : (ρ₂.bound 34).val = (ι.bound 25).val := request 17
+  obtain ⟨p₁, entry₁, pay₁⟩ := payload
+  have lower₁ := it_payload_bound_l (ZF.modelsKP hZF) next.tree.move_function entry₁ pay₁ lower
   exact ⟨k, β, T', J', G', E', H', d', N, R', L.val, K₀, η', C', π',
-    next, ext, target, mn, ready, context', root', iRoot', anchor', nv, ρ₂, round₂, request, high, odd,
+    next, ext, target, mn, ready, context', root', iRoot', anchor', lower₁, nv, ρ₂, round₂, request, high, odd,
     ⟨by change M.mem (ρ₂.bound 40).val Z₀; rw [digits]; exact queryLow 5,
       by change Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ₂.bound 40).val; rw [digits]; exact played⟩,
     β₂, T₂, J₂, G₂, E₂, H₂, c₂, j₂, N₂, R₂, K₂, L₂, F₂, κ₂, U₂, D₂, u₂, η₂, C₂, W₂,
-    π₂, next₂, ext₂, target₂, edge₂, mn₂, ready₂, eκ ▸ ultra₂, eκ ▸ critical₂, limit₂, bound₂, subset₂, heights₂,
+    π₂, next₂, ext₂, target₂, edge₂, mn₂, ready₂, eκ ▸ ultra₂, eκ ▸ critical₂, eκ ▸ payload₂, limit₂, bound₂, subset₂, heights₂,
     eU ▸ iU₂, eD ▸ iD₂, eu ▸ iu₂, reply₂, iη₂, iC₂, context₂, hW₂, common₂, level₂,
     root₂, iRoot₂, anchor₂, eκ ▸ past⟩
 

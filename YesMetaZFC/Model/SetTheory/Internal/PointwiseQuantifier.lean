@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.SetTheory.Internal.PointwiseSteps
-import YesMetaZFC.Model.SetTheory.Internal.UniformizationSource
+import YesMetaZFC.Model.SetTheory.Internal.RelationUniformCode
 
 /-! # 存在量词的逐点翻译
 
@@ -20,36 +20,40 @@ theorem pe_ex_step_l {ω F n b t m G r z i j v u σ}
     ∃ l J k, Sbuild_d I ω m G l J k ∧ ∀ c X R D E, Pe_context_d I ω c X R D E →
       Pe_row_d I b t D X R E F n m G j v → Pe_row_d I b t D X R E F n l J r k := by
   have hiω := hω.transitive hZF σ hσ i hi
-  obtain ⟨n₁, F₁, r₁, h₁, a₁⟩ := sfm_function_l I hZF hω hG hσ hi hb hu hub hui
+  obtain ⟨n₁, F₁, r₁, h₁, a₁⟩ := sfm_function_raw_l I hZF hω hG hσ hi hb hu hub hui
   obtain ⟨n₂, F₂, r₂, h₂, a₂⟩ := sfm_and_l I hZF hω h₁.program h₁.root (h₁.span v hv)
   obtain ⟨l, J, k, h₃, a₃⟩ := sfm_ex_l I hZF hω h₂.program hiω h₂.root
   refine ⟨l, J, k, (h₁.comp I h₂).comp I h₃, fun c X R D E context hj p a f hp ha hf hDa ht he => ?_⟩
-  obtain ⟨hX, hm, hE, _, constants⟩ := context
+  obtain ⟨ext, model, hE, hD, constants⟩ := context
+  have en := ext.native_l I model.2.1
+  have hpX := model.2.2.2 p D hp |>.1
   obtain ⟨V, hV⟩ := seval_exists_l I hZF X R E F hF.2.1.1
   have body B a' (hB : M.mem B X) (ha' : Senv_update_d I a i B a') :
-      Ssat_d I X R E F₂ n₂ r₂ a' ↔ Sfun_d X D B ∧ Ssat_d I X R E G m v a' := by
+      Ssat_d I X R E F₂ n₂ r₂ a' ↔ Rf_fun_d I X R D B ∧ Ssat_d I X R E G m v a' := by
     have hA := (hE a').mpr (ha'.function_l I ((hE a).mp ha) hiω hB)
-    rw [a₂ X R E a' hA, a₁ X R E c a' B D hX hm hE hA
+    rw [a₂ X R E a' hA, a₁ X R E c a' model ⟨B, hB⟩ ⟨D, hD⟩ en hE hA
       ((ha'.2 i B).mpr (Or.inl ⟨rfl, rfl⟩)) ((ha'.2 b D).mpr (Or.inr ⟨hbi, hDa⟩)),
       ← h₁.sat_l I hZF hG hv X R E a']
-  have row B x a' f' (hB : Sfun_d X D B) (hx : Rd_entry_d p x B)
+    exact and_congr (rf_fun_native_l I model.2.1 en ⟨D, hD⟩ ⟨B, hB⟩).symm Iff.rfl
+  have row B x a' f' (hB : Rf_fun_d I X R D B) (hx : Rf_val_d I X R p x B)
       (ha' : Senv_update_d I a i B a') (hf' : Senv_update_d I f i x f') :
       Ssat_d I X R E F n j f' ↔ Ssat_d I X R E G m v a' :=
-    hj p a' f' hp ((hE a').mpr (ha'.function_l I ((hE a).mp ha) hiω hB.1))
-      ((hE f').mpr (hf'.function_l I ((hE f).mp hf) hiω ((hB.function_l hX).bound_l hx).2))
+    hj p a' f' hp ((hE a').mpr (ha'.function_l I ((hE a).mp ha) hiω (hB.mem_l I)))
+      ((hE f').mpr (hf'.function_l I ((hE f).mp hf) hiω (hx.bounds_l I).2.1))
       ((ha'.2 b D).mpr (Or.inr ⟨hbi, hDa⟩)) ((ha'.2 t p).mpr (Or.inr ⟨hti, ht⟩))
       (he.update_l I hB hx ha' hf')
   rw [ssat_exists_l I hZF hF hV hc hs hf, a₃ X R E a ha]
   constructor
   · rintro ⟨x, f', hx, hf', ht⟩
     obtain ⟨B, hfun, hB⟩ := constants x hx
-    have hBX := hfun.1
+    have hBX := hfun.mem_l I
     obtain ⟨a', ha', _⟩ := senv_update_exists_l I hZF ((hE a).mp ha) hiω hBX
     exact ⟨B, a', hBX, ha', (body B a' hBX ha').mpr
-      ⟨hfun, (row B x a' f' hfun (hB p hp) ha' hf').mp ht⟩⟩
+      ⟨hfun, (row B x a' f' hfun (hB p hpX hp) ha' hf').mp ht⟩⟩
   · rintro ⟨B, a', hBX, ha', ht⟩
     obtain ⟨hB, hs⟩ := (body B a' hBX ha').mp ht
-    obtain ⟨x, hx, hpx⟩ := (hB.function_l hX).2.1 p hp
+    obtain ⟨x, hpx⟩ := hB.value_l I ext hpX hp
+    have hx := hpx.bounds_l I |>.2.1
     obtain ⟨f', hf', _⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hiω hx
     exact ⟨x, f', hx, hf', (row B x a' f' hB hpx ha' hf').mpr hs⟩
 

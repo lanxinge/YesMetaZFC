@@ -26,6 +26,7 @@ theorem rs_formula_l {ω c X R D P U o G p C T f g B H : M.Domain}
       ∃ A, M.mem A U ∧ ∀ v, M.mem v A → ∃ x y : (smdl_structure_l I (R := R) hm.1.2.1).Domain,
         Rd_entry_d v x.val f ∧ Rd_entry_d v y.val g ∧
           Formula.satisfies (sr_pair_env_l (N := smdl_structure_l I (R := R) hm.1.2.1) x y) φ := by
+  have ext := rf_ext_mem_l I hZF.1 hX hm
   let N := smdl_structure_l I (R := R) hm.1.2.1
   let L := smdl_structure_l I (R := T) model.code.2.1
   obtain ⟨z, n, F, r, k, code, nums, read⟩ := source_compile_l I hZF hω φ hc
@@ -61,7 +62,7 @@ theorem rs_formula_l {ω c X R D P U o G p C T f g B H : M.Domain}
   apply imp_congr_right
   intro hv
   have hvD := hU.base.bounds V hV v hv
-  have point u (hu : M.mem u E) (eval : Pe_assign_d I ω D X t u v)
+  have point u (hu : M.mem u E) (eval : Pe_assign_d I ω D X R t u v)
       (x y : N.Domain) (hx : Rd_entry_d v x.val f) (hy : Rd_entry_d v y.val g) :
       Satisfies_d I ω c z u ↔ Formula.satisfies (sr_pair_env_l (N := N) x y) φ := by
     apply (satisfies_decode_l I hZF.1 hm.1 code he).trans
@@ -71,14 +72,15 @@ theorem rs_formula_l {ω c X R D P U o G p C T f g B H : M.Domain}
     have eq := tf.1.2 (k i) q (a i) hkq (tk i)
     subst q
     have val : Rd_entry_d v ((sr_pair_env_l (N := N) x y).bound i).val (a i) := Fin.cases hy (fun _ => hx) i
-    exact (fn0_function_l (ZF.modelsKP hZF) (sf.function_l hX)).1.2 v z' _ hvz val ▸ hkz
+    exact sf.unique_l I ext hvz ((rf_val_mem_l I hZF.1 hX hm (sf.mem_l I)).mpr val) ▸ hkz
   constructor
   · rintro ⟨u, hu, eval, hs⟩
     obtain ⟨x, hx, hfx⟩ := (model.map.functions f (model.map.projection.input_mem_of_pairMember hf)).2.1 v hvD
     obtain ⟨y, hy, hgy⟩ := (model.map.functions g (model.map.projection.input_mem_of_pairMember hg)).2.1 v hvD
     exact ⟨⟨x, hx⟩, ⟨y, hy⟩, hfx, hgy, (point u hu eval ⟨x, hx⟩ ⟨y, hy⟩ hfx hgy).mp hs⟩
   · rintro ⟨x, y, hx, hy, hs⟩
-    obtain ⟨u, hu, eval⟩ := pe_value_exists_l I hZF hX he htf (fun _ h => h) hvD hm.1.2.1 (ev.repr_l I tf.1)
+    obtain ⟨u, hu, eval⟩ := pe_value_exists_l I hZF ext he htf (fun _ h => h) (hX D hD v hvD)
+      ((hm.2 v D).mpr ⟨hX D hD v hvD, hD, hvD⟩) (ev.repr_l I tf.1)
     exact ⟨u, hu, eval, (point u hu eval x y hx hy).mpr hs⟩
 
 /-- 原测度可能含源外集合；用否定公式及共同细化消去对源内测度限制的依赖。 -/

@@ -47,9 +47,9 @@ theorem Tg_context_d.tree_successor_l {ω X R μ K η C c₀ α ξ T Q G E L H b
     have eb : (ε.bound 23).val = (ι.bound 24).val := (congrArg Subtype.val hb).trans eκ
     have above i ν (hn : Rd_entry_d i ν L) : M.mem ν (ε.bound 23).val ∨ ν = (ε.bound 23).val :=
       Or.inl (eb.symm ▸ (bounds i ν hn).elim (κlimit.1.transitive b below ν) (fun eq => eq.symm ▸ below))
-    obtain ⟨v, round, β, T₁, Q₁, G₁, E₁, id, π₁, padded, pad, node₁, padEdge, identity, _, root₁, image₁, anchor₁,
+    obtain ⟨v, round, β, T₁, Q₁, G₁, E₁, id, π₁, padded, pad, node₁, padEdge, identity, padEmpty, root₁, image₁, anchor₁,
       β₂, T₂, Q₂, G₂, E₂, L₂, d, j, N, R₂, K₂, ℓ, F, κ, U, D, u, η₂, C₂, W,
-      next, extend, node₂, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
+      next, extend, node₂, edge, mn, ready, ultra, critical, payload, limit, bound, subset, heights,
       iU, iD, iu, reply, iη, iC, context₂, _, hW, _, common, level, _, _, _, _, π₂, root₂, image₂, anchor₂, update⟩ :=
       context.pad_round_l hZFC nc ε source tree succ hc mx hwε ho root image anchor lowerε above seed
     let ρ := tg_round_env_d ε v
@@ -81,12 +81,15 @@ theorem Tg_context_d.tree_successor_l {ω X R μ K η C c₀ α ξ T Q G E L H b
       apply (tg_play_read_l hZF fs.transitive nc J (ι.bound 4) (ι.bound 3) (ι.bound 20) (ι.bound 1)).mpr
       rintro i x ⟨p, _, hp⟩
       exact (empty₀ p hp).elim
+    have padLower : ∀ p κ L F, Rd_entry_d ξ p E₁ → It_payload_d p κ L F → M.MemberSubset γ κ := by
+      rintro p κ L F hp ⟨r, ⟨a, b, _, _, pair⟩, _⟩
+      exact (padEmpty p hp a ((pair a).mpr (Or.inl rfl))).elim
     exact ⟨ξ, β, T₁, Q₁, G₁, E₁, L, c, X, R, μ, K, η, C, π₁,
-      padded, pad, node₁, mx, source, context, root₁, image₁, anchor₁, nc, ρ, round, request, high,
+      padded, pad, node₁, mx, source, context, root₁, image₁, anchor₁, padLower, nc, ρ, round, request, high,
       Or.inl ⟨congrArg Subtype.val empty, rfl, congrArg Subtype.val graph, id, padEdge, hS⟩,
       ⟨lowS, play⟩,
       β₂, T₂, Q₂, G₂, E₂, L₂, d, j, N, R₂, K₂, ℓ, F, κ, U, D, u, η₂, C₂, W, π₂,
-      next, extend, node₂, edge, mn, ready, eκ ▸ ultra, eκ ▸ critical, limit, bound, subset, heights,
+      next, extend, node₂, edge, mn, ready, eκ ▸ ultra, eκ ▸ critical, eκ ▸ payload, limit, bound, subset, heights,
       eU ▸ iU, eD ▸ iD, eu ▸ iu, reply, iη, iC, context₂, hW, common, level,
       root₂, image₂, anchor₂, eκ ▸ update⟩
   · exact events.continue_tree_l hZFC context source nc ι issued hw empty tree succ hc mx ho root image

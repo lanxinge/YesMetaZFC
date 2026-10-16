@@ -22,9 +22,9 @@ variable {ω c X R D P U o G p C T E}
 include hω hX hm theory uniform hD hP hU hG hM hE
 
 theorem rs_satisfies_l {A a e z} (hA : Scode_d I ω A) (ha : M.mem a E)
-    (he : M.IsSetFunctionFromTo I e ω C) (hv : Rs_eval_d I ω D X p a e) (hz : M.mem z A) :
+    (he : M.IsSetFunctionFromTo I e ω C) (hv : Rs_eval_d I ω D X R p a e) (hz : M.mem z A) :
     Satisfies_d I ω o z e ↔ ∃ B, M.mem B U ∧ ∀ v, M.mem v B →
-      ∃ f, M.mem f E ∧ Pe_assign_d I ω D X a f v ∧ Satisfies_d I ω c z f := by
+      ∃ f, M.mem f E ∧ Pe_assign_d I ω D X R a f v ∧ Satisfies_d I ω c z f := by
   obtain ⟨n, F, r, hf⟩ := (hA z).mp hz
   obtain ⟨b, hb, hB⟩ := sbound_exists_l I hZF hω hf.2.1
   obtain ⟨K, hK⟩ := ZF.exists_functionSpace hZF I ω C
@@ -42,23 +42,24 @@ theorem rs_satisfies_l {A a e z} (hA : Scode_d I ω A) (ha : M.mem a E)
   apply imp_congr_right
   intro hvB
   have hvD := hU.base.bounds B hB' v hvB
-  apply (pe_sat_full_l I hZF hX hE hf.2.1 hB bω hf.2.2 ha repr hvD hm.1.2.1).trans
+  apply (pe_sat_full_l I hZF (rf_ext_mem_l I hZF.1 hX hm) hE hf.2.1 hB bω hf.2.2 ha repr (hX D hD v hvD) ((hm.2 v D).mpr ⟨hX D hD v hvD, hD, hvD⟩)).trans
   exact exists_congr fun f => and_congr_right fun _ => and_congr_right fun _ =>
     (satisfies_decode_l I hZF.1 hm.1 hf hE).symm
 
 omit hE in
 /-- 从实际 ω→G 代表赋值图一次构造赋值空间、商赋值和全部公式码。 -/
 theorem rs_los_assignment_l {a} (ha : M.IsSetFunctionFromTo I a ω G) : ∃ E e A,
-    M.IsFunctionSpace I E ω X ∧ M.IsSetFunctionFromTo I e ω C ∧ Rs_eval_d I ω D X p a e ∧ Scode_d I ω A ∧
+    M.IsFunctionSpace I E ω X ∧ M.IsSetFunctionFromTo I e ω C ∧ Rs_eval_d I ω D X R p a e ∧ Scode_d I ω A ∧
     ∀ z, M.mem z A → (Satisfies_d I ω o z e ↔ ∃ B, M.mem B U ∧ ∀ v, M.mem v B →
-      ∃ f, M.mem f E ∧ Pe_assign_d I ω D X a f v ∧ Satisfies_d I ω c z f) := by
+      ∃ f, M.mem f E ∧ Pe_assign_d I ω D X R a f v ∧ Satisfies_d I ω c z f) := by
   obtain ⟨E, hE⟩ := ZF.exists_functionSpace hZF I ω X
   have hax : M.IsSetFunctionFromTo I a ω X := ⟨ha.1, ha.2.1, fun i hi =>
     (ha.2.2 i hi).imp fun g hg => ⟨((hG g).mp hg.1).1, hg.2⟩⟩
-  have hr : Pe_repr_d I ω D X a := fun i g _ hg => by
+  have hr : Pe_repr_d I ω D X R a := fun i g _ hg => by
     obtain ⟨hgX, hgD⟩ := (hG g).mp (ha.output_mem_of_pairMember hg)
-    exact sc_function_domain_l theory.algebra hgX hgD
-  obtain ⟨e, he, hv⟩ := rs_eval_exists_l I hZF hX hG hM.map hE ((hE a).mpr hax) hr
+    exact (rf_fun_mem_l I hZF.1 hX hm hD).mpr (sc_function_domain_l theory.algebra hgX hgD)
+  obtain ⟨e, he, hv⟩ := rs_eval_exists_l I hZF (fun g hg => (hG g).mpr
+    ⟨hg.mem_l I, ((rf_fun_mem_l I hZF.1 hX hm hD).mp hg).function_l hX⟩) hM.map.projection hE ((hE a).mpr hax) hr
   obtain ⟨A, hA⟩ := scode_exists_l I hZF hω
   exact ⟨E, e, A, hE, he, hv, hA, fun z hz => rs_satisfies_l hZF hω hX hm theory uniform hD hP hU hG hM hE
     hA ((hE a).mpr hax) he hv hz⟩

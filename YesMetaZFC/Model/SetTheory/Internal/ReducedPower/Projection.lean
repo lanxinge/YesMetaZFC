@@ -44,41 +44,45 @@ theorem rs_projection_embedding_l {ω c X R D₀ D₁ P₀ P₁ U₀ U₁ t o₀
     (ha₀.2.2 i hi).imp fun g hg => ⟨((hG₀ g).mp hg.1).1, hg.2⟩⟩
   have a₁X : M.IsSetFunctionFromTo I a₁ ω X := ⟨ha₁.1, ha₁.2.1, fun i hi =>
     (ha₁.2.2 i hi).imp fun g hg => ⟨((hG₁ g).mp hg.1).1, hg.2⟩⟩
-  have r₀ : Rs_eval_d I ω D₀ X p₀ a₀ e₀ := by
+  have r₀ : Rs_eval_d I ω D₀ X R p₀ a₀ e₀ := by
     intro i hi
     obtain ⟨g, hg, hig⟩ := ha₀.2.2 i hi
     obtain ⟨B, _, hgp⟩ := hM₀.map.projection.2.2 g hg
-    exact ⟨g, B, hig, s₀ g hg, hgp, eval₀ i hi g B hig hgp⟩
-  have r₁ : Rs_eval_d I ω D₁ X p₁ a₁ e₁ := by
+    exact ⟨g, B, hig, (rf_fun_mem_l I hZF.1 hX hm hD₀).mpr (s₀ g hg), hgp, eval₀ i hi g B hig hgp⟩
+  have r₁ : Rs_eval_d I ω D₁ X R p₁ a₁ e₁ := by
     intro i hi
     obtain ⟨g, hg, hig⟩ := ha₀.2.2 i hi
     obtain ⟨B, _, hgp⟩ := hM₀.map.projection.2.2 g hg
     obtain ⟨g', hg', hgg⟩ := hK.2.2 g hg
     obtain ⟨C, _, hgp'⟩ := hM₁.map.projection.2.2 g' hg'
-    exact ⟨g', C, (comp i g').mpr ⟨hi, g, hig, hgg⟩, s₁ g' hg', hgp',
+    exact ⟨g', C, (comp i g').mpr ⟨hi, g, hig, hgg⟩, (rf_fun_mem_l I hZF.1 hX hm hD₁).mpr (s₁ g' hg'), hgp',
       hh i hi B C (eval₀ i hi g B hig hgp) (lift g g' B C hgg hgp hgp')⟩
   have point v w (hvw : Rd_entry_d v w t) f :
-      Pe_assign_d I ω D₀ X a₀ f w ↔ Pe_assign_d I ω D₁ X a₁ f v := by
+      Pe_assign_d I ω D₀ X R a₀ f w ↔ Pe_assign_d I ω D₁ X R a₁ f v := by
     constructor
     · intro h i hi
       obtain ⟨g, x, hig, _, hwx, hix⟩ := h i hi
       have hg := ha₀.output_mem_of_pairMember hig
       obtain ⟨g', hg', hgg⟩ := hK.2.2 g hg
-      exact ⟨g', x, (comp i g').mpr ⟨hi, g, hig, hgg⟩, s₁ g' hg',
-        (((hk g g').mp hgg).2.2.value_l ht.1 ((hG₀ g).mp hg).2 hvw).mpr hwx, hix⟩
+      exact ⟨g', x, (comp i g').mpr ⟨hi, g, hig, hgg⟩, (rf_fun_mem_l I hZF.1 hX hm hD₁).mpr (s₁ g' hg'),
+        (rf_val_mem_l I hZF.1 hX hm ((hG₁ g').mp hg').1).mpr
+          ((((hk g g').mp hgg).2.2.value_l ht.1 ((hG₀ g).mp hg).2 hvw).mpr
+            ((rf_val_mem_l I hZF.1 hX hm ((hG₀ g).mp hg).1).mp hwx)), hix⟩
     · intro h i hi
       obtain ⟨g', x, hig', _, hvx, hix⟩ := h i hi
       obtain ⟨g, hg, hig⟩ := ha₀.2.2 i hi
       obtain ⟨g'', hg'', hgg⟩ := hK.2.2 g hg
       have eq := ha₁.1.2 i g' g'' hig' ((comp i g'').mpr ⟨hi, g, hig, hgg⟩)
-      exact ⟨g, x, hig, s₀ g hg, (((hk g g'').mp hgg).2.2.value_l ht.1 ((hG₀ g).mp hg).2 hvw).mp (eq ▸ hvx), hix⟩
+      exact ⟨g, x, hig, (rf_fun_mem_l I hZF.1 hX hm hD₀).mpr (s₀ g hg), (rf_val_mem_l I hZF.1 hX hm ((hG₀ g).mp hg).1).mpr
+        ((((hk g g'').mp hgg).2.2.value_l ht.1 ((hG₀ g).mp hg).2 hvw).mp
+          ((rf_val_mem_l I hZF.1 hX hm ((hG₁ g'').mp hg'').1).mp (eq ▸ hvx))), hix⟩
   obtain ⟨n, F, r, hcode⟩ := (hA z).mp hz
   obtain ⟨B, hBX, hB⟩ := sc_full_trace_l hZF hω hX hm theory hD₀ hE hcode
     ((hE a₀).mpr a₀X) (r₀.repr_l I ha₀.1)
   have hBP := (hP₀ B).mpr ⟨hBX, fun v hv => ((hB v).mp hv).1⟩
   obtain ⟨C, hCQ, hC, measure⟩ := ht.2 B hBP
   have trace v : M.mem v C ↔ M.mem v D₁ ∧
-      ∃ f, M.mem f E ∧ Pe_assign_d I ω D₁ X a₁ f v ∧ Satisfies_d I ω c z f := by
+      ∃ f, M.mem f E ∧ Pe_assign_d I ω D₁ X R a₁ f v ∧ Satisfies_d I ω c z f := by
     refine (hC v).trans ⟨?_, ?_⟩
     · rintro ⟨hv, w, hw, hvw⟩
       obtain ⟨_, f, hf, hval, hs⟩ := (hB w).mp hw

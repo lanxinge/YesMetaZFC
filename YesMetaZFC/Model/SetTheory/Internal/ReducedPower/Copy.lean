@@ -51,18 +51,18 @@ theorem rs_copy_embedding_l {ω c d X R Y S π D D' P Q U V o₀ o₁ G H p₀ p
     obtain ⟨g, _, hfg⟩ := hK.2.2 f (ha.output_mem_of_pairMember hif)
     have eq := hπ.1.1.1.2 f g f' ((ks f g).mp hfg).2 hff
     exact (comp i f').mpr ⟨hi, f, hif, eq ▸ hfg⟩
-  have r₀ : Rs_eval_d I ω D X p₀ a e₀ := by
+  have r₀ : Rs_eval_d I ω D X R p₀ a e₀ := by
     intro i hi
     obtain ⟨f, hf, hif⟩ := ha.2.2 i hi
     obtain ⟨B, _, hfp⟩ := hM₀.map.projection.2.2 f hf
-    exact ⟨f, B, hif, sf f hf, hfp, eval₀ i hi f B hif hfp⟩
-  have r₁ : Rs_eval_d I ω D' Y p₁ a' e₁ := by
+    exact ⟨f, B, hif, (rf_fun_mem_l I hZF.1 hX hm hDX).mpr (sf f hf), hfp, eval₀ i hi f B hif hfp⟩
+  have r₁ : Rs_eval_d I ω D' Y S p₁ a' e₁ := by
     intro i hi
     obtain ⟨f, hf, hif⟩ := ha.2.2 i hi
     obtain ⟨g, hg, hfg⟩ := hK.2.2 f hf
     obtain ⟨B, _, hfp⟩ := hM₀.map.projection.2.2 f hf
     obtain ⟨C, _, hgp⟩ := hM₁.map.projection.2.2 g hg
-    exact ⟨g, C, (comp i g).mpr ⟨hi, f, hif, hfg⟩, sg g hg, hgp,
+    exact ⟨g, C, (comp i g).mpr ⟨hi, f, hif, hfg⟩, (rf_fun_mem_l I hZF.1 hY hn hDY).mpr (sg g hg), hgp,
       hh i hi B C (eval₀ i hi f B hif hfp) (lift f g B C hfg hfp hgp)⟩
   obtain ⟨n, F, r, code⟩ := (hA z).mp hz
   obtain ⟨b, hb, bound⟩ := sbound_exists_l I hZF hω code.2.1

@@ -37,6 +37,7 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
         It_pnice_d hZF ω c₀ β₂ T₂ J₂ G₂ E₂ H₂ ∧ It_extension_d β α ξ T₁ J₁ G₁ E₁ β₂ T₂ J₂ G₂ E₂ ∧
         Rd_entry_d β d J₂ ∧ It_map_d G₂ ξ β j ∧ Smem_d I d N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
         It_ultra_d hZF ω (p 5) L F c d j ∧ Wd_crit_d I X j (p 5) κ' ∧
+        (∃ q, Rd_entry_d α q E₂ ∧ It_payload_d q (p 5) L F) ∧
         M.IsLimitOrdinal L ∧ M.mem (v 15).val L ∧ M.MemberSubset L κ' ∧
         (∀ i ν, Rd_entry_d i ν H₂ → M.mem ν κ' ∨ ν = κ') ∧
         Rd_entry_d (p 15) U' j ∧ Rd_entry_d (p 16) D' j ∧ Rd_entry_d (p 18) u' j ∧
@@ -70,7 +71,7 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
       (fixed x (owner.source.transitive Z₀ anchor.member x hx))⟩
   obtain ⟨ζ, V, hV, rank, hζ, hVC, hζδ, hκV⟩ := context.round_scope_l hZFC nc ε owner hw valid
   obtain ⟨β₂, T₂, J₂, G₂, E₂, H₂, d, j, N, R', K₀, L, F, κ', U', D', u', η', C', W,
-    result, ext, target, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
+    result, ext, target, edge, mn, ready, ultra, critical, payload, limit, bound, subset, heights,
     hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, fixedV⟩ :=
     context.round_l hZFC nc ε context owner owner padded pad.1 nextNode oldNode mx mx
       hV rank hV rank hζ hVC hζδ hκV hw above valid
@@ -91,7 +92,7 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
     (fun i d hi => ext.2.2.1 i d (pad.2.2.1 i d hi)) (ext.2.2.1 α c nextNode) mx
   exact ⟨v, valid, β, T₁, J₁, G₁, E₁, id, π₁, padded, pad, nextNode, edge₁, identity, empty,
     root₁, iRoot₁, anchor₁, β₂, T₂, J₂, G₂, E₂, H₂, d, j, N, R', K₀, L, F, κ', U', D', u', η', C', W,
-    result, ext, target, edge, mn, ready, ultra, critical, limit, bound, subset, heights,
+    result, ext, target, edge, mn, ready, ultra, critical, payload, limit, bound, subset, heights,
     hU, hD, hu, reply, iη, iC, context', legal, hW, hWC, common, level, hQW, hwW, agreement, fixedV,
     π₂, root₂, iRoot₂, anchor₂, past⟩
 

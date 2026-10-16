@@ -52,15 +52,16 @@ theorem sc_pe_witness_l {ω c X R D E F n V r z i j b a A}
       ← h₁.sat_l I hZF h.1 hv X R E aF]
   have row p g x aT aF f f' (hp : M.mem p D) (hg : Sfun_d X D g) (hx : Rd_entry_d p x g)
       (hT : Senv_update_d I aD t p aT) (hG : Senv_update_d I aT i g aF)
-      (hf : M.mem f E) (he : Pe_assign_d I b D X a f p) (hff : Senv_update_d I f i x f') :
+      (hf : M.mem f E) (he : Pe_assign_d I b D X R a f p) (hff : Senv_update_d I f i x f') :
       Ssat_d I X R E F n j f' ↔ Ssat_d I X R E G m v aF :=
-    h.2.2 c X R D E (sc_pe_context_l hZF hω hX hm theory hD hE) j v hjv p aF f' hp ((hE aF).mpr (hG.function_l I
+    h.2.2 c X R D E (sc_pe_context_l hZF hω hX hm theory hD hE) j v hjv p aF f' ((hm.2 p D).mpr ⟨hX D hD p hp, hD, hp⟩) ((hE aF).mpr (hG.function_l I
       (hT.function_l I haD htω (hX D hD p hp)) hiω hg.1))
       ((hE f').mpr (hff.function_l I ((hE f).mp hf) hiω ((hg.function_l hX).bound_l hx).2))
       ((hG.2 b D).mpr (Or.inr ⟨hbi, (hT.2 b D).mpr
         (Or.inr ⟨hbt, (hDa.2 b D).mpr (Or.inl ⟨rfl, rfl⟩)⟩)⟩))
       ((hG.2 t p).mpr (Or.inr ⟨hti, (hT.2 t p).mpr (Or.inl ⟨rfl, rfl⟩)⟩))
-      ((he.congr_left_l I (agree p aT hT)).update_l I hg hx hG hff)
+      ((he.congr_left_l I (agree p aT hT)).update_l I ((rf_fun_mem_l I hZF.1 hX hm hD).mpr hg)
+        ((rf_val_mem_l I hZF.1 hX hm hg.1).mpr hx) hG hff)
   obtain ⟨B, C, hBX, hCX, hBC, select⟩ := uniform E F₂ n₂ r₂ t i aD A hE h₂.program
     h₂.root htω hiω hti ((hE aD).mpr haD) hA hAD (fun p hp => by
       obtain ⟨f, hf, he, hsat⟩ := htot p hp
@@ -83,7 +84,8 @@ theorem sc_pe_witness_l {ω c X R D E F n V r z i j b a A}
   have hfun := chosen p g' hpg
   obtain ⟨x, hx, hpx⟩ := (hfun.function_l hX).2.1 p (hAD p hp)
   obtain ⟨f', hff, hf'⟩ := senv_update_exists_l I hZF ((hE f).mp hf) hiω hx
-  exact ⟨f', (hE f').mpr hf', he.update_l I hg ((diag p g' x hpg).mpr hpx) ha' hff,
+  exact ⟨f', (hE f').mpr hf', he.update_l I ((rf_fun_mem_l I hZF.1 hX hm hD).mpr hg)
+    ((rf_val_mem_l I hZF.1 hX hm hg.1).mpr ((diag p g' x hpg).mpr hpx)) ha' hff,
     (row p g' x aT aF f f' (hAD p hp) hfun hpx hT hG hf he hff).mpr
       ((matrix p g' aT aF (hAD p hp) hfun.1 hT hG).mp hs).2⟩
 

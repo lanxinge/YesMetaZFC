@@ -36,25 +36,7 @@ theorem ep_collapse_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q c C V
     (elementary : Di_elementary_d (kp_pair_l (ZF.modelsKP hZF)) ω O A p T S)
     (wf : Wf_rel_d C V) : Ep_collapse_d hZF ω X R q c C V := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨B, hB⟩ := model.2.1
-  obtain ⟨u, hu⟩ := (limit.range B).mp hB
-  obtain ⟨a, ha, _⟩ := h.diagram.index.2.1 u (limit.projection.bound_l hu).1
-  obtain ⟨_, hz, _⟩ := h.models
-  obtain ⟨d, _, had⟩ := hz.2.1 a ha
-  obtain ⟨b, i, n, D, U, G, r, E, Q, hm, hi, hn, ha, hD, haU, hG, md, spec⟩ :=
-    ep_constant_limit_l hZF source hF h limit model elementary had
-  have constants : Ep_constants_d X q i := by
-    intro x H hxH
-    obtain ⟨_, f, B, u, hf, hc, hfr, hu, huH⟩ := (spec x H).mp hxH
-    have hDX := source.space_mem_l hZF hn hD
-    exact ⟨u, a, B, f, D, hDX, source.function_l hZF ((hG f).mp hf).1 ((hG f).mp hf).2,
-      hc, md.map.representative_l I (hF.at_l hZF.1 haU ha hD).base hfr, hu, huH⟩
-  have extX : Wc_ext_d X R := fun x hx y hy same => hZF.1.eq_of_same_members x y (fun z =>
-    ⟨fun hz => ((hm.2 z y).mp ((same z (source.transitive x hx z hz)).mp
-      ((hm.2 z x).mpr ⟨source.transitive x hx z hz, hx, hz⟩))).2.2,
-     fun hz => ((hm.2 z x).mp ((same z (source.transitive y hy z hz)).mpr
-      ((hm.2 z y).mpr ⟨source.transitive y hy z hz, hy, hz⟩))).2.2⟩)
-  have he := hi.extensional_l hZF source.omega hm.1 model extX
+  obtain ⟨b, i, hm, hi, constants, he⟩ := ep_constant_l hZF source hF h limit model elementary
   obtain ⟨N, e, inv, d, W, ht, hg, bij, hn, elem, bi, inverse, elemInv⟩ := wc_smaps_l hZF source.omega model wf he
   obtain ⟨j, hj, js⟩ := smap_comp_l I hZF hi elem
   have fix := hj.omega_l I hZF source.omega source.transitive ht hm hn source.omega_mem

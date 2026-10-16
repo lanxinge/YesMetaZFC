@@ -11,9 +11,10 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
-def Tg_archive_play_d (ω H G o X f : M.Domain) : Prop := ∀ m i Y R μ K η C L V q,
+def Tg_archive_play_d (ω H G o X Z f : M.Domain) : Prop := ∀ m i Y R μ K η C L V q,
   ∀ v : Fin 54 → M.Domain, Tg_past_at_d H m i Y R μ K η C L V q → Tg_saved_code_d ω V q v →
-    M.mem (v 40) X ∧ M.MemberSubset (v 40) f ∧ ∃ j, It_map_d G o i j ∧ Rd_entry_d (v 40) (v 40) j
+    M.mem (v 40) X ∧ M.mem (v 40) Z ∧ M.MemberSubset (v 40) f ∧
+      ∃ j, It_map_d G o i j ∧ Rd_entry_d (v 40) (v 40) j
 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
@@ -23,7 +24,7 @@ theorem Tg_sequence_d.archive_play_l {ω c o C γ Z A D H X R f : M.Domain} {U :
     (columns : ∀ a x, M.mem x (U a) ↔ Tg_run_value_d ⟨8+a.val,by omega⟩ H x)
     (root : Rd_entry_d o c (U 1)) (mx : Smem_d I c X R)
     (played : ∀ k r, Rd_entry_d k r H → ∃ n s, M.SuccessorOf n k ∧ Tg_run_real_d A n r s ∧ M.IsRestrictionOf I s f n) :
-    Tg_archive_play_d ω (U 5) (U 2) o X f := by
+    Tg_archive_play_d ω (U 5) (U 2) o X Z f := by
   have hw := tree.tree.omega
   intro m i Y R' μ K η C' L V q v row code
   obtain ⟨r,⟨p,pair,hp⟩,cell⟩ := row
@@ -40,7 +41,7 @@ theorem Tg_sequence_d.archive_play_l {ω c o C γ Z A D H X R f : M.Domain} {U :
   obtain ⟨d,⟨z,zp,hz⟩,my⟩ := run.links m i Y R' μ K η C' L V q localRow
   have node : Rd_entry_d i d (U 1) := ⟨z,zp,(columns 1 z).mpr ⟨w,k,t,kt,pack,hz⟩⟩
   have map := tree.tree.diagram.elementary o i j c X R d Y R' global root node mx.1 my.1
-  refine ⟨map.1.1.input_mem_of_pairMember fixed,?_,j,global,fixed⟩
+  refine ⟨map.1.1.input_mem_of_pairMember fixed,ev ▸ low,?_,j,global,fixed⟩
   obtain ⟨hn,_,node⟩ := (run.past.read_l hZF localRow).1.node_l hZF code
   intro a ha
   obtain ⟨l,x,px⟩ := node.1.1.1 a ha

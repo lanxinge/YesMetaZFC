@@ -46,6 +46,7 @@ theorem Tg_context_d.round_l {c₀ α ξ T J G E H k c d R Y S μ K μ' K' ζ V 
         It_pnice_d hZF ω c₀ β T' J' G' E' H' ∧ It_extension_d α ξ k T J G E β T' J' G' E' ∧
         Rd_entry_d α d' J' ∧ It_map_d G' k α j ∧ Smem_d I d' N R' ∧ Ic_model_d hZF ω L K₀ N R' ∧
         It_ultra_d hZF ω (p 21) L F d d' j ∧ Wd_crit_d I Y j (p 21) κ' ∧
+        (∃ q, Rd_entry_d ξ q E' ∧ It_payload_d q (p 21) L F) ∧
         M.IsLimitOrdinal L ∧ M.mem (p 15) L ∧ M.MemberSubset L κ' ∧
         (∀ i μ, Rd_entry_d i μ H' → M.mem μ κ' ∨ μ = κ') ∧
         Rd_entry_d (p 31) U' j ∧ Rd_entry_d (p 32) D' j ∧ Rd_entry_d (p 34) u' j ∧

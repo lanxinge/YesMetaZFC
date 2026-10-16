@@ -1,10 +1,9 @@
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSeedNormal
-import YesMetaZFC.SetTheory.Collapse.RelationSyntax
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderSeedSegment
 
 /-! # 坍塌把坐标类精确识别为支撑序数
 
-坐标原子给出全部已知前驱，正规性排除额外前驱。对实际原公式作成员
-归纳，得到每个坐标类的坍塌值；不借助产生扩展器的旧嵌入。
+支撑初段已经独立于整体坍塌构造。把给定坍塌限制到该初段，局部递归
+唯一性就识别出原支撑序数；不再重复坐标初段的构造。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal
@@ -20,35 +19,27 @@ theorem ep_seed_collapse_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q 
     (collapse : Wc_graph_d C W e) (he : Fn0_d C N e) :
     M.MemberSubset L N ∧ ∀ α E, Ep_seed_d κ L q α E → Rd_entry_d E α e := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  let ρ : Env M 4 := ⟨Fin.cases κ (Fin.cases L (Fin.cases q (fun _ => e))), fun _ => L⟩
-  let φ : UnarySchema 4 := {
-    body := .forallE (.imp (ep_seed_m (.bound 2) (.bound 3) (.bound 4) (.bound 1) .newest)
-      (rd_entry_m .newest (.bound 1) (.bound 5))) }
-  have sat α : φ.denote ρ α ↔ ∀ E, Ep_seed_d κ L q α E → Rd_entry_d E α e := by
-    simp only [φ, UnarySchema.denote, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
-      ep_seed_sat_l hZF.1, rd_entry_sat_l hZF.1]; rfl
+  obtain ⟨B, r, sub, map, _, read, down⟩ := ep_seed_segment_l hZF source hκ hL hωL family coherent atoms normal h limit
+  obtain ⟨s, restriction⟩ := ZF.exists_restriction hZF I e B
+  have fs := restriction.isSetFunctionFromTo (fn0_function_l (ZF.modelsKP hZF) he) sub
+  have graph : Wc_graph_d B W s := by
+    refine ⟨fs.1.1, fun E α entry => ?_⟩
+    obtain ⟨hE, original⟩ := (restriction.2 E α).mp entry
+    refine ⟨hE, ?_, fun β => ?_⟩
+    · intro H hH edge
+      obtain ⟨β, _, hHβ⟩ := he.2.1 H (sub H hH)
+      exact ⟨β, (restriction.2 H β).mpr ⟨hH, hHβ⟩⟩
+    · rw [(collapse.2 E α original).2.2 β]
+      exact ⟨fun ⟨H, _, edge, hHβ⟩ => ⟨H, down E H hE edge, edge,
+        (restriction.2 H β).mpr ⟨down E H hE edge, hHβ⟩⟩,
+        fun ⟨H, hH, edge, hHβ⟩ => ⟨H, sub H hH, edge, ((restriction.2 H β).mp hHβ).2⟩⟩
   have fixed : ∀ α E, Ep_seed_d κ L q α E → Rd_entry_d E α e := by
-    intro α
-    apply (sat α).mp (ZF.mem_ind_l M hZF I φ ρ ?_ α)
-    intro α ih
-    apply (sat α).mpr
-    intro E seed
-    have bounds : M.mem α L ∧ M.mem E C := by
-      obtain ⟨_, a, i, _, _, ha, hi, _, _, u, B, _, _, hu⟩ := seed
-      exact ⟨(ha.bound_l hi).2, (limit.projection.bound_l hu).2⟩
-    obtain ⟨y, _, hEy⟩ := he.2.1 E bounds.2
-    have eq : y = α := hZF.1.eq_of_same_members y α fun β => by
-      rw [(collapse.2 E y hEy).2.2 β]
-      constructor
-      · rintro ⟨H, _, hHE, hHβ⟩
-        obtain ⟨γ, hγα, seedH⟩ := ep_seed_down_l hZF source hκ hωL family coherent normal h limit seed hHE
-        have hHγ := (sat γ).mp (ih γ hγα) H seedH
-        exact (fn0_function_l (ZF.modelsKP hZF) he).1.2 H γ β hHγ hHβ ▸ hγα
-      · intro hβα
-        obtain ⟨H, hHC, seedH⟩ := ep_seed_exists_l hZF source family h limit (hL α bounds.1 β hβα)
-        exact ⟨H, hHC, (ep_seed_atoms_l hZF source family atoms h limit seedH seed).2.mpr hβα,
-          (sat β).mp (ih β hβα) H seedH⟩
-    exact eq ▸ hEy
+    intro α E seed
+    have hEα := (read E α).mpr seed
+    obtain ⟨β, _, hEβ⟩ := fs.2.2 E (map.function.bound_l hEα).1
+    have eq := wc_value_unique_l hZF (map.well_founded_l (ZF.modelsKP hZF))
+      ⟨s, graph, hEβ⟩ ⟨r, map.graph_l, hEα⟩
+    exact eq ▸ ((restriction.2 E β).mp hEβ).2
   exact ⟨fun α hα => by
     obtain ⟨E, _, hs⟩ := ep_seed_exists_l hZF source family h limit hα
     exact (he.bound_l (fixed α E hs)).2, fixed⟩
