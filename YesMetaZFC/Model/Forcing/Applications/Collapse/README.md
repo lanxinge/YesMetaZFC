@@ -21,3 +21,10 @@
 | [Rule.lean](Rule.lean) | `CollapseRule.lean` | 参数化塌缩规则的存在、唯一性与闭性实例 |
 | [Proper.lean](Proper.lean) | `CollapseProper.lean` | 参数化塌缩的实际 proper 后继规则 |
 | [Iteration.lean](Iteration.lean) | `CollapseIteration.lean` | 任意内部长度的参数化可数闭塌缩迭代 |
+| [FiniteSequence.lean](FiniteSequence.lean) | — | 内部有限序列的 Col(ω,X)，实际泛型满射 |
+| [FiniteRecode.lean](FiniteRecode.lean) | — | 沿字母表双射精确重编码有限条件与泛型 |
+| [Lift.lean](Lift.lean) | — | 共同低秩段固定小条件域，自动证明目标泛型性并提升初等嵌入 |
+| [DenseNames.lean](DenseNames.lean) | — | 小坍缩之上大坍缩的有界全局稠密集名称库及完整覆盖 |
+
+后两项服务于用户优化路线中的 7.22–7.23。实数吸收的迭代树及“每条共尾良基分支”
+结论尚未完成；具体缺口见 [大基数入口](../../../../SetTheory/LargeCardinal/README.md)。

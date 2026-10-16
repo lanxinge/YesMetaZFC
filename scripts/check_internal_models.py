@@ -19,6 +19,7 @@ MODULES = ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection." + name for name in
             ("Parameters", "WitnessSyntax", "Collection", "Step", "Chain", "Closure", "Relativization", "Decode", "Bounded")]
 MODULES += ["YesMetaZFC.Model.SetTheory.LevyReflection", "YesMetaZFC.SetTheory.CumulativeUnion"]
+MODULES += ["YesMetaZFC.Model.SetTheory.ProjectEmbedding", "YesMetaZFC.Model.SetTheory.Internal.EmbeddingProject"]
 MODULES += ["YesMetaZFC.SetTheory.RelationChain", "YesMetaZFC.Model.SetTheory.ClassResponse"]
 MODULES += ["YesMetaZFC.SetTheory.FlatPairing"]
 MODULES += ["YesMetaZFC.SetTheory.FlatPairing." + name for name in
@@ -808,6 +809,7 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("Tp_left_d", "Tp_filter_d", "Td_cover_d", "td_cover_m", "tp_win_m", "td_cover0_m",
                 "td_checks_m", "td_order_m", "td_parameters_m", "td_names_m", "td_input_m", "Td_input_d",
                 "td_output_m", "Tp_certificate_d", "Td_winner_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.Pe_d"]
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
                  ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}

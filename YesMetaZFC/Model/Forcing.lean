@@ -46,6 +46,9 @@ import YesMetaZFC.Model.Forcing.Iteration.Proper.Prefix.Limit
 import YesMetaZFC.Model.Forcing.Iteration.Names.DenseName
 import YesMetaZFC.Model.Forcing.Proper.Generic.Ground
 import YesMetaZFC.Model.Forcing.Applications.Cohen.HOD
+import YesMetaZFC.Model.Forcing.Applications.Collapse.Lift
+import YesMetaZFC.Model.Forcing.Applications.Collapse.DenseNames
+import YesMetaZFC.Model.Forcing.Internal.Extension.Cofinal
 
 /-! # 力迫偏序、名称求值与相对扩张入口
 
@@ -54,6 +57,10 @@ import YesMetaZFC.Model.Forcing.Applications.Cohen.HOD
 Cohen 实例同时满足全部公式真值、指定稠密要求和旧实数规避要求。
 内部名称泛型商的完整原公式真值和原 ZFC 全部公理及模式由实际内部构造证明，
 适用于外部非良基、内部 ω 非标准的任意地模型；商载体保持地模型的 universe。
+em_lift_l 在名称商上直接定义初等嵌入提升，em_lift_ground_l 给出规范地嵌入的交换方块。
+Smap_d.collapse_lift_l 从实际共同低秩段自动证明旧小泛型在目标中的泛型性。
+fseq_dense_names_l 构造小坍缩之上大坍缩的有界稠密集名称库；
+Generic_d.nonrefute_sequence_l 把给定泛型内共尾条件列上的非反驳等同于实际真值。
 preserves_zfc_l 一次取得全部保持性，two_extension_zfc_l 给出可直接调用的实际实例。
 ch_extension_l 自动构造可数地模型的 CH 塌缩扩张；ch_model_l 给出实际 ZFC＋CH 模型存在。
 cohen_extension_l 以地模型指标集 κ 参数化添加量，自动构造互异新实数族并保持旧无限基数。

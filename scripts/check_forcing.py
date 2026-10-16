@@ -37,6 +37,9 @@ ZFC_MODULES = [MODULE_PREFIX + n for n in (
 )]
 
 INTERNAL_MODULES = [MODULE_PREFIX + n for n in (
+    "Internal.Embedding.Transport", "Internal.Embedding.Lift", "Internal.Embedding.Generic", "Internal.Embedding.Rank",
+    "Internal.Extension.Cofinal", "Internal.Extension.DenseNames", "Internal.Maximum.Patch",
+    "Applications.Collapse.Lift", "Applications.Collapse.DenseNames",
     "Closed.Basic", "Distributive.Basic", "Distributive.Function", "Distributive.NoNewReals",
     "Distributive.NoNewFunctions", "Distributive.NoNewCountable", "Distributive.Extension",
     "Internal.Automorphism.Basic", "Internal.Automorphism.Names", "Internal.Automorphism.Atomic",
@@ -435,6 +438,7 @@ INTERNAL_CHOICE_FREE += [PREFIX + "Internal." + n for n in
                         ("chain_m", "chain_bound_m", "closed_m", "Nchain_d", "nchain_m")]
 INTERNAL_CHOICE_FREE += [PREFIX + "Internal." + n for n in
                         ("coll_names_m", "Row_coll_d", "row_coll_m", "Coll_rule_d", "coll_rule_m", "coll_rule_s")]
+INTERNAL_CHOICE_FREE += [PREFIX + "Internal." + n for n in ("Em_generic_d", "em_lift_l", "dn_s")]
 ITERATION_CHOICE_FREE += [PREFIX + "Internal." + n for n in
                          ("Coll_spec_d", "coll_spec_m", "coll_closed_body_m", "coll_names_body_m", "coll_names_env_l", "Coll_names_d")]
 ITERATION_CHOICE_FREE += [PREFIX + "Internal." + n for n in
