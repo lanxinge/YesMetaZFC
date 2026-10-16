@@ -12,7 +12,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRigidity
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameReplyBuild
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameDeterminacy
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameTransfer
-import YesMetaZFC.SetTheory.LargeCardinal.TypeGameCorollary610
+import YesMetaZFC.SetTheory.LargeCardinal.TwinTreeOutward
 import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 
 /-! # 大基数与实际派生测度
@@ -109,6 +109,10 @@ nice 树的 ω₁ 弱迭代策略已完成。`ee_definition_l` 实际构造定�
 已闭合原 Col(ω,δ) 的二择一。`tg_corollary67_l` 自动插入无约束 ω 坐标，
 分别在地面和实际扩张内证明二坐标投影相同，沿同一策略完成 6.7。
 `tg_corollary610_l` 通过插入首手反转后继回合的归属，并在地面及原坍缩扩张内保留
-相应投影，已完成原投影博弈的地 I／泛型 II 二择一。双树决定性端点仍待证明。
-后续采用双树坍缩穷尽的直接决定性路线；实数吸收及 L(ℝ)⊨AD 蕴涵仍待证明。
+相应投影，已完成原投影博弈的地 I／泛型 II 二择一。
+`td_determinacy_l` 已完成优化稿的双树决定性：原坍缩正条件迫使穷尽，加地面互斥，
+给出地面互补、实际赢家与反方反例树秩。固定旧实数的截面树秩实现投影回传，
+两个泛型分支在同一名称扩张中实际对弈；可数反射构造泛型后反射回任意原模型。
+`Td_winner_d.outward_l` 在保持覆盖的传递外模型中保留同一策略；II 分支无需覆盖。
+实数吸收、双侧树证书构造及 L(ℝ)⊨AD 蕴涵仍待证明。
 -/

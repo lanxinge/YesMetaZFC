@@ -111,13 +111,15 @@ MODULES += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
              "TypeGameProjection", "TypeGameGenericPlay", "TypeGameGenericCatch", "TypeGameGenericBranch",
              "TypeGameLevel", "TypeGameLevelReply", "TypeGameTracked", "TypeGameGenericAvoid", "TypeGameGenericTransfer", "TypeGameCollapse",
              "TypeGameVacuous", "TypeGameCorollary67", "TypeGameShiftProjection", "TypeGameCorollary610",
+             "TreeProjection", "TreeProjectionTransfer", "TwinTreeDichotomy", "TwinTreeSyntax", "TwinTreeGround",
+             "TwinTreeRank", "TwinTreeCertificate", "TwinTreeOutward",
              "TypeGameImageSyntax", "TypeGameRenewalSyntax", "TypeGameContext",
              "TypeGameReplySource", "TypeGameImageRead")]
 MODULES += ["YesMetaZFC.Model.SetTheory.Internal." + name for name in
             ("FiniteRecordCoordinate", "TypeGameGraphUnion", "SubtypeInsertion", "TypeGameNodeRank")]
 MODULES += ["YesMetaZFC.SetTheory.Descriptive." + name for name in
             ("InputIteration", "Path", "TreeDependentChoice", "TreePullback", "GameAttemptRank", "TreeRankPrefix",
-             "TreeTail", "SequenceCons", "GameParity", "GameShift", "TreeShift",
+             "TreeTail", "SequenceCons", "GameParity", "GameShift", "TreeShift", "TreeRank", "HistoryTree", "GameBattle",
              "LeastLegalMove", "LegalMoveBounded", "ScanResponse", "ScanStrategy", "GameCompletion", "GameLegalStep", "GameControl",
              "FirstViolation", "FirstViolationRead", "FirstViolationMinimum", "LegalHistory", "ScheduledGame",
              "GameContinuation", "GameSplice", "GameGlue", "GameWinningPositions", "GameAvoid", "GameAvoidRun", "ClosedDeterminacy")]
@@ -802,6 +804,10 @@ CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
 CHOICE_FREE += ["YesMetaZFC.SetTheory.Descriptive." + name for name in ("Tr_pull_d", "tr_pull_m", "Tr_shift_d", "tr_shift_m")]
 CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
                ("Tv_drop_value_d", "tv_drop_value_m", "Tv_drop_d", "Tp_projection_d", "tp_projection_m", "Tp_win_d")]
+CHOICE_FREE += ["YesMetaZFC.SetTheory.LargeCardinal." + name for name in
+               ("Tp_left_d", "Tp_filter_d", "Td_cover_d", "td_cover_m", "tp_win_m", "td_cover0_m",
+                "td_checks_m", "td_order_m", "td_parameters_m", "td_names_m", "td_input_m", "Td_input_d",
+                "td_output_m", "Tp_certificate_d", "Td_winner_d")]
 HOD_CHOICE_MODULES = ["YesMetaZFC.SetTheory.InnerModel.HOD." + name for name in ("Choice", "BracketChoice")]
 HOD_ZF_BOUNDS = {"YesMetaZFC.SetTheory.InnerModel." + name: BASELINE for name in
                  ("hod_choice_set_l", "hod_model_l", "hod_model_ext_l")}

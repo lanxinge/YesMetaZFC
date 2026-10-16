@@ -58,6 +58,7 @@ INTERNAL_MODULES = [MODULE_PREFIX + n for n in (
     "Internal.Functions.Decision", "Internal.Functions.Injection", "Internal.Functions.Rules",
     "Internal.Ground.Cofinality", "Internal.Ground.FiniteSequence", "Internal.Ground.LegalMove", "Internal.Ground.Syntax",
     "Internal.Ground.Arithmetic", "Internal.Ground.Prefix", "Internal.Ground.TreePullback", "Internal.Ground.TreeShift",
+    "Internal.Ground.HistoryTree", "Internal.Ground.TreeRank",
     "Applications.Collapse.FiniteSequence", "Applications.Collapse.FiniteRecode",
     "Internal.Maximum.Hull", "Internal.Maximum.Normal", "Internal.Maximum.NormalSyntax",
     "Internal.Maximum.Selection", "Internal.Names.Closure", "Internal.Names.Construction",

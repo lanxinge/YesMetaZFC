@@ -18,6 +18,8 @@
 | [NameRank.lean](NameRank.lean) | — | 名称支撑的实际秩图，以及扩张内的逐名称求值图 |
 | [Ordinals.lean](Ordinals.lean) | — | 内部归纳证明序数名称值的秩界；`check_map_ordinals_l` 返回全部序数的旧原像 |
 | [Collapse.lean](Collapse.lean) | — | 内部关系良基性回拉、坍塌图保持，以及 OD[A] 代码的 HOD[A] 坍塌恢复 |
+| [HistoryTree.lean](HistoryTree.lean) | — | 旧历史的策略服从性和固定旧实数的截面条件保持 |
+| [TreeRank.lean](TreeRank.lean) | — | 树及其有界序数秩证书沿成员满嵌入保持 |
 
 不增加序数只要求地模型 ZF 和泛型性，不要求弱齐性、外部良基性或可数性。
 归纳正文使用扩张中的实际求值图和旧秩图作参数，未把外部求值谓词直接交给内部归纳。
