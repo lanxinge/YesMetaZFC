@@ -68,7 +68,8 @@ theorem ee_ordinal_node_l (hZF : M.Models ZF) {ω δ X A Y B j κ k L S F R J O 
     (fun he => (hz i he).elim) (hZF.1.eq_of_same_members i zero)
   have haJ := (system.indices a).mpr ⟨one, h1ω, fn0_of_function_l (ZF.modelsKP hZF) ha,
     fun i r x hi hr => (singleton i (ha.input_mem_of_pairMember hi)).trans (singleton r (ha.input_mem_of_pairMember hr)).symm⟩
-  obtain ⟨_, hZ, models⟩ := system.models
+  obtain ⟨_, hZ⟩ := system.codes
+  have models := system.components
   obtain ⟨c, _, hac⟩ := hZ.2.1 a haJ
   obtain ⟨n, H, U, G, r, E, Q, hn, han, hH, haU, hG, model⟩ := models a c hac
   have eq := han.domain_eq_l hZF.1 (fn0_of_function_l (ZF.modelsKP hZF) ha)

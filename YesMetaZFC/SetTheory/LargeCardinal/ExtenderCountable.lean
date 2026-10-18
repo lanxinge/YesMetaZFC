@@ -66,7 +66,8 @@ theorem ep_countable_l {ω κ L X R F J O Z A p T S q C W : M.Domain}
     exact (hv a).mpr ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) hf⟩) cv
   obtain ⟨H, hh⟩ := ZF.exists_cartesianProduct hZF I J X
   have ch := ZF.countable_product_l I hZF hω cj cx hh
-  obtain ⟨D, hz, models⟩ := h.models
+  obtain ⟨D, hz⟩ := h.codes
+  have models := h.components
   let φ : BinarySchema 7 := { body := (ec_project_m (.bound 2) (.bound 3) (.bound 4) (.bound 5)
     (.bound 6) (.bound 7) (.bound 8) (.bound 1) .newest) }
   let ρ : Env M 7 := ⟨Fin.cases ω (Fin.cases κ (Fin.cases L (Fin.cases X (Fin.cases R (Fin.cases F (fun _ => Z)))))), fun _ => ω⟩

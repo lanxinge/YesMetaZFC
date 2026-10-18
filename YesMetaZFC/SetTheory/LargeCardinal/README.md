@@ -1127,8 +1127,8 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
 - [RelationUniformCode](../../Model/SetTheory/Internal/RelationUniformCode.lean) 在原程序后追加
   关系模型的函数图、逐点存在和统一见证条件；[RelationCollection](../../Model/SetTheory/Internal/RelationCollection.lean)
   从源的小域收集传输其带编号守卫的全称闭包，覆盖目标的新参数及非标准内部程序。
-  指定集合上的逐点存在经成员守卫扩展为全定义的模型内见证；`ep_raw_reduced_l`
-  已将该见证送入同一个实际代表集合。
+  指定集合上的逐点存在经成员守卫扩展为全定义的模型内见证；原关系 Łoś
+  在存在行把该见证送入同一个实际代表集合。
 - [RelationSeparation](../../Model/SetTheory/Internal/RelationSeparation.lean) 构造原关系的全内部分离程序；
   `sc_separation_raw_l` 自动取得目标内部的真值分离集。旧分离、统一化和收集传递定理
   已改由这些关系证明读取传递特例，重复证明主体已移除。
@@ -1139,11 +1139,56 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
   A∈P 当且仅当 A 是某个原模型集合码沿既有坐标图的逆像。全部内部逐点真值集均已证明属于同一 P。
 - [RelationPointwiseWitness](../../Model/SetTheory/Internal/RelationPointwiseWitness.lean) 对原始关系源的存在行收集实际内部函数码。
   [RelationLos](../../Model/SetTheory/Internal/ReducedPower/RelationLos.lean) 以此完成内部行归纳，并给出同一代表赋值上全部内部公式码的 `Satisfies_d` 方程。
-  该定理的测度条件是 `Rel_ultra_d D P U`；`ep_raw_reduced_l` 已将其接到同一实际代表族与商分量。
+  该定理的测度条件现由下面的共同低层识别实际满足。
 
-**5.23 的原始后继尚未闭合。** 当前下一测度仅已传入 `Base_d D U`；还需用共同低秩段识别上述 P 与扩展器所属模型的可测子集族，
-从实际测度证明该特定 P 上的 `Rel_ultra_d`，才能无条件调用原始后继的 Łoś。此条件在定理中显式保留，
-没有从 `Base_d` 推出尚未证明的二择。随后仍需原关系源的有限支撑过渡、共同低秩段递归保持和后继状态迁移，再接任意地模型的相对初值。
+- [RelationSubset](../../Model/SetTheory/Internal/RelationSubset.lean) 先在原关系内取集合码与定义域的交，
+  用源内低层的子集闭包把交集放入常值像，再用实现图的完整前驱方程证明坐标真值集就是共同低层中的同一个集合。
+  它同时证明精确子集族 P 的交、差封闭；只需 P 的成员属于所属源，不额外要求 P 等于该源的整个相对幂集。
+- [ExtenderRawMeasure](ExtenderRawMeasure.lean) 从所属源已有的有界坍塌图回收 P 中全部集合，
+  将下一真实测度 U 限制为 U∩P，实际构造 `Rel_ultra_d D P (U∩P)`。
+  [RelationRestriction](../../Model/SetTheory/Internal/ReducedPower/RelationRestriction.lean) 在原关系源内分离两种原子的精确真值集，
+  证明 U 与 U∩P 对同一代表集合给出字面相同的类集合、投影及商关系。
+- [RelationSmall](../../Model/SetTheory/Internal/RelationSmall.lean) 把传递小容器内各成员的编号句子传到原关系模型的新对象。
+  `Eb_collapse_d.raw_reduced_l` 从共同相对秩段、源内小容器和下一张实际扩展器构造坐标、相对超滤及原模型内部编号；
+  随后直接调用完整 Łoś，并将最终满足等价式还原为原测度 U。源内小性为已有 `Sc_small_d`，不要求外部 ω 闭性。
+- [ReducedPower/RelationConstant](../../Model/SetTheory/Internal/ReducedPower/RelationConstant.lean) 先构造每个原对象的唯一内部常值函数码，
+  再与同一个商投影复合，证明覆盖全部内部公式码的实际常值初等图。该图已由上述分量后继返回。
+
+- [ExtenderRawProjection](ExtenderRawProjection.lean) 的 `ep_raw_map_l` 先由所属源构造实际有限坐标投影，
+  再经共同相对秩段解释为原关系内部函数。原扩展器协调律实际给出两侧限制测度的 `Push_d`；
+  [RelationProjection](../../Model/SetTheory/Internal/ReducedPower/RelationProjection.lean) 逐项拉回内部函数码和商赋值，
+  用完整 Łoś 证明初等性。返回图满足现有 `Ep_arrow_d`，并与两端常值嵌入交换；
+  它返回的同一 `Rp_lift_d` 和实际复合方程可直接用于既有恒等、复合律。
+- [RelationPower](../../Model/SetTheory/Internal/RelationPower.lean) 和
+  [RelationHierarchy](../../Model/SetTheory/Internal/RelationHierarchy.lean) 识别共同低层中的相对幂集及整个秩历史。
+  对原关系中新出现的子集，先用子集封闭回收，再核验幂集递归，因此全称范围包含全部原关系对象。
+  `Eb_collapse_d.raw_measure_l` 现为全部定义域提供同一张实现图 k，有限支撑之间共用这张图。
+- [RelationFunctionCapture](../../Model/SetTheory/Internal/RelationFunctionCapture.lean) 通过乘积和子集回收，
+  将原关系内的有界函数码还原为共同低层中的实际图。
+  [RelationBounded](../../Model/SetTheory/Internal/ReducedPower/RelationBounded.lean) 据此证明：
+  所属源的每个有界函数恰对应原关系源的一张有界代表图，两者满足同一实际复合方程。
+  [RelationNormalize](../../Model/SetTheory/Internal/ReducedPower/RelationNormalize.lean) 在测度零处用源内函数码改值；
+  `Rp_model_d.low_cover_raw_l` 因而覆盖下一分量常值像以下的全部新成员。
+- [RelationSuccessor](../../Model/SetTheory/Internal/ReducedPower/RelationSuccessor.lean) 的 `rc_successor_l`
+  已直接替换旧 `ep_raw_reduced_l`：当前源只需同一原始源的完整初等图，后继返回其复合图、
+  原测度下的完整 Łoś 和处处有界代表。`Eb_collapse_d.raw_reduced_l` 已迁移到此构造。
+
+- [ExtenderRawAssembly](ExtenderRawAssembly.lean) 用规范分量码的一次替换形成全部有限支撑；
+  共享的 `Eg_graph_d`、过渡律与标签同构装配成实际定向系统，旧传递源构造也已迁入同一层。
+  [ExtenderRawLimit](ExtenderRawLimit.lean) 的 `er_ultrapower_l` 构造未坍塌极限、完整内部初等过渡、
+  当前源常值嵌入及原始源的复合初等图。
+- [ExtenderRawBounded](ExtenderRawBounded.lean) 在共同支撑上将任意新成员规范化为所属源的有界代表；
+  [ExtenderRawValue](ExtenderRawValue.lean) 反向构造每个所属源代表的极限值。
+  [ExtenderRawRelation](ExtenderRawRelation.lean) 证明有界代表池关系与新原关系极限的精确等价。
+  [ExtenderRawLow](ExtenderRawLow.lean) 的 `Eb_collapse_d.next_raw_l` 据此构造下一低层的单射实现，
+  覆盖常值像的全部成员，并对像中每个对象覆盖全部前驱；同时证明新低层属于所属模型。
+  `er_successor_l` 将极限构造和这张实现图合并成同一次实际后继。
+
+**5.23 尚未整体闭合。** 全部支撑的定向极限装配和下一低层的完整前驱实现已完成。
+下一次递归仍需识别新低层的相对秩高度，并把内部小性与子集封闭用于新对象；
+当前装配定理的这些性质仍通过原始源对象的初等像取得，不能直接假定下一低层也有这种原像。
+给定 M 的相对初值及 `Tg_run_d` 状态迁移仍未完成：生产递归的 `Ic_model_d` 仍含外部 ω 闭性，
+`It_ultra_d` 仍含整体传递坍塌。树必须建在给定 M 上的要求仍须落实。
 
 之后仍需 7.4 与 7.8 的要求第一辅助坐标满射的改造类型游戏及 7.12 的树上限制；
 随后构造原提示的 R、S，证明小／大坍缩分解以排除泛型 I 分支，

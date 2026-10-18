@@ -36,7 +36,7 @@ theorem Sf_ultra_d.transfer_l {X Y D U : M.Domain} (h : Sf_ultra_d X D U)
       ((agree B (fun x hx => ((hc x).mp hx).1)).mpr hb) hc⟩
 
 theorem Sf_ultra_d.restrict_l (hKP : M.Models KP) {X D P U : M.Domain} (h : Sf_ultra_d X D U)
-    (hp : Source_d X D P) (field : Field_d D P) :
+    (hp : M.MemberSubset P X) (field : Field_d D P) :
     ∃ V, Rel_ultra_d D P V ∧ ∀ A, M.mem A V ↔ M.mem A P ∧ M.mem A U := by
   obtain ⟨V, hv⟩ := KP.intersection_exists_d hKP P U
   have top := (hv D).mpr ⟨field.top, h.base.top⟩
@@ -44,14 +44,14 @@ theorem Sf_ultra_d.restrict_l (hKP : M.Models KP) {X D P U : M.Domain} (h : Sf_u
       ∃ C, M.mem C V ∧ M.MemberSubset C A ∧ M.MemberSubset C B := by
     obtain ⟨C, hc, spec⟩ := field.inter A B ((hv A).mp ha).1 ((hv B).mp hb).1
     obtain ⟨W, hw, wa, wb⟩ := h.base.meet A B ((hv A).mp ha).2 ((hv B).mp hb).2
-    exact ⟨C, (hv C).mpr ⟨hc, h.upward W C hw ((hp C).mp hc).1 (field.bounds C hc)
+    exact ⟨C, (hv C).mpr ⟨hc, h.upward W C hw (hp C hc) (field.bounds C hc)
       (fun x hx => (spec x).mpr ⟨wa x hx, wb x hx⟩)⟩,
       fun x hx => ((spec x).mp hx).1, fun x hx => ((spec x).mp hx).2⟩
   refine ⟨V, ⟨field, ⟨fun A ha => h.base.bounds A ((hv A).mp ha).2, top, meet⟩,
     fun A ha => ((hv A).mp ha).1, ?_, fun A ha => h.proper A ((hv A).mp ha).2, ?_⟩, hv⟩
-  · exact fun A B ha hb hab => (hv B).mpr ⟨hb, h.upward A B ((hv A).mp ha).2 ((hp B).mp hb).1 (field.bounds B hb) hab⟩
+  · exact fun A B ha hb hab => (hv B).mpr ⟨hb, h.upward A B ((hv A).mp ha).2 (hp B hb) (field.bounds B hb) hab⟩
   · intro A B ha hb hc
-    exact (h.decides A B ((hp A).mp ha).1 (field.bounds A ha) ((hp B).mp hb).1 hc).imp
+    exact (h.decides A B (hp A ha) (field.bounds A ha) (hp B hb) hc).imp
       (fun h => (hv A).mpr ⟨ha, h⟩) (fun h => (hv B).mpr ⟨hb, h⟩)
 
 end YesMetaZFC.SetTheory.FilterZF

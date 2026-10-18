@@ -71,7 +71,7 @@ theorem ep_inclusion_l {ω κ L X R Y S F c d
   obtain ⟨t, ht, ts⟩ := ZF.exists_setFunctionFromTo_of_denote hZF I φ ρ (source := A) (target := C')
     (fun u hu => by
       obtain ⟨a, B, pair, hat⟩ := (h.nodes u).mp hu
-      obtain ⟨_, _, models⟩ := h.models
+      have models := h.components
       obtain ⟨_, _, _, _, comp, model, hb⟩ := ep_at_model_l hZF models hat
       obtain ⟨_, _, _, ⟨f, hf⟩, _⟩ := ep_representatives_l I hZF.1 family comp model hb
       obtain ⟨E, _, he⟩ := lift u a B f hu pair hf

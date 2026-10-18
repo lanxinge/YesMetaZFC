@@ -26,7 +26,7 @@ theorem ep_bad_desc_bound_l {ω κ K L X R F J O Z A p T S q c C W d Y V j W' g 
   obtain ⟨n, a, D, f, hn, haJ, ha, hD, hfX, hf, fv⟩ := ep_repr_surjective_l hZF family system limit he₀
   obtain ⟨P, hP, coords⟩ := source.theory.algebra.envelope_l hfX
   obtain ⟨T₀, B, hT₀, hB, sub, hull⟩ := sc_sb_hull_l (ZF.modelsKP hZF) source.theory.algebra cover hP
-  obtain ⟨_, models, _⟩ := system.models
+  obtain ⟨_, models⟩ := system.codes
   obtain ⟨o, _, hao⟩ := models.2.1 a haJ
   obtain ⟨b, k, m, D', U, G, r, C₀, V₀, code, hk, _, ha', hd', haU, functions, component, constants⟩ :=
     ep_constant_limit_l hZF source family system limit model elementary hao

@@ -59,17 +59,7 @@ theorem ep_component_unique_l (hE : Extensional M) {ω κ L X R F a c d : M.Doma
     (hF : Em_source_d ω κ L X F) (hc : Ep_component_d I ω κ L X R F a c)
     (hd : Ep_component_d I ω κ L X R F a d) : c = d := by
   obtain ⟨_, D, U, G, p, C, T, T', _, _, _, _, _, hm, hm'⟩ := ep_component_pair_l I hE hF hc hd
-  have et : T' = T := by
-    apply hm'.code.2.2.1.eq_of_pairMember_iff hE hm.code.2.2.1
-    intro B E
-    have transfer {c₀ c₁ S₀ S₁} (h₀ : Rp_model_d I D X U R c₀ G p C S₀)
-        (h₁ : Rp_model_d I D X U R c₁ G p C S₁) (hBD : M.PairMember I B E S₀) : M.PairMember I B E S₁ := by
-      obtain ⟨f, hf⟩ := (h₀.map.range B).mp ((h₀.code.2.2.2 B E hBD).1)
-      obtain ⟨g, hg⟩ := (h₀.map.range E).mp ((h₀.code.2.2.2 B E hBD).2)
-      exact (h₁.relation f g B E hf hg).mpr ((h₀.relation f g B E hf hg).mp hBD)
-    exact ⟨transfer hm' hm, transfer hm hm'⟩
-  subst T'
-  exact I.unique hm.code.1 hm'.code.1
+  exact hm.unique_l I hE hm'
 
 variable (hZF : M.Models ZF)
 local notation "Kp" => kp_pair_l (ZF.modelsKP hZF)

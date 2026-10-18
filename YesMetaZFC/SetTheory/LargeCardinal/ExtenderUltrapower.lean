@@ -23,7 +23,8 @@ theorem ep_ultrapower_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
   obtain ⟨z, hz, hzω⟩ := source.omega.1.1
   have hzfn : Fn0_d z L z := ⟨fun r hr => (hz r hr).elim, fun r hr => (hz r hr).elim, fun r hr => (hz r hr).elim⟩
   have hzJ := (h.indices z).mpr ⟨z, hzω, hzfn, fun i j x hi _ => hi.elim fun r hr => (hz r hr.2).elim⟩
-  obtain ⟨Q, hZ, models⟩ := h.models
+  obtain ⟨Q, hZ⟩ := h.codes
+  have models := h.components
   obtain ⟨d, _, hzd⟩ := hZ.2.1 z hzJ
   obtain ⟨_, _, _, _, _, D, W, _, _, _, _, _, hm⟩ := models z d hzd
   obtain ⟨B, hBD⟩ := hm.code.2.1

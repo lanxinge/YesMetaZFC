@@ -3,7 +3,7 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawReduced
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawLow
 import YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch
 import YesMetaZFC.SetTheory.LargeCardinal.TypeElasticRead
 import YesMetaZFC.SetTheory.LargeCardinal.LocalTypeTransportTuple
@@ -36,9 +36,13 @@ import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 按 ν 选择不可达 L>ν，恢复整个 V_L 覆盖与谓词强性，并用原代表计数证明最大强度恰为 L。
 所属源中的实际有界超幂及求值图记录这一强度，可沿完整初等图传输并由指定实际超幂读取。
 原始商的完整原公式 Łoś、源内求值代表和有界部分的前驱完整识别已构造；
-`ep_raw_reduced_l` 用商内部函数码的实际坐标图构造下一约化幂分量。
-同一构造已返回全内部分离和小定义域上的大集合见证，覆盖非标准内部程序。
-关系源的逐点赋值编译、完整 Łoś、支撑过渡和任意地模型的递归初值仍待完成。
+`rc_successor_l` 用原关系内部函数码构造下一约化幂分量，并返回同一原始源的复合初等图。
+共同低秩段已将原关系的全部实际真值集回收到扩展器所属源，构造其上的相对超滤；
+测度限制保持同一商，并给出原测度下的完整内部 Łoś。小容器还自动提供内部编号，
+`ep_raw_map_l` 已构造实际有限支撑过渡、原 `Ep_arrow_d` 图和常值交换方块。
+共同低层的相对幂集、整个秩历史和有界函数码已识别；下一分量低层的全部成员由所属源有界代表覆盖。
+`er_successor_l` 已装配全部支撑的初等定向极限，并由同一所属源有界池构造下一共同层的完整前驱实现。
+给定地模型的相对初值与整条 `Tg_run_d` 状态迁移仍待完成。
 源内原始不可达性及初始短扩展器判断已构造；不可达性随完整初等图和严格极限秩截断保持。
 严格正则秩截断自动保留同一扩展器的最大强度、实际秩层枚举与全部所属判断。
 完整类型的实际伸展已实现：任意 Vη 中的内部有限元组有无界多个 κ，

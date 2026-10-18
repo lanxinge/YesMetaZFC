@@ -52,6 +52,12 @@ theorem rt_source_exists_l (hZF : M.Models ZF) (X R D t : M.Domain) : ∃ P, Rt_
   exact ⟨fun h => (read A).mp h.2, fun h => ⟨(power A).mpr (fun s hs => h.elim fun _ hb => ((hb.2 s).mp hs).1),
     (read A).mpr h⟩⟩
 
+theorem Rt_trace_d.value_l {X R D t B A s x} (trace : Rt_trace_d I D t R B A)
+    (ft : M.IsSetFunctionFromTo I t D X) (hsx : M.PairMember I s x t) :
+    M.mem s A ↔ M.PairMember I x B R := (trace s).trans
+  ⟨fun ⟨_, y, hsy, hy⟩ => ft.1.2 s y x hsy hsx ▸ hy,
+    fun hx => ⟨ft.input_mem_of_pairMember hsx, x, hsx, hx⟩⟩
+
 theorem Rt_source_d.pointwise_l {X R D t P d B A b E F n r a}
     (h : Rt_source_d I X R D t P) (ft : M.IsSetFunctionFromTo I t D X)
     (domain : ∀ s x, M.PairMember I s x t → M.PairMember I x d R)
@@ -61,13 +67,7 @@ theorem Rt_source_d.pointwise_l {X R D t P d B A b E F n r a}
     M.mem A P ∧ ∀ s x, M.PairMember I s x t →
       (M.mem s A ↔ Pe_sat_d I b d X R E F n r a x) := by
   refine ⟨(h A).mpr ⟨B, hB, trace⟩, fun s x hsx => ?_⟩
-  apply (trace s).trans
-  constructor
-  · rintro ⟨_, y, hsy, hy⟩
-    have eq := ft.1.2 s y x hsy hsx
-    exact ((truth x (ft.output_mem_of_pairMember hsx)).mp (eq ▸ hy)).2
-  · intro hx
-    exact ⟨ft.input_mem_of_pairMember hsx, x, hsx,
-      (truth x (ft.output_mem_of_pairMember hsx)).mpr ⟨domain s x hsx, hx⟩⟩
+  exact (trace.value_l I ft hsx).trans ((truth x (ft.output_mem_of_pairMember hsx)).trans
+    (and_iff_right (domain s x hsx)))
 
 end YesMetaZFC.SetTheory.Internal

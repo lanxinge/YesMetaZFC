@@ -56,7 +56,8 @@ theorem ep_formula_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V 
         (∀ i, Rd_entry_d s (η.bound i).val (f i)) → Formula.satisfies η φ := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨_, hz, models⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨o, _, hao⟩ := hz.2.1 a haJ
   obtain ⟨m, D', U', G, r, H, Q, hn, ha', hD', haU', hG, md⟩ := models a o hao
   have en := ha'.domain_eq_l hZF.1 ha
@@ -66,7 +67,7 @@ theorem ep_formula_value_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T V 
   have eU := family.function a U' U haU' haU
   subst U'
   have ultra := family.at_l hZF.1 haU ha hD
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega h limit
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega h.toEg_graph_d h.diagram limit
     (h.toEp_graph_d.elementary_l hZFC source family coherent) model hao md.code
   obtain ⟨t, ht, ts⟩ := smap_comp_l I hZF hv he
   have read i : ∃ B, Rd_entry_d (f i) B r ∧ Rd_entry_d B (ρ.bound i).val t := by
@@ -135,7 +136,7 @@ theorem ep_value_constants_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T 
       ∃ f, M.mem f X ∧ Fn0_d D X f ∧ Rs_const_d D x f ∧ Ep_value_d q e a f y := by
   let hZF := ZFC.models_zf_l hZFC
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨_, hz, _⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
   obtain ⟨o, _, hao⟩ := hz.2.1 a haJ
   obtain ⟨b, i, m, D', U, G, r, H, Q, code, hi, _, ha', hD', haU, hG, md, spec⟩ :=
     ep_constant_limit_l hZF source family h limit model (h.toEp_graph_d.elementary_l hZFC source family coherent) hao

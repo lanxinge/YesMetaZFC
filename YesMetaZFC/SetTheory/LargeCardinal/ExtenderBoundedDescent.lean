@@ -25,7 +25,7 @@ theorem ep_desc_bound_l {ω κ K L X R F J O Z A p T S q c C W g : M.Domain}
   obtain ⟨n, a, D, f, hn, haJ, ha, hD, hfX, hf, fv⟩ := ep_repr_surjective_l hZF family system limit he₀
   obtain ⟨P, hP, coords⟩ := source.theory.algebra.envelope_l hfX
   obtain ⟨B, hB, bt, sub⟩ := cover P hP
-  obtain ⟨_, models, _⟩ := system.models
+  obtain ⟨_, models⟩ := system.codes
   obtain ⟨o, _, hao⟩ := models.2.1 a haJ
   obtain ⟨b, j, m, D', U, G, r, Y, V, code, hj, _, ha', hd', haU, functions, component, constants⟩ :=
     ep_constant_limit_l hZF source family system limit model elementary hao

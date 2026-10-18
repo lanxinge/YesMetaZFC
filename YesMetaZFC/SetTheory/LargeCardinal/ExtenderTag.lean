@@ -11,8 +11,8 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
-theorem ep_tag_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S a c C V d Y W : M.Domain}
-    (hω : M.IsOmega ω) (h : Ep_graph_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X R F J O Z A p T S)
+theorem ep_tag_l (hZF : M.Models ZF) {ω κ L X J O Z A p T S a c C V d Y W : M.Domain}
+    (hω : M.IsOmega ω) (h : Eg_graph_d ω κ L X J O Z A p T S)
     (stage : Di_stage_d (kp_pair_l (ZF.modelsKP hZF)) A p S a d Y W)
     (hac : Rd_entry_d a c Z) (hm : Smdl_d (kp_pair_l (ZF.modelsKP hZF)) c C V) :
     ∃ e u, Smap_d (kp_pair_l (ZF.modelsKP hZF)) ω d c Y C e ∧
@@ -20,7 +20,7 @@ theorem ep_tag_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S a c C V d Y W 
       (∀ x B, Rd_entry_d x B e ↔ M.mem x Y ∧ KPair_d M x a B) ∧
       ∀ B x, Rd_entry_d B x u ↔ M.mem x Y ∧ KPair_d M x a B := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨Q, hz, _⟩ := h.models
+  obtain ⟨Q, hz⟩ := h.codes
   let φ : BinarySchema 1 := { body := kpair_m (.bound 1) (.bound 2) .newest }
   let ρ : Env M 1 := ⟨fun _ => a, fun _ => a⟩
   have sat x B : φ.denote ρ x B ↔ KPair_d M x a B := kpair_sat_l M hZF.1 _ _ _ _
@@ -73,7 +73,7 @@ theorem ep_tag_change_l {ω κ L X R F J O Z D p T V V' q C W a b H U e U' d Q S
   obtain ⟨d₀, Q₀, S₀, st⟩ := di_stage_exists_l hZF system.diagram (((stage.2.1 x).mp hx).2)
   have eq := hZF.1.eq_of_same_members Q₀ Q (fun x => (st.2.1 x).trans (stage.2.1 x).symm)
   subst Q₀
-  obtain ⟨t, s, ht, hs, ts, ss⟩ := ep_tag_l hZF hω system.toEp_graph_d st hab old
+  obtain ⟨t, s, ht, hs, ts, ss⟩ := ep_tag_l hZF hω system.toEg_graph_d st hab old
   have bt : M.IsSetBijectionFromTo I t Q H := ⟨ht.1, fun E hE => by
     obtain ⟨x, hx, hEx⟩ := hs.1.1.2.2 E hE
     exact ⟨x, hx, (ts x E).mpr ((ss E x).mp hEx)⟩⟩

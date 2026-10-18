@@ -32,8 +32,8 @@ theorem ep_graph_sat_l (hE : Extensional M) {d} (η : Env M d) (ω κ L X R F J 
     Formula.satisfies_exists_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff, di_order_sat_l hE,
     fn0_sat_l hE, rd_entry0_sat_l hE, kpair0_sat_l hE, ei_map_sat_l hE, ei_sat_l hE,
     ep_component_sat_l I hE, ep_at_sat_l hE, ep_arrow_sat_l hE, ep_rel_sat_l hE, Definitional.Term.eval_weaken]
-  exact ⟨fun ⟨a, b, c, d, e, f, g, h, i⟩ => ⟨a, b, c, d, e, f, g, h, i⟩,
-    fun h => ⟨h.order, h.order_spec, h.projection, h.indices, h.models, h.nodes, h.index, h.arrows, h.relations⟩⟩
+  exact ⟨fun ⟨a, b, c, d, ⟨Q, e, models⟩, f, g, h, i⟩ => ⟨⟨a, b, c, d, ⟨Q, e⟩, f, g, h, i⟩, models⟩,
+    fun h => ⟨h.order, h.order_spec, h.projection, h.indices, (h.codes.elim fun Q hz => ⟨Q, hz, h.components⟩), h.nodes, h.index, h.arrows, h.relations⟩⟩
 
 def ep_lift_m {d} (ω κ L X a b B C : Term d) : Formula 1 d := set[d] ⟪
   ∀ f ∈ ⌜B⌝ₛ, ∃ m n q g, m ∈ ⌜ω⌝ₛ ∧ n ∈ ⌜ω⌝ₛ ∧ ⌜fn0_m⌝ₚ(m, n, q) ∧ ⌜fn0_m⌝ₚ(n, ⌜L⌝ₛ, ⌜b⌝ₛ) ∧

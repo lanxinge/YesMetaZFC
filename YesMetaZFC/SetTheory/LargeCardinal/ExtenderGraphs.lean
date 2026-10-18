@@ -10,18 +10,19 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
-theorem ep_graphs_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
-    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S, Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S := by
-  let hZF := ZFC.models_zf_l hZFC
+theorem eg_graphs_l (hZF : M.Models ZF) {ω κ L X J O Z Q : M.Domain}
+    (ho : Di_order_d J O)
+    (os : ∀ a b, Rd_entry_d a b O ↔ M.mem a J ∧ M.mem b J ∧ ∃ q, Ei_map_d ω L a b q)
+    (hj : ∀ a, M.mem a J ↔ Ei_d ω L a) (hz : Fn0_d J Q Z) :
+    ∃ A p T S, Eg_graph_d ω κ L X J O Z A p T S := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨J, O, hj, ho, os⟩ := ei_order_l hZF h.omega hωL
-  obtain ⟨Z, Q, hz, models⟩ := ep_components_l hZF h hF (fun a ha => ((hj a).mp ha).elim fun n hn => ⟨n, hn.1, hn.2.1⟩) R
-  obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF X
+  obtain ⟨Q₁, h₁⟩ := KP.exists_union (ZF.modelsKP hZF) Q
+  obtain ⟨Q₂, h₂⟩ := KP.exists_union (ZF.modelsKP hZF) Q₁
+  obtain ⟨P, hP⟩ := KP.exists_union (ZF.modelsKP hZF) Q₂
   have bound a B (hat : Ep_at_d Z a B) : M.mem a J ∧ M.mem B P := by
-    obtain ⟨c, C, S, hac, hc, hm, hB⟩ := ep_at_model_l hZF models hat
-    obtain ⟨_, _, _, _, reps⟩ := ep_representatives_l I hZF.1 hF hc hm hB
-    exact ⟨(hz.bound_l hac).1, (hP B).mpr (fun f hf => (reps f hf).1)⟩
+    obtain ⟨c, C, S, hac, ⟨s, t, hs, _, pair⟩, hB⟩ := hat
+    have hCQ := (h₂ C).mpr ⟨s, (h₁ s).mpr ⟨c, (hz.bound_l hac).2, (pair s).mpr (Or.inl rfl)⟩, (hs C).mpr rfl⟩
+    exact ⟨(hz.bound_l hac).1, (hP B).mpr ⟨C, hCQ, hB⟩⟩
   obtain ⟨W, hW⟩ := ZF.exists_cartesianProduct hZF I J P
   let φ : UnarySchema 1 := { body := .existsE (.existsE (.conj (kpair_m (.bound 2) (.bound 1) .newest)
     (ep_at_m (.bound 3) (.bound 1) .newest))) }
@@ -67,7 +68,17 @@ theorem ep_graphs_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
       ∃ a B C, KPair_d M u a B ∧ KPair_d M v a C ∧ Ep_rel_d Z a B C := by
     simpa only [relation, BinarySchema.denote, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
       kpair_sat_l M hZF.1, ep_rel_sat_l hZF.1] using! ss u v
-  exact ⟨J, O, Z, A, p, T, S, ho, os, fn0_of_function_l (ZF.modelsKP hZF) hp, hj,
-    ⟨Q, hz, models⟩, node, index, arrows, relations⟩
+  exact ⟨A, p, T, S, ho, os, fn0_of_function_l (ZF.modelsKP hZF) hp, hj, ⟨Q, hz⟩, node, index, arrows, relations⟩
+
+/-- 传递源直接调用与原关系源共用的图装配。 -/
+theorem ep_graphs_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
+    (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (hωL : M.MemberSubset ω L) : ∃ J O Z A p T S,
+      Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨J, O, hj, ho, os⟩ := ei_order_l hZF h.omega hωL
+  obtain ⟨Z, Q, hz, models⟩ := ep_components_l hZF h hF (fun a ha => ((hj a).mp ha).elim fun n hn => ⟨n, hn.1, hn.2.1⟩) R
+  obtain ⟨A, p, T, S, graph⟩ := eg_graphs_l hZF (κ := κ) (X := X) ho os hj hz
+  exact ⟨J, O, Z, A, p, T, S, graph, models⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

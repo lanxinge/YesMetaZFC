@@ -10,14 +10,15 @@ open Definitional.Project InnerModel Internal
 universe u
 variable {M : Structure.{u}}
 
-theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S : M.Domain}
-    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
-    (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
-    (h : Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S) :
-    Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S := by
-  let hZF := ZFC.models_zf_l hZFC
+theorem Eg_graph_d.system_l (hZF : M.Models ZF) {ω κ L X J O Z A p T S : M.Domain}
+    (hω : M.IsOmega ω) (h : Eg_graph_d ω κ L X J O Z A p T S)
+    (reps : ∀ a B, Ep_at_d Z a B → ∃ n, M.mem n ω ∧ Fn0_d n L a ∧
+      (∃ f, M.mem f B) ∧ ∀ f, M.mem f B → Ep_fun_d κ X n f)
+    (transition : Eg_transition_d (kp_pair_l (ZF.modelsKP hZF)) ω κ L X O Z) :
+    Di_system_d J O A p T S ∧ ∀ u v a b B C,
+      KPair_d M u a B → KPair_d M v b C → Rd_entry_d u v T → Ep_lift_d ω κ L X a b B C := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨Q, hz, models⟩ := h.models
+  obtain ⟨Q, hz⟩ := h.codes
   have label u a (hua : Rd_entry_d u a p) : ∃ B, KPair_d M u a B ∧ Ep_at_d Z a B := by
     obtain ⟨b, B, hu, hat⟩ := (h.nodes u).mp (h.projection.bound_l hua).1
     have hub := (h.index u b B hu).mpr (h.projection.bound_l hua).1
@@ -41,28 +42,38 @@ theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
       (∀ B E B' E', Rd_entry_d B B' j → Rd_entry_d E E' j → (Rd_entry_d B E V ↔ Rd_entry_d B' E' W)) ∧
       (∀ B E, Rd_entry_d B E j ↔ M.mem B C ∧ M.mem E D ∧ Ep_arrow_d ω κ L X a b B E) ∧
       ∀ B E, Rd_entry_d B E j → Ep_lift_d ω κ L X a b B E := by
-    obtain ⟨ha, hb, q, m, n, hm, hn, hq, hnb, hqa⟩ := (h.order_spec a b).mp hab
-    obtain ⟨c, _, hac⟩ := hz.2.1 a ha
-    obtain ⟨d, _, hbd⟩ := hz.2.1 b hb
-    obtain ⟨_, _, _, inj⟩ := (h.indices b).mp hb
-    obtain ⟨j, C, V, D, W, hc, hd, hj, _, rel, spec, any⟩ := ep_map_l hZFC source hF coherent hm hn hq hnb inj hqa
-      (models a c hac) (models b d hbd)
-    exact ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, hj, rel, spec, fun B E hBE f hf =>
-      (any B E hBE f hf).elim fun g hg => ⟨m, n, q, g, hm, hn, hq, hnb, hqa, hg⟩⟩
-  refine ⟨h, ⟨h.order, h.projection, bounds, forward, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
+    obtain ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, elem, spec, lift⟩ := transition a b hab
+    exact ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, elem.1,
+      fun B E B' E' hb he => elem.relation_l I hZF hω hc hd hb he, spec, lift⟩
+  refine ⟨⟨h.order, h.projection, bounds, forward, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
   · intro u hu
     obtain ⟨a, B, huB, hat⟩ := (h.nodes u).mp hu
-    obtain ⟨c, C, V, hac, hm, hc, hBC⟩ := ep_at_model_l hZF models hat
-    exact (h.arrow_l huB huB).mpr ⟨hu, hu, ep_arrow_id_l hZF hF ((h.indices a).mp (hz.bound_l hac).1) hm hc hBC⟩
+    obtain ⟨n, hn, hna, ⟨f, hf⟩, fs⟩ := reps a B hat
+    obtain ⟨_, _, _, ha⟩ := (h.indices a).mp (h.projection.bound_l ((h.index u a B huB).mpr hu)).2
+    obtain ⟨r, hr, hra⟩ := ec_factor_l hZF hna ⟨fn0_function_l (ZF.modelsKP hZF) hna, ha⟩ (fun i _ hi => ⟨i, hi⟩)
+    have fixed i j (hij : Rd_entry_d i j r) : i = j := by
+      obtain ⟨x, _, hix⟩ := hna.2.1 i (hr.bound_l hij).1
+      exact ha i j x hix ((hra.value_l hr hna hij).mp hix)
+    exact (h.arrow_l huB huB).mpr ⟨hu, hu, n, n, r, f, f, hn, hn, hr, hna, hra,
+      hf, hf, ep_pull_id_l hZF.1 (fs f hf) fixed⟩
   · intro u v w huv hvw
     obtain ⟨a, B, hu, _⟩ := (h.nodes u).mp (bounds u v huv).1
-    obtain ⟨b, C, hv, hCv⟩ := (h.nodes v).mp (bounds u v huv).2
-    obtain ⟨c, D, hw, hDw⟩ := (h.nodes w).mp (bounds v w hvw).2
-    obtain ⟨e, E, V, _, he, hE, hCE⟩ := ep_at_model_l hZF models hCv
-    obtain ⟨f, G, W, hcf, hf, hG, hDG⟩ := ep_at_model_l hZF models hDw
-    exact (h.arrow_l hu hw).mpr ⟨(bounds u v huv).1, (bounds v w hvw).2,
-      ep_arrow_comp_l hZFC source hF coherent ((h.indices c).mp (hz.bound_l hcf).1)
-        he hf hE hG hCE hDG ((h.arrow_l hu hv).mp huv).2.2 ((h.arrow_l hv hw).mp hvw).2.2⟩
+    obtain ⟨b, C, hv, hvC⟩ := (h.nodes v).mp (bounds u v huv).2
+    obtain ⟨c, D, hw, hwD⟩ := (h.nodes w).mp (bounds v w hvw).2
+    have hvb := (h.index v b C hv).mpr (bounds u v huv).2
+    have hwc := (h.index w c D hw).mpr (bounds v w hvw).2
+    obtain ⟨j, c₀, C₀, V, c₁, C₁, W, hbc, hcc, mc₀, mc₁, _, _, spec, lift⟩ :=
+      maps b c (forward v w b c hvb hwc hvw)
+    have hCD := (spec C D).mpr ⟨(ep_at_read_l hz hbc mc₀.1).mp hvC,
+      (ep_at_read_l hz hcc mc₁.1).mp hwD, ((h.arrow_l hv hw).mp hvw).2.2⟩
+    obtain ⟨m, n, r, f, g, hm, hn, hr, hnb, hra, hf, hg, pull⟩ := ((h.arrow_l hu hv).mp huv).2.2
+    obtain ⟨n', l, t, g', _, hl, ht, hlc, htb, hg', pull'⟩ := lift C D hCD g hg
+    have eq := htb.1.domain_eq_l hZF.1 hnb
+    subst n'
+    obtain ⟨s, hs⟩ := cp0_exists_l (ZF.modelsKP hZF) hr ht
+    exact (h.arrow_l hu hw).mpr ⟨(bounds u v huv).1, (bounds v w hvw).2, m, l, s, f, g',
+      hm, hl, hs.1, hlc, Cp0_d.assoc_l ht hr hs hlc htb hra, hf, hg',
+      ep_pull_comp_l (ZF.modelsKP hZF) hr ht hs pull pull'⟩
   · intro u a b hua hab
     obtain ⟨B, hu, hat⟩ := label u a hua
     obtain ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, hj, _, spec, _⟩ := maps a b hab
@@ -122,6 +133,35 @@ theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S
       (forward u v a b ((h.index u a B hu).mpr huA) ((h.index v b C hv).mpr hvA) huv)
     exact lifts B C ((spec B C).mpr ⟨(ep_at_read_l hz hac hc.1).mp (h.at_l huA hu),
       (ep_at_read_l hz hbd hd.1).mp (h.at_l hvA hv), ((h.arrow_l hu hv).mp huv).2.2⟩)
+
+theorem Ep_graph_d.transition_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S : M.Domain}
+    (h : Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S)
+    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F) :
+    Eg_transition_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X O Z := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨_, hz⟩ := h.codes
+  intro a b hab
+  obtain ⟨ha, hb, q, m, n, hm, hn, hq, hnb, hqa⟩ := (h.order_spec a b).mp hab
+  obtain ⟨c, _, hac⟩ := hz.2.1 a ha
+  obtain ⟨d, _, hbd⟩ := hz.2.1 b hb
+  obtain ⟨_, _, _, inj⟩ := (h.indices b).mp hb
+  obtain ⟨j, C, V, D, W, hc, hd, _, elem, _, spec, any⟩ := ep_map_l hZFC source hF coherent hm hn hq hnb inj hqa
+    (h.components a c hac) (h.components b d hbd)
+  exact ⟨j, c, C, V, d, D, W, hac, hbd, hc, hd, elem, spec, fun B E hBE f hf =>
+    (any B E hBE f hf).elim fun g hg => ⟨m, n, q, g, hm, hn, hq, hnb, hqa, hg⟩⟩
+
+theorem Ep_graph_d.system_l (hZFC : M.Models ZFC) {ω κ K L X R F J O Z A p T S : M.Domain}
+    (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)
+    (coherent : Ec_source_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X F)
+    (h : Ep_graph_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S) :
+    Ep_system_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω κ L X R F J O Z A p T S := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨diagram, lifts⟩ := h.toEg_graph_d.system_l hZF source.omega (fun a B hat => by
+    obtain ⟨c, C, V, _, component, model, hB⟩ := ep_at_model_l hZF h.components hat
+    obtain ⟨n, hn, ha, point, functions⟩ := ep_representatives_l _ hZF.1 hF component model hB
+    exact ⟨n, hn, ha, point, fun f hf => (functions f hf).2⟩) (h.transition_l hZFC source hF coherent)
+  exact ⟨h, diagram, lifts⟩
 
 theorem ep_system_exists_l (hZFC : M.Models ZFC) {ω κ K L X R F : M.Domain}
     (h : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R) (hF : Em_source_d ω κ L X F)

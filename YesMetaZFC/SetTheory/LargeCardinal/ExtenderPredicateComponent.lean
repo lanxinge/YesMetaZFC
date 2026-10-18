@@ -36,9 +36,9 @@ theorem ep_predicate_component_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁
       (∀ E H x y, Rd_entry_d E x v → Rd_entry_d H y v → (Rd_entry_d E H V₁ ↔ Rd_entry_d x y W')) ∧
       ∀ E E', Rd_entry_d E E' v ↔ M.mem E H ∧ ∃ u, KPair_d M u a E ∧ Rd_entry_d u E' q := by
   have embed : Spred_emb_d I ω X A Y B j := ⟨c₀, R₀, c₁, R₁, hx, hy, hj⟩
-  obtain ⟨_, _, models⟩ := system.models
+  have models := system.components
   obtain ⟨n, Q, U, G, r, H, V₀, hn, ha, hQ, haU, hG, hm⟩ := models a b hab
-  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega system limit
+  obtain ⟨v, hv, vs⟩ := ep_stage_embedding_l hZF source.omega system.toEg_graph_d system.diagram limit
     (system.toEp_graph_d.elementary_l hZFC source (hF.source_l hZF X) (coherent.source_l I X)) model hab hm.code
   obtain ⟨e, V₁, code, vr⟩ := smdl_pull_l hZF hm.code.2.1 hv.1.1 W'
   obtain ⟨haS, m, Q₀, ha₀, hQ₀, hu⟩ := (family.2.2 a U).mp haU

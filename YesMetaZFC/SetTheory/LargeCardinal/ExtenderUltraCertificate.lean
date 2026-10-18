@@ -24,7 +24,7 @@ theorem it_ultra_of_certificate_l {ω κ K L X R F J O Z A p T V q b C W c d Y S
   obtain ⟨B, hB⟩ := model.2.1
   obtain ⟨u, hu⟩ := (limit.range B).mp hB
   obtain ⟨a, ha, _⟩ := system.projection.2.1 u (limit.projection.bound_l hu).1
-  obtain ⟨_, maps, _⟩ := system.models
+  obtain ⟨_, maps⟩ := system.codes
   obtain ⟨v, _, hav⟩ := maps.2.1 a ha
   obtain ⟨c', i', n, D, U, G, r, H, Q, code, hi', _, hna, hd, hau, hg, quotient, values⟩ :=
     ep_constant_limit_l hZF source family system limit model

@@ -30,7 +30,8 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
   obtain ⟨U, hU, us⟩ := smdl_formula_relation_l hZF hn φ hc
   obtain ⟨e, W', newModel, jr⟩ := smdl_pull_l hZF model.2.1 hj.1.1 U
   obtain ⟨S', diagram, newLimit, sr⟩ := di_relation_change_l hZF h.diagram limit newModel
-  obtain ⟨Q₀, hz, models⟩ := h.models
+  obtain ⟨Q₀, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨Z', Q₁, hz', models'⟩ := ep_components_l hZF source family
     (fun a ha => ((h.indices a).mp ha).elim fun n hn => ⟨n, hn.1, hn.2.1⟩) Q
   -- 同一代表族产生同一类集合；仅分量的关系码随公式改变。
@@ -63,7 +64,7 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
     obtain ⟨H, _, hvH⟩ := limit.projection.2.1 v hvA
     obtain ⟨x, _, hEx⟩ := hj.1.1.2.2 E (limit.projection.bound_l huE).2
     obtain ⟨y, _, hHy⟩ := hj.1.1.2.2 H (limit.projection.bound_l hvH).2
-    obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZF source.omega h limit elementary model hac old.code
+    obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZF source.omega h.toEg_graph_d h.diagram limit elementary model hac old.code
     obtain ⟨l, hl, ls⟩ := smap_comp_l I hZF hk hj
     have hBx := (ls B x).mpr ⟨hB, E, (ks B E).mpr ⟨hB, u, hu, huE⟩, hEx⟩
     have hDy := (ls D y).mpr ⟨hD, H, (ks D H).mpr ⟨hD, v, hv, hvH⟩, hHy⟩
@@ -83,7 +84,7 @@ theorem ep_formula_system_l {ω κ K L X R F J O Z A p T S q c C W b Y V d j : M
       (eq.symm.trans (ep_rel_read_l hz' had new.code.1).symm))
   have graph : Ep_graph_d I ω κ L X Q F J O Z' A p T S' := {
     order := h.order, order_spec := h.order_spec, projection := h.projection, indices := h.indices
-    models := ⟨Q₁, hz', models'⟩, nodes := nodes, index := h.index, arrows := h.arrows
+    codes := ⟨Q₁, hz'⟩, components := models', nodes := nodes, index := h.index, arrows := h.arrows
     relations := fun u v => ⟨fun huv => by
       obtain ⟨a, hua, hva⟩ := diagram.locality u v huv
       obtain ⟨B, hu, _⟩ := h.toEp_graph_d.label_l hua

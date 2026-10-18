@@ -36,7 +36,8 @@ theorem ep_repr_exists_l (family : Em_source_d ω κ L X F)
     (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {n D a f : M.Domain} (haJ : M.mem a J) (ha : Fn0_d n L a) (hD : Ep_space_d κ n D)
     (hfX : M.mem f X) (hf : Fn0_d D X f) : ∃ E, M.mem E C ∧ Ep_repr_d q a f E := by
-  obtain ⟨_, hz, models⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨b, _, hab⟩ := hz.2.1 a haJ
   obtain ⟨m, D', U, G, r, H, V, _, ha', hD', haU, hG, model⟩ := models a b hab
   have en := ha'.domain_eq_l hZF.1 ha
@@ -57,7 +58,7 @@ theorem ep_repr_surjective_l (family : Em_source_d ω κ L X F)
   obtain ⟨u, huE⟩ := (limit.range E).mp hEC
   have huA := (limit.projection.bound_l huE).1
   obtain ⟨a, B, hu, _, _, _, _, _, _⟩ := (h.nodes u).mp huA
-  obtain ⟨_, _, models⟩ := h.models
+  have models := h.components
   obtain ⟨_, _, _, _, component, model, hB⟩ := ep_at_model_l hZF models (h.toEp_graph_d.at_l huA hu)
   obtain ⟨n, hn, ha, ⟨f, hfB⟩, reps⟩ := ep_representatives_l I hZF.1 family component model hB
   obtain ⟨hfX, D, hD, hf⟩ := reps f hfB
@@ -69,7 +70,7 @@ theorem Ep_repr_d.source_l (family : Em_source_d ω κ L X F)
     (h : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     {a f E : M.Domain} (he : Ep_repr_d q a f E) : M.mem f X ∧ ∃ n, M.mem n ω ∧ Fn0_d n L a ∧ Ep_fun_d κ X n f := by
   obtain ⟨u, B, hu, hf, huE⟩ := he
-  obtain ⟨_, _, models⟩ := h.models
+  have models := h.components
   obtain ⟨_, _, _, _, component, model, hB⟩ := ep_at_model_l hZF models
     (h.toEp_graph_d.at_l (limit.projection.bound_l huE).1 hu)
   obtain ⟨n, hn, ha, _, reps⟩ := ep_representatives_l I hZF.1 family component model hB
@@ -86,7 +87,8 @@ theorem ep_repr_atoms_l (family : Em_source_d ω κ L X F)
   have hvA := (limit.projection.bound_l hvH).1
   have hua := (h.index u a B hu).mpr huA
   have hva := (h.index v a D hv).mpr hvA
-  obtain ⟨_, hz, models⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨b, Q, V, hab, component, model, hBQ⟩ := ep_at_model_l hZF models (h.toEp_graph_d.at_l huA hu)
   have hDQ := (ep_at_read_l hz hab model.1).mp (h.toEp_graph_d.at_l hvA hv)
   have relation := ep_relation_l I hZF.1 family component model hBQ hDQ hf hg haU

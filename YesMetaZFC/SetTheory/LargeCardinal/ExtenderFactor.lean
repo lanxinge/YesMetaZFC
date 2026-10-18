@@ -48,7 +48,8 @@ theorem ee_nodes_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z D p
         (u = v ↔ y = z) ∧ (Rd_entry_d u v V ↔ M.mem y z)) ∧
       ∀ u a B y f, KPair_d M u a B → Rd_entry_d u y e → M.mem f B → Ee_value_d j a f y := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨Q, hZ, models⟩ := system.models
+  obtain ⟨Q, hZ⟩ := system.codes
+  have models := system.components
   have component a c (hac : Rd_entry_d a c Z) := ee_component_l hZF source hV hδ h hY hc hL hS hSY hF (models a c hac)
   have atMap a E (hat : Ep_at_d Z a E) : ∃ c C W e, Rd_entry_d a c Z ∧ Smdl_d I c C W ∧
       M.mem E C ∧ M.IsSetInjectionFromTo I e C Y ∧

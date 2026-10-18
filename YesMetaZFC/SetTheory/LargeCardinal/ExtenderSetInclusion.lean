@@ -56,12 +56,13 @@ theorem ep_set_inclusion_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
   have hg : M.IsSetInjectionFromTo I g C₀ A₁ := ⟨fn0_function_l (ZF.modelsKP hZF) fg₁, inj⟩
   obtain ⟨f, ff, fs⟩ := ZF.exists_compositionFunction hZF I
     (fn0_function_l (ZF.modelsKP hZF) limit₀.projection) hg.1
-  obtain ⟨_, hz, models⟩ := system₀.models
+  obtain ⟨_, hz⟩ := system₀.codes
+  have models := system₀.components
   have component a o (hao : Rd_entry_d a o Z₀) : ∃ H Q k,
       Smdl_d I o H Q ∧ Smap_d I ω o a₁ H A₁ k ∧
         ∀ B x, Rd_entry_d B x k ↔ M.mem B H ∧ ∃ u, KPair_d M u a B ∧ Rd_entry_d u x f := by
     obtain ⟨n, D, U, G, p', H, Q, hnω, ha, space, haU, hG, cmp⟩ := models a o hao
-    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF small.omega system₀ limit₀ elementary model₀ hao cmp.code
+    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF small.omega system₀.toEg_graph_d system₀.diagram limit₀ elementary model₀ hao cmp.code
     obtain ⟨k, fk, ks⟩ := ZF.exists_compositionFunction hZF I ht.1.1 hg.1
     have hk : M.IsSetInjectionFromTo I k H A₁ := ⟨fk, fun B D x hBx hDx => by
       obtain ⟨_, E, hBE, hEx⟩ := (ks B x).mp hBx
@@ -86,7 +87,7 @@ theorem ep_set_inclusion_l {ω κ K L X R F J O Z A p T V q c C W d N S μ K' e 
     obtain ⟨u, hu⟩ := stage.1.2.1
     obtain ⟨o', _, hao⟩ := hz.2.1 a (system₀.projection.bound_l ((stage.2.1 u).mp hu).2).2
     obtain ⟨H, Q', k, cmp, hk, ks⟩ := component a o' hao
-    obtain ⟨t, _, ht, _, ts, _⟩ := ep_tag_l hZF small.omega system₀.toEp_graph_d stage hao cmp
+    obtain ⟨t, _, ht, _, ts, _⟩ := ep_tag_l hZF small.omega system₀.toEg_graph_d stage hao cmp
     obtain ⟨s, hs, ss⟩ := smap_comp_l I hZF ht hk
     refine ⟨s, hs, fun u x => (ss u x).trans (and_congr_right fun hu => ?_)⟩
     constructor

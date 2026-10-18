@@ -28,14 +28,14 @@ theorem ep_constant_limit_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q
       ∀ x E, Rd_entry_d x E j ↔ M.mem x X ∧ ∃ f B u,
         M.mem f G ∧ Rs_const_d D x f ∧ Rd_entry_d f B r ∧ KPair_d M u a B ∧ Rd_entry_d u E q := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨_, _, models⟩ := h.models
+  have models := h.components
   obtain ⟨n, D, U, G, r, Y, W, hn, ha, hD, haU, hG, hm⟩ := models a d had
   obtain ⟨b, hX⟩ := source.code
   obtain ⟨P, U', hP, hU', _, hm'⟩ := rs_restrict_model_l hZF source.omega source.transitive hX source.theory
     (source.space_mem_l hZF hn hD) (hF.at_l hZF.1 haU ha hD) hG hm
   obtain ⟨i, hi, is⟩ := rs_constant_embedding_l hZF source.omega source.transitive hX source.theory (source.uniform_l hZF hn hD)
     (source.space_mem_l hZF hn hD) hP hU' hG hm'
-  obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZF source.omega h limit elementary model had hm.code
+  obtain ⟨k, hk, ks⟩ := ep_stage_embedding_l hZF source.omega h.toEg_graph_d h.diagram limit elementary model had hm.code
   obtain ⟨j, hj, js⟩ := smap_comp_l I hZF hi hk
   refine ⟨b, j, n, D, U, G, r, Y, W, hX, hj, hn, ha, hD, haU, hG, hm, fun x E =>
     (js x E).trans (and_congr_right fun hx => ?_)⟩
@@ -60,7 +60,7 @@ theorem ep_constant_l (hZF : M.Models ZF) {ω κ K L X R F J O Z A p T S q c C V
   obtain ⟨B, hB⟩ := model.2.1
   obtain ⟨u, hu⟩ := (limit.range B).mp hB
   obtain ⟨a, ha, _⟩ := system.diagram.index.2.1 u (limit.projection.bound_l hu).1
-  obtain ⟨_, hz, _⟩ := system.models
+  obtain ⟨_, hz⟩ := system.codes
   obtain ⟨d, _, had⟩ := hz.2.1 a ha
   obtain ⟨b, i, n, D, U, G, r, E, Q, hm, hi, hn, ha, hD, haU, hG, md, spec⟩ :=
     ep_constant_limit_l hZF source family system limit model elementary had

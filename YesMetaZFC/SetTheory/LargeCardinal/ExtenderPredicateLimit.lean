@@ -31,7 +31,8 @@ theorem ep_predicate_limit_l {ω δ κ k K L X R A Y B j c₀ R₀ c₁ R₁ S F
   obtain ⟨V', changed, newLimit, _⟩ := di_relation_change_l hZF system.diagram limit md
   have component a b (hab : Rd_entry_d a b Z) := ep_predicate_component_l hZFC source hδ hωδ hV hH
     hx hy hj hY hc hL hSY family hF coherent system limit model hg rel any hab
-  obtain ⟨Q, hz, models⟩ := system.models
+  obtain ⟨Q, hz⟩ := system.codes
+  have models := system.components
   have elementary : Di_elementary_d I ω O D p T V' := by
     intro a b e H U f N W st₀ st₁ hab
     obtain ⟨ha, hb, s, m, n, hm, hn, hs, hnb, hsa⟩ := (system.order_spec a b).mp hab

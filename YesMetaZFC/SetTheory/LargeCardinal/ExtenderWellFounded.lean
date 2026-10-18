@@ -18,7 +18,8 @@ theorem ep_limit_wf_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S q C V : M
     (wf : Wf_rel_d X R) : Wf_rel_d C V := by
   let I := kp_pair_l (ZF.modelsKP hZF)
   have h := system.toEp_graph_d
-  obtain ⟨Q, hz, models⟩ := h.models
+  obtain ⟨Q, hz⟩ := h.codes
+  have models := h.components
   apply di_wf_of_no_step_l hZF hDC system.diagram limit
   intro H hH step
   -- 固定指标递增的下降节点链 H；DC 在每个类中选出源代表，组成实际函数图 G。

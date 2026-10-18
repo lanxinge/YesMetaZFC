@@ -61,9 +61,10 @@ theorem Fs_read_d.graph_read_l (hZF : M.Models ZF) {ω V : M.Domain}
       obtain ⟨m, n, hm, hn, fn, _⟩ := hq
       have hqV := finite hm (vt ω source.omega_mem n hn) fn
       exact ⟨⟨q, hqV⟩, (rt_ei_map_l (ZF.modelsKP hZF) vt nv w L a b _).mpr (hw.symm ▸ old)⟩
-  obtain ⟨B, models, components⟩ := h.models
-  refine ⟨rt_di_order_l (ZF.modelsKP hZF) vt nv J O h.order, ?_, (rt_fn_l vt nv hZF.1 ..).mp h.projection,
-    ?_, ⟨B.val, (rt_fn_l vt nv hZF.1 ..).mp models, ?_⟩, ?_, ?_, ?_, ?_⟩
+  obtain ⟨B, models⟩ := h.codes
+  have components := h.components
+  refine ⟨⟨rt_di_order_l (ZF.modelsKP hZF) vt nv J O h.order, ?_, (rt_fn_l vt nv hZF.1 ..).mp h.projection,
+    ?_, ⟨B.val, (rt_fn_l vt nv hZF.1 ..).mp models⟩, ?_, ?_, ?_, ?_⟩, ?_⟩
   · intro a b
     constructor
     · intro hab
@@ -80,10 +81,6 @@ theorem Fs_read_d.graph_read_l (hZF : M.Models ZF) {ω V : M.Domain}
       obtain ⟨n, hn, fn, _⟩ := ha
       exact (h.indices ⟨a, finite hn L.property fn⟩).mpr
         ((rt_ei_l (ZF.modelsKP hZF) vt nv w L _).mpr (hw.symm ▸ old))
-  · intro a c hac
-    have ac := rd_entry_transitive_l vt Z.property hac
-    exact source.component_read_l hZF nv w μ L X R F ⟨a, ac.1⟩ ⟨c, ac.2⟩ hw
-      (components _ _ ((ent ..).mpr hac))
   · intro u
     constructor
     · intro hu
@@ -130,6 +127,10 @@ theorem Fs_read_d.graph_read_l (hZF : M.Models ZF) {ω V : M.Domain}
       have ac := hq.mem_l M vt vV
       exact (ent ..).mp ((h.relations ⟨u, uV⟩ ⟨v, vV⟩).mpr ⟨hu, hv, ⟨a, ab.1⟩, ⟨B, ab.2⟩, ⟨C, ac.2⟩,
         (kp ..).mpr hp, (kp ..).mpr hq, (rel ..).mpr hc⟩)
+  · intro a c hac
+    have ac := rd_entry_transitive_l vt Z.property hac
+    exact source.component_read_l hZF nv w μ L X R F ⟨a, ac.1⟩ ⟨c, ac.2⟩ hw
+      (components _ _ ((ent ..).mpr hac))
 
 theorem Fs_read_d.system_read_l (hZF : M.Models ZF) {ω V : M.Domain}
     (source : Fs_read_d ω V) (nv : Nonempty {x // M.mem x V})

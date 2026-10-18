@@ -30,8 +30,10 @@ theorem ep_copy_l
     (h : Ep_system_d I ω κ L X R F J O Z D p T V) (limit : Di_limit_d D p T V q C W) (model : Smdl_d I e C W)
     (h' : Ep_system_d I ω κ' L' Y S F' J' O' Z' D' p' T' V') (limit' : Di_limit_d D' p' T' V' q' C' W')
     (model' : Smdl_d I e' C' W') : Ec_limit_d hZF ω c X d Y π σ q q' e C W e' C' W' := by
-  obtain ⟨Q, hz, models⟩ := h.models
-  obtain ⟨Q', hz', models'⟩ := h'.models
+  obtain ⟨Q, hz⟩ := h.codes
+  have models := h.components
+  obtain ⟨Q', hz'⟩ := h'.codes
+  have models' := h'.components
   have image a (ha : M.mem a J) : ∃ a', Rd_entry_d a a' σ ∧ M.mem a' J' := by
     obtain ⟨n, hnω, hna, _⟩ := (h.indices a).mp ha
     obtain ⟨U, haU⟩ := family.total n a hnω hna
@@ -46,7 +48,7 @@ theorem ep_copy_l
     obtain ⟨a', haa, haJ⟩ := image a (hz.bound_l hao).1
     obtain ⟨o', _, hao'⟩ := hz'.2.1 a' haJ
     obtain ⟨A, R, A', R', s, ma, ma', hs, ss, _⟩ := component a a' o o' haa hao hao'
-    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF target.omega h' limit'
+    obtain ⟨t, ht, ts⟩ := ep_stage_embedding_l hZF target.omega h'.toEg_graph_d h'.diagram limit'
       (h'.toEp_graph_d.elementary_l hZFC target family' coherent') model' hao' ma'
     obtain ⟨k, hk, ks⟩ := smap_comp_l I hZF hs ht
     refine ⟨A, R, k, ma, hk, fun u B E hu => (ks B E).trans ?_⟩
@@ -110,7 +112,7 @@ theorem ep_copy_l
     obtain ⟨u, hu⟩ := stage.1.2.1
     obtain ⟨o₀, _, hio⟩ := hz.2.1 i (h.projection.bound_l ((stage.2.1 u).mp hu).2).2
     obtain ⟨A₀, R₀, t, ma, ht, ts⟩ := into i o₀ hio
-    obtain ⟨s, _, hs, _, ss, _⟩ := ep_tag_l hZF source.omega h.toEp_graph_d stage hio ma
+    obtain ⟨s, _, hs, _, ss, _⟩ := ep_tag_l hZF source.omega h.toEg_graph_d stage hio ma
     obtain ⟨k, hk, ks⟩ := smap_comp_l I hZF hs ht
     refine ⟨k, hk, fun u E => (ks u E).trans (and_congr_right fun hu => ?_)⟩
     constructor
@@ -181,7 +183,8 @@ theorem ep_copy_identity_l (hZ : M.Models ZF)
     (hπ : ∀ f, M.mem f X → Rd_entry_d f f π) (hσ : ∀ a, M.mem a J → Rd_entry_d a a σ)
     (copy : ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ ∃ u, Rd_entry_d u B q ∧ Ec_node_d π σ q u E) :
     ∀ B E, Rd_entry_d B E τ ↔ M.mem B C ∧ B = E := by
-  obtain ⟨_, hz, models⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
+  have models := h.components
   have fixed B (hBC : M.mem B C) : Rd_entry_d B B τ := by
     obtain ⟨u, hu⟩ := (limit.range B).mp hBC
     obtain ⟨a, H, hup, hat⟩ := (h.nodes u).mp (limit.projection.bound_l hu).1

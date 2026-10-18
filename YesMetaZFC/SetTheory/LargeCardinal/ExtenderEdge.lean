@@ -42,7 +42,8 @@ theorem ee_common_edge_l (hZF : M.Models ZF) {ω κ L X R F J O Z A p T S u v a 
     (hvz : Rd_entry_d v z T) (hwz : Rd_entry_d w z S) : ∃ E U, Rd_entry_d c U F ∧ M.mem E U ∧
       Ee_constraint_d (kp_pair_l (ZF.modelsKP hZF)) κ L X R a f b g c E := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  obtain ⟨Q, hz, models⟩ := h.models
+  obtain ⟨Q, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨D, hw, hatD⟩ := h.toEp_graph_d.label_l hwc
   obtain ⟨E, he, hatE⟩ := h.toEp_graph_d.label_l hzc
   obtain ⟨m, l, q, f', _, hl, hq, hlc, hqa, hf', hff'⟩ := h.representatives u w a c B D hu hw huw f hf

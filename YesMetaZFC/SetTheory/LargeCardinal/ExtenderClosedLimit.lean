@@ -26,7 +26,8 @@ theorem It_local_d.closed_wf_l {ω κ K Y R' L F V X R J O Z A p T S q C W : M.D
   have local_copy := loc
   obtain ⟨_, _, _, hF_mem, _⟩ := local_copy
   have h := system.toEp_graph_d
-  obtain ⟨Q, hz, models⟩ := h.models
+  obtain ⟨Q, hz⟩ := h.codes
+  have models := h.components
   apply di_wf_of_no_step_l hZF hDC system.diagram limit
   intro H hH step
   -- 固定指标递增的下降节点链 H；DC 在每个类中选出源代表，组成实际函数图 G。

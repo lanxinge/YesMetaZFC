@@ -27,7 +27,8 @@ theorem ee_represent_l (hZF : M.Models ZF) {ω δ X A Y B j κ k K R L S F J O Z
   obtain ⟨b, t, hbJ, m, l, _, hl, ht, hb, hba⟩ := ep_support_cover_l hZF source.omega hωL system hn ha
   have eq := hba.1.domain_eq_l hZF.1 ha
   subst m
-  obtain ⟨_, hZ, models⟩ := system.models
+  obtain ⟨_, hZ⟩ := system.codes
+  have models := system.components
   obtain ⟨c, _, hbc⟩ := hZ.2.1 b hbJ
   have md := models b c hbc
   obtain ⟨l', E, U, G, r, Q, S₀, _, hb', hE, hbU, hG, model⟩ := md

@@ -22,6 +22,7 @@ theorem Eb_collapse_d.raw_l {ω κ K K₀ L X R N R₀ F J O Z A p T S q c C W D
     (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (ff : Fn0_d D₀ X f₀) (constant : Rs_const_d D₀ B f₀)
     (fv : Ep_repr_d q a₀ f₀ H) (owned : Eb_collapse_d ω κ L K₀ N B F D Q Γ e) :
+    ∃ b i, Smem_d I b X R ∧ Smap_d I ω b c X C i ∧ Rd_entry_d B H i ∧
     ∃ k, M.IsSetInjectionFromTo I k Γ C ∧
       (∀ x E, Rd_entry_d x E k ↔ ∃ u, M.mem u D ∧ Rd_entry_d u x e ∧ Eb_value_d q u E) ∧
       (∀ E, Rd_entry_d E H W ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x E k) ∧
@@ -51,7 +52,7 @@ theorem Eb_collapse_d.raw_l {ω κ K K₀ L X R N R₀ F J O Z A p T S q c C W D
       ⟨E, (limit.bounded E H hEH).1⟩ hEH ⟨P, (limit.bounded P E hPE).1⟩ hPE
   obtain ⟨k, fk, spec, member, predecessor⟩ := map.realize_l hZF exact vf ext reads (fun u E huE P hPE =>
     (covers P).mpr (down E P ((covers E).mp ⟨u, (vf.bound_l huE).1, huE⟩) hPE))
-  refine ⟨k, fk, fun x E => (spec x E).trans ?_, fun E => ?_, member, predecessor⟩
+  refine ⟨b, i, mx, hi, hBH, k, fk, fun x E => (spec x E).trans ?_, fun E => ?_, member, predecessor⟩
   · exact exists_congr fun u => and_congr_right fun hu => and_congr_right fun _ =>
       (values u E).trans ⟨And.right, fun value => ⟨hu, value⟩⟩
   · refine (covers E).symm.trans ⟨?_, ?_⟩

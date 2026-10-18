@@ -29,7 +29,8 @@ theorem ep_seed_down_l {ω κ K L X R F J O Z A p T S q C W α E H : M.Domain}
   obtain ⟨H₀, _, hwH₀⟩ := limit.projection.2.1 w (h.diagram.bound v w hvw).2
   have hwH : Rd_entry_d w H q := (limit.commute_l h.diagram hvw hvH hwH₀).symm ▸ hwH₀
   obtain ⟨B', hw, hat⟩ := h.toEp_graph_d.label_l hwc
-  obtain ⟨_, hz, models⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
+  have models := h.components
   obtain ⟨o, Q, V, hco, component, model, hBQ⟩ := ep_at_model_l hZF models hat
   obtain ⟨m, D', U, G, r, Q', V', _, hc', hD', hcU, hG, md⟩ := component
   obtain ⟨rfl, rfl⟩ := smdl_unique_l I md.code model

@@ -43,7 +43,7 @@ theorem sc_source_ultrafilter_l (hZF : M.Models ZF) {ω c X R D U}
     (hD : M.mem D X) (hU : Sf_ultra_d X D U) :
     ∃ P V, Source_d X D P ∧ Rel_ultra_d D P V ∧ ∀ A, M.mem A V ↔ M.mem A P ∧ M.mem A U := by
   obtain ⟨P, hP, hp⟩ := sc_source_field_l I hZF hω hX hm theory hD
-  obtain ⟨V, hV, hv⟩ := hU.restrict_l (ZF.modelsKP hZF) hP hp
+  obtain ⟨V, hV, hv⟩ := hU.restrict_l (ZF.modelsKP hZF) (fun A hA => ((hP A).mp hA).1) hp
   exact ⟨P, V, hP, hV, hv⟩
 
 end YesMetaZFC.SetTheory.Internal

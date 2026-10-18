@@ -57,7 +57,7 @@ theorem Ep_successor_d.branch_l (hZFC : M.Models ZFC) {ω κ K L X R F N S : M.D
   obtain ⟨B, hB⟩ := model.2.1
   obtain ⟨u, hu⟩ := (limit.range B).mp hB
   obtain ⟨a, ha, _⟩ := h.projection.2.1 u (limit.projection.bound_l hu).1
-  obtain ⟨_, hz, _⟩ := h.models
+  obtain ⟨_, hz⟩ := h.codes
   obtain ⟨o, _, hao⟩ := hz.2.1 a ha
   have fs := family.source_l hZF X
   have cs := coherent.source_l I X

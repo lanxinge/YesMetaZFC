@@ -69,4 +69,24 @@ theorem rp_family_model_l (hZF : M.Models ZF) {D Q U B f} (hU : FilterZF.Base_d 
     ⟨f, (hG f).mpr ⟨hfB, hf⟩⟩ R
   exact ⟨G, c, p, C, T, hG, h⟩
 
+/-- 同一实际代表族决定唯一的类、投影和结构码。 -/
+theorem Rp_model_d.unique_l (hE : Extensional M) {D Q U R G c p C T d q N S : M.Domain}
+    (h : Rp_model_d I D Q U R c G p C T) (g : Rp_model_d I D Q U R d G q N S) : c = d := by
+  have ep := g.map.projection.1.1.eq_of_pairMember_iff hE h.map.projection.1.1
+    (fun f B => (g.map.classes f B).trans (h.map.classes f B).symm)
+  subst q
+  have ec := hE.eq_of_same_members N C (fun B => (g.map.range B).trans (h.map.range B).symm)
+  subst N
+  have et : S = T := by
+    apply g.code.2.2.1.eq_of_pairMember_iff hE h.code.2.2.1
+    intro B E
+    have read {a b V W} (m : Rp_model_d I D Q U R a G p C V) (n : Rp_model_d I D Q U R b G p C W)
+        (edge : M.PairMember I B E V) : M.PairMember I B E W := by
+      obtain ⟨f, hf⟩ := (m.map.range B).mp (m.code.2.2.2 B E edge).1
+      obtain ⟨g, hg⟩ := (m.map.range E).mp (m.code.2.2.2 B E edge).2
+      exact (n.relation f g B E hf hg).mpr ((m.relation f g B E hf hg).mp edge)
+    exact ⟨read g h, read h g⟩
+  subst S
+  exact I.unique h.code.1 g.code.1
+
 end YesMetaZFC.SetTheory.Internal
