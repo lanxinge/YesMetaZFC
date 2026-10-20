@@ -48,11 +48,12 @@ theorem it_working_rank_apply_l {ω c₀ α ξ T Q G E H k c d X R Y S κ K K' �
   obtain ⟨κ', _, hκj⟩ := hj.1.1.2.2 κ source.source.cardinal_mem
   obtain ⟨P, hP, power⟩ := owner.power K owner.source.finite_mem
   have reverse : Ea_agree_d ω κ X Y := fun n D B hn hd sub => (agree n D B hn hd sub).symm
-  have family := (localFull.measures_l hZF owner.source hP power).transfer_l reverse
+  have family := (localFull.measures_l hZF owner.source.omega (owner.source.read_source_l hZF) owner.source.code owner.source.theory
+    (sf_finite_power_l hZF owner.source.omega owner.source.transitive owner.source.code owner.source.theory owner.source.finite hP power)).transfer_l reverse
   have critical := ultra.critical_l hZF source.source family owner.source agree localFull hκL my target hκj
   have bound := ultra.support_l hZF source.source family
-    ((localFull.coherent_l hZF owner.source).transfer_l hZF reverse) (localFull.atoms_l hZF owner.source)
-    ((localFull.normal_l hZF owner.source).transfer_l hZF owner.source source.source agree.subset_l)
+    ((localFull.coherent_l hZF (owner.source.read_source_l hZF)).transfer_l hZF reverse) (localFull.atoms_l hZF (owner.source.read_source_l hZF))
+    ((localFull.normal_l hZF (owner.source.read_source_l hZF)).transfer_l hZF owner.source source.source agree.subset_l)
     critical.ordinal hL.1 (hL.1.transitive ω hωL) my target hκj
   obtain ⟨K₁, omegaSource⟩ := ready.source.rebase_l hZF ready.source.omega_mem
     (fun _ h => h) (ready.source.cardinal_small.mono_l ready.source.below)
@@ -98,7 +99,8 @@ theorem it_working_image_l {ω c₀ α ξ T Q G E H k c d X R Y S κ K K' δ A L
   obtain ⟨P, hP, subsets⟩ := powerA K₁ small.finite_mem
   have ord := loc.ordinals_l (ZF.modelsKP hZF) small.transitive
   have same := it_ultra_common_l hZF small source.source powerA loc.2.2.1 loc.2.2.2.1
-    (loc.measures_l hZF small hP subsets) ma my mb mn smallUltra ultra hVA cutV hV' rank' hζ hκV
+    (loc.measures_l hZF small.omega (small.read_source_l hZF) small.code small.theory
+      (sf_finite_power_l hZF small.omega small.transitive small.code small.theory small.finite hP subsets)) ma my mb mn smallUltra ultra hVA cutV hV' rank' hζ hκV
   obtain ⟨V₀, hV₀, r₀⟩ := owner.hierarchy κ owner.source.cardinal_mem ord.1
   obtain ⟨hV₀V, rV⟩ := rank.rank_l hZF owner.source.transitive hV hζ hκV hV₀ r₀
   have hV₀Y := source.source.transitive V hV' V₀ hV₀V

@@ -14,8 +14,10 @@ def tg_run_m {d} (ω c₀ o C γ Z A : Term d) (v : Fin 18 → Term d) (u : Fin 
   ⌜it_pnice_m⌝ₚ(⌜ω⌝ₛ, ⌜c₀⌝ₛ, ⌜v 6⌝ₛ, ⌜v 8⌝ₛ, ⌜v 9⌝ₛ, ⌜v 10⌝ₛ, ⌜v 11⌝ₛ, ⌜v 12⌝ₛ) ∧
   ⌜rd_entry0_m⌝ₚ(⌜v 7⌝ₛ, ⌜v 15⌝ₛ, ⌜v 9⌝ₛ) ∧ ⌜smem_m (𝒞 := kpair_convention_l)⌝ₚ(⌜v 15⌝ₛ, ⌜v 0⌝ₛ, ⌜v 1⌝ₛ) ∧
   ⌜it_map_m⌝ₚ(⌜v 10⌝ₛ, ⌜o⌝ₛ, ⌜v 7⌝ₛ, ⌜v 16⌝ₛ) ∧ ⌜rd_entry0_m⌝ₚ(⌜C⌝ₛ, ⌜v 5⌝ₛ, ⌜v 16⌝ₛ) ∧
-  ⌜tg_anchor_m⌝ₚ(⌜γ⌝ₛ, ⌜Z⌝ₛ, ⌜v 0⌝ₛ, ⌜v 16⌝ₛ) ∧ ⌜rt_record_in_m tg_issued0_m⌝ₚ(⌜v 5⌝ₛ, ⌜v 17⌝ₛ) ∧
-  ⌜rt_tuple_m u⌝ₚ(⌜v 17⌝ₛ) ∧ ⌜u 0⌝ₛ = ⌜ω⌝ₛ ∧ ⌜u 6⌝ₛ = ⌜A⌝ₛ ∧ ⌜γ⌝ₛ ⊆ ⌜u 24⌝ₛ ∧
+  ⌜tg_anchor_m⌝ₚ(⌜γ⌝ₛ, ⌜Z⌝ₛ, ⌜v 0⌝ₛ, ⌜v 16⌝ₛ) ∧
+  ⌜rf_record_m (𝒞 := kpair_convention_l) tg_issued0_m⌝ₚ(⌜v 0⌝ₛ, ⌜v 1⌝ₛ, ⌜v 5⌝ₛ, ⌜v 17⌝ₛ) ∧
+  ⌜rf_tuple_m (𝒞 := kpair_convention_l) (v 0) (v 1) u⌝ₚ(⌜v 17⌝ₛ) ∧
+  ⌜u 0⌝ₛ = ⌜ω⌝ₛ ∧ ⌜u 6⌝ₛ = ⌜A⌝ₛ ∧ ⌜γ⌝ₛ ⊆ ⌜u 24⌝ₛ ∧
   ⌜tg_past_m⌝ₚ(⌜ω⌝ₛ, ⌜u 19⌝ₛ, ⌜v 13⌝ₛ, ⌜v 0⌝ₛ, ⌜v 14⌝ₛ) ∧ ⌜tg_past_links_m⌝ₚ(⌜v 13⌝ₛ, ⌜v 9⌝ₛ) ∧
   ⌜tg_past_roots_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 10⌝ₛ, ⌜o⌝ₛ, ⌜C⌝ₛ, ⌜γ⌝ₛ, ⌜Z⌝ₛ) ∧
   ⌜tg_past_events_m⌝ₚ(⌜ω⌝ₛ, ⌜v 13⌝ₛ, ⌜v 5⌝ₛ, ⌜u 4⌝ₛ, ⌜u 1⌝ₛ, ⌜u 2⌝ₛ, ⌜u 20⌝ₛ) ∧
@@ -29,7 +31,7 @@ def tg_run_m {d} (ω c₀ o C γ Z A : Term d) (v : Fin 18 → Term d) (u : Fin 
     (hγ : γ.freeSupport = []) (hZ : Z.freeSupport = []) (hA : A.freeSupport = [])
     (hv : ∀ i, (v i).freeSupport = []) (hu : ∀ i, (u i).freeSupport = []) : (tg_run_m ω c₀ o C γ Z A v u).FreeClosed := by
   simp -implicitDefEqProofs [tg_run_m, Definitional.Formula.FreeClosed, hw, hc, ho, hC, hγ, hZ, hA, hv, hu,
-    rt_record_in_closed_l _ _ _ tg_issued0_closed_l (hv 5) (hv 17), rt_tuple_closed_l u (v 17) hu (hv 17)]
+    rf_record_closed_l _ tg_issued0_closed_l _ _ _ _ (hv 0) (hv 1) (hv 5) (hv 17)]
 
 theorem tg_run_sat_l {d} (η : Env M d) (ω c₀ o C γ Z A : Term d) (v : Fin 18 → Term d) (u : Fin 46 → Term d) :
     Formula.satisfies η (tg_run_m ω c₀ o C γ Z A v u) ↔
@@ -37,8 +39,8 @@ theorem tg_run_sat_l {d} (η : Env M d) (ω c₀ o C γ Z A : Term d) (v : Fin 1
         (fun i => (v i).eval η) (fun i => (u i).eval η) := by
   simp only [tg_run_m, Formula.satisfies_conj_iff, ic_model_sat_l hZF, tg_context_data_sat_l (ZF.modelsKP hZF),
     Formula.satisfies_mem_iff, KP.succ0_sat_l hZF.1, it_pnice_sat_l hZF, rd_entry0_sat_l hZF.1, smem_sat_l I,
-    it_map_sat_l hZF.1, tg_anchor_sat_l (ZF.modelsKP hZF), rt_record_in_sat_l _ _ _ _ tg_issued0_closed_l,
-    rt_tuple_sat_l hZF.1, Formula.satisfies_extensionalEq_iff_eq hZF.1, Formula.satisfies_subset_iff,
+    it_map_sat_l hZF.1, tg_anchor_sat_l (ZF.modelsKP hZF), rf_record_sat_l I _ _ tg_issued0_closed_l,
+    rf_tuple_sat_l I, Formula.satisfies_extensionalEq_iff_eq hZF.1, Formula.satisfies_subset_iff,
     tg_past_sat_l hZF, tg_past_links_sat_l I hZF.1, tg_past_roots_sat_l (ZF.modelsKP hZF),
     tg_past_events_sat_l hZF.1, tg_common_tree_sat_l hZF.1, tg_past_play_sat_l hZF.1, it_critical_bound_sat_l hZF.1,
     Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,

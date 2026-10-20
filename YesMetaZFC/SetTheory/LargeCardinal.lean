@@ -3,7 +3,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.SourceMeasure
 import YesMetaZFC.SetTheory.LargeCardinal.SourceProjection
 import YesMetaZFC.SetTheory.LargeCardinal.WellFoundedComponents
 import YesMetaZFC.SetTheory.LargeCardinal.Extender
-import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawLow
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawRank
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRelativeStart
 import YesMetaZFC.SetTheory.LargeCardinal.TypeMinusStretch
 import YesMetaZFC.SetTheory.LargeCardinal.TypeElasticRead
 import YesMetaZFC.SetTheory.LargeCardinal.LocalTypeTransportTuple
@@ -42,7 +43,16 @@ import YesMetaZFC.SetTheory.LargeCardinal.Iteration
 `ep_raw_map_l` 已构造实际有限支撑过渡、原 `Ep_arrow_d` 图和常值交换方块。
 共同低层的相对幂集、整个秩历史和有界函数码已识别；下一分量低层的全部成员由所属源有界代表覆盖。
 `er_successor_l` 已装配全部支撑的初等定向极限，并由同一所属源有界池构造下一共同层的完整前驱实现。
-给定地模型的相对初值与整条 `Tg_run_d` 状态迁移仍待完成。
+`er_rank_successor_l` 只用有界坍塌，直接在原关系后继中保持共同层的相对秩、小性和子集封闭；
+低层间的实际单射及逐点交换方块已构造，不再要求所属侧的整体 `It_ultra_d`。
+含 ω 的极限共同层还返回下一层的全部内部有限函数、函数空间及并集闭包，低层单射固定同一个 ω。
+协调律、原子测试及正规性的实际读取已改为消费该有限闭包。
+任意内部程序经原限制编译器进入原关系分离，再由完整前驱回收实际分离集；
+新层的 `Sc_theory_d`、相对幂集和模型码已返回。测度读取及有界商已去掉完整超幂源前提。
+完整内部 ZFC 证书已有实际不可达秩段实例及任意原关系语义解码；普通收集、真值图分离与源内选择
+导出全内部源理论。给定地模型的零轮请求现同时返回实际 `Ep_source_d`、恒等根图及共同低层实现。
+该证书已沿原关系超幂后继保持；三个生产记录搬运调用已使用完整前驱实现。
+完整 `Tg_run_d` 的源字段、实际树边和外部历史元数据迁移仍待完成。
 源内原始不可达性及初始短扩展器判断已构造；不可达性随完整初等图和严格极限秩截断保持。
 严格正则秩截断自动保留同一扩展器的最大强度、实际秩层枚举与全部所属判断。
 完整类型的实际伸展已实现：任意 Vη 中的内部有限元组有无界多个 κ，

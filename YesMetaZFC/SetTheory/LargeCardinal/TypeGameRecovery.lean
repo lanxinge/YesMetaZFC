@@ -73,9 +73,8 @@ theorem Tg_context_d.recover_l {κ K R U W u ν : M.Domain}
   let f : Fin 9 → Term 22 := fun i => [.bound 0, .bound 16, .bound 4, .bound 15, .bound 5,
     .bound 6, .bound 7, .bound 21, .bound 20].get i
   let r : Fin 9 → M.Domain := fun i => [ω, p 18, p 24, p 29, (ψ.bound 3).val, U, W, u, ν].get i
-  obtain ⟨c, H, model⟩ := smdl_membership_l I hZF ⟨ω, context.omega⟩
   have witness : Formula.satisfies (Definitional.Env.substitute ξ f) ts_at0_m :=
-    (sc_relative_sat_l I model fs.transitive nc ts_at0_m ts_at0_closed_l (Definitional.Env.substitute ξ f)
+    (sc_relative_sat_l fs.transitive nc ts_at0_m ts_at0_closed_l (Definitional.Env.substitute ξ f)
       ((⟨r, fun _ => ω⟩ : Env M 9).push C) .newest (fun i => .bound i.succ) rfl (by
         intro i
         exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
@@ -138,7 +137,7 @@ theorem Tg_context_d.recover_l {κ K R U W u ν : M.Domain}
         (sg_set_m (𝒞 := kpair_convention_l) (.bound 0) (.bound 1) (.bound 2) (.bound 3))).mp set)
       funext i
       exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j)))) i
-  have recovered := context.recover_seed_l hZF source nc ξ raw
+  have recovered := (context.kernel_l (context.read_l hZF source).1.transitive nc).recover_seed_l ξ raw
   simp only [tc_recover_result0_m, Formula.satisfies_exists_iff] at recovered
   obtain ⟨A, c, H, r', g, z, π, recovered⟩ := recovered
   let θ := ξ.push A |>.push c |>.push H |>.push r' |>.push g |>.push z |>.push π

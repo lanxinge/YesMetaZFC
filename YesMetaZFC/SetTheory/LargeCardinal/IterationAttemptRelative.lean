@@ -35,7 +35,7 @@ theorem Ep_source_d.sequences_relative_l {ω κ K Z S : M.Domain}
       obtain ⟨n, hn, fn⟩ := (h ⟨f, source.transitive _ (Q.eval ρ).property f hf⟩).mp hf
       exact ⟨n.val, hw ▸ hn, fn⟩
     · rintro ⟨n, hn, fn⟩
-      have hf := sc_finite_function_l hZF source.omega source.transitive code source.theory source.omega_mem
+      have hf := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
         (source.transitive _ (A.eval ρ).property) hn (fn0_of_function_l (ZF.modelsKP hZF) fn)
       exact (h ⟨f, hf⟩).mpr ⟨⟨n, source.transitive ω source.omega_mem n hn⟩, hw ▸ hn, fn⟩
   · intro h f

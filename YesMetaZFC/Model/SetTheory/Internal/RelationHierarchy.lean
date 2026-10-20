@@ -1,4 +1,5 @@
 import YesMetaZFC.Model.SetTheory.Internal.RelationRealization
+import YesMetaZFC.Model.SetTheory.Internal.RelationSubset
 import YesMetaZFC.SetTheory.CumulativeRelativeRestriction
 
 /-! # 原关系共同低层的整个相对秩历史
@@ -11,6 +12,27 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+
+omit hZF in
+def Rr_rank_d (Kp : kpair_convention_l.Interpretation M) (Y S a v : M.Domain) : Prop :=
+  ∃ ha : M.mem a Y, ∃ hv : M.mem v Y,
+    Formula.satisfies (⟨Fin.cases ⟨v, hv⟩ (fun _ => ⟨a, ha⟩), fun _ => ⟨a, ha⟩⟩ :
+      Env (smdl_structure_l Kp (R := S) ⟨a, ha⟩) 2) (v_sigma_m (.bound 1) .newest)
+
+/-- 低层中较早的相对秩段本身对子集封闭，且其全部新成员仍有内部编号。 -/
+theorem rr_rank_low_l {Γ Y S H k α V v : M.Domain}
+    (hΓ : M.TransitiveSet Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
+    (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
+    (pred : ∀ x z, Rd_entry_d x z k → ∀ w, Rd_entry_d w z S ↔ ∃ y, M.mem y x ∧ Rd_entry_d y w k)
+    (closed : Rr_closed_d I Y S H) (small : Rr_small_d I Y S H)
+    (hV : M.mem V Γ) (rank : Vr_d Γ α V) (hVv : Rd_entry_d V v k) :
+    Rr_closed_d I Y S v ∧ Rr_small_d I Y S v := by
+  refine ⟨fun a b ha hb hav sub => ?_, fun a ha hav => ?_⟩
+  · obtain ⟨x, hx, hxa⟩ := (pred V v hVv a).mp hav
+    obtain ⟨A, hA, hAb, bound⟩ := rr_capture_l I closed hΓ fk image pred hxa hb sub
+    exact (pred V v hVv b).mpr ⟨A, rank.subset_mem_l hΓ hV hx hA bound, hAb⟩
+  · obtain ⟨x, hx, hxa⟩ := (pred V v hVv a).mp hav
+    exact small a ha ((image a).mpr ⟨x, hΓ V hV x hx, hxa⟩)
 
 theorem rr_realize_rank_l {c Y S Γ H k α V : M.Domain}
     (model : Smdl_d I c Y S) (ext : Rf_ext_d I Y S) (hΓ : M.TransitiveSet Γ)

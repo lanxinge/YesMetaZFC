@@ -45,8 +45,7 @@ theorem sc_num_local_sat_l (hZF : M.Models ZF) {d} (ρ : Env M d) (Z ω a z : Te
     let b : N.Domain := ⟨a.eval ρ, ha⟩
     let v : N.Domain := ⟨z.eval ρ, hz⟩
     let η : Env N 3 := ⟨Fin.cases v (Fin.cases b (fun _ => w)), fun _ => w⟩
-    obtain ⟨c, R, hc, hR⟩ := smdl_membership_l I hZF ⟨ω.eval ρ, hωZ⟩
-    exact (sc_relative_sat_l I ⟨hc, hR⟩ trans nz φ (sc_num_m_freeClosed _ _ _ rfl rfl rfl)
+    exact (sc_relative_sat_l trans nz φ (sc_num_m_freeClosed _ _ _ rfl rfl rfl)
       η ρ Z _ rfl (Fin.cases rfl (Fin.cases rfl (fun _ => rfl)))).trans
         ((sc_num_sat_l J (rt_model_ext_l hZF.1 trans nz) η (.bound 2) (.bound 1) .newest).trans
           (rt_sc_num_l hZF hδ hV nz w b v hω))

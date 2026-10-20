@@ -113,8 +113,7 @@ theorem Tg_context_d.support_reply_l {ω μ K X R η C l n κ τ U D Q u w b z r
         (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))))) i
     rw [eq]
     exact reply
-  obtain ⟨c, T, code⟩ := smdl_membership_l I hZF ⟨ω, context.omega⟩
-  exact (sc_relative_sat_l I code fs.transitive nc tg_reply0_m tg_reply0_closed_l ρ
+  exact (sc_relative_sat_l fs.transitive nc tg_reply0_m tg_reply0_closed_l ρ
     ((⟨p, fun _ => ω⟩ : Env M 22).push C) .newest (fun i => .bound i.succ) rfl (fun _ => rfl)).mpr valid
 
 end YesMetaZFC.SetTheory.LargeCardinal

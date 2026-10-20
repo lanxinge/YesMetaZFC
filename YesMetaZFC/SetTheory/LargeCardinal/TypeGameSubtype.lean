@@ -58,7 +58,7 @@ theorem Tg_context_d.subtype_l {ω μ K X R η C n κ τ m U w b z u : M.Domain}
   have valid : Formula.satisfies ρ tg_subtype0_m := ts_subtype_reflect_l (ZF.modelsKP hZF) fs.transitive nc
     ρ (.bound 0) (.bound 1) (.bound 2) (.bound 3) (.bound 4) (.bound 5) (.bound 6) (.bound 7) (.bound 8) (.bound 9)
     f hA names (eq.symm ▸ subtype)
-  exact ⟨hp, (sc_relative_sat_l I model fs.transitive nc tg_subtype0_m tg_subtype0_closed_l ρ
+  exact ⟨hp, (sc_relative_sat_l fs.transitive nc tg_subtype0_m tg_subtype0_closed_l ρ
     ((⟨p, fun _ => ω⟩ : Env M 17).push C) .newest (fun i => .bound i.succ) rfl (fun _ => rfl)).mpr valid⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

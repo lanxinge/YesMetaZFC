@@ -51,12 +51,14 @@ theorem ep_set_copy_l {ω κ κ' K K' K₂ K₀ K₁ L L' X R Y S H Q H' Q' c d 
   obtain ⟨P₁, hP₁, pow₁⟩ := power' K₁ owner'.finite_mem
   have reverse : Ea_agree_d ω κ H X := fun n D B hn hd sub => (agree n D B hn hd sub).symm
   have reverse' : Ea_agree_d ω κ' H' Z := fun n D B hn hd sub => (agree' n D B hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP₀ pow₀).transfer_l reverse
-  have family' := (loc'.measures_l hZF owner' hP₁ pow₁).transfer_l reverse'
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
-  have coherent' := (loc'.coherent_l hZF owner').transfer_l hZF reverse'
-  have normal := (loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l
-  have normal' := (loc'.normal_l hZF owner').transfer_l hZF owner' ambient agree'.subset_l
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP₀ pow₀)).transfer_l reverse
+  have family' := (loc'.measures_l hZF owner'.omega (owner'.read_source_l hZF) owner'.code owner'.theory
+    (sf_finite_power_l hZF owner'.omega owner'.transitive owner'.code owner'.theory owner'.finite hP₁ pow₁)).transfer_l reverse'
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
+  have coherent' := (loc'.coherent_l hZF (owner'.read_source_l hZF)).transfer_l hZF reverse'
+  have normal := (loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l
+  have normal' := (loc'.normal_l hZF (owner'.read_source_l hZF)).transfer_l hZF owner' ambient agree'.subset_l
   have hP := ultra.transitive_l hZF mdl.1
   have hZ' := big.transitive_l hZF hz'.1
   obtain ⟨X₀, R₀, P₀, Q₀, J, O, U, A, p, T, V, q, e, C, W, i, g,
@@ -140,9 +142,9 @@ theorem ep_set_copy_l {ω κ κ' K K' K₂ K₀ K₁ L L' X R Y S H Q H' Q' c d 
     have same := (ff'.mono_target_l inside).ext_l hZF.1 cf (fun s hs => ⟨x', fc' s hs, cc s hs⟩)
     exact copied a a' f f' y y' haa hff ⟨E, fv, hEy⟩ (same.symm ▸ value')
   have seed := (ep_seed_collapse_l hZF source ord.1.transitive ord.2.transitive hωL family coherent
-    (loc.atoms_l hZF owner) normal system limit wc (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1)).2
+    (loc.atoms_l hZF (owner.read_source_l hZF)) normal system limit wc (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1)).2
   have seed' := (ep_seed_collapse_l hZF ambient ord'.1.transitive ord'.2.transitive hωL' family' coherent'
-    (loc'.atoms_l hZF owner') normal' system₁ limit₁ wc₁ (fn0_of_function_l (ZF.modelsKP hZF) bij₁.1.1)).2
+    (loc'.atoms_l hZF (owner'.read_source_l hZF)) normal' system₁ limit₁ wc₁ (fn0_of_function_l (ZF.modelsKP hZF) bij₁.1.1)).2
   have fixed α α' (hα : M.mem α L) (hαα : Rd_entry_d α α' σ) : Rd_entry_d α α' k := by
     obtain ⟨E, hE, s⟩ := ep_seed_exists_l hZF source family system limit hα
     obtain ⟨E', hE', hEE⟩ := hτ.1.1.2.2 E hE

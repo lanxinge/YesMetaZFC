@@ -97,7 +97,7 @@ theorem Tg_context_d.language_peer_l {r B R x S y T π σ C₀ κ K κ' K' L W :
   have vrY := rank'.of_rank_l hZF next.transitive hW' hBW vrW
   have hBY := next.transitive W hW' (p 3) hBW
   have vrD := (target.rank.rank_l hZF next.transitive target.member target.limit (inside _ hkW) hBY vrY).2
-  refine ⟨hn, all, nd, θ, fun _ => rfl, target.language_l hZF next nd θ ?_⟩
+  refine ⟨hn, all, nd, θ, fun _ => rfl, (target.kernel_l (target.read_l hZF next).1.transitive nd).language_l θ ?_⟩
   simp only [ee_rebuild_seed_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff]
   refine ⟨(Formula.satisfies_isOmega_iff ..).mpr (rt_omega_l ft.transitive nd hZF.1 _
       (show M.IsOmega (p 0) from hw.symm ▸ source.omega)),

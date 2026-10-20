@@ -34,10 +34,11 @@ theorem It_local_d.successors_l {ω κ K X R K' Y S L F : M.Domain}
   obtain ⟨N', V', b', d', j', _, successor', ultra', code', target', _, next', nb', nh', np', nc', ns'⟩ :=
     loc.node_l hZFC owner owner ob oh op oc os (fun _ h => h) (fun _ _ _ _ _ _ => Iff.rfl) ob hP subsets
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP subsets).transfer_l reverse
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
-  have atoms := loc.atoms_l hZF owner
-  have normal := (loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP subsets)).transfer_l reverse
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
+  have atoms := loc.atoms_l hZF (owner.read_source_l hZF)
+  have normal := (loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have local_copy := loc
   obtain ⟨_, _, _, _, pre⟩ := local_copy

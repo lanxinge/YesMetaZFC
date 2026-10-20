@@ -55,8 +55,7 @@ theorem ts_program_peer_l (hω : M.IsOmega ω)
         (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j)))))))))))) i
   have moved := (smap_numeric_peer_l hZF hω bt xt yt mb mx my j k hwB iC iD ct dt nc nd
     ts_numeric0_m ts_numeric0_closed_l ξ θ (fun _ => rfl) low).mp code
-  obtain ⟨c, H, model⟩ := smdl_membership_l I hZF ⟨ω, hwD⟩
-  exact ⟨inD, (sc_relative_sat_l I model dt nd ts_numeric0_m ts_numeric0_closed_l θ
+  exact ⟨inD, (sc_relative_sat_l dt nd ts_numeric0_m ts_numeric0_closed_l θ
     ((⟨q, fun _ => ω⟩ : Env M 11).push D) .newest (fun i => .bound i.succ) rfl (fun _ => rfl)).mpr moved⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -66,7 +66,7 @@ theorem Smap_d.sequences_l {ω c d X R Y S j A A' K K' : M.Domain}
   · obtain ⟨n, hnω, fn⟩ := (read f (hY K' (hj.1.1.output_mem_of_pairMember hK) f hf)).mp hf
     exact ⟨n, hnω, fn0_function_l (ZF.modelsKP hZF) fn⟩
   · have fn := fn0_of_function_l (ZF.modelsKP hZF) fn
-    exact (read f (sc_finite_function_l hZF hω hY hn theory (hj.1.1.output_mem_of_pairMember hωj)
+    exact (read f (sc_finite_function_l hZF hω hY theory.algebra.pair theory.algebra.union (hj.1.1.output_mem_of_pairMember hωj)
       (hY A' (hj.1.1.output_mem_of_pairMember hA)) hnω fn)).mpr ⟨n, hnω, fn⟩
 
 theorem sc_sequences_iff_l {ω c d X R Y S q : M.Domain}
@@ -125,7 +125,7 @@ theorem sc_sequences_iff_l {ω c d X R Y S q : M.Domain}
           exact ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) hf⟩
         · rintro ⟨n, hnω, hf⟩
           have fn := fn0_of_function_l (ZF.modelsKP hZF) hf
-          exact (spec f (sc_finite_function_l hZF hω hZ hc theory hωZ (hZ A hA) hnω fn)).mpr ⟨n, hnω, fn⟩
+          exact (spec f (sc_finite_function_l hZF hω hZ theory.algebra.pair theory.algebra.union hωZ (hZ A hA) hnω fn)).mpr ⟨n, hnω, fn⟩
       refine ⟨fun A hA => ?_, fun A K μ e hA _ hμ he hK hw idx => ?_⟩
       · obtain ⟨K, hk, spec, _⟩ := target A hA
         exact ⟨K, hk, full A K hA hk spec⟩

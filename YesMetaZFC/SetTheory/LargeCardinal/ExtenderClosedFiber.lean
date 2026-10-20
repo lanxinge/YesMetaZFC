@@ -21,8 +21,9 @@ theorem es_closed_joint_fiber_l {ω κ K Y R L F V S P A B : M.Domain}
     ∃ f g, M.mem f Y ∧ M.mem g Y ∧ M.IsSetInjectionFromTo I f ω L ∧ Fn0_d ω κ g ∧
       (∀ i a j x, Rd_entry_d i a A → Rd_entry_d j x a → ∃ n, Rd_entry_d n x f) ∧
       ∀ i a E, Rd_entry_d i a A → Rd_entry_d i E B → ∃ r, M.mem r E ∧ Ec_eval_d ω κ L f g a r := by
-  have family := loc.measures_l hZF owner hV power
-  have coherent := loc.coherent_l hZF owner
+  have family := loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hV power)
+  have coherent := loc.coherent_l hZF (owner.read_source_l hZF)
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have local_copy := loc
   obtain ⟨hw, hk, hl, hf, pre⟩ := local_copy

@@ -23,7 +23,11 @@ theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
     a, h, _, _, _, _, ε, seed, hw, _, _, hS, _, _, _, _, _, _, _, _, _, limit, letters,
     α, T, Q, G, π, ha, tree, hc, self, iC, anchor, ℓ, issued⟩ := game.root_l hZFC woodin root win
   let ι := tg_issued_start_env_d ρ ε a h ℓ (ρ.bound 2)
-  obtain ⟨r', record', values⟩ := context.save_issued_l hZF source.source nc ι issued
+  obtain ⟨r', record', values⟩ := rt_record_in_save_l hZF.1 tg_issued0_m tg_issued0_closed_l
+    (context.read_l hZF source.source).1.transitive (context.read_l hZF source.source).1.pair nc ι issued
+  have values := (rf_tuple_mem_l I hZF.1 source.source.transitive code _).mpr
+    ⟨source.source.transitive C context.member r' record'.member_l, values⟩
+  have record' := (rf_record_mem_l I source.source.transitive code tg_issued0_m).mpr ⟨context.member, record'⟩
   have zero : (ι.bound 19).val = p.e := eqρ 1
   have high : (ι.bound 24).val = (ε.bound 5).val := rfl
   have memS : M.mem p.S X := hS ▸ source.source.transitive C context.member _ (ε.bound 3).property
@@ -31,14 +35,9 @@ theorem Tg_game_d.run_start_l {p : Tg_params_d M.Domain} {A F₀ L₀ G₀ J₀ 
   obtain ⟨S', _, image⟩ := rootMap.1.1.2.2 p.S memS
   have image : Rd_entry_d p.S p.S π := tree.tree.diagram.identity p.e π self p.S S' image ▸ image
   have image : Rd_entry_d p.S (ι.bound 7).val π := (eqρ 7).symm ▸ image
-  -- 原首轮扩展器的实际临界点严格超过 ω；这一事实也在对手落子前成立。
-  have prep := context.pad_round_l hZFC nc ε source tree ha hc code hw game.setup.empty self iC anchor
-    (fun _ h => h) (fun _ _ ⟨q,_,hq⟩ => (game.setup.empty q hq).elim) seed
-  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
-    _, _, _, _, _, _, _, j, N, R', _, _, _, _, _, _, _, _, _, _,
-    _, _, _, _, mn, ready, ultra, crit, _⟩ := prep
-  have hwκ := crit.omega_lt_l hZF game.setup.omega source.source.transitive ready.source.transitive
-    code mn (ultra.elementary_l hZF code.1 mn.1) source.source.omega_mem
+  -- 原所属短扩展器已经断言 ω∈κ；零轮不预先实施一条树边。
+  have hwκ : M.mem p.ω (ε.bound 5).val := hw ▸
+    tg_successor_omega_l ε ((context.kernel_l (context.read_l hZF source.source).1.transitive nc).renew_l ε seed)
   have omega : M.mem p.ω (ε.bound 14).val := anchor.rank.ordinal_subset_l hZF source.source.transitive anchor.member p.ω hwκ
   have he := num_mem_l hZF.1 game.setup.omega (show Num_d 0 p.e from game.setup.empty)
   have below := limit.1.empty_mem_of_nonempty (ZF.modelsKP hZF) limit.2.1 game.setup.empty

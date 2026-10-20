@@ -31,8 +31,9 @@ theorem It_ultra_d.closed_l {ω κ K X R K' Y R' L F c d N S j : M.Domain}
   subst X₀ R₀ N₀ S₀
   obtain ⟨P, hP, subsets⟩ := op K' owner.finite_mem
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP subsets).transfer_l reverse
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP subsets)).transfer_l reverse
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have local_copy := loc
   obtain ⟨_, _, hLY, _, pre⟩ := local_copy
@@ -40,7 +41,7 @@ theorem It_ultra_d.closed_l {ω κ K X R K' Y R' L F c d N S j : M.Domain}
   have hωL := hL.1.transitive κ pre.1.2.2.2.2.1 ω pre.1.2.2.1
   have below := hL.1.transitive ω hωL
   have fixed := (ep_seed_collapse_l hZF source ord.1.transitive hL.1.transitive below family coherent
-    (loc.atoms_l hZF owner) ((loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l)
+    (loc.atoms_l hZF (owner.read_source_l hZF)) ((loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l)
     system limit wc (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1)).2
   have hLN := ep_support_mem_l hZFC source family coherent system limit model hN hn he fixed ord.1 hL.1
   have hw := hj.omega_l I hZF source.omega source.transitive hN hm hn source.omega_mem

@@ -39,11 +39,12 @@ theorem Ic_model_d.apply_l {ω κ K X R K' Y S L F c : M.Domain}
     fun x y => (js x y).trans ⟨And.right, fun ⟨z, hxz, hzy⟩ => ⟨hi.1.1.input_mem_of_pairMember hxz, z, hxz, hzy⟩⟩⟩
   obtain ⟨K₁, next⟩ := h.ultra_l hZFC owner agree closed op oc bound sizes hL loc strength hm hn ultra
   have reverse : Ea_agree_d ω κ Y X := fun n D B hn hd sub => (agree n D B hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP ps).transfer_l reverse
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP ps)).transfer_l reverse
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have seed := (ep_seed_collapse_l hZF h.source ord.1.transitive hL.1.transitive below family coherent
-    (loc.atoms_l hZF owner) ((loc.normal_l hZF owner).transfer_l hZF owner h.source agree.subset_l)
+    (loc.atoms_l hZF (owner.read_source_l hZF)) ((loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner h.source agree.subset_l)
     system limit wc (fn0_of_function_l (ZF.modelsKP hZF) bij.1.1)).2
   have hLN := ep_support_mem_l hZFC h.source family coherent system limit model ht hn he seed ord.1 hL.1
   obtain ⟨K₀, ready⟩ := next.rebase_l hZF hLN below

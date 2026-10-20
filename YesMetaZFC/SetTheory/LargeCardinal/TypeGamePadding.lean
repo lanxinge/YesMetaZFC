@@ -53,7 +53,7 @@ theorem Tg_context_d.pad_round_l {c₀ α ξ T J G E H c R μ K o π Cᵣ γ Z�
         ∃ π₂, It_map_d G₂ o β π₂ ∧ Rd_entry_d Cᵣ C' π₂ ∧ Tg_anchor_d γ Z₀ N π₂ ∧
           Tg_past_update_d hZF ω X (p 5) α X R μ K η C L W N κ' j J J₂
             (fun i => ((tg_round_env_d ρ v).bound i).val) := by
-  obtain ⟨v, valid⟩ := tg_successor_read_l ρ seed (context.renew_l hZF owner.source nc ρ seed)
+  obtain ⟨v, valid⟩ := tg_successor_read_l ρ seed ((context.kernel_l (context.read_l hZF owner.source).1.transitive nc).renew_l ρ seed)
   let ε := tg_round_env_d ρ v
   obtain ⟨β, T₁, J₁, G₁, E₁, c₁, id, padded, pad, hc₁, nextNode, edge₁, identity, empty⟩ := tree.pad_l hZF succ
   have eq := tree.tree.diagram.model_function.2 ξ c₁ c hc₁ hc

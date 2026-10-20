@@ -1,3 +1,4 @@
+import YesMetaZFC.Model.SetTheory.Internal.RelationLow
 import YesMetaZFC.Model.SetTheory.Internal.RelationSeparationSource
 import YesMetaZFC.Model.SetTheory.Internal.RelationTraceFamily
 import YesMetaZFC.SetTheory.Filter.SourceUltrafilter
@@ -56,10 +57,8 @@ theorem Smap_d.subsets_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H : M.Doma
     Formula.satisfies_imp_iff, Formula.satisfies_subset_iff, Formula.satisfies_mem_iff] at moved
   exact fun a b ha hb h sub => moved ⟨a, ha⟩ h ⟨b, hb⟩ (fun x => sub x.val x.property)
 
-theorem Smap_d.capture_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k D d Z : M.Domain}
-    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : M.PairMember I B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+theorem rr_capture_l {Y S H Γ k D d Z : M.Domain}
+    (closed : Rr_closed_d I Y S H)
     (hΓ : M.TransitiveSet Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ a, M.PairMember I a H S ↔ ∃ x, M.mem x Γ ∧ M.PairMember I x a k)
     (pred : ∀ x a, M.PairMember I x a k → ∀ b,
@@ -69,18 +68,17 @@ theorem Smap_d.capture_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k D d
     ∃ A, M.mem A Γ ∧ M.PairMember I A Z k ∧ M.MemberSubset A D := by
   have hd := fk.1.output_mem_of_pairMember hDd
   have hDH := (image d).mpr ⟨D, fk.1.input_mem_of_pairMember hDd, hDd⟩
-  obtain ⟨A, hA, hAZ⟩ := (image Z).mp (hq.subsets_raw_l I hZF hω hX hm model hBH closed d Z hd hZ hDH sub)
+  obtain ⟨A, hA, hAZ⟩ := (image Z).mp (closed d Z hd hZ hDH sub)
   refine ⟨A, hA, hAZ, fun s hs => ?_⟩
   obtain ⟨x, hx, hsx⟩ := fk.1.2.2 s (hΓ A hA s hs)
   obtain ⟨r, hr, hrx⟩ := (pred D d hDd x).mp (sub x hx ((pred A Z hAZ x).mpr ⟨s, hs, hsx⟩))
   exact fk.2 r s x hrx hsx ▸ hr
 
 /-- 每个实际坐标子集都是共同低层中的同一个集合，而不只是与之同构。 -/
-theorem Rt_source_d.recover_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k D d t P : M.Domain}
+theorem Rt_source_d.recover_l (hZF : M.Models ZF) {ω c X R c' Y S q H Γ k D d t P : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
     (theory : Sc_theory_d I ω X R) (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
-    (hBH : M.PairMember I B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (closed : Rr_closed_d I Y S H)
     (hΓ : M.TransitiveSet Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ a, M.PairMember I a H S ↔ ∃ x, M.mem x Γ ∧ M.PairMember I x a k)
     (pred : ∀ x a, M.PairMember I x a k → ∀ b,
@@ -94,7 +92,7 @@ theorem Rt_source_d.recover_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k D 
   -- 先在原模型内截到 d；子集闭包把这个新集合码放回原常值像 H。
   obtain ⟨Q, hQ, cut⟩ := sc_cut_raw_l I hZF hω hX hm theory model hq true hd hZY
   have cut x hx : M.PairMember I x Q S ↔ M.PairMember I x d S ∧ M.PairMember I x Z S := cut x hx
-  have hQH := hq.subsets_raw_l I hZF hω hX hm model hBH closed d Q hd hQ hDH
+  have hQH := closed d Q hd hQ hDH
     (fun x hx h => ((cut x hx).mp h).1)
   obtain ⟨A₀, hA₀, hAQ⟩ := (image Q).mp hQH
   -- 两向使用完整前驱方程和实现图的单射性，得到背景集合的字面相等。
@@ -153,11 +151,10 @@ theorem Rt_source_d.field_l (hZF : M.Models ZF) {ω c X R c' Y S q D d t P : M.D
     · exact iff_of_false (fun h => hs (bounds C hC s h)) (fun h => hs (bounds A hA s h.1))
 
 /-- 任意已有低层实现直接提供真实测度的原关系坐标与限制，供递归后继重用。 -/
-theorem Smap_d.measure_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k N D U : M.Domain}
+theorem Smap_d.measure_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q H Γ k N D U : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
     (theory : Sc_theory_d I ω X R) (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
-    (hBH : M.PairMember I B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (closed : Rr_closed_d I Y S H)
     (hΓ : M.TransitiveSet Γ) (inside : M.MemberSubset Γ N) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ z, M.PairMember I z H S ↔ ∃ x, M.mem x Γ ∧ M.PairMember I x z k)
     (pred : ∀ x z, M.PairMember I x z k → ∀ w, M.PairMember I w z S ↔ ∃ y, M.mem y x ∧ M.PairMember I y w k)
@@ -172,7 +169,7 @@ theorem Smap_d.measure_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k N D
   have domain s x (hsx : M.PairMember I s x t) := (pred D d hDd x).mpr
     ⟨s, ((ht.2 s x).mp hsx).1, ((ht.2 s x).mp hsx).2⟩
   obtain ⟨P, hP⟩ := rt_source_exists_l I hZF Y S D t
-  have low := hP.recover_l I hZF hω hX hm theory model hq hBH closed hΓ fk image pred hDd ht
+  have low := hP.recover_l I hZF hω hX hm theory model hq closed hΓ fk image pred hDd ht
   have contains : M.MemberSubset P N := fun A hA => inside A (low A hA)
   obtain ⟨U', ultra, restriction⟩ := measure.restrict_l (ZF.modelsKP hZF) contains
     (hP.field_l I hZF hω hX hm theory model hq hd ft domain)

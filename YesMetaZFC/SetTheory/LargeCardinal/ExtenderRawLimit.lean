@@ -1,4 +1,5 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRawAssembly
+import YesMetaZFC.Model.SetTheory.Internal.ZfcTransfer
 
 /-! # 全部原关系支撑的实际初等极限
 
@@ -12,12 +13,12 @@ variable {M : Structure.{u}} (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem er_ultrapower_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domain}
+theorem er_ultrapower_l {ω c X R c' Y S q H N κ K L F R₀ Γ γ k : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d I c X R)
     (theory : Sc_theory_d I ω X R) (collection : Sc_collection_d I ω X R)
-    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : Rd_entry_d B H q)
-    (trans : M.TransitiveSet B) (small : Sc_small_d X B)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
+    (small : Rr_small_d I Y S H)
+    (closed : Rr_closed_d I Y S H)
     (owner : Ep_source_d hZF ω κ K N R₀) (hΓ : M.mem Γ N) (rank : Vr_d N γ Γ)
     (hγ : M.IsLimitOrdinal γ) (hκ : M.mem κ Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
@@ -26,15 +27,16 @@ theorem er_ultrapower_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domai
     ∃ J O Z A p T V r o C W i q', Er_system_d I ω κ L Y S F k J O Z A p T V ∧
       Di_limit_d A p T V r C W ∧ Smdl_d I o C W ∧ Di_elementary_d I ω O A p T V ∧
       Smap_d I ω c' o Y C i ∧ Smap_d I ω c o X C q' ∧
+      (Zc_model_d I ω c X R → Zc_model_d I ω o C W) ∧
       (∀ x z, Rd_entry_d x z q' ↔ M.mem x X ∧ ∃ y, Rd_entry_d x y q ∧ Rd_entry_d y z i) ∧
       ∃ a D, (∀ z, ¬ M.mem z a) ∧ Ep_space_d κ a D ∧
         ∀ x E, Rd_entry_d x E i → ∃ B f u, Fn0_d D Y f ∧ M.mem f B ∧ Rs_const_d D x f ∧
           KPair_d M u a B ∧ Rd_entry_d u E r := by
   obtain ⟨J, O, indices, order, os⟩ := ei_order_l hZF hω above
-  obtain ⟨Z, Q, hz, components⟩ := er_components_l hZF hω hX mx theory collection model hq hBH trans small closed
+  obtain ⟨Z, Q, hz, components⟩ := er_components_l hZF hω hX mx theory collection model hq small closed
     owner hΓ rank hγ hκ fk image pred family (fun a ha => (indices a).mp ha)
   obtain ⟨A, p, T, V, graph⟩ := eg_graphs_l hZF (κ := κ) (X := Y) order os indices hz
-  have maps {a b o₀ o₁ m n r : M.Domain} := er_component_map_l hZFC hω hX mx theory collection model hq hBH trans small closed
+  have maps {a b o₀ o₁ m n r : M.Domain} := er_component_map_l hZFC hω hX mx theory collection model hq small closed
     owner hΓ rank hγ fk image pred family coherent (a := a) (b := b) (o₀ := o₀) (o₁ := o₁) (m := m) (n := n) (r := r)
   have transition : Eg_transition_d I ω κ L Y O Z := by
     intro a b hab
@@ -73,7 +75,8 @@ theorem er_ultrapower_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domai
   obtain ⟨i, hi, square⟩ := smap_comp_l I hZF hi₀ hv
   obtain ⟨q', hq', composition⟩ := smap_comp_l I hZF hq hi
   refine ⟨J, O, Z, A, p, T, V, r, o, C, W, i, q', ⟨graph, components, diagram, lifts⟩,
-    limit, mc, elementary, hi, hq', composition, a, D, empty, space, fun x E hxE => ?_⟩
+    limit, mc, elementary, hi, hq', (fun certificate => certificate.map_l hZF hω mc hq'),
+    composition, a, D, empty, space, fun x E hxE => ?_⟩
   obtain ⟨_, B₁, hxB, hBE⟩ := (square x E).mp hxE
   obtain ⟨_, _, f, ff, hf, fc⟩ := (const x B₁).mp hxB
   obtain ⟨_, u, pair, huE⟩ := (values B₁ E).mp hBE

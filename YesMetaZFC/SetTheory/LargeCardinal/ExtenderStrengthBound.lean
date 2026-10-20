@@ -38,7 +38,7 @@ theorem ep_inaccessible_bound_l {ω κ K L X R F J O Z A p T S q C W b d N V i t
   obtain ⟨U, hU, hKU, hPU⟩ := ZF.v_joint_bound_l I hZF hB rank.finite_mem hPB
   have node_rank u (node : Eb_node_d ω κ L K P J X X u) : M.mem u B := by
     obtain ⟨a, _, f, _, pair, n, hn, D, _, ha, space, ff⟩ := node
-    have haB := sc_finite_function_l hZF source.omega rank.transitive code rank.theory rank.omega_mem
+    have haB := sc_finite_function_l hZF source.omega rank.transitive rank.theory.algebra.pair rank.theory.algebra.union rank.omega_mem
       (ZF.v_ordinal_subset_l I hZF hB) hn ha
     have hfB := ZF.v_relation_mem_l I hZF hB hr.isLimitOrdinal hU (fun p hp => by
       obtain ⟨s, hd, x, hx, pair⟩ := ff.1 p hp

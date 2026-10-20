@@ -97,7 +97,7 @@ theorem Tg_context_d.answer_members_l {ω X R μ K η C Y S μ' K' η' D B T r c
   have links (i : Fin 4) : (ψ.bound (i.castAdd 3)).val =
       [(ρ.bound 16).val, (ρ.bound 17).val, (ρ.bound 23).val, (ρ.bound 24).val].get i :=
     (eqψ (i.castAdd 3)).trans (same i)
-  have compare := context.reply_queries_l hZF owner nc ρ round
+  have compare := (context.kernel_l (context.read_l hZF owner).1.transitive nc).reply_queries_l ρ round
   simp only [tg_reply_compare0_m, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
     Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at compare
   have facts := compare (ψ.bound 4) (ψ.bound 5) (ψ.bound 6) (by

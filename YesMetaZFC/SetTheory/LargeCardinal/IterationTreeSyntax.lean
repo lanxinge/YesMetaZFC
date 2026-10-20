@@ -52,7 +52,7 @@ theorem it_active_sat_l {d} (η : Env M d) (ω c a b j p : Term d)
     (trans : ∀ X R, Smem_d I (c.eval η) X R → M.TransitiveSet X) :
     Formula.satisfies η (it_active_m ω c a b j p) ↔
       It_active_d hZF (ω.eval η) (c.eval η) (a.eval η) (b.eval η) (j.eval η) (p.eval η) := by
-  have read κ L F X R Y S (model : Smem_d I (c.eval η) X R) := ex_local_sat_l hZF
+  have read κ L F X R Y S (model : Smem_d I (c.eval η) X R) := ex_local_sat_l
     (((((((η.push κ).push L).push F).push X).push R).push Y).push S)
     ω.weaken.weaken.weaken.weaken.weaken.weaken.weaken (.bound 6) (.bound 5) (.bound 3) (.bound 4) (trans X R model)
   simp only [Definitional.Term.eval_weaken, Term.eval_bound_zero_push, Term.eval_bound_one_push, Term.eval_bound_two_push, Term.eval_bound_three_push, Term.eval_bound_four_push, Term.eval_bound_five_push, Term.eval_bound_six_push] at read
@@ -149,7 +149,7 @@ theorem it_pnice_sat_l {d} (η : Env M d) (ω c α T Q G E L : Term d) :
     have strong := it_strength_sat_l hZF ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
         ω.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken (.bound 5) (.bound 4) (.bound 1) (.bound 3)
         (by simpa only [Definitional.Term.eval_weaken] using tree.omega)
-    have inaccessible := ex_inaccessible_sat_l hZF ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
+    have inaccessible := ex_inaccessible_sat_l ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
         ω.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken (.bound 1) (.bound 4) (trans tree i a X R ha mx)
     simp only [Definitional.Term.eval_weaken, Term.eval_bound_zero_push, Term.eval_bound_one_push, Term.eval_bound_two_push, Term.eval_bound_three_push, Term.eval_bound_four_push, Term.eval_bound_five_push] at strong inaccessible
     exact ⟨strong.mp strength, inaccessible.mp card⟩
@@ -160,7 +160,7 @@ theorem it_pnice_sat_l {d} (η : Env M d) (ω c α T Q G E L : Term d) :
     have strong := it_strength_sat_l hZF ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
         ω.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken (.bound 5) (.bound 4) (.bound 1) (.bound 3)
         (by simpa only [Definitional.Term.eval_weaken] using nice.tree.omega)
-    have inaccessible := ex_inaccessible_sat_l hZF ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
+    have inaccessible := ex_inaccessible_sat_l ((((((((η.push i).push p).push κ).push ρ).push F).push a).push X).push R)
         ω.weaken.weaken.weaken.weaken.weaken.weaken.weaken.weaken (.bound 1) (.bound 4) (trans nice.tree i a X R ha mx)
     simp only [Definitional.Term.eval_weaken, Term.eval_bound_zero_push, Term.eval_bound_one_push, Term.eval_bound_two_push, Term.eval_bound_three_push, Term.eval_bound_four_push, Term.eval_bound_five_push] at strong inaccessible
     exact ⟨strong.mpr strength, inaccessible.mpr card⟩

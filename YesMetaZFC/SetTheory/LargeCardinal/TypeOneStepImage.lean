@@ -41,11 +41,12 @@ theorem Ee_one_step_d.image_l {ω κ δ n u τ m w b a z B U D η A c₀ R₀ r 
   have κlimit := (hj.limit_l hZF hω source.transitive hY mx my hκj).mp language.limit
   have hκU := (hj.member_l I hZF hω mx my hκj hU).mp ((language.constants κ).mpr (Or.inr rfl))
   obtain ⟨P, hP, power⟩ := sc_v_power_l hZF hδ hX K source.finite_mem
-  have family := loc.measures_l hZF source hP power
+  have family := loc.measures_l hZF source.omega (source.read_source_l hZF) source.code source.theory
+    (sf_finite_power_l hZF source.omega source.transitive source.code source.theory source.finite hP power)
   have ord := loc.ordinals_l (ZF.modelsKP hZF) source.transitive
   have below : M.MemberSubset ω L := fun i hi => ord.2.transitive κ hκL i (source.below i hi)
-  have bound := ultra.support_l hZF source family (loc.coherent_l hZF source) (loc.atoms_l hZF source)
-    (loc.normal_l hZF source) ord.1 ord.2 below mx my hκj
+  have bound := ultra.support_l hZF source family (loc.coherent_l hZF (source.read_source_l hZF)) (loc.atoms_l hZF (source.read_source_l hZF))
+    (loc.normal_l hZF (source.read_source_l hZF)) ord.1 ord.2 below mx my hκj
   have critical := ultra.critical_l hZF source family source (fun _ _ _ _ _ _ => Iff.rfl) loc hκL mx my hκj
   have hτL := ord.2.transitive ℓ hℓL τ hτℓ
   have sub : Ts_subtype_d ω n ℓ τ m V w b σ z u' := by

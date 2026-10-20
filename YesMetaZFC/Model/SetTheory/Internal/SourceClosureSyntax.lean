@@ -19,15 +19,45 @@ variable {M : Structure.{u}}
     (Formula.isFunctionSpace kpair_convention_l E ω X).FreeClosed := by
   simp -implicitDefEqProofs [Formula.isFunctionSpace, Definitional.Formula.FreeClosed, he, hw, hx]
 
-/-- 相对化直接读取已有实际隶属模型；不改变原公式或其量词强度。 -/
-theorem sc_relative_sat_l (I : kpair_convention_l.Interpretation M) {c X R : M.Domain}
-    (hm : Smem_d I c X R) (hX : M.TransitiveSet X) (nx : Nonempty {x // M.mem x X})
-    {n d} (φ : Formula 1 n) (hc : φ.FreeClosed) (η : Env (rt_model_l X nx) n)
-    (ρ : Env M d) (T : Term d) (e : Fin n → Term d)
-    (ht : T.eval ρ = X) (he : ∀ i, (e i).eval ρ = (η.bound i).val) :
-    Formula.satisfies ρ (lr_rel_m φ T e) ↔ Formula.satisfies η φ :=
-  (lr_rel_decode_l I hm.1 hm.2 hX φ hc ⟨η.bound, η.free⟩ ρ T e ht he).trans
-    (smem_formula_l I hm nx φ η).symm
+/-- 相对化只需结构内部的传递性；背景结构本身可以是未坍塌的商关系。 -/
+theorem sc_relative_sat_l {C : M.Domain} (trans : M.TransitiveSet C)
+    (nc : Nonempty {x // M.mem x C}) {n d} (φ : Formula 1 n) (closed : φ.FreeClosed)
+    (ρ : Env (rt_model_l C nc) n) (η : Env M d) (T : Term d) (a : Fin n → Term d)
+    (hT : T.eval η = C) (params : ∀ i, (a i).eval η = (ρ.bound i).val) :
+    Formula.satisfies η (lr_rel_m φ T a) ↔ Formula.satisfies ρ φ := by
+  have term {n d} (ρ : Env (rt_model_l C nc) n) (η : Env M d) (a : Fin n → Term d)
+      (ha : ∀ i, (a i).eval η = (ρ.bound i).val) (t : Term n) (ht : t.freeSupport = []) :
+      (t.bind a).eval η = (t.eval ρ).val := by
+    cases t with
+    | free _ => cases ht
+    | bound i => exact ha i
+  induction φ generalizing d <;> simp only [Definitional.Formula.FreeClosed] at closed
+  case falsum | truth => rfl
+  case mem s t =>
+    simp only [lr_rel_m, Formula.satisfies_mem_iff, term ρ η a params s closed.1,
+      term ρ η a params t closed.2]; rfl
+  case atom r hr ts =>
+    have eq := rt_model_delta_l trans nc (φ := .atom r hr ts) (.atom ..) ρ
+    cases r <;>
+      simpa only [lr_rel_m, Formula.satisfies_atom_extensionalEq_iff,
+        Formula.satisfies_atom_subset_iff, Definitional.TermVector.get_bind,
+        term ρ η a params (ts 0) (closed 0), term ρ η a params (ts 1) (closed 1),
+        @eval_image_env_l (rt_model_l C nc) M Subtype.val] using eq.symm
+  case neg φ ih => exact not_congr (ih closed ρ η T a hT params)
+  case conj φ ψ ih jh => exact and_congr (ih closed.1 ρ η T a hT params) (jh closed.2 ρ η T a hT params)
+  case disj φ ψ ih jh => exact or_congr (ih closed.1 ρ η T a hT params) (jh closed.2 ρ η T a hT params)
+  case imp φ ψ ih jh => exact imp_congr (ih closed.1 ρ η T a hT params) (jh closed.2 ρ η T a hT params)
+  case iff φ ψ ih jh => exact iff_congr (ih closed.1 ρ η T a hT params) (jh closed.2 ρ η T a hT params)
+  case existsE φ ih | forallE φ ih =>
+    have next (x : (rt_model_l C nc).Domain) := ih closed (ρ.push x) (η.push x.val) T.weaken
+      (Fin.cases .newest (fun i => (a i).weaken)) (by simpa using hT)
+      (Fin.cases rfl (fun i => (Definitional.Term.eval_weaken η x.val (a i)).trans (params i)))
+    first
+    | rw [lr_rel_m, Formula.satisfies_existsMem_iff, Formula.satisfies_exists_iff, hT]
+      exact ⟨fun ⟨x, hx, h⟩ => ⟨⟨x, hx⟩, (next ⟨x, hx⟩).mp h⟩,
+        fun ⟨x, h⟩ => ⟨x.val, x.property, (next x).mpr h⟩⟩
+    | rw [lr_rel_m, Formula.satisfies_forallMem_iff, Formula.satisfies_forall_iff, hT]
+      exact ⟨fun h x => (next x).mp (h x.val x.property), fun h x hx => (next ⟨x, hx⟩).mpr (h ⟨x, hx⟩)⟩
 
 def sc_small0_m {d} (X A : Term d) : Formula 1 d := set[d] ⟪
   ∃ μ ∈ ⌜X⌝ₛ, ∃ f ∈ ⌜X⌝ₛ, ⌜sc_index_m⌝ₚ(μ, ⌜A⌝ₛ, f)⟫

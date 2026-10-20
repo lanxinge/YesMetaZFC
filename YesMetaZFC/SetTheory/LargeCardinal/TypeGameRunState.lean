@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameHistoryStep
-import YesMetaZFC.Model.SetTheory.Internal.FiniteRecordRelative
+import YesMetaZFC.Model.SetTheory.Internal.RelationRecord
 import YesMetaZFC.SetTheory.LargeCardinal.TypeGameRootTree
 
 /-! # 统一递归的可编码不变量
@@ -26,8 +26,8 @@ structure Tg_run_d (ω c₀ o Cᵣ γ Z A : M.Domain) (v : Fin 18 → M.Domain) 
   root : It_map_d (v 10) o (v 7) (v 16)
   image : Rd_entry_d Cᵣ (v 5) (v 16)
   anchor : Tg_anchor_d γ Z (v 0) (v 16)
-  record : Rt_record_in_d tg_issued0_m (v 5) (v 17)
-  values : Rt_tuple_d u (v 17)
+  record : Rf_record_d I (v 0) (v 1) tg_issued0_m (v 5) (v 17)
+  values : Rf_tuple_d I (v 0) (v 1) u (v 17)
   omega : u 0 = ω
   alphabet : u 6 = A
   lower : M.MemberSubset γ (u 24)
@@ -45,9 +45,11 @@ structure Tg_run_d (ω c₀ o Cᵣ γ Z A : M.Domain) (v : Fin 18 → M.Domain) 
 theorem Tg_run_d.read_l {ω c₀ o Cᵣ γ Z A : M.Domain} {v : Fin 18 → M.Domain} {u : Fin 46 → M.Domain}
     (h : Tg_run_d hZF ω c₀ o Cᵣ γ Z A v u) (nc : Nonempty {x // M.mem x (v 5)}) :
     ∃ ι : Env (rt_model_l (v 5) nc) 46, (∀ i, (ι.bound i).val = u i) ∧ Formula.satisfies ι tg_issued0_m := by
-  obtain ⟨_, w, code, valid⟩ := (rt_record_in_read_l hZF tg_issued0_m tg_issued0_closed_l
-    (h.context.read_l hZF h.source.source).1.transitive nc).mp h.record
-  exact ⟨⟨w, fun _ => w 0⟩, congrFun (rt_tuple_inj_l code h.values), valid⟩
+  have record := ((rf_record_mem_l I h.source.source.transitive h.model tg_issued0_m).mp h.record).2
+  have values := ((rf_tuple_mem_l I hZF.1 h.source.source.transitive h.model u).mp h.values).2
+  obtain ⟨_, w, code, valid⟩ := (rt_record_in_read_l hZF.1 tg_issued0_m tg_issued0_closed_l
+    (h.context.read_l hZF h.source.source).1.transitive nc).mp record
+  exact ⟨⟨w, fun _ => w 0⟩, congrFun (rt_tuple_inj_l code values), valid⟩
 
 def Tg_run_next_d (ω c₀ : M.Domain) (v : Fin 18 → M.Domain) (u : Fin 46 → M.Domain)
     (w : Fin 18 → M.Domain) (t : Fin 46 → M.Domain) : Prop :=
@@ -60,26 +62,5 @@ def Tg_run_next_d (ω c₀ : M.Domain) (v : Fin 18 → M.Domain) (u : Fin 46 →
     Rd_entry_d (u 20) h j ∧ M.MemberSubset h (t 20) ∧ h ≠ t 20 ∧ M.MemberSubset (v 13) (w 13) ∧
     ∃ Y R μ K η C L V q S n s g, Tg_past_at_d (w 13) (u 19) (v 6) Y R μ K η C L V q ∧
       Tg_saved_branch_d ω V q S n s (u 23) g ∧ Tg_odd_d ω (v 13) (v 7) (v 6) k G (u 1) (u 23) (u 22) (u 7) S n s g
-
-/-- 策略请求本身也保存为反射层中的实际有限记录。 -/
-theorem Tg_context_d.save_issued_l {ω X R μ K η C : M.Domain} (context : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω μ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 46) (valid : Formula.satisfies ρ tg_issued0_m) :
-    ∃ r, Rt_record_in_d tg_issued0_m C r ∧ Rt_tuple_d (fun i => (ρ.bound i).val) r := by
-  have fs := (context.read_l hZF source).1
-  have tuple {k} (v : Fin (k+1) → (rt_model_l C nc).Domain) :
-      ∃ r, M.mem r C ∧ Rt_tuple_d (fun i => (v i).val) r := by
-    induction k with
-    | zero => exact ⟨(v 0).val, (v 0).property, rfl⟩
-    | succ k ih =>
-      obtain ⟨r, hr, tail⟩ := ih (fun i => v i.succ)
-      let r₀ : (rt_model_l C nc).Domain := ⟨r, hr⟩
-      obtain ⟨q, pair⟩ := (rt_pair_l fs.transitive nc hZF.1 fs.pair).total (v 0) r₀
-      exact ⟨q.val, q.property, r,
-        (rt_kpair_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) fs.transitive nc fs.pair q (v 0) r₀).mp pair, tail⟩
-  obtain ⟨r, hr, code⟩ := tuple ρ.bound
-  refine ⟨r, (rt_record_in_read_l hZF tg_issued0_m tg_issued0_closed_l fs.transitive nc).mpr ?_, code⟩
-  exact ⟨hr, ρ.bound, code, (Formula.closed_env_l tg_issued0_m tg_issued0_closed_l
-    (ρ := ρ) (η := ⟨ρ.bound, fun _ => ρ.bound 0⟩) rfl).mp valid⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

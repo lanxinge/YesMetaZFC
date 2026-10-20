@@ -78,7 +78,7 @@ theorem Tg_context_d.tree_successor_l {ω X R μ K η C c₀ α ξ T Q G E L H b
         (num_mem_l hZF.1 source.source.omega (show Num_d 0 (ι.bound 1).val from he))
     have play : Tg_play_d C (ι.bound 4).val (ι.bound 3).val (ι.bound 20).val (ρ.bound 40).val := by
       rw [digitZero]
-      apply (tg_play_read_l hZF fs.transitive nc J (ι.bound 4) (ι.bound 3) (ι.bound 20) (ι.bound 1)).mpr
+      apply (tg_play_read_l hZF.1 fs.transitive nc J (ι.bound 4) (ι.bound 3) (ι.bound 20) (ι.bound 1)).mpr
       rintro i x ⟨p, _, hp⟩
       exact (empty₀ p hp).elim
     have padLower : ∀ p κ L F, Rd_entry_d ξ p E₁ → It_payload_d p κ L F → M.MemberSubset γ κ := by

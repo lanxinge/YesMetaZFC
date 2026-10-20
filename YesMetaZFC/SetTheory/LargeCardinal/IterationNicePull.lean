@@ -129,8 +129,9 @@ theorem it_pnice_pull_l {ω B R b K U S u J C V π c c' T Q Q' G G' E E' L L' : 
       (sc_ordinal_small_l hZF hw sx.transitive mx sx.theory loc.2.1 ko)
     obtain ⟨K₃, parent⟩ := agree.subset_l.alphabet_l hZF owner sn ko
     obtain ⟨P₀, hP₀, pool⟩ := power K₂ owner.finite_mem
-    have family := (loc.measures_l hZF owner hP₀ pool).transfer_l agree
-    have coherent := (loc.coherent_l hZF owner).transfer_l hZF agree
+    have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+      (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP₀ pool)).transfer_l agree
+    have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF agree
     -- 真实有限幂一致性给出小施加源的族与相干性，再读取原超幂证书。
     obtain ⟨t, pt, tf⟩ := pay
     have kp := pt.mem_l M fs.transitive hpC

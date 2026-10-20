@@ -47,7 +47,7 @@ theorem Ep_source_d.program_l {ω κ K Z S n F : M.Domain}
   have fn : M.IsSetFunctionFromTo I F n Z := ⟨hF.2.1.2.1, hF.2.1.2.2, fun r hr =>
     ((hF.2.1.2.2 r).mp hr).imp fun c hc => ⟨row r c hc, hc⟩⟩
   obtain ⟨c, hc⟩ := source.code
-  have hFZ := sc_finite_function_l hZF source.omega source.transitive hc source.theory source.omega_mem
+  have hFZ := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
     (fun _ h => h) hF.1 (fn0_of_function_l (ZF.modelsKP hZF) fn)
   obtain ⟨_, L, hLZ, hfL⟩ := source.function_l hZF
     hFZ (fn0_of_function_l (ZF.modelsKP hZF) fn)

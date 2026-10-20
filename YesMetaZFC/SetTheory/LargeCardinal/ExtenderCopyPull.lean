@@ -31,7 +31,7 @@ theorem ep_pull_image_l {ω κ κ' K K' X R Y S c d π m n q f f' g g' : M.Domai
     (hff : Rd_entry_d f f' π) (hgg : Rd_entry_d g g' π) (pull : Ep_pull_d κ X m n q f g) :
     Ep_pull_d κ' Y m n q f' g' := by
   have qω := hq.mono_target_l (source.omega.transitive hZF n hnω)
-  have hqX := sc_finite_function_l hZF source.omega source.transitive hm source.theory
+  have hqX := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union
     source.omega_mem (source.transitive ω source.omega_mem) hmω qω
   have hqq := hπ.finite_fixed_l hZF source.omega source.transitive target.transitive hm hn source.omega_mem hmω hqX qω
   have nat := hπ.natural_l hZF source.omega source.transitive target.transitive hm hn source.omega_mem
@@ -61,8 +61,8 @@ theorem ep_pull_image_l {ω κ κ' K K' X R Y S c d π m n q f f' g g' : M.Domai
   have next := tr.mp (fun s r x hs hsr => (pull.2.2 s.val r.val hs hsr x.val).symm)
   refine ⟨ep_function_image_l hZF source target hm hn hπ hκ hmω hff pull.1,
     ep_function_image_l hZF source target hm hn hπ hκ hnω hgg pull.2.1, fun s r hs hsr x => ?_⟩
-  have hsY := sc_finite_function_l hZF target.omega target.transitive hn target.theory target.omega_mem (target.transitive κ' target.cardinal_mem) hnω hs
-  have hrY := sc_finite_function_l hZF target.omega target.transitive hn target.theory target.omega_mem (target.transitive κ' target.cardinal_mem) hmω hsr.1
+  have hsY := sc_finite_function_l hZF target.omega target.transitive target.theory.algebra.pair target.theory.algebra.union target.omega_mem (target.transitive κ' target.cardinal_mem) hnω hs
+  have hrY := sc_finite_function_l hZF target.omega target.transitive target.theory.algebra.pair target.theory.algebra.union target.omega_mem (target.transitive κ' target.cardinal_mem) hmω hsr.1
   by_cases hx : M.mem x Y
   · exact (next ⟨s, hsY⟩ ⟨r, hrY⟩ ⟨x, hx⟩ hs hsr).symm
   · exact iff_of_false (fun h => hx (rd_entry_transitive_l target.transitive (hπ.1.1.output_mem_of_pairMember hgg) h).2)

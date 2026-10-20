@@ -88,7 +88,7 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have prog := program
   simp only [ts_program0_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at prog
   have hb : M.mem (p 14) ω := hw ▸ prog.2.1
-  have valid := context.continue_l hZF owner.source nc ρ seed
+  have valid := (context.kernel_l (context.read_l hZF owner.source).1.transitive nc).continue_l ρ seed
   simp only [tc_result0_m, tc_image_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff] at valid
   obtain ⟨⟨A, K₁, R₁, L, F, a, a', B, S₁, f, κ', U', D', u', core, _, subtype⟩, _, _⟩ := valid
   let ε := ρ.push A |>.push K₁ |>.push R₁ |>.push L |>.push F |>.push a |>.push a' |>.push B
@@ -121,9 +121,15 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   have hj := ultra.elementary_l hZF my.1 mn.1
   obtain ⟨η', C', iη, iC, context'⟩ := prior.map_l hZF source.source.omega source.source.transitive ready.source.transitive my mn hj
   let nv : Nonempty {x // M.mem x C'} := ⟨⟨ω, context'.omega⟩⟩
-  obtain ⟨θ, images, moved⟩ := hj.relative_image_l hZF source.source.omega source.source.transitive
-    ready.source.transitive my mn (prior.read_l hZF source.source).1.transitive
-    (context'.read_l hZF ready.source).1.transitive nc₀ nv iC tg_round0_m tg_round0_closed_l ρ₀
+  obtain ⟨kC, layerC, idC⟩ := rr_layer_mem_l I hZF my source.source.transitive prior.member
+    (prior.read_l hZF source.source).1.transitive
+  obtain ⟨kD, layerD, idD⟩ := rr_layer_mem_l I hZF mn ready.source.transitive context'.member
+    (context'.read_l hZF ready.source).1.transitive
+  obtain ⟨θ, trace, moved⟩ := hj.relative_image_l hZF source.source.omega my.1 mn.1
+    layerC layerD nc₀ nv iC tg_round0_m tg_round0_closed_l ρ₀
+  have images i : Rd_entry_d (ρ₀.bound i).val (θ.bound i).val j := by
+    obtain ⟨a, b, ha, edge, hb⟩ := trace i
+    exact ((idC _ _).mp ha).2.symm ▸ ((idD _ _).mp hb).2.symm ▸ edge
   have oldImage : Rd_entry_d (p 7) (θ.bound 11).val j := oldType ▸ images 11
   have oldEq := hj.1.1.1.2 (p 7) (θ.bound 11).val u'.val oldImage (same _ _ hu iu)
   have inner x (hx : M.mem x V) := (prior.read_l hZF source.source).1.transitive V hVC x hx
@@ -181,7 +187,7 @@ theorem Tg_context_d.continue_image_tree_l {c₀ α ξ T J G E H k c d R Y S K K
   obtain ⟨v, drop, _⟩ := cElastic
   have drop := (td_dcp_source_l hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) fs.transitive nc fs.pair
     (χ.push v) (.bound 5) (.bound 2) (.bound 8) (.bound 1) (.bound 0)).mp drop
-  have mω : M.mem (p 9) ω := hw ▸ ((Formula.satisfies_conj_iff ..).mp (context.continue_l hZF owner.source nc ρ seed)).2.1
+  have mω : M.mem (p 9) ω := hw ▸ ((Formula.satisfies_conj_iff ..).mp ((context.kernel_l (context.read_l hZF owner.source).1.transitive nc).continue_l ρ seed)).2.1
   have ℓχ : (ψ.bound 2).val = (χ.bound 4).val := sn.predecessor_eq hZF.1
     ((owner.source.omega.members_areOrdinals hZF _ (nψ.symm ▸ mω)).mem sn.predecessor_mem)
     (Eq.mp (congrArg (fun a => M.SuccessorOf a (χ.bound 4).val) (mχ.trans nψ.symm)) drop.1)

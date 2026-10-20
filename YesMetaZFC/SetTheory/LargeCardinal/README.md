@@ -1185,10 +1185,80 @@ I 获胜当且仅当对局全程合法或首次违规属于 II。完整合法历
   `er_successor_l` 将极限构造和这张实现图合并成同一次实际后继。
 
 **5.23 尚未整体闭合。** 全部支撑的定向极限装配和下一低层的完整前驱实现已完成。
-下一次递归仍需识别新低层的相对秩高度，并把内部小性与子集封闭用于新对象；
-当前装配定理的这些性质仍通过原始源对象的初等像取得，不能直接假定下一低层也有这种原像。
-给定 M 的相对初值及 `Tg_run_d` 状态迁移仍未完成：生产递归的 `Ic_model_d` 仍含外部 ω 闭性，
-`It_ultra_d` 仍含整体传递坍塌。树必须建在给定 M 上的要求仍须落实。
+[RelationLow](../../Model/SetTheory/Internal/RelationLow.lean) 已把内部小性和子集封闭直接定义在当前原关系模型上，
+全部测度识别、有界函数回收和支撑装配均已迁入这些内在条件。
+[ExtenderRawRank](ExtenderRawRank.lean) 的 `er_rank_successor_l` 已去掉所属侧的 `It_ultra_d`、
+整体目标模型及其全局坍塌参数。新共同层只消费同一有界坍塌；相对秩直接沿原关系常值嵌入传输。
+低层间的实际单射由两张完整前驱实现图和原关系边构造，逐点交换方块、小性及子集封闭均已证明。
+新层返回原关系中的秩证书，不再为读取该秩另行要求一个整体传递超幂。
+[ExtenderReadLayer](ExtenderReadLayer.lean) 已证明新共同层的有限读写闭包：
+把配对、并集及全部有限函数空间作为固定原句沿原关系边传递，先识别同一个背景 ω，
+再用背景内部自然数归纳回收全部有限图。`er_rank_successor_l` 已实际调用该证明，
+对含 ω 的极限共同层返回新层的 `Fs_read_d`、并集闭包及低层单射固定 ω。
+`ExtenderLocalRead` 中协调律、原子测试和正规性的原接口已改为只用 `Fs_read_d`，
+全部既有调用同步迁移。
+[RelationProgram](../../Model/SetTheory/Internal/RelationProgram.lean) 通过实际实现图的值域同构和
+同一内部限制编译器解释全部内部程序；限制的载体与高模型中的层对象分别保存。
+[RelationLayerSeparation](../../Model/SetTheory/Internal/RelationLayerSeparation.lean) 随后在原关系模型中
+实际分离，再由子集封闭回收所得集合，得到新层的全内部分离，包含新参数及非标准程序。
+`er_rank_successor_l` 已返回新低层模型码、完整 `Sc_theory_d` 和 `Sc_power_d`；
+代数及相对幂集的全称句子沿同一原关系边传输。
+给定 M 的零轮已从内部 ZFC 证书导出 M 及初始反射层的相对幂集，较小极限层继续由 `Sc_power_d.rank_l` 取得实例。
+测度读取已移除 `Ep_source_d`，只消费有限闭包、源理论及每个有限幂的实际相对幂集；
+旧的单个有限列幂集输入通过分离构造这些见证，新层的 `Sc_power_d` 直接提供它们。
+`It_local_d.bounded_model_l` 也已直接消费这些弱条件，构造留在新层中的实际有界商。
+有界代表池、所属扩展器及有界坍塌仍须由已有构造提供；整条游戏递归尚未完成。
+
+[RelationLayer](../../Model/SetTheory/Internal/RelationLayer.lean) 将全部成员及前驱实现统一为 `Rr_layer_d`，
+证明任意原公式的完整低层解释。零轮和实际原关系后继均返回此证书。
+`Smap_d.relative_image_l` 的原接口已迁为任意编码关系模型上的低层记录搬运，
+不要求两侧高模型传递；`TypeGameRunAdvance`、`TypeGameContinue` 和 `TypeGameEvenLimit`
+三个生产调用均已迁入该证明。旧的传递高模型搬运实现已删除。
+
+[TypeGameRelativeContext](TypeGameRelativeContext.lean) 已在给定传递 ZFC 地模型内部构造实际反射层，
+包含指定参数并满足原更新核；源内序数枚举和最小原像给出该层的实际编号图。
+[ExtenderReadRelative](ExtenderReadRelative.lean) 从给定模型的 ZF 实例证明自然数集的绝对性，
+并构造该模型及其极限相对秩层的有限读写闭包。`sc_finite_function_l` 已改为只用配对与并集，
+归纳覆盖全部背景内部有限长度；全部旧调用已迁移，不再通过完整源理论统一化有限函数。
+
+[TypeGameRelativeStart](TypeGameRelativeStart.lean) 的 `Tg_game_d.zero_relative_l` 已从给定模型中的
+原游戏及 II 获胜策略构造实际 46 坐标请求记录，逐项保留原参数、原策略、原树和零轮标号，
+并给出原字母表及 ω 所在的相对 Vκ。
+[TypeGameRelativeRoot](TypeGameRelativeRoot.lean) 在同一个给定载体上构造恒等根图和低层限制图，
+证明完整前驱实现、内在秩、小性及子集封闭。
+[TypeGameSeedBound](TypeGameSeedBound.lean) 直接读取原所属短扩展器的 ω∈κ；
+生产 `run_start_l` 已删除原来仅为取得这个下界而预先实施的整次树后继。
+记录读写只需当前结构的外延性、内部传递性与配对闭包。`sc_relative_sat_l` 直接证明
+相对真值，不再为读取公式而构造成员关系码；`rt_record_in_save_l` 由零轮、后继及历史存档共用。
+
+[RelationRecord](../../Model/SetTheory/Internal/RelationRecord.lean) 的 `Rr_truth_d` 同时保存
+全部坐标的所属检查和原关系真值。`Rf_record_d`、`Rf_tuple_d` 的配对、量词与等同均在 `(X,R)`
+中解释。`Tg_run_d.record/values`、`Tg_saved_d.record/head` 及给定模型的零轮输出已直接迁入
+这套语义，其一阶编码同步修改。生产 `advance_l` 沿原关系初等图搬运完整记录，再由元组唯一性
+核对全部坐标；不再为高层反射上下文建立共同低层实现图。
+`Tg_kernel_d` 读取同一七条原全称规则，全部生产调用已替换，操作本身不再要求 `Ep_source_d`。
+这些规则的实际实例仍由已证更新句子和反射上下文产生，覆盖目标结构中的新参数。
+
+[ZfcCode](../../Model/SetTheory/Internal/ZfcCode.lean) 现以单一背景公式编码完整 ZFC：
+固定公理、关系外延性及覆盖全部内部程序的分离、普通收集模式。
+[ZfcDecode](../../Model/SetTheory/Internal/ZfcDecode.lean) 将其解码为任意原关系模型的原生 `Models ZFC`；
+[ZfcRank](../../Model/SetTheory/Internal/ZfcRank.lean) 从实际不可达 Vδ 构造证书，收集的集合界由 Vδ＝Hδ 得到。
+原生 `Models ZFC` 本身不替代这份全内部证书；给定模型的零轮入口已改为消费该证书。
+[ZfcSource](../../Model/SetTheory/Internal/ZfcSource.lean) 从普通收集得到集合界，再用全内部分离
+构造实际二元真值图，最后调用源内选择，导出 `Sc_theory_d` 和 `Sc_collection_d`。
+[ExtenderSourceRelative](ExtenderSourceRelative.lean) 构造原模型的完整有限列空间、编号及内部小关系坍塌，
+因此同一个给定模型得到实际 `Ep_source_d`；零轮请求现在同时返回这份源证书。
+[ZfcTransfer](../../Model/SetTheory/Internal/ZfcTransfer.lean) 传输模式的内部全称闭包，覆盖原关系目标中的
+全部新参数。`er_ultrapower_l`、`er_successor_l`、`er_rank_successor_l` 已同时返回完整证书的保持，
+模型仍是原关系定向极限。
+
+**这仍不是完整的 `Tg_run_d` 零轮。** 上述完整源初值及内部理论缺口已补齐；
+生产递归的 `Ic_model_d` 仍含外部 ω 闭性，`It_ultra_d` 仍含整体传递坍塌；
+原关系秩后继和高层记录搬运已摆脱整体坍塌；当前记录读取的后续消费者仍用隶属模型识别，
+`Tg_run_d.source`、`It_tree_d.sources`、活动树边及历史的共同层比较仍需迁移。
+外部档案 `Tg_past_cell_d` 保存模型码，不能改成当前模型内的整份历史对象。两张扩展器仍分别
+在当前偶数源、当前奇数源中选取，再施加到旧奇数树前驱、当前偶数树前驱；5.17 的 agreement
+义务和 5.16 的历史更新方程必须同时保留。5.23 的任意共尾良基分支版本尚未闭合。
 
 之后仍需 7.4 与 7.8 的要求第一辅助坐标满射的改造类型游戏及 7.12 的树上限制；
 随后构造原提示的 R、S，证明小／大坍缩分解以排除泛型 I 分支，

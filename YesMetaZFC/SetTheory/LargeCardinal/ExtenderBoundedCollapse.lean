@@ -43,7 +43,7 @@ theorem Eb_pool_d.rank_small_l {ω κ K X R L B J P G A V : M.Domain}
       exact ⟨i, source.omega.transitive hZF n hn i hi, x, hx, pair⟩)
   have sub u (hu : M.mem u A) : M.mem u V := by
     obtain ⟨n, a, D, f, hn, _, ha, hd, hf, fn, pair⟩ := pool.read_l hZF source hu
-    have haV := sc_finite_function_l hZF source.omega trans code theory hω
+    have haV := sc_finite_function_l hZF source.omega trans theory.algebra.pair theory.algebra.union hω
       (level.hierarchy.ordinal_subset_l hZF source.transitive level.member) hn ha
     have hfV := level.hierarchy.relation_mem_l hZF source.transitive level.member limit hK hB hf (fun p hp => by
       obtain ⟨s, hs, x, hx, pair⟩ := fn.1 p hp

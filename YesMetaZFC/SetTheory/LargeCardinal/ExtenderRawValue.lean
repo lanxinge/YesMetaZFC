@@ -42,11 +42,11 @@ theorem er_repr_atoms_l {ω κ L N Y S F k J O Z A p T V r C W a f g E H U : M.D
         ((and_congr_right fun _ => and_congr_right fun _ => ep_rel_read_l hz hao model.1).trans
           ((and_iff_right huA).trans ((and_iff_right hvA).trans (md.relation f g B D fp gp))))))
 
-theorem Er_system_d.bounded_value_l {ω c X R c' Y S q B H N κ L F Γ γ k J O Z A p T V r C W
+theorem Er_system_d.bounded_value_l {ω c X R c' Y S q H N κ L F Γ γ k J O Z A p T V r C W
     A₀ b n a D f : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d I c X R)
-    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : Rd_entry_d B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
+    (closed : Rr_closed_d I Y S H)
     (hN : M.TransitiveSet N) (algebra : Sc_algebra_d N) (hΓ : M.mem Γ N)
     (rank : Vr_d N γ Γ) (hγ : M.IsLimitOrdinal γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
@@ -70,7 +70,7 @@ theorem Er_system_d.bounded_value_l {ω c X R c' Y S q B H N κ L F Γ γ k J O 
   have codes := (rc_family_native_l I model.2.1 (ext.native_l I model.2.1) d' ft).mp functions
   obtain ⟨g, comp⟩ := cp0_exists_l (ZF.modelsKP hZF) (ff.mono_target_l (low A₀ (fk.1.input_mem_of_pairMember hAb)))
     (fn0_of_function_l (ZF.modelsKP hZF) fk.1)
-  have hg := ((hq.bounded_functions_raw_l hZF hω hX mx model hBH closed hN algebra hΓ rank hγ
+  have hg := ((rr_bounded_functions_l hZF model.2.1 ext closed hN algebra hΓ rank hγ
     fk image pred d' b' hDd hAb ht codes g).mpr ⟨f, hf, ff, comp⟩).1
   obtain ⟨B₁, hB₁, gp⟩ := quotient.map.projection.2.2 g hg
   obtain ⟨u, pair⟩ := (I).total a B₁
@@ -97,5 +97,43 @@ theorem Er_system_d.reindex_l {ω κ L Y S F k J O Z A p T V r C W m n a b t f E
   subst t'
   obtain ⟨E', _, hvE⟩ := limit.projection.2.1 v (system.projection.bound_l hvb).1
   exact ⟨g, pull, v, P, pv, hg, (limit.commute_l system.diagram huv huE hvE).symm ▸ hvE⟩
+
+/-- 不同支撑的同一处处常值在原关系极限中有同一个值。 -/
+theorem Er_system_d.constant_l {ω κ L N Y S F k J O Z A p T V r C W D E x a b f g H P : M.Domain}
+    (family : Em_source_d ω κ L N F) (system : Er_system_d I ω κ L Y S F k J O Z A p T V)
+    (limit : Di_limit_d A p T V r C W) (ff : Fn0_d D Y f) (fg : Fn0_d E Y g)
+    (fc : Rs_const_d D x f) (gc : Rs_const_d E x g) (fv : Ep_repr_d r a f H) (gv : Ep_repr_d r b g P) : H = P := by
+  obtain ⟨u, B, pu, hf, huH⟩ := fv
+  obtain ⟨v, B', pv, hg, hvP⟩ := gv
+  obtain ⟨c, w, z, hwc, hzc, huw, hvz⟩ := system.diagram.common_l (limit.projection.bound_l huH).1 (limit.projection.bound_l hvP).1
+  obtain ⟨Q, pw, atQ⟩ := system.toEg_graph_d.label_l hwc
+  obtain ⟨Q', pz, atQ'⟩ := system.toEg_graph_d.label_l hzc
+  obtain ⟨o, C₀, W₀, hco, component, mc, hQC⟩ := system.model_l hZF atQ
+  obtain ⟨_, hz⟩ := system.codes
+  have hQ'C := (ep_at_read_l hz hco mc.1).mp atQ'
+  obtain ⟨n, D₀, U, _, _, G, s, C₁, W₁, _, fn, space, hcU, _, _, _, quotient⟩ := component
+  obtain ⟨rfl, rfl⟩ := smdl_unique_l I quotient.code mc
+  have measure := (family.at_l hZF.1 hcU fn space).base
+  have lift {D a B u f} (ff : Fn0_d D Y f) (fc : Rs_const_d D x f)
+      (pu : KPair_d M u a B) (hf : M.mem f B) {Q w} (pw : KPair_d M w c Q) (huw : Rd_entry_d u w T) :
+      ∃ g, M.mem g Q ∧ Rs_const_d D₀ x g := by
+    obtain ⟨m, n', t, g, _, _, ft, fn', _, hg, pull⟩ := system.representatives u w a c B Q pu pw huw f hf
+    have eq := fn'.domain_eq_l hZF.1 fn
+    subst n'
+    obtain ⟨D', ds, ff'⟩ := pull.1
+    have eq := ff'.domain_eq_l hZF.1 ff
+    subst D'
+    refine ⟨g, hg, fun v hv => ?_⟩
+    obtain ⟨t₀, comp⟩ := cp0_exists_l (ZF.modelsKP hZF) ft ((space v).mp hv)
+    exact (pull.2.2 v t₀ ((space v).mp hv) comp x).mpr (fc t₀ ((ds t₀).mpr comp.1))
+  obtain ⟨f', hf', fc'⟩ := lift ff fc pu hf pw huw
+  obtain ⟨g', hg', gc'⟩ := lift fg gc pv hg pz hvz
+  have sf := quotient.map.member_l I hZF.1 measure hQC hf'
+  have sg := quotient.map.member_l I hZF.1 measure hQ'C hg'
+  have fnf := quotient.map.functions f' (quotient.map.projection.input_mem_of_pairMember sf)
+  have eq := (rp_kernel_l I hZF.1 measure quotient.map sf sg).mpr
+    ⟨D₀, measure.top, fun s hs => ⟨x, (fnf.bound_l (fc' s hs)).2, fc' s hs, gc' s hs⟩⟩
+  have wz := kpair_unique_l M hZF.1 pw (eq.symm ▸ pz)
+  exact (limit.kernel u v H P huH hvP).mpr ⟨w, huw, wz.symm ▸ hvz⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

@@ -52,8 +52,7 @@ theorem ft_rank_satisfaction_l (hZF : M.Models ZF) {d} (ρ : Env M d) (Y ω X R 
   let g : N.Domain := ⟨f.eval ρ, hg⟩
   let η : Env N 7 := ⟨Fin.cases g (Fin.cases k (Fin.cases l (Fin.cases t (Fin.cases s (Fin.cases x (fun _ => w)))))), fun _ => w⟩
   let φ := ft_sat_m (𝒞 := FlatPairing.convention) (.bound 6) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) (.newest : Term 7)
-  obtain ⟨v, S, hv, hS⟩ := smdl_membership_l (kp_pair_l (ZF.modelsKP hZF)) hZF ⟨ω.eval ρ, hw⟩
-  have rel := sc_relative_sat_l (kp_pair_l (ZF.modelsKP hZF)) ⟨hv, hS⟩ trans ⟨⟨ω.eval ρ, hw⟩⟩ φ
+  have rel := sc_relative_sat_l trans ⟨⟨ω.eval ρ, hw⟩⟩ φ
     (ft_sat_m_freeClosed _ _ _ _ _ _ _ rfl rfl rfl rfl rfl rfl rfl) η ρ Y
     (Fin.cases f (Fin.cases r (Fin.cases n (Fin.cases F (Fin.cases R (Fin.cases X (fun _ => ω))))))) rfl
     (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun _ => rfl)))))))

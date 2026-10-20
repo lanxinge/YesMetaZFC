@@ -25,7 +25,7 @@ theorem ep_indices_map_l {ω X R Y S c d σ L L' J J' : M.Domain}
   have read := tr.mp (fun a _ => indices a)
   exact fun a => ⟨fun ha => (read a (hY J' (hσ.1.1.output_mem_of_pairMember hJ) a ha)).mp ha, fun ha => by
     obtain ⟨n, hnω, fn, inj⟩ := ha
-    have owned := sc_finite_function_l hZF hω hY hn theory (hσ.1.1.output_mem_of_pairMember ωσ)
+    have owned := sc_finite_function_l hZF hω hY theory.algebra.pair theory.algebra.union (hσ.1.1.output_mem_of_pairMember ωσ)
       (hY L' (hσ.1.1.output_mem_of_pairMember hL)) hnω fn
     exact (read a owned).mpr ⟨n, hnω, fn, inj⟩⟩
 
@@ -44,7 +44,7 @@ theorem ep_space_map_l {ω μ μ' κ κ' K K' X R Y S c d π n D D' : M.Domain}
   have read := tr.mp (fun f _ => space f)
   intro f
   exact ⟨fun hf => (read f (target.transitive D' (hπ.1.1.output_mem_of_pairMember hD) f hf)).mp hf,
-    fun hf => (read f (sc_finite_function_l hZF target.omega target.transitive hn target.theory target.omega_mem
+    fun hf => (read f (sc_finite_function_l hZF target.omega target.transitive target.theory.algebra.pair target.theory.algebra.union target.omega_mem
       (target.transitive κ' (hπ.1.1.output_mem_of_pairMember hκ)) hnω hf)).mpr hf⟩
 
 theorem ec_measure_image_l {ω c d N R N' S σ F F' a a' U V A A' : M.Domain}
@@ -80,7 +80,7 @@ theorem ec_index_image_l {ω c d N R N' S σ L L' a a' b b' q m n : M.Domain}
     (hmω : M.mem m ω) (hnω : M.mem n ω) (hq : Fn0_d m n q) (hb : Fn0_d n L b) (ha : Cp0_d m n L q b a) :
     Fn0_d n L' b' ∧ Cp0_d m n L' q b' a' := by
   have qω := hq.mono_target_l (hω.transitive hZF n hnω)
-  have hqN := sc_finite_function_l hZF hω hN hm theory hωN (hN ω hωN) hmω qω
+  have hqN := sc_finite_function_l hZF hω hN theory.algebra.pair theory.algebra.union hωN (hN ω hωN) hmω qω
   have hqq := hσ.finite_fixed_l hZF hω hN hN' hm hn hωN hmω hqN qω
   have nat := hσ.natural_l hZF hω hN hN' hm hn hωN
   exact ⟨(hσ.function_l hZF hω hN hN' hm hn (nat n hnω) hL hbb).mp hb,

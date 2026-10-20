@@ -38,7 +38,7 @@ theorem sc_finite_partial_l {ω c X R D n f : M.Domain} (hω : M.IsOmega ω)
       · exact (ha ha').elim
       · exact hb.trans hb'.symm)
     (fun a b _ hb => ((read a b).mp hb).elim (fun h => (hf.bound_l h.2).2) (fun h => h.2.symm ▸ hωX))
-  have hg := sc_finite_function_l hZF hω hX hm theory hωX (fun _ h => h) hn (fn0_of_function_l (ZF.modelsKP hZF) fg)
+  have hg := sc_finite_function_l hZF hω hX theory.algebra.pair theory.algebra.union hωX (fun _ h => h) hn (fn0_of_function_l (ZF.modelsKP hZF) fg)
   obtain ⟨C, hC, bound⟩ := theory.algebra.envelope_l hg
   let η : Env M 2 := ⟨Fin.cases D (fun _ => C), fun _ => D⟩
   let ψ : UnarySchema 2 := {

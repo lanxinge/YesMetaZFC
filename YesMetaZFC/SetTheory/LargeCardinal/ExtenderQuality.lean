@@ -77,8 +77,8 @@ theorem ex_quality_sat_l {d K R} (ρ : Env M d) (ω κ L X F : Term d)
       It_local_d (ω.eval ρ) (X.eval ρ) (κ.eval ρ) (L.eval ρ) (F.eval ρ) ∧
       Sc_inaccessible_d (ω.eval ρ) (X.eval ρ) (L.eval ρ) ∧
       Ex_strength_d hZF (ω.eval ρ) (κ.eval ρ) (L.eval ρ) (X.eval ρ) (F.eval ρ) :=
-  (Formula.satisfies_conj_iff ..).trans (and_congr (ex_local_sat_l hZF ρ ω κ L X F source.transitive)
-    ((Formula.satisfies_conj_iff ..).trans (and_congr (ex_inaccessible_sat_l hZF ρ ω X L source.transitive)
+  (Formula.satisfies_conj_iff ..).trans (and_congr (ex_local_sat_l ρ ω κ L X F source.transitive)
+    ((Formula.satisfies_conj_iff ..).trans (and_congr (ex_inaccessible_sat_l ρ ω X L source.transitive)
       (ex_strength_sat_l hZF ρ ω κ L X F source))))
 
 end YesMetaZFC.SetTheory.LargeCardinal

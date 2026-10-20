@@ -5,7 +5,7 @@ import YesMetaZFC.SetTheory.InnerModel.Recursion.Composition
 
 /-! # 源模型包含全部背景内部有限函数
 
-每一步在源内统一构造追加末项后的函数图，再由唯一性识别为背景给定图。
+每一步只用配对和并集追加末项，再由外延性识别为背景给定图。
 归纳对实际 Fn0 原公式进行，覆盖非标准有限长度。
 -/
 namespace YesMetaZFC.SetTheory.Internal
@@ -13,9 +13,12 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+include hZF
 
-theorem sc_finite_function_l {ω c X R A n f : M.Domain} (hω : M.IsOmega ω)
-    (hX : M.TransitiveSet X) (hm : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+theorem sc_finite_function_l {ω X A n f : M.Domain} (hω : M.IsOmega ω)
+    (hX : M.TransitiveSet X)
+    (pair : ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b)
+    (union : ∀ a, M.mem a X → ∃ p, M.mem p X ∧ M.IsUnionOf p a)
     (hωX : M.mem ω X) (hA : M.MemberSubset A X) (hn : M.mem n ω) (hf : Fn0_d n A f) : M.mem f X := by
   let ρ := (⟨fun _ => A, fun _ => A⟩ : Env M 1).push X
   let φ : UnarySchema 2 := {
@@ -39,34 +42,41 @@ theorem sc_finite_function_l {ω c X R A n f : M.Domain} (hω : M.IsOmega ω)
       have hgn := hg.isSetFunctionFromTo (fn0_function_l (ZF.modelsKP hZF) hf) (fun i hi => (hs i).mpr (Or.inl hi))
       have hgX := (sat n).mp ih g (fn0_of_function_l (ZF.modelsKP hZF) hgn)
       obtain ⟨x, hx, hnx⟩ := hf.2.1 n hs.predecessor_mem
-      obtain ⟨m', hs', hm'⟩ := hω.1.2 n hn
-      have hmω := Structure.SuccessorOf.eq hZF.1 hs' hs ▸ hm'
-      let η := ((⟨fun _ => n, fun _ => n⟩ : Env M 1).push g).push x
-      let ψ : BinarySchema 3 := {
-        body := .disj (.conj (.mem (.bound 1) (.bound 4)) (rd_entry0_m (.bound 1) .newest (.bound 3)))
-          (.conj (.neg (.mem (.bound 1) (.bound 4))) (Formula.extensionalEq .newest (.bound 2))) }
-      have read i y : ψ.denote η i y ↔ (M.mem i n ∧ Rd_entry_d i y g) ∨ (¬ M.mem i n ∧ y = x) := by
-        simp only [ψ, BinarySchema.denote, Formula.satisfies_disj_iff, Formula.satisfies_conj_iff,
-          Formula.satisfies_mem_iff, Formula.satisfies_neg_iff, rd_entry0_sat_l hZF.1,
-          Formula.satisfies_extensionalEq_iff_eq hZF.1]; rfl
-      obtain ⟨B, hBX, bound⟩ := theory.algebra.envelope_l hgX
-      obtain ⟨C, hCX, hc⟩ := theory.algebra.insert_l hBX (hA x hx)
-      obtain ⟨f', hfX, hfn, choose⟩ := sc_uniform_source_l hZF hω hX hm theory ψ
-        (.disj (.conj (.mem _ _) (rd_entry0_delta_l ..)) (.conj (.neg (.mem _ _)) (.atom _ _ _))) η
-        (Fin.cases (hA x hx) (Fin.cases hgX (fun _ => hX ω hωX n hn))) (hX ω hωX m hmω)
-        hCX (fun i _ => by
-          classical
-          by_cases hi : M.mem i n
-          · obtain ⟨y, _, hiy⟩ := hgn.2.2 i hi
-            exact ⟨y, (hc y).mpr (Or.inl (bound i y hiy).2), (read i y).mpr (Or.inl ⟨hi, hiy⟩)⟩
-          · exact ⟨x, (hc x).mpr (Or.inr rfl), (read i x).mpr (Or.inr ⟨hi, rfl⟩)⟩)
-      have eq : f' = f := hfn.ext_l hZF.1 hf (fun i hi => by
-        obtain ⟨y, _, hiy⟩ := hfn.2.1 i hi
-        refine ⟨y, hiy, ?_⟩
-        rcases (read i y).mp (choose i y hiy) with ⟨_, h⟩ | ⟨hn, rfl⟩
-        · exact ((hg.2 i y).mp h).2
-        · have eq := ((hs i).mp hi).elim (fun h => (hn h).elim) (hZF.1.eq_of_same_members i n)
-          exact eq.symm ▸ hnx)
+      have hnX := hX ω hωX n hn
+      obtain ⟨s, hsX, singleton⟩ := pair n n hnX hnX
+      obtain ⟨t, htX, both⟩ := pair n x hnX (hA x hx)
+      obtain ⟨p, hpX, outer⟩ := pair s t hsX htX
+      have hp : KPair_d M p n x := ⟨s, t,
+        fun y => (singleton y).trans ⟨fun h => h.elim id id, Or.inl⟩, both, outer⟩
+      obtain ⟨q, hqX, one⟩ := pair p p hpX hpX
+      obtain ⟨r, hrX, two⟩ := pair g q hgX hqX
+      obtain ⟨f', hfX, un⟩ := union r hrX
+      have graph y : M.mem y f' ↔ M.mem y g ∨ y = p := by
+        rw [un]
+        exact ⟨fun ⟨z, hz, hy⟩ => ((two z).mp hz).elim
+          (fun e => Or.inl (e ▸ hy)) (fun e => Or.inr (((one y).mp (e ▸ hy)).elim id id)),
+          fun h => h.elim (fun hy => ⟨g, (two g).mpr (Or.inl rfl), hy⟩)
+            (fun e => ⟨q, (two q).mpr (Or.inr rfl), (one y).mpr (Or.inl e)⟩)⟩
+      have eq : f' = f := by
+        apply hZF.1.eq_of_same_members
+        intro y
+        rw [graph]
+        constructor
+        · rintro (hy | rfl)
+          · obtain ⟨i, z, code⟩ := hgn.1.1 y hy
+            obtain ⟨p', pp, mem⟩ := ((hg.2 i z).mp ⟨y, code, hy⟩).2
+            exact kpair_unique_l M hZF.1 pp code ▸ mem
+          · obtain ⟨p', pp, mem⟩ := hnx
+            exact kpair_unique_l M hZF.1 pp hp ▸ mem
+        · intro hy
+          obtain ⟨i, hi, z, hz, code⟩ := hf.1 y hy
+          rcases (hs i).mp hi with hin | eq
+          · obtain ⟨p', pp, mem⟩ := (hg.2 i z).mpr ⟨hin, y, code, hy⟩
+            exact Or.inl (kpair_unique_l M hZF.1 pp code ▸ mem)
+          · have eq := hZF.1.eq_of_same_members i n eq
+            subst i
+            have eq := hf.2.2 n hs.predecessor_mem z hz x hx ⟨y, code, hy⟩ hnx
+            exact Or.inr (kpair_unique_l M hZF.1 (eq ▸ code) hp)
       exact eq ▸ hfX
   exact (sat n).mp (all n hn) f hf
 

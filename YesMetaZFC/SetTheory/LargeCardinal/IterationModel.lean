@@ -62,12 +62,11 @@ theorem pn_model_sat_l {d} (ρ : Env M d) (ω κ K X R : Term d) :
       (Formula.satisfies ρ (pn_structure_m X) ∧ Formula.satisfies ρ (pn_closure_m ω X)) ↔
         (Sc_hierarchy_d (X.eval ρ) ∧ Sc_power_d (X.eval ρ) ∧ Sc_cover_d (X.eval ρ)) ∧
           Sh_source_d (ZF.modelsKP hZF) (ω.eval ρ) (X.eval ρ) ∧ Sc_inaccessible_closure_d I (ω.eval ρ) (X.eval ρ) := by
-    obtain ⟨c, hm⟩ := source.code
     let nx : Nonempty {x // M.mem x (X.eval ρ)} := ⟨⟨ω.eval ρ, source.omega_mem⟩⟩
     let η : Env (rt_model_l (X.eval ρ) nx) 0 := ⟨Fin.elim0, fun _ => ⟨ω.eval ρ, source.omega_mem⟩⟩
     let θ : Env (rt_model_l (X.eval ρ) nx) 1 := ⟨fun _ => ⟨ω.eval ρ, source.omega_mem⟩, η.free⟩
-    have base := sc_relative_sat_l I hm source.transitive nx pn_base_m pn_base_closed_l η ρ X Fin.elim0 rfl (fun i => Fin.elim0 i)
-    have closure := sc_relative_sat_l I hm source.transitive nx
+    have base := sc_relative_sat_l source.transitive nx pn_base_m pn_base_closed_l η ρ X Fin.elim0 rfl (fun i => Fin.elim0 i)
+    have closure := sc_relative_sat_l source.transitive nx
       (.conj (sh_source_m .newest) (sc_inaccessible_closure_m .newest)) (by simp -implicitDefEqProofs [Definitional.Formula.FreeClosed])
       θ ρ X (fun _ => ω) rfl (fun _ => rfl)
     simp only [pn_base_m, Formula.satisfies_conj_iff, sc_hierarchy_sat_l (ZF.modelsKP hZF) source.transitive nx,

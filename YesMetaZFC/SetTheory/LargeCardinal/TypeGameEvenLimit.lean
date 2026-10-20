@@ -70,8 +70,13 @@ theorem Tg_sequence_d.even_illfounded_l {ω c o C γ Z A D f B : M.Domain} {U : 
   have oldFs := (run.context.read_l hZF run.source.source).1
   have newFs := (context.read_l hZF source).1
   obtain ⟨ι, eq, valid⟩ := run.read_l hZF nc
-  obtain ⟨θ, images, moved⟩ := map.relative_image_l hZF hw run.source.source.transitive nt run.model target
-    oldFs.transitive newFs.transitive nc nc' imageC tg_issued0_m tg_issued0_closed_l ι
+  obtain ⟨kC, layerC, idC⟩ := rr_layer_mem_l I hZF run.model run.source.source.transitive run.context.member oldFs.transitive
+  obtain ⟨kD, layerD, idD⟩ := rr_layer_mem_l I hZF target nt context.member newFs.transitive
+  obtain ⟨θ, trace, moved⟩ := map.relative_image_l hZF hw run.model.1 target.1
+    layerC layerD nc nc' imageC tg_issued0_m tg_issued0_closed_l ι
+  have images i : Rd_entry_d (ι.bound i).val (θ.bound i).val j := by
+    obtain ⟨a, b, ha, edge, hb⟩ := trace i
+    exact ((idC _ _).mp ha).2.symm ▸ ((idD _ _).mp hb).2.symm ▸ edge
   have state := (tg_issued_sat_l (rt_pair_l newFs.transitive nc' hZF.1 newFs.pair)
     (rt_model_ext_l hZF.1 newFs.transitive nc') θ).mp (moved.mp valid)
   obtain ⟨α, H, _, _, rank⟩ := tg_control_rank_l (ZF.modelsKP hZF) newFs.transitive nc' _ state.control

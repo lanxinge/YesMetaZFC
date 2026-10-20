@@ -14,12 +14,12 @@ section Components
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem er_components_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domain}
+theorem er_components_l {ω c X R c' Y S q H N κ K L F R₀ Γ γ k : M.Domain}
   (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d I c X R)
   (theory : Sc_theory_d I ω X R) (collection : Sc_collection_d I ω X R)
-  (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : Rd_entry_d B H q)
-  (trans : M.TransitiveSet B) (small : Sc_small_d X B)
-  (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+  (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
+  (small : Rr_small_d I Y S H)
+  (closed : Rr_closed_d I Y S H)
   (owner : Ep_source_d hZF ω κ K N R₀) (hΓ : M.mem Γ N) (rank : Vr_d N γ Γ)
   (hγ : M.IsLimitOrdinal γ) (hκ : M.mem κ Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
   (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
@@ -38,7 +38,7 @@ theorem er_components_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domai
     have eq := fa'.domain_eq_l hZF.1 fa
     subst n'
     have hD := (owner.rank_agree_l hZF hΓ rank hγ hκ n D D hn space (fun _ h => h)).mpr (owner.space_mem_l hZF hn space)
-    obtain ⟨o, component⟩ := er_component_exists_l hZF hω hX mx theory collection model hq hBH trans small closed
+    obtain ⟨o, component⟩ := er_component_exists_l hZF hω hX mx theory collection model hq small closed
       (rank.transitive_l hZF owner.transitive hΓ) (owner.transitive Γ hΓ) fk image pred hn fa space haU hD measure
     exact ⟨o, (sat a o).mpr component⟩
   have unique a (_ : M.mem a J) b d (hb : φ.denote η a b) (hd : φ.denote η a d) :=
@@ -55,12 +55,12 @@ variable (hZFC : M.Models ZFC)
 local notation "hZF" => ZFC.models_zf_l hZFC
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem er_component_map_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Domain}
+theorem er_component_map_l {ω c X R c' Y S q H N κ K L F R₀ Γ γ k : M.Domain}
   (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d I c X R)
   (theory : Sc_theory_d I ω X R) (collection : Sc_collection_d I ω X R)
-  (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : Rd_entry_d B H q)
-  (trans : M.TransitiveSet B) (small : Sc_small_d X B)
-  (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+  (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
+  (small : Rr_small_d I Y S H)
+  (closed : Rr_closed_d I Y S H)
   (owner : Ep_source_d hZF ω κ K N R₀) (hΓ : M.mem Γ N) (rank : Vr_d N γ Γ)
   (hγ : M.IsLimitOrdinal γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
   (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
@@ -88,7 +88,7 @@ theorem er_component_map_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Do
       ∃ P V, Rt_source_d I Y S D t P ∧ M.MemberSubset P N ∧ Rel_ultra_d D P V ∧
         (∀ A, M.mem A V ↔ M.mem A P ∧ M.mem A U) ∧ Rp_model_d I D Y V S o G p C T := by
     obtain ⟨d', t', P, V, hDd', _, ht', ft, domain, hP, inN, ultra, restrict⟩ :=
-      hq.measure_raw_l I hZF hω hX mx theory model hBH closed low (owner.transitive Γ hΓ) fk image pred
+      hq.measure_raw_l I hZF hω hX mx theory model closed low (owner.transitive Γ hΓ) fk image pred
         (fk.1.input_mem_of_pairMember hDd) measure
     have eq := fk.1.1.2 D d' d hDd' hDd
     subst d'
@@ -103,10 +103,8 @@ theorem er_component_map_l {ω c X R c' Y S q B H N κ K L F R₀ Γ γ k : M.Do
   obtain ⟨Q, V', hQ, _, ultra', vs, model₁'⟩ := prepare hEe hv hG₁ model₁ (family.at_l hZF.1 hbV fb es)
   let d' : (smdl_structure_l I (R := S) model.2.1).Domain := ⟨d, fk.1.output_mem_of_pairMember hDd⟩
   let e' : (smdl_structure_l I (R := S) model.2.1).Domain := ⟨e, fk.1.output_mem_of_pairMember hEe⟩
-  obtain ⟨μ₀, f₀, small₀⟩ := hq.small_raw_l hZF hω hX mx model hBH trans small d'
-    ((image d).mpr ⟨D, fk.1.input_mem_of_pairMember hDd, hDd⟩)
-  obtain ⟨μ₁, f₁, small₁⟩ := hq.small_raw_l hZF hω hX mx model hBH trans small e'
-    ((image e).mpr ⟨E, fk.1.input_mem_of_pairMember hEe, hEe⟩)
+  obtain ⟨μ₀, f₀, small₀⟩ := (small d d'.property ((image d).mpr ⟨D, fk.1.input_mem_of_pairMember hDd, hDd⟩)).index_l I model.2.1 d'
+  obtain ⟨μ₁, f₁, small₁⟩ := (small e e'.property ((image e).mpr ⟨E, fk.1.input_mem_of_pairMember hEe, hEe⟩)).index_l I model.2.1 e'
   have ft (D d t) (hDd : Rd_entry_d D d k) (ht : M.IsRestrictionOf I t k D) :=
     fn0_of_function_l (ZF.modelsKP hZF) (ht.isSetFunctionFromTo fk.1 (low D (fk.1.input_mem_of_pairMember hDd)))
   obtain ⟨_, _, j, _, _, _, _, _, embed, _, spec, lift, i, _, hi, _, ci, _, _⟩ :=

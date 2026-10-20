@@ -37,14 +37,13 @@ theorem ic_model_sat_l {d} (ρ : Env M d) (ω κ K X R : Term d) :
       (Formula.satisfies ρ (pn_structure_m X) ∧ Formula.satisfies ρ (ic_closure_m ω X)) ↔
         (Sc_hierarchy_d (X.eval ρ) ∧ Sc_power_d (X.eval ρ) ∧ Sc_cover_d (X.eval ρ)) ∧
           Sc_inaccessible_closure_d I (ω.eval ρ) (X.eval ρ) := by
-    obtain ⟨c, hm⟩ := s.code
     let nx : Nonempty {x // M.mem x (X.eval ρ)} := ⟨⟨ω.eval ρ, s.omega_mem⟩⟩
     let η : Env (rt_model_l (X.eval ρ) nx) 0 := ⟨Fin.elim0, fun _ => ⟨ω.eval ρ, s.omega_mem⟩⟩
     let θ : Env (rt_model_l (X.eval ρ) nx) 1 := ⟨fun _ => ⟨ω.eval ρ, s.omega_mem⟩, η.free⟩
-    have base := sc_relative_sat_l I hm s.transitive nx
+    have base := sc_relative_sat_l s.transitive nx
       (.conj sc_hierarchy_m (.conj sc_power_m sc_cover_m)) (by simp -implicitDefEqProofs [sc_hierarchy_m, Definitional.Formula.FreeClosed])
       η ρ X Fin.elim0 rfl (fun i => Fin.elim0 i)
-    have closure := sc_relative_sat_l I hm s.transitive nx (sc_inaccessible_closure_m .newest)
+    have closure := sc_relative_sat_l s.transitive nx (sc_inaccessible_closure_m .newest)
       (by simp -implicitDefEqProofs) θ ρ X (fun _ => ω) rfl (fun _ => rfl)
     simp only [Formula.satisfies_conj_iff, sc_hierarchy_sat_l (ZF.modelsKP hZF) s.transitive nx,
       sc_power_sat_l s.transitive nx, sc_cover_sat_l s.transitive nx] at base

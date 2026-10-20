@@ -48,7 +48,7 @@ theorem tg_issued_real_l {ω C : M.Domain} (fs : Fs_read_d ω C) (nc : Nonempty 
   let J := rt_pair_l fs.transitive nc hZF.1 fs.pair
   obtain ⟨h,x,_,_,_,_,_,_,_,_,_,endt,digits,_⟩ := tg_issued_query_l J (rt_model_ext_l hZF.1 fs.transitive nc) ρ valid
   refine ⟨x.val,(rt_fn_l fs.transitive nc hZF.1 _ _ _).mp digits.1,?_⟩
-  apply (tg_play_read_l hZF fs.transitive nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) x).mpr
+  apply (tg_play_read_l hZF.1 fs.transitive nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) x).mpr
   intro i v hi
   exact ((digits.2 i v (digits.1.bound_l hi).1).mp hi).end_l endt
 

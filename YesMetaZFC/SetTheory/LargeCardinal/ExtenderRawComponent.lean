@@ -70,24 +70,24 @@ theorem Er_system_d.model_l {ω κ L Y S F k J O Z A p T V a B : M.Domain}
   obtain ⟨rfl, rfl⟩ := kpair_injective_l M pair model.code.1
   exact ⟨o, C, W, hao, h.components a o hao, model.code, hB⟩
 
-theorem er_component_exists_l {ω c X R c' Y S q B H Γ k N κ L F a n D U : M.Domain}
+theorem er_component_exists_l {ω c X R c' Y S q H Γ k N κ L F a n D U : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d Kp c X R)
     (theory : Sc_theory_d Kp ω X R) (collection : Sc_collection_d Kp ω X R)
-    (model : Smdl_d Kp c' Y S) (hq : Smap_d Kp ω c c' X Y q) (hBH : Rd_entry_d B H q)
-    (trans : M.TransitiveSet B) (small : Sc_small_d X B)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (model : Smdl_d Kp c' Y S) (hq : Smap_d Kp ω c c' X Y q)
+    (small : Rr_small_d Kp Y S H)
+    (closed : Rr_closed_d Kp Y S H)
     (hΓ : M.TransitiveSet Γ) (inside : M.MemberSubset Γ N) (fk : M.IsSetInjectionFromTo Kp k Γ Y)
     (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
     (pred : ∀ x z, Rd_entry_d x z k → ∀ w, Rd_entry_d w z S ↔ ∃ y, M.mem y x ∧ Rd_entry_d y w k)
     (hn : M.mem n ω) (fa : Fn0_d n L a) (space : Ep_space_d κ n D) (haU : Rd_entry_d a U F)
     (hD : M.mem D Γ) (measure : Sf_ultra_d N D U) : ∃ o, Er_component_d Kp ω κ L Y S F k a o := by
   obtain ⟨d, t, P, V, hDd, hdH, ht, ft, domain, hP, inN, ultra, restrict⟩ :=
-    hq.measure_raw_l Kp hZF hω hX mx theory model hBH closed hΓ inside fk image pred hD measure
+    hq.measure_raw_l Kp hZF hω hX mx theory model closed hΓ inside fk image pred hD measure
   have hd := fk.1.output_mem_of_pairMember hDd
-  obtain ⟨μ, e, index⟩ := hq.small_raw_l hZF hω hX mx model hBH trans small ⟨d, hd⟩ hdH
+  have ext : Rf_ext_d Kp Y S := hq.extensional_l hZF hω mx.1 model (rf_ext_mem_l Kp hZF.1 hX mx)
+  obtain ⟨μ, e, index⟩ := (small d hd hdH).index_l Kp model.2.1 ⟨d, hd⟩
   obtain ⟨G, o, p, C, T, _, _, quotient, _, functions, _⟩ := rc_successor_l hZF hω hX mx theory collection model hq
     ⟨d, hd⟩ μ e index (fn0_of_function_l (ZF.modelsKP hZF) ft) domain hP inN measure ultra restrict
-  have ext : Rf_ext_d Kp Y S := hq.extensional_l hZF hω mx.1 model (rf_ext_mem_l Kp hZF.1 hX mx)
   exact ⟨o, n, D, U, d, t, G, p, C, T, hn, fa, space, haU, hDd, ht,
     (rc_family_native_l Kp model.2.1 (ext.native_l Kp model.2.1) ⟨d, hd⟩ (fn0_of_function_l (ZF.modelsKP hZF) ft)).mpr functions, quotient⟩
 

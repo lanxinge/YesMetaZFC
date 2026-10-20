@@ -11,12 +11,12 @@ universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
-theorem Er_system_d.bounded_l {ω c X R c' Y S q B H N κ L F Γ γ k J O Z A p T V r C W
+theorem Er_system_d.bounded_l {ω c X R c' Y S q H N κ L F Γ γ k J O Z A p T V r C W
     A₀ b D₀ a₀ f₀ H₀ E : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (mx : Smem_d I c X R)
     (theory : Sc_theory_d I ω X R) (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
-    (hBH : Rd_entry_d B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+
+    (closed : Rr_closed_d I Y S H)
     (hN : M.TransitiveSet N) (algebra : Sc_algebra_d N) (hΓ : M.mem Γ N)
     (rank : Vr_d N γ Γ) (hγ : M.IsLimitOrdinal γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ z, Rd_entry_d z H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x z k)
@@ -62,7 +62,7 @@ theorem Er_system_d.bounded_l {ω c X R c' Y S q B H N κ L F Γ γ k J O Z A p 
   have codes := (rc_family_native_l I model.2.1 (ext.native_l I model.2.1) d' ft).mp functions
   obtain ⟨g, hg, gp, bound⟩ := rc_bounded_representative_l hZF hω hX mx theory model hq d' ft domain
     measure.base measure.proper codes quotient ⟨b'.property, f', quotient.map.projection.input_mem_of_pairMember fp, fc, fp⟩ rel
-  obtain ⟨f, hf, fn, comp⟩ := (hq.bounded_functions_raw_l hZF hω hX mx model hBH closed hN algebra hΓ rank hγ
+  obtain ⟨f, hf, fn, comp⟩ := (rr_bounded_functions_l hZF model.2.1 ext closed hN algebra hΓ rank hγ
     fk image pred d' b' hDd hAb ht codes g).mp ⟨hg, bound⟩
   obtain ⟨E', _, hwE⟩ := limit.projection.2.1 w (system.projection.bound_l hwa).1
   have eq := limit.commute_l system.diagram huw huE hwE

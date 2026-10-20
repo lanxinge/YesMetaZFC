@@ -44,9 +44,8 @@ theorem rt_record_in_sat_l {d n} (ρ : Env M d) (φ : Formula 1 (n+1)) (C r : Te
 theorem Rt_record_in_d.member_l {n} {φ : Formula 1 (n+1)} {C r : M.Domain}
     (h : Rt_record_in_d φ C r) : M.mem r C := ((Formula.satisfies_conj_iff ..).mp h).1
 
-variable (hZF : M.Models ZF)
-local notation "I" => kp_pair_l (ZF.modelsKP hZF)
-include hZF
+variable (hE : Extensional M)
+include hE
 
 theorem rt_record_in_read_l {n} (φ : Formula 1 (n+1)) (closed : φ.FreeClosed) {C r : M.Domain}
     (trans : M.TransitiveSet C) (nc : Nonempty {x // M.mem x C}) : Rt_record_in_d φ C r ↔
@@ -56,30 +55,41 @@ theorem rt_record_in_read_l {n} (φ : Formula 1 (n+1)) (closed : φ.FreeClosed) 
   · intro h
     let a : (rt_model_l C nc).Domain := ⟨r, h.member_l⟩
     let ρ : Env (rt_model_l C nc) 1 := ⟨fun _ => a, fun _ => a⟩
-    obtain ⟨c, R, code⟩ := smdl_membership_l I hZF ⟨a.val, a.property⟩
-    have valid := (sc_relative_sat_l I code trans nc (rt_record_m φ .newest)
+    have valid := (sc_relative_sat_l trans nc (rt_record_m φ .newest)
       (rt_record_closed_l _ _ closed rfl) ρ _ (.bound 0) (fun i => .bound i.succ) rfl (fun _ => rfl)).mp
       ((Formula.satisfies_conj_iff ..).mp h).2
-    obtain ⟨v, tuple, valid⟩ := (rt_record_sat_l (rt_model_ext_l hZF.1 trans nc) ρ φ .newest closed).mp valid
-    exact ⟨h.member_l, v, (rt_tuple_source_l hZF.1 trans nc v a).mp tuple,
+    obtain ⟨v, tuple, valid⟩ := (rt_record_sat_l (rt_model_ext_l hE trans nc) ρ φ .newest closed).mp valid
+    exact ⟨h.member_l, v, (rt_tuple_source_l hE trans nc v a).mp tuple,
       (Formula.closed_env_l φ closed (ρ := ⟨v, ρ.free⟩) (η := ⟨v, fun _ => v 0⟩) rfl).mp valid⟩
   · rintro ⟨hr, v, tuple, valid⟩
     let a : (rt_model_l C nc).Domain := ⟨r, hr⟩
     let ρ : Env (rt_model_l C nc) 1 := ⟨fun _ => a, fun _ => a⟩
-    obtain ⟨c, R, code⟩ := smdl_membership_l I hZF ⟨a.val, a.property⟩
     apply (Formula.satisfies_conj_iff ..).mpr
-    refine ⟨hr, (sc_relative_sat_l I code trans nc (rt_record_m φ .newest)
+    refine ⟨hr, (sc_relative_sat_l trans nc (rt_record_m φ .newest)
       (rt_record_closed_l _ _ closed rfl) ρ _ (.bound 0) (fun i => .bound i.succ) rfl (fun _ => rfl)).mpr ?_⟩
-    exact (rt_record_sat_l (rt_model_ext_l hZF.1 trans nc) ρ φ .newest closed).mpr
-      ⟨v, (rt_tuple_source_l hZF.1 trans nc v a).mpr tuple,
+    exact (rt_record_sat_l (rt_model_ext_l hE trans nc) ρ φ .newest closed).mpr
+      ⟨v, (rt_tuple_source_l hE trans nc v a).mpr tuple,
         (Formula.closed_env_l φ closed (ρ := ⟨v, fun _ => v 0⟩) (η := ⟨v, ρ.free⟩) rfl).mp valid⟩
 
-theorem Rt_record_in_d.map_l {n} {φ : Formula 1 (n+1)} {ω b B R x X S j C C' r r' : M.Domain}
-    (h : Rt_record_in_d φ C r) (closed : φ.FreeClosed) (hω : M.IsOmega ω)
-    (bt : M.TransitiveSet B) (xt : M.TransitiveSet X) (mb : Smem_d I b B R) (mx : Smem_d I x X S)
-    (embed : Smap_d I ω b x B X j) (iC : Rd_entry_d C C' j) (ir : Rd_entry_d r r' j) :
-    Rt_record_in_d φ C' r' :=
-  (smap_delta_l I hZF hω bt xt mb mx embed (rt_record_in0_m φ) (rt_record_in0_closed_l φ closed)
-    (rt_record_in0_delta_l φ) _ _ (Fin.cases iC (Fin.cases ir (fun i => Fin.elim0 i)))).mp h
+/-- 固定有限记录只需要配对闭包，与整个工作源的超幂性质无关。 -/
+theorem rt_record_in_save_l {n C} (φ : Formula 1 (n+1)) (closed : φ.FreeClosed)
+    (trans : M.TransitiveSet C)
+    (pair : ∀ a b, M.mem a C → M.mem b C → ∃ p, M.mem p C ∧ Pair_d M p a b)
+    (nc : Nonempty {x // M.mem x C}) (ρ : Env (rt_model_l C nc) (n+1)) (valid : Formula.satisfies ρ φ) :
+    ∃ r, Rt_record_in_d φ C r ∧ Rt_tuple_d (fun i => (ρ.bound i).val) r := by
+  have tuple {k} (v : Fin (k+1) → (rt_model_l C nc).Domain) :
+      ∃ r, M.mem r C ∧ Rt_tuple_d (fun i => (v i).val) r := by
+    induction k with
+    | zero => exact ⟨(v 0).val, (v 0).property, rfl⟩
+    | succ k ih =>
+      obtain ⟨r, hr, tail⟩ := ih (fun i => v i.succ)
+      let r₀ : (rt_model_l C nc).Domain := ⟨r, hr⟩
+      obtain ⟨q, code⟩ := (rt_pair_l trans nc hE pair).total (v 0) r₀
+      exact ⟨q.val, q.property, (rt_tuple_source_l hE trans nc v q).mp ⟨r₀, code,
+        (rt_tuple_source_l hE trans nc (fun i => v i.succ) r₀).mpr tail⟩⟩
+  obtain ⟨r, hr, code⟩ := tuple ρ.bound
+  exact ⟨r, (rt_record_in_read_l hE φ closed trans nc).mpr
+    ⟨hr, ρ.bound, code, (Formula.closed_env_l φ closed
+      (ρ := ρ) (η := ⟨ρ.bound, fun _ => ρ.bound 0⟩) rfl).mp valid⟩, code⟩
 
 end YesMetaZFC.SetTheory.Internal

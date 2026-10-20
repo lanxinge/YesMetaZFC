@@ -177,11 +177,10 @@ theorem Tg_context_d.restart_l {ω X η C κ K R b z : M.Domain} {σ : Fin 7 →
         ∃ a : Fin 16 → (rt_model_l C nc).Domain,
           Formula.satisfies (tg_round_env_d (tg_restart_env_d ρ χ ε π v) a) tg_round0_m := by
   have fs := (context.read_l hZF source).1
-  obtain ⟨c, S, model⟩ := smdl_membership_l I hZF ⟨ω, context.omega⟩
   let p : Fin 11 → M.Domain := fun i => [ω, (ρ.bound 24).val, b, z,
     σ 0, σ 1, σ 2, σ 3, σ 4, σ 5, σ 6].get i
   let ν : Env (rt_model_l C nc) 11 := ⟨fun i => ⟨p i, program.1 i⟩, fun _ => ⟨ω, context.omega⟩⟩
-  have numeric := (sc_relative_sat_l I model fs.transitive nc ts_numeric0_m ts_numeric0_closed_l
+  have numeric := (sc_relative_sat_l fs.transitive nc ts_numeric0_m ts_numeric0_closed_l
     ν ((⟨p, fun _ => ω⟩ : Env M 11).push C) .newest (fun i => .bound i.succ) rfl (fun _ => rfl)).mp program.2
   simp only [ts_numeric0_m, Formula.satisfies_exists_iff] at numeric
   obtain ⟨a, numeric⟩ := numeric
@@ -192,7 +191,7 @@ theorem Tg_context_d.restart_l {ω X η C κ K R b z : M.Domain} {σ : Fin 7 →
   have prog : Formula.satisfies π ts_program0_m := (Formula.satisfies_bind (ν.push a) f ts_program0_m).mp numeric
   obtain ⟨v, seed⟩ := tg_restart_l ρ χ ε π old candidate recovered prog same hw hl
     (Subtype.ext ωρ.symm) (Subtype.ext rfl) below
-  obtain ⟨a', round⟩ := tg_successor_read_l _ seed (context.renew_l hZF source nc _ seed)
+  obtain ⟨a', round⟩ := tg_successor_read_l _ seed ((context.kernel_l fs.transitive nc).renew_l _ seed)
   refine ⟨π, ?_, v, seed, a', round⟩
   intro i
   exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl

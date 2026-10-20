@@ -72,8 +72,9 @@ theorem pn_cut_step_l
   have ab := owner.rank_agree_l hZF hB rb limit hκB
   have full : Ea_agree_d ω κ B X := fun n D A hn hd sub =>
     (ab n D A hn hd sub).trans (agree n D A hn hd sub).symm
-  have family := (localB.measures_l hZF sb hv powers).transfer_l full
-  have coherent := (localB.coherent_l hZF sb).transfer_l hZF full
+  have family := (localB.measures_l hZF sb.omega (sb.read_source_l hZF) sb.code sb.theory
+    (sf_finite_power_l hZF sb.omega sb.transitive sb.code sb.theory sb.finite hv powers)).transfer_l full
+  have coherent := (localB.coherent_l hZF (sb.read_source_l hZF)).transfer_l hZF full
   have lo := (loc.ordinals_l (ZF.modelsKP hZF) owner.transitive).2
   obtain ⟨la, KA, a', R', γ', V', v, S', j', sa, code, _, eαγ, hV, rv, gv, mv, edge, _, _⟩ :=
     it_ultra_rank_l hZFC source family coherent (fun x hx => lo.transitive κ hκL x (source.below x hx))

@@ -18,10 +18,11 @@ local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 theorem It_local_d.subsets_l {ω κ K X R L F P N S : M.Domain}
     (source : Ep_source_d hZF ω κ K X R) (hP : M.mem P X) (power : FilterZF.Source_d X K P)
     (loc : It_local_d ω X κ L F) (next : Ep_successor_d hZF ω κ L X R F N S) : Ea_subset_d ω L N X := by
-  have family := loc.measures_l hZF source hP power
-  have coherent := loc.coherent_l hZF source
-  have atoms := loc.atoms_l hZF source
-  have normal := loc.normal_l hZF source
+  have family := loc.measures_l hZF source.omega (source.read_source_l hZF) source.code source.theory
+    (sf_finite_power_l hZF source.omega source.transitive source.code source.theory source.finite hP power)
+  have coherent := loc.coherent_l hZF (source.read_source_l hZF)
+  have atoms := loc.atoms_l hZF (source.read_source_l hZF)
+  have normal := loc.normal_l hZF (source.read_source_l hZF)
   have ord := loc.ordinals_l (ZF.modelsKP hZF) source.transitive
   obtain ⟨_, _, hL, hF, pre⟩ := loc
   simp only [ex_short_m, ex_pre_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at pre
@@ -46,10 +47,11 @@ theorem It_local_d.return_l {ω κ K X R K' Y S L F N V : M.Domain}
       Ea_agree_d ω L N N' ∧ Ea_subset_d ω L N' Y := by
   obtain ⟨P, hP, subsets⟩ := power K' owner.finite_mem
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP subsets).transfer_l reverse
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
-  have atoms := loc.atoms_l hZF owner
-  have normal := (loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP subsets)).transfer_l reverse
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
+  have atoms := loc.atoms_l hZF (owner.read_source_l hZF)
+  have normal := (loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have local_copy := loc
   obtain ⟨_, _, _, _, pre⟩ := local_copy

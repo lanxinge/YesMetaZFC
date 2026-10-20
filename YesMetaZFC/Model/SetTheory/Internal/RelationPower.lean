@@ -10,17 +10,15 @@ open Definitional.Project InnerModel FilterZF
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-theorem Smap_d.power_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k N D P : M.Domain}
-    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : M.PairMember I B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+theorem rr_power_l {Y S H Γ k N D P : M.Domain}
+    (ny : ∃ y, M.mem y Y) (closed : Rr_closed_d I Y S H)
     (hΓ : M.TransitiveSet Γ) (inside : M.MemberSubset Γ N) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ a, M.PairMember I a H S ↔ ∃ x, M.mem x Γ ∧ M.PairMember I x a k)
     (pred : ∀ x a, M.PairMember I x a k → ∀ b,
       M.PairMember I b a S ↔ ∃ y, M.mem y x ∧ M.PairMember I y b k)
-    (d p : (smdl_structure_l I (R := S) model.2.1).Domain)
+    (d p : (smdl_structure_l I (R := S) ny).Domain)
     (hDd : M.PairMember I D d.val k) (hPp : M.PairMember I P p.val k) (power : Source_d N D P) :
-    (smdl_structure_l I (R := S) model.2.1).IsPowerSetOf p d := by
+    (smdl_structure_l I (R := S) ny).IsPowerSetOf p d := by
   intro z
   constructor
   · intro hz x hx
@@ -28,7 +26,7 @@ theorem Smap_d.power_raw_l (hZF : M.Models ZF) {ω c X R c' Y S q B H Γ k N D P
     obtain ⟨s, hs, hsx⟩ := (pred A z.val hAz x.val).mp hx
     exact (pred D d.val hDd x.val).mpr ⟨s, ((power A).mp hA).2 s hs, hsx⟩
   · intro sub
-    obtain ⟨A, hA, hAz, subA⟩ := hq.capture_raw_l I hZF hω hX hm model hBH closed hΓ fk image pred hDd z.property
+    obtain ⟨A, hA, hAz, subA⟩ := rr_capture_l I closed hΓ fk image pred hDd z.property
       (fun x hx => sub ⟨x, hx⟩)
     exact (pred P p.val hPp z.val).mpr ⟨A, (power A).mpr ⟨inside A hA, subA⟩, hAz⟩
 

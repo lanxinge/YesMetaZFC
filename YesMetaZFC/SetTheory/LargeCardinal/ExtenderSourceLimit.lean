@@ -19,7 +19,8 @@ theorem It_local_d.limit_l {ω κ K X R K' Y S L F V : M.Domain}
     (owner_branches : Sc_branch_d ω Y) (hV : M.mem V Y) (owner_power : FilterZF.Source_d Y K' V)
     (loc : It_local_d ω Y κ L F) : Ep_limit_d hZF ω κ L X R F := by
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hV owner_power).transfer_l reverse
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hV owner_power)).transfer_l reverse
   obtain ⟨J, O, Z, A, p, T, U, q, c, C, W, system, limit, model, elementary⟩ :=
     loc.apply_l hZFC source owner hV owner_power reverse
   have wf := loc.source_wf_l hZF source owner (ZFC.dc_l I hZFC source.omega) branches cover power

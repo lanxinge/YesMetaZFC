@@ -43,26 +43,26 @@ variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 include hZF
 
-theorem tg_play_read_l {C : M.Domain} (ct : M.TransitiveSet C) (nc : Nonempty {x // M.mem x C})
+omit hZF in
+theorem tg_play_read_l (hE : Extensional M) {C : M.Domain} (ct : M.TransitiveSet C) (nc : Nonempty {x // M.mem x C})
     (J : kpair_convention_l.Interpretation (rt_model_l C nc)) (c b h s : (rt_model_l C nc).Domain) :
     Tg_play_d C c.val b.val h.val s.val ↔ ∀ i x, Rd_entry_d i x s → Tg_event_d J c i b h x := by
-  obtain ⟨d, R, model⟩ := smdl_membership_l I hZF ⟨c.val, c.property⟩
   let ρ : Env (rt_model_l C nc) 4 := ⟨fun i => [c,b,h,s].get i, fun _ => c⟩
   let η : Env M 5 := ⟨fun i => [C,c.val,b.val,h.val,s.val].get i, fun _ => C⟩
-  have rel := sc_relative_sat_l I model ct nc tg_play_body0_m tg_play_body0_closed_l ρ η
+  have rel := sc_relative_sat_l ct nc tg_play_body0_m tg_play_body0_closed_l ρ η
     (.bound 0) (fun i => .bound i.succ) rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun i => Fin.elim0 i)))))
   change (M.mem s.val C ∧ Formula.satisfies η (lr_rel_m tg_play_body0_m (.bound 0) (fun i => .bound i.succ))) ↔ _
   rw [and_iff_right s.property, rel]
   simp only [tg_play_body0_m, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
-    rd_entry0_sat_l (rt_model_ext_l hZF.1 ct nc), tg_event_sat_l J (rt_model_ext_l hZF.1 ct nc)]
+    rd_entry0_sat_l (rt_model_ext_l hE ct nc), tg_event_sat_l J (rt_model_ext_l hE ct nc)]
   rfl
 
 theorem Tg_play_d.mono_l {C s : M.Domain} (ct : M.TransitiveSet C) (nc : Nonempty {x // M.mem x C})
     (J : kpair_convention_l.Interpretation (rt_model_l C nc)) (c b h h' : (rt_model_l C nc).Domain)
     (play : Tg_play_d C c.val b.val h.val s) (sub : M.MemberSubset h.val h'.val) : Tg_play_d C c.val b.val h'.val s := by
   have hs : M.mem s C := ((Formula.satisfies_conj_iff ..).mp play).1
-  exact (tg_play_read_l hZF ct nc J c b h' ⟨s,hs⟩).mpr fun i x hi =>
-    ((tg_play_read_l hZF ct nc J c b h ⟨s,hs⟩).mp play i x hi).mono_l J (fun p hp => sub p.val hp)
+  exact (tg_play_read_l hZF.1 ct nc J c b h' ⟨s,hs⟩).mpr fun i x hi =>
+    ((tg_play_read_l hZF.1 ct nc J c b h ⟨s,hs⟩).mp play i x hi).mono_l J (fun p hp => sub p.val hp)
 
 theorem Tg_play_d.map_l {ω X R d Y S e j C C' c c' b b' h h' s s' : M.Domain}
     (hw : M.IsOmega ω) (xt : M.TransitiveSet X) (yt : M.TransitiveSet Y)
@@ -85,9 +85,9 @@ theorem Tg_play_d.entry_eq_l {C s t i x y : M.Domain} (ct : M.TransitiveSet C) (
   have state := (tg_issued_sat_l J (rt_model_ext_l hZF.1 ct nc) ρ).mp valid
   have ix := rd_entry_transitive_l ct hs hi
   have iy := rd_entry_transitive_l ct ht hy
-  have ex := (tg_play_read_l hZF ct nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) ⟨s,hs⟩).mp left
+  have ex := (tg_play_read_l hZF.1 ct nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) ⟨s,hs⟩).mp left
     ⟨i,ix.1⟩ ⟨x,ix.2⟩ ((rt_entry_l ct nc hZF.1 _ _ _).mpr hi)
-  have ey := (tg_play_read_l hZF ct nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) ⟨t,ht⟩).mp right
+  have ey := (tg_play_read_l hZF.1 ct nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) ⟨t,ht⟩).mp right
     ⟨i,ix.1⟩ ⟨y,iy.2⟩ ((rt_entry_l ct nc hZF.1 _ _ _).mpr hy)
   exact congrArg Subtype.val (tg_control_event_unique_l J (rt_model_ext_l hZF.1 ct nc) _ state.control state.history ex ey)
 

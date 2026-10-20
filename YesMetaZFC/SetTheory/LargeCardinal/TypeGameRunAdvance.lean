@@ -60,9 +60,22 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   let n₂ : Nonempty {z // M.mem z C₂} := ⟨⟨ω, cn.omega⟩⟩
   have ft := (cn.read_l hZF sn.source).1
   let P := rt_pair_l ft.transitive n₂ hZF.1 ft.pair
-  obtain ⟨θ, images, moved⟩ := hj.relative_image_l hZF h.source.source.omega h.source.source.transitive
-    sn.source.transitive h.model mn fs.transitive ft.transitive nc n₂ iC tg_issued0_m tg_issued0_closed_l ι
-  have valid := moved.mp issued
+  -- 完整高层记录沿原关系边搬运，不把反射层冒充有界共同层。
+  obtain ⟨r', _, ir⟩ := hj.1.1.2.2 (v 17) (h.record.elim fun mem _ => mem 1)
+  have record' : Rf_record_d I N R₂ tg_issued0_m C₂ r' := h.record.map_l I hZF h.source.source.omega h.model.1 mn.1 hj
+    (rt_record_in0_closed_l _ tg_issued0_closed_l) (Fin.cases iC (fun _ => ir))
+  have coords i : ∃ z, Rd_entry_d (ι.bound i).val z j := by
+    obtain ⟨z, _, hz⟩ := hj.1.1.2.2 (ι.bound i).val (h.values.elim fun mem _ => mem i.succ)
+    exact ⟨z, hz⟩
+  obtain ⟨z, hz⟩ := Classical.axiomOfChoice coords
+  have tuple' : Rf_tuple_d I N R₂ z r' := h.values.map_l I hZF h.source.source.omega h.model.1 mn.1 hj
+    (rt_tuple_closed_l _ _ (fun _ => rfl) rfl) (Fin.cases ir hz)
+  have record' := ((rf_record_mem_l I sn.source.transitive mn tg_issued0_m).mp record').2
+  have tuple' := ((rf_tuple_mem_l I hZF.1 sn.source.transitive mn z).mp tuple').2
+  obtain ⟨_, a', code', valid⟩ := (rt_record_in_read_l hZF.1 tg_issued0_m tg_issued0_closed_l ft.transitive n₂).mp record'
+  let θ : Env (rt_model_l C₂ n₂) 46 := ⟨a', fun _ => a' 0⟩
+  have images i : Rd_entry_d (ι.bound i).val (θ.bound i).val j :=
+    (congrFun (rt_tuple_inj_l code' tuple') i).symm ▸ hz i
   have ωθ : (θ.bound 0).val = ω := fn ω _ ω (h.omega ▸ images 0)
     (hj.omega_l I hZF h.source.source.omega h.source.source.transitive sn.source.transitive h.model mn h.source.source.omega_mem)
   have seed := (Formula.satisfies_conj_iff ..).mp round |>.1
@@ -222,7 +235,7 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
   have qC : M.mem r₁ C₂ := ((Formula.satisfies_conj_iff ..).mp real₁.2).1
   obtain ⟨z, _, hz⟩ := real₁.1.2.1 _ sm.predecessor_mem
   have zC := (rd_entry_transitive_l ft.transitive qC hz).2
-  have ev := (tg_play_read_l hZF ft.transitive n₂ P (ε.bound 4) (ε.bound 3) (ε.bound 20) ⟨r₁,qC⟩).mp real₁.2
+  have ev := (tg_play_read_l hZF.1 ft.transitive n₂ P (ε.bound 4) (ε.bound 3) (ε.bound 20) ⟨r₁,qC⟩).mp real₁.2
     (θ.bound 19) ⟨z,zC⟩ ((rt_entry_l ft.transitive n₂ hZF.1 ..).mpr (en.symm ▸ hz))
   have event : Tg_event_d P (ε.bound 4) (θ.bound 19) (ε.bound 3) (ε.bound 20) y :=
     (control 4).symm ▸ (control 3).symm ▸ event
@@ -240,7 +253,11 @@ theorem Tg_run_d.advance_l {ω c₀ o Cᵣ γ Z A x : M.Domain} {v : Fin 18 → 
     · intro he
       have he := (fs_even_l hZF h.source.source.omega ft n₂ (θ.bound 0) (θ.bound 19) ωθ).mpr (en.symm ▸ he)
       exact congrArg Subtype.val (even ((Descriptive.gm_even_sat_l P (rt_model_ext_l hZF.1 ft.transitive n₂) ψ (.bound 0) (.bound 19)).mpr he))
-  obtain ⟨r, record, values⟩ := cn.save_issued_l hZF sn.source n₂ ε legal
+  obtain ⟨r, record, values⟩ := rt_record_in_save_l hZF.1 tg_issued0_m tg_issued0_closed_l
+    (cn.read_l hZF sn.source).1.transitive (cn.read_l hZF sn.source).1.pair n₂ ε legal
+  have values := (rf_tuple_mem_l I hZF.1 sn.source.transitive mn _).mpr
+    ⟨sn.source.transitive C₂ cn.member r record.member_l, values⟩
+  have record := (rf_record_mem_l I sn.source.transitive mn tg_issued0_m).mpr ⟨cn.member, record⟩
   let w : Fin 18 → M.Domain := fun i => [N, R₂, L, K₂, η₂, C₂, β₂, β, T₂, Q₂, G₂, E₂, H₂, H, κ, d, π₂, r].get i
   have growing : M.mem κ (ε.bound 24).val := eκ ▸ growth
   have highκ : M.MemberSubset γ κ := fun z hz => subset z (limit.1.transitive _ bound z (high z hz))

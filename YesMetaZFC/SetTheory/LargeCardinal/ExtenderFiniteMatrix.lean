@@ -17,7 +17,7 @@ theorem Ep_source_d.matrix_l {ω κ K X R D b G : M.Domain}
     ∃ B E V, M.mem B X ∧ M.mem E X ∧ M.mem V X ∧ M.IsFunctionSpace I E b B ∧ Fn0_d D E V ∧
       ∀ v t i f x, Rd_entry_d v t V → Rd_entry_d i f G → (Rd_entry_d i x t ↔ Rd_entry_d v x f) := by
   obtain ⟨c, code⟩ := source.code
-  have hG := sc_finite_function_l hZF source.omega source.transitive code source.theory source.omega_mem
+  have hG := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
     (fun _ h => h) hb fg
   obtain ⟨C, hC, functions⟩ := source.theory.algebra.envelope_l hG
   obtain ⟨U, hU, union⟩ := source.theory.algebra.union C hC

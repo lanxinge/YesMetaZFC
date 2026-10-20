@@ -41,7 +41,7 @@ theorem Tg_game_d.control_context_l
       (η := ⟨Fin.cases C (fun _ => r), fun _ => C⟩)
       (funext (Fin.cases rfl (Fin.cases rfl (fun i => Fin.elim0 i))))).mp reflected
   let nc : Nonempty {x // M.mem x C} := ⟨⟨p.ω, context.omega⟩⟩
-  obtain ⟨_, v, code, valid⟩ := (rt_record_in_read_l hZF tg_control0_m tg_control0_closed_l
+  obtain ⟨_, v, code, valid⟩ := (rt_record_in_read_l hZF.1 tg_control0_m tg_control0_closed_l
     (context.read_l hZF source.source).1.transitive nc).mp record
   have eq := rt_tuple_inj_l code tuple
   exact ⟨H, r, θ, X, R, c, K, η, C, regular, rank, model, source, context, record, tuple,

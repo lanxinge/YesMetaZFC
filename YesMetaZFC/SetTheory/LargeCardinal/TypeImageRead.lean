@@ -50,9 +50,9 @@ theorem ti_image_read_l (owner : Ep_source_d hZF ω μ K₀ Z R₀) (power : Sc_
   have quality := Δ _ (ex_quality_delta_l ..) quality
   simp only [ex_quality_m, Formula.satisfies_conj_iff] at quality
   obtain ⟨loc, card, strong⟩ := quality
-  have loc := (ex_local_sat_l hZF _ _ _ _ _ _
+  have loc := (ex_local_sat_l _ _ _ _ _ _
     (by simpa only [@eval_image_env_l N M Subtype.val] using trans)).mp loc
-  have card := (ex_inaccessible_sat_l hZF _ _ _ _
+  have card := (ex_inaccessible_sat_l _ _ _ _
     (by simpa only [@eval_image_env_l N M Subtype.val] using trans)).mp card
   simp only [@eval_image_env_l N M Subtype.val, hw] at loc card
   have ord := (loc.ordinals_l (ZF.modelsKP hZF) trans).1
@@ -65,8 +65,9 @@ theorem ti_image_read_l (owner : Ep_source_d hZF ω μ K₀ Z R₀) (power : Sc_
     (by simpa only [@eval_image_env_l N M Subtype.val, hw] using source)).mp strong
   simp only [@eval_image_env_l N M Subtype.val, hw] at strong
   obtain ⟨P, hP, subsets⟩ := power.rank_l hZF owner.transitive hXZ full hδ K₁ source.finite_mem
-  have family := loc.measures_l hZF source hP subsets
-  have actual := it_ultra_read_l hZFC fs nc ρ o κ L F c d j hw source mx family (loc.coherent_l hZF source) ultra
+  have family := loc.measures_l hZF source.omega (source.read_source_l hZF) source.code source.theory
+    (sf_finite_power_l hZF source.omega source.transitive source.code source.theory source.finite hP subsets)
+  have actual := it_ultra_read_l hZFC fs nc ρ o κ L F c d j hw source mx family (loc.coherent_l hZF (source.read_source_l hZF)) ultra
   have critical := (wd_crit_sat_l J ext ρ X j κ κ').mp critical
   have image := (rt_entry_l fs.transitive nc hZF.1 ..).mp critical.image
   have crit := actual.critical_l hZF source family source (fun _ _ _ _ _ _ => Iff.rfl) loc hκL mx my image

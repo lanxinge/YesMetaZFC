@@ -26,7 +26,8 @@ theorem et_stretch_closed_l {d K R V} (ρ : Env M d) (ω κ L X F t D v : Term d
   obtain ⟨c, hm⟩ := source.code
   obtain ⟨c', j, ultra, N, S, _, hn, _⟩ := it_ultra_exists_l hZF hm
     (loc.closed_limit_l hZFC source source closed (fun _ _ _ _ _ _ => Iff.rfl) hP subsets)
-  have family := loc.measures_l hZF source hP subsets
+  have family := loc.measures_l hZF source.omega (source.read_source_l hZF) source.code source.theory
+    (sf_finite_power_l hZF source.omega source.transitive source.code source.theory source.finite hP subsets)
   obtain ⟨_, _, hL, hF, _⟩ := loc
   exact et_stretch_sat_l hZF ρ ω κ L X F t D v source power family hm hn ultra hL hF hl level hκ ht
 

@@ -40,29 +40,26 @@ theorem rr_realize_product_l {Γ Y S k D A P : M.Domain}
   obtain ⟨w, hw, code⟩ := moved.2 x hx y hy
   exact kpair_unique_l _ en code pair ▸ hw
 
-theorem Smap_d.capture_function_raw_l {ω c X R c' Y S q B H Γ k D A P : M.Domain}
-    (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
-    (model : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q) (hBH : Rd_entry_d B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+theorem rr_capture_function_l {Y S H Γ k D A P : M.Domain}
+    (ny : ∃ y, M.mem y Y) (ext : Rf_ext_d I Y S) (closed : Rr_closed_d I Y S H)
     (hΓ : M.TransitiveSet Γ) (fk : M.IsSetInjectionFromTo I k Γ Y)
     (image : ∀ a, Rd_entry_d a H S ↔ ∃ x, M.mem x Γ ∧ Rd_entry_d x a k)
     (pred : ∀ x a, Rd_entry_d x a k → ∀ b, Rd_entry_d b a S ↔ ∃ y, M.mem y x ∧ Rd_entry_d y b k)
-    (d a f : (smdl_structure_l I (R := S) model.2.1).Domain)
+    (d a f : (smdl_structure_l I (R := S) ny).Domain)
     (hD : Rd_entry_d D d.val k) (hA : Rd_entry_d A a.val k)
     (hP : M.mem P Γ) (product : M.IsCartesianProduct I P D A) (fn : Fn0_d d a f) :
     ∃ F, M.mem F Γ ∧ Rd_entry_d F f.val k ∧ Fn0_d D A F := by
-  have ext : Rf_ext_d I Y S := hq.extensional_l hZF hω hm.1 model (rf_ext_mem_l I hZF.1 hX hm)
   obtain ⟨p, hp, hPp⟩ := fk.1.2.2 P hP
-  have prod := rr_realize_product_l hZF hΓ model.2.1 ext fk pred d a ⟨p, hp⟩ hD hA hPp product
-  obtain ⟨F, hF, hFf, _⟩ := hq.capture_raw_l I hZF hω hX hm model hBH closed hΓ fk image pred hPp f.property
+  have prod := rr_realize_product_l hZF hΓ ny ext fk pred d a ⟨p, hp⟩ hD hA hPp product
+  obtain ⟨F, hF, hFf, _⟩ := rr_capture_l I closed hΓ fk image pred hPp f.property
     (fun z hz hzf => (prod ⟨z, hz⟩).mpr (fn.1 ⟨z, hz⟩ hzf))
   let nx : Nonempty {x // M.mem x Γ} := ⟨⟨F, hF⟩⟩
-  have transfer := rr_realize_delta_l I hΓ nx model.2.1 fk pred (fn0_m (.bound 2) (.bound 1) .newest)
+  have transfer := rr_realize_delta_l I hΓ nx ny fk pred (fn0_m (.bound 2) (.bound 1) .newest)
     (by simp -implicitDefEqProofs) (fn0_delta_l ..)
     (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨A, fk.1.input_mem_of_pairMember hA⟩
       (fun _ => ⟨D, fk.1.input_mem_of_pairMember hD⟩)), fun _ => ⟨F, hF⟩⟩ : Env (rt_model_l Γ nx) 3)
-    (⟨Fin.cases f (Fin.cases a (fun _ => d)), fun _ => d⟩ : Env (smdl_structure_l I (R := S) model.2.1) 3)
+    (⟨Fin.cases f (Fin.cases a (fun _ => d)), fun _ => d⟩ : Env (smdl_structure_l I (R := S) ny) 3)
     (Fin.cases hFf (Fin.cases hA (fun _ => hD)))
-  exact ⟨F, hF, hFf, (fn0_sat_l hZF.1 ..).mp (transfer.mpr ((fn0_sat_l (ext.native_l I model.2.1) ..).mpr fn))⟩
+  exact ⟨F, hF, hFf, (fn0_sat_l hZF.1 ..).mp (transfer.mpr ((fn0_sat_l (ext.native_l I ny) ..).mpr fn))⟩
 
 end YesMetaZFC.SetTheory.Internal

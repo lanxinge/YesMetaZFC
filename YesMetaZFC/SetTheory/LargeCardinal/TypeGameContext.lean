@@ -10,6 +10,8 @@ import YesMetaZFC.SetTheory.LargeCardinal.ExtenderReadSource
 import YesMetaZFC.Model.SetTheory.LevyReflection
 import YesMetaZFC.SetTheory.CumulativeRegularCover
 import YesMetaZFC.SetTheory.Card.FiniteParameters
+import YesMetaZFC.SetTheory.LargeCardinal.TypeGameSeedBound
+import YesMetaZFC.Model.SetTheory.Internal.RelationRecord
 
 /-! # 工作模型中的有限反射秩段
 
@@ -29,6 +31,19 @@ def tg_kernel_m : Formula 1 0 := .conj tg_renewal_m
 theorem tg_kernel_closed_l : tg_kernel_m.FreeClosed :=
   ⟨tg_renewal_closed_l, tc_transfer_closed_l, ee_rebuild_closed_l, tc_realize_closed_l,
     tc_rigid_closed_l, tc_recover_closed_l, tg_reply_compare_closed_l⟩
+
+/-- 当前结构中的七条原全称规则；结构可以使用任意实际成员关系。 -/
+def Tg_kernel_d (N : Structure.{u}) : Prop :=
+  ∀ ρ : Env N 0, Formula.satisfies ρ tg_kernel_m
+
+/-- 已证更新规则组成同一反射核，可在给定地模型内部直接调用。 -/
+theorem tg_kernel_true_l (hZFC : M.Models ZFC) (z : M.Domain) :
+    Formula.satisfies (⟨Fin.elim0, fun _ => z⟩ : Env M 0) tg_kernel_m := by
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff]
+  exact ⟨tg_renewal_true_l hZFC (fun _ => z), tc_transfer_true_l hZFC (fun _ => z),
+    ee_rebuild_true_l hZFC (fun _ => z), tc_realize_true_l (ZFC.models_zf_l hZFC) (fun _ => z),
+    tc_rigid_true_l (ZFC.models_zf_l hZFC) (fun _ => z), tc_recover_true_l (ZFC.models_zf_l hZFC) (fun _ => z),
+    tg_reply_compare_true_l (ZFC.models_zf_l hZFC) (fun _ => z)⟩
 
 def tg_context_m : Formula 1 1 := lr_rel_m tg_kernel_m .newest (fun i => .bound i.succ)
 
@@ -72,15 +87,19 @@ theorem tg_context_data_sat_l (hKP : M.Models KP) {d} (ρ : Env M d) (ω X η C 
 variable (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
 
+theorem Tg_context_d.kernel_l {ω X η C : M.Domain} (h : Tg_context_d ω X η C)
+    (trans : M.TransitiveSet C) (nc : Nonempty {x // M.mem x C}) : Tg_kernel_d (rt_model_l C nc) := by
+  intro ρ
+  exact (sc_relative_sat_l trans nc tg_kernel_m tg_kernel_closed_l ρ
+    ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C)
+    .newest (fun i => .bound i.succ) rfl (fun i => Fin.elim0 i)).mp h.kernel
+
 theorem Tg_context_d.read_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
     (source : Ep_source_d hZF ω κ K X R) :
     Fs_read_d ω C ∧ Formula.satisfies
       (⟨Fin.elim0, fun _ => ⟨ω, h.omega⟩⟩ : Env (rt_model_l C ⟨⟨ω, h.omega⟩⟩) 0) tg_kernel_m := by
   have finite := source.rank_read_source_l hZF h.member h.rank h.limit h.omega
-  obtain ⟨c, S, code⟩ := smdl_membership_l I hZF ⟨ω, h.omega⟩
-  exact ⟨finite, (sc_relative_sat_l I code finite.transitive ⟨⟨ω, h.omega⟩⟩ tg_kernel_m tg_kernel_closed_l
-    ⟨Fin.elim0, fun _ => ⟨ω, h.omega⟩⟩ ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C)
-    .newest (fun i => .bound i.succ) rfl (fun i => Fin.elim0 i)).mp h.kernel⟩
+  exact ⟨finite, h.kernel_l finite.transitive _ _⟩
 
 theorem Tg_context_d.map_l {ω X R c Y S d j η C : M.Domain} (h : Tg_context_d ω X η C)
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hY : M.TransitiveSet Y)
@@ -89,112 +108,78 @@ theorem Tg_context_d.map_l {ω X R c Y S d j η C : M.Domain} (h : Tg_context_d 
   obtain ⟨η', hη', hη⟩ := hj.1.1.2.2 η h.height
   obtain ⟨C', hC', hC⟩ := hj.1.1.2.2 C h.member
   have hw := hj.omega_l I hZF hω hX hY mx my (hX C h.member ω h.omega)
-  have tr := smap_delta_l I hZF hω hX hY mx my hj tg_context_m tg_context_closed_l tg_context_delta_l
-    ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C) ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C')
-    (Fin.cases hC (fun i => Fin.elim0 i))
+  -- 更新核作为原关系中的整句搬运，因而仍覆盖目标中的全部新输入。
+  have old : Rr_truth_d I X R tg_context_m (fun _ => C) :=
+    (rr_truth_mem_l I hX mx tg_context_m tg_context_delta_l _).mpr ⟨fun _ => h.member,
+      (Formula.closed_env_l tg_context_m tg_context_closed_l
+        (ρ := ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C))
+        (η := ⟨fun _ => C, fun _ => C⟩) (funext (Fin.cases rfl (fun i => Fin.elim0 i)))).mp h.kernel⟩
+  have moved : Rr_truth_d I Y S tg_context_m (fun _ => C') :=
+    old.map_l I hZF hω mx.1 my.1 hj tg_context_closed_l (fun _ => hC)
+  have kernel := ((rr_truth_mem_l I hY my tg_context_m tg_context_delta_l _).mp moved).2
+  have kernel := (Formula.closed_env_l tg_context_m tg_context_closed_l
+    (ρ := (⟨fun _ => C', fun _ => C'⟩ : Env M 1))
+    (η := ((⟨Fin.elim0, fun _ => ω⟩ : Env M 0).push C'))
+    (funext (Fin.cases rfl (fun i => Fin.elim0 i)))).mp kernel
   exact ⟨η', C', hη, hC, hη', hC', (hj.hierarchy_l hZF hω hX hY mx my hη hC).mp h.rank,
     (hj.limit_l hZF hω hX hY mx my hη).mp h.limit,
-    (hj.member_l I hZF hω mx my hw hC).mp h.omega, tr.mp h.kernel⟩
+    (hj.member_l I hZF hω mx my hw hC).mp h.omega, kernel⟩
 
-/-- 全称句子在目标秩段内覆盖任意新输入，不局限于旧参数的像。 -/
-theorem Tg_context_d.renew_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 38) (seed : Formula.satisfies ρ tg_seed0_m) :
-    Formula.satisfies ρ tg_successor0_m := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tg_seed0_m tg_successor0_m)).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp tg_seed0_m tg_successor0_m)
-    ⟨tg_seed0_closed_l, tg_successor0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved seed
-
-/-- 原继续规则中的新超过见证在当前层直接产生实际像证书。 -/
-theorem Tg_context_d.continue_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 28) (seed : Formula.satisfies ρ tc_seed0_m) :
-    Formula.satisfies ρ tc_result0_m := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp
-    ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).2).1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tc_seed0_m tc_result0_m)).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp tc_seed0_m tc_result0_m)
-    ⟨tc_seed0_closed_l, tc_result0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved seed
-
-/-- 原程序与原名字列在新层重新解释为完整的四查询语言。 -/
-theorem Tg_context_d.language_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 10) (seed : Formula.satisfies ρ ee_rebuild_seed_m) :
-    Formula.satisfies ρ ee_language0_m := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-    ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).2).2).1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp ee_rebuild_seed_m ee_language0_m)).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp ee_rebuild_seed_m ee_language0_m)
-    ⟨ee_rebuild_seed_closed_l, ee_language0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved seed
-
-/-- 完整旧实现与原程序共同解释同一原子类型查询。 -/
-theorem Tg_context_d.realize_seed_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 27) (seed : Formula.satisfies ρ tc_realize_seed0_m) :
-    Formula.satisfies ρ tc_realize_result0_m := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-    ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).2).2).2).1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tc_realize_seed0_m tc_realize_result0_m)).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp tc_realize_seed0_m tc_realize_result0_m)
-    ⟨tc_realize_seed0_closed_l, tc_realize_result0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved seed
-
-/-- 超过关系和 dcp 定义域自动给出原最大序数查询。 -/
-theorem Tg_context_d.rigid_seed_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 29) (seed : Formula.satisfies ρ tc_rigid_seed0_m) :
-    M.mem (ρ.bound 25).val (ρ.bound 20).val := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-    ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-      ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).2).2).2).2).1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tc_rigid_seed0_m (.mem (.bound 25) (.bound 20)))).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp tc_rigid_seed0_m (.mem (.bound 25) (.bound 20)))
-    ⟨tc_rigid_seed0_closed_l, rfl, rfl⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_mem_iff ..).mp ((Formula.satisfies_imp_iff ..).mp moved seed)
-
-/-- 在同一目标层中恢复新的元组、树节点及恰好一个标签。 -/
-theorem Tg_context_d.recover_seed_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 22) (seed : Formula.satisfies ρ tc_recover_seed0_m) :
-    Formula.satisfies ρ tc_recover_result0_m := by
-  have kernel := ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-    ((Formula.satisfies_conj_iff ..).mp ((Formula.satisfies_conj_iff ..).mp
-      ((Formula.satisfies_conj_iff ..).mp (h.read_l hZF source).2).2).2).2).2).2
-  have kernel := (Formula.satisfies_conj_iff ..).mp kernel |>.1
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tc_recover_seed0_m tc_recover_result0_m)).mp kernel ρ.bound
-  have moved := (Formula.closed_env_l (.imp tc_recover_seed0_m tc_recover_result0_m)
-    ⟨tc_recover_seed0_closed_l, tc_recover_result0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved seed
-
-/-- 完整回答在当前层接受同一基底上的任意原查询代码。 -/
-theorem Tg_context_d.reply_queries_l {ω κ K X R η C : M.Domain} (h : Tg_context_d ω X η C)
-    (source : Ep_source_d hZF ω κ K X R) (nc : Nonempty {x // M.mem x C})
-    (ρ : Env (rt_model_l C nc) 54) (round : Formula.satisfies ρ tg_round0_m) :
-    Formula.satisfies ρ tg_reply_compare0_m := by
-  have kernel := (h.read_l hZF source).2
+/-- 原后继规则覆盖当前结构的全部新参数。 -/
+theorem Tg_kernel_d.renew_l (h : Tg_kernel_d M) (ρ : Env M 38)
+    (seed : Formula.satisfies ρ tg_seed0_m) : Formula.satisfies ρ tg_successor0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
   simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
-  have step := (Formula.satisfies_forallClosure_iff (ℳ := rt_model_l C nc) (fun _ => ⟨ω, h.omega⟩)
-    (.imp tg_round0_m tg_reply_compare0_m)).mp kernel.2.2.2.2.2.2 ρ.bound
-  have moved := (Formula.closed_env_l (.imp tg_round0_m tg_reply_compare0_m)
-    ⟨tg_round0_closed_l, tg_reply_compare0_closed_l⟩
-    (ρ := ⟨ρ.bound, fun _ => ⟨ω, h.omega⟩⟩) (η := ρ) rfl).mp step
-  exact (Formula.satisfies_imp_iff ..).mp moved round
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tg_seed0_m tg_successor0_m)).mp kernel.1 ρ.bound) seed
+
+/-- 继续分支读取原超过见证，产生实际像证书。 -/
+theorem Tg_kernel_d.continue_l (h : Tg_kernel_d M) (ρ : Env M 28)
+    (seed : Formula.satisfies ρ tc_seed0_m) : Formula.satisfies ρ tc_result0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tc_seed0_m tc_result0_m)).mp kernel.2.1 ρ.bound) seed
+
+/-- 原程序和名字列重新解释为同一四查询语言。 -/
+theorem Tg_kernel_d.language_l (h : Tg_kernel_d M) (ρ : Env M 10)
+    (seed : Formula.satisfies ρ ee_rebuild_seed_m) : Formula.satisfies ρ ee_language0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp ee_rebuild_seed_m ee_language0_m)).mp kernel.2.2.1 ρ.bound) seed
+
+/-- 完整旧实现核验同一原子类型查询。 -/
+theorem Tg_kernel_d.realize_seed_l (h : Tg_kernel_d M) (ρ : Env M 27)
+    (seed : Formula.satisfies ρ tc_realize_seed0_m) : Formula.satisfies ρ tc_realize_result0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tc_realize_seed0_m tc_realize_result0_m)).mp kernel.2.2.2.1 ρ.bound) seed
+
+/-- 超过关系和 dcp 定义域给出原最大序数查询。 -/
+theorem Tg_kernel_d.rigid_seed_l (h : Tg_kernel_d M) (ρ : Env M 29)
+    (seed : Formula.satisfies ρ tc_rigid_seed0_m) : M.mem (ρ.bound 25) (ρ.bound 20) := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tc_rigid_seed0_m (.mem (.bound 25) (.bound 20)))).mp kernel.2.2.2.2.1 ρ.bound) seed
+
+/-- 恢复原元组、树节点及恰好一个新标签。 -/
+theorem Tg_kernel_d.recover_seed_l (h : Tg_kernel_d M) (ρ : Env M 22)
+    (seed : Formula.satisfies ρ tc_recover_seed0_m) : Formula.satisfies ρ tc_recover_result0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tc_recover_seed0_m tc_recover_result0_m)).mp kernel.2.2.2.2.2.1 ρ.bound) seed
+
+/-- 完整回答接受同一基底上的全部原查询代码。 -/
+theorem Tg_kernel_d.reply_queries_l (h : Tg_kernel_d M) (ρ : Env M 54)
+    (seed : Formula.satisfies ρ tg_round0_m) : Formula.satisfies ρ tg_reply_compare0_m := by
+  have kernel := h ⟨Fin.elim0, ρ.free⟩
+  simp only [tg_kernel_m, Formula.satisfies_conj_iff] at kernel
+  exact (Formula.satisfies_imp_iff ..).mp
+    ((Formula.satisfies_forallClosure_iff (ℳ := M) ρ.free (.imp tg_round0_m tg_reply_compare0_m)).mp kernel.2.2.2.2.2.2 ρ.bound) seed
 
 /-- 任意给定参数集合进入内层；两层均由已有 ZFC 构造实际产生。 -/
 theorem tg_context_l (hZFC : M.Models ZFC) {ω : M.Domain} (hω : M.IsOmega ω) (A : M.Domain) (Φ : List Lr_formula) :
@@ -221,13 +206,7 @@ theorem tg_context_l (hZFC : M.Models ZFC) {ω : M.Domain} (hω : M.IsOmega ω) 
   exact ⟨θ, X, R, c, K, η, C, regular, outer, code, source,
     ⟨hηX, hCX, ⟨D, F, hD, hF, fun t _ => cert t⟩, limit, hωC,
       (reflect ⟨0, tg_kernel_m, tg_kernel_closed_l⟩ (List.mem_cons_self ..)
-        ρ (fun i => Fin.elim0 i)).mp ((Formula.satisfies_conj_iff ..).mpr
-          ⟨tg_renewal_true_l hZFC ρ.free, (Formula.satisfies_conj_iff ..).mpr
-            ⟨tc_transfer_true_l hZFC ρ.free, (Formula.satisfies_conj_iff ..).mpr
-              ⟨ee_rebuild_true_l hZFC ρ.free, (Formula.satisfies_conj_iff ..).mpr
-                ⟨tc_realize_true_l hZF ρ.free, (Formula.satisfies_conj_iff ..).mpr
-                  ⟨tc_rigid_true_l hZF ρ.free, (Formula.satisfies_conj_iff ..).mpr
-                    ⟨tc_recover_true_l hZF ρ.free, tg_reply_compare_true_l hZF ρ.free⟩⟩⟩⟩⟩⟩)⟩, hAC,
+        ρ (fun i => Fin.elim0 i)).mp (tg_kernel_true_l hZFC ω)⟩, hAC,
       fun q hq => reflect q (List.mem_cons_of_mem _ hq)⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

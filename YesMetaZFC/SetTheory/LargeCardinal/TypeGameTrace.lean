@@ -77,14 +77,13 @@ theorem tg_trace_build_l {ω C k τ w : M.Domain} (trans : M.TransitiveSet C)
     (pair : KPair_d M z.val τ w) (event : Formula.satisfies
       (⟨fun i => [c, e, a, n, h, t, z].get i, fun _ => z⟩ : Env (rt_model_l C nc) 7) tg_round_event0_m) :
     Tg_trace_d ω C c.val e.val a.val n.val h.val t.val τ w := by
-  obtain ⟨b, R, code⟩ := smdl_membership_l I hZF ⟨n.val, n.property⟩
   apply (Formula.satisfies_conj_iff ..).mpr
   refine ⟨n.property, (Formula.satisfies_conj_iff ..).mpr ⟨t.property, ?_⟩⟩
   apply (Formula.satisfies_existsMem_iff ..).mpr
   refine ⟨k, hk, (Formula.satisfies_existsMem_iff ..).mpr ⟨z.val, z.property, ?_⟩⟩
   apply (Formula.satisfies_conj_iff ..).mpr
   refine ⟨(fn0_sat_l hZF.1 ..).mpr fn, (Formula.satisfies_conj_iff ..).mpr ⟨(kpair0_sat_l hZF.1 ..).mpr pair, ?_⟩⟩
-  have rel := (sc_relative_sat_l I code trans nc tg_round_event0_m tg_round_event0_closed_l
+  have rel := (sc_relative_sat_l trans nc tg_round_event0_m tg_round_event0_closed_l
     (⟨fun i => [c, e, a, n, h, t, z].get i, fun _ => z⟩ : Env (rt_model_l C nc) 7)
     ((⟨fun i => [c.val, e.val, a.val, n.val, h.val, t.val, z.val].get i, fun _ => ω⟩ : Env M 7).push C)
     .newest (fun i => .bound i.succ)
@@ -111,7 +110,6 @@ theorem Tg_trace_d.read_l {ω C n t τ w : M.Domain} (trans : M.TransitiveSet C)
   obtain ⟨pair, event⟩ := (Formula.satisfies_conj_iff ..).mp trace
   have fn := (fn0_sat_l hZF.1 ..).mp fn
   have pair := (kpair0_sat_l hZF.1 ..).mp pair
-  obtain ⟨b, R, code⟩ := smdl_membership_l I hZF ⟨n, hn⟩
   refine ⟨k, hk, fn, ⟨n, hn⟩, ⟨t, ht⟩, ⟨z, hz⟩, rfl, rfl, pair, ?_⟩
   have event := (Formula.satisfies_bind ..).mp event
   have rel : Formula.satisfies
@@ -120,7 +118,7 @@ theorem Tg_trace_d.read_l {ω C n t τ w : M.Domain} (trans : M.TransitiveSet C)
     funext i
     exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
       (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun i => Fin.elim0 i)))))))) i
-  exact (sc_relative_sat_l I code trans nc tg_round_event0_m tg_round_event0_closed_l
+  exact (sc_relative_sat_l trans nc tg_round_event0_m tg_round_event0_closed_l
     (⟨fun i => [c, e, a, ⟨n, hn⟩, h, ⟨t, ht⟩, ⟨z, hz⟩].get i, fun _ => ⟨z, hz⟩⟩ : Env (rt_model_l C nc) 7)
     ((⟨fun i => [c.val, e.val, a.val, n, h.val, t, z].get i, fun _ => ω⟩ : Env M 7).push C)
     .newest (fun i => .bound i.succ)

@@ -32,11 +32,12 @@ theorem It_local_d.strength_agree_l {ω κ K X R K' Y S Kₙ L F N V : M.Domain}
   have hωL := ord.2.transitive κ pre.1.2.2.2.2.1 ω pre.1.2.2.1
   have below := ord.2.transitive ω hωL
   obtain ⟨P, hP, ps⟩ := power K' owner.finite_mem
-  have family := loc.measures_l hZF owner hP ps
+  have family := loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP ps)
   have hj := ultra.elementary_l hZF hm.1 hn.1
   obtain ⟨Γ, _, hκΓ⟩ := hj.1.1.2.2 κ owner.cardinal_mem
-  have bound := ultra.support_l hZF owner family (loc.coherent_l hZF owner) (loc.atoms_l hZF owner)
-    (loc.normal_l hZF owner) ord.1 ord.2 below hm hn hκΓ
+  have bound := ultra.support_l hZF owner family (loc.coherent_l hZF (owner.read_source_l hZF)) (loc.atoms_l hZF (owner.read_source_l hZF))
+    (loc.normal_l hZF (owner.read_source_l hZF)) ord.1 ord.2 below hm hn hκΓ
   have value := strength.realize_l hZF owner family hm hn ultra ord.1.transitive hκΓ bound
   obtain ⟨KY, sy⟩ := owner.rebase_l hZF hLY below
     (sc_ordinal_small_l hZF owner.omega owner.transitive hm owner.theory hLY ord.2)

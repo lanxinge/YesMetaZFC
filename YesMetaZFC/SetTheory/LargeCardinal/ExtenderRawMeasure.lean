@@ -48,16 +48,16 @@ theorem Eb_collapse_d.raw_measure_l {ω κ K K₀ L X R N R₀ F J O Z A p T V q
   have inside x (hx : M.mem x Γ) : M.mem x N := by
     obtain ⟨u, _, hux⟩ := map.onto x hx
     exact (rd_entry_transitive_l owner.transitive he hux).2
+  have closed' := hi.subsets_raw_l I hZF source.omega source.transitive mx model hBH closed
   refine ⟨b, i, k, mx, hi, hBH, fk, image, pred, inside, ?_, ?_, ?_⟩
-  · exact fun D P d p hDd hPp power => hi.power_raw_l I hZF source.omega source.transitive mx model hBH
-      closed map.transitive inside fk image pred d p hDd hPp power
+  · exact fun D P d p hDd hPp power => rr_power_l I model.2.1 closed' map.transitive inside fk image pred d p hDd hPp power
   · have ext : Rf_ext_d I C W := hi.extensional_l hZF source.omega mx.1 model (rf_ext_mem_l I hZF.1 source.transitive mx)
     exact fun α V a v hα hV rank => rr_realize_rank_l hZF model ext map.transitive fk image pred
-      (hi.subsets_raw_l I hZF source.omega source.transitive mx model hBH closed) a v hα hV rank
+      closed' a v hα hV rank
   intro D U hD measure
   obtain ⟨d, t, P, U', hDd, hdH, ht, ft, domain, hP, contains, ultra, restriction⟩ :=
-    hi.measure_raw_l I hZF source.omega source.transitive mx source.theory model hBH
-      closed map.transitive inside fk image pred hD measure
+    hi.measure_raw_l I hZF source.omega source.transitive mx source.theory model
+      closed' map.transitive inside fk image pred hD measure
   exact ⟨d, t, P, U', hDd, hdH, ht, fn0_of_function_l (ZF.modelsKP hZF) ft, domain, hP, contains, ultra, restriction⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

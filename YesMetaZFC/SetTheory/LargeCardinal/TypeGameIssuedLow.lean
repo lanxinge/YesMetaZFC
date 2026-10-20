@@ -42,7 +42,7 @@ theorem Tg_context_d.issued_queries_l {ω X R μ K η C γ Z : M.Domain}
   have fx := fn digits.1
   have ft := fn state.labels
   have play : Tg_play_d C (ρ.bound 4).val (ρ.bound 3).val (ρ.bound 20).val s.val := by
-    apply (tg_play_read_l hZF fs.transitive nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) s).mpr
+    apply (tg_play_read_l hZF.1 fs.transitive nc J (ρ.bound 4) (ρ.bound 3) (ρ.bound 20) s).mpr
     intro i v hi
     have entry := ((rest.2 i v).mp hi).2
     exact ((digits.2 i v (digits.1.bound_l entry).1).mp entry).end_l endt

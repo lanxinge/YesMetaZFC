@@ -42,9 +42,9 @@ theorem It_ultra_d.critical_l {ω κ K L X R F c d Y S j κ' K₀ Z T : M.Domain
   have ord := loc.ordinals_l (ZF.modelsKP hZF) owner.transitive
   have below : M.MemberSubset ω L := fun i hi => ord.2.transitive κ hκL i (source.below i hi)
   have reverse : Ea_agree_d ω κ Z X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
-  have atoms := loc.atoms_l hZF owner
-  have normal := (loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
+  have atoms := loc.atoms_l hZF (owner.read_source_l hZF)
+  have normal := (loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l
   have bound := ultra.support_l hZF source family coherent atoms normal ord.1 ord.2 below hm hn hκj
   have hj := ultra.elementary_l hZF hm.1 hn.1
   have hY := ultra.transitive_l hZF hn.1
@@ -73,7 +73,7 @@ theorem It_ultra_d.critical_l {ω κ K L X R F c d Y S j κ' K₀ Z T : M.Domain
     (coord.1.mono_target_l (source.transitive κ source.cardinal_mem))
   obtain ⟨g, _, _, constant, H, rep, hH⟩ := ep_value_constant_l hZF source family system limit constants comp hnω haJ ha space hαX image
   obtain ⟨U, haU⟩ := family.total n a hnω ha
-  have haX := sc_finite_function_l hZF source.omega source.transitive hm source.theory source.omega_mem
+  have haX := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
     (source.transitive κ source.cardinal_mem) hnω small
   obtain ⟨B, hBX, pair⟩ := source.theory.algebra.pair a a haX haX
   have read x : M.mem x B ↔ x = a := (pair x).trans ⟨fun h => h.elim id id, Or.inl⟩

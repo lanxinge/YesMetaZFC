@@ -97,8 +97,7 @@ theorem ft_predecessor_rank_l {d} (ρ : Env M d) (Y ω F n r f : Term d)
   let g : T.Domain := ⟨f.eval ρ, hg⟩
   let η : Env T 5 := ⟨Fin.cases g (Fin.cases k (Fin.cases l (Fin.cases G (fun _ => w)))), fun _ => w⟩
   let φ := ft_prev_m (.bound 4) (.bound 3) (.bound 2) (.bound 1) (.newest : Term 5)
-  obtain ⟨v, S, hv, hS⟩ := smdl_membership_l Q hZF ⟨ω.eval ρ, hw⟩
-  have rel := sc_relative_sat_l Q ⟨hv, hS⟩ trans ⟨⟨ω.eval ρ, hw⟩⟩ φ
+  have rel := sc_relative_sat_l trans ⟨⟨ω.eval ρ, hw⟩⟩ φ
     (ft_prev_m_freeClosed _ _ _ _ _ rfl rfl rfl rfl rfl) η ρ Y
     (Fin.cases f (Fin.cases r (Fin.cases n (Fin.cases F (fun _ => ω))))) rfl
     (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun _ => rfl)))))

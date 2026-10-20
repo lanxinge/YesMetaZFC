@@ -33,7 +33,7 @@ theorem Ja_node_d.member_l {ω κ K Z S T Q G E Y W z π k P : M.Domain}
       obtain ⟨p, hp⟩ := (node.domain i).mpr ((dom i).mp hi)
       obtain ⟨a, A, R, ha, ma⟩ := diagram.model_l hZF (diagram.order.bound i k ((dom i).mp hi)).1
       obtain ⟨e, he⟩ := (en.domain i).mp (diagram.order.bound i k ((dom i).mp hi)).1
-      exact ⟨p, sc_finite_function_l hZF source.omega source.transitive code source.theory source.omega_mem
+      exact ⟨p, sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
         hY node.length (node.rows i p a A R e hp ha ma.1 he).1, hp⟩⟩
   exact sc_finite_partial_l hZF source.omega source.transitive code source.theory source.omega_mem hD hm
     (fun i hi => ((ds i).mp hi).1) (fn0_of_function_l (ZF.modelsKP hZF) fn)

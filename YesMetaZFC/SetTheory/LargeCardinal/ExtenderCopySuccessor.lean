@@ -86,14 +86,16 @@ theorem ep_copy_successor_l
     (hσ.omega_l I hZF source.omega owner.transitive owner'.transitive h₀ h₁ owner.omega_mem) hLσ).mp hωL
   have reverse : Ea_agree_d ω κ N X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
   have reverse' : Ea_agree_d ω κ' N' Y := fun n D A hn hd sub => (agree' n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hP₀ power₀).transfer_l reverse
-  have family' := (loc'.measures_l hZF owner' hP₁ power₁).transfer_l reverse'
-  have coherent := (loc.coherent_l hZF owner).transfer_l hZF reverse
-  have coherent' := (loc'.coherent_l hZF owner').transfer_l hZF reverse'
-  have atoms := loc.atoms_l hZF owner
-  have atoms' := loc'.atoms_l hZF owner'
-  have normal := (loc.normal_l hZF owner).transfer_l hZF owner source agree.subset_l
-  have normal' := (loc'.normal_l hZF owner').transfer_l hZF owner' target agree'.subset_l
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP₀ power₀)).transfer_l reverse
+  have family' := (loc'.measures_l hZF owner'.omega (owner'.read_source_l hZF) owner'.code owner'.theory
+    (sf_finite_power_l hZF owner'.omega owner'.transitive owner'.code owner'.theory owner'.finite hP₁ power₁)).transfer_l reverse'
+  have coherent := (loc.coherent_l hZF (owner.read_source_l hZF)).transfer_l hZF reverse
+  have coherent' := (loc'.coherent_l hZF (owner'.read_source_l hZF)).transfer_l hZF reverse'
+  have atoms := loc.atoms_l hZF (owner.read_source_l hZF)
+  have atoms' := loc'.atoms_l hZF (owner'.read_source_l hZF)
+  have normal := (loc.normal_l hZF (owner.read_source_l hZF)).transfer_l hZF owner source agree.subset_l
+  have normal' := (loc'.normal_l hZF (owner'.read_source_l hZF)).transfer_l hZF owner' target agree'.subset_l
   obtain ⟨J', O', Z', A', p', T', V', q', c₁, C', W', h', limit', model', _, elementary', collapse'⟩ :=
     loc'.limit_l hZFC target owner' branches cover power inside agree' ob hP₁ power₁
   obtain ⟨_, d₀, i', P', g', _, o', Rₚ', j', code', hi', constants', hP', wc', bij', mdl', hg', _, _, _, hj', js', next'⟩ := collapse'

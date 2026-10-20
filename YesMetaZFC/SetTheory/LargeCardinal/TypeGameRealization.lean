@@ -34,7 +34,6 @@ theorem Tg_context_d.realize_l {μ K R n κ τ m U t u b z : M.Domain} {σ : Fin
     ∃ W ν, Tt_pool_d I ω m (χ.bound 6).val W ∧ M.mem ν (p 10) ∧
       Tg_realized_in_d ω (p 18) n (p 29) m (χ.bound 6).val W u ν C := by
   have fs := (context.read_l hZF source).1
-  obtain ⟨c, H, model⟩ := smdl_membership_l I hZF ⟨ω, context.omega⟩
   obtain ⟨seed, round⟩ := (Formula.satisfies_conj_iff ..).mp old
   simp only [tg_seed0_m, Formula.satisfies_rename, tg_seed_m, Formula.satisfies_conj_iff] at seed
   have omega : (N).IsOmega (ρ.bound 16) := (Formula.satisfies_isOmega_iff ..).mp seed.1
@@ -83,7 +82,7 @@ theorem Tg_context_d.realize_l {μ K R n κ τ m U t u b z : M.Domain} {σ : Fin
   have prog : Formula.satisfies ψ (ts_numeric_m (.bound 0) (.bound 1) (.bound 2) (.bound 3)
       (fun i => [Term.bound 20, Term.bound 21, Term.bound 22, Term.bound 23, Term.bound 24, Term.bound 25, Term.bound 26].get i)) := by
     apply (Formula.satisfies_bind ψ fp ts_numeric0_m).mpr
-    apply (sc_relative_sat_l I model fs.transitive nc ts_numeric0_m ts_numeric0_closed_l
+    apply (sc_relative_sat_l fs.transitive nc ts_numeric0_m ts_numeric0_closed_l
       (Definitional.Env.substitute ψ fp) ((⟨pn, fun _ => ω⟩ : Env M 11).push C)
       .newest (fun i => .bound i.succ) rfl ?_).mp program.2
     intro i
@@ -94,7 +93,7 @@ theorem Tg_context_d.realize_l {μ K R n κ τ m U t u b z : M.Domain} {σ : Fin
     .bound 19, .bound 2, .bound 3, .bound 12, .bound 20, .bound 21, .bound 22, .bound 23, .bound 24, .bound 25, .bound 26].get i
   let pq : Fin 17 → M.Domain := fun i => [ω, n, κ, τ, m, U, u, b, z, t, σ 0, σ 1, σ 2, σ 3, σ 4, σ 5, σ 6].get i
   have sub : Formula.satisfies (Definitional.Env.substitute ψ fq) tg_subtype0_m := by
-    apply (sc_relative_sat_l I model fs.transitive nc tg_subtype0_m tg_subtype0_closed_l
+    apply (sc_relative_sat_l fs.transitive nc tg_subtype0_m tg_subtype0_closed_l
       (Definitional.Env.substitute ψ fq) ((⟨pq, fun _ => ω⟩ : Env M 17).push C)
       .newest (fun i => .bound i.succ) rfl ?_).mp subtype.2
     intro i
@@ -111,7 +110,7 @@ theorem Tg_context_d.realize_l {μ K R n κ τ m U t u b z : M.Domain} {σ : Fin
     · apply (fs.pool_sat_l (ZF.modelsKP hZF) nc ψ (.bound 0) (.bound 15) (.bound 17) (.bound 18) hw).mpr
       exact ⟨A, E, hA, hE, hm.symm ▸ names, seq, product⟩
     · exact (Formula.satisfies_bind ψ fq tg_subtype0_m).mpr sub
-  have realized := context.realize_seed_l hZF source nc ψ raw
+  have realized := (context.kernel_l (context.read_l hZF source).1.transitive nc).realize_seed_l ψ raw
   simp only [tc_realize_result0_m, Formula.satisfies_exists_iff, Formula.satisfies_conj_iff,
     Formula.satisfies_mem_iff] at realized
   obtain ⟨ν, bound, realized⟩ := realized
@@ -129,7 +128,7 @@ theorem Tg_context_d.realize_l {μ K R n κ τ m U t u b z : M.Domain} {σ : Fin
     exact Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl
       (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun j => Fin.elim0 j))))))))) i
   exact ⟨W, ν.val, pool, bound, members,
-    (sc_relative_sat_l I model fs.transitive nc ts_at0_m ts_at0_closed_l ξ
+    (sc_relative_sat_l fs.transitive nc ts_at0_m ts_at0_closed_l ξ
       ((⟨pr, fun _ => ω⟩ : Env M 9).push C) .newest (fun i => .bound i.succ) rfl same).mpr proof⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

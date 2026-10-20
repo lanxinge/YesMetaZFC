@@ -100,7 +100,7 @@ theorem Ep_source_d.finite_evaluation_l {ω κ K Z S b A R E n L F : M.Domain}
       exact ⟨x, hx, g, row_sub j V hjV g h, (update x hx g).mpr hg, h⟩
   have fnZ := (fn0_of_function_l (ZF.modelsKP hZF) fnH).retarget_l
     (fun r Y hY => rows r (fnH.input_mem_of_pairMember hY) Y hY)
-  have hHZ := sc_finite_function_l hZF hω source.transitive model source.theory source.omega_mem
+  have hHZ := sc_finite_function_l hZF hω source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
     (fun _ h => h) hF.1 fnZ
   obtain ⟨_, C', hC'Z, fn'⟩ := source.function_l hZF hHZ fnZ
   exact ⟨C', H, hC'Z, hHZ, fv_eval_of_l hZF hω program hE hH fn'⟩

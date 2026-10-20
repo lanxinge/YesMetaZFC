@@ -69,8 +69,7 @@ theorem tf_type_rank_l {d} (ρ : Env M d) (Y ω δ n h D t : Term d) {ν μ X Z 
         (Fin.cases δ (fun _ => ω))))))) ↔ Tt_truth_d Q (ω.eval ρ) c (n.eval ρ) s (δ.eval ρ) (D.eval ρ) (t.eval ρ) := by
     let u : N.Domain := ⟨t.eval ρ, trans Z hZY (t.eval ρ) (ZF.v_subset_mem_l Q hZF hZ hDZ sub)⟩
     let η : Env N 6 := ⟨Fin.cases u (Fin.cases B (Fin.cases f (Fin.cases k (Fin.cases a (fun _ => w))))), fun _ => f⟩
-    obtain ⟨b, S, hb, hS⟩ := smdl_membership_l Q hZF ⟨ω.eval ρ, hw⟩
-    exact (sc_relative_sat_l Q ⟨hb, hS⟩ trans nz φ (tf_type_m_freeClosed _ _ _ _ _ _ rfl rfl rfl rfl rfl rfl)
+    exact (sc_relative_sat_l trans nz φ (tf_type_m_freeClosed _ _ _ _ _ _ rfl rfl rfl rfl rfl rfl)
       η ρ Y (Fin.cases t (Fin.cases D (Fin.cases h (Fin.cases n (Fin.cases δ (fun _ => ω)))))) rfl
       (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun _ => rfl))))))).trans
         (tf_type_source_l hZF hω hV hW hs hw η (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest rfl

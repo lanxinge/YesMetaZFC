@@ -78,8 +78,7 @@ theorem sc_flat_local_sat_l {d} (ρ : Env M d) (U w z G n r : Term d)
   let η : Env N 5 := ⟨Fin.cases ⟨r.eval ρ, hr⟩ (Fin.cases ⟨n.eval ρ, hn⟩
     (Fin.cases ⟨G.eval ρ, hG⟩ (Fin.cases ⟨z.eval ρ, hz⟩ (fun _ => ⟨ω, hωZ⟩)))), fun _ => ⟨ω, hωZ⟩⟩
   let φ := sc_flat_m (.bound 4) (.bound 3) (.bound 2) (.bound 1) (.newest : Term 5)
-  obtain ⟨c, R, hc, hR⟩ := smdl_membership_l I hZF ⟨ω, hωZ⟩
-  exact (sc_relative_sat_l I ⟨hc, hR⟩ T nz φ (sc_flat_m_freeClosed _ _ _ _ _ rfl rfl rfl rfl rfl)
+  exact (sc_relative_sat_l T nz φ (sc_flat_m_freeClosed _ _ _ _ _ rfl rfl rfl rfl rfl)
     η ρ U _ hU (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (Fin.cases rfl (fun _ => hw)))))).trans
     ((sc_flat_sat_l J L (rt_model_ext_l hZF.1 T nz) η (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest).trans
       (rt_sc_flat_l hZF hω hδ hV hωZ ..))

@@ -61,7 +61,8 @@ theorem Eb_collapse_d.raw_reduced_l {ω κ K K₀ L X R N R₀ F J O Z A p T V q
     owned.raw_measure_l hZFC source owner common hBX trans closed family coherent system limit model ff constant fv
   obtain ⟨d, t, P, U', hDd, hdH, ht, ft, domain, hP, inside, ultra, restriction⟩ := components D U hD measure
   have hd := fk.1.output_mem_of_pairMember hDd
-  obtain ⟨μ, e, index⟩ := hi.small_raw_l hZF source.omega source.transitive mx model hBH trans small ⟨d, hd⟩ hdH
+  have sizes := hi.small_raw_l hZF source.omega source.transitive mx model hBH trans small
+  obtain ⟨μ, e, index⟩ := (sizes d hd hdH).index_l I model.2.1 ⟨d, hd⟩
   obtain ⟨G, b, r, Y, S, j, q', model₀, model₁, functions, embed, composite, square, constants, bounded, los⟩ :=
     rc_successor_l hZF source.omega source.transitive mx source.theory source.collection model hi
       ⟨d, hd⟩ μ e index ft domain hP inside measure ultra restriction

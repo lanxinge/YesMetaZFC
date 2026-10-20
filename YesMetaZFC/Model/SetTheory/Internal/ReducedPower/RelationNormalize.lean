@@ -112,11 +112,10 @@ theorem rc_bounded_representative_l {ω c X R c' Y S q D t U G o p C T a A E : M
   exact (ff'.bound_l ((decode' s ⟨x, hx⟩ ⟨y, (gg.bound_l hsy).2⟩ hsx).mp hsy)).2
 
 /-- 下一商的低层恰由所属源中的有界图覆盖，包括全部新商成员。 -/
-theorem Rp_model_d.low_cover_raw_l {ω c X R c' Y S q B H N Γ γ k D A t U G o p C T j A' : M.Domain}
+theorem Rp_model_d.low_cover_raw_l {ω c X R c' Y S q H N Γ γ k D A t U G o p C T j A' : M.Domain}
     (hω : M.IsOmega ω) (hX : M.TransitiveSet X) (hm : Smem_d I c X R)
     (theory : Sc_theory_d I ω X R) (source : Smdl_d I c' Y S) (hq : Smap_d I ω c c' X Y q)
-    (hBH : Rd_entry_d B H q)
-    (closed : ∀ a b, M.mem a B → M.mem b X → M.MemberSubset b a → M.mem b B)
+    (closed : Rr_closed_d I Y S H)
     (hN : M.TransitiveSet N) (algebra : Sc_algebra_d N)
     (hΓN : M.mem Γ N) (rank : Vr_d N γ Γ) (hγ : M.IsLimitOrdinal γ)
     (fk : M.IsSetInjectionFromTo I k Γ Y)
@@ -137,7 +136,8 @@ theorem Rp_model_d.low_cover_raw_l {ω c X R c' Y S q B H N Γ γ k D A t U G o 
   have ft := fn0_of_function_l (ZF.modelsKP hZF) (ht.isSetFunctionFromTo fk.1 (trans D (fk.1.input_mem_of_pairMember hD)))
   have domain s x (hsx : Rd_entry_d s x t) := (pred D d.val hD x).mpr
     ⟨s, ((ht.2 s x).mp hsx).1, ((ht.2 s x).mp hsx).2⟩
-  have common := hq.bounded_functions_raw_l hZF hω hX hm source hBH closed hN algebra hΓN rank hγ fk image pred d a hD hA ht hG
+  have ext : Rf_ext_d I Y S := hq.extensional_l hZF hω hm.1 source (rf_ext_mem_l I hZF.1 hX hm)
+  have common := rr_bounded_functions_l hZF source.2.1 ext closed hN algebra hΓN rank hγ fk image pred d a hD hA ht hG
   intro E
   constructor
   · intro edge

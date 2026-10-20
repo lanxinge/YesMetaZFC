@@ -167,7 +167,7 @@ theorem ep_set_restriction_l {ω κ K X R μ K' Y S c d j a A Q b B T : M.Domain
   obtain ⟨t, gt⟩ := ZF.exists_restriction hZF I g l
   have sf := fn0_of_function_l (ZF.modelsKP hZF) (fs.isSetFunctionFromTo hf sub)
   have tf := fn0_of_function_l (ZF.modelsKP hZF) (gt.isSetFunctionFromTo hg sub)
-  have hs := sc_finite_function_l hZF source.omega source.transitive hm source.theory source.omega_mem
+  have hs := sc_finite_function_l hZF source.omega source.transitive source.theory.algebra.pair source.theory.algebra.union source.omega_mem
     (source.transitive A hA) hl sf
   obtain ⟨t', _, hst⟩ := hj.1.1.2.2 s hs
   have nat := hj.natural_l hZF source.omega source.transitive target.transitive hm hn source.omega_mem

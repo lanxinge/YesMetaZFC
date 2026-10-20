@@ -6,7 +6,7 @@ import YesMetaZFC.SetTheory.Notation
 /-! # 全部内部程序的限制翻译
 
 新变量 b 指向被限制的载体。语义只要求旧关系是新关系在该载体上的限制，
-且新关系正确读取这个载体的成员；任意实际隶属子结构都满足这些最弱条件。
+且新关系通过指定对象正确读取这个载体的成员；任意实际隶属子结构都满足这些最弱条件。
 翻译状态保存已经处理的各行，不要求内部程序有外部有限长度。
 -/
 namespace YesMetaZFC.SetTheory.Internal
@@ -14,31 +14,31 @@ open Definitional.Project
 universe u
 variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
 
-structure Sr_context_d (ω X R Y S E D : M.Domain) : Prop where
+structure Sr_context_d (ω X R Y S H E D : M.Domain) : Prop where
   subset : M.MemberSubset X Y
   relation : ∀ x y, M.mem x X → M.mem y X → (M.PairMember I x y R ↔ M.PairMember I x y S)
-  guard : ∀ x, M.mem x Y → (M.PairMember I x X S ↔ M.mem x X)
+  guard : ∀ x, M.mem x Y → (M.PairMember I x H S ↔ M.mem x X)
   small : M.IsFunctionSpace I E ω X
   large : M.IsFunctionSpace I D ω Y
 
-def sr_context_m {d} (ω X R Y S E D : Term d) : Formula 1 d := set[d] ⟪
+def sr_context_m {d} (ω X R Y S H E D : Term d) : Formula 1 d := set[d] ⟪
   ⌜X⌝ₛ ⊆ ⌜Y⌝ₛ ∧
   (∀ x y, x ∈ ⌜X⌝ₛ → y ∈ ⌜X⌝ₛ →
     (⌜Formula.orderedPairMem 𝒞⌝ₚ(x, y, ⌜R⌝ₛ) ↔ ⌜Formula.orderedPairMem 𝒞⌝ₚ(x, y, ⌜S⌝ₛ))) ∧
-  (∀ x, x ∈ ⌜Y⌝ₛ → (⌜Formula.orderedPairMem 𝒞⌝ₚ(x, ⌜X⌝ₛ, ⌜S⌝ₛ) ↔ x ∈ ⌜X⌝ₛ)) ∧
+  (∀ x, x ∈ ⌜Y⌝ₛ → (⌜Formula.orderedPairMem 𝒞⌝ₚ(x, ⌜H⌝ₛ, ⌜S⌝ₛ) ↔ x ∈ ⌜X⌝ₛ)) ∧
   ⌜Formula.isFunctionSpace 𝒞⌝ₚ(⌜E⌝ₛ, ⌜ω⌝ₛ, ⌜X⌝ₛ) ∧
   ⌜Formula.isFunctionSpace 𝒞⌝ₚ(⌜D⌝ₛ, ⌜ω⌝ₛ, ⌜Y⌝ₛ)⟫
 
-@[simp] theorem sr_context_closed_l {d} (ω X R Y S E D : Term d)
+@[simp] theorem sr_context_closed_l {d} (ω X R Y S H E D : Term d)
     (hω : ω.freeSupport = []) (hX : X.freeSupport = []) (hR : R.freeSupport = [])
-    (hY : Y.freeSupport = []) (hS : S.freeSupport = []) (hE : E.freeSupport = []) (hD : D.freeSupport = []) :
-    (sr_context_m (𝒞 := 𝒞) ω X R Y S E D).FreeClosed := by
+    (hY : Y.freeSupport = []) (hS : S.freeSupport = []) (hH : H.freeSupport = []) (hE : E.freeSupport = []) (hD : D.freeSupport = []) :
+    (sr_context_m (𝒞 := 𝒞) ω X R Y S H E D).FreeClosed := by
   simp -implicitDefEqProofs [sr_context_m, Formula.isFunctionSpace, Definitional.Formula.FreeClosed,
-    hω, hX, hR, hY, hS, hE, hD]
+    hω, hX, hR, hY, hS, hH, hE, hD]
 
-theorem sr_context_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω X R Y S E D : Term d) :
-    Formula.satisfies ρ (sr_context_m (𝒞 := 𝒞) ω X R Y S E D) ↔
-      Sr_context_d I (ω.eval ρ) (X.eval ρ) (R.eval ρ) (Y.eval ρ) (S.eval ρ) (E.eval ρ) (D.eval ρ) := by
+theorem sr_context_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω X R Y S H E D : Term d) :
+    Formula.satisfies ρ (sr_context_m (𝒞 := 𝒞) ω X R Y S H E D) ↔
+      Sr_context_d I (ω.eval ρ) (X.eval ρ) (R.eval ρ) (Y.eval ρ) (S.eval ρ) (H.eval ρ) (E.eval ρ) (D.eval ρ) := by
   simp only [sr_context_m, Formula.satisfies_conj_iff, Formula.satisfies_subset_iff,
     Formula.satisfies_forall_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff,
     Formula.satisfies_iff_iff, Formula.satisfies_orderedPairMem_iff I,
@@ -48,26 +48,26 @@ theorem sr_context_sat_l (hE : Extensional M) {d} (ρ : Env M d) (ω X R Y S E D
 
 theorem sr_context_l {ω c X R d Y S E D : M.Domain} (hx : Smem_d I c X R) (hy : Smem_d I d Y S)
     (hXY : M.MemberSubset X Y) (hX : M.mem X Y) (hE : M.IsFunctionSpace I E ω X)
-    (hD : M.IsFunctionSpace I D ω Y) : Sr_context_d I ω X R Y S E D := by
+    (hD : M.IsFunctionSpace I D ω Y) : Sr_context_d I ω X R Y S X E D := by
   refine ⟨hXY, fun x y hxX hyX => ?_, fun x hxY => ?_, hE, hD⟩
   · exact (hx.2 x y).trans ⟨fun h => (hy.2 x y).mpr ⟨hXY x hxX, hXY y hyX, h.2.2⟩,
       fun h => ⟨hxX, hyX, ((hy.2 x y).mp h).2.2⟩⟩
   · exact (hy.2 x X).trans ⟨fun h => h.2.2, fun h => ⟨hxY, hX, h⟩⟩
 
-def Sr_row_d (b X R Y S E D F n m G r u : M.Domain) : Prop := ∀ f g,
-  M.mem f E → M.mem g D → M.PairMember I b X g → Senv_agree_d I b f g →
+def Sr_row_d (b X R Y S H E D F n m G r u : M.Domain) : Prop := ∀ f g,
+  M.mem f E → M.mem g D → M.PairMember I b H g → Senv_agree_d I b f g →
     (Ssat_d I X R E F n r f ↔ Ssat_d I Y S D G m u g)
 
-def sr_row_m {d} (b X R Y S E D F n m G r u : Term d) : Formula 1 d := set[d] ⟪
-  ∀ f g, f ∈ ⌜E⌝ₛ → g ∈ ⌜D⌝ₛ → ⌜Formula.orderedPairMem 𝒞⌝ₚ(⌜b⌝ₛ, ⌜X⌝ₛ, g) →
+def sr_row_m {d} (b X R Y S H E D F n m G r u : Term d) : Formula 1 d := set[d] ⟪
+  ∀ f g, f ∈ ⌜E⌝ₛ → g ∈ ⌜D⌝ₛ → ⌜Formula.orderedPairMem 𝒞⌝ₚ(⌜b⌝ₛ, ⌜H⌝ₛ, g) →
     ⌜senv_agree_m (𝒞 := 𝒞)⌝ₚ(⌜b⌝ₛ, f, g) →
     (⌜ssat_m (𝒞 := 𝒞)⌝ₚ(⌜X⌝ₛ, ⌜R⌝ₛ, ⌜E⌝ₛ, ⌜F⌝ₛ, ⌜n⌝ₛ, ⌜r⌝ₛ, f) ↔
      ⌜ssat_m (𝒞 := 𝒞)⌝ₚ(⌜Y⌝ₛ, ⌜S⌝ₛ, ⌜D⌝ₛ, ⌜G⌝ₛ, ⌜m⌝ₛ, ⌜u⌝ₛ, g))⟫
 derive_free_closed sr_row_m
 
-theorem sr_row_sat_l (hE : Extensional M) {d} (ρ : Env M d) (b X R Y S E D F n m G r u : Term d) :
-    Formula.satisfies ρ (sr_row_m (𝒞 := 𝒞) b X R Y S E D F n m G r u) ↔
-      Sr_row_d I (b.eval ρ) (X.eval ρ) (R.eval ρ) (Y.eval ρ) (S.eval ρ) (E.eval ρ) (D.eval ρ)
+theorem sr_row_sat_l (hE : Extensional M) {d} (ρ : Env M d) (b X R Y S H E D F n m G r u : Term d) :
+    Formula.satisfies ρ (sr_row_m (𝒞 := 𝒞) b X R Y S H E D F n m G r u) ↔
+      Sr_row_d I (b.eval ρ) (X.eval ρ) (R.eval ρ) (Y.eval ρ) (S.eval ρ) (H.eval ρ) (E.eval ρ) (D.eval ρ)
         (F.eval ρ) (n.eval ρ) (m.eval ρ) (G.eval ρ) (r.eval ρ) (u.eval ρ) := by
   simp only [sr_row_m, Sr_row_d, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
     Formula.satisfies_mem_iff, Formula.satisfies_orderedPairMem_iff I, senv_agree_sat_l I,

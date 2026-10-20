@@ -61,7 +61,7 @@ theorem Tg_context_d.rigid_l {κ K R γ Z : M.Domain}
   have member a (ha : M.mem a Z) := (cons₁ a).mpr (Or.inl (sub a ha))
   have scope : M.mem (ψ.bound 4).val (χ.bound 6).val ∧ M.mem (ψ.bound 5).val (χ.bound 6).val ∧
       M.mem (ψ.bound 6).val (χ.bound 6).val := ⟨member _ low.1, member _ low.2.1, member _ low.2.2⟩
-  have result := context.continue_l hZF source nc ρ seed
+  have result := (context.kernel_l (context.read_l hZF source).1.transitive nc).continue_l ρ seed
   have fullPool := ((Formula.satisfies_conj_iff ..).mp result).2.2
   let ξ : Env N 29 := ⟨fun i => [ε.bound 0, ε.bound 1, ε.bound 2, ε.bound 3, ε.bound 4, ε.bound 5, ε.bound 6,
     ρ.bound 1, ρ.bound 2, ρ.bound 5, ρ.bound 6, ρ.bound 7, χ.bound 3, χ.bound 4, χ.bound 1, χ.bound 6,
@@ -133,6 +133,6 @@ theorem Tg_context_d.rigid_l {κ K R γ Z : M.Domain}
       exact Fin.cases sameω.symm (Fin.cases rfl (Fin.cases rfl (Fin.cases sameN.symm (Fin.cases rfl
         (Fin.cases rfl (Fin.cases rfl (Fin.cases (Subtype.ext τχ.symm) (Fin.cases (Subtype.ext mχ.symm)
           (Fin.cases (Subtype.ext eqV.symm) (Fin.cases rfl (Fin.cases (Subtype.ext uχ.symm) (fun j => Fin.elim0 j)))))))))))) i
-  exact ⟨eqV, scope, uχ ▸ context.rigid_seed_l hZF source nc ξ raw⟩
+  exact ⟨eqV, scope, uχ ▸ (context.kernel_l (context.read_l hZF source).1.transitive nc).rigid_seed_l ξ raw⟩
 
 end YesMetaZFC.SetTheory.LargeCardinal

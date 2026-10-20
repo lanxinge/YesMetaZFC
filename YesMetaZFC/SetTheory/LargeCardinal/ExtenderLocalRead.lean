@@ -1,20 +1,23 @@
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderFiberRelative
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderRelative
 import YesMetaZFC.SetTheory.LargeCardinal.ExtenderNormalSource
+import YesMetaZFC.SetTheory.LargeCardinal.ExtenderReadSource
 import YesMetaZFC.Model.SetTheory.Internal.SourceUltrafilter
 import YesMetaZFC.Model.SetTheory.Internal.ReducedPower.SourceModel
 import YesMetaZFC.Model.SetTheory.Internal.TransitiveSource
 
 /-! # 所属模型内部测度族的实际相对解释
 
-有限函数由源闭包回收，极大性通过源内扩张滤子读成子集二择。
-这里只需全部有限 κ 序列的一个相对幂集，不要求背景极大性或背景可数完备性。
+有限函数由有限读写闭包回收，极大性通过源内扩张滤子读成子集二择。
+测度读取只需各有限幂的相对幂集；一个已拥有的有限列幂集通过实际分离给出
+这些见证，全相对幂集闭包也直接提供它们。全部读取及有界商都无需完整超幂源。
 -/
 namespace YesMetaZFC.SetTheory.LargeCardinal
 open Definitional.Project InnerModel Internal FilterZF
 universe u
 variable {M : Structure.{u}} (hZF : M.Models ZF)
 local notation "I" => kp_pair_l (ZF.modelsKP hZF)
+include hZF
 
 theorem It_local_d.function_l {ω X κ L F : M.Domain} (ht : M.TransitiveSet X)
     (pair : ∀ a b, M.mem a X → M.mem b X → ∃ p, M.mem p X ∧ Pair_d M p a b)
@@ -27,20 +30,30 @@ theorem It_local_d.function_l {ω X κ L F : M.Domain} (ht : M.TransitiveSet X)
   have graph := (Formula.satisfies_isFunction_iff J he _ _).mp loc.1.2.2.2.2.2.1
   exact (rt_function_l ht nx hZF.1 (KP.exists_pair (ZF.modelsKP hZF)) pair ⟨F, hf⟩).mp graph
 
-theorem em_family_relative_l {ω κ K X R L F P : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hP : M.mem P X) (power : Source_d X K P) (hL : M.mem L X) (hF : M.mem F X)
+/-- 一个已拥有的有限列相对幂集，实际分离出每个有限幂的相对幂集。 -/
+theorem sf_finite_power_l {ω κ K X R P : M.Domain} (hω : M.IsOmega ω) (hX : M.TransitiveSet X)
+    (code : ∃ c, Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (finite : Fseq_space_d I ω κ K) (hP : M.mem P X) (power : Source_d X K P) :
+    ∀ n D, M.mem n ω → M.mem D X → Ep_space_d κ n D → ∃ Q, M.mem Q X ∧ Source_d X D Q := by
+  obtain ⟨c, model⟩ := code
+  intro n D hn hD space
+  exact sc_power_subset_l hZF hω hX model theory hD hP power
+    (fun s hs => (finite s).mpr ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) ((space s).mp hs)⟩)
+
+theorem em_family_relative_l {ω κ c X R L F : M.Domain}
+    (hω : M.IsOmega ω) (source : Fs_read_d ω X) (model : Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (powers : ∀ n D, M.mem n ω → M.mem D X → Ep_space_d κ n D → ∃ Q, M.mem Q X ∧ Source_d X D Q)
+    (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X)
     (family : Formula.satisfies
-      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, source.cardinal_mem⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
+      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
         fun _ => ⟨ω, source.omega_mem⟩⟩ : Env (rt_model_l X ⟨⟨ω, source.omega_mem⟩⟩) 4)
       (em_family_m (.bound 3) (.bound 2) (.bound 1) .newest)) : Em_source_d ω κ L X F := by
   let ne : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
   let N := rt_model_l X ne
   have he := rt_model_ext_l hZF.1 source.transitive ne
   have family := (em_family_sat_l he _ _ _ _ _).mp family
-  obtain ⟨c, hm⟩ := source.code
   have finite {A n f} (hA : M.mem A X) (hn : M.mem n ω) (hf : Fn0_d n A f) : M.mem f X :=
-    sc_finite_function_l hZF source.omega source.transitive hm source.theory source.omega_mem
-      (source.transitive A hA) hn hf
+    source.functions n A f hn (source.transitive A hA) hf
   refine ⟨?_, ?_, ?_⟩
   · intro n a hn ha
     let n' : N.Domain := ⟨n, source.transitive ω source.omega_mem n hn⟩
@@ -58,29 +71,30 @@ theorem em_family_relative_l {ω κ K X R L F P : M.Domain} (source : Ep_source_
       ((rt_entry_l source.transitive ne hZF.1 ..).mpr hu)
     have space : Ep_space_d κ n.val D.val := fun s => ⟨fun hs =>
       (rt_fn_l source.transitive ne hZF.1 ..).mp ((hd ⟨s, source.transitive D.val D.property s hs⟩).mp hs),
-      fun hs => (hd ⟨s, finite source.cardinal_mem hn hs⟩).mpr ((rt_fn_l source.transitive ne hZF.1 ..).mpr hs)⟩
-    obtain ⟨Q, hQ, subsets⟩ := sc_power_subset_l hZF source.omega source.transitive hm source.theory D.property hP power
-      (fun s hs => (source.finite s).mpr ⟨n.val, hn, fn0_function_l (ZF.modelsKP hZF) ((space s).mp hs)⟩)
+      fun hs => (hd ⟨s, finite hκ hn hs⟩).mpr ((rt_fn_l source.transitive ne hZF.1 ..).mpr hs)⟩
+    obtain ⟨Q, hQ, subsets⟩ := powers n.val D.val hn D.property space
     exact ⟨n.val, D.val, hn, (rt_fn_l source.transitive ne hZF.1 ..).mp ha, space,
-      sf_maximal_relative_l hZF source.omega source.transitive hm source.theory ne D ⟨U, au.2⟩ ⟨Q, hQ⟩ subsets hU⟩
+      sf_maximal_relative_l hZF hω source.transitive model theory ne D ⟨U, au.2⟩ ⟨Q, hQ⟩ subsets hU⟩
 
-theorem It_local_d.measures_l {ω κ K X R L F P : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hP : M.mem P X) (power : Source_d X K P) (locality : It_local_d ω X κ L F) : Em_source_d ω κ L X F := by
-  obtain ⟨hω, hκ, hL, hF, loc⟩ := locality
+theorem It_local_d.measures_l {ω κ X R L F : M.Domain} (hω : M.IsOmega ω) (source : Fs_read_d ω X)
+    (code : ∃ c, Smem_d I c X R) (theory : Sc_theory_d I ω X R)
+    (powers : ∀ n D, M.mem n ω → M.mem D X → Ep_space_d κ n D → ∃ Q, M.mem Q X ∧ Source_d X D Q)
+    (locality : It_local_d ω X κ L F) : Em_source_d ω κ L X F := by
+  obtain ⟨_, hκ, hL, hF, loc⟩ := locality
+  obtain ⟨c, model⟩ := code
   simp only [ex_short_m, ex_pre_m, Formula.satisfies_conj_iff] at loc
-  exact em_family_relative_l hZF source hP power hL hF loc.1.2.2.2.2.2.2.1
+  exact em_family_relative_l hZF hω source model theory powers hκ hL hF loc.1.2.2.2.2.2.2.1
 
-theorem ec_coherent_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hL : M.mem L X) (hF : M.mem F X) (coherent : Formula.satisfies
-      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, source.cardinal_mem⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
+theorem ec_coherent_relative_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
+    (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X) (coherent : Formula.satisfies
+      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
         fun _ => ⟨ω, source.omega_mem⟩⟩ : Env (rt_model_l X ⟨⟨ω, source.omega_mem⟩⟩) 4)
       (es_coherent_m (𝒞 := kpair_convention_l) (.bound 3) (.bound 2) (.bound 1) .newest)) : Ec_source_d I ω κ L X F := by
   let ne : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
   let N := rt_model_l X ne
   have he := rt_model_ext_l hZF.1 source.transitive ne
-  obtain ⟨c, code⟩ := source.code
   have finite {A n f} (hA : M.mem A X) (hn : M.mem n ω) (hf : Fn0_d n A f) : M.mem f X :=
-    sc_finite_function_l hZF source.omega source.transitive code source.theory source.omega_mem (source.transitive A hA) hn hf
+    source.functions n A f hn (source.transitive A hA) hf
   have fn {d} (ρ : Env N d) (A B f : Term d) : Formula.satisfies ρ (fn0_m A B f) ↔
       Fn0_d (A.eval ρ).val (B.eval ρ).val (f.eval ρ).val :=
     (fn0_sat_l he ..).trans (rt_fn_l source.transitive ne hZF.1 ..)
@@ -91,7 +105,7 @@ theorem ec_coherent_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_
       Rd_entry_d (a.eval ρ).val (b.eval ρ).val (F.eval ρ).val :=
     (rd_entry_sat_l he ..).trans (rt_entry_l source.transitive ne hZF.1 ..)
   have pull {d} (ρ : Env N d) (m n q A Z : Term d) (k : Term d)
-      (hk : k.eval ρ = (⟨κ, source.cardinal_mem⟩ : N.Domain)) (hn : M.mem (n.eval ρ).val ω) :
+      (hk : k.eval ρ = (⟨κ, hκ⟩ : N.Domain)) (hn : M.mem (n.eval ρ).val ω) :
       Formula.satisfies ρ (es_pull_m m n k q A Z) ↔
       Es_pull_d (m.eval ρ).val (n.eval ρ).val κ (q.eval ρ).val (A.eval ρ).val (Z.eval ρ).val := by
     simp only [es_pull_m, Formula.satisfies_forall_iff, Formula.satisfies_iff_iff, Formula.satisfies_mem_iff,
@@ -102,7 +116,7 @@ theorem ec_coherent_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_
       · obtain ⟨hs, t, ht, comp⟩ := (h ⟨s, source.transitive _ (Z.eval ρ).property s hs⟩).mp hs
         exact ⟨hs, t.val, ht, comp⟩
       · rintro ⟨hs, t, ht, comp⟩
-        exact (h ⟨s, finite source.cardinal_mem hn hs⟩).mpr
+        exact (h ⟨s, finite hκ hn hs⟩).mpr
           ⟨hs, ⟨t, source.transitive _ (A.eval ρ).property t ht⟩, ht, comp⟩
     · intro h s
       exact (h s.val).trans (and_congr_right fun _ =>
@@ -122,16 +136,16 @@ theorem ec_coherent_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_
   · rfl
   · exact hn
 
-theorem It_local_d.coherent_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
+theorem It_local_d.coherent_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
     (locality : It_local_d ω X κ L F) : Ec_source_d I ω κ L X F := by
   obtain ⟨hω, hκ, hL, hF, loc⟩ := locality
   simp only [ex_short_m, ex_pre_m, Formula.satisfies_conj_iff] at loc
-  exact ec_coherent_relative_l hZF source hL hF loc.1.2.2.2.2.2.2.2.1
+  exact ec_coherent_relative_l hZF source hκ hL hF loc.1.2.2.2.2.2.2.2.1
 
 /-- 所有内部有限坐标图都在源中，故原子测度集合的完整背景规格可直接读取。 -/
-theorem ea_atoms_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hL : M.mem L X) (hF : M.mem F X) (atoms : Formula.satisfies
-      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, source.cardinal_mem⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
+theorem ea_atoms_relative_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
+    (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X) (atoms : Formula.satisfies
+      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
         fun _ => ⟨ω, source.omega_mem⟩⟩ : Env (rt_model_l X ⟨⟨ω, source.omega_mem⟩⟩) 4)
       (ea_atoms_m (.bound 3) (.bound 2) (.bound 1) .newest)) : Ea_atoms_d ω κ L F := by
   let ne : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
@@ -149,7 +163,7 @@ theorem ea_atoms_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d h
   let r' : N.Domain := ⟨r, rb.1⟩
   let α' : N.Domain := ⟨α, ia.2⟩
   let β' : N.Domain := ⟨β, rb.2⟩
-  let κ' : N.Domain := ⟨κ, source.cardinal_mem⟩
+  let κ' : N.Domain := ⟨κ, hκ⟩
   have test (s : N.Domain) : Ea_test_d p κ' i' r' s ↔ Ea_test_d p κ i r s.val := by
     let ρ : Env N 4 := ⟨Fin.cases s (Fin.cases r' (Fin.cases i' (fun _ => κ'))), fun _ => s⟩
     exact (ea_test_sat_l he ρ p (.bound 3) (.bound 2) (.bound 1) .newest).symm.trans
@@ -165,22 +179,21 @@ theorem ea_atoms_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d h
   · let s' : N.Domain := ⟨s, source.transitive T.val T.property s hs⟩
     have hh := (ts s').mp hs
     exact ⟨(rt_fn_l source.transitive ne hZF.1 ..).mp hh.1, (test s').mp hh.2⟩
-  · let s' : N.Domain := ⟨s, source.transitive K source.finite_mem s
-      ((source.finite s).mpr ⟨n, hn, fn0_function_l (ZF.modelsKP hZF) hs.1⟩)⟩
+  · let s' : N.Domain := ⟨s, source.functions n κ s hn (source.transitive κ hκ) hs.1⟩
     exact (ts s').mpr ⟨(rt_fn_l source.transitive ne hZF.1 ..).mpr hs.1, (test s').mpr hs.2⟩
 
-theorem It_local_d.atoms_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
+theorem It_local_d.atoms_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
     (loc : It_local_d ω X κ L F) : Ea_atoms_d ω κ L F := by
-  obtain ⟨_, _, hL, hF, loc⟩ := loc
+  obtain ⟨_, hκ, hL, hF, loc⟩ := loc
   have pre := ((Formula.satisfies_conj_iff _ _ _).mp loc).1
   simp only [ex_pre_m, Formula.satisfies_conj_iff] at pre
   obtain ⟨_, _, _, _, _, _, _, _, _, atoms, _, _, _⟩ := pre
-  exact ea_atoms_relative_l hZF source hL hF atoms
+  exact ea_atoms_relative_l hZF source hκ hL hF atoms
 
 /-- 正规性只读取源内代表；测度及其成员均由原源内扩展器图提供。 -/
-theorem en_normal_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
-    (hL : M.mem L X) (hF : M.mem F X) (normal : Formula.satisfies
-      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, source.cardinal_mem⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
+theorem en_normal_relative_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
+    (hκ : M.mem κ X) (hL : M.mem L X) (hF : M.mem F X) (normal : Formula.satisfies
+      (⟨Fin.cases ⟨F, hF⟩ (Fin.cases ⟨L, hL⟩ (Fin.cases ⟨κ, hκ⟩ (fun _ => ⟨ω, source.omega_mem⟩))),
         fun _ => ⟨ω, source.omega_mem⟩⟩ : Env (rt_model_l X ⟨⟨ω, source.omega_mem⟩⟩) 4)
       (en_normal_m (.bound 3) (.bound 2) (.bound 1) .newest)) : En_source_d ω κ L X F := by
   let ne : Nonempty {x // M.mem x X} := ⟨⟨ω, source.omega_mem⟩⟩
@@ -190,15 +203,17 @@ theorem en_normal_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d 
   intro n a U D f i α A hn ha haU hd hf fn hi hA regressive
   have au := rd_entry_transitive_l source.transitive hF haU
   have ia := rd_entry_transitive_l source.transitive au.1 hi
+  obtain ⟨D₀, hD₀, space⟩ := source.spaces κ n hκ hn
+  have eq := hZF.1.eq_of_same_members D₀ D (fun s => (space s).trans (hd s).symm)
   let n' : N.Domain := ⟨n, source.transitive ω source.omega_mem n hn⟩
   let a' : N.Domain := ⟨a, au.1⟩
   let U' : N.Domain := ⟨U, au.2⟩
-  let D' : N.Domain := ⟨D, source.space_mem_l hZF hn hd⟩
+  let D' : N.Domain := ⟨D, eq ▸ hD₀⟩
   let f' : N.Domain := ⟨f, hf⟩
   let i' : N.Domain := ⟨i, ia.1⟩
   let α' : N.Domain := ⟨α, ia.2⟩
   let A' : N.Domain := ⟨A, source.transitive U au.2 A hA⟩
-  let κ' : N.Domain := ⟨κ, source.cardinal_mem⟩
+  let κ' : N.Domain := ⟨κ, hκ⟩
   obtain ⟨m, b, V, β, B, hm, succ, fb, sub, last, lt, hbV, hBV, point⟩ := normal n' a' U' D' f' i' α' A' hn
     ((rt_fn_l source.transitive ne hZF.1 ..).mpr ha) ((rt_entry_l source.transitive ne hZF.1 ..).mpr haU)
     (fun s => (hd s.val).trans (rt_fn_l source.transitive ne hZF.1 n' κ' s).symm)
@@ -217,14 +232,15 @@ theorem en_normal_relative_l {ω κ K X R L F : M.Domain} (source : Ep_source_d 
   exact (en_graph_sat_l hZF.1 ..).mp ((rt_model_delta_l source.transitive ne (en_graph_delta_l ..) ρ).mp
     ((en_graph_sat_l he ρ (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest).mpr (point s' hs)))
 
-theorem It_local_d.normal_l {ω κ K X R L F : M.Domain} (source : Ep_source_d hZF ω κ K X R)
+theorem It_local_d.normal_l {ω κ X L F : M.Domain} (source : Fs_read_d ω X)
     (loc : It_local_d ω X κ L F) : En_source_d ω κ L X F := by
-  obtain ⟨_, _, hL, hF, loc⟩ := loc
+  obtain ⟨_, hκ, hL, hF, loc⟩ := loc
   have pre := ((Formula.satisfies_conj_iff _ _ _).mp loc).1
   simp only [ex_pre_m, Formula.satisfies_conj_iff] at pre
   obtain ⟨_, _, _, _, _, _, _, _, _, _, normal, _, _⟩ := pre
-  exact en_normal_relative_l hZF source hL hF normal
+  exact en_normal_relative_l hZF source hκ hL hF normal
 
+omit hZF in
 /-- 内部所属判断和子集一致性直接生成施加源的完整初等定向极限。 -/
 theorem It_local_d.apply_l (hZFC : M.Models ZFC) {ω κ K K' X R Y S L F P : M.Domain}
     (source : Ep_source_d (ZFC.models_zf_l hZFC) ω κ K X R)
@@ -235,8 +251,9 @@ theorem It_local_d.apply_l (hZFC : M.Models ZFC) {ω κ K K' X R Y S L F P : M.D
       Smdl_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) c C W ∧
       Di_elementary_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) ω O A p T V := by
   let hZF := ZFC.models_zf_l hZFC
-  have family := locality.measures_l hZF owner hP power
-  have coherent := locality.coherent_l hZF owner
+  have family := locality.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hP power)
+  have coherent := locality.coherent_l hZF (owner.read_source_l hZF)
   have ord := (locality.ordinals_l (ZF.modelsKP hZF) owner.transitive).2
   obtain ⟨_, _, _, _, loc⟩ := locality
   simp only [ex_short_m, ex_pre_m, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff] at loc
@@ -244,18 +261,21 @@ theorem It_local_d.apply_l (hZFC : M.Models ZFC) {ω κ K K' X R Y S L F P : M.D
     (fun x hx => ord.transitive κ loc.1.2.2.2.2.1 x (source.below x hx))
 
 /-- 同一内部测度的有界商全部留在当前源中，可供枝反射读取下降链。 -/
-theorem It_local_d.bounded_model_l {ω κ K X S L F Q R a U : M.Domain}
-    (source : Ep_source_d hZF ω κ K X S) (power : Sc_power_d X) (locality : It_local_d ω X κ L F)
+theorem It_local_d.bounded_model_l {ω κ X S L F Q R a U : M.Domain}
+    (hω : M.IsOmega ω) (source : Fs_read_d ω X) (code : ∃ c, Smem_d I c X S)
+    (theory : Sc_theory_d I ω X S) (power : Sc_power_d X) (locality : It_local_d ω X κ L F)
     (ha : Rd_entry_d a U F) (hQ : M.mem Q X) (hR : M.mem R X) (nonempty : ∃ x, M.mem x Q) :
     ∃ n D G d p C T, M.mem n ω ∧ Fn0_d n L a ∧ Ep_space_d κ n D ∧
       M.mem G X ∧ M.mem d X ∧ M.mem p X ∧ M.mem C X ∧ M.mem T X ∧
       (∀ f, M.mem f G ↔ M.mem f X ∧ Fn0_d D Q f) ∧ Rp_model_d I D Q U R d G p C T := by
-  obtain ⟨P, hP, subsets⟩ := power K source.finite_mem
-  obtain ⟨n, D, hn, hna, space, ultra⟩ := (locality.measures_l hZF source hP subsets).measure a U ha
-  obtain ⟨_, _, _, hF, _⟩ := locality
-  obtain ⟨c, hm⟩ := source.code
-  obtain ⟨G, d, p, C, T, hG, hd, hp, hC, hT, functions, model⟩ := rs_bounded_model_l hZF source.omega
-    source.transitive hm source.theory power (source.space_mem_l hZF hn space) hQ
+  obtain ⟨n, D, hn, hna, space, ultra⟩ := (locality.measures_l hZF hω source code theory
+    (fun _ D _ hD _ => power D hD)).measure a U ha
+  obtain ⟨_, hκ, _, hF, _⟩ := locality
+  obtain ⟨D₀, hD₀, ds⟩ := source.spaces κ n hκ hn
+  have eq := hZF.1.eq_of_same_members D₀ D (fun s => (ds s).trans (space s).symm)
+  obtain ⟨c, hm⟩ := code
+  obtain ⟨G, d, p, C, T, hG, hd, hp, hC, hT, functions, model⟩ := rs_bounded_model_l hZF hω
+    source.transitive hm theory power (eq ▸ hD₀) hQ
     (rd_entry_transitive_l source.transitive hF ha).2 hR ultra.base nonempty
   exact ⟨n, D, G, d, p, C, T, hn, hna, space, hG, hd, hp, hC, hT, functions, model⟩
 

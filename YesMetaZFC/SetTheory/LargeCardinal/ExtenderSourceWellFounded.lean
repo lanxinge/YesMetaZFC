@@ -23,7 +23,8 @@ theorem It_local_d.realize_desc_l {ω κ K X R K' Y R' L F V B R₀ J P₀ G D V
     (hs : M.mem s X) (fs : Fn0_d ω D s)
     (links : ∀ i j u v, M.SuccessorOf j i → Rd_entry_d i u s → Rd_entry_d j v s → Eb_link_d ω κ L B J K V₀ R₀ F G v u) :
     ∃ v, Fn0_d ω B v ∧ Wf_desc_d R₀ v := by
-  have family := loc.measures_l hZF owner hV owner_power
+  have family := loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hV owner_power)
   have local_copy := loc
   obtain ⟨_, _, hL, hF, _⟩ := local_copy
   obtain ⟨P, N, H, hP, hN, hH, fn, fh, large, constraints⟩ := eb_source_constraints_l hZF source (inside L hL) hB
@@ -45,7 +46,8 @@ theorem It_local_d.source_wf_l {ω κ K X R K' Y R' L F V J O Z A p T S q c C W 
     (system : Ep_system_d I ω κ L X R F J O Z A p T S) (limit : Di_limit_d A p T S q C W)
     (model : Smdl_d I c C W) (elementary : Di_elementary_d I ω O A p T S) : Wf_rel_d C W := by
   have reverse : Ea_agree_d ω κ Y X := fun n D A hn hd sub => (agree n D A hn hd sub).symm
-  have family := (loc.measures_l hZF owner hV owner_power).transfer_l reverse
+  have family := (loc.measures_l hZF owner.omega (owner.read_source_l hZF) owner.code owner.theory
+    (sf_finite_power_l hZF owner.omega owner.transitive owner.code owner.theory owner.finite hV owner_power)).transfer_l reverse
   have local_copy := loc
   obtain ⟨_, _, hL, hF, _⟩ := local_copy
   apply wf_of_no_desc_l hZF hDC
