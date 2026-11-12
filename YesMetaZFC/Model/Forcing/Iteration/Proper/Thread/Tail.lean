@@ -43,7 +43,7 @@ theorem row_pr_tail_l {ω δ F G b D V N A γ E X Q j}
     obtain ⟨α, _, hiα⟩ := hA'.2.2 i hi
     exact ⟨α, (hJ α).mpr ⟨i, hiα⟩, hiα⟩⟩
   obtain ⟨f, hf⟩ := ZF.exists_inclusionInjection hZF I (fun i hi => ((hL i).mp hi).1)
-  have hCount := ZF.ordinal_image_bound_l I hZF (hω.isOrdinal hZF) ⟨f, hf⟩ hAJ (by
+  have hCount := ZF.ordinal_image_bound_l I hZF (hω.isOrdinal (ZF.modelsKP hZF)) ⟨f, hf⟩ hAJ (by
     intro α hα
     obtain ⟨i, hi⟩ := (hJ α).mp hα
     exact ⟨i, hA'.input_mem_of_pairMember hi, hi⟩)
@@ -62,7 +62,7 @@ theorem row_pr_tail_l {ω δ F G b D V N A γ E X Q j}
       rcases hik with hik | rfl
       · exact inc i k α β hik hi hkβ z hzα
       · exact hA.1.2 i α β hi hkβ ▸ hzα
-    rcases (hω.isOrdinal hZF).wellOrder.linear.compare i hiω j hj with he | hij | hji
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare i hiω j hj with he | hij | hji
     · exact pick j hj (Or.inr (hZF.1.eq_of_same_members i j he)) (Or.inr rfl)
     · exact pick j hj (Or.inl hij) (Or.inr rfl)
     · exact pick i hiω (Or.inr rfl) (Or.inl hji)

@@ -44,7 +44,7 @@ theorem ZF.ot_tail_exists_l (hZF : M.Models ZF) {ω ν : M.Domain} (hω : M.IsOm
     · obtain ⟨n, hn, a, ha, base, sum⟩ := ih u next.predecessor_mem
       obtain ⟨m, step, hm⟩ := hω.1.2 n hn
       exact ⟨m, hm, a, ha, base, (ZF.ordinalAddition_successor_iff hZF I
-        (hω.members_areOrdinals hZF n hn) step).mpr ⟨u, sum, next⟩⟩
+        (hω.members_areOrdinals (ZF.modelsKP hZF) n hn) step).mpr ⟨u, sum, next⟩⟩
     · obtain ⟨e, he, heω⟩ := hω.1.1
       exact ⟨e, heω, v, hv, Or.inr limit, (ZF.ordinalAddition_zero_iff hZF I he).mpr rfl⟩
 
@@ -54,7 +54,7 @@ theorem ZF.ot_tail_gap_l (hZF : M.Models ZF) {ω n ν μ k β : M.Domain} (hω :
     (hk : M.mem k ω) (sum : M.IsOrdinalAddition I β ν k) : M.mem β μ := by
   obtain ⟨hn, a, ha, za, sa⟩ := low
   obtain ⟨_, b, hb, zb, sb⟩ := high
-  have on := hω.members_areOrdinals hZF n hn
+  have on := hω.members_areOrdinals (ZF.modelsKP hZF) n hn
   have om := ZF.ordinalAddition_isOrdinal hZF I hb on sb
   have ab : M.mem a b := by
     rcases ha.trichotomy hZF.1 hb (KP.difference_exists_d (ZF.modelsKP hZF))

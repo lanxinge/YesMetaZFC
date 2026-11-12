@@ -19,7 +19,7 @@ theorem rt_fp_coordinates_l {a b f : M.Domain} (hf : M.mem f X) (h : M.PairMembe
     M.mem a X ∧ M.mem b X := by
   obtain ⟨p, code, hp⟩ := h
   exact ((fp_fixed_l hZF.1 hω).mp code).inverse_rank_l I hZF hω.1 hV
-    (ZF.v_transitive_l I hZF hV f hf p hp)
+    (v_transitive_l I hV f hf p hp)
 
 theorem rt_fp_entry_l (a b f : (N).Domain) :
     (N).PairMember J a b f ↔ M.PairMember K a.val b.val f.val := by
@@ -27,12 +27,12 @@ theorem rt_fp_entry_l (a b f : (N).Domain) :
   · rintro ⟨p, code, hp⟩
     exact ⟨p.val, (fp_fixed_l hZF.1 hω).mpr code, hp⟩
   · rintro ⟨p, code, hp⟩
-    exact ⟨⟨p, ZF.v_transitive_l I hZF hV f.val f.property p hp⟩, (fp_fixed_l hZF.1 hω).mp code, hp⟩
+    exact ⟨⟨p, v_transitive_l I hV f.val f.property p hp⟩, (fp_fixed_l hZF.1 hω).mp code, hp⟩
 
 theorem rt_fp_relation_l (R : (N).Domain) : (N).IsSetRelation J R ↔ M.IsSetRelation K R.val := by
   constructor
   · intro h p hp
-    obtain ⟨a, b, code⟩ := h ⟨p, ZF.v_transitive_l I hZF hV R.val R.property p hp⟩ hp
+    obtain ⟨a, b, code⟩ := h ⟨p, v_transitive_l I hV R.val R.property p hp⟩ hp
     exact ⟨a.val, b.val, (fp_fixed_l hZF.1 hω).mpr code⟩
   · intro h p hp
     obtain ⟨a, b, code⟩ := h p.val hp
@@ -55,7 +55,7 @@ theorem rt_fp_function_l (f : (N).Domain) : (N).IsSetFunction J f ↔ M.IsSetFun
 theorem rt_fp_function_from_l (f A B : (N).Domain) :
     (N).IsSetFunctionFromTo J f A B ↔ M.IsSetFunctionFromTo K f.val A.val B.val := by
   have entry := rt_fp_entry_l I hZF hω hV hωX
-  have trans := ZF.v_transitive_l I hZF hV
+  have trans := v_transitive_l I hV
   constructor
   · rintro ⟨hf, domain, total⟩
     refine ⟨(rt_fp_function_l I hZF hω hV hωX f).mp hf, fun x => ⟨?_, ?_⟩, fun x hx => ?_⟩

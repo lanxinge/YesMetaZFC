@@ -87,7 +87,7 @@ theorem oc_seq_tables_l (hZF : M.Models ZF) {ω a S} (hω : M.IsOmega ω) (ha : 
   have total F (hF : M.mem F S) : ∃ c, φ.denote ρ F c := by
     obtain ⟨n, hn, hf⟩ := (hS F).mp hF
     obtain ⟨c, hc⟩ := oc_seq_exists_l I hZF hn
-      ⟨⟨hω.members_areOrdinals hZF n hn, hf.1, hf.2.1⟩, fun _ _ _ hz => ha.mem (hf.output_mem_of_pairMember hz)⟩
+      ⟨⟨hω.members_areOrdinals (ZF.modelsKP hZF) n hn, hf.1, hf.2.1⟩, fun _ _ _ hz => ha.mem (hf.output_mem_of_pairMember hz)⟩
     exact ⟨c, (sat F c).mpr hc⟩
   have unique F (_ : M.mem F S) c d (hc : φ.denote ρ F c) (hd : φ.denote ρ F d) : c = d :=
     oc_seq_unique_l I hZF ((sat F c).mp hc) ((sat F d).mp hd)

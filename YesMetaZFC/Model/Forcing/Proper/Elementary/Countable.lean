@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.Membership
 import YesMetaZFC.Model.Forcing.Proper.Hereditary.NameBound
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 
 /-! # 内部初等模型的可数集合闭包
 

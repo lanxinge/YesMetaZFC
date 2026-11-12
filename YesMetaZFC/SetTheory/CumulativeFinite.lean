@@ -39,7 +39,7 @@ theorem v_finite_function_l {ω η Y n F : M.Domain} (hω : M.IsOmega ω)
   obtain ⟨S, range⟩ := exists_range_of_setFunction hZF Q hg.1 hg.2.1
   have gs : M.IsSetFunctionFromTo Q G n S := ⟨hg.1, hg.2.1,
     fun i hi => (hg.2.2 i hi).imp fun α ha => ⟨(range α).mpr ⟨i, ha.2⟩, ha.2⟩⟩
-  have finite : Finite_d Q ω S := ⟨n, hn, ordinal_image_bound_l Q hZF (hω.members_areOrdinals hZF n hn)
+  have finite : Finite_d Q ω S := ⟨n, hn, ordinal_image_bound_l Q hZF (hω.members_areOrdinals (ZF.modelsKP hZF) n hn)
     (exists_inclusionInjection hZF Q (source := n) (fun _ h => h)) gs
     (fun α hα => ((range α).mp hα).imp fun i hi => ⟨hg.input_mem_of_pairMember hi, hi⟩)⟩
   have union : M.IsUnionOf η η := fun i => ⟨fun hi => (hη.2.2 i hi).imp fun j hj => ⟨hj.1, hj.2⟩,
@@ -54,8 +54,8 @@ theorem v_finite_function_l {ω η Y n F : M.Domain} (hω : M.IsOmega ω)
     exact (rk_mem_l Q hZF (hf.1.2 i y x hy hx ▸ rank) hc).mpr (bound α ((range α).mpr ⟨i, hα⟩))
   have fc : M.IsSetFunctionFromTo Q F n C := ⟨hf.1, hf.2.1,
     fun i hi => (hf.2.2 i hi).imp fun x hx => ⟨values i x hx.2, hx.2⟩⟩
-  obtain ⟨B, hB, hnB, hcB⟩ := v_joint_bound_l Q hZF hY (v_transitive_l Q hZF hY ω hωY n hn) hCY
-  exact ⟨C, hCY, fc, v_relation_mem_l Q hZF hY hη hB fun p hp =>
+  obtain ⟨B, hB, hnB, hcB⟩ := v_joint_bound_l Q hY (v_transitive_l Q hY ω hωY n hn) hCY
+  exact ⟨C, hCY, fc, v_relation_mem_l Q hY hη hB fun p hp =>
     (fn0_of_function_l (modelsKP hZF) fc).1 p hp |>.elim fun i hi => hi.2.elim fun x hx =>
       ⟨i, hnB i hi.1, x, hcB x hx.1, hx.2⟩⟩
 

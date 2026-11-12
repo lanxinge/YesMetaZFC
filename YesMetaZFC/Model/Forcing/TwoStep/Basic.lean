@@ -1,6 +1,5 @@
-import YesMetaZFC.Model.Forcing.Internal.Forcing.OrderCongruence
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Congruence
-import YesMetaZFC.Model.Forcing.Internal.Extension.Choice
+import YesMetaZFC.Model.Forcing.Truth.OrderCongruence
+import YesMetaZFC.Model.Forcing.Extension.Choice
 
 /-! # 任意名称偏序的二步迭代
 

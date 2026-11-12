@@ -44,9 +44,9 @@ J 的递归与局部良序消费 KPi；L 的 ZFC＋GCH、OD/HOD 参数模型及�
 [LargeCardinal](../YesMetaZFC/SetTheory/LargeCardinal/README.md)。`lr_model_zf_l` 仅需 ZF；
 统一层界、有界分离、序数包含和公式相对化仅需 KPi。
 
-[TypeOneStep](../YesMetaZFC/SetTheory/LargeCardinal/TypeOneStep.lean) 的 `ee_one_step_l`
+[TypeOneStep](../YesMetaZFC/SetTheory/LargeCardinal/Types/OneStep.lean) 的 `ee_one_step_l`
 完成 Neeman 3.23：实际构造 τ+ω、源和不可达最大强度扩展器，保留原固定子类型程序、
-内部任意有限元数与排列。[WoodinTypeStep](../YesMetaZFC/SetTheory/LargeCardinal/WoodinTypeStep.lean)
+内部任意有限元数与排列。[WoodinTypeStep](../YesMetaZFC/SetTheory/LargeCardinal/Cardinals/WoodinTypeStep.lean)
 的 `woodin_elastic_step_l` 从武丁假设自动产生同一元组的两份弹性类型和一步实例。
 两个证明的 Lean 公理均仅为 `propext`、`Quot.sound`、`Classical.choice`；
 纯结果关系 `Ee_one_step_d` 仅依赖前两者，原定义的子类型查询 `Ts_subtype_d` 无公理依赖。
@@ -55,16 +55,16 @@ J 的递归与局部良序消费 KPi；L 的 ZFC＋GCH、OD/HOD 参数模型及�
 四组声明审计：内部模型 710 模块／11989 声明，HOD 2／42，小壳 41／360，Łoś 106／1095。
 两份新证明模块分别为 76、55 行，编译约 3 秒；这项核验不包含尚未完成的 L(ℝ)⊨AD。
 
-[LocalIndiscernibles](../YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscernibles.lean)
+[LocalIndiscernibles](../YesMetaZFC/SetTheory/LargeCardinal/Cardinals/LocalTypeTransportTuple.lean)
 在 ZF 中实际构造参数带 V(δ+ω) 和全部内部查询域。类型值属于同一幂集；
 `ordinal_unbounded_fiber_l` 通过原公式收集取得无界纤维，产生任意下界以上、
 满足 ν+ω<μ 的完整类型相同的序数对。`Li_pair_d.read_l` 将它读取为原公式的
-逐参数真值对应。[LocalIndiscerniblesLeast](../YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscerniblesLeast.lean)
+逐参数真值对应。[LocalIndiscerniblesLeast](../YesMetaZFC/SetTheory/LargeCardinal/Cardinals/LocalTypeTransportTuple.lean)
 按原 δ<ν 条件、第二坐标优先的顺序构造最小对，并证明唯一性及原公式表示，不把额外间隔条件
 加入最小化。固定查询关系、原公式及赋值数据另经无选择依赖检查。
 这一层已纳入上述四组审计。五份构造模块共 354 行，单模块 39–95 行，正常编译约 2–5 秒。
 
-[LocalTypeTransportTuple](../YesMetaZFC/SetTheory/LargeCardinal/LocalTypeTransportTuple.lean)
+[LocalTypeTransportTuple](../YesMetaZFC/SetTheory/LargeCardinal/Cardinals/LocalTypeTransportTuple.lean)
 的 `Li_pair_d.transport_l` 已完成有限后继秩层的完整类型搬运。k>0 与元组长度都取自
 内部 ω；源元组逐项自动生成原名字列，固定对象可以来自整个共同极限参数带。
 `li_canonical_transport_l` 从任意 θ≥δ 自动产生最小不可分辨对，固定参数带 V(θ+ω)，
@@ -74,46 +74,46 @@ J 的递归与局部良序消费 KPi；L 的 ZFC＋GCH、OD/HOD 参数模型及�
 48–137 行，编译约 2–4 秒。原名字、矩阵、读取公式与结果关系额外通过无选择依赖审计；
 全部新增声明无新公理、`sorryAx` 或不可计算数据。
 
-[TypeGameDecoding](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean) 已把一张图恢复
+[TypeGameDecoding](../YesMetaZFC/SetTheory/LargeCardinal/Game/RecoverySyntax.lean) 已把一张图恢复
 接入实际子类型见证。内部有限集合公式完整核验中间坐标的两个包含方向；节点谓词再检查
 坐标图的函数性、精确定义域和三元组图属于树。源绝对性只使用传递性。
 `tg_one_graph_recovery_l` 自动构造三个实际查询，保留任意双射排列及逐项对应，恢复原树、
 末位和恰好一个新增标签；高度由最大序数查询推出为 α+1。
-[TypeGameReset](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameReset.lean) 实际构造二元重置
+[TypeGameReset](../YesMetaZFC/SetTheory/LargeCardinal/Game/Reset.lean) 实际构造二元重置
 类型，连同完整节点、空根和最大序数查询的语义证书及真值。规范局部不可分辨对的最小化
 同时校正为原 5.12 的第二坐标优先约定，已重验其存在性、唯一性及完整类型搬运。
 本层十一模块共 775 行，单模块 42–120 行，正常编译约 3 秒，均少于一分钟。
 全部新增声明已纳入上述四组审计；14 个关系、原公式及查询证书另经无选择依赖检查。
 
-[TypeDrop](../YesMetaZFC/Model/SetTheory/Internal/TypeDrop.lean) 已实际构造内部前缀投影和
+[TypeDrop](../YesMetaZFC/Model/SetTheory/Types/DropEmbedding.lean) 已实际构造内部前缀投影和
 dcp。查询的自然数公式码不变，名字列只将指定常量 δ 的元数标记从小元数重编码为大元数；
 裸类型的投影是该纯语法关系的逆像。结果由实际限制元组实现，增加末位后再取 dcp
-字面返回原完整类型。[TypeGameReply](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameReply.lean)
+字面返回原完整类型。[TypeGameReply](../YesMetaZFC/SetTheory/LargeCardinal/Game/ReplyDescent.lean)
 装配规则 (7) 的子类型、空根、严格秩界及加二最大序数；实际语言工厂和低层回答构造均已实现。
 严格秩界另已与原集合秩公式证明等价，实现高度由查询准确读取为末位加三。
-[TypeElasticDomain](../YesMetaZFC/SetTheory/LargeCardinal/TypeElasticDomain.lean) 将原定义域
+[TypeElasticDomain](../YesMetaZFC/SetTheory/LargeCardinal/Types/ElasticDomain.lean) 将原定义域
 查询的独立读取纳入既有弹性语言，不需要完整弹性或 ZFC；
-[TypeGameRigidity](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameRigidity.lean) 只用 ZF、
+[TypeGameRigidity](../YesMetaZFC/SetTheory/LargeCardinal/Game/Rigidity.lean) 只用 ZF、
 超过关系和 dcp⁻ 定义域，就证明新类型的末位为最大序数。
-[WoodinGameReset](../YesMetaZFC/SetTheory/LargeCardinal/WoodinGameReset.lean) 在原 ZFC 武丁
+[WoodinGameReset](../YesMetaZFC/SetTheory/LargeCardinal/Cardinals/WoodinTypeStep.lean) 在原 ZFC 武丁
 假设下实际生成任意参数域下界以上的重置类型，完整节点、根、最大序数和 dcp 弹性同时为真。
 本层十四模块共 855 行，单模块 34–91 行，编译约 3 秒；全部模块仍少于 2000 行。
 新增关系、公式、游戏约束及语言证书中 21 个声明另通过无选择依赖检查；全部新增
 声明已通过上述四组审计，无新增公理、`sorryAx` 或不可计算数据。
-两张图恢复及 5.15 的迭代获胜论证已接到 TypeGameTransfer 的实际 II 策略；最终 L(ℝ)⊨AD 仍待证明。
+两张图恢复及 5.15 的迭代获胜论证已接到 TypeGameTransfer 的实际 II 策略；真类 Woodin 下的最终 L(ℝ)⊨AD 已由 `wd_lr_ad_l` 证明。
 
-[TypeGame](../YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 的 `tg_game_l` 已完成原 5.13
+[TypeGame](../YesMetaZFC/SetTheory/LargeCardinal/Game/RoundNativeScope.lean) 的 `tg_game_l` 已完成原 5.13
 辅助闭博弈的实际装配。先从 max(δ,rank(S)) 自动选择原最小局部不可分辨点，再在模型内部
 统一化三张固定代码表；弹性表、节点／端点表的图包含于 Vδ，仅依赖内部元数的子类型程序表
 的图包含于 Vω。原函数图、名字列及完整编译性质都有原语言公式和精确解码定理。
 合法性只读取同一固定表项及查询字面成员性，不给裸类型假定逻辑闭包或可实现性。
 
-[TypeGameHistory](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameHistory.lean) 构造全部内部
+[TypeGameHistory](../YesMetaZFC/SetTheory/LargeCardinal/Game/RoundNativeScope.lean) 构造全部内部
 有限历史与逐步检查集合，完整合法历史另形成前缀树。七条规则保留域增长、原重置类型、
 回读较早轮、pred(t) 及任意排列的 subtype／exceeds；唯一额外坐标条件为空根。
-[TypeGameStages](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameStages.lean) 用内部序数除法
+[TypeGameStages](../YesMetaZFC/SetTheory/LargeCardinal/Game/RoundNativeScope.lean) 用内部序数除法
 对每个时刻恢复唯一轮号、阶段、责任玩家及相应规则，保留 II 辅助、I 回答、原实数落子的因果顺序。
-[FirstViolationMinimum](../YesMetaZFC/SetTheory/Descriptive/FirstViolationMinimum.lean) 在模型内
+[FirstViolationMinimum](../YesMetaZFC/SetTheory/Descriptive/Game/FirstViolationMonotone.lean) 在模型内
 最小化失败前缀的长度，不使用外部 ω 的良基性。`Tg_game_d.payoff_l` 精确证明 I 获胜当且仅当
 全程合法或首次违规属于 II；闭收益集及其开补集都是实际集合。策略空间及常值策略实例也实际构造。
 获胜策略由下述闭博弈定理另行取得。
@@ -121,12 +121,12 @@ dcp。查询的自然数公式码不变，名字列只将指定常量 δ 的元�
 完整博弈装配层含 31 个新增模块、2336 行，每模块 29–125 行，正常检查约 2–9 秒。
 66 个纯公式和数据接口另经无选择依赖检查；全部新声明纳入上述四组审计。
 
-[ClosedDeterminacy](../YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 的
+[ClosedDeterminacy](../YesMetaZFC/SetTheory/Descriptive/Game/ClosedDeterminacy.lean) 的
 `cg_closed_det_l` 在 ZFC 中证明任意非空集合字母表、任意固定玩家时序上的闭博弈决定性。
 证明遵循 Neeman 4.16 的获胜局面集合：内部策略量词定义 II 获胜区，ZF 构造按首项拼接的
 策略图，模型内选择提供子策略族及 I 的可走字母，再以最早进入获胜区的内部长度证明避让。
 整个论证不要求 ω 外部标准或外部良基。
-[TypeGameDeterminacy](../YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 的
+[TypeGameDeterminacy](../YesMetaZFC/SetTheory/LargeCardinal/Game/RoundNativeScope.lean) 的
 `Tg_game_d.determined_l` 返回原三阶段游戏策略空间中某一方的实际获胜策略。
 TypeGameTransfer 已完成 5.15 的实际 II 策略转移。TypeGameCollapse 的 `tg_lemma61_l` 已闭合 6.1：
 最小编号策略、原实数坐标一致性、地稠密集调用和 6.6 首达捕获共同推出严格高度矛盾。
@@ -352,7 +352,7 @@ nice 树的全前驱 Pₙ 递归、内部下降反证、整树 Skolem 回拉、�
 原选择公理给出实际应答函数；历史原公式的超限归纳证明合法对局一直有效。
 状态取并、规范商投影及其腿、前缀重放与公开策略输出对应均保留原图。
 获胜证书覆盖直到实际 Hartogs(ω) 的全部初始对局；运行唯一性只用 ZF 和局部单值性。
-最终 L(R) 的 AD 尚未证明。
+真类 Woodin 下的 L(R) AD 已由 `wd_lr_ad_l` 证明。
 有限矩阵、内部源闭性和正则下降秩的关系操作按 ZF 边界核验；实际超幂、赋值代表选择和正则化使用 ZFC。
 短扩展器层全部按 ZF 边界审计：`Ex_pre_d`、`Ex_short_d` 及原公式对应已实现，
 正规性、临界点种子、布尔运算、有限坐标乘积、有界投影、可数纤维和长度截断均已证明。
@@ -387,7 +387,7 @@ H(χ) 的配对与乘积封闭已迁至集合论层，原力迫调用直接迁�
 | --- | --- | --- |
 | 原生小图模型与裸 ZFC 一致性 | [SmallGraph/ZFC](../YesMetaZFC/Model/SmallGraph/ZFC.lean)：`sg_model`、`sg_project_zfc`、`sg_models_zfc`、`zfc_consistent` | 小图双模拟商直接构造；原公理及全部有限参数分离、收集模式已经核验，无模型存在或一致性前提；载体固定为 `Type (u+1)` |
 | 标准布尔值 ZFC 模型 | [Boolean/ZFC](../YesMetaZFC/Model/Boolean/ZFC.lean)：`project_zfc`、`bv_models_zfc`、`zfc_consistent` | 任意 `B : Type u` 及实际 `CB_alg B`；名称节点同层，载体固定在 `Type (u+1)`；原公理与所有有限参数模式逐句核验 |
-| 任意地模型的内部泛型商 | [Forcing/InternalQuotient](../YesMetaZFC/Model/Forcing/Internal/Extension/Quotient.lean)、[InternalChoice](../YesMetaZFC/Model/Forcing/Internal/Extension/Choice.lean) | 外部非良基、内部 ω 非标准的地模型也满足完整真值及原 ZFC 保持；商载体与地模型同 universe，基础公理通过内部公式归纳证明 |
+| 任意地模型的内部泛型商 | [Forcing/InternalQuotient](../YesMetaZFC/Model/Forcing/Extension/Isomorphism.lean)、[InternalChoice](../YesMetaZFC/Model/Forcing/Extension/Choice.lean) | 外部非良基、内部 ω 非标准的地模型也满足完整真值及原 ZFC 保持；商载体与地模型同 universe，基础公理通过内部公式归纳证明 |
 | ZFC＋CH 的实际力迫模型 | [Forcing/CH](../YesMetaZFC/Model/Forcing/Applications/Continuum/CH.lean)：`ch_forcing_l`、`ch_extension_l`、`ch_model_l` | 对任意地模型构造可数部分函数塌缩，证明每个泛型商满足原 ZFC＋CH；可数地模型自动取得泛型，实际无模型存在前提的实例载体在 `Type 1` |
 | 参数化 Cohen 添加与 ZFC＋¬CH | [Forcing/CohenAdd](../YesMetaZFC/Model/Forcing/Applications/Cohen/Add.lean)、[NotCH](../YesMetaZFC/Model/Forcing/Applications/Continuum/NotCH.lean) | 对任意模型内指标集 κ 构造 κ 条互异新实数，保持旧无限基数；添加量超过旧 ω₁ 即否定 CH，自动入口默认取 ω₂ |
 | 原 ZFC 的 CH 独立性 | [Forcing/CHIndependence](../YesMetaZFC/Model/Forcing/Applications/Continuum/Independence.lean)：`ch_independent_l`、`ch_consistency_l` | 原 Project Derives 即原纯隶属推导核中的 CH 双侧不可证；两侧一致性由实际模型与既有六规则可靠性给出，不添加新理论或替代 CH 句子 |

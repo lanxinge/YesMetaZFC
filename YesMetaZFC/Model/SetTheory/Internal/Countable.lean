@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.CanonicalCode
+import YesMetaZFC.Model.SetTheory.Types.CanonicalCode
 
 /-! # 全部内部公式码的规范可数性见证
 

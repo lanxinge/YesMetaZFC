@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Names.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Extension.Foundation
+import YesMetaZFC.Model.Forcing.Extension.Isomorphism
 
 /-! # 两步名称转换的内部递归
 

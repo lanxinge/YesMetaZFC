@@ -64,7 +64,7 @@ theorem od_graph_exists_l (hZF : M.Models ZF) (I : kpair_convention_l.Interpreta
     ∃ F, Od_d F ∧ M.IsSetFunction I F ∧ M.PairMember I A x F := by
   obtain ⟨P, hP⟩ := KP.exists_pair (ZF.modelsKP hZF) A x
   obtain ⟨a, V, hv, hp⟩ := ZF.v_cover_l I hZF P
-  have ht := ZF.v_transitive_l I hZF hv
+  have ht := v_transitive_l I hv
   let ψ := od_unique_s φ
   obtain ⟨F, hf, hF⟩ := ZF.exists_setRelationOn_of_denote hZF I ψ ρ V
   have graph : Od_graph_d I ψ ρ V F := ⟨hf.1, hF⟩

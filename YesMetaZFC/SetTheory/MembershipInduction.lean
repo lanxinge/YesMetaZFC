@@ -68,7 +68,7 @@ theorem ZF.mem_hull_l (hZF : M.Models ZF) {C : OrderedPairConvention}
     exact ⟨v, (hφ F v).mpr h, fun w hw =>
       hZF.1.eq_of_same_members w v (fun z => ((hφ F w).mp hw z).trans (h z).symm)⟩
   obtain ⟨ω, hω⟩ := ZF.exists_omega hZF
-  obtain ⟨F, hF⟩ := ZF.recursiveSequence_exists hZF I ρ φ ho (hω.isOrdinal hZF)
+  obtain ⟨F, hF⟩ := ZF.recursiveSequence_exists hZF I ρ φ ho (hω.isOrdinal (ZF.modelsKP hZF))
   obtain ⟨R, hR⟩ := ZF.exists_range_of_setFunction hZF I hF.1.2.1 hF.1.2.2
   obtain ⟨S, hS⟩ := KP.exists_union (ZF.modelsKP hZF) R
   have hs z : M.mem z S ↔ ∃ i t, M.PairMember I i t F ∧ M.mem z t := by

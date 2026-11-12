@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.CompileSemantics
+import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
 
 /-! # 有限公式反射的参数块
 

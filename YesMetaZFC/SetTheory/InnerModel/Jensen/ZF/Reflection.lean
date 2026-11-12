@@ -101,7 +101,7 @@ theorem jl_closed_layer_l (hZF : M.Models ZF) (Φ : Lr_family)
   obtain ⟨e, he⟩ := KP.exists_empty hKP
   obtain ⟨P, hp⟩ := KP.exists_pair hKP A.val e
   obtain ⟨_, V, hv, _, hpV, hc⟩ := ZF.lr_closed_layer_l I hZF hω (jl_cut_queries_l ++ jl_queries_l Φ) P
-  have ht := ZF.v_transitive_l I hZF hv
+  have ht := v_transitive_l I hv
   obtain ⟨a, U, ha, hcut⟩ := jl_cut_l hM ht ⟨e, he, ht P hpV e ((hp e).mpr (Or.inr rfl))⟩
     (fun q hq => hc q (List.mem_append_left _ hq))
   let W : (l_model_l hM).Domain := ⟨U, l_layer_l hM ha⟩

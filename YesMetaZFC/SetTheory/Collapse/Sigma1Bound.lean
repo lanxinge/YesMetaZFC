@@ -28,7 +28,7 @@ theorem s1_value_bound_l (hZFC : M.Models ZFC) {ω κ A Y : M.Domain}
   have hq := ZF.infinite_insert_l I hZF hω hκ (ZF.infinite_insert_l I hZF hω hκ ha hS) hQ
   obtain ⟨P, hP⟩ := KP.exists_insert hKP Q T
   obtain ⟨α, U, hU, hpU⟩ := ZF.v_cover_l I hZF P
-  have htU := ZF.v_transitive_l I hZF hU
+  have htU := v_transitive_l I hU
   have hQU : M.MemberSubset Q U := fun x hx => htU P hpU x ((hP x).mpr (Or.inl hx))
   have hAQ : M.mem A Q := (hQ A).mpr (Or.inl ((hS A).mpr (Or.inr rfl)))
   have hYQ : M.mem Y Q := (hQ Y).mpr (Or.inr rfl)

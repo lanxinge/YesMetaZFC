@@ -94,12 +94,12 @@ theorem ordinal_existsUnique (hℳ : Theory.Models ℳ theory) (operation : Oper
     (left : Carrier ℳ) {right : Carrier ℳ} (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) :
     ∃ output, OrdinalValue hℳ operation output left right ∧
       ∀ other, OrdinalValue hℳ operation other left right → other = output := by
-  have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) right hRight
+  have hOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) right hRight
   cases operation
   · exact _root_.YesMetaZFC.SetTheory.ZF.ordinalAddition_existsUnique (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ) left hOrdinal
   · exact _root_.YesMetaZFC.SetTheory.ZF.ordinalMultiplication_existsUnique (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ) left hOrdinal
   · exact _root_.YesMetaZFC.SetTheory.ZF.ordinalExponentiation_existsUnique (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ)
-      ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) left hLeft) hOrdinal
+      ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) left hLeft) hOrdinal
 
 theorem ordinal_unique (hℳ : Theory.Models ℳ theory) (operation : Operation)
     {left right first second : Carrier ℳ} (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ))
@@ -141,7 +141,7 @@ theorem sequence_exists (hℳ : Theory.Models ℳ theory) (operation : Operation
         membership ℳ input (succ hℳ length) ∧ OrdinalValue hℳ operation output left input := by
   have hInputOmega {input : Carrier ℳ} (hInput : membership ℳ input (succ hℳ length)) : membership ℳ input (omega hℳ) := by
     rcases (succ_spec hℳ length input).mp hInput with hLess | rfl
-    · exact (omega_project hℳ).transitive (project_modelsZF hℳ) length hLength input hLess
+    · exact (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength input hLess
     · exact hLength
   obtain ⟨sequence,hMapping,hValues⟩ := _root_.YesMetaZFC.SetTheory.ZF.exists_setFunctionFromTo_of_denote
     (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ) (schema operation) (env left left)

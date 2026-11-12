@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.Restriction
-import YesMetaZFC.Model.Forcing.Internal.Check.Application
+import YesMetaZFC.Model.Forcing.Check.Order
 import YesMetaZFC.Model.Forcing.Iteration.Names.Quotient
 
 /-! # 旧条件名称的前缀投影

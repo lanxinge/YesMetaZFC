@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.SetTheory.Internal.Isomorphism
-import YesMetaZFC.Model.SetTheory.Internal.Sigma1Substructure
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.SetTheory.Collapse.Mostowski
 
 /-! # Mostowski 图的完整内部初等性

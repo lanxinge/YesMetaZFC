@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.CCC.Basic
-import YesMetaZFC.Model.Forcing.Internal.Extension.ZF
+import YesMetaZFC.Model.Forcing.Extension.Choice
 
 /-! # 可数链条件的基数界反射
 
@@ -260,7 +260,7 @@ theorem ccc_infinite_cardinal_l {ω κ b} (hω : M.IsOmega ω) (hc : Ccc_d M I �
     have hακ' := ZF.exists_inclusionInjection hZF I (hκ.1.1.transitive α hακ)
     exact hκ.1.2 α hακ (ZF.equinumerous_of_cardinalLessOrEqual hZF I hακ' hκα)
   · have hμω : M.mem μ ω := by
-      rcases hμ.1.1.trichotomy hZF.1 (hω.isOrdinal hZF) (KP.difference_exists_d (ZF.modelsKP hZF))
+      rcases hμ.1.1.trichotomy hZF.1 (hω.isOrdinal (ZF.modelsKP hZF)) (KP.difference_exists_d (ZF.modelsKP hZF))
           (KP.intersection_exists_d (ZF.modelsKP hZF) μ ω) with heq | hμω | hωμ'
       · have heq := hZF.1.eq_of_same_members μ ω heq
         exact False.elim (hωμ (heq.symm ▸ ZF.exists_inclusionInjection hZF I (fun _ h => h)))
@@ -269,7 +269,7 @@ theorem ccc_infinite_cardinal_l {ω κ b} (hω : M.IsOmega ω) (hc : Ccc_d M I �
     obtain ⟨r, hr⟩ := hκμE
     have hωμE := ZF.exists_compositionInjection hE J hgE hr
     have hμωE := (image_member_l e hi he).mpr hμω
-    have hμω' := ZF.exists_inclusionInjection hE J ((hωE.isOrdinal hE).transitive (e μ) hμωE)
+    have hμω' := ZF.exists_inclusionInjection hE J ((hωE.isOrdinal (ZF.modelsKP hE)).transitive (e μ) hμωE)
     exact hωc.2 (e μ) hμωE (ZF.equinumerous_of_cardinalLessOrEqual hE J hμω' hωμE)
 
 end YesMetaZFC.Model.Forcing.Internal

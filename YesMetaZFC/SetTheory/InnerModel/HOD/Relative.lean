@@ -54,7 +54,7 @@ theorem ha_ordinal_l (hZF : M.Models ZF) (k : Bool) (A : M.Domain) {x} (hx : M.I
 theorem ha_of_members_l (hZF : M.Models ZF) {k A x} (hx : Oa_d (M := M) k A x)
     (hm : ∀ y, M.mem y x → Ha_d k A y) : Ha_d k A x := by
   obtain ⟨a, V, hv, hxm⟩ := ZF.v_cover_l (kp_pair_l (ZF.modelsKP hZF)) hZF x
-  have ht := ZF.v_transitive_l (kp_pair_l (ZF.modelsKP hZF)) hZF hv
+  have ht := v_transitive_l (kp_pair_l (ZF.modelsKP hZF)) hv
   let ρ : Env M 2 := ⟨Fin.cases x (fun _ => A), fun _ => x⟩
   let φ : UnarySchema 2 := { body := .disj (Formula.extensionalEq .newest (.bound 1)) (ha_m k (.bound 2) .newest) }
   have sat y : φ.denote ρ y ↔ y = x ∨ Ha_d k A y := by

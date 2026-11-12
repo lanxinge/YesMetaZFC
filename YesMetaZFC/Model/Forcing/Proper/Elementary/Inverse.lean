@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.Countable
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
 
 /-! # H(χ) 内关系图反向与初等闭包
 

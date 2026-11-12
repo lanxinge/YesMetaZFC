@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Names.Quotient
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Pool
+import YesMetaZFC.Model.Forcing.Maximum.UniqueRules
 
 /-! # 随前缀泛型变化的后继坐标
 

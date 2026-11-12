@@ -47,7 +47,7 @@ theorem row_pr_omega_thread_l {ω δ F G b U χ H N w v α B R D V p τ K}
   have hωsub := selem_omega_subset_l I hM.2 (ZF.h_transitive_l I hZF hH) hZF hω hSub hElem hωN
   obtain ⟨γ, A, E, X, Q, x, p₀, α₀, B₀, R₀, hγω, hNγ, hA, hc, ha, hE, hd, he, hQ,
     hx, hα₀, hB₀, hR₀, hxp₀, hpp₀, hLow, hv, hs, hcoh, hbs, hOrig, _⟩ :=
-      row_pr_limit_thread_l hZFC h hN hFN hGN hωN (hω.isLimitOrdinal hZF) hωN
+      row_pr_limit_thread_l hZFC h hN hFN hGN hωN (hω.isLimitOrdinal (ZF.modelsKP hZF)) hωN
         (fun ξ _ hξ => hNat ξ hξ) hD hV hαω (hωsub α hαω) hB hR hK hτ hτK hp
   have heγ := hZFC.1.eq_of_same_members γ ω (fun ξ => ⟨hγω ξ, fun hξ => hNγ ξ (hωsub ξ hξ) hξ⟩)
   subst γ

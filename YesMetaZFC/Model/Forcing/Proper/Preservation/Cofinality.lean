@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Preservation.CoverValue
-import YesMetaZFC.Model.Forcing.Internal.Ground.Cofinality
+import YesMetaZFC.Model.Forcing.Ground.Ordinals
 import YesMetaZFC.SetTheory.Card.SmallBound
 
 /-! # proper 泛型扩张的可数共尾性保持

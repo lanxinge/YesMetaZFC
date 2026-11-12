@@ -67,13 +67,31 @@ theorem Fseq_end_d.subset_l {ω F f a : M.Domain} (h : Fseq_end_d I ω F f a) :
   obtain ⟨q, code, hq⟩ := ((h.prefix_restriction.2 i v).mp ⟨p, pair, hp⟩).2
   exact (I.unique pair code).symm ▸ hq
 
+/-- 末项分解逐点给出旧图与唯一新增坐标。 -/
+theorem Fseq_end_d.entries_l (hE : Extensional M) {ω F f a n : M.Domain}
+    (end' : Fseq_end_d I ω F f a) (domain : M.IsDomainOf I n f) (i x : M.Domain) :
+    M.PairMember I i x F ↔ M.PairMember I i x f ∨ (i = n ∧ x = a) := by
+  obtain ⟨m,k,d⟩ := end'
+  have eq := d.prefix_sequence.2.2.2.eq hE domain
+  subst k
+  constructor
+  · intro ix
+    rcases (d.length_successor i).mp ((d.source.2.2.2 i).mpr ⟨x,ix⟩) with hi | eq
+    · exact Or.inl ((d.prefix_restriction.2 i x).mpr ⟨hi,ix⟩)
+    · have eq := hE.eq_of_same_members i n eq
+      subst i
+      exact Or.inr ⟨rfl,d.source.2.2.1.2 n x a ix d.last_value⟩
+  · rintro (ix | ⟨rfl,rfl⟩)
+    · exact ((d.prefix_restriction.2 i x).mp ix).2
+    · exact d.last_value
+
 /-- 将一项追加到内部有限参数列；新增图仍取值于同一集合。 -/
 theorem ZF.fseq_end_exists_l (hZF : M.Models ZF) {ω n f X p} (hω : M.IsOmega ω)
     (hn : M.mem n ω) (hf : M.IsSetFunctionFromTo I f n X) (hp : M.mem p X) :
     ∃ m F, M.mem m ω ∧ M.IsSetFunctionFromTo I F m X ∧ Fseq_end_d I ω F f p := by
   obtain ⟨m, hm, hmω⟩ := hω.1.2 n hn
   obtain ⟨F, hF, hFf⟩ := Structure.IsSequenceOfLength.exists_append (value := p)
-    (modelsKP hZF) I ⟨(hω.isOrdinal hZF).mem hn, hf.1, hf.2.1⟩ ((hω.isOrdinal hZF).mem hmω) hm
+    (modelsKP hZF) I ⟨(hω.isOrdinal (ZF.modelsKP hZF)).mem hn, hf.1, hf.2.1⟩ ((hω.isOrdinal (ZF.modelsKP hZF)).mem hmω) hm
   have hr : M.IsRestrictionOf I f F n := by
     refine ⟨hf.1.1, fun i x => ?_⟩
     constructor
@@ -81,9 +99,9 @@ theorem ZF.fseq_end_exists_l (hZF : M.Models ZF) {ω n f X p} (hω : M.IsOmega �
     · rintro ⟨hi, hx⟩
       rcases (hFf i x).mp hx with hx | ⟨rfl, _⟩
       · exact hx
-      · exact ((hω.isOrdinal hZF).mem hn).wellOrder.linear.irrefl _ hi hi |>.elim
+      · exact ((hω.isOrdinal (ZF.modelsKP hZF)).mem hn).wellOrder.linear.irrefl _ hi hi |>.elim
   refine ⟨m, F, hmω, ⟨hF.2.1, hF.2.2, fun i hi => ?_⟩, m, n,
-    ⟨⟨hmω, hF⟩, hn, hm, ⟨hn, (hω.isOrdinal hZF).mem hn, hf.1, hf.2.1⟩, hr,
+    ⟨⟨hmω, hF⟩, hn, hm, ⟨hn, (hω.isOrdinal (ZF.modelsKP hZF)).mem hn, hf.1, hf.2.1⟩, hr,
       (hFf n p).mpr (Or.inr ⟨rfl, rfl⟩)⟩⟩
   obtain ⟨x, hx⟩ := (hF.2.2 i).mp hi
   refine ⟨x, ?_, hx⟩

@@ -11,10 +11,10 @@ universe u
 variable {M : Structure.{u}}
 
 /-- 较早层的历史可从秩段回到原源：反向幂集见证由原秩证书自动回收。 -/
-theorem Vr_d.of_rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
+theorem Vr_d.of_rank_l {Z α V β W : M.Domain}
     (hZ : M.TransitiveSet Z) (hV : M.mem V Z) (hv : Vr_d Z α V)
     (hW : M.mem W V) (hw : Vr_d V β W) : Vr_d Z β W := by
-  have ht := hv.transitive_l hZF hZ hV
+  have ht := hv.transitive_l hZ hV
   obtain ⟨B, F, hB, hF, cert⟩ := hw
   have step {δ U} (hU : M.mem U V) (eq : ∀ t, M.mem t V → Vc_step_d δ B F U t)
       t (h : M.mem t Z) : Vc_step_d δ B F U t := by
@@ -24,7 +24,7 @@ theorem Vr_d.of_rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
   refine ⟨B, F, hZ V hV B hB, hZ V hV F hF, fun t ht =>
     ⟨(cert W hW).1, (cert W hW).2.1, ?_, step hW (fun t ht => (cert t ht).2.2.2) t ht⟩⟩
   intro δ hδ U hU hu
-  exact step (hv.transitive_l hZF hZ hV B hB U hU) (fun t ht => (cert t ht).2.2.1 δ hδ U hU hu) t ht
+  exact step (hv.transitive_l hZ hV B hB U hU) (fun t ht => (cert t ht).2.2.1 δ hδ U hU hu) t ht
 
 theorem Vr_d.rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
     (hZ : M.TransitiveSet Z) (hV : M.mem V Z) (hv : Vr_d Z α V) (hα : M.IsLimitOrdinal α)
@@ -38,7 +38,7 @@ theorem Vr_d.rank_l (hZF : M.Models ZF) {Z α V β W : M.Domain}
     ((cert U (hZ B hB U (fn.bound_l hu).2)).2.2.2).mpr
       ⟨δ, (fn.bound_l hu).1, U, (fn.bound_l hu).2, hu, fun _ h => h⟩
   have fw := fn.retarget_l range
-  have hFV := hv.relation_mem_l hZF hZ hV hα hβ hWV hF fw.1
+  have hFV := hv.relation_mem_l hZ hV hα hβ hWV hF fw.1
   refine ⟨hWV, W, F, hWV, hFV, fun t ht => ⟨ho, fw, ?_, ?_⟩⟩
   · intro δ hδ U _ hu
     exact ((cert t (hZ V hV t ht)).2.2.1 δ hδ U (fn.bound_l hu).2 hu).trans

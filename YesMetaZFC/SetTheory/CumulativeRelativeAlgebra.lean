@@ -2,7 +2,7 @@ import YesMetaZFC.SetTheory.CumulativeRelative
 
 /-! # 相对秩层的传递性与唯一性
 
-对给定历史作模型内成员归纳。只比较载体已经包含的对象，既不将相对幂集
+同一历史的两步方程直接给出传递性；历史比较再使用模型内归纳。只比较载体已经包含的对象，既不将相对幂集
 偷换为背景幂集，也不要求载体满足完整 ZF。
 -/
 namespace YesMetaZFC.SetTheory
@@ -17,37 +17,29 @@ theorem Vr_d.ordinal_l {Z α V : M.Domain} (h : Vr_d Z α V) (hV : M.mem V Z) : 
   obtain ⟨_, _, _, _, cert⟩ := h
   exact (cert V hV).1
 
+omit hZF in
 theorem vc_transitive_l {Z α V B F : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
     (hB : M.mem B Z) (cert : ∀ t, M.mem t Z → Vc_d α V B F t) :
     M.TransitiveSet V ∧ ∀ β, M.mem β α → ∀ W, Rd_entry_d β W F → M.TransitiveSet W := by
   have ho := (cert V hV).1
   have hf := (cert V hV).2.1
-  have step β W (hW : M.mem W Z) (eqn : ∀ t, M.mem t Z → Vc_step_d β B F W t)
-      (ih : ∀ γ, M.mem γ β → ∀ U, Rd_entry_d γ U F → M.TransitiveSet U) : M.TransitiveSet W := by
+  have step β W (hβ : M.IsOrdinal β) (sub : M.MemberSubset β α) (hW : M.mem W Z)
+      (eqn : ∀ t, M.mem t Z → Vc_step_d β B F W t) : M.TransitiveSet W := by
     intro x hx y hy
-    obtain ⟨γ, hγ, U, hU, hγU, sub⟩ := (eqn x (hZ W hW x hx)).mp hx
-    exact (eqn y (hZ x (hZ W hW x hx) y hy)).mpr
-      ⟨γ, hγ, U, hU, hγU, (ih γ hγ U hγU) y (sub y hy)⟩
-  let ρ : Env M 2 := ⟨Fin.cases α (fun _ => F), fun _ => α⟩
-  let φ : UnarySchema 2 := { body := .imp (.mem .newest (.bound 1)) (.forallE
-    (.imp (rd_entry0_m (.bound 1) .newest (.bound 3)) (Formula.isTransitive .newest))) }
-  have sat β : φ.denote ρ β ↔ M.mem β α → ∀ W, Rd_entry_d β W F → M.TransitiveSet W := by
-    simp only [φ, UnarySchema.denote, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff,
-      Formula.satisfies_forall_iff, rd_entry0_sat_l hZF.1, Formula.satisfies_isTransitive_iff]; rfl
-  have all β (hβ : M.mem β α) : ∀ W, Rd_entry_d β W F → M.TransitiveSet W := by
-    apply (sat β).mp (ZF.mem_ind_l M hZF I φ ρ ?_ β) hβ
-    intro β ih
-    apply (sat β).mpr
-    intro hβ W hβW
-    exact step β W (hZ B hB W (hf.bound_l hβW).2)
-      (fun t ht => (cert t ht).2.2.1 β hβ W (hf.bound_l hβW).2 hβW)
-      (fun γ hγ => (sat γ).mp (ih γ hγ) (ho.transitive β hβ γ hγ))
-  exact ⟨step α V hV (fun t ht => (cert t ht).2.2.2) all, all⟩
+    have hyZ := hZ x (hZ W hW x hx) y hy
+    obtain ⟨γ, hγ, U, hU, hγU, xu⟩ := (eqn x (hZ W hW x hx)).mp hx
+    obtain ⟨δ, hδ, T, hT, hδT, yt⟩ :=
+      ((cert y hyZ).2.2.1 γ (sub γ hγ) U hU hγU).mp (xu y hy)
+    exact (eqn y hyZ).mpr ⟨δ, hβ.transitive γ hγ δ hδ, T, hT, hδT, yt⟩
+  exact ⟨step α V ho (fun _ h => h) hV (fun t ht => (cert t ht).2.2.2),
+    fun β hβ W hw => step β W (ho.mem hβ) (ho.transitive β hβ)
+      (hZ B hB W (hf.bound_l hw).2) (fun t ht => (cert t ht).2.2.1 β hβ W (hf.bound_l hw).2 hw)⟩
 
+omit hZF in
 theorem Vr_d.transitive_l {Z α V : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
     (h : Vr_d Z α V) : M.TransitiveSet V := by
   obtain ⟨_, _, hB, _, cert⟩ := h
-  exact (vc_transitive_l hZF hZ hV hB cert).1
+  exact (vc_transitive_l hZ hV hB cert).1
 
 /-- 相对 Vα 仍包含 α 的全部序数；这里只用给定历史，不要求载体满足 ZF。 -/
 theorem Vr_d.ordinal_subset_l {Z α V : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)

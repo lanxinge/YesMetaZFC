@@ -1,15 +1,23 @@
-import YesMetaZFC.SetTheory.Descriptive.Completion
-import YesMetaZFC.SetTheory.Descriptive.Borel
-import YesMetaZFC.SetTheory.Descriptive.Projective
-import YesMetaZFC.SetTheory.Descriptive.BorelRank
-import YesMetaZFC.SetTheory.Descriptive.Determinacy
-import YesMetaZFC.SetTheory.Descriptive.ClosedDeterminacy
-import YesMetaZFC.SetTheory.Descriptive.TreeBounded
+import YesMetaZFC.SetTheory.Descriptive.Topology.Completion
+import YesMetaZFC.SetTheory.Descriptive.Borel.Universe
+import YesMetaZFC.SetTheory.Descriptive.Topology.Projective
+import YesMetaZFC.SetTheory.Descriptive.Topology.BorelRank
+import YesMetaZFC.SetTheory.Descriptive.Game.GameShift
+import YesMetaZFC.SetTheory.Descriptive.Game.GameWitness
+import YesMetaZFC.SetTheory.Descriptive.Coding.RelationCode
+import YesMetaZFC.SetTheory.Descriptive.Game.ClosedDeterminacy
+import YesMetaZFC.SetTheory.Descriptive.Tree.TreeWellFounded
 
 /-! # 内部描述集合论：空间、Borel、解析、射影层与博弈
 
 `Gm_win_d` 用内部有限局面、内部策略图和 ω 长对局定义双方获胜；
 `AD_d` 量化全部内部收益子集。`Axioms.ad_axiom` 是语义对应已核验的原句子。
+`gs_det_iff_l` 将全部策略编码为实数，给出与原决定性等价的 Δ₀ 公式；
+`gs_witness_l` 在实际传递见证集合中准确核验该公式，见证不需满足 ZF。
+`gs_base_iff_l` 以 Δ₀ 前缀覆盖、编号单射和奇偶递推准确识别原博弈基础数据。
+`bc_encode_l` 将每个实数编码为零或输入后继值的实数；规范解码唯一，
+`bc_decode_l` 只用 KP 从 Δ₀ 逐行检查构造实际解码函数。
+`wo_code_exists_l` 将背景可数良序的载体和严格关系合并为同一二值实数，保留原序型。
 `cg_closed_det_l` 在 ZFC 中证明任意非空集合字母表、任意固定玩家时序的闭博弈决定性，
 返回模型内的实际获胜策略；策略拼接只用 ZF，两个选择步骤单独使用对象选择公理。
 

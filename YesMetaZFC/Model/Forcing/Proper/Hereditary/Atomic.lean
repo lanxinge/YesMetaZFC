@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Hereditary.AtomicWitness
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
-import YesMetaZFC.Model.Forcing.Internal.Atomic.Witness
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Atomic.Truth
 
 /-! # H(χ) 中名称与原子力迫的绝对性
 

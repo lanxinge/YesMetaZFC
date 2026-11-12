@@ -15,7 +15,7 @@ include hZF
 
 private theorem fp_omega_le_l {ω α : M.Domain} (hω : M.IsOmega ω) (hα : M.IsOrdinal α)
     (hn : ¬ M.mem α ω) : M.MemberSubset ω α := by
-  rcases Structure.IsOrdinal.trichotomy hZF.1 (hω.isOrdinal hZF) hα
+  rcases Structure.IsOrdinal.trichotomy hZF.1 (hω.isOrdinal (ZF.modelsKP hZF)) hα
       (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF) ω α) with eq | lt | gt
   · exact fun x hx => (eq x).mp hx
   · exact hα.transitive ω lt
@@ -29,7 +29,7 @@ theorem Fp_tag_d.subset_rank_l {b : Bool} {ω ν V x y : M.Domain} (hω : M.IsOm
   rcases (h z).mp hz with ⟨_, empty⟩ | ⟨a, ha, shift⟩
   · exact (ZF.v_unfold_l I hZF hV z).mpr ⟨α, W, hα, hW, fun t ht => (empty t ht).elim⟩
   · rcases shift with ⟨haω, succ⟩ | ⟨_, rfl⟩
-    · have oa := hω.members_areOrdinals hZF a haω
+    · have oa := hω.members_areOrdinals (ZF.modelsKP hZF) a haω
       have haα := ZF.v_ordinal_height_l hZF hW oa (bound a ha)
       have sub : M.MemberSubset z α := fun t ht => ((succ t).mp ht).elim
         ((v_ordinal_l I hW).transitive a haα t) (fun eq => (hZF.1.eq_of_same_members t a eq).symm ▸ haα)
@@ -45,7 +45,7 @@ theorem Fp_tag_d.rank_mem_l {b : Bool} {ω ν V x y : M.Domain} (hω : M.IsOmega
   obtain ⟨α, W, hα, hW, bound⟩ := (ZF.v_unfold_l I hZF hV x).mp hx
   by_cases finite : M.mem α ω
   · obtain ⟨β, succ, hβω⟩ := hω.1.2 α finite
-    obtain ⟨T, hT⟩ := ZF.v_exists_l I hZF (hω.members_areOrdinals hZF β hβω)
+    obtain ⟨T, hT⟩ := ZF.v_exists_l I hZF (hω.members_areOrdinals (ZF.modelsKP hZF) β hβω)
     have hxT := (ZF.v_unfold_l I hZF hT x).mpr ⟨α, W, succ.predecessor_mem, hW, bound⟩
     exact (ZF.v_unfold_l I hZF hV y).mpr ⟨β, T, hων β hβω, hT, h.subset_rank_l I hZF hω hT hxT⟩
   · have hωα := fp_omega_le_l hZF hω (v_ordinal_l I hW) finite
@@ -65,13 +65,13 @@ theorem Fp_pair_d.rank_mem_l {ω ν V x y p : M.Domain} (hω : M.IsOmega ω)
     (hV : V_d I ν V) (hων : M.MemberSubset ω ν) (hx : M.mem x V) (hy : M.mem y V)
     (h : Fp_pair_d ω x y p) : M.mem p V := by
   classical
-  obtain ⟨R, hR, hxR, hyR⟩ := ZF.v_joint_bound_l I hZF hV hx hy
+  obtain ⟨R, hR, hxR, hyR⟩ := v_joint_bound_l I hV hx hy
   obtain ⟨α, W, hα, hW, bound⟩ := (ZF.v_unfold_l I hZF hV R).mp hR
   have tags : ∃ β T, M.mem β ν ∧ V_d I β T ∧
       ∀ b a z, M.mem a W → Fp_tag_d b ω a z → M.mem z T := by
     by_cases finite : M.mem α ω
     · obtain ⟨β, succ, hβω⟩ := hω.1.2 α finite
-      obtain ⟨T, hT⟩ := ZF.v_exists_l I hZF (hω.members_areOrdinals hZF β hβω)
+      obtain ⟨T, hT⟩ := ZF.v_exists_l I hZF (hω.members_areOrdinals (ZF.modelsKP hZF) β hβω)
       exact ⟨β, T, hων β hβω, hT, fun _ _ z ha tag => (ZF.v_unfold_l I hZF hT z).mpr
         ⟨α, W, succ.predecessor_mem, hW, tag.subset_rank_l I hZF hω hW ha⟩⟩
     · exact ⟨α, W, hα, hW, fun _ _ _ ha tag =>
@@ -96,7 +96,7 @@ theorem Fp_tag_d.inverse_rank_l {b : Bool} {ω ν V x y : M.Domain} (hω : M.IsI
   obtain ⟨α, W, hα, hW, bound⟩ := (ZF.v_unfold_l I hZF hV y).mp hy
   refine (ZF.v_unfold_l I hZF hV x).mpr ⟨α, W, hα, hW, fun a ha => ?_⟩
   obtain ⟨z, shift⟩ := fp_shift_exists_l hω a
-  exact shift.mem_l (ZF.v_transitive_l I hZF hW) (bound z ((h z).mpr (Or.inr ⟨a, ha, shift⟩)))
+  exact shift.mem_l (v_transitive_l I hW) (bound z ((h z).mpr (Or.inr ⟨a, ha, shift⟩)))
 
 /-- 已属于秩层的平坦对，其两个坐标也实际属于该层。 -/
 theorem Fp_pair_d.inverse_rank_l {ω ν V x y p : M.Domain} (hω : M.IsInductive ω)

@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Proper.Witness
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Criterion
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
 import YesMetaZFC.Model.Forcing.TwoStep.Presentation
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 二步主条件的合成
 

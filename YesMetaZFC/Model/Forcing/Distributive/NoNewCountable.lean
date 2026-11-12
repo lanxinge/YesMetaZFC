@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Distributive.NoNewFunctions
-import YesMetaZFC.Model.Forcing.Internal.Extension.ZF
+import YesMetaZFC.Model.Forcing.Extension.Choice
 import YesMetaZFC.SetTheory.FunctionRetraction
 import YesMetaZFC.SetTheory.Card.Cofinality.Comparison
 
@@ -39,7 +39,8 @@ theorem no_new_countable_l {ω b X} (hω : M.IsOmega ω) (hD : Distributive_d (M
       obtain ⟨x, _, hix⟩ := hG.2.2 i hi
       exact ⟨x, (hA x).mpr ⟨i, hix⟩, hix⟩⟩
     refine ⟨A, (fun x hx => ?_),
-      ZF.exists_rightInverseInjection_of_surjection_from_ordinal hZF I (hω.isOrdinal hZF) hGA (fun x hx => ?_), ?_⟩
+      (ZF.exists_rightInverseInjection_of_surjection_from_ordinal hZF I (hω.isOrdinal (ZF.modelsKP hZF)) hGA
+        (fun x hx => ?_)).imp (fun _ h => h.1), ?_⟩
     · obtain ⟨i, hix⟩ := (hA x).mp hx
       exact hG.output_mem_of_pairMember hix
     · obtain ⟨i, hix⟩ := (hA x).mp hx

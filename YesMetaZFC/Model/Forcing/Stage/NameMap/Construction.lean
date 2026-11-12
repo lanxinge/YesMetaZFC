@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Stage.NameMap.Basic
-import YesMetaZFC.Model.Forcing.Internal.Check.Model
+import YesMetaZFC.Model.Forcing.Check.SupportBound
 
 /-! # 原 ZF 内的名称搬运存在定理
 

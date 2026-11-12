@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.Realization
+import YesMetaZFC.Model.Forcing.Names.Realization
 import YesMetaZFC.SetTheory.Boolean.Algebra
 
 /-! # 布尔代数的实际模型内编码

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Master.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Definability
+import YesMetaZFC.Model.Forcing.Truth.Definability
 
 /-! # 主条件的加强保持与泛型意义 -/
 

@@ -49,7 +49,7 @@ theorem cc_fseq_bound_l (hZF : M.Models ZF) {ω P Q N} (hω : M.IsOmega ω)
     rfl
   have merge {j k B C} (hB : M.PairMember I j B Q) (hC : M.PairMember I k C Q) :
       ∃ l D, M.PairMember I l D Q ∧ M.MemberSubset B D ∧ M.MemberSubset C D := by
-    rcases (hω.isOrdinal hZF).wellOrder.linear.compare j (hQ.input_mem_of_pairMember hB)
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare j (hQ.input_mem_of_pairMember hB)
         k (hQ.input_mem_of_pairMember hC) with he | hjk | hkj
     · have he := hZF.1.eq_of_same_members j k he
       subst k

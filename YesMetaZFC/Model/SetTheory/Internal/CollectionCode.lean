@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.BinaryTruth
-import YesMetaZFC.Model.SetTheory.Internal.SeparationCode
+import YesMetaZFC.Model.SetTheory.Internal.SmallSkolemSyntax
+import YesMetaZFC.Model.SetTheory.Internal.SeparationHull
 
 /-! # 全内部公式的收集实例代码
 

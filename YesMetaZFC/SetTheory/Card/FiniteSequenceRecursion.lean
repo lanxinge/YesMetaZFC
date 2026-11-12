@@ -34,7 +34,7 @@ theorem fseq_space_exists_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (X : M
   intro p hp
   obtain ⟨i, x, hc⟩ := hF.1.1 p hp
   have hi : M.PairMember I i x F := ⟨p, hc, hp⟩
-  exact (hD p).mpr ⟨i, hω.transitive hZF n hn i (hF.input_mem_of_pairMember hi),
+  exact (hD p).mpr ⟨i, hω.transitive (ZF.modelsKP hZF) n hn i (hF.input_mem_of_pairMember hi),
     x, hF.output_mem_of_pairMember hi, hc⟩
 
 theorem fseq_step_exists_l (hZF : M.Models ZF) (κ X S Q J H : M.Domain) :
@@ -63,7 +63,7 @@ theorem fseq_recursion_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (κ X S Q
     obtain ⟨K, hK⟩ := fseq_step_exists_l I hZF κ X S Q J P
     exact ⟨K, hK, fun L hL => hL.1.eq_of_pairMember_iff hZF.1 hK.1
       (fun F z => (hL.2 F z).trans (hK.2 F z).symm)⟩
-  obtain ⟨H, hH⟩ := recursiveSequence_exists hZF I (fseq_env_l κ X S Q J) (fseq_step_s (𝒞 := 𝒞)) hc (hω.isOrdinal hZF)
+  obtain ⟨H, hH⟩ := recursiveSequence_exists hZF I (fseq_env_l κ X S Q J) (fseq_step_s (𝒞 := 𝒞)) hc (hω.isOrdinal (ZF.modelsKP hZF))
   exact ⟨H, by simpa only [ho] using hH⟩
 
 end ZF

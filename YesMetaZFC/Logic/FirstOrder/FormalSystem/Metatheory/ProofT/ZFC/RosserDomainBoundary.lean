@@ -79,7 +79,7 @@ theorem natural_in_domain (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     · exact Or.inl hEqual
     · exact Or.inr hLess
     · have hOrdinal := (omega_project h𝒩).members_areOrdinals
-        (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩)) number hNumber
+        (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩))) number hNumber
       have hSelf : mem 𝒩 number number := by
         rcases (PureSourceNumerals.successor_spec h𝒩 element number).mp hGreater with h | h
         · exact hOrdinal.transitive element hElement number h

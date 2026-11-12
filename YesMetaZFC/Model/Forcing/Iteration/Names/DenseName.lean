@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Iteration.Names.Dense
-import YesMetaZFC.Model.Forcing.Internal.Check.Relation
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Basic
+import YesMetaZFC.Model.Forcing.Check.Order
+import YesMetaZFC.Model.Forcing.Maximum.Bounded
 
 /-! # 指定稠密集中的商条件名称
 

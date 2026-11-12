@@ -1,11 +1,12 @@
 import YesMetaZFC.SetTheory.Definitional.Project.FlatPairing
 import YesMetaZFC.SetTheory.Foundation
+import YesMetaZFC.SetTheory.KP.OrdinalCore
 import YesMetaZFC.SetTheory.Ord.Arithmetic.Recursion
 /-!
 # 最小归纳集与自然数归纳
 本文件为对象公式 `isInductive`、`isOmega` 补上纸面语义，并从 ZF 的无穷与分离公理
-构造最小归纳集。随后证明最小归纳集是非零极限序数，并整理出供序数算术复用的自然数
-归纳核。
+构造最小归纳集。对已给定的最小归纳集，只用 KP 证明其序数性与非零极限性，
+并整理出供序数算术复用的自然数归纳核。
 -/
 namespace YesMetaZFC
 namespace SetTheory
@@ -173,12 +174,6 @@ theorem exists_omega {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF) :
       simpa [hSuccessorEq] using hSetSuccessorMem
   exact ⟨ω, hOmegaInductive, fun set hSet value hValue =>
     (hOmegaSemantic value).mp hValue |>.2 set hSet⟩
-/-- “当前对象是序数”的无参数分离模式。 -/
-private def ordinalSchema : Definitional.Project.UnarySchema 0 where
-  body := Definitional.Project.Formula.isOrdinal (.bound 0)
-/-- “当前对象包含于给定参数”的一参数分离模式。 -/
-private def subsetParameterSchema : Definitional.Project.UnarySchema 1 where
-  body := Definitional.Project.Formula.subset (.bound 0) (.bound 1)
 /-- “当前自然数为空或为 `ω` 中某个自然数的后继”的分离模式。 -/
 private def emptyOrSuccessorInOmegaSchema : Definitional.Project.UnarySchema 1 where
   body := .disj (Definitional.Project.Formula.isEmpty (.bound 0)) <|
@@ -260,65 +255,32 @@ private theorem satisfies_ordinalExponentiationClosedInOmegaSchema_iff
   rfl
 end ZF
 namespace Structure.IsOmega
-/-- 最小归纳集的每个成员都是序数。 -/
-theorem members_areOrdinals {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
+/-- 最小归纳集的每个成员都是序数；归纳性质采用等价的 Δ₀ 序数公式。 -/
+theorem members_areOrdinals {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
     {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) :
-    ∀ value, ℳ.mem value ω → ℳ.IsOrdinal value := by
-  let env : Env ℳ 0 := {
-    bound := Fin.elim0
-    free := fun _ => Classical.choice ℳ.nonempty
-  }
-  apply hω.induction (fun value => ℳ.IsOrdinal value)
-  · rcases ZF.separation_exists_d hZF ZF.ordinalSchema
-        env ω with ⟨ordinals, hOrdinals⟩
-    refine ⟨ordinals, fun value => ?_⟩
-    rw [hOrdinals value]
-    constructor
-    · rintro ⟨hValue, hValueOrdinal⟩
-      exact ⟨hValue, (Definitional.Project.Formula.satisfies_isOrdinal_iff (env.push value) (.bound 0)).mp hValueOrdinal⟩
-    · rintro ⟨hValue, hValueOrdinal⟩
-      exact ⟨hValue, (Definitional.Project.Formula.satisfies_isOrdinal_iff (env.push value) (.bound 0)).mpr hValueOrdinal⟩
-  · intro empty hEmpty
-    exact Structure.IsOrdinal.of_no_members hEmpty
-  · intro predecessor _ hPredecessor successor hSuccessor
-    exact KP.successor_isOrdinal (ZF.modelsKP hZF)
-      hPredecessor hSuccessor
-/-- 最小归纳集是传递集。 -/
-theorem transitive {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
-    {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) :
-    ℳ.TransitiveSet ω := by
-  let env : Env ℳ 1 := {
-    bound := fun _ => ω
-    free := fun _ => Classical.choice ℳ.nonempty
-  }
-  have hMembersClosed :
-      ∀ predecessor, ℳ.mem predecessor ω →
-        ℳ.MemberSubset predecessor ω := by
-    apply hω.induction (fun predecessor => ℳ.MemberSubset predecessor ω)
-    · rcases ZF.separation_exists_d hZF
-          ZF.subsetParameterSchema env ω with
-        ⟨closed, hClosed⟩
-      refine ⟨closed, fun value => ?_⟩
-      rw [hClosed value]
-      constructor
-      · rintro ⟨hValue, hSubset⟩
-        exact ⟨hValue, (Definitional.Project.Formula.satisfies_subset_iff (env.push value) (.bound 0) (.bound 1)).mp
-            hSubset⟩
-      · rintro ⟨hValue, hSubset⟩
-        exact ⟨hValue, (Definitional.Project.Formula.satisfies_subset_iff (env.push value) (.bound 0) (.bound 1)).mpr
-            hSubset⟩
-    · intro empty hEmpty value hValue
-      exact False.elim (hEmpty value hValue)
-    · intro predecessor hPredecessor hSubset
-        successor hSuccessor value hValue
-      rcases (hSuccessor value).mp hValue with
-        hValuePredecessor | hSame
-      · exact hSubset value hValuePredecessor
-      · have hEq :=
-          hZF.1.eq_of_same_members value predecessor hSame
-        simpa [hEq] using hPredecessor
-  intro predecessor hPredecessor
-  exact hMembersClosed predecessor hPredecessor
+    ∀ x, ℳ.mem x ω → ℳ.IsOrdinal x := by
+  let ρ : Env ℳ 0 := ⟨Fin.elim0, fun _ => ω⟩
+  let φ : Definitional.Project.Delta0UnarySchema 0 := {
+    body := KP.ord0_m .newest, delta0 := KP.ord0_delta_l _ }
+  apply hω.induction (fun x => ℳ.IsOrdinal x)
+  · obtain ⟨S, spec⟩ := KP.separation_exists_d hKP φ ρ ω
+    exact ⟨S, fun x => (spec x).trans (and_congr_right fun _ => KP.ord0_sat_l hKP ..)⟩
+  · exact fun _ h => Structure.IsOrdinal.of_no_members h
+  · exact fun _ _ h _ hs => KP.successor_isOrdinal hKP h hs
+
+/-- 对“包含于 ω”作 Δ₀ 归纳，得到最小归纳集的传递性。 -/
+theorem transitive {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
+    {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) : ℳ.TransitiveSet ω := by
+  let ρ : Env ℳ 1 := ⟨fun _ => ω, fun _ => ω⟩
+  let φ : Definitional.Project.Delta0UnarySchema 1 := {
+    body := Definitional.Project.Formula.subset .newest (.bound 1), delta0 := .atom .. }
+  apply hω.induction (fun x => ℳ.MemberSubset x ω)
+  · obtain ⟨S, spec⟩ := KP.separation_exists_d hKP φ ρ ω
+    exact ⟨S, fun x => (spec x).trans (and_congr_right fun _ => Definitional.Project.Formula.satisfies_subset_iff ..)⟩
+  · exact fun _ hz x hx => (hz x hx).elim
+  · intro k hk sub s hs x hx
+    exact ((hs x).mp hx).elim (sub x) (fun eq => hKP.1.eq_of_same_members x k eq ▸ hk)
+
 /-- `ω` 中每个非零成员都是某个仍属于 `ω` 的自然数的后继。 -/
 theorem exists_predecessor_of_mem_of_nonempty
     {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
@@ -363,10 +325,10 @@ theorem exists_predecessor_of_mem_of_nonempty
     exact False.elim (hEmpty member hMember)
   · exact hSuccessor
 /-- 最小归纳集由隶属关系良序。 -/
-theorem membershipWellOrder {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
+theorem membershipWellOrder {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
     {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) :
     ℳ.MembershipWellOrder ω := by
-  have hMembersOrdinal := hω.members_areOrdinals hZF
+  have hMembersOrdinal := hω.members_areOrdinals hKP
   refine ⟨?_, ?_⟩
   · refine {
       irrefl := ?_
@@ -380,31 +342,31 @@ theorem membershipWellOrder {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF
       exact (hMembersOrdinal right hRight).transitive
         middle hMiddleRight left hLeftMiddle
     · intro left hLeft right hRight
-      exact Structure.IsOrdinal.trichotomy hZF.1 (hMembersOrdinal left hLeft) (hMembersOrdinal right hRight) (KP.difference_exists_d (ZF.modelsKP hZF))
-        (KP.intersection_exists_d (ZF.modelsKP hZF) left right)
+      exact Structure.IsOrdinal.trichotomy hKP.1 (hMembersOrdinal left hLeft) (hMembersOrdinal right hRight) (KP.difference_exists_d hKP)
+        (KP.intersection_exists_d hKP left right)
   · intro subset hSubset hNonempty
-    rcases KP.mem_minimal_exists_d (ZF.modelsKP hZF) hNonempty with
+    rcases KP.mem_minimal_exists_d hKP hNonempty with
       ⟨minimal, hMinimalSubset, hMinimal⟩
     refine ⟨minimal, hMinimalSubset, ?_⟩
     intro value hValueSubset
-    rcases Structure.IsOrdinal.trichotomy hZF.1 (hMembersOrdinal minimal (hSubset minimal hMinimalSubset)) (hMembersOrdinal value (hSubset value hValueSubset))
-        (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF)
+    rcases Structure.IsOrdinal.trichotomy hKP.1 (hMembersOrdinal minimal (hSubset minimal hMinimalSubset)) (hMembersOrdinal value (hSubset value hValueSubset))
+        (KP.difference_exists_d hKP) (KP.intersection_exists_d hKP
           minimal value) with
       hSame | hMinimalValue | hValueMinimal
     · exact Or.inl hSame
     · exact Or.inr hMinimalValue
     · exact False.elim (hMinimal value hValueSubset hValueMinimal)
 /-- 最小归纳集是序数。 -/
-theorem isOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
+theorem isOrdinal {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
     {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) :
     ℳ.IsOrdinal ω :=
-  ⟨hω.transitive hZF,
-    hω.membershipWellOrder hZF⟩
+  ⟨hω.transitive hKP,
+    hω.membershipWellOrder hKP⟩
 /-- 最小归纳集是非零极限序数。 -/
-theorem isLimitOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
+theorem isLimitOrdinal {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
     {ω : ℳ.Domain} (hω : ℳ.IsOmega ω) :
     ℳ.IsLimitOrdinal ω := by
-  refine ⟨hω.isOrdinal hZF, ?_, ?_⟩
+  refine ⟨hω.isOrdinal hKP, ?_, ?_⟩
   · rcases hω.1.1 with ⟨empty, _, hEmptyOmega⟩
     exact ⟨empty, hEmptyOmega⟩
   · intro predecessor hPredecessor
@@ -412,26 +374,26 @@ theorem isLimitOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
       ⟨successor, hSuccessor, hSuccessorOmega⟩
     exact ⟨successor, hSuccessorOmega, (hSuccessor predecessor).mpr (Or.inr fun _ => Iff.rfl)⟩
 /-- 每个非零极限序数都包含最小归纳集中的全部自然数。 -/
-theorem subset_limitOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
+theorem subset_limitOrdinal {ℳ : Structure.{u}} (hKP : ℳ.Models SetTheory.KP)
     {ω α : ℳ.Domain} (hω : ℳ.IsOmega ω) (hα : ℳ.IsLimitOrdinal α) :
     ℳ.MemberSubset ω α := by
   apply hω.2 α
   constructor
-  · rcases KP.exists_empty (ZF.modelsKP hZF) with
+  · rcases KP.exists_empty hKP with
       ⟨empty, hEmpty⟩
     rcases hα.2.1 with ⟨member, hMember⟩
-    rcases Structure.IsOrdinal.trichotomy hZF.1 (Structure.IsOrdinal.of_no_members hEmpty) (hα.1.mem hMember) (KP.difference_exists_d (ZF.modelsKP hZF))
-        (KP.intersection_exists_d (ZF.modelsKP hZF)
+    rcases Structure.IsOrdinal.trichotomy hKP.1 (Structure.IsOrdinal.of_no_members hEmpty) (hα.1.mem hMember) (KP.difference_exists_d hKP)
+        (KP.intersection_exists_d hKP
           empty member) with
       hSame | hEmptyMember | hMemberEmpty
     · have hEq :=
-        hZF.1.eq_of_same_members empty member hSame
+        hKP.1.eq_of_same_members empty member hSame
       exact ⟨empty, hEmpty, by simpa [hEq] using hMember⟩
     · exact ⟨empty, hEmpty,
         hα.1.transitive member hMember empty hEmptyMember⟩
     · exact False.elim <| hEmpty member hMemberEmpty
   · intro predecessor hPredecessor
-    rcases KP.exists_successor (ZF.modelsKP hZF)
+    rcases KP.exists_successor hKP
         predecessor with
       ⟨successor, hSuccessor⟩
     have hPredecessorOrdinal :
@@ -439,19 +401,19 @@ theorem subset_limitOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF
       hα.1.mem hPredecessor
     have hSuccessorOrdinal :
         ℳ.IsOrdinal successor :=
-      KP.successor_isOrdinal (ZF.modelsKP hZF)
+      KP.successor_isOrdinal hKP
         hPredecessorOrdinal hSuccessor
     rcases hα.2.2 predecessor hPredecessor with
       ⟨larger, hLarger, hPredecessorLarger⟩
     have hLargerOrdinal :
         ℳ.IsOrdinal larger :=
       hα.1.mem hLarger
-    rcases Structure.IsOrdinal.trichotomy hZF.1
-        hSuccessorOrdinal hLargerOrdinal (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF)
+    rcases Structure.IsOrdinal.trichotomy hKP.1
+        hSuccessorOrdinal hLargerOrdinal (KP.difference_exists_d hKP) (KP.intersection_exists_d hKP
           successor larger) with
       hSame | hSuccessorLarger | hLargerSuccessor
     · have hEq :=
-        hZF.1.eq_of_same_members successor larger hSame
+        hKP.1.eq_of_same_members successor larger hSame
       exact ⟨successor, hSuccessor, by simpa [hEq] using hLarger⟩
     · exact ⟨successor, hSuccessor,
         hα.1.transitive larger hLarger
@@ -467,7 +429,7 @@ theorem subset_limitOrdinal {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF
           hα.1.wellOrder.linear.irrefl
             predecessor hPredecessor hSelf
       · have hEq :=
-          hZF.1.eq_of_same_members
+          hKP.1.eq_of_same_members
             larger predecessor hLargerEqPredecessor
         have hSelf : ℳ.mem predecessor predecessor := by
           simpa [hEq] using hPredecessorLarger
@@ -516,7 +478,7 @@ theorem ordinalAddition_mem_omega
     · intro predecessor hPredecessor hPredecessorClosed
         successor hSuccessor value hValue
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF predecessor hPredecessor
+        hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
       rcases (ordinalAddition_successor_iff
           hZF 𝕀 hPredecessorOrdinal hSuccessor).mp hValue with
         ⟨previous, hPrevious, hValueSuccessor⟩
@@ -566,7 +528,7 @@ theorem ordinalMultiplication_mem_omega
       rfl
     · intro empty hEmpty value hValue
       have hValueEmpty := (ordinalMultiplication_zero_iff
-          hZF 𝕀 (hω.members_areOrdinals hZF left hLeft)
+          hZF 𝕀 (hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft)
           hEmpty).mp hValue
       rcases hω.1.1 with
         ⟨omegaEmpty, hOmegaEmpty, hOmegaEmptyMem⟩
@@ -578,9 +540,9 @@ theorem ordinalMultiplication_mem_omega
     · intro predecessor hPredecessor hPredecessorClosed
         successor hSuccessor value hValue
       have hLeftOrdinal :=
-        hω.members_areOrdinals hZF left hLeft
+        hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF predecessor hPredecessor
+        hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
       rcases (ordinalMultiplication_successor_iff
           hZF 𝕀 hLeftOrdinal hPredecessorOrdinal hSuccessor).mp hValue with
         ⟨previous, hPrevious, hValueAddition⟩
@@ -625,7 +587,7 @@ theorem ordinalExponentiation_mem_omega
               ℳ.mem value ω
       rfl
     · intro empty hEmpty value hValue
-      have hValueOne := (ordinalExponentiation_zero_iff hZF 𝕀 (hω.members_areOrdinals hZF base hBase)
+      have hValueOne := (ordinalExponentiation_zero_iff hZF 𝕀 (hω.members_areOrdinals (ZF.modelsKP hZF) base hBase)
           hEmpty).mp hValue
       rcases hω.exists_ordinalOne_mem with
         ⟨one, hOne, hOneOmega⟩
@@ -635,9 +597,9 @@ theorem ordinalExponentiation_mem_omega
     · intro predecessor hPredecessor hPredecessorClosed
         successor hSuccessor value hValue
       have hBaseOrdinal :=
-        hω.members_areOrdinals hZF base hBase
+        hω.members_areOrdinals (ZF.modelsKP hZF) base hBase
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF predecessor hPredecessor
+        hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
       rcases (ordinalExponentiation_successor_iff
           hZF 𝕀 hBaseOrdinal hPredecessorOrdinal hSuccessor).mp hValue with
         ⟨previous, hPrevious, hValueSuccessor⟩

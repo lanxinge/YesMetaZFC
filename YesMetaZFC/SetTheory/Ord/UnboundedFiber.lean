@@ -45,7 +45,7 @@ theorem ordinal_unbounded_fiber_l {k} (φ : BinarySchema k) (ρ : Env M k)
   let I := kp_pair_l (modelsKP hZF)
   obtain ⟨B, pair⟩ := KP.exists_pair (modelsKP hZF) C γ
   obtain ⟨ν, V, hV, hBV⟩ := v_cover_l I hZF B
-  have tr := v_transitive_l I hZF hV
+  have tr := v_transitive_l I hV
   have hγν := v_ordinal_height_l hZF hV hγ (tr B hBV γ ((pair γ).mpr (Or.inr rfl)))
   obtain ⟨t, ht, h⟩ := total ν (v_ordinal_l I hV) hγν
   obtain ⟨β, hβC, hb⟩ := bounds t ht

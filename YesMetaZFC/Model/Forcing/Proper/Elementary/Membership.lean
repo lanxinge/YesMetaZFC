@@ -1,6 +1,6 @@
-import YesMetaZFC.Model.SetTheory.Internal.SourceElementary
-import YesMetaZFC.Model.SetTheory.Internal.Membership
-import YesMetaZFC.Model.Forcing.Internal.Check.Syntax
+import YesMetaZFC.Model.SetTheory.Source.Elementary
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.Forcing.Check.Syntax
 
 /-! # 内部初等子模型中的实际关系见证
 

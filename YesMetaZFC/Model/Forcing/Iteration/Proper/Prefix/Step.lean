@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Proper.Prefix.Comparison
-import YesMetaZFC.Model.Forcing.Internal.Check.Relation
+import YesMetaZFC.Model.Forcing.Check.Order
 
 /-! # 变动前缀的旧名称比较保持
 

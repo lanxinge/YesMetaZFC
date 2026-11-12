@@ -8,7 +8,9 @@ import YesMetaZFC.SetTheory.InnerModel.GCH
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Definable
 import YesMetaZFC.SetTheory.InnerModel.OD
 import YesMetaZFC.SetTheory.InnerModel.HOD
-import YesMetaZFC.SetTheory.InnerModel.Relative.Determinacy
+import YesMetaZFC.SetTheory.InnerModel.Relative.PayoffQuerySound
+import YesMetaZFC.SetTheory.InnerModel.Relative.TruthSyntax
+import YesMetaZFC.SetTheory.InnerModel.Relative.PayoffModelMinimum
 
 /-! # 内模型技术的共同基础
 
@@ -35,5 +37,19 @@ HOD[A] 的有界序数关系呈现与总坍塌已构造。弱齐性力迫的 HOD
 另由 Model.Forcing.Internal.Homogeneous.HOD 导出；具体边界和待建内容见 InnerModel/README.md。
 相对 Jensen 层级在 KPi 上构造；任意传递基集的并类在 ZF 上满足原 ZF。
 `Relative.lr_model_l` 以 TC({ℝ}) 为起层构造规范 L(ℝ)，保留全部序数与实数；
-`lr_ad_axiom_sat_l` 精确识别 L(ℝ) 中 AD 的原句子，目前未证明大基数蕴涵 AD。
+`lr_ad_axiom_sat_l` 精确识别 L(ℝ) 中 AD 的原句子；大基数层的
+`LargeCardinal.RealDeterminacy.wd_lr_ad_l` 已在 ZFC 加真类 Woodin 前提下证明该句子。
+相对层元素的有限实数参数及单序数码已构造；完整实数族下合并为一个二值实数。
+lr_min_counterexample_l 从原 lr_ad 目标的否定取得 L(ℝ) 内唯一最小坏收益代码，
+并为每个原查询实数生产四个实数参数的正负 Sr_truth_d 断言；声音性允许非传递见证。
+规范代码方块、同一 Jensen 递归图及完整旧收益覆盖也已纳入同一 Δ₀ 矩阵。
+非传递见证已由有限成员同余条件构造实际满坍塌，序数性与最小归纳性识别其背景 ω。
+常零、后继实数的有限条件已接入工厂；规范化同时恢复完整自然数支撑并固定全部二值实数。
+有限规范解码闭包已恢复值域的完整背景实数覆盖，并识别真实 Baire 空间；所选二值参数被固定。
+有限局面、编号、偶数集合及种子的 Δ₀ 识别已接入；最小坏收益存在断言已完成 Σ₁(ℝ) 封装。
+一般原坍缩派生模型无新实数已由 Model.Forcing.Applications.Collapse.ProductNoNewReals 证明。
+la_reals_l 与 la_real_self_l 只要求并类上的准确实数刻画，派生模型的完整 Baire 空间及原种子已有实际实例。
+带符号成员性由同一坍塌图及唯一解码准确恢复，两个断言对应同一最小坏收益。
+PayoffModelMinimum 给出派生最小坏代码的精确原公式、代码序数性和唯一性。
+具体统一力迫判定已由 Model.Forcing 的 ProductMinimumUniform 完成；双侧见证树仍待构造。
 -/

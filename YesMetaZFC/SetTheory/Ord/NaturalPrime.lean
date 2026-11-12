@@ -181,9 +181,9 @@ theorem natural_add_left_successor
     (hValue : ℳ.IsOrdinalAddition 𝕀 value successor right) :
     ℳ.SuccessorOf value previous := by
   have hPredecessorOrdinal :=
-    hω.members_areOrdinals hZF predecessor hPredecessor
+    hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
   have hRightOrdinal :=
-    hω.members_areOrdinals hZF right hRight
+    hω.members_areOrdinals (ZF.modelsKP hZF) right hRight
   rcases hω.exists_ordinalOne_mem with
     ⟨one, hOne, hOneOmega⟩
   have hOneOrdinal :=
@@ -281,18 +281,18 @@ theorem natural_add_comm
       have hFirstEq := (ZF.ordinalAddition_zero_iff hZF 𝕀 hEmpty).mp hFirstValue
       have hSecondEq :=
         ZF.ordinalAddition_empty_left hZF 𝕀 hEmpty
-          left (hω.members_areOrdinals hZF left hLeft)
+          left (hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft)
           secondValue hSecondValue
       exact hFirstEq.trans hSecondEq.symm
     · intro predecessor hPredecessor hPrevious
         successor hSuccessor firstValue secondValue
         hFirstValue hSecondValue
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF predecessor hPredecessor
+        hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
       rcases (ZF.ordinalAddition_successor_iff
           hZF 𝕀 hPredecessorOrdinal hSuccessor).mp hFirstValue with
         ⟨firstPrevious, hFirstPrevious, hFirstSuccessor⟩
-      have hLeftOrdinal := hω.members_areOrdinals hZF left hLeft
+      have hLeftOrdinal := hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
       rcases ZF.ordinalAddition_existsUnique hZF 𝕀 predecessor hLeftOrdinal with
         ⟨secondPrevious, hSecondPrevious, _⟩
       have hSecondSuccessor :=
@@ -316,8 +316,8 @@ theorem natural_add_successor_swap
     (hBaseFirst : ℳ.IsOrdinalAddition 𝕀 baseFirst left right) (hBaseSecond : ℳ.IsOrdinalAddition 𝕀 baseSecond right left)
     (hFirst : ℳ.IsOrdinalAddition 𝕀 first left rightSuccessor) (hSecond : ℳ.IsOrdinalAddition 𝕀 second right leftSuccessor) :
     first = second := by
-  have hLeftOrdinal := hω.members_areOrdinals hZF left hLeft
-  have hRightOrdinal := hω.members_areOrdinals hZF right hRight
+  have hLeftOrdinal := hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
+  have hRightOrdinal := hω.members_areOrdinals (ZF.modelsKP hZF) right hRight
   have hBaseEq :=
     natural_add_comm hZF 𝕀 hω hLeft hRight hBaseFirst hBaseSecond
   rcases (ZF.ordinalAddition_successor_iff
@@ -348,7 +348,7 @@ theorem natural_mul_left_successor_add
       value successor right) (hSum : ℳ.IsOrdinalAddition 𝕀 sum previous right) :
     value = sum := by
   have hPredecessorOrdinal :=
-    hω.members_areOrdinals hZF predecessor hPredecessor
+    hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
   have hSuccessorOrdinal :=
     KP.successor_isOrdinal (ZF.modelsKP hZF)
       hPredecessorOrdinal hSuccessor
@@ -410,7 +410,7 @@ theorem natural_mul_left_successor_add
         currentSuccessor hCurrentSuccessor first second
         hFirst hSecond
       have hCurrentPredecessorOrdinal :=
-        hω.members_areOrdinals hZF
+        hω.members_areOrdinals (ZF.modelsKP hZF)
           currentPredecessor hCurrentPredecessor
       have hCurrentSuccessorOrdinal :=
         KP.successor_isOrdinal (ZF.modelsKP hZF)
@@ -500,7 +500,7 @@ theorem natural_mul_comm
       first left right) (hSecond : ℳ.IsOrdinalMultiplication 𝕀
       second right left) :
     first = second := by
-  have hLeftOrdinal := hω.members_areOrdinals hZF left hLeft
+  have hLeftOrdinal := hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
   let env : Env ℳ 1 := {
     bound := fun _ => left
     free := fun _ => Classical.choice ℳ.nonempty
@@ -554,7 +554,7 @@ theorem natural_mul_comm
         successor hSuccessor firstValue secondValue
         hFirstValue hSecondValue
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF predecessor hPredecessor
+        hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessor
       have hSuccessorOrdinal :=
         KP.successor_isOrdinal (ZF.modelsKP hZF)
           hPredecessorOrdinal hSuccessor
@@ -597,9 +597,9 @@ theorem nat_div_quotient_mem_omega
     ⟨hQuotientOrdinal, hRemainderDivisor,
       product, hProduct, hDecomposition⟩
   have hDividendOrdinal :=
-    hω.members_areOrdinals hZF dividend hDividend
+    hω.members_areOrdinals (ZF.modelsKP hZF) dividend hDividend
   have hDivisorOrdinal :=
-    hω.members_areOrdinals hZF divisor hDivisor
+    hω.members_areOrdinals (ZF.modelsKP hZF) divisor hDivisor
   have hQuotientProduct :=
     ZF.ordinalMultiplication_right_eq_or_mem
       hZF 𝕀 hDivisorOrdinal hDivisorNonempty
@@ -611,12 +611,12 @@ theorem nat_div_quotient_mem_omega
   rcases hQuotientProduct with hQuotientEq | hQuotientProduct
   · rcases hProductDividend with hProductEq | hProductDividend
     · simpa [hQuotientEq, hProductEq] using hDividend
-    · exact hω.transitive hZF dividend hDividend quotient <| by
+    · exact hω.transitive (ZF.modelsKP hZF) dividend hDividend quotient <| by
         simpa [hQuotientEq] using hProductDividend
   · rcases hProductDividend with hProductEq | hProductDividend
-    · exact hω.transitive hZF dividend hDividend quotient <| by
+    · exact hω.transitive (ZF.modelsKP hZF) dividend hDividend quotient <| by
         simpa [hProductEq] using hQuotientProduct
-    · exact hω.transitive hZF dividend hDividend quotient <|
+    · exact hω.transitive (ZF.modelsKP hZF) dividend hDividend quotient <|
         hDividendOrdinal.transitive
           product hProductDividend quotient hQuotientProduct
 /-- 自然数整除关系对被除数的右乘封闭。 -/
@@ -630,11 +630,11 @@ theorem nat_dvd_mul_right
   rcases hDivides with
     ⟨hDivisor, quotient, hQuotient, hFactor⟩
   have hDivisorOrdinal :=
-    hω.members_areOrdinals hZF divisor hDivisor
+    hω.members_areOrdinals (ZF.modelsKP hZF) divisor hDivisor
   have hQuotientOrdinal :=
-    hω.members_areOrdinals hZF quotient hQuotient
+    hω.members_areOrdinals (ZF.modelsKP hZF) quotient hQuotient
   have hRightOrdinal :=
-    hω.members_areOrdinals hZF right hRight
+    hω.members_areOrdinals (ZF.modelsKP hZF) right hRight
   rcases ZF.ordinalMultiplication_existsUnique
       hZF 𝕀 quotient hRightOrdinal with
     ⟨combinedQuotient, hCombinedQuotient, _⟩
@@ -669,17 +669,17 @@ theorem nat_dvd_add_right_cancel
   rcases hDividesSum with
     ⟨_, sumQuotient, hSumQuotient, hSumProduct⟩
   have hDivisorOrdinal :=
-    hω.members_areOrdinals hZF divisor hDivisor
+    hω.members_areOrdinals (ZF.modelsKP hZF) divisor hDivisor
   have hLeftOrdinal :=
-    hω.members_areOrdinals hZF left hLeft
+    hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
   have hRightOrdinal :=
-    hω.members_areOrdinals hZF right hRight
+    hω.members_areOrdinals (ZF.modelsKP hZF) right hRight
   have hSumOrdinal :=
-    hω.members_areOrdinals hZF sum hSum
+    hω.members_areOrdinals (ZF.modelsKP hZF) sum hSum
   have hLeftQuotientOrdinal :=
-    hω.members_areOrdinals hZF leftQuotient hLeftQuotient
+    hω.members_areOrdinals (ZF.modelsKP hZF) leftQuotient hLeftQuotient
   have hSumQuotientOrdinal :=
-    hω.members_areOrdinals hZF sumQuotient hSumQuotient
+    hω.members_areOrdinals (ZF.modelsKP hZF) sumQuotient hSumQuotient
   have hQuotientOrder :
       leftQuotient = sumQuotient ∨
         ℳ.mem leftQuotient sumQuotient := by
@@ -743,7 +743,7 @@ theorem nat_dvd_add_right_cancel
     have hRightQuotientOmega : ℳ.mem rightQuotient ω := by
       rcases hRightQuotientOrder with hEq | hMem
       · simpa [hEq] using hSumQuotient
-      · exact hω.transitive hZF
+      · exact hω.transitive (ZF.modelsKP hZF)
           sumQuotient hSumQuotient rightQuotient hMem
     rcases ZF.ordinalMultiplication_existsUnique
         hZF 𝕀 divisor hRightQuotientOrdinal with
@@ -796,13 +796,13 @@ theorem nat_dvd_mul_remainder
         remainderProduct factor remainder ∧
       ℳ.IsNaturalDivisor 𝕀 ω divisor remainderProduct := by
   have hFactorOrdinal :=
-    hω.members_areOrdinals hZF factor hFactor
+    hω.members_areOrdinals (ZF.modelsKP hZF) factor hFactor
   have hBlockBaseOrdinal :=
-    hω.members_areOrdinals hZF blockBase hBlockBase
+    hω.members_areOrdinals (ZF.modelsKP hZF) blockBase hBlockBase
   have hQuotientOrdinal :=
-    hω.members_areOrdinals hZF quotient hQuotient
+    hω.members_areOrdinals (ZF.modelsKP hZF) quotient hQuotient
   have hRemainderOrdinal :=
-    hω.members_areOrdinals hZF remainder hRemainder
+    hω.members_areOrdinals (ZF.modelsKP hZF) remainder hRemainder
   have hBlockOmega :=
     ZF.ordinalMultiplication_mem_omega
       hZF 𝕀 hω hBlockBase hQuotient hBlock
@@ -878,7 +878,7 @@ theorem nat_prime_dvd_mul
     have hPrimeNonempty : ∃ member, ℳ.mem member prime :=
       ⟨one, hPrime.one_mem_prime⟩
     have hLeftOrdinal :=
-      hω.members_areOrdinals hZF left hLeft
+      hω.members_areOrdinals (ZF.modelsKP hZF) left hLeft
     have hPrimeOrdinal := hPrime.prime_isOrdinal hZF hω
     let env : Env ℳ 3 := {
       bound := fun
@@ -923,7 +923,7 @@ theorem nat_prime_dvd_mul
     have hPrimeCandidate : ℳ.mem prime candidates := (hCandidates prime).mpr
         ⟨hPrime.prime_mem_omega, hPrimeNonempty,
           leftPrime, hLeftPrime, hPrimeDividesLeftPrime⟩
-    rcases (hω.isOrdinal hZF).wellOrder.least
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.least
         candidates hCandidatesSubset
         ⟨prime, hPrimeCandidate⟩ with
       ⟨leastMultiplier, hLeastCandidate, hLeast⟩
@@ -931,7 +931,7 @@ theorem nat_prime_dvd_mul
       ⟨hLeastOmega, hLeastNonempty,
         leastProduct, hLeastProduct, hPrimeDividesLeastProduct⟩
     have hLeastOrdinal :=
-      hω.members_areOrdinals hZF leastMultiplier hLeastOmega
+      hω.members_areOrdinals (ZF.modelsKP hZF) leastMultiplier hLeastOmega
     have hNoEarlierCandidate :
         ∀ earlier, ℳ.mem earlier leastMultiplier →
           ¬ ℳ.mem earlier candidates := by
@@ -960,7 +960,7 @@ theorem nat_prime_dvd_mul
       intro multiplier candidateProduct
         hMultiplier hCandidateProduct hPrimeDividesCandidate
       rcases ZF.ordinalDivision_existsUnique_pair
-          hZF 𝕀 (hω.members_areOrdinals hZF multiplier hMultiplier)
+          hZF 𝕀 (hω.members_areOrdinals (ZF.modelsKP hZF) multiplier hMultiplier)
           hLeastOrdinal hLeastNonempty with
         ⟨quotient, remainder, hDivision, _⟩
       have hQuotientOmega :=
@@ -971,7 +971,7 @@ theorem nat_prime_dvd_mul
         ⟨_, hRemainderLeast,
           block, hBlock, hDecomposition⟩
       have hRemainderOmega :=
-        hω.transitive hZF
+        hω.transitive (ZF.modelsKP hZF)
           leastMultiplier hLeastOmega
           remainder hRemainderLeast
       rcases nat_dvd_mul_remainder
@@ -1033,7 +1033,7 @@ theorem nat_prime_not_dvd_one
     ⟨_, quotient, hQuotient, hOneProduct⟩
   have hPrimeOrdinal := hPrime.prime_isOrdinal hZF hω
   have hQuotientOrdinal :=
-    hω.members_areOrdinals hZF quotient hQuotient
+    hω.members_areOrdinals (ZF.modelsKP hZF) quotient hQuotient
   by_cases hQuotientEmpty :
       ∀ member, ¬ ℳ.mem member quotient
   · have hOneEmpty := (ZF.ordinalMultiplication_zero_iff
@@ -1115,7 +1115,7 @@ theorem nat_prime_dvd_base_of_dvd_power
     exact (hCandidates candidateExponent).mp hCandidate |>.1
   have hExponentCandidate : ℳ.mem exponent candidates := (hCandidates exponent).mpr
       ⟨hExponent, power, hPower, hDividesPower⟩
-  rcases (hω.isOrdinal hZF).wellOrder.least
+  rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.least
       candidates hCandidatesSubset
       ⟨exponent, hExponentCandidate⟩ with
     ⟨leastExponent, hLeastCandidate, hLeast⟩
@@ -1123,9 +1123,9 @@ theorem nat_prime_dvd_base_of_dvd_power
     ⟨hLeastOmega, leastPower,
       hLeastPower, hDividesLeastPower⟩
   have hBaseOrdinal :=
-    hω.members_areOrdinals hZF base hBase
+    hω.members_areOrdinals (ZF.modelsKP hZF) base hBase
   have hLeastOrdinal :=
-    hω.members_areOrdinals hZF leastExponent hLeastOmega
+    hω.members_areOrdinals (ZF.modelsKP hZF) leastExponent hLeastOmega
   have hLeastNonempty :
       ∃ member, ℳ.mem member leastExponent := by
     apply Classical.byContradiction
@@ -1145,7 +1145,7 @@ theorem nat_prime_dvd_base_of_dvd_power
       hZF hLeastOmega hLeastNonempty with
     ⟨predecessor, hPredecessorOmega, hLeastSuccessor⟩
   have hPredecessorOrdinal :=
-    hω.members_areOrdinals hZF predecessor hPredecessorOmega
+    hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessorOmega
   rcases (ZF.ordinalExponentiation_successor_iff
       hZF 𝕀 hBaseOrdinal hPredecessorOrdinal
       hLeastSuccessor).mp hLeastPower with
@@ -1194,7 +1194,7 @@ theorem prime_dvd_power_of_exponent_nonempty
   have hPrimeOrdinal :=
     hPower.prime_is_prime.prime_isOrdinal hZF hω
   have hPredecessorOrdinal :=
-    hω.members_areOrdinals hZF predecessor hPredecessorOmega
+    hω.members_areOrdinals (ZF.modelsKP hZF) predecessor hPredecessorOmega
   rcases (ZF.ordinalExponentiation_successor_iff
       hZF 𝕀 hPrimeOrdinal hPredecessorOrdinal
       hExponentSuccessor).mp hPower.power_spec with
@@ -1205,7 +1205,7 @@ theorem prime_dvd_power_of_exponent_nonempty
       hPower.prime_is_prime.prime_mem_omega
       hPredecessorOmega hPreviousPower
   rcases ZF.ordinalMultiplication_existsUnique
-      hZF 𝕀 prime (hω.members_areOrdinals hZF
+      hZF 𝕀 prime (hω.members_areOrdinals (ZF.modelsKP hZF)
         previousPower hPreviousPowerOmega) with
     ⟨primePrevious, hPrimePrevious, _⟩
   have hPowerEqPrimePrevious :=

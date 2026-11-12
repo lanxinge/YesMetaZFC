@@ -71,11 +71,12 @@ theorem Vr_d.relation_cover_l {Z α V A B : M.Domain} (hZ : M.TransitiveSet Z) (
   exact ((cert p hpZ).2.2.1 δ hδ T hT hδT).mpr ⟨γ, hγδ, Q, hQ, hγQ,
     fun z hz => ((pair z).mp hz).elim (fun eq => eq ▸ hsQ) (fun eq => eq ▸ htQ)⟩
 
+omit hZF in
 theorem Vr_d.relation_mem_l {Z α V A B F : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
     (hv : Vr_d Z α V) (hα : M.IsLimitOrdinal α) (hA : M.mem A V) (hB : M.mem B V) (hF : M.mem F Z)
     (bound : ∀ p, M.mem p F → ∃ x, M.mem x A ∧ ∃ y, M.mem y B ∧ KPair_d M p x y) : M.mem F V := by
   obtain ⟨W, hW, cover⟩ := hv.relation_cover_l hZ hV hα hA hB
-  exact hv.transitive_l hZF hZ hV W hW F (cover F hF bound)
+  exact hv.transitive_l hZ hV W hW F (cover F hF bound)
 
 omit hZF in
 theorem Vr_d.relations_mem_l {Z α V A B J : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
@@ -122,12 +123,13 @@ theorem Vr_d.height_unique_l {X Y α β V : M.Domain}
     ⟨fun hγ => g.ordinal_height_l hZF hY hV' (ho.mem hγ) (h.ordinal_subset_l hZF hX hV γ hγ),
       fun hγ => h.ordinal_height_l hZF hX hV (ho'.mem hγ) (g.ordinal_subset_l hZF hY hV' γ hγ)⟩)
 
+omit hZF in
 /-- 并集不提高先前见证层；使用同一历史中已经证明的传递性。 -/
 theorem Vr_d.union_mem_l {Z α V A U : M.Domain} (hZ : M.TransitiveSet Z) (hV : M.mem V Z)
     (hv : Vr_d Z α V) (hA : M.mem A V) (hU : M.mem U Z) (hu : M.IsUnionOf U A) : M.mem U V := by
   obtain ⟨B, F, hB, _, cert⟩ := hv
   obtain ⟨β, hβ, W, hW, hβW, aw⟩ := ((cert A (hZ V hV A hA)).2.2.2).mp hA
-  have ht := (vc_transitive_l hZF hZ hV hB cert).2 β hβ W hβW
+  have ht := (vc_transitive_l hZ hV hB cert).2 β hβ W hβW
   exact ((cert U hU).2.2.2).mpr ⟨β, hβ, W, hW, hβW, fun x hx =>
     ((hu x).mp hx).elim fun y hy => ht y (aw y hy.1) x hy.2⟩
 

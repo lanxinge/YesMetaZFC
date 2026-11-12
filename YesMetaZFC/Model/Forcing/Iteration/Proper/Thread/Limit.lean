@@ -84,7 +84,7 @@ theorem row_pr_limit_thread_l {ω δ F G b β χ H N α B R D V p τ K}
   have bounds := row_pr_bounds_l hZF hω h hD hV hA inc leβ hQ hv hs
   have original := row_pr_bound_l hZF hω h hD hV hA inc leβ hQ hv hs hB hR hτ hz hα₀ hR₀ hx hαα₀ hpre low
   have zero i (hi : M.mem i ω) : M.mem b i ∨ b = i := by
-    rcases (hω.isOrdinal hZF).wellOrder.linear.compare b hbω i hi with he | hb | hi
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare b hbω i hi with he | hb | hi
     · exact Or.inr (hZFC.1.eq_of_same_members b i he)
     · exact Or.inl hb
     · exact (h.empty i hi).elim

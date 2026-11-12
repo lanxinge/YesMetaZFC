@@ -61,18 +61,18 @@ rational codes is constructed, and both spaces are internally complete. Cantor i
 compact; an explicit Baire open cover has no internal finite subcover. Internal prefix
 trees and their bodies are implemented: bodies are closed, and every closed set has a
 unique canonical prefix tree representation, using only KP. In internal Baire space this
-canonical tree has no dead ends. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel.lean)
+canonical tree has no dead ends. [Borel codes](YesMetaZFC/SetTheory/Descriptive/Borel/Universe.lean)
 are internally well-founded labelled prefix trees with unique evaluations and denotations.
 Basic cylinders, complements, internal countable unions, open sets, and closed tree bodies
 have actual codes. Grafting has a unique output and an object formula; codes also restrict
 to internal subspaces. The constructions use at most ZF, with no additional choice axiom;
-countable union takes an internal family of codes. The [analytic layer](YesMetaZFC/SetTheory/Descriptive/Analytic.lean)
+countable union takes an internal family of codes. The [analytic layer](YesMetaZFC/SetTheory/Descriptive/Topology/Analytic.lean)
 uses internal Baire projections of Borel relations, with unique denotations, coded countable
 unions, countable intersections of coanalytic complements, and closed tree projections.
 Closed-set and closed-tree projection normal forms are proved by closed evaluation
 certificates and witness pairing. The direct criterion quantifies over an internal real
 and all internal prefix lengths, and also has a relative subspace version.
-The [projective layer](YesMetaZFC/SetTheory/Descriptive/Projective.lean) constructs Σ¹ₙ, Π¹ₙ,
+The [projective layer](YesMetaZFC/SetTheory/Descriptive/Topology/Projective.lean) constructs Σ¹ₙ, Π¹ₙ,
 and Δ¹ₙ along the model's own ω, including nonstandard levels. Base and first-level identities,
 successor projection equations, complement duality, monotonicity, and Δ¹₁ = Borel are proved.
 Individual projective codes and the entire hierarchy have unique internal interpretations;
@@ -83,10 +83,10 @@ preserve each Σ, Π, and Δ level under countable choice for internal reals; th
 only needs choice on the given index set. Standard numeral levels agree with finite alternating
 real quantifiers over Borel matrices, with subspace-relative interfaces.
 Borel separation for disjoint analytic sets, Suslin's theorem, universal sets, and strictness
-of the positive internal projective levels are implemented over ZF. [Borel ranks](YesMetaZFC/SetTheory/Descriptive/BorelRank.lean)
+of the positive internal projective levels are implemented over ZF. [Borel ranks](YesMetaZFC/SetTheory/Descriptive/Topology/BorelRank.lean)
 distinguish code-tree rank from the standard rank of a coded set; complementation preserves
 the latter, and restriction to an internal subspace does not increase it.
-The [perfect-set theorem](YesMetaZFC/SetTheory/Descriptive/Perfect.lean) covers internal analytic
+The [perfect-set theorem](YesMetaZFC/SetTheory/Descriptive/Topology/Analytic.lean) covers internal analytic
 and coded Borel sets in ZF, without countable choice or regularity of ω₁. These results allow
 nonstandard internal ω and externally ill-founded models. Uncoded set-based Borel classes
 are not identified with the coded classes in ZF. Uniformization and determinacy remain
@@ -101,7 +101,7 @@ primitive-recursive program. Import `YesMetaZFC.Logic.Arithmetic` or
 Model pairing and projections use relations: classical proofs in `Prop` are allowed,
 but choice is not used to construct model data in `Type`.
 
-Repository guides other than README files are collected in [markdown/](markdown/).
+Repository guides other than README files are collected in [markdown/](markdown).
 
 The existing development connects typed syntax and substitution, formal proof systems,
 set-theoretic definitions, model interpretations, internal proof coding, and automation.
@@ -171,3 +171,11 @@ Original project code and accompanying documentation are licensed under the
 Separately identified third-party material retains its original license.
 
 Lightweight derivation tactics are available through `YesMetaZFC.Tactic`. The general proof-search engine has been archived outside this project; see the [split record](markdown/PROVER_SPLIT.md) for the source archive and module migration.
+
+## Determinacy in L(ℝ)
+
+[`wd_lr_ad_l`](YesMetaZFC/SetTheory/LargeCardinal/Determinacy/LReal.lean) proves that
+every model of ZFC with a proper class of Woodin cardinals satisfies AD in its canonical L(ℝ).
+See the [module guide](YesMetaZFC/SetTheory/LargeCardinal/README.md) and
+[proof outline](markdown/LR_AD.md). The weaker hypothesis of ω Woodin cardinals with
+a measurable above them remains a separate unfinished extension.

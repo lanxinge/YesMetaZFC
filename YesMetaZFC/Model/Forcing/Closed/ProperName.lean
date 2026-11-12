@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Closed.Proper
 import YesMetaZFC.Model.Forcing.Closed.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Check.Omega
+import YesMetaZFC.Model.Forcing.Check.Omega
 
 /-! # 可数闭名称的实际 properness 力迫证书
 

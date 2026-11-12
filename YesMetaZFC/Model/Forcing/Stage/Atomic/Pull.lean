@@ -13,7 +13,7 @@ variable {M : SetTheory.Structure.{u}} {P R z Q S w F : M.Domain}
 
 /-- 目标等号力迫在它的每个源约减上反射；不要求目标条件属于阶段像。 -/
 theorem nmap_eq_pull_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
-    (hZF : M.Models ZF) (h : Reg_embed_d M P R z Q S w F) {x y s t p q}
+    (hZF : M.Models ZF) (h : Reg_map_d M P R z Q S w F) {x y s t p q}
     (hx : Name_d M P x) (hy : Name_d M P y) (hs : Nmap_d M F x s) (ht : Nmap_d M F y t)
     (hp : M.mem p P) (hr : Red_d M R Q S w F q p) (he : Eq_force_d M Q S w q s t) :
     Eq_force_d M P R z p x y := by
@@ -43,7 +43,7 @@ theorem nmap_eq_pull_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
     obtain ⟨v₀, hrv⟩ := h.total r hr.1 hr.2.1
     obtain ⟨a₀, ha₀, ha₀v⟩ := hred r v₀ hrv hr.2.2
     have ha₀d := L.trans a₀ v₀ d' ha₀.1 (h.domain r v₀ hrv).2.2.1 (h.domain d d' hdd).2.2.1
-      ha₀v ((h.order r d v₀ d' hrv hdd).mpr hrd)
+      ha₀v (h.mono r d v₀ d' hrv hdd hrd)
     obtain ⟨a₁, e', f', ha₁, he'f, ha₁f, hce⟩ :=
       ((eq_force_unfold_l M hZF (names hax) (names hby)).mp he).2.1 c' d' hc'x a₀ ha₀ ha₀d
     obtain ⟨e, f, hef, hee, hff⟩ := (nmap_entry_l M hZF.1 hI hPair hby e' f').mp he'f
@@ -62,7 +62,7 @@ theorem nmap_eq_pull_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
 
 /-- 名称搬运在阶段像上精确保留并反射原等号力迫。 -/
 theorem nmap_eq_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
-    (hZF : M.Models ZF) (h : Reg_embed_d M P R z Q S w F) {x y s t p q}
+    (hZF : M.Models ZF) (h : Reg_map_d M P R z Q S w F) {x y s t p q}
     (hx : Name_d M P x) (hy : Name_d M P y) (hs : Nmap_d M F x s) (ht : Nmap_d M F y t)
     (hpq : Entry_d M p q F) : Eq_force_d M P R z p x y ↔ Eq_force_d M Q S w q s t :=
   ⟨nmap_eq_push_l O L hZF h hx hy hs ht hpq,

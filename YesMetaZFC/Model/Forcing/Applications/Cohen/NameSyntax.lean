@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.Presentation
-import YesMetaZFC.Model.Forcing.Internal.Maximum.NormalSyntax
+import YesMetaZFC.Model.Forcing.Maximum.Normal
 import YesMetaZFC.Model.Forcing.TwoStep.Top
 
 /-! # 规范 Cohen 名称的原公式规格

@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.SkolemSyntax
+import YesMetaZFC.Model.SetTheory.Reflection.SkolemSyntax
 
 /-! # 完整内部赋值上的 Tarski–Vaught 条件
 

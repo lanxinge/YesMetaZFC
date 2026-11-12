@@ -8,11 +8,11 @@ import sys
 from check_filters import main
 
 MODULES = [
-    "YesMetaZFC.SetTheory.Filter.Logic",
-    "YesMetaZFC.Model.ReducedProduct.Germ",
-    "YesMetaZFC.Model.ReducedProduct.Structure",
-    "YesMetaZFC.Model.ReducedProduct.Los",
-    "YesMetaZFC.Model.Ultrapower",
+    'YesMetaZFC.SetTheory.Filter.Logic',
+    'YesMetaZFC.Model.ReducedProduct.Germ',
+    'YesMetaZFC.Model.ReducedProduct.Structure',
+    'YesMetaZFC.Model.ReducedProduct.Los',
+    'YesMetaZFC.Model.Ultrapower',
 ]
 PREFIX = "YesMetaZFC.Logic.FirstOrder."
 CHOICE_FREE = ["YesMetaZFC.SetTheory.Filter." + n for n in (

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.Evaluation
-import YesMetaZFC.Model.Forcing.Internal.Extension.ZF
+import YesMetaZFC.Model.Forcing.Extension.Choice
 import YesMetaZFC.SetTheory.Card.OrdinalImage
 
 /-! # N[G] 的内部可数性
@@ -44,6 +44,6 @@ theorem ng_countable_l {N ω} (hω : M.IsOmega ω) (hN : M.CardinalLessOrEqual I
   have hE := preserves_zf_l O hZF hU
   have hωE : (E).IsOmega (e ω) := image_omega_l (hEN := hE.1) e hi he hZF
     (internal_foundation_l O hZF hU) hω (fun T => KP.difference_exists_d (ZF.modelsKP hE) T (e ω))
-  exact ⟨Y, e ω, hY, hωE, ng_cardinal_bound_l O hZF hU hb (hω.isOrdinal hZF) hN hY e hi he hv⟩
+  exact ⟨Y, e ω, hY, hωE, ng_cardinal_bound_l O hZF hU hb (hω.isOrdinal (ZF.modelsKP hZF)) hN hY e hi he hv⟩
 
 end YesMetaZFC.Model.Forcing.Internal

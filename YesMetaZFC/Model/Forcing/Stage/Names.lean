@@ -2,9 +2,9 @@ import YesMetaZFC.Model.Forcing.Stage.NameMap.Composition
 import YesMetaZFC.Model.Forcing.Stage.NameMap.Identity
 import YesMetaZFC.Model.Forcing.Stage.Composition
 
-/-! # 阶段完全嵌入的名称搬运
+/-! # 阶段映射的名称搬运
 
-实际嵌入图直接充当标签映射，自动构造目标名称及唯一性。嵌入图复合与名称
+实际映射图直接充当标签关系，自动构造目标名称及唯一性。嵌入图复合与名称
 搬运复合严格一致，为阶段系统提供不依赖代表元选择的名称过渡。
 -/
 
@@ -13,7 +13,7 @@ open SetTheory
 universe u
 variable {M : SetTheory.Structure.{u}} {P R z Q S w T V v F G : M.Domain}
 
-theorem stage_nmap_l (hZF : M.Models ZF) (h : Reg_embed_d M P R z Q S w F) (x : M.Domain) :
+theorem stage_nmap_l (hZF : M.Models ZF) (h : Reg_map_d M P R z Q S w F) (x : M.Domain) :
     ∃ t, Nmap_d M F x t ∧ Name_d M Q t ∧ ∀ s, Nmap_d M F x s → s = t := by
   obtain ⟨t, ht⟩ := nmap_exists_l M hZF F x
   exact ⟨t, ht, nmap_name_l M hZF (fun b c hc => (h.domain b c hc).2.2.1) ht,

@@ -1,9 +1,9 @@
 import YesMetaZFC.Model.Forcing.Stage.Reduction
 
-/-! # 完全嵌入下泛型滤子的回拉
+/-! # 局部阶段映射下泛型滤子的回拉
 
 把源集合的阶段像向下闭包为实际目标集合。约减保证所需稠密性，包括两个源
-条件的共同加强要求，由此直接验证回拉滤子的全部泛型条件。
+条件的共同加强要求。目标泛型命中像后，回拉满足全部泛型条件；完全嵌入的像自动被命中。
 -/
 
 namespace YesMetaZFC.Model.Forcing.Internal
@@ -14,7 +14,7 @@ variable {M : SetTheory.Structure.{u}} {P R z Q S w F : M.Domain}
 def Pull_generic_d (M : SetTheory.Structure.{u}) (F : M.Domain) (V : M.Domain → Prop) (p : M.Domain) : Prop :=
   ∃ q, Entry_d M p q F ∧ V q
 
-private theorem image_down_set_l (hZF : M.Models ZF) (F Q S D : M.Domain) : ∃ E, ∀ x,
+theorem image_down_set_l (hZF : M.Models ZF) (F Q S D : M.Domain) : ∃ E, ∀ x,
     M.mem x E ↔ M.mem x Q ∧ ∃ p y, M.mem p D ∧ Entry_d M p y F ∧ Entry_d M x y S := by
   let ρ : Env M 3 := ((⟨fun _ => F, fun _ => F⟩ : Env M 1).push S).push D
   let φ : UnarySchema 3 := {
@@ -27,7 +27,7 @@ private theorem image_down_set_l (hZF : M.Models ZF) (F Q S D : M.Domain) : ∃ 
   rfl
 
 private theorem image_down_dense_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
-    (h : Reg_embed_d M P R z Q S w F) {p q D E} (hpq : Entry_d M p q F)
+    (h : Reg_map_d M P R z Q S w F) {p q D E} (hpq : Entry_d M p q F)
     (hE : ∀ x, M.mem x E ↔ M.mem x Q ∧ ∃ a b, M.mem a D ∧ Entry_d M a b F ∧ Entry_d M x b S)
     (hd : Dense_d M P R z (fun a => M.mem a D) p) : Dense_d M Q S w (fun x => M.mem x E) q := by
   intro x hx
@@ -37,10 +37,25 @@ private theorem image_down_dense_l (O : Cond_order_d M P R z) (L : Cond_order_d 
   obtain ⟨y, hy, hyb⟩ := hred a b hab ha.2.2
   exact ⟨y, hy, (hE y).mpr ⟨hy.1, a, b, haD, hab, hyb⟩⟩
 
-/-- 目标泛型沿实际完全嵌入图回拉，自动满足全部源模型内稠密要求。 -/
+/-- 完全嵌入的像被任意目标泛型命中。 -/
+theorem Reg_embed_d.pull_inhabited_l (h : Reg_embed_d M P R z Q S w F)
+    (O : Cond_order_d M P R z) (hZF : M.Models ZF)
+    {V : M.Domain → Prop} (generic : Generic_d M Q S w V) : ∃ p, Pull_generic_d M F V p := by
+  obtain ⟨x,hx⟩ := generic.inhabited
+  obtain ⟨E,members⟩ := image_down_set_l hZF F Q S P
+  obtain ⟨y,hy,yE⟩ := generic.meets x hx E (by
+    intro q hq
+    obtain ⟨r,hr,nz,red⟩ := h.reduction q hq.1 hq.2.1
+    obtain ⟨v,rv⟩ := h.total r hr nz
+    obtain ⟨s,hs,sv⟩ := red r v rv (O.refl r hr)
+    exact ⟨s,hs,(members s).mpr ⟨hs.1,r,v,hr,rv,sv⟩⟩)
+  obtain ⟨_,p,q,_,pq,yq⟩ := (members y).mp yE
+  exact ⟨p,q,pq,generic.upward y q hy (h.domain p q pq).2.2.1 yq⟩
+
+/-- 命中局部映射的目标泛型回拉为源泛型，满足全部内部稠密要求。 -/
 theorem reg_generic_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
-    (hZF : M.Models ZF) (h : Reg_embed_d M P R z Q S w F)
-    {V : M.Domain → Prop} (hV : Generic_d M Q S w V) :
+    (hZF : M.Models ZF) (h : Reg_map_d M P R z Q S w F)
+    {V : M.Domain → Prop} (hV : Generic_d M Q S w V) (inhabited : ∃ p, Pull_generic_d M F V p) :
     Generic_d M P R z (Pull_generic_d M F V) := by
   have accept {x D E} (hx : V x)
       (hE : ∀ x, M.mem x E ↔ M.mem x Q ∧ ∃ p y, M.mem p D ∧ Entry_d M p y F ∧ Entry_d M x y S)
@@ -51,19 +66,11 @@ theorem reg_generic_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rintro p ⟨q, hpq, _⟩
     exact ⟨(h.domain p q hpq).1, (h.domain p q hpq).2.1⟩
-  · obtain ⟨x, hx⟩ := hV.inhabited
-    obtain ⟨E, hE⟩ := image_down_set_l hZF F Q S P
-    obtain ⟨p, hp, _⟩ := accept hx hE (by
-      intro q hq
-      obtain ⟨r, hr, hrz, hred⟩ := h.reduction q hq.1 hq.2.1
-      obtain ⟨v, hrv⟩ := h.total r hr hrz
-      obtain ⟨y, hy, hyv⟩ := hred r v hrv (O.refl r hr)
-      exact ⟨y, hy, (hE y).mpr ⟨hy.1, r, v, hr, hrv, hyv⟩⟩)
-    exact ⟨p, hp⟩
+  · exact inhabited
   · rintro p q ⟨x, hpx, hx⟩ hq hpq
     have hqz : q ≠ z := fun hz => (h.domain p x hpx).2.1 (O.zero p (h.domain p x hpx).1 (hz ▸ hpq))
     obtain ⟨y, hqy⟩ := h.total q hq hqz
-    exact ⟨y, hqy, hV.upward x y hx (h.domain q y hqy).2.2.1 ((h.order p q x y hpx hqy).mpr hpq)⟩
+    exact ⟨y, hqy, hV.upward x y hx (h.domain q y hqy).2.2.1 (h.mono p q x y hpx hqy hpq)⟩
   · rintro p q ⟨x, hpx, hx⟩ ⟨y, hqy, hy⟩
     obtain ⟨u, hu, hux, huy⟩ := hV.directed x y hx hy
     let ρ : Env M 5 := ((((⟨fun _ => P, fun _ => P⟩ : Env M 1).push R).push z).push p).push q

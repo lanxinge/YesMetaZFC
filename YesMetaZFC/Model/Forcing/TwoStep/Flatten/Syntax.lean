@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.Depth
+import YesMetaZFC.Model.Forcing.Names.Depth
 import YesMetaZFC.Model.Forcing.TwoStep.Basic
 
 /-! # 二步名称摊平的内部递归规格

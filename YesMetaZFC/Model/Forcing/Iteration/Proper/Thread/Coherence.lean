@@ -73,7 +73,7 @@ theorem row_pr_coherent_l {ω δ F G b D V N A Z E X Q}
   intro i j x y α β p τ q σ hx hy hα hβ hp hq hαβ
   have hi := hQ.input_mem_of_pairMember hx
   have hj := hQ.input_mem_of_pairMember hy
-  rcases (hω.isOrdinal hZF).wellOrder.linear.compare i hi j hj with he | hij | hji
+  rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare i hi j hj with he | hij | hji
   · have heij := hZF.1.eq_of_same_members i j he
     subst j
     have hexy := hQ.1.2 i x y hx hy

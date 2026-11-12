@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
-import YesMetaZFC.Model.SetTheory.Internal.CanonicalCode
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.SetTheory.Types.CanonicalCode
 import YesMetaZFC.SetTheory.Cumulative
 
 /-! # 内部序数可定义性的公式
@@ -80,7 +80,7 @@ theorem od_code_unique_l (hZF : M.Models ZF) {θ z p x y}
 theorem od_code_types_l (hZF : M.Models ZF) {θ z p x} (h : Od_code_d I θ z p x) :
     M.IsOrdinal θ ∧ M.IsOrdinal z ∧ M.IsOrdinal p := by
   obtain ⟨ω, _, _, _, _, hω, hX, _, _, ha, hs, _⟩ := h
-  exact ⟨v_ordinal_l I hX, hω.members_areOrdinals hZF z (sc_num_natural_l I hZF hω ha),
+  exact ⟨v_ordinal_l I hX, hω.members_areOrdinals (ZF.modelsKP hZF) z (sc_num_natural_l I hZF hω ha),
     oc_seq_ordinal_l I hZF hs⟩
 
 end YesMetaZFC.SetTheory.InnerModel

@@ -96,7 +96,7 @@ theorem accumulator_exists (hℳ : Theory.Models ℳ theory) {family : Carrier �
     ∃ accumulator, Accumulates hℳ family accumulator := by
   obtain ⟨accumulator,hAccumulator⟩ := _root_.YesMetaZFC.SetTheory.ZF.recursiveSequence_exists (project_modelsZF hℳ)
     (PureKuratowskiProject.interpretation hℳ) (parameters hℳ family) operator (operator_functional hℳ family)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ (succ_mem hℳ hFamily.2))
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ (succ_mem hℳ hFamily.2))
   have hDomain := sequence_domain hℳ hAccumulator.1
   have hFinite : Finite hℳ accumulator := ⟨hAccumulator.1.2.1,hDomain.symm ▸ succ_mem hℳ hFamily.2⟩
   have hPair (index : Carrier ℳ) (hIndex : membership ℳ index (succ hℳ (domain hℳ family))) :
@@ -112,7 +112,7 @@ theorem accumulator_exists (hℳ : Theory.Models ℳ theory) {family : Carrier �
     · exact False.elim (hNe hRestrictedDomain)
   · intro index hIndex
     have hSucc := successor_mem_successor hℳ hFamily.2 hIndex
-    have hIndexOmega := (omega_project hℳ).transitive (project_modelsZF hℳ) _ hFamily.2 index hIndex
+    have hIndexOmega := (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hFamily.2 index hIndex
     obtain ⟨restricted,hRestricted,hOutput⟩ := hAccumulator.2 (succ hℳ index) hSucc _ (hPair _ hSucc)
     have hRestrictedSequence := hAccumulator.1.restriction hSucc hRestricted
     have hRestrictedDomain := sequence_domain hℳ hRestrictedSequence

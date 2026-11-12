@@ -26,7 +26,7 @@ theorem union_zero (hℳ : Theory.Models ℳ theory) : PureSetIterations.Union (
 
 theorem union_successor (hℳ : Theory.Models ℳ theory) {previous : Carrier ℳ}
     (hPrevious : membership ℳ previous (omega hℳ)) : PureSetIterations.Union (succ hℳ previous) previous := by
-  have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) previous hPrevious
+  have hOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) previous hPrevious
   intro element
   constructor
   · intro hElement
@@ -59,7 +59,7 @@ theorem step_union (hℳ : Theory.Models ℳ theory) {current next : Carrier ℳ
     exact union_zero hℳ
   · rw [hSuccessor] at hCurrent
     rw [hSuccessor,hNext]
-    exact union_successor hℳ ((omega_project hℳ).transitive (project_modelsZF hℳ) _ hCurrent previous
+    exact union_successor hℳ ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hCurrent previous
       ((succ_spec hℳ previous previous).mpr (Or.inr rfl)))
 
 theorem union_step (hℳ : Theory.Models ℳ theory) {current next : Carrier ℳ}

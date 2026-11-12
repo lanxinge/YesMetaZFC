@@ -32,7 +32,7 @@ theorem ng_elementary_hull_l {ω A p} (hω : M.IsOmega ω) (hP : Proper_d I ω B
   obtain ⟨P, hPow⟩ := ZF.exists_powerSet hZF B
   obtain ⟨Q, hQ⟩ := KP.exists_pair (ZF.modelsKP hZF) P A
   obtain ⟨α, X, hV, hQX⟩ := ZF.v_cover_l I hZF Q
-  have hX := ZF.v_transitive_l I hZF hV
+  have hX := v_transitive_l I hV
   have hPX := hX Q hQX P ((hQ P).mpr (Or.inl rfl))
   have hAX := hX Q hQX A ((hQ A).mpr (Or.inr rfl))
   have hBound D (hD : M.MemberSubset D B) : M.mem D X := hX P hPX D ((hPow D).mpr hD)

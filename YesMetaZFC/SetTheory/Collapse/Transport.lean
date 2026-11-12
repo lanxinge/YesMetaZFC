@@ -1,8 +1,8 @@
 import YesMetaZFC.SetTheory.Collapse.Mostowski
 import YesMetaZFC.SetTheory.InnerModel.Separation.Formula
-import YesMetaZFC.Model.SetTheory.Internal.Source
+import YesMetaZFC.Model.SetTheory.Source.Basic
 
-/-! # 集合编码同构的原公式传输
+/-! # 集合编码满映射的原公式传输
 
 先用既有原子消去，再对原纯公式归纳。量词见证直接通过集合图的全域性和
 满射性搬运；无需选择一个外部不可计算的同构函数。
@@ -13,7 +13,13 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}} {X B F : M.Domain}
 
-theorem Mc_iso_d.core_formula_l (h : Mc_iso_d X B F)
+theorem Mc_map_d.nonempty_l {X B F : M.Domain} (h : Mc_map_d X B F)
+    (hn : Nonempty {x : M.Domain // M.mem x X}) : Nonempty {x : M.Domain // M.mem x B} := by
+  obtain ⟨x⟩ := hn
+  obtain ⟨y, hy, _⟩ := h.function.2.1 x.val x.property
+  exact ⟨⟨y, hy⟩⟩
+
+theorem Mc_map_d.core_formula_l (h : Mc_map_d X B F)
     (hX : Nonempty {x : M.Domain // M.mem x X}) (hB : Nonempty {x : M.Domain // M.mem x B})
     {n} (φ : Formula 0 n) (hφ : φ.FreeClosed) (ρ : Env (rt_model_l X hX) n) (η : Env (rt_model_l B hB) n)
     (he : ∀ i, Rd_entry_d (ρ.bound i).val (η.bound i).val F) :
@@ -52,7 +58,7 @@ theorem Mc_iso_d.core_formula_l (h : Mc_iso_d X B F)
       let x : (rt_model_l X hX).Domain := ⟨a, (h.function.bound_l ha).1⟩
       exact ⟨x, (ih hφ (ρ.push x) (η.push y) (Fin.cases ha he)).mpr hy⟩
 
-theorem Mc_iso_d.formula_l (h : Mc_iso_d X B F)
+theorem Mc_map_d.formula_l (h : Mc_map_d X B F)
     (hX : Nonempty {x : M.Domain // M.mem x X}) (hB : Nonempty {x : M.Domain // M.mem x B})
     {n} (φ : Formula 1 n) (hφ : φ.FreeClosed) (ρ : Env (rt_model_l X hX) n) (η : Env (rt_model_l B hB) n)
     (he : ∀ i, Rd_entry_d (ρ.bound i).val (η.bound i).val F) : Formula.satisfies ρ φ ↔ Formula.satisfies η φ :=
@@ -60,7 +66,7 @@ theorem Mc_iso_d.formula_l (h : Mc_iso_d X B F)
     (Internal.source_core_closed_l φ hφ) ρ η he).trans (Internal.source_core_sat_l φ η))
 
 /-- 有限参数赋值可逐项回拉，不选择整个模型上的逆函数。 -/
-theorem Mc_iso_d.params_l (h : Mc_iso_d X B F)
+theorem Mc_map_d.params_l (h : Mc_map_d X B F)
     (hX : Nonempty {x : M.Domain // M.mem x X}) (hB : Nonempty {x : M.Domain // M.mem x B})
     {n} (η : Env (rt_model_l B hB) n) : ∃ ρ : Env (rt_model_l X hX) n,
       ∀ i, Rd_entry_d (ρ.bound i).val (η.bound i).val F := by

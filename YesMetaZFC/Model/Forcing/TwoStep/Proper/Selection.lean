@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Proper.Composition
 import YesMetaZFC.Model.Forcing.Proper.Generic.Successor
 import YesMetaZFC.Model.Forcing.TwoStep.Witness
-import YesMetaZFC.Model.Forcing.Internal.Functions.Rules
+import YesMetaZFC.Model.Forcing.Functions.ValueIsomorphism
 
 /-! # 二步主加强的实际名称选择
 

@@ -1,8 +1,8 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.Countable
-import YesMetaZFC.Model.Forcing.Internal.Ground.FiniteSequence
+import YesMetaZFC.Model.Forcing.Ground.TreeShift
 import YesMetaZFC.SetTheory.Card.FiniteSequenceLift
 import YesMetaZFC.SetTheory.CountableChain
-import YesMetaZFC.Model.Forcing.Internal.Names.Sequence
+import YesMetaZFC.Model.Forcing.Names.SequenceForcing
 
 /-! # N[G] 参数列的内部有限名称提升
 

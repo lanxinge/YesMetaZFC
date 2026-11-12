@@ -1,4 +1,4 @@
-import YesMetaZFC.SetTheory.Descriptive.Projection
+import YesMetaZFC.SetTheory.Descriptive.Tree.Trace
 
 /-! # 沿内部 ω 的射影求值
 

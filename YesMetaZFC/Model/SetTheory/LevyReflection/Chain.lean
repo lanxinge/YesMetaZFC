@@ -41,7 +41,7 @@ theorem ZF.lr_chain_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω) (Φ : Lr_fam
     obtain ⟨x, hx, hu⟩ := ht s hs
     exact ⟨x, (lr_iter_sat_l I hZF.1 Φ ρ s x).mpr hx,
       fun y hy => hu y ((lr_iter_sat_l I hZF.1 Φ ρ s y).mp hy)⟩
-  obtain ⟨Q, hQ⟩ := recursiveSequence_exists hZF I ρ (lr_iter_s Φ) hop (hω.isOrdinal hZF)
+  obtain ⟨Q, hQ⟩ := recursiveSequence_exists hZF I ρ (lr_iter_s Φ) hop (hω.isOrdinal (ZF.modelsKP hZF))
   obtain ⟨P, hP⟩ := exists_range_of_setFunction hZF I hQ.1.2.1 hQ.1.2.2
   refine ⟨P, Q, ⟨hQ.1.2.1, hQ.1.2.2, fun i hi => ?_⟩, ?_, ?_⟩
   · obtain ⟨x, hx⟩ := (hQ.1.2.2 i).mp hi

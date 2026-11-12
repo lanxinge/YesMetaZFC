@@ -50,7 +50,7 @@ theorem wr_regular_l (hZFC : M.Models ZFC) {ω A R η F : M.Domain} (hω : M.IsO
   have hZF := ZFC.models_zf_l hZFC
   have hKP := ZF.modelsKP hZF
   let I := kp_pair_l hKP
-  have hwo := hω.isOrdinal hZF
+  have hwo := hω.isOrdinal (ZF.modelsKP hZF)
   obtain ⟨ζ, card, above, uncountable⟩ : ∃ ζ, M.IsCardinal I ζ ∧ M.mem η ζ ∧ M.mem ω ζ := by
     rcases ho.trichotomy hZF.1 hwo (KP.difference_exists_d hKP) (KP.intersection_exists_d hKP η ω) with eq | hηω | hωη
     · obtain ⟨ζ, hc, hwζ⟩ := ZF.exists_cardinalAbove hZF I hwo

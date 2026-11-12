@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Order.Separative
+import YesMetaZFC.Model.Forcing.Order.Tree
 import YesMetaZFC.Model.Boolean.Algebra
 
 /-! # 布尔代数的非零条件

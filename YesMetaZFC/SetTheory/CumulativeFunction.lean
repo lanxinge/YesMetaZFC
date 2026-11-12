@@ -77,8 +77,8 @@ theorem v_small_function_l {δ ν Z D F μ : M.Domain} (hcf : M.IsCofinality I �
       (fun eq => eq.symm ▸ hγβ) (fun hαγ => (hδ.1.mem hβ).transitive γ hγβ α hαγ))
   have fc : M.IsSetFunctionFromTo I F D C := ⟨hf.1, hf.2.1,
     fun i hi => (hf.2.2 i hi).imp fun x hx => ⟨values i x hx.2, hx.2⟩⟩
-  obtain ⟨Y, hY, hDY, hCY⟩ := v_joint_bound_l I hZF hZ hDZ hC
-  exact ⟨C, hC, fc, v_relation_mem_l I hZF hZ hδ hY fun p hp =>
+  obtain ⟨Y, hY, hDY, hCY⟩ := v_joint_bound_l I hZ hDZ hC
+  exact ⟨C, hC, fc, v_relation_mem_l I hZ hδ hY fun p hp =>
     (fn0_of_function_l (modelsKP hZF) fc).1 p hp |>.elim fun i hi => hi.2.elim fun x hx =>
       ⟨i, hDY i hi.1, x, hCY x hx.1, hx.2⟩⟩
 

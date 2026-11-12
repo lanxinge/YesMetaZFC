@@ -45,6 +45,6 @@ theorem ZF.tc_exists_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M
   refine ⟨T, ?_, (hT x).mpr ⟨hxV, fun _ _ h => h⟩, fun A hA hxA y hy => ((hT y).mp hy).2 A hA hxA⟩
   intro y hy z hz
   obtain ⟨hyV, hy⟩ := (hT y).mp hy
-  exact (hT z).mpr ⟨v_transitive_l I hZF hV y hyV z hz, fun A hA hxA => hA y (hy A hA hxA) z hz⟩
+  exact (hT z).mpr ⟨v_transitive_l I hV y hyV z hz, fun A hA hxA => hA y (hy A hA hxA) z hz⟩
 
 end YesMetaZFC.SetTheory

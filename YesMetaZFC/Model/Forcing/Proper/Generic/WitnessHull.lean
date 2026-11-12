@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.WitnessReflection
 import YesMetaZFC.Model.Forcing.Proper.Generic.Countable
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryClub
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
 import YesMetaZFC.Model.Forcing.Proper.Syntax
 import YesMetaZFC.SetTheory.CumulativeRank
 
@@ -41,7 +41,7 @@ theorem ng_witness_hull_l {ω A p} (hω : M.IsOmega ω) (hP : Proper_d I ω B R 
   obtain ⟨α, X, hV, _, hAX, hr⟩ := ZF.lr_finite_l I hZF F A₄
   have hData := hr ⟨n+5, ng_data_m φ, ng_data_closed_l φ⟩ (List.mem_cons_self ..)
   have hExists := hr ⟨n+3, ng_exists_m φ, ng_exists_closed_l φ⟩ (List.mem_cons_of_mem _ (List.mem_cons_self ..))
-  have hX := ZF.v_transitive_l I hZF hV
+  have hX := v_transitive_l I hV
   have hBA := (hd' B).mpr (Or.inl ((hc B).mpr (Or.inl ((hb B).mpr (Or.inl ((ha B).mpr (Or.inr rfl)))))))
   obtain ⟨C, hC, hm⟩ := hP X (hX B (hX A₄ hAX B hBA))
   obtain ⟨c, T, hM, hT⟩ := smdl_membership_l I hZF ⟨A₄, hAX⟩

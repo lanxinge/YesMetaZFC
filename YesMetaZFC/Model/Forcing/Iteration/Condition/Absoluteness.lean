@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
 import YesMetaZFC.Model.Forcing.Iteration.Stage.Successor
 
 /-! # 坐标追加与二步编码的传递绝对性

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Stage.NameMap.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Extension.Foundation
+import YesMetaZFC.Model.Forcing.Extension.Isomorphism
 
 /-! # 名称搬运递归的唯一性与部分图装配
 

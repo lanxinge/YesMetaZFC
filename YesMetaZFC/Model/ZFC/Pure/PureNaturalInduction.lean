@@ -119,7 +119,7 @@ theorem predecessor_mem (hℳ : Theory.Models ℳ theory)
     (hInput : membership ℳ (succ hℳ input) (succ hℳ length)) : membership ℳ input length := by
   have hSelf := (succ_spec hℳ input input).mpr (Or.inr rfl)
   rcases (succ_spec hℳ length (succ hℳ input)).mp hInput with hLess | hEqual
-  · exact ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) length hLength).transitive
+  · exact ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength).transitive
       (succ hℳ input) hLess input hSelf
   · exact hEqual ▸ hSelf
 
@@ -143,7 +143,7 @@ theorem finite_recurrence_ext (hℳ : Theory.Models ℳ theory)
   intro input hInput
   have hInputOmega : membership ℳ input (omega hℳ) := by
     rcases (succ_spec hℳ length input).mp hInput with hLess | rfl
-    · exact (omega_project hℳ).transitive (project_modelsZF hℳ) length hLength input hLess
+    · exact (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength input hLess
     · exact hLength
   exact ⟨_, application_member hℳ hFirst hInput,
     (hValues input hInputOmega hInput).symm ▸ application_member hℳ hSecond hInput⟩

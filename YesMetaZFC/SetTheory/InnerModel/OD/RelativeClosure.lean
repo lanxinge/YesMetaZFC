@@ -24,8 +24,8 @@ theorem oa_common_l (hZF : M.Models ZF) (k : Bool) {A p q : M.Domain}
     obtain ⟨l, F, hl, _, hF, hS, hT⟩ := ZF.fseq_join_l I hZF hω hn hm hs ht
     obtain ⟨r, hr⟩ := I.total A F
     obtain ⟨ha, hf⟩ := ob_pair_components_l hZF r (ob_parameter_l hZF r) hr
-    have hno := ob_ordinal_l hZF r (hω.members_areOrdinals hZF n hn)
-    have hmo := ob_ordinal_l hZF r (hω.members_areOrdinals hZF m hm)
+    have hno := ob_ordinal_l hZF r (hω.members_areOrdinals (ZF.modelsKP hZF) n hn)
+    have hmo := ob_ordinal_l hZF r (hω.members_areOrdinals (ZF.modelsKP hZF) m hm)
     have hso : Ob_d r s := by
       let φ : UnarySchema 2 := { body := Formula.isRestriction kpair_convention_l .newest (.bound 1) (.bound 2) }
       let ρ : Env M 2 := ⟨Fin.cases F (fun _ => n), fun _ => F⟩

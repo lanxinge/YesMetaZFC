@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Names.QuotientOrder
-import YesMetaZFC.Model.Forcing.Internal.Check.Relation
+import YesMetaZFC.Model.Forcing.Check.Order
 
 /-! # 商名称的加强与实际尾部比较
 

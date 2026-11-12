@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.RelationRelative
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
+import YesMetaZFC.Model.SetTheory.Relations.CollectCode
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.SetTheory.InnerModel.Recursion.Graph
 
 /-! # 原公式定义的实际二元关系

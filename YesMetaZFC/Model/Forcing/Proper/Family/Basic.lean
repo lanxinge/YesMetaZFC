@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Family.IndexedHull
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
 import YesMetaZFC.SetTheory.HereditaryCover
 
 /-! # 整个阶段族的 H(χ) 与共同 N 一键装配

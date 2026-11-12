@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Check.Syntax
+import YesMetaZFC.Model.Forcing.Check.Syntax
 
 /-! # 内部名称搬运的递归图规格
 

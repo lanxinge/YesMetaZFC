@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Definability
+import YesMetaZFC.Model.Forcing.Truth.Definability
 
 /-! # 内部可数分配性
 

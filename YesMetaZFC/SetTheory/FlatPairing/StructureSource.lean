@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.FlatPairing.Functions
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 后继秩层中的实际平坦结构码
 
@@ -15,7 +15,7 @@ local notation "N" => rt_model_l Y (Nonempty.intro (Subtype.mk ω hωY))
 local notation "J" => fp_rank_interpretation_l I hZF hω hW hωY
 
 theorem rt_fp_smdl_l (c A R : (N).Domain) : Smdl_d J c A R ↔ Smdl_d K c.val A.val R.val := by
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   have entry := rt_fp_entry_l I hZF hω hW hωY
   refine and_congr (fp_fixed_l hZF.1 hω).symm (and_congr ?_ ?_)
   · exact ⟨fun ⟨x, hx⟩ => ⟨x.val, hx⟩, fun ⟨x, hx⟩ => ⟨⟨x, trans A.val A.property x hx⟩, hx⟩⟩
@@ -28,7 +28,7 @@ theorem rt_fp_smdl_l (c A R : (N).Domain) : Smdl_d J c A R ↔ Smdl_d K c.val A.
       exact h x.val y.val ((entry x y R).mp he)
 
 theorem rt_fp_smem_l (c A R : (N).Domain) : Smem_d J c A R ↔ Smem_d K c.val A.val R.val := by
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   have entry := rt_fp_entry_l I hZF hω hW hωY
   refine and_congr (rt_fp_smdl_l I hZF hω hW hωY c A R) ?_
   constructor

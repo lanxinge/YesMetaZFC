@@ -25,7 +25,7 @@ def Le (left right : Carrier ℳ) : Prop := left = right ∨ membership ℳ left
 theorem ordinal (hℳ : Theory.Models ℳ theory) {value : Carrier ℳ}
     (hValue : membership ℳ value (omega hℳ)) :
     (Project.FirstOrderSemantics.reduct ℳ).IsOrdinal value :=
-  (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) value hValue
+  (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) value hValue
 
 theorem lt_le (hℳ : Theory.Models ℳ theory) {point middle upper : Carrier ℳ}
     (hUpper : membership ℳ upper (omega hℳ))

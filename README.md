@@ -31,20 +31,16 @@ Rosser 独立性与哥二不可证性以裸 ZFC 一致为前提；Tarski 语义�
 普通 J 已实现；L[A]、更强的 OD 图复杂度及无参数 HOD 完整模型接口的归并尚待完成，
 集中见[尚未完成](YesMetaZFC/SetTheory/InnerModel/README.md#尚未完成)。
 
-[迭代树](YesMetaZFC/SetTheory/LargeCardinal/Iteration.lean) 已完成 Pₙ 全前驱递归、内部下降反证，
-以及返回嵌入失败时的联合尝试树和正则下降秩。nice 后继的背景可数闭性、
-[到 j(A) 的完整初等复制](YesMetaZFC/SetTheory/LargeCardinal/ExtenderSetCopy.lean) 已构造，保留支撑端点及有限幂子集上的一致性。
-[整棵 nice 树的复制](YesMetaZFC/SetTheory/LargeCardinal/IterationCopyTree.lean) 已通过内部类依赖选择与相容图列取并完成，保留原根嵌入和所有交换方块。
-[联合尝试树的完整像](YesMetaZFC/SetTheory/LargeCardinal/IterationAttemptMember.lean) 已由有限真值证书的绝对性及实际有限节点拥有性证明，原节点公式和调用方已迁移。
-[移位秩与下降复制树](YesMetaZFC/SetTheory/LargeCardinal/IterationFailureCopy.lean) 已从返回失败自动构造：高度列覆盖内部 ω，每条严格树边上新高度小于旧高度的像，实际正则秩段包含相应扩展器。
-[指定超幂证书的读取](YesMetaZFC/SetTheory/LargeCardinal/IterationUltraRead.lean) 已保留原商、常值图、坍塌与复合图，并重新证明完整初等性；容器只需有限闭性，拥有极限秩段提供不要求正则性的实例。
-[nice 树返回定理](YesMetaZFC/SetTheory/LargeCardinal/IterationNiceReturn.lean) 与 ω₁ 长弱迭代策略已完成。
-[弹性类型的一步伸展](YesMetaZFC/SetTheory/LargeCardinal/TypeOneStep.lean) 已接通原定义的子类型查询、任意内部有限排列及同一扩展器，武丁实例保留精确实现高度。后续采用双树坍缩穷尽的直接决定性路线；L(R) 的 AD 尚未证明。
-[局部不可分辨对象](YesMetaZFC/SetTheory/LargeCardinal/LocalIndiscerniblesLeast.lean) 已在 ZF 中实际构造，包含完整内部类型、原公式真值对应及唯一的字典序最小选取。
-[有限后继秩层的完整类型搬运](YesMetaZFC/SetTheory/LargeCardinal/LocalTypeTransportTuple.lean) 已接通该最小对：内部任意正有限层高和有限元组均可自动搬运，整个 V(θ+ω) 参数带保持原值，原 κ 型集合与全部内部查询不变。
-[类型游戏的图恢复](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDecoding.lean) 已接到实际子类型见证：完整节点、空根和高度查询均自动编译，任意有限排列下恢复原树、末位及函数图的单点延长；重置位置的完整类型也已实际构造。
-[dcp 与规则 (7)](YesMetaZFC/SetTheory/LargeCardinal/TypeGameReply.lean) 已接通原语法投影、严格秩界和加二最大序数查询；后继高度刚性只需 ZF。[武丁重置工厂](YesMetaZFC/SetTheory/LargeCardinal/WoodinGameReset.lean) 自动产生任意参数域下界以上、dcp 弹性的实际重置类型。
-[完整辅助闭博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGame.lean) 已装配原七条规则、全部内部有限历史、固定三阶段时序和策略空间。三张编码表在开局前实际构造，裸类型只检查既定查询的字面成员性；已证明首次违规者输、无限合法对局由 I 获胜及收益集闭。[闭博弈决定性](YesMetaZFC/SetTheory/Descriptive/ClosedDeterminacy.lean) 已按 Neeman 4.16 的获胜局面集合证明，并在[类型博弈](YesMetaZFC/SetTheory/LargeCardinal/TypeGameDeterminacy.lean) 中给出某一方的实际获胜策略。[统一历史递归](YesMetaZFC/SetTheory/LargeCardinal/TypeGameRunSequence.lean) 已完成有限树取并、偶数枝排除、奇数返回、共同树识别及三张坐标图的相容取并；[5.15 策略转移](YesMetaZFC/SetTheory/LargeCardinal/TypeGameTransfer.lean) 的 `Tg_game_d.transfer_l` 已从辅助博弈中 II 的获胜策略，统一构造原博弈中 II 的获胜策略：任意服从对局都是原树分支的第一坐标。后续实数吸收及 L(ℝ)⊨AD 仍待完成。
+## 大基数与 L(ℝ) 的 AD
+
+[wd_lr_ad_l](YesMetaZFC/SetTheory/LargeCardinal/Determinacy/LReal.lean) 已证明：
+任意模型满足 ZFC 且内部有真类个 Woodin，则其规范 L(ℝ) 满足 AD。
+证明使用实际原关系超幂、完整复制历史、辅助博弈、双树决定性、实数吸收和高度提升。
+同一收益及规范策略实数的运输完成最终反证。
+
+[大基数目录](YesMetaZFC/SetTheory/LargeCardinal/README.md) 按 Cardinals、Extender、Iteration、
+Types、Game、Demand、Absorption、Determinacy 导航；[数学说明](markdown/LR_AD.md)
+给出关键不变量和前提边界。Neeman 原文“ω 个 Woodin＋上方可测”的较弱版本仍待实现。
 
 ## 描述集合论基础
 
@@ -54,15 +50,15 @@ Cantor 是 Baire 的闭且无处稠密子空间，并与内部自然数幂集等
 超度量已实际构造，两空间内部完备；Cantor 紧致，Baire 有具体的无有限子覆盖开覆盖。
 内部前缀树、分支与树体已实现；闭集与树体双向等价，规范前缀树唯一，这部分只需 KP。
 在内部 Baire 空间上，该规范树没有死节点。
-[Borel 码](YesMetaZFC/SetTheory/Descriptive/Borel.lean) 使用内部良基的带标签前缀树，
+[Borel 码](YesMetaZFC/SetTheory/Descriptive/Borel/Universe.lean) 使用内部良基的带标签前缀树，
 已构造唯一求值与解释集合、基本柱集码、补码和内部可数并码，并证明开集与闭树体有码。
 码的拼接输出唯一；原公式支持模型内部化及既有相对化接口，同一码可限制到内部子空间。
 以上构造不超过 ZF，不增添选择公理；可数并的输入是内部码族。
-[解析层](YesMetaZFC/SetTheory/Descriptive/Analytic.lean) 按 Borel 关系的内部 Baire
+[解析层](YesMetaZFC/SetTheory/Descriptive/Topology/Analytic.lean) 按 Borel 关系的内部 Baire
 投影定义，支持唯一解释、有实际码族的可数并、余解析补族的可数交和闭树投影。
 解析集的闭集／闭树投影正规形已完成：Borel 求值先转为闭证书，再合并实数见证。
 直接接口给出“存在内部实数、每个内部长度都有树内前缀”的双向判据及子空间相对版本。
-[射影层](YesMetaZFC/SetTheory/Descriptive/Projective.lean) 沿模型自身的 ω 构造
+[射影层](YesMetaZFC/SetTheory/Descriptive/Topology/Projective.lean) 沿模型自身的 ω 构造
 Σ¹ₙ、Π¹ₙ、Δ¹ₙ，已证明零层／第一层对应、后继投影方程、补对偶、单调性及 Δ¹₁=Borel。
 单个射影码和全部层次图都有唯一实际解释；Cantor 点类由内部子空间迹给出。
 各内部层的补、交替量词、同极性量词合并、升层、连续逆像及二元并交码已完成。
@@ -73,10 +69,10 @@ Cantor 是 Baire 的闭且无处稠密子空间，并与内部自然数幂集等
 对角法给出每个正内部层的 Σ\Π、Π\Σ 见证；Σ、Π 每个后继层严格增长，Δ 从第一层
 以后严格增长，Δ₀=Δ₁=Borel。证明只需 ZF，内部层号允许非标准。
 解析子空间上的相对 Suslin 定理也已接入，同一相对集合的 Σ¹₁、Π¹₁ 两码可转为 Borel 码。
-[Borel 秩](YesMetaZFC/SetTheory/Descriptive/BorelRank.lean) 已区分码树根秩与集合的
+[Borel 秩](YesMetaZFC/SetTheory/Descriptive/Topology/BorelRank.lean) 已区分码树根秩与集合的
 标准秩：Σ⁰₁／Π⁰₁ 对应开／闭，Σ⁰₂ 对应 Fσ，高层满足通常的内部超限递归。
 有码集合有唯一内部可数标准秩，补集保秩，任意内部子空间的限制不增秩。
-[完美集定理](YesMetaZFC/SetTheory/Descriptive/Perfect.lean) 已证明内部解析集及
+[完美集定理](YesMetaZFC/SetTheory/Descriptive/Topology/Analytic.lean) 已证明内部解析集及
 有码 Borel 集可数，或含实际非空、闭且无孤立点的子集。两类秩及完美集证明
 均只用 ZF，允许非标准 ω 和外部非良基模型，不假设可数选择或 ω₁ 正则。
 ZF 中未把无统一码族的集合式 Borel 类与有码类等同。闭博弈决定性已在 ZFC 中证明；
@@ -112,7 +108,7 @@ CI 为 Linux、Windows、Intel Mac 和 Apple Silicon Mac 构建独立缓存，�
 
 ## 基础设施导航
 
-除各级 README 外，仓库文档统一保存在 [markdown/](markdown/)。
+除各级 README 外，仓库文档统一保存在 [markdown/](markdown)。
 
 | 要做的工作 | 入口 |
 | --- | --- |

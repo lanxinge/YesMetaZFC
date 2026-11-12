@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.CCC.IndexSyntax
-import YesMetaZFC.Model.Forcing.Internal.Functions.Generic
+import YesMetaZFC.Model.Forcing.Functions.Generic
 
 /-! # 泛型索引及第二坐标图的实际名称构造 -/
 

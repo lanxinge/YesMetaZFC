@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Distributive.Function
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 
 /-! # ZF 中可数分配力迫不增加取值于旧集合的内部序列
 

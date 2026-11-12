@@ -1,8 +1,8 @@
 import YesMetaZFC.Model.Forcing.Iteration.Names.Inclusion
 import YesMetaZFC.Model.Forcing.Iteration.Stage.SystemSyntax
 import YesMetaZFC.Model.Forcing.Stage.Extension
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Criterion
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 import YesMetaZFC.Model.SetTheory.ProjectBounded
 import YesMetaZFC.Model.SetTheory.LevyReflection.Parameters
 
@@ -33,7 +33,8 @@ private theorem row_absolute_generic_l (hZF : M.Models ZF) {α B R D V p}
     Formula.satisfies ξ φ := by
   obtain ⟨F, hF, hEmb⟩ := row_link_embed_l hZF k
   let G := Pull_generic_d M F U
-  have hG := reg_generic_l O L hZF hEmb hU
+  have hit := hEmb.pull_inhabited_l O hZF hU
+  have hG := reg_generic_l O L hZF hEmb hU hit
   have hpG : G p := ⟨p, (hF p p).mpr ⟨hp, rfl⟩, hpU⟩
   obtain ⟨a, ha⟩ := KP.exists_empty (ZF.modelsKP hZF)
   have haN := name_empty_l M (KP.exists_pair (ZF.modelsKP hZF)) B a ha
@@ -47,7 +48,7 @@ private theorem row_absolute_generic_l (hZF : M.Models ZF) {α B R D V p}
   have hv := qenv_val_l (R := R) (z := B) (U := G) hZF σ hσ
   have hs := (forcing_truth_l O hZF hG φ hc σ η hv).mp
     ⟨p, hpG, (forces_env_l hZF.1 φ hc ρ σ (fun _ => rfl) p).mp hf⟩
-  obtain ⟨e, he, hm, hi⟩ := stage_extension_l O L hZF hEmb hU
+  obtain ⟨e, he, hm, hi⟩ := stage_extension_l O L hZF hEmb hU hit
   apply (lr_env_congr_l φ hc (image_env_l e η) ξ (fun i => ?_)).mp
     ((hφ _ _ (preserves_zf_l O hZF hG) (preserves_zf_l L hZF hU) e hi hm η).mp hs)
   exact qval_unique_l (he (η.bound i) (ρ.bound i) (ρ.bound i) (hv (.bound i))

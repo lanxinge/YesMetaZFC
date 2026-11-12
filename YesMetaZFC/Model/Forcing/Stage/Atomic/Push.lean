@@ -12,7 +12,7 @@ universe u
 variable {M : SetTheory.Structure.{u}} {P R z Q S w F : M.Domain}
 
 theorem nmap_eq_push_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
-    (hZF : M.Models ZF) (h : Reg_embed_d M P R z Q S w F) {x y s t p q}
+    (hZF : M.Models ZF) (h : Reg_map_d M P R z Q S w F) {x y s t p q}
     (hx : Name_d M P x) (hy : Name_d M P y) (hs : Nmap_d M F x s) (ht : Nmap_d M F y t)
     (hpq : Entry_d M p q F) (he : Eq_force_d M P R z p x y) : Eq_force_d M Q S w q s t := by
   let hI : Mem_ind_d M := check_ind_l M hZF
@@ -48,7 +48,7 @@ theorem nmap_eq_push_l (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w)
     obtain ⟨j, hj, hjv⟩ := hr₁ p₂ v₂ hp₂v hp₂.2.2
     have hb'e := (nmap_entry_l M hZF.1 hI hPair hyb b' e).mpr ⟨y', e₀, hy'e, hy'b, he₀e⟩
     have hje := L.trans j v₂ e hj.1 (h.domain p₂ v₂ hp₂v).2.2.1 (h.domain e₀ e he₀e).2.2.1
-      hjv ((h.order p₂ e₀ v₂ e hp₂v he₀e).mpr hp₂e)
+      hjv (h.mono p₂ e₀ v₂ e hp₂v he₀e hp₂e)
     exact ⟨j, b', e, hj, hb'e, hje, (hk j c b').mpr
       ⟨hj.1, (supp_entry_l M hW haW hcd).1, (supp_entry_l M hW hbW hb'e).1,
         p₂, v₂, x', y', hp₂v, hjv, (name_entry_l M hx hx'd).1, (name_entry_l M hy hy'e).1,

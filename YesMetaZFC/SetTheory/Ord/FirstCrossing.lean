@@ -21,15 +21,15 @@ theorem omega_prefix_bound_l {ω E ℓ : M.Domain} (hw : M.IsOmega ω)
     ∃ B, M.mem B ω ∧ ∀ n v, (M.mem n ℓ ∨ n = ℓ) → Rd_entry_d n v E → M.mem v B := by
   obtain ⟨m, succ, hm⟩ := hw.1.2 ℓ hℓ
   obtain ⟨F, cut⟩ := exists_restriction hZF I E m
-  have ff := cut.isSetFunctionFromTo fn (hw.transitive hZF m hm)
+  have ff := cut.isSetFunctionFromTo fn (hw.transitive (ZF.modelsKP hZF) m hm)
   obtain ⟨R, range⟩ := exists_range_of_setFunction hZF I ff.1 ff.2.1
   have fr : M.IsSetFunctionFromTo I F m R := ⟨ff.1, ff.2.1,
     fun n hn => (ff.2.2 n hn).imp fun v hv => ⟨(range v).mpr ⟨n, hv.2⟩, hv.2⟩⟩
-  have finite : Finite_d I ω R := ⟨m, hm, ordinal_image_bound_l I hZF (hw.members_areOrdinals hZF m hm)
+  have finite : Finite_d I ω R := ⟨m, hm, ordinal_image_bound_l I hZF (hw.members_areOrdinals (ZF.modelsKP hZF) m hm)
     (exists_inclusionInjection hZF I (source := m) (fun _ h => h)) fr
     (fun v hv => ((range v).mp hv).imp fun n hn => ⟨ff.input_mem_of_pairMember hn, hn⟩)⟩
   obtain ⟨v, _, lv⟩ := ff.2.2 ℓ succ.predecessor_mem
-  obtain ⟨a, ha, max⟩ := finite_max_l I hZF hw (hw.isOrdinal hZF) finite
+  obtain ⟨a, ha, max⟩ := finite_max_l I hZF hw (hw.isOrdinal (ZF.modelsKP hZF)) finite
     (fun v hv => ((range v).mp hv).elim fun _ h => ff.output_mem_of_pairMember h) ⟨v, (range v).mpr ⟨ℓ, lv⟩⟩
   have haω := ((range a).mp ha).elim fun _ h => ff.output_mem_of_pairMember h
   obtain ⟨B, next, hB⟩ := hw.1.2 a haω
@@ -57,9 +57,9 @@ theorem omega_first_crossing_l {ω E i : M.Domain} (hw : M.IsOmega ω)
     simp only [φ, UnarySchema.denote, Formula.satisfies_conj_iff, Formula.satisfies_mem_iff,
       Formula.satisfies_exists_iff, rd_entry0_sat_l hZF.1, Formula.satisfies_neg_iff, Definitional.Term.eval_weaken]; rfl
   obtain ⟨n, v, hn, nv, hv⟩ := hit
-  obtain ⟨m, _, hm, first⟩ := ordinal_min_l hZF φ ρ (hw.members_areOrdinals hZF n hn) ((sat n).mpr ⟨hn, v, nv, hv⟩)
+  obtain ⟨m, _, hm, first⟩ := ordinal_min_l hZF φ ρ (hw.members_areOrdinals (ZF.modelsKP hZF) n hn) ((sat n).mpr ⟨hn, v, nv, hv⟩)
   obtain ⟨hm, w, mw, hw'⟩ := (sat m).mp hm
   exact ⟨m, w, hm, mw, hw', fun j x hj jx => Classical.byContradiction fun hx =>
-    first j hj ((sat j).mpr ⟨hw.transitive hZF m hm j hj, x, jx, hx⟩)⟩
+    first j hj ((sat j).mpr ⟨hw.transitive (ZF.modelsKP hZF) m hm j hj, x, jx, hx⟩)⟩
 
 end YesMetaZFC.SetTheory.ZF

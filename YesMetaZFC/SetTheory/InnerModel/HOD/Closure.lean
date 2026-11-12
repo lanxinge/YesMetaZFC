@@ -28,6 +28,26 @@ theorem ha_union_l (hZF : M.Models ZF) {k A X} (hX : Ha_d (M := M) k A X) :
   exact ⟨U, ha_of_members_l hZF ho (fun z hz => (hu z).mp hz |>.elim fun y hy =>
     ha_trans_l (ha_trans_l hX hy.1) hy.2), hu⟩
 
+theorem ha_kpair_l (hZF : M.Models ZF) {k : Bool} {A a b p : M.Domain}
+    (ha : Ha_d k A a) (hb : Ha_d k A b) (pair : KPair_d M p a b) : Ha_d k A p := by
+  obtain ⟨s,hs,ss⟩ := ha_pair_l hZF ha ha
+  obtain ⟨t,ht,tt⟩ := ha_pair_l hZF ha hb
+  obtain ⟨q,hq,qq⟩ := ha_pair_l hZF hs ht
+  have same : q = p := kpair_unique_l M hZF.1
+    ⟨s,t,fun z => (ss z).trans ⟨fun h => h.elim id id,Or.inl⟩,tt,qq⟩ pair
+  exact same ▸ hq
+
+/-- 传递闭包由原参数唯一确定，其成员留在原遗传容器中。 -/
+theorem ha_tc_closed_l (hZF : M.Models ZF) {k : Bool} {A x S : M.Domain}
+    (hx : Ha_d k A x) (tc : Tc_d x S) : Ha_d k A S := by
+  let φ : UnarySchema 1 := { body := tc_m (.bound 1) .newest }
+  have defined : Oa_d k A S := oa_unique_l hZF k A φ ⟨fun _ => x,fun _ => x⟩
+    (fun _ => ha_oa_l hx) (fun T => (tc_sat_l _ _ _).trans
+      ⟨fun h => tc_unique_l hZF.1 h tc,fun eq => eq.symm ▸ tc⟩)
+  apply ha_of_members_l hZF defined
+  obtain ⟨T,trans,inside,all⟩ := hx
+  exact fun y hy => ⟨T,trans,tc.2.2 T trans inside y hy,all⟩
+
 theorem ha_power_l (hZF : M.Models ZF) {k A X} (hX : Ha_d (M := M) k A X) :
     ∃ S, Ha_d k A S ∧ ∀ z, M.mem z S ↔ M.MemberSubset z X ∧ Ha_d k A z := by
   obtain ⟨P, hp⟩ := ZF.exists_powerSet hZF X

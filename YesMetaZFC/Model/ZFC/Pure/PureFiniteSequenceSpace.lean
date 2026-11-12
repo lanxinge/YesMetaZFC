@@ -56,7 +56,7 @@ theorem mapping_bounded (hℳ : Theory.Models ℳ theory) (sequence length sourc
   obtain ⟨value, hValue, hGraph⟩ := hMapping.2.2 input hInput
   have hOutput : membership ℳ output source := (hMapping.1.2 input value output hGraph hMember) ▸ hValue
   have hOmegaInput : membership ℳ input ((PureStageTwoSemantics.expansion hℳ).function .omega .nil) :=
-    (omega_project hℳ).transitive (project_modelsZF hℳ) length hLength input hInput
+    (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength input hInput
   exact ((PureMappingDefinitions.cartesian_correct _ _ _).mp hProduct pair).mpr
     ⟨input, hOmegaInput, output, hOutput, hCode⟩
 

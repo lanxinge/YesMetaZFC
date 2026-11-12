@@ -17,7 +17,7 @@
 并保持旧无限基数；`not_ch_extension_l` 默认添加 ω₂ 条实数。`ch_independent_l` 与
 `ch_consistency_l` 已把两侧模型接入原推导核，给出 CH 双侧不可证及两侧扩充的一致性。
 
-[弱齐性 OD/HOD 比较](Internal/Homogeneous/README.md) 已从内部自同构作用推进到
+[弱齐性 OD/HOD 比较](Homogeneous/README.md) 已从内部自同构作用推进到
 完整 HOD 恢复：背景仅需 ZF，若条件呈现 B、R、z 均为 OD 且弱齐性，则
 `HOD^{M[U]} ⊆ e[HOD^M]`。`whom_hod_comparison_l` 自动构造地嵌入 e，并返回序数相同；
 `whom_hb_comparison_l` 给出 OD[A] 呈现下的固定参数版。
@@ -50,10 +50,10 @@
 
 | 模块 | 接口与已经证明的内容 |
 | --- | --- |
-| [Order/Basic](Order/Basic.lean) | `Cmp_l` 是存在共同加强，`Inc_l` 是不相容；`Lower_l`、`down_l`、反链、无原子性、分离性及条件以下的限制。 |
-| [Order/Density](Order/Density.lean) | 稠密、局部稠密及预稠密；预稠密等价于向下闭包稠密；两个稠密集在其中一个向下封闭时交仍稠密。 |
-| [Order/Density](Order/Density.lean) 的映射 | `PO_hom` 只保序，`PO_compat` 另保持不相容，`PO_dense` 再要求像稠密；证明稠密开集回拉及稠密映射复合。相容性反射只要求 `PO_compat`。 |
-| [Order/Separative](Order/Separative.lean) | 通过相容性定义分离预序与实际商 `Sep_l`，构造 `sep_order_l` 和规范稠密映射 `sep_map_l`；证明商序分离、规范映射保持并反射相容性。 |
+| [Order/Basic](Order/Tree.lean) | `Cmp_l` 是存在共同加强，`Inc_l` 是不相容；`Lower_l`、`down_l`、反链、无原子性、分离性及条件以下的限制。 |
+| [Order/Density](Order/Tree.lean) | 稠密、局部稠密及预稠密；预稠密等价于向下闭包稠密；两个稠密集在其中一个向下封闭时交仍稠密。 |
+| [Order/Density](Order/Tree.lean) 的映射 | `PO_hom` 只保序，`PO_compat` 另保持不相容，`PO_dense` 再要求像稠密；证明稠密开集回拉及稠密映射复合。相容性反射只要求 `PO_compat`。 |
+| [Order/Separative](Order/Tree.lean) | 通过相容性定义分离预序与实际商 `Sep_l`，构造 `sep_order_l` 和规范稠密映射 `sep_map_l`；证明商序分离、规范映射保持并反射相容性。 |
 | [Boolean/Conditions](Boolean/Conditions.lean) | 任意 `BA_alg B` 的非零部分给出 `positive_order_l`；相容等价于交非零，差 `p ∧ ¬q` 给出分离见证。条件域非空恰要求代数非平凡。 |
 | [Order/Tree](Order/Tree.lean) | `List A` 按延长排序；相容恰为前缀可比，任意有限长度的条件稠密；二元树的两个孩子形成反链，整棵树无原子。 |
 | [Boolean/RegularOpen](Boolean/RegularOpen.lean) | `RO_l` 是向下且双重伪补稳定的谓词；`ro_algebra_l` 实际装配交、剩余、双重否定及任意上确界，直接返回原 `CB_alg`。 |
@@ -74,30 +74,30 @@
 | [External/ZFCBase](External/ZFCBase.lean) | 直接核验原外延性、空集、基础公理；当 ω 在实际解释像中时，核验原无穷公理。 |
 | [Applications/Cohen/Theory](Applications/Cohen/Theory.lean) | `cohen_full_extension_l` 一次生成满足全部公式真值、额外稠密族和新实数要求的同一滤子；`cohen_zfc_base_l` 自动给出四条原公理。 |
 | [SetTheory/Kuratowski](../../SetTheory/Kuratowski.lean) | 名称与内模型共同使用的 Kuratowski 编码及原 `OrderedPairConvention` 实例；坐标单射、编码唯一性和三步成员下降。 |
-| [Internal/Names/Basic](Internal/Names/Basic.lean) | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
-| [Internal/Names/Closure](Internal/Names/Closure.lean) | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
-| [Internal/Names/Graph](Internal/Names/Graph.lean) | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |
-| [Internal/Names/Realization](Internal/Names/Realization.lean) | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
+| [Internal/Names/Basic](Names/Realization.lean) | `Internal.Name_d` 的全部量词遍历模型对象；`name_m` 是同一条件的原 Project 公式，已证明语义对应与子名称、标签闭包。 |
+| [Internal/Names/Closure](Names/Realization.lean) | 用模型内部两条明确的分离／收集模式构造支撑，证明 `name_unfold_l`；内部子集和带权二元名称只要求配对与并集。 |
+| [Internal/Names/Graph](Names/Realization.lean) | 从内部支撑和条件集的小呈现解码；`Rep_d` 精确保留并覆盖带权成员，`rep_val_eq_l` 与 `val_exists_unique_l` 保证求值与呈现选择无关。 |
+| [Internal/Names/Realization](Names/Realization.lean) | 原布尔名称实际编码为小图模型中的集合、条件集及支撑；`encode_pred_val_l` 给出求值往返，`sg_check_exists_l` 给出该模型内的规范名称。 |
 | [Boolean/Internal](Boolean/Internal.lean) | 以集合编码载体和序关系，实现原 `BooleanZF.Boolean_d`；模型内集合族的上确界直接构造。关系编码无需序公理，上确界只消费 `Sup_order`。 |
 | [Applications/Cohen/Internal](Applications/Cohen/Internal.lean) | Cohen 正则开条件有单射的集合编码；`cohen_boolean_l` 是实际内部布尔代数实例，`cohen_internal_name_l` 是实际模型对象。 |
-| [Internal/Atomic/Syntax](Internal/Atomic/Syntax.lean)／[Internal/Atomic/Closure](Internal/Atomic/Closure.lean)／[Internal/Atomic/Recursion](Internal/Atomic/Recursion.lean) | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
-| [Internal/Forcing/Conditions](Internal/Forcing/Conditions.lean)／[Internal/Forcing/Definability](Internal/Forcing/Definability.lean)／[Internal/Atomic/Witness](Internal/Atomic/Witness.lean) | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集。 |
-| [Internal/Atomic/Equivalence](Internal/Atomic/Equivalence.lean)／[Internal/Extension/Quotient](Internal/Extension/Quotient.lean) | 模型内部双模拟的等价及替换；同 universe 的名称泛型商、原子真值、求值成员方程及外延性。 |
-| [Internal/Extension/Foundation](Internal/Extension/Foundation.lean)／[Internal/Check/Forcing](Internal/Check/Forcing.lean) | 由内部公式归纳证明条目极小元、商模型的基础公理及规范名称嵌入单射性；允许外部非良基地模型。 |
-| [Internal/Atomic/Truth](Internal/Atomic/Truth.lean) | 外部良基名称图的原子真值及求值对应；图表示层的独立接口。 |
-| [Internal/Forcing/Formula](Internal/Forcing/Formula.lean)／[Internal/Forcing/Logic](Internal/Forcing/Logic.lean)／[Internal/Forcing/Truth](Internal/Forcing/Truth.lean) | 原 Project 公式的内部力迫翻译、正则性和泛型商的完整真值定理；量词遍历全部内部名称。 |
-| [Internal/Names/Construction](Internal/Names/Construction.lean)／[Internal/Extension/Separation](Internal/Extension/Separation.lean)／[Internal/Extension/Collection](Internal/Extension/Collection.lean)／[Internal/Extension/Power](Internal/Extension/Power.lean) | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
-| [Internal/Extension/Operations](Internal/Extension/Operations.lean)／[Internal/Extension/ZF](Internal/Extension/ZF.lean) | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
-| `SetTheory.Choice`／[Internal/Maximum/Selection](Internal/Maximum/Selection.lean)／[Internal/Extension/Choice](Internal/Extension/Choice.lean) | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
-| [Internal/Extension/Instance](Internal/Extension/Instance.lean) | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
-| [Internal/Extension/Generic](Internal/Extension/Generic.lean) | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
-| [Closed/Basic](Closed/Basic.lean)／[Applications/Collapse/Basic](Applications/Collapse/Basic.lean) | 内部可数递降链；ZF＋DC 下可数闭推出分配性，另有 ZFC 下可数部分函数塌缩的实际闭性。 |
-| [Distributive](Distributive/README.md)／[Internal/Ground/Transfer](Internal/Ground/Transfer.lean) | ZF＋可数分配性下不增加实数、旧值序列或旧集合的可数子集，并反射可数性、保持 ω₁。可数性证明使用最小原像。原 CH 与闭扩张接口自动从 ZFC 的 DC 实例接入。 |
-| [Applications/Collapse/Generic](Applications/Collapse/Generic.lean)／[Applications/Continuum/CH](Applications/Continuum/CH.lean) | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
+| [Internal/Atomic/Syntax](Atomic/Recursion.lean)／[Internal/Atomic/Closure](Atomic/Recursion.lean)／[Internal/Atomic/Recursion](Atomic/Recursion.lean) | 内部带条件双模拟及其最大关系；证明支撑无关性、等号递归方程及隶属力迫的一阶可定义性。 |
+| [Internal/Forcing/Conditions](Truth/Definability.lean)／[Internal/Forcing/Definability](Truth/Definability.lean)／[Internal/Atomic/Witness](Atomic/Truth.lean) | 条件预序、模型内稠密集泛型性、实际见证和反例稠密集。 |
+| [Internal/Atomic/Equivalence](Atomic/Equivalence.lean)／[Internal/Extension/Quotient](Extension/Isomorphism.lean) | 模型内部双模拟的等价及替换；同 universe 的名称泛型商、原子真值、求值成员方程及外延性。 |
+| [Internal/Extension/Foundation](Extension/Isomorphism.lean)／[Internal/Check/Forcing](Check/SupportBound.lean) | 由内部公式归纳证明条目极小元、商模型的基础公理及规范名称嵌入单射性；允许外部非良基地模型。 |
+| [Internal/Atomic/Truth](Atomic/Truth.lean) | 外部良基名称图的原子真值及求值对应；图表示层的独立接口。 |
+| [Internal/Forcing/Formula](Truth/Truth.lean)／[Internal/Forcing/Logic](Truth/Truth.lean)／[Internal/Forcing/Truth](Truth/Truth.lean) | 原 Project 公式的内部力迫翻译、正则性和泛型商的完整真值定理；量词遍历全部内部名称。 |
+| [Internal/Names/Construction](Names/PairConstruction.lean)／[Internal/Extension/Separation](Extension/Choice.lean)／[Internal/Extension/Collection](Extension/Choice.lean)／[Internal/Extension/Power](Extension/Choice.lean) | 有界加权名称构造、任意有限参数的全分离和收集、内部幂集名称。 |
+| [Internal/Extension/Operations](Extension/Choice.lean)／[Internal/Extension/ZF](Extension/Choice.lean) | 配对、并集、无穷及其余原 ZF 公理装配；`preserves_zf_l` 自动构造名称域非空证书。 |
+| `SetTheory.Choice`／[Internal/Maximum/Selection](Maximum/Bounded.lean)／[Internal/Extension/Choice](Extension/Choice.lean) | 从原选择集公理构造内部序数枚举，证明最早隶属选择的稠密性与唯一性；`preserves_zfc_l` 给出完整 ZFC 保持。 |
+| [Internal/Extension/Instance](Extension/Choice.lean) | 实际二元布尔条件及其主泛型滤子；`two_extension_zfc_l` 直接实例化完整保持定理。 |
+| [Internal/Extension/Generic](Extension/Generic.lean) | 从地模型对象枚举构造遇到全部内部稠密集的滤子，并自动给出小呈现。 |
+| [Closed/Basic](Closed/Basic.lean)／[Applications/Collapse/Basic](Collapse/Iteration.lean) | 内部可数递降链；ZF＋DC 下可数闭推出分配性，另有 ZFC 下可数部分函数塌缩的实际闭性。 |
+| [Distributive](Distributive/README.md)／[Internal/Ground/Transfer](Ground/Collapse.lean) | ZF＋可数分配性下不增加实数、旧值序列或旧集合的可数子集，并反射可数性、保持 ω₁。可数性证明使用最小原像。原 CH 与闭扩张接口自动从 ZFC 的 DC 实例接入。 |
+| [Applications/Collapse/Generic](Collapse/Iteration.lean)／[Applications/Continuum/CH](Applications/Continuum/CH.lean) | 构造实际泛型满射名称，核验原 ZFC＋CH 理论，装配可数地模型和实际模型存在入口。 |
 | `SetTheory.Card.Finite`／`PartialFunction`／`PartialFunctionCCC` | 内部有限集合的删除归纳、有限部分函数添值与合并，以及任意坐标集和可数值集上的内部可数链条件。 |
 | `SetTheory.Fiber`／`Card.CountableUnion` | 可定义纤维自动组成集合函数；小集合族的并单射到 κ×κ，供可数覆盖与基数保持共同使用。 |
 | [CCC/Basic](CCC/Basic.lean)／[CCC/Bounds](CCC/Bounds.lean) | 有限部分函数偏序自动装配 CCC；可定义碰撞的否定条件控制可能原像，反射基数上界并保持每个旧无限基数。 |
-| [Internal/Functions/Generic](Internal/Functions/Generic.lean)／[Applications/Cohen/Coordinates](Applications/Cohen/Coordinates.lean) | 塌缩与 Cohen 共用泛型函数名称；新鲜自然数列、两行分离及旧集合对角稠密集。 |
+| [Internal/Functions/Generic](Functions/Generic.lean)／[Applications/Cohen/Coordinates](Applications/Cohen/Coordinates.lean) | 塌缩与 Cohen 共用泛型函数名称；新鲜自然数列、两行分离及旧集合对角稠密集。 |
 | [Applications/Cohen/Add](Applications/Cohen/Add.lean)／[Applications/Continuum/NotCH](Applications/Continuum/NotCH.lean)／[Applications/Continuum/Independence](Applications/Continuum/Independence.lean) | 按 κ 添加互异新实数、ZFC＋¬CH 模型及原 ZFC 的 CH 独立性；均允许外部非良基地模型。 |
 
 分离比较定义为
@@ -359,11 +359,11 @@ have hConcrete := Internal.two_extension_zfc_l
 这条路线与 [Isabelle/ZF 的 CH 塌缩构造](https://isa-afp.org/browser_info/current/AFP/Independence_CH/CH.html)
 使用的可数部分函数塌缩一致。
 
-[Collapse/FiniteSequence](Applications/Collapse/FiniteSequence.lean) 实现另一条有限初段坍缩：
+[Collapse/FiniteSequence](Collapse/NameCode.lean) 实现另一条有限初段坍缩：
 条件为 X 值内部有限序列，反向包含为序；实际泛型并图给出 ω→X 满射并保留图边的条件来源。
-[Collapse/FiniteRecode](Applications/Collapse/FiniteRecode.lean) 沿模型内字母双射保持条件包含序，
+[Collapse/FiniteRecode](Collapse/FiniteRecode.lean) 沿模型内字母双射保持条件包含序，
 通过实际完全嵌入回拉泛型滤子，同时逐项重编码泛型并图。
-[TypeGameCollapse](../../SetTheory/LargeCardinal/TypeGameCollapse.lean) 的 `tg_lemma61_l` 利用 δ≅Vδ 将此构造接入原 Col(ω,δ)，
+[TypeGameCollapse](../../SetTheory/LargeCardinal/Game/Corollary610.lean) 的 `tg_lemma61_l` 利用 δ≅Vδ 将此构造接入原 Col(ω,δ)，
 不需要改变名称扩张或额外假定泛型枚举满足请求公平性。
 
 模型存在的地模型由 `SetTheory.countable_ground_l` 实际提供：对原小图 ZFC 模型
@@ -608,11 +608,11 @@ H(χ) 对应的内部秩、传递闭包和集合存在性只用 ZF；小名称�
 
 可数闭二步与坐标后继的入口为 [TwoStepClosed](TwoStep/Closed.lean) 和
 [IterationClosedSuccessor](Iteration/Closed/Successor.lean)：下界精确保留给定共同前缀。
-[CollapseClosed](Applications/Collapse/Closed.lean) 实际构造任意名称参数的可数闭塌缩后继、
+[CollapseClosed](Collapse/Iteration.lean) 实际构造任意名称参数的可数闭塌缩后继、
 两组集合参数的可数闭二步塌缩，以及保留原阶段链接和支撑的坐标后继。
 `row_cl_induction_l` 已通过实际极限下界和原公式内部超限归纳完成全部闭区间，
 `row_iteration_closed_l` 证明任意内部长度的全部阶段可数闭。
-[CollapseIteration](Applications/Collapse/Iteration.lean) 从两个集合参数和内部长度自动构造
+[CollapseIteration](Collapse/Iteration.lean) 从两个集合参数和内部长度自动构造
 确定的塌缩迭代，返回各阶段 ZFC、内部 ω，以及实数、任意旧目标上的内部 ω 函数和可数子集的实际旧原像。
 `closed_proper_l` 已从内部可数闭预序构造实际 proper club；闭扩张装配也自动返回
 ω₁、旧可数性和 ω 共尾性保持。`collapse_iteration_pil_l` 进一步为任意可数种子

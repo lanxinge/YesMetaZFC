@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.FlatPairing.Rank
-import YesMetaZFC.Model.SetTheory.Internal.TransitiveSource
+import YesMetaZFC.Model.SetTheory.Reflection.TransitiveSequence
 
 /-! # 秩层内部的原平坦配对解释
 
@@ -25,8 +25,8 @@ theorem rt_fp_pair_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M) 
     (ω x y p : (rt_model_l X nx).Domain) (hω : M.IsOmega ω.val) :
     Fp_pair_d (M := rt_model_l X nx) ω x y p ↔ Fp_pair_d ω.val x.val y.val p.val := by
   let N := rt_model_l X nx
-  have ht := ZF.v_transitive_l I hZF hV
-  have hων := (v_ordinal_l I hV).transitive ω.val (ZF.v_ordinal_height_l hZF hV (hω.isOrdinal hZF) ω.property)
+  have ht := v_transitive_l I hV
+  have hων := (v_ordinal_l I hV).transitive ω.val (ZF.v_ordinal_height_l hZF hV (hω.isOrdinal (ZF.modelsKP hZF)) ω.property)
   have tags (b : Bool) (A z : N.Domain) :
       (∃ a : N.Domain, N.mem a A ∧ Fp_tag_d (M := N) b ω a z) ↔
         ∃ a, M.mem a A.val ∧ Fp_tag_d b ω.val a z.val := by
@@ -56,7 +56,7 @@ theorem fp_rank_code_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M
     (nx : Nonempty {x // M.mem x X}) {d} (ρ : Env (rt_model_l X nx) d) (p x y : Term d) :
     Formula.satisfies ρ (FlatPairing.code p x y) ↔ Fp_pair_d ω (x.eval ρ).val (y.eval ρ).val (p.eval ρ).val := by
   let N := rt_model_l X nx
-  have ht := ZF.v_transitive_l I hZF hV
+  have ht := v_transitive_l I hV
   have he := rt_model_ext_l hZF.1 ht nx
   let w : N.Domain := ⟨ω, hωX⟩
   have hw := rt_omega_l ht nx hZF.1 w hω
@@ -75,12 +75,12 @@ def fp_rank_interpretation_l {𝒞 : OrderedPairConvention} (I : 𝒞.Interpreta
   realizes := fp_rank_code_l I hZF hω hV hωX ⟨⟨ω, hωX⟩⟩
   total x y := by
     obtain ⟨p, hp⟩ := fp_pair_exists_l (ZF.modelsKP hZF) hω.1 x.val y.val
-    have hων := (v_ordinal_l I hV).transitive ω (ZF.v_ordinal_height_l hZF hV (hω.isOrdinal hZF) hωX)
+    have hων := (v_ordinal_l I hV).transitive ω (ZF.v_ordinal_height_l hZF hV (hω.isOrdinal (ZF.modelsKP hZF)) hωX)
     exact ⟨⟨p, hp.rank_mem_l I hZF hω hV hων x.property y.property⟩, hp⟩
   unique := fun hp hq => Subtype.ext (hp.unique_l hZF.1 hq)
   injective := by
     intro p x y u v hp hq
-    obtain ⟨hx, hy⟩ := hp.injective_l (ZF.modelsKP hZF) hω.1 (hω.members_areOrdinals hZF) hq
+    obtain ⟨hx, hy⟩ := hp.injective_l (ZF.modelsKP hZF) hω.1 (hω.members_areOrdinals (ZF.modelsKP hZF)) hq
     exact ⟨Subtype.ext hx, Subtype.ext hy⟩
 
 end YesMetaZFC.SetTheory.Internal

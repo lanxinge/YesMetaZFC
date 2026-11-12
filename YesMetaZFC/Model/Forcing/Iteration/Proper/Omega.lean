@@ -43,7 +43,7 @@ theorem row_pr_omega_l {ω δ F G b U χ H N w v D V F' G'}
     have bound r (hr : M.mem r D) (_ : M.mem r N) : Row_d M ω r := (h.stages ω D V hD hV).rows r hr
     obtain ⟨q, hq, hqm, hpre⟩ := row_pr_master_fusion_l hZFC hω h hD hV hD hV (fun _ h => h)
       hF hG hS hl hc hQ hv hs hE.1 he bound
-    have hαα₀ := ((hω.isOrdinal hZF).mem (hA.output_mem_of_pairMember hα₀)).transitive.memberSubset (ha b α₀ hα₀)
+    have hαα₀ := ((hω.isOrdinal (ZF.modelsKP hZF)).mem (hA.output_mem_of_pairMember hα₀)).transitive.memberSubset (ha b α₀ hα₀)
     obtain ⟨hpq, lower⟩ := row_pr_total_l hZF hω h hD hV hD hV (fun _ h => h)
       hF hG hl hc hQ hv hs hq hpre bound hα hB hR hτ hx hα₀ hR₀ hxp₀ hαα₀ hpp₀ hLow
     exact ⟨q, hq, hpq, hqm, lower⟩
@@ -58,7 +58,7 @@ theorem row_iteration_pr_omega_l {n} {φ : BinarySchema (n+4)} {ρ : Env M n} {�
   obtain ⟨V, hV⟩ := (h.1.relations.2.2 ω).mp hωδ
   obtain ⟨U, χ, H, N, w, v, J, hU, hN, hAN, hωN, hFN, hGN, _, _, hUN, _, hLift, _⟩ :=
     row_iteration_pr_prepare_l hZFC hω hRule hPr h ha
-  obtain ⟨F', G', hF, hG, _, hl⟩ := row_iteration_limit_l hZF hω hRule h (hω.isLimitOrdinal hZF) hD hV
+  obtain ⟨F', G', hF, hG, _, hl⟩ := row_iteration_limit_l hZF hω hRule h (hω.isLimitOrdinal (ZF.modelsKP hZF)) hD hV
   exact ⟨χ, H, N, hN, hAN, row_pr_omega_l hZFC h.1 hU hN hLift hFN hGN hUN hωN hD hV hF hG h.2.1 hl⟩
 
 end YesMetaZFC.Model.Forcing.Internal

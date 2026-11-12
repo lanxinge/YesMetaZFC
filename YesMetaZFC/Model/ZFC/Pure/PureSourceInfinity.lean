@@ -94,14 +94,14 @@ theorem member_natural (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     (hNumber : mem 𝒩 number (w 𝒩)) (hElement : mem 𝒩 element number) :
     mem 𝒩 element (w 𝒩) :=
   (omega_project h𝒩).transitive
-    (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩)) number hNumber element hElement
+    (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩))) number hNumber element hElement
 
 theorem natural_compare (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
     {left right : 𝒩.Carrier .set}
     (hLeft : mem 𝒩 left (w 𝒩)) (hRight : mem 𝒩 right (w 𝒩)) :
     left = right ∨ mem 𝒩 left right ∨ mem 𝒩 right left := by
   rcases (omega_project h𝒩).membershipWellOrder
-    (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩)) |>.linear.compare
+    (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩))) |>.linear.compare
       left hLeft right hRight with hEqual | hLess | hGreater
   · exact Or.inl ((PureModel.project_models (PureZFCModels.reduct_models h𝒩)).1.eq_of_same_members
       left right hEqual)

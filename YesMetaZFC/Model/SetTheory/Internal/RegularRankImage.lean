@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.SetTheory.Internal.SourceOmegaBound
+import YesMetaZFC.Model.SetTheory.Source.RankSizeInitial
 import YesMetaZFC.SetTheory.Collapse.RegularRank
 
 /-! # 正则秩图的完整初等像

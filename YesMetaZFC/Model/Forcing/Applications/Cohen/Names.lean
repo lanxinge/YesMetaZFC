@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.NameSyntax
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Unique
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Countermodel
+import YesMetaZFC.Model.Forcing.Maximum.Unique
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
 
 /-! # Cohen 后继的全局名称装配
 

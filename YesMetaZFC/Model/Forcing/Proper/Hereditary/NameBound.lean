@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.HereditaryAlgebra
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Pool
+import YesMetaZFC.Model.Forcing.Maximum.UniqueRules
 
 /-! # 遗传小名称族的加权装配界
 

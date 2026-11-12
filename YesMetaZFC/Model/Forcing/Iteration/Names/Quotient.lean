@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Stage.Basic
-import YesMetaZFC.Model.Forcing.Internal.Functions.Generic
+import YesMetaZFC.Model.Forcing.Functions.Generic
 
 /-! # 任意阶段在指定前缀泛型下的旧条件名称
 

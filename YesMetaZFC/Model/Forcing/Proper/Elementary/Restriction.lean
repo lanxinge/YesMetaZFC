@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.FirstPreimage
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
 
 /-! # 限制图的传递绝对性与内部初等闭包
 

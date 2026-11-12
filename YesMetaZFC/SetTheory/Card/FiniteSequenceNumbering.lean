@@ -117,7 +117,7 @@ theorem fseq_numbering_l (hZF : M.Models ZF) {ω κ X S W Q J H}
     have he F z : M.PairMember I F z K ↔ M.mem F S ∧ M.mem z κ ∧
         M.IsSetFunctionFromTo I F n X ∧ Fseq_snoc_d I Q J L m F z :=
       (hStep.2 F z).trans (and_congr_right fun _ => and_congr_right fun _ =>
-        fseq_at_succ_l I hZF.1 hd (hP.isSetFunction hH.1.2.1) (hω.members_areOrdinals hZF m hm) hn hLP F z)
+        fseq_at_succ_l I hZF.1 hd (hP.isSetFunction hH.1.2.1) (hω.members_areOrdinals (ZF.modelsKP hZF) m hm) hn hLP F z)
     obtain ⟨B, hB⟩ := exists_functionSpace hZF I n X
     have total F (hF : M.mem F B) : ∃ z, M.mem z κ ∧ M.PairMember I F z K := by
       obtain ⟨z, hz, hf⟩ := fseq_snoc_total_l I hZF hW hQ.1 hJ.1 hA hInj.1 hn ((hB F).mp hF)
@@ -132,7 +132,7 @@ theorem fseq_numbering_l (hZF : M.Models ZF) {ω κ X S W Q J H}
     · intro F G z hz hw
       have hf := (he F z).mp hz
       have hg := (he G z).mp hw
-      exact fseq_snoc_injective_l I hZF.1 hQ hJ hInj (hω.members_areOrdinals hZF n hnω) hn
+      exact fseq_snoc_injective_l I hZF.1 hQ hJ hInj (hω.members_areOrdinals (ZF.modelsKP hZF) n hnω) hn
         hf.2.2.1 hg.2.2.1 hf.2.2.2 hg.2.2.2
 
 end ZF

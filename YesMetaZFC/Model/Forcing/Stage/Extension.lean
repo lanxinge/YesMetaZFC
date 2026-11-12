@@ -3,7 +3,7 @@ import YesMetaZFC.Model.Forcing.Stage.Generic
 
 /-! # 阶段泛型扩张之间的实际嵌入
 
-目标泛型自动回拉为源泛型。名称搬运在两侧泛型商中给出成员满覆盖的单射，
+命中阶段像的目标泛型回拉为源泛型。名称搬运在两侧泛型商中给出成员满覆盖的单射，
 其像是目标模型中的传递子结构；不假定外部良基或额外模型呈现。
 -/
 
@@ -12,8 +12,9 @@ open SetTheory
 universe u
 variable {M : SetTheory.Structure.{u}} {P R z Q S w F : M.Domain} {V : M.Domain → Prop}
 variable (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w) (hZF : M.Models ZF)
-variable (h : Reg_embed_d M P R z Q S w F) (hV : Generic_d M Q S w V)
-include O L hZF h hV
+variable (h : Reg_map_d M P R z Q S w F) (hV : Generic_d M Q S w V)
+variable (inhabited : ∃ p, Pull_generic_d M F V p)
+include O L hZF h hV inhabited
 local notation "G" => Pull_generic_d M F V
 local notation "E" => extension_l M hZF P R z G
 local notation "N" => extension_l M hZF Q S w V
@@ -23,7 +24,7 @@ theorem stage_value_eq_l {x y s t} {a b : (E).Domain} {c d : (N).Domain}
     (hx : Qval_d M P R z G x a) (hy : Qval_d M P R z G y b)
     (hs : Nmap_d M F x s) (ht : Nmap_d M F y t)
     (hc : Qval_d M Q S w V s c) (hd : Qval_d M Q S w V t d) : a = b ↔ c = d := by
-  have hG := reg_generic_l O L hZF h hV
+  have hG := reg_generic_l O L hZF h hV inhabited
   constructor
   · intro hab
     obtain ⟨p, ⟨q, hpq, hq⟩, he⟩ := (qval_eq_l O hZF hG hx hy).mpr hab
@@ -42,12 +43,12 @@ theorem stage_value_eq_l {x y s t} {a b : (E).Domain} {c d : (N).Domain}
     exact hn r ⟨hr'.1, hr'.2, hrv⟩
       (eq_force_lower_l L hZF (qval_name_l hc) (qval_name_l hd) q r he.1 ⟨hr'.1, hr'.2, hrq⟩ he)
 
-/-- 自动回拉泛型并装配成员满覆盖的阶段嵌入；选择仅位于 Prop 存在证明中。 -/
+/-- 在回拉非空时装配成员满覆盖的阶段嵌入；选择仅位于 Prop 存在证明中。 -/
 theorem stage_extension_l :
     ∃ e : (E).Domain → (N).Domain,
       (∀ a s t, Qval_d M P R z G s a → Nmap_d M F s t → Qval_d M Q S w V t (e a)) ∧
       (∀ a y, y ∈ e a ↔ ∃ c, c ∈ a ∧ e c = y) ∧ Function.Injective e := by
-  have hG := reg_generic_l O L hZF h hV
+  have hG := reg_generic_l O L hZF h hV inhabited
   have hall (a : (E).Domain) : ∃ b : (N).Domain, ∃ s t,
       Qval_d M P R z G s a ∧ Nmap_d M F s t ∧ Qval_d M Q S w V t b := by
     obtain ⟨s, _, hs⟩ := value_name_l a
@@ -59,7 +60,7 @@ theorem stage_extension_l :
     obtain ⟨u, v, hu, huv, hv⟩ := he a
     have htN := nmap_name_l M hZF (fun b c hc => (h.domain b c hc).2.2.1) ht
     obtain ⟨b, hb⟩ := name_value_l (R := S) (z := w) (U := V) htN
-    have heq := (stage_value_eq_l O L hZF h hV hu hs huv ht hv hb).mp rfl
+    have heq := (stage_value_eq_l O L hZF h hV inhabited hu hs huv ht hv hb).mp rfl
     exact heq.symm ▸ hb
   refine ⟨e, hv, ?_, ?_⟩
   · intro a y
@@ -81,6 +82,6 @@ theorem stage_extension_l :
   · intro a b hab
     obtain ⟨s, t, hs, hst, ht⟩ := he a
     obtain ⟨u, v, hu, huv, hv⟩ := he b
-    exact (stage_value_eq_l O L hZF h hV hs hu hst huv ht hv).mpr hab
+    exact (stage_value_eq_l O L hZF h hV inhabited hs hu hst huv ht hv).mpr hab
 
 end YesMetaZFC.Model.Forcing.Internal

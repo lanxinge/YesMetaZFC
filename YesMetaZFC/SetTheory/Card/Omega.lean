@@ -49,13 +49,13 @@ theorem omega_skip_l (hZF : M.Models ZF) {ω i : M.Domain} (hω : M.IsOmega ω) 
       rcases (hφ y z).mp ((he y z).mp hy).2 with hy | hy
     · exact hx.2.symm.trans hy.2
     · have hyz := hy.2.predecessor_mem
-      exact False.elim (hy.1 ((hω.members_areOrdinals hZF i hi).transitive x hx.1 y (hx.2 ▸ hyz)))
+      exact False.elim (hy.1 ((hω.members_areOrdinals (ZF.modelsKP hZF) i hi).transitive x hx.1 y (hx.2 ▸ hyz)))
     · have hxz := hx.2.predecessor_mem
-      exact False.elim (hx.1 ((hω.members_areOrdinals hZF i hi).transitive y hy.1 x (hy.2 ▸ hxz)))
-    · exact Structure.SuccessorOf.predecessor_eq hZF.1 (hω.members_areOrdinals hZF x hxω) hx.2 hy.2
+      exact False.elim (hx.1 ((hω.members_areOrdinals (ZF.modelsKP hZF) i hi).transitive y hy.1 x (hy.2 ▸ hxz)))
+    · exact Structure.SuccessorOf.predecessor_eq hZF.1 (hω.members_areOrdinals (ZF.modelsKP hZF) x hxω) hx.2 hy.2
   · intro x hx
     rcases (hφ x i).mp ((he x i).mp hx).2 with hx | hx
-    · exact (hω.isOrdinal hZF).wellOrder.linear.irrefl i hi (hx.2.symm ▸ hx.1)
+    · exact (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.irrefl i hi (hx.2.symm ▸ hx.1)
     · exact hx.1 hx.2.predecessor_mem
 
 theorem omega_not_le_finite_l (hZF : M.Models ZF) {ω : M.Domain} (hω : M.IsOmega ω) :
@@ -102,7 +102,7 @@ theorem omega_not_le_finite_l (hZF : M.Models ZF) {ω : M.Domain} (hω : M.IsOme
 
 /-- ω 的基数性由原 ZF 自动取得，不再要求调用者另行给出。 -/
 theorem omega_cardinal_l (hZF : M.Models ZF) {ω : M.Domain} (hω : M.IsOmega ω) : M.IsCardinal I ω := by
-  refine ⟨hω.isOrdinal hZF, fun n hn he => ?_⟩
+  refine ⟨hω.isOrdinal (ZF.modelsKP hZF), fun n hn he => ?_⟩
   obtain ⟨F, hF⟩ := he.symm hZF I
   exact omega_not_le_finite_l I hZF hω n hn ⟨F, hF.1⟩
 
@@ -156,7 +156,7 @@ theorem countable_insert_l (hZF : M.Models ZF) {ω X S a : M.Domain} (hω : M.Is
     · exact False.elim (hz hx.2 hy)
     · exact False.elim (hz hy.2 hx)
     · have heq := Structure.SuccessorOf.predecessor_eq hZF.1
-        (hω.members_areOrdinals hZF n (hF.1.output_mem_of_pairMember hxn)) hx hy
+        (hω.members_areOrdinals (ZF.modelsKP hZF) n (hF.1.output_mem_of_pairMember hxn)) hx hy
       subst m
       exact hF.2 x y n hxn hym
 

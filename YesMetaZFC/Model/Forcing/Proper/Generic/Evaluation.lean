@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.Hull
-import YesMetaZFC.Model.Forcing.Internal.Names.PairConstruction
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Names.PairConstruction
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 
 /-! # 名称集合上的实际泛型求值函数图
 

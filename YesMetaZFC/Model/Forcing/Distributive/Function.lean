@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Functions.Decision
+import YesMetaZFC.Model.Forcing.Functions.Surjection
 import YesMetaZFC.Model.Forcing.Distributive.Basic
 
 /-! # 可数分配力迫同时判定整个内部函数图

@@ -124,7 +124,7 @@ obtain ⟨E, H, Y, hE, hH, hY, hSubset, hTruth, hUnique⟩ :=
 `smodels_theory_l` 构造给定结构的全部有效公式集合并证明其模型性。全部存在性仅用
 ZF，允许地模型外部非良基；这里的满足关系针对集合结构，不是地模型全宇宙的真谓词。
 
-原 Project AST 的编译见 [Compiler](SetTheory/Internal/Compiler.lean)：`source_compile_l`
+原 Project AST 的编译见 [Compiler](SetTheory/Internal/FiniteSource.lean)：`source_compile_l`
 接收任意有限参数上下文中的 `FreeClosed` 公式，返回实际程序码、规范变量编号及
 对全部编码结构的语义对应。定义原子先展开为原正文，因而解码结构不需外延性；
 量词在内部取得新编号并更新赋值。`source_satisfaction_l` 自动装配参数赋值与满足等价式。
@@ -145,7 +145,7 @@ obtain ⟨C, N, hCodes, hNumbering⟩ :=
 编号层沿内部 ω 统一递归，最终把长度与层内编号配对，只需 ZF。
 [Countable](SetTheory/Internal/Countable.lean) 将它用于完整公式码集合。
 
-规范编码入口为 [CanonicalCode](SetTheory/Internal/CanonicalCode.lean) 与
+规范编码入口为 [CanonicalCode](SetTheory/Types/CanonicalCode.lean) 与
 [Ord/Code](../SetTheory/Ord/Code.lean)。固定有序对约定后，序数配对 `Oc_pair_d a b c`
 取 `(a,b)` 在“最大坐标、第一坐标、第二坐标”典范良序中的位置；端延拓证明
 计算结果与方块界无关。它在全部序数上有唯一输出，单射，且将内部自然数对编码为自然数。
@@ -161,7 +161,7 @@ obtain ⟨C, N, hCodes, hNumbering⟩ :=
 | `oc_seq_tables_l` | 任意序数字母表的全部有限列与其合法序数码之间，实际存在双向集合编码表 |
 | `sc_num_exists_l`、`sc_num_unique_l`、`sc_num_injective_l` | 原内部公式码 `(程序,根)` 的固定自然数编号，无额外编号图参数 |
 | `sc_num_tables_l` | 自动构造全部原公式码、合法自然数码集及精确互逆图 |
-| [CanonicalSatisfaction](SetTheory/Internal/CanonicalSatisfaction.lean) 的 `sc_sat_decode_l` | 自然数码上的满足关系精确还原为原内部满足关系 |
+| [CanonicalSatisfaction](SetTheory/Types/CanonicalSatisfaction.lean) 的 `sc_sat_decode_l` | 自然数码上的满足关系精确还原为原内部满足关系 |
 | `source_nat_satisfaction_l` | 从原 Project 公式与实际模型参数自动取得自然数码、内部赋值和真值等价 |
 
 上述结果均在背景 ZF 中证明，未使用背景选择公理。原 `scode_numbering_l` 与
@@ -176,10 +176,10 @@ OD 的 Σ₂ 正规形已由 [Complexity](../SetTheory/InnerModel/OD/Complexity.
 [内模型进度总览](../SetTheory/InnerModel/README.md) 统一列出其后的 J/L、OD/HOD
 研究接口：ZF 背景下 L 满足 ZFC＋GCH，HOD[A] 满足 ZFC，HOD(A) 满足 ZF。
 同一套规范码还用于 HOD 的有界序数关系呈现和内部坍塌；
-[弱齐性比较](Forcing/Internal/Homogeneous/HOD.lean) 因而恢复扩张 HOD 的地模型 HOD 原像。
+[弱齐性比较](Forcing/Homogeneous/HOD.lean) 因而恢复扩张 HOD 的地模型 HOD 原像。
 这些结论继续使用内部语法与模型自身序数，允许外部非良基及非标准有限长度。
 
-[Skolem](SetTheory/Internal/Skolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
+[Skolem](SetTheory/Reflection/RankSkolem.lean) 的 `ssk_hull_l` 在原 ZFC 内构造实际司寇伦
 函数图 K 及任意内部可数种子 A 的最小闭包 N。规则域为全部内部公式码与变量编号
 的积，输入是内部有限参数列；列外取基点 u，再在被量化变量处更新。存在见证时
 K 返回真见证，否则精确返回 u。假公式的零元运算保证每个闭集包含 u，因此空种子
@@ -196,7 +196,7 @@ obtain ⟨u, C, S, T, D, K, N, hSkolem, hHull, hCountable, hu, hWitness⟩ :=
 阶段，因而实际取并保持闭性。`ZF.fc_step_countable_l` 的单步可数性用最小原像
 编号证明，保留 ZF 强度；自动司寇伦选择及完整可数闭包装配使用 ZFC。
 
-[SupportBound](SetTheory/Internal/SupportBound.lean) 的 `sbound_exists_l` 证明每个内部
+[SupportBound](SetTheory/Internal/Support.lean) 的 `sbound_exists_l` 证明每个内部
 有限程序的全部坐标都有内部自然数界；[Support](SetTheory/Internal/Support.lean)
 的 `ssat_agree_l` 证明界内赋值一致就保持真值。`ssk_full_l` 据此把有限参数见证
 闭性提升到全部内部 ω→N 赋值。归纳性质均为实际原公式，允许非标准有限程序。
@@ -205,7 +205,7 @@ obtain ⟨u, C, S, T, D, K, N, hSkolem, hHull, hCountable, hu, hWitness⟩ :=
 内部 Tarski–Vaught 等价，只需 ZF。`Selem_d ω c d` 与 `selem_m` 同时量化全部内部
 公式码和完整内部赋值，比较大结构码 c 与子结构码 d 的满足关系。`Selem_d.trans_l`
 给出复合，`Selem_d.models_l` 保持任意内部编码理论的模型性。
-[ElementaryHull](SetTheory/Internal/ElementaryHull.lean) 从实际司寇伦构造自动取得
+[ElementaryHull](SetTheory/Embedding/ElementaryTrace.lean) 从实际司寇伦构造自动取得
 内部可数初等子模型，输入无需额外闭性或初等性证书。
 
 ```lean
@@ -222,7 +222,7 @@ obtain ⟨N, d, S, hSubstructure, hSeed, hCountable, hElementary⟩ :=
 [SmallHull](SetTheory/Internal/SmallHull.lean) 的 `s1_hull_l` 将这套实际构造接到
 Σ₁ 隶属子结构接口，供 Mostowski 坍塌和 Jensen 凝聚直接调用。
 
-[SourceElementary](SetTheory/Internal/SourceElementary.lean) 的 `selem_source_l` 与
+[SourceElementary](SetTheory/Source/Elementary.lean) 的 `selem_source_l` 与
 `selem_witness_l` 把完整内部初等性用于原公式保持及实际见证回拉。力迫层已构造
 实际可数 `N[G]`，并由主条件和内部初等性提升指定原公式在所有 N 名称参数下的存在见证；
 `selem_club_hull_l` 在指定内部 club 中构造初等模型，`ng_witness_hull_l` 据此从

@@ -1,7 +1,6 @@
-import YesMetaZFC.Model.SetTheory.Internal.PredicateEmbedding
-import YesMetaZFC.Model.SetTheory.Internal.Induction
-import YesMetaZFC.Model.SetTheory.Internal.TruthRules
-import YesMetaZFC.Model.SetTheory.Internal.Elementary
+import YesMetaZFC.Model.SetTheory.Embedding.PredicateTrace
+import YesMetaZFC.Model.SetTheory.Internal.Theory
+import YesMetaZFC.Model.SetTheory.Embedding.Elementary
 
 /-! # 内部同构保持全部公式码的真值
 

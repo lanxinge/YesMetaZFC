@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Presentation
-import YesMetaZFC.Model.Forcing.Internal.Names.PairConstruction
+import YesMetaZFC.Model.Forcing.Names.PairConstruction
 
 /-! # 二步反链的泛型索引名称
 

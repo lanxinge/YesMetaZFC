@@ -1,6 +1,6 @@
-import YesMetaZFC.Model.SetTheory.Internal.FiniteEnumeration
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
-import YesMetaZFC.Model.SetTheory.Internal.SupportSyntax
+import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.SetTheory.Internal.Theory
 
 /-! # 中间坐标的实际集合公式
 

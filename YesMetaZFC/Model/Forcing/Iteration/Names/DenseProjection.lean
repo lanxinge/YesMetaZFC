@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.FirstPreimage
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Transitive
+import YesMetaZFC.Model.Forcing.Reflection.Transitive
 import YesMetaZFC.Model.Forcing.Proper.Master.Basic
 
 /-! # 稠密集向前段的投影及内部见证

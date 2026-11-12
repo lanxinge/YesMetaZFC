@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Criterion
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
 import YesMetaZFC.Model.Forcing.TwoStep.Presentation
 import YesMetaZFC.Model.Forcing.TwoStep.Names.Interpretation
 

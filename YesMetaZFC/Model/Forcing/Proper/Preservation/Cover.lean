@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Proper.Hereditary.Hull
 import YesMetaZFC.Model.Forcing.Proper.Generic.Ground
-import YesMetaZFC.Model.Forcing.Internal.Functions.Injection
-import YesMetaZFC.Model.Forcing.Internal.Functions.Cover
+import YesMetaZFC.Model.Forcing.Functions.ValueIsomorphism
+import YesMetaZFC.Model.Forcing.Functions.Cover
 import YesMetaZFC.SetTheory.Card.FiniteParameters
 
 /-! # proper 力迫的实际旧可数覆盖名称

@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.EmbeddingCountable
-import YesMetaZFC.Model.SetTheory.Internal.EmbeddingComposition
+import YesMetaZFC.Model.SetTheory.Embedding.RankFixed
+import YesMetaZFC.Model.SetTheory.Embedding.Range
 import YesMetaZFC.SetTheory.Collapse.EmbeddingFixed
 
 /-! # 可数初等图的塌缩像保持原定义域

@@ -33,7 +33,7 @@ theorem infinite_union_two_l (hZF : M.Models ZF) {ω κ X Y U} (hω : M.IsOmega 
   classical
   obtain ⟨F, hF⟩ := hX
   obtain ⟨G, hG⟩ := hY
-  have hwκ := hω.subset_limitOrdinal hZF
+  have hwκ := hω.subset_limitOrdinal (ZF.modelsKP hZF)
     (infiniteCardinal_isLimitOrdinal hZF I hω (omega_cardinal_l I hZF hω) hκ)
   obtain ⟨e, he, heω⟩ := hω.1.1
   obtain ⟨l, hl, hlω⟩ := hω.1.2 e heω

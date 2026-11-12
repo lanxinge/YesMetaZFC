@@ -550,7 +550,7 @@ theorem ordinalIteration_isIncreasing_on_omega (hZF : ℳ.Models SetTheory.ZF) (
       intro earlier hEarlier predecessorValue successorValue
         hEarlierValue hSuccessorValue
       have hPredecessorOrdinal :=
-        hω.members_areOrdinals hZF
+        hω.members_areOrdinals (ZF.modelsKP hZF)
           predecessor hPredecessorOmega
       have hSuccessorOrdinal :=
         KP.successor_isOrdinal (ZF.modelsKP hZF) hPredecessorOrdinal hSuccessor
@@ -583,7 +583,7 @@ theorem ordinalIteration_isIncreasing_on_omega (hZF : ℳ.Models SetTheory.ZF) (
               hZF hPredecessorOmega hPredecessorNonempty with
             ⟨prior, hPriorOmega, hPredecessorSuccessor⟩
           rcases (ordinalIteration_successor_iff
-                hZF 𝕀 env function hNormal (hω.members_areOrdinals hZF
+                hZF 𝕀 env function hNormal (hω.members_areOrdinals (ZF.modelsKP hZF)
                   prior hPriorOmega)
                 hPredecessorSuccessor).mp hPreviousIteration with
             ⟨priorValue, hPriorIteration, hPreviousFunction⟩
@@ -598,7 +598,7 @@ theorem ordinalIteration_isIncreasing_on_omega (hZF : ℳ.Models SetTheory.ZF) (
             hPredecessorProperty prior hPriorPredecessor
               priorValue previousValue hPriorValue hPreviousValue
           exact hNormal.2.1 priorValue previousValue (ordinalIteration_isOrdinal
-              hZF 𝕀 env function hNormal (hω.members_areOrdinals hZF prior hPriorOmega)
+              hZF 𝕀 env function hNormal (hω.members_areOrdinals (ZF.modelsKP hZF) prior hPriorOmega)
               hPriorIteration)
             hPreviousOrdinal hPriorValuePredecessor
             previousValue successorValue
@@ -659,8 +659,8 @@ theorem normalFunction_exists_limitFixedPoint (hZF : ℳ.Models SetTheory.ZF) (�
       ℳ.IsOrdinalIteration 𝕀 (function.denote env) ω fixed ∧
         ℳ.IsLimitOrdinal fixed ∧
           function.denote env fixed fixed := by
-  have hωOrdinal := hω.isOrdinal hZF
-  have hωLimit := hω.isLimitOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
+  have hωLimit := hω.isLimitOrdinal (ZF.modelsKP hZF)
   have hIncreasing :=
     ordinalIteration_isIncreasing_on_omega
       hZF 𝕀 env function hNormal
@@ -690,7 +690,7 @@ theorem normalFunction_exists_limitFixedPoint (hZF : ℳ.Models SetTheory.ZF) (�
     rcases hω.1.2 index hIndex with
       ⟨successor, hSuccessor, hSuccessorOmega⟩
     have hIndexOrdinal :=
-      hω.members_areOrdinals hZF index hIndex
+      hω.members_areOrdinals (ZF.modelsKP hZF) index hIndex
     have hSuccessorOrdinal :=
       KP.successor_isOrdinal (ZF.modelsKP hZF) hIndexOrdinal hSuccessor
     rcases ordinalIteration_existsUnique
@@ -768,14 +768,13 @@ theorem normalFunction_exists_limitFixedPoint (hZF : ℳ.Models SetTheory.ZF) (�
       have hFunctionValueNext :
           ℳ.mem functionValue next :=
         hNormal.2.1 input current (hFixedOrdinal.mem hInputFixed) (ordinalIteration_isOrdinal
-            hZF 𝕀 env function hNormal (hω.members_areOrdinals hZF index hIndex)
+            hZF 𝕀 env function hNormal (hω.members_areOrdinals (ZF.modelsKP hZF) index hIndex)
             hCurrent)
           hInputCurrent functionValue next
           hInputFunction hCurrentFunction
       have hNextOrdinal :=
         ordinalIteration_isOrdinal
-          hZF 𝕀 env function hNormal (hω.members_areOrdinals
-            hZF successor hSuccessorOmega)
+          hZF 𝕀 env function hNormal (hω.members_areOrdinals (ZF.modelsKP hZF) successor hSuccessorOmega)
           hNext
       exact (hUnion member).mpr
         ⟨next, (hRange next).mpr
@@ -799,8 +798,7 @@ theorem normalFunction_exists_limitFixedPoint (hZF : ℳ.Models SetTheory.ZF) (�
           ⟨current, hCurrentFixed, hCurrentFunction⟩
       have hNextOrdinal :=
         ordinalIteration_isOrdinal
-          hZF 𝕀 env function hNormal (hω.members_areOrdinals
-            hZF successor hSuccessorOmega)
+          hZF 𝕀 env function hNormal (hω.members_areOrdinals (ZF.modelsKP hZF) successor hSuccessorOmega)
           hNext
       exact (hImageUnion member).mpr
         ⟨next, hNextRange,
@@ -818,7 +816,7 @@ theorem exists_epsilonNumber (hZF : ℳ.Models SetTheory.ZF) (𝕀 : 𝒞.Interp
       ℳ.IsEpsilonNumber 𝕀 ω epsilon := by
   rcases hω.exists_ordinalOne_mem with
     ⟨one, hOne, hOneOmega⟩
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   let env : Env ℳ 1 := {
     bound := fun _ => ω
     free := fun _ => Classical.choice ℳ.nonempty

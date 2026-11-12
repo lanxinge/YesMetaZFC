@@ -1,6 +1,6 @@
-import YesMetaZFC.Model.Forcing.Internal.Functions.Injection
+import YesMetaZFC.Model.Forcing.Functions.ValueIsomorphism
 import YesMetaZFC.Model.Forcing.CCC.Bounds
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Basic
+import YesMetaZFC.Model.Forcing.Maximum.Bounded
 
 /-! # CCC 下可数名称的可能旧成员
 

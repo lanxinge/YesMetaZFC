@@ -42,14 +42,8 @@ theorem S1_sub_d.extensional_l (hE : Extensional M) {X U : M.Domain} (h : S1_sub
   have eq := (Formula.satisfies_extensionalEq_iff_eq (rt_model_ext_l hE hu h.target_nonempty_l) _ _ _).mp hx
   exact congrArg Subtype.val eq
 
-theorem Mc_iso_d.nonempty_l {X B F : M.Domain} (h : Mc_iso_d X B F)
-    (hn : Nonempty {x : M.Domain // M.mem x X}) : Nonempty {x : M.Domain // M.mem x B} := by
-  obtain ⟨x⟩ := hn
-  obtain ⟨y, hy, _⟩ := h.function.2.1 x.val x.property
-  exact ⟨⟨y, hy⟩⟩
-
 /-- Σ₁ 存在见证的全域性沿初等子结构与实际坍塌图传输。 -/
-theorem Mc_iso_d.total_pull_l {X U B F : M.Domain} (s : S1_sub_d X U) (h : Mc_iso_d X B F)
+theorem Mc_map_d.total_pull_l {X U B F : M.Domain} (s : S1_sub_d X U) (h : Mc_map_d X B F)
     (hB : Nonempty {x : M.Domain // M.mem x B}) {n} (φ : Delta0UnarySchema n)
     (ht : ∀ η : Env (rt_model_l U s.target_nonempty_l) n, ∃ y, φ.toUnarySchema.denote η y)
     (η : Env (rt_model_l B hB) n) : ∃ y, φ.toUnarySchema.denote η y := by

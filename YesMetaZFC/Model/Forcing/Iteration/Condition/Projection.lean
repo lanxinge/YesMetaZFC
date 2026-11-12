@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Condition.Splice
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Conditions
+import YesMetaZFC.Model.Forcing.Truth.Definability
 
 /-! # 坐标阶段之间的限制投影与尾部提升
 

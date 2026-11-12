@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Elementary.Countable
 import YesMetaZFC.SetTheory.CountableDirected
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 内部初等模型捕获 club
 

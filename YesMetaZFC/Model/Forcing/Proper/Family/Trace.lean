@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Proper.Family.ClosedSyntax
 import YesMetaZFC.Model.Forcing.Proper.Family.Indexed
 import YesMetaZFC.Model.Forcing.Proper.Family.ClosedForcing
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryTrace
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 import YesMetaZFC.SetTheory.FinitaryFamily
 

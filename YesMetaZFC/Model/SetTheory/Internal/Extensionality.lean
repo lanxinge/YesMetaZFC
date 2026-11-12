@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.Compiler
-import YesMetaZFC.Model.SetTheory.Internal.EmbeddingComposition
+import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
+import YesMetaZFC.Model.SetTheory.Embedding.Range
 import YesMetaZFC.SetTheory.Collapse.RelationIso
 
 /-! # 内部等号与外延性的保持

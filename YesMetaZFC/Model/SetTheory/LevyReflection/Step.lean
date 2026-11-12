@@ -115,7 +115,7 @@ theorem Lr_next_d.cover_l (hZF : M.Models ZF) {Φ X Y} (h : Lr_next_d I Φ X Y) 
   subst V
   obtain ⟨hzY, hZ⟩ := (hS Z).mp hz
   obtain ⟨hXZ, hstep⟩ := (lr_cover_sat_l Φ _ Z).mp hZ
-  exact ⟨⟨α, hy⟩, ZF.v_transitive_l I hZF hy Z hzY X hXZ,
-    hstep.mono_l (fun _ h => h) (ZF.v_transitive_l I hZF hy Z hzY)⟩
+  exact ⟨⟨α, hy⟩, v_transitive_l I hy Z hzY X hXZ,
+    hstep.mono_l (fun _ h => h) (v_transitive_l I hy Z hzY)⟩
 
 end YesMetaZFC.SetTheory

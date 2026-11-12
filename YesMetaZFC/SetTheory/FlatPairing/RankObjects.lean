@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.FlatPairing.Finite
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 后继秩层中的实际结构、赋值和编码轨道
 

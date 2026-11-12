@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Generic.Projection
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Congruence
+import YesMetaZFC.Model.Forcing.Truth.OrderCongruence
 
 /-! # 第二阶段稠密集的地模型提升
 

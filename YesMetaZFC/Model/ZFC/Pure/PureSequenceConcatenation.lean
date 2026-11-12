@@ -54,12 +54,12 @@ theorem choice_unique (hℳ : Theory.Models ℳ theory) {left right input first 
   rcases hFirst with ⟨hInput,hFirst⟩ | ⟨i,hi,hInput,hFirst⟩
   · rcases hSecond with ⟨_,hSecond⟩ | ⟨j,hj,hIndex,hSecond⟩
     · exact hFirst.trans hSecond.symm
-    · exact False.elim (add_not_mem_left hℳ hLeft.2 ((omega_project hℳ).transitive (project_modelsZF hℳ) _ hRight.2 j hj) (hIndex ▸ hInput))
+    · exact False.elim (add_not_mem_left hℳ hLeft.2 ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hRight.2 j hj) (hIndex ▸ hInput))
   · rcases hSecond with ⟨hIndex,hSecond⟩ | ⟨j,hj,hIndex,hSecond⟩
-    · exact False.elim (add_not_mem_left hℳ hLeft.2 ((omega_project hℳ).transitive (project_modelsZF hℳ) _ hRight.2 i hi) (hInput ▸ hIndex))
+    · exact False.elim (add_not_mem_left hℳ hLeft.2 ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hRight.2 i hi) (hInput ▸ hIndex))
     · have hEqual := add_injective hℳ hLeft.2
-        ((omega_project hℳ).transitive (project_modelsZF hℳ) _ hRight.2 i hi)
-        ((omega_project hℳ).transitive (project_modelsZF hℳ) _ hRight.2 j hj) (hInput.symm.trans hIndex)
+        ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hRight.2 i hi)
+        ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hRight.2 j hj) (hInput.symm.trans hIndex)
       exact hFirst.trans ((congrArg (value hℳ right) hEqual).trans hSecond.symm)
 
 def Concats (hℳ : Theory.Models ℳ theory) (left right output : Carrier ℳ) : Prop :=

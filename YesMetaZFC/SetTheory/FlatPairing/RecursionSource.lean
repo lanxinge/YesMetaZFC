@@ -16,7 +16,7 @@ local notation "J" => fp_rank_interpretation_l I hZF hω hW hωY
 theorem rt_fp_domain_l (A F : (N).Domain) :
     (N).IsDomainOf J A F ↔ M.IsDomainOf K A.val F.val := by
   have entry := rt_fp_entry_l I hZF hω hW hωY
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   constructor
   · intro h x
     constructor

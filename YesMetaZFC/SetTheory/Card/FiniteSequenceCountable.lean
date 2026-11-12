@@ -17,7 +17,7 @@ variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpreta
 theorem fseq_bound_l (hZF : M.Models ZF) {ω κ X S} (hω : M.IsOmega ω)
     (hκ : M.IsInfiniteCardinal I ω κ)
     (hX : M.CardinalLessOrEqual I X κ) (hS : Fseq_space_d I ω X S) : M.CardinalLessOrEqual I S κ := by
-  have hωκ := hω.subset_limitOrdinal hZF
+  have hωκ := hω.subset_limitOrdinal (ZF.modelsKP hZF)
     (infiniteCardinal_isLimitOrdinal hZF I hω (omega_cardinal_l I hZF hω) hκ)
   obtain ⟨Q, hQ⟩ := hX
   obtain ⟨W, hW⟩ := exists_cartesianProduct hZF I κ κ
@@ -97,7 +97,7 @@ theorem fseq_ordinal_bound_l (hZF : M.Models ZF) {ω μ A K : M.Domain} (hω : M
   obtain ⟨δ, ho, hs⟩ := KP.ordinal_successor_l (modelsKP hZF) hμ
   have hμδ := hs.predecessor_mem
   obtain ⟨ν, hν, inf, ⟨g, hg⟩, _⟩ := common_cardinal_l I hZF ho
-    (ordinal_down_l (modelsKP hZF) (hω.isOrdinal hZF) ho hw hμδ) hμδ hμδ
+    (ordinal_down_l (modelsKP hZF) (hω.isOrdinal (ZF.modelsKP hZF)) ho hw hμδ) hμδ hμδ
   obtain ⟨e, he⟩ := ha
   obtain ⟨q, hq⟩ := fseq_bound_l I hZF hω inf (exists_compositionInjection hZF I he hg) seq
   have sub : M.MemberSubset ν μ := ((hs ν).mp hν).elim (hμ.transitive ν) (fun eq x hx => (eq x).mp hx)

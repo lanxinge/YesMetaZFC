@@ -15,3 +15,4 @@
 | [Construction.lean](Construction.lean) | `InternalNameMapConstruction.lean` | 原 ZF 内的名称搬运存在定理 |
 | [Composition.lean](Composition.lean) | `InternalNameMapComposition.lean` | 名称搬运与标签关系复合 |
 | [Identity.lean](Identity.lean) | `InternalNameMapIdentity.lean` | 恒等搬运与零标签消去 |
+| [Check.lean](Check.lean) | — | 规范名称的基标签随实际名字搬运图移动 |

@@ -15,7 +15,7 @@ theorem vr_cross_l (hZF : M.Models ZF) {X Y L U V : M.Domain}
     (rx : Vr_d X L U) (ry : Vr_d Y L V) (inside : M.MemberSubset U Y)
     (subsets : ∀ A, M.mem A U → ∀ t, M.mem t Y → M.MemberSubset t A → M.mem t X) : U = V := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  have ut := rx.transitive_l hZF hX hU
+  have ut := rx.transitive_l hX hU
   obtain ⟨B, F, hB, _, hx⟩ := rx
   obtain ⟨C, G, hC, _, hy⟩ := ry
   have ff := (hx U hU).2.1

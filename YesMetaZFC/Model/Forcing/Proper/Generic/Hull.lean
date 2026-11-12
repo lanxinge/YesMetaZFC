@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.Construction
+import YesMetaZFC.Model.Forcing.Names.PairConstruction
 
 /-! # 内部集合中名称的泛型像 N[G]
 

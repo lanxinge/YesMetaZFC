@@ -53,18 +53,18 @@ theorem specification_correct (hℳ : Theory.Models ℳ theory) {subset : Carrie
       (E hℳ).relation .isOrderIsomorphic (.cons (epsilon hℳ subset) (.cons subset (.cons (epsilon hℳ output) (.cons output .nil))))) ∧
     (¬ (E hℳ).relation .isBoundedSubset (.cons subset (.cons (epsilon hℳ ((E hℳ).function .omega .nil)) (.cons ((E hℳ).function .omega .nil) .nil))) → output = (E hℳ).function .omega .nil))) ↔ _
   rw [omega_eq hℳ,PureNaturalDifferenceStage.function_from_difference hℳ .successor rfl,bounded_correct hℳ hSubset]
-  have hLinear := epsilon_linear hℳ ((omega_project hℳ).isOrdinal (project_modelsZF hℳ)) hSubset
+  have hLinear := epsilon_linear hℳ ((omega_project hℳ).isOrdinal (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ))) hSubset
   constructor
   · rintro ⟨hOutput,hBounded,hUnbounded⟩
     refine ⟨hOutput,?_,hUnbounded⟩
     intro hB
     have hData := hBounded hB
-    exact ⟨hData.1,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) output hData.1)).mp hData.2⟩
+    exact ⟨hData.1,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) output hData.1)).mp hData.2⟩
   · rintro ⟨hOutput,hBounded,hUnbounded⟩
     refine ⟨hOutput,?_,hUnbounded⟩
     intro hB
     have hData := hBounded hB
-    exact ⟨hData.1,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) output hData.1)).mpr hData.2⟩
+    exact ⟨hData.1,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) output hData.1)).mpr hData.2⟩
 
 def body : Formula ℒ [] [setSort,setSort] := openFormula PureNaturalDifferenceStage.interpretation (.conj guard specification)
 def graph : Formula ℒ [] [setSort,setSort] := _root_.YesMetaZFC.Automation.TotalizedGraph.formula body PureRelationFunctions.emptyFallback
@@ -108,7 +108,7 @@ theorem functional (hℳ : Theory.Models ℳ theory) (subset : Carrier ℳ) :
   by_cases hBounded : Bounded hℳ subset
   · obtain ⟨hFirst,f,hFIso⟩ := hF.2.2.1 hBounded
     obtain ⟨hSecond,g,hGIso⟩ := hS.2.2.1 hBounded
-    exact natural_type_unique hℳ (epsilon_linear hℳ ((omega_project hℳ).isOrdinal (project_modelsZF hℳ)) hF.1)
+    exact natural_type_unique hℳ (epsilon_linear hℳ ((omega_project hℳ).isOrdinal (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ))) hF.1)
       (PureBoundedNaturalOrder.least_on_subset hℳ hF.1) hFirst hSecond hFIso hGIso
   · exact (hF.2.2.2 hBounded).trans (hS.2.2.2 hBounded).symm
 

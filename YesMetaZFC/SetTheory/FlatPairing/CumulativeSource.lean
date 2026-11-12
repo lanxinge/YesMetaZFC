@@ -22,7 +22,7 @@ local notation "J" => fp_rank_interpretation_l I hZF hω hW hωY
 /-- 相对历史由实际图拥有；比较不要求源内拥有重编码后的辅助图。 -/
 theorem rt_fp_v_up_l
     (α A : (N).Domain) (h : V_d J α A) : V_d Q α.val A.val := by
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   have entry := rt_fp_entry_l I hZF hω hW hωY
   obtain ⟨F, history, root⟩ := h
   have ho := (rt_ordinal_iff_l trans (Nonempty.intro (Subtype.mk ω hωY)) (ZF.modelsKP hZF) α).mp history.1.1
@@ -62,15 +62,15 @@ theorem rt_fp_v_up_l
 /-- 平坦历史以 max(ω, α) 为界，故属于任何包含 ω、α 的秩层。 -/
 theorem rt_fp_v_down_l
     (α A : (N).Domain) (h : V_d Q α.val A.val) : V_d J α A := by
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   have entry := rt_fp_entry_l I hZF hω hW hωY
   have ho := v_ordinal_l Q h
   have bound : ∃ γ, M.IsOrdinal γ ∧ M.MemberSubset ω γ ∧ M.MemberSubset α.val γ ∧ M.mem γ Y := by
-    rcases (hω.isOrdinal hZF).trichotomy hZF.1 ho (KP.difference_exists_d (ZF.modelsKP hZF))
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).trichotomy hZF.1 ho (KP.difference_exists_d (ZF.modelsKP hZF))
         (KP.intersection_exists_d (ZF.modelsKP hZF) ω α.val) with eq | lt | gt
     · exact ⟨α.val, ho, fun x hx => (eq x).mp hx, fun _ h => h, α.property⟩
     · exact ⟨α.val, ho, ho.transitive ω lt, fun _ h => h, α.property⟩
-    · exact ⟨ω, hω.isOrdinal hZF, fun _ h => h, (hω.isOrdinal hZF).transitive α.val gt, hωY⟩
+    · exact ⟨ω, hω.isOrdinal (ZF.modelsKP hZF), fun _ h => h, (hω.isOrdinal (ZF.modelsKP hZF)).transitive α.val gt, hωY⟩
   obtain ⟨γ, hγ, hωγ, hαγ, hγY⟩ := bound
   obtain ⟨X, hV⟩ := ZF.v_exists_l I hZF hγ
   have hXY := ZF.v_mem_l I hZF hV hW (ZF.v_ordinal_height_l hZF hW hγ hγY)
@@ -82,7 +82,7 @@ theorem rt_fp_v_down_l
       hV (hαγ β hβ), he⟩⟩
   have hFX := fp_function_rank_l I hZF hω hV hωγ
     (fun β hβ => ZF.v_ordinal_mem_l I hZF hV (hαγ β hβ)) fn
-  let F' : (N).Domain := ⟨F, ZF.v_subset_mem_l I hZF hW hXY hFX⟩
+  let F' : (N).Domain := ⟨F, v_subset_mem_l I hW hXY hFX⟩
   have fn' := (rt_fp_function_from_l I hZF hω hW hωY F' α ⟨X, hXY⟩).mpr fn
   have step (P W : (N).Domain) (hp : V_step_d K P.val W.val) : V_step_d J P W := by
     intro t
@@ -100,7 +100,7 @@ theorem rt_fp_v_down_l
     intro p hp
     obtain ⟨x, y, cp⟩ := cut.1 p hp
     exact hFX p (history.1.2.1.1.mem_iff_pairMember.mpr ⟨x, y, cp, ((cut.2 x y).mp ⟨p, cp, hp⟩).2⟩)
-  let P' : (N).Domain := ⟨P, ZF.v_subset_mem_l I hZF hW hXY hPX⟩
+  let P' : (N).Domain := ⟨P, v_subset_mem_l I hW hXY hPX⟩
   exact ⟨P', (rt_fp_restriction_l I hZF hω hW hωY P' F' β).mpr cut, step P' U hP⟩
 
 theorem rt_fp_v_l

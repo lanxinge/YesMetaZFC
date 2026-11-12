@@ -1,6 +1,6 @@
 import YesMetaZFC.SetTheory.InnerModel.Condensation.Collapse
-import YesMetaZFC.Model.SetTheory.Internal.Sigma1Substructure
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryHull
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
 
 /-! # 内部初等结构与实际 Skolem 壳的凝聚入口 -/
 
@@ -32,7 +32,7 @@ theorem jc_countable_hull_l (hZFC : M.Models ZFC) {ω a U A : M.Domain} (hω : M
   obtain ⟨X, d, S, B, F, j, e, T, hs, hAX, hx, he, hB, hf, hcB, hp, ht, hk⟩ :=
     Internal.selem_hull_collapse_l hZFC hω (jh_value_transitive_l (ZF.models_kpi_l hZF) hU) ⟨hm, hr⟩ hA hc
   obtain ⟨b, B', F', hb, hf', _⟩ := jc_internal_l I hZF hω ha hU ⟨hm, hr⟩ hs he
-  have eq := (mc_iso_unique_l (ZF.models_kpi_l hZF) hf hf' hB
+  have eq := (mc_map_unique_l (ZF.models_kpi_l hZF) hf.toMc_map_d hf'.toMc_map_d hB
     (jh_value_transitive_l (ZF.models_kpi_l hZF) hb.2)).1
   exact ⟨X, b, B, F, j, c, R, e, T, hAX, hs.subset, hx, hcB, eq.symm ▸ hb, hf, hp, ⟨hm, hr⟩, ht, hk⟩
 

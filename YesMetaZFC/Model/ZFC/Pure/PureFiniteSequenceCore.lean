@@ -80,21 +80,21 @@ theorem add_parts (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     membership ℳ input (add hℳ left right) ↔ membership ℳ input left ∨
       ∃ index, membership ℳ index right ∧ input = add hℳ left index := by
   apply (_root_.YesMetaZFC.SetTheory.ZF.ordinalAddition_mem_iff (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) right hRight) (add_ordinal hℳ hLeft hRight)).trans
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) right hRight) (add_ordinal hℳ hLeft hRight)).trans
   apply or_congr Iff.rfl
   constructor
   · rintro ⟨index,hIndex,hValue⟩
-    have hIndexOmega := (omega_project hℳ).transitive (project_modelsZF hℳ) right hRight index hIndex
+    have hIndexOmega := (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) right hRight index hIndex
     exact ⟨index,hIndex,PureOrdinalArithmetic.ordinal_unique hℳ .addition hLeft hIndexOmega hValue (add_ordinal hℳ hLeft hIndexOmega)⟩
   · rintro ⟨index,hIndex,hEqual⟩
-    exact ⟨index,hIndex,hEqual.symm ▸ add_ordinal hℳ hLeft ((omega_project hℳ).transitive (project_modelsZF hℳ) right hRight index hIndex)⟩
+    exact ⟨index,hIndex,hEqual.symm ▸ add_ordinal hℳ hLeft ((omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) right hRight index hIndex)⟩
 
 theorem add_not_mem_left (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) : ¬ membership ℳ (add hℳ left right) left := by
   intro hLess
-  have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) left hLeft
+  have hOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) left hLeft
   rcases _root_.YesMetaZFC.SetTheory.ZF.ordinalAddition_left_eq_or_mem (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) right hRight) (add_ordinal hℳ hLeft hRight) with hEqual | hMember
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) right hRight) (add_ordinal hℳ hLeft hRight) with hEqual | hMember
   · have hSelf : membership ℳ left left := (congrArg (fun x => membership ℳ x left) hEqual).mpr hLess
     exact hOrdinal.wellOrder.linear.irrefl left hSelf hSelf
   · have hSelf := hOrdinal.transitive _ hLess left hMember
@@ -104,9 +104,9 @@ theorem add_injective (hℳ : Theory.Models ℳ theory) {left first second : Car
     (hLeft : membership ℳ left (omega hℳ)) (hFirst : membership ℳ first (omega hℳ)) (hSecond : membership ℳ second (omega hℳ))
     (hEqual : add hℳ left first = add hℳ left second) : first = second :=
   _root_.YesMetaZFC.SetTheory.ZF.ordinalAddition_right_injective (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) left hLeft)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) first hFirst)
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) second hSecond)
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) left hLeft)
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) first hFirst)
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) second hSecond)
     (hEqual ▸ add_ordinal hℳ hLeft hFirst) (add_ordinal hℳ hLeft hSecond)
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureFiniteSequenceCore

@@ -27,7 +27,7 @@ theorem greatest_of_bounded (hℳ : Theory.Models ℳ theory) {subset bound : Ca
   obtain ⟨uppers,hUppers⟩ := PureSeparation.exists_subset hℳ upperCondition (.cons subset .nil) (omega hℳ)
   have hU (candidate : Carrier ℳ) : membership ℳ candidate uppers ↔ membership ℳ candidate (omega hℳ) ∧
       ∀ input, membership ℳ input subset → membership ℳ input candidate := hUppers candidate
-  obtain ⟨least,hLeast,hMinimal⟩ := (omega_project hℳ).membershipWellOrder (project_modelsZF hℳ) |>.least
+  obtain ⟨least,hLeast,hMinimal⟩ := (omega_project hℳ).membershipWellOrder (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) |>.least
     uppers (fun input hInput => ((hU input).mp hInput).1) ⟨bound,(hU bound).mpr ⟨hBound,hSubset⟩⟩
   have hLeastData := (hU least).mp hLeast
   have hLeastNonempty : ∃ input, membership ℳ input least := by
@@ -39,7 +39,7 @@ theorem greatest_of_bounded (hℳ : Theory.Models ℳ theory) {subset bound : Ca
   have hPreviousLeast : membership ℳ previous least := hEqual.symm ▸ (succ_spec hℳ previous previous).mpr (Or.inr rfl)
   have hPreviousNotUpper : ¬ membership ℳ previous uppers := by
     intro hUpper
-    have hLeastOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) least hLeastData.1
+    have hLeastOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) least hLeastData.1
     rcases hMinimal previous hUpper with hSame | hLess
     · have hSameEq := (project_models hℳ).1.eq_of_same_members least previous hSame
       have hSelf : membership ℳ least least := (congrArg (fun input => membership ℳ input least) hSameEq).mpr hPreviousLeast
@@ -66,7 +66,7 @@ theorem greatest_of_bounded (hℳ : Theory.Models ℳ theory) {subset bound : Ca
 theorem least_on_subset (hℳ : Theory.Models ℳ theory) {carrier : Carrier ℳ}
     (hSubset : ∀ input, membership ℳ input carrier → membership ℳ input (omega hℳ)) : Extremes (epsilon hℳ carrier) carrier false := by
   intro subset hSubsetCarrier hNonempty
-  obtain ⟨least,hLeast,hMinimal⟩ := (omega_project hℳ).membershipWellOrder (project_modelsZF hℳ) |>.least
+  obtain ⟨least,hLeast,hMinimal⟩ := (omega_project hℳ).membershipWellOrder (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) |>.least
     subset (fun input hInput => hSubset input (hSubsetCarrier input hInput)) hNonempty
   refine ⟨least,hLeast,fun input hInput hNe => ?_⟩
   apply (epsilon_correct hℳ carrier least input).mpr
@@ -79,8 +79,8 @@ theorem natural_order (hℳ : Theory.Models ℳ theory) {carrier bound : Carrier
     (hBound : membership ℳ bound (omega hℳ))
     (hSubset : ∀ input, membership ℳ input carrier → membership ℳ input bound) :
     Linear (epsilon hℳ carrier) carrier ∧ Extremes (epsilon hℳ carrier) carrier true ∧ Extremes (epsilon hℳ carrier) carrier false := by
-  have hOmegaSubset := fun input hInput => (omega_project hℳ).transitive (project_modelsZF hℳ) bound hBound input (hSubset input hInput)
-  refine ⟨epsilon_linear hℳ ((omega_project hℳ).isOrdinal (project_modelsZF hℳ)) hOmegaSubset,?_,least_on_subset hℳ hOmegaSubset⟩
+  have hOmegaSubset := fun input hInput => (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) bound hBound input (hSubset input hInput)
+  refine ⟨epsilon_linear hℳ ((omega_project hℳ).isOrdinal (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ))) hOmegaSubset,?_,least_on_subset hℳ hOmegaSubset⟩
   intro subset hSubsetCarrier hNonempty
   obtain ⟨greatest,hGreatest,hMaximal⟩ := greatest_of_bounded hℳ hBound
     (fun input hInput => hSubset input (hSubsetCarrier input hInput)) hNonempty

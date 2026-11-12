@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.InnerModel.Jensen.Class
-import YesMetaZFC.Model.SetTheory.Internal.Numeral
+import YesMetaZFC.Model.SetTheory.Internal.Quotient
 import YesMetaZFC.SetTheory.InnerModel.Order.Coordinates
 
 /-! # 携带序数参数的 J 构造推导码

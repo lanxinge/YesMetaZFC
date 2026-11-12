@@ -56,7 +56,7 @@ theorem body_correct (hℳ : Theory.Models ℳ theory) (left right output : Carr
 theorem compare (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hRight : membership ℳ right (omega hℳ)) :
     membership ℳ left right ∨ right = left ∨ membership ℳ right left := by
-  rcases (omega_project hℳ).membershipWellOrder (project_modelsZF hℳ) |>.linear.compare left hLeft right hRight with hEqual | hLess | hGreater
+  rcases (omega_project hℳ).membershipWellOrder (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) |>.linear.compare left hLeft right hRight with hEqual | hLess | hGreater
   · exact Or.inr (Or.inl ((project_models hℳ).1.eq_of_same_members left right hEqual).symm)
   · exact Or.inl hLess
   · exact Or.inr (Or.inr hGreater)
@@ -64,7 +64,7 @@ theorem compare (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
 theorem branches_disjoint (hℳ : Theory.Models ℳ theory) {left right : Carrier ℳ}
     (hLeft : membership ℳ left (omega hℳ)) (hLess : membership ℳ left right)
     (hOther : right = left ∨ membership ℳ right left) : False := by
-  have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) left hLeft
+  have hOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) left hLeft
   rcases hOther with hEqual | hReverse
   · have hSelf : membership ℳ left left := hEqual ▸ hLess
     exact hOrdinal.wellOrder.linear.irrefl left hSelf hSelf

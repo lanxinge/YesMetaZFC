@@ -1,6 +1,6 @@
-import YesMetaZFC.Model.SetTheory.Internal.TransitiveSequence
-import YesMetaZFC.Model.SetTheory.Internal.FlatProgram
-import YesMetaZFC.Model.SetTheory.Internal.FormulaCode
+import YesMetaZFC.Model.SetTheory.Reflection.TransitiveSequence
+import YesMetaZFC.Model.SetTheory.Types.FlatSatisfaction
+import YesMetaZFC.Model.SetTheory.Internal.Theory
 
 /-! # 原有 Kuratowski 程序在传递子源中的语法绝对性 -/
 namespace YesMetaZFC.SetTheory.Internal

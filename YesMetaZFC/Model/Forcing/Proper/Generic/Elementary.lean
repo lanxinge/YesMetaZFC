@@ -1,8 +1,8 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.OperationLift
 import YesMetaZFC.Model.Forcing.Proper.Generic.Sequence
-import YesMetaZFC.Model.Forcing.Internal.Ground.Syntax
-import YesMetaZFC.Model.SetTheory.Internal.MembershipSkolem
-import YesMetaZFC.Model.SetTheory.Internal.Elementary
+import YesMetaZFC.Model.Forcing.Ground.TreeShift
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
+import YesMetaZFC.Model.SetTheory.Embedding.Elementary
 
 /-! # N[G] 对全部内部公式码的初等提升
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.Flip
-import YesMetaZFC.Model.Forcing.Internal.Homogeneous.Basic
+import YesMetaZFC.Model.Forcing.Homogeneous.HOD
 
 /-! # 任意添加量 Cohen 力迫的弱齐性
 

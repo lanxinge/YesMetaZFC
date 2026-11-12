@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Class
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Pool
+import YesMetaZFC.Model.Forcing.Maximum.UniqueRules
 
 /-! # 地模型内的二步条件集与序关系装配 -/
 

@@ -41,7 +41,7 @@ theorem tag_injective (hℳ : Theory.Models ℳ theory) {first second : Kind} (h
     have hSelf : membership ℳ (succ hℳ (zero hℳ)) (succ hℳ (zero hℳ)) :=
       (congrArg (membership ℳ (succ hℳ (zero hℳ))) h.symm).mp
         ((succ_spec hℳ (succ hℳ (zero hℳ)) (succ hℳ (zero hℳ))).mpr (Or.inr rfl))
-    have hOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ (succ_mem hℳ (zero_mem hℳ))
+    have hOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ (succ_mem hℳ (zero_mem hℳ))
     exact hOrdinal.wellOrder.linear.irrefl _ hSelf hSelf
   have hTerm : tag hℳ .term = zero hℳ := zero_eq hℳ
   have hList : tag hℳ .termList = succ hℳ (zero hℳ) := by

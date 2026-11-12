@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.OrdinalSubsets
-import YesMetaZFC.Model.Forcing.Internal.Homogeneous.HOD
+import YesMetaZFC.Model.Forcing.Homogeneous.HOD
 
 /-! # Cohen 扩张的 HOD 比较实例
 

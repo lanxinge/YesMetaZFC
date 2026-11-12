@@ -154,7 +154,7 @@ theorem ordinalExponentiation_exists_leadingExponent
         ℳ.IsOrdinalExponentiation 𝕀
           successorPower ω successor ∧ (power = α ∨ ℳ.mem power α) ∧
         ℳ.mem α successorPower := by
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases hω.exists_ordinalOne_mem with
     ⟨one, hOne, hOneOmega⟩
   rcases KP.exists_successor (ZF.modelsKP hZF) α with
@@ -338,7 +338,7 @@ theorem ordinalExponentiation_leadingExponent_unique
       secondPower = α ∨ ℳ.mem secondPower α) (hαSecondSuccessorPower :
       ℳ.mem α secondSuccessorPower) :
     firstExponent = secondExponent := by
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases hω.exists_ordinalOne_mem with
     ⟨one, hOne, hOneOmega⟩
   have hFirstSuccessorOrdinal :=
@@ -507,7 +507,7 @@ theorem ordinalDivision_omegaPower_quotient_mem_omega
         α power quotient remainder) :
     ℳ.mem quotient ω ∧
       ∃ member, ℳ.mem member quotient := by
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   have hSuccessorOrdinal :=
     KP.successor_isOrdinal (ZF.modelsKP hZF)
       hExponent hSuccessor
@@ -715,7 +715,7 @@ theorem cantorNormalFormBelow_exists_leadingTerm_of_length_nonempty
     hExponents.1.2 previousLength hPreviousLengthLength
       exponent hExponentValue
   have hCoefficientOrdinal :=
-    hω.members_areOrdinals hZF
+    hω.members_areOrdinals (ZF.modelsKP hZF)
       coefficient hCoefficientOmega
   have hDivision :
       ℳ.IsOrdinalDivision 𝕀
@@ -727,7 +727,7 @@ theorem cantorNormalFormBelow_exists_leadingTerm_of_length_nonempty
   have hSuccessorOrdinal :=
     KP.successor_isOrdinal (ZF.modelsKP hZF)
       hExponentOrdinal hSuccessor
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases ordinalExponentiation_existsUnique hZF
       𝕀 hωOrdinal hSuccessorOrdinal with
     ⟨successorPower, hSuccessorPower, _⟩
@@ -1075,7 +1075,7 @@ theorem cantorNormalFormBelow_length_empty_of_ordinal_empty
     ⟨_, exponent, _, _, power, _, _,
       _, _, _, _, _, hExponent, _, _, hPower, _,
       _, _, hPowerLeOrdinal, _⟩
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases hω.exists_ordinalOne_mem with
     ⟨one, _, hOneOmega⟩
   have hPowerNonempty :=
@@ -1205,7 +1205,7 @@ theorem exists_cantorNormalForm_of_remainder
       ℳ.IsCantorNormalForm 𝕀
         ω α newLength
         newExponents newCoefficients newValues := by
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases hω.exists_ordinalOne_mem with
     ⟨one, hOne, hOneOmega⟩
   have hQuotientData :=
@@ -1511,7 +1511,7 @@ theorem cantorNormalForm_exists
         ⟨exponent, successor, power, successorPower,
           hExponent, hSuccessor, hPower, hSuccessorPower,
           hPowerLeCurrent, hCurrentSuccessorPower⟩
-      have hωOrdinal := hω.isOrdinal hZF
+      have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
       have hPowerOrdinal :=
         ordinalExponentiation_isOrdinal hZF 𝕀
           hωOrdinal hExponent hPower
@@ -1649,7 +1649,7 @@ theorem cantorNormalFormBelow_unique
             hSecondPower hSecondSuccessorPower
             hSecondPowerLeCurrent hCurrentSecondSuccessorPower
         subst secondExponent
-        have hωOrdinal := hω.isOrdinal hZF
+        have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
         have hPowerEq : firstPower = secondPower := by
           rcases ordinalExponentiation_existsUnique hZF
               𝕀 hωOrdinal hFirstExponent with

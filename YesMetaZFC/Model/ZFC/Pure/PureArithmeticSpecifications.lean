@@ -33,21 +33,21 @@ theorem succ_mem (hℳ : Theory.Models ℳ theory) {input : Carrier ℳ} (hInput
 theorem input_mem_omega (hℳ : Theory.Models ℳ theory) {length input : Carrier ℳ}
     (hLength : membership ℳ length (omega hℳ)) (hInput : membership ℳ input (succ hℳ length)) :
     membership ℳ input (omega hℳ) :=
-  (omega_project hℳ).transitive (project_modelsZF hℳ) (succ hℳ length) (succ_mem hℳ hLength) input hInput
+  (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) (succ hℳ length) (succ_mem hℳ hLength) input hInput
 
 theorem zero_mem_successor (hℳ : Theory.Models ℳ theory) {length : Carrier ℳ}
     (hLength : membership ℳ length (omega hℳ)) : membership ℳ (zero hℳ) (succ hℳ length) :=
   _root_.YesMetaZFC.SetTheory.Structure.IsOrdinal.empty_mem_of_nonempty
     (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ))
-    ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ (succ_mem hℳ hLength))
+    ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ (succ_mem hℳ hLength))
     ⟨length,(succ_spec hℳ length length).mpr (Or.inr rfl)⟩ (zero_spec hℳ)
 
 theorem successor_mem_successor (hℳ : Theory.Models ℳ theory) {length input : Carrier ℳ}
     (hLength : membership ℳ length (omega hℳ)) (hInput : membership ℳ input length) :
     membership ℳ (succ hℳ input) (succ hℳ length) := by
-  have hInputOmega := (omega_project hℳ).transitive (project_modelsZF hℳ) length hLength input hInput
-  have hLengthOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) length hLength
-  have hSuccOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ (succ_mem hℳ hInputOmega)
+  have hInputOmega := (omega_project hℳ).transitive (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength input hInput
+  have hLengthOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) length hLength
+  have hSuccOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ (succ_mem hℳ hInputOmega)
   have hSubset : (Project.FirstOrderSemantics.reduct ℳ).MemberSubset (succ hℳ input) length := by
     intro member hMember
     rcases (succ_spec hℳ input member).mp hMember with hLess | rfl
@@ -65,7 +65,7 @@ theorem ordinal_zero_value (hℳ : Theory.Models ℳ theory) (operation : Operat
     {base output : Carrier ℳ} (hBase : membership ℳ base (omega hℳ))
     (hOutput : OrdinalValue hℳ operation output base (zero hℳ)) :
     output = PureArithmeticRecurrence.seed hℳ operation base := by
-  have hBaseOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) base hBase
+  have hBaseOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) base hBase
   cases operation with
   | addition => exact (_root_.YesMetaZFC.SetTheory.ZF.ordinalAddition_zero_iff
       (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ) (zero_spec hℳ)).mp hOutput
@@ -85,8 +85,8 @@ theorem ordinal_step_value (hℳ : Theory.Models ℳ theory) (operation : Operat
     (hCurrent : OrdinalValue hℳ operation current base input)
     (hNext : OrdinalValue hℳ operation next base (succ hℳ input)) :
     next = PureArithmeticStage.step hℳ operation base base current := by
-  have hBaseOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) base hBase
-  have hInputOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) input hInput
+  have hBaseOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) base hBase
+  have hInputOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) input hInput
   have hCurrentOmega := closed hℳ operation hBase hInput hCurrent
   cases operation with
   | addition =>

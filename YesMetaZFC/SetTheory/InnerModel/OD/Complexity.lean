@@ -56,7 +56,7 @@ theorem od_rank_complete_l (hZF : M.Models ZF) {x : M.Domain} (h : Od_d x) :
   obtain ⟨A, hA⟩ := KP.exists_pair (ZF.modelsKP hZF) q x
   let φ := od_eval_s kpair_convention_l
   obtain ⟨a, X, hX, _, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
-  have ht := ZF.v_transitive_l I hZF hX
+  have ht := v_transitive_l I hX
   have hqX := ht A hAX q ((hA q).mpr (Or.inl rfl))
   have hxX := ht A hAX x ((hA x).mpr (Or.inr rfl))
   obtain ⟨c, R, hM, hR⟩ := smdl_membership_l I hZF ⟨x, hxX⟩

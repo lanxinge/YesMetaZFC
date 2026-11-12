@@ -39,36 +39,59 @@ theorem nmap_identity_l (hZF : M.Models ZF)
     obtain ⟨w, hw, hws⟩ := hab
     exact kpair_unique_l M hZF.1 hw hv ▸ hws
 
-theorem nmap_id_force_l (O : Cond_order_d M B R z) (hZF : M.Models ZF)
-    (hF : ∀ b c, Entry_d M b c F ↔ M.mem b B ∧ b ≠ z ∧ c = b)
-    {x t p} (hx : Name_d M B x) (ht : Nmap_d M F x t) (hp : M.mem p B) :
+/-- 将每个标签替换为其下方的内部预稠密族，保持全部名称的力迫值。 -/
+theorem nmap_refine_below_l (O : Cond_order_d M B R z) (hZF : M.Models ZF) {b₀ : M.Domain} (hb₀ : M.mem b₀ B)
+    (bound : ∀ b c, Entry_d M b c F → M.mem b B ∧ Below_d M B R z c b)
+    (dense : ∀ b, M.mem b B → b ≠ z → ∀ r, Below_d M B R z r b → Below_d M B R z r b₀ →
+      ∃ c v, Entry_d M b c F ∧ Below_d M B R z v r ∧ Entry_d M v c R)
+    {x t p} (hx : Name_d M B x) (ht : Nmap_d M F x t) (hp : M.mem p B) (pb : Entry_d M p b₀ R) :
     Eq_force_d M B R z p x t := by
   let hI : Mem_ind_d M := check_ind_l M hZF
   let hP := KP.exists_pair (ZF.modelsKP hZF)
-  have htN := nmap_name_l M hZF (fun b c hc => by
-    obtain ⟨hb, _, he⟩ := (hF b c).mp hc
-    exact he.symm ▸ hb) ht
+  have htN := nmap_name_l M hZF (fun b c hc => (bound b c hc).2.1) ht
   obtain ⟨S, hxS, htS, hS⟩ := name_support_l M hP (KP.exists_union (ZF.modelsKP hZF)) hx htN
-  let ρ : Env M 1 := ⟨fun _ => F, fun _ => F⟩
-  let φ : BinarySchema 2 := { body := nmap_m (.bound 3) (.bound 1) .newest }
+  let ρ : Env M 3 := ⟨fun i => [F,R,b₀].get i,fun _ => F⟩
+  let φ : BinarySchema 4 := {
+    body := .conj (entry_m (.bound 2) (.bound 5) (.bound 4)) (nmap_m (.bound 3) (.bound 1) .newest) }
   obtain ⟨K, hK⟩ := rel_separation_l hZF φ ρ B S
-  have hk q s u : Rel_d M K q s u ↔ M.mem q B ∧ M.mem s S ∧ M.mem u S ∧ Nmap_d M F s u := by
-    simpa only [BinarySchema.denote, φ, nmap_sat_l M hZF.1] using! hK q s u
-  refine ⟨hp, K, ?_, (hk p x t).mpr ⟨hp, hxS, htS, ht⟩⟩
+  have hk q s u : Rel_d M K q s u ↔ M.mem q B ∧ M.mem s S ∧ M.mem u S ∧ Entry_d M q b₀ R ∧ Nmap_d M F s u := by
+    simpa only [BinarySchema.denote,φ,Formula.satisfies_conj_iff,entry_sat_l M hZF.1,nmap_sat_l M hZF.1] using! hK q s u
+  refine ⟨hp, K, ?_, (hk p x t).mpr ⟨hp, hxS, htS, pb, ht⟩⟩
   intro q s u h
-  obtain ⟨_, hs, hu, hm⟩ := (hk q s u).mp h
+  obtain ⟨hq, hs, hu, qb, hm⟩ := (hk q s u).mp h
   constructor
   · intro a b hab r hr hrb
     have hb := (supp_entry_l M hS hs hab).2
     have hbz : b ≠ z := fun he => hr.2.1 (O.zero r hr.1 (he ▸ hrb))
+    have rb := O.trans r q b₀ hr.1 hq hb₀ hr.2.2 qb
+    obtain ⟨c,v,bc,hv,vc⟩ := dense b hb hbz r ⟨hr.1,hr.2.1,hrb⟩ ⟨hr.1,hr.2.1,rb⟩
     obtain ⟨a', ha⟩ := nmap_exists_l M hZF F a
-    have ha'u := (nmap_entry_l M hZF.1 hI hP hm a' b).mpr ⟨a, b, hab, ha, (hF b b).mpr ⟨hb, hbz, rfl⟩⟩
-    exact ⟨r, a', b, below_refl_l O hr.1 hr.2.1, ha'u, hrb,
-      (hk r a a').mpr ⟨hr.1, (supp_entry_l M hS hs hab).1, (supp_entry_l M hS hu ha'u).1, ha⟩⟩
+    have ha'u := (nmap_entry_l M hZF.1 hI hP hm a' c).mpr ⟨a, b, hab, ha, bc⟩
+    exact ⟨v, a', c, hv, ha'u, vc,
+      (hk v a a').mpr ⟨hv.1, (supp_entry_l M hS hs hab).1, (supp_entry_l M hS hu ha'u).1,
+        O.trans v r b₀ hv.1 hr.1 hb₀ hv.2.2 rb,ha⟩⟩
   · intro a b hab r hr hrb
     obtain ⟨c, d, hcd, hca, hdb⟩ := (nmap_entry_l M hZF.1 hI hP hm a b).mp hab
-    have he : b = d := ((hF d b).mp hdb).2.2
-    exact ⟨r, c, d, below_refl_l O hr.1 hr.2.1, hcd, he ▸ hrb,
-      (hk r c a).mpr ⟨hr.1, (supp_entry_l M hS hs hcd).1, (supp_entry_l M hS hu hab).1, hca⟩⟩
+    have hd := bound d b hdb
+    exact ⟨r, c, d, below_refl_l O hr.1 hr.2.1, hcd, O.trans r b d hr.1 hd.2.1 hd.1 hrb hd.2.2.2,
+      (hk r c a).mpr ⟨hr.1, (supp_entry_l M hS hs hcd).1, (supp_entry_l M hS hu hab).1,
+        O.trans r q b₀ hr.1 hq hb₀ hr.2.2 qb,hca⟩⟩
+
+theorem nmap_refine_force_l (O : Cond_order_d M B R z) (hZF : M.Models ZF)
+    (bound : ∀ b c, Entry_d M b c F → M.mem b B ∧ Below_d M B R z c b)
+    (dense : ∀ b, M.mem b B → b ≠ z → ∀ r, Below_d M B R z r b →
+      ∃ c v, Entry_d M b c F ∧ Below_d M B R z v r ∧ Entry_d M v c R)
+    {x t p} (hx : Name_d M B x) (ht : Nmap_d M F x t) (hp : M.mem p B) :
+    Eq_force_d M B R z p x t :=
+  nmap_refine_below_l O hZF hp bound (fun b hb hz r hr _ => dense b hb hz r hr) hx ht hp (O.refl p hp)
+
+theorem nmap_id_force_l (O : Cond_order_d M B R z) (hZF : M.Models ZF)
+    (hF : ∀ b c, Entry_d M b c F ↔ M.mem b B ∧ b ≠ z ∧ c = b)
+    {x t p} (hx : Name_d M B x) (ht : Nmap_d M F x t) (hp : M.mem p B) :
+    Eq_force_d M B R z p x t :=
+  nmap_refine_force_l O hZF (fun b c bc => by
+    obtain ⟨hb,hz,rfl⟩ := (hF b c).mp bc
+    exact ⟨hb,below_refl_l O hb hz⟩)
+    (fun b hb hz r hr => ⟨b,r,(hF b b).mpr ⟨hb,hz,rfl⟩,below_refl_l O hr.1 hr.2.1,hr.2.2⟩) hx ht hp
 
 end YesMetaZFC.Model.Forcing.Internal

@@ -1,0 +1,225 @@
+import YesMetaZFC.Model.SetTheory.Reflection.SkolemSyntax
+import YesMetaZFC.Model.SetTheory.Internal.FiniteSource
+import YesMetaZFC.SetTheory.FinitaryHull
+import YesMetaZFC.SetTheory.Card.OrdinalCardinality
+import YesMetaZFC.Model.SetTheory.Internal.SmallSkolemSyntax
+import YesMetaZFC.SetTheory.CumulativeClosure
+
+/-! # 实际内部司寇伦函数与最小闭包
+
+原选择公理把满足关系的见证纤维统一选成一张函数图。规则域内部可数，任意无限 κ 的 κ 小种子之有限
+参数闭包仍为 κ 小。假公式的零元运算确保基点进入每个闭集，空种子同样有效。
+-/
+
+namespace YesMetaZFC.SetTheory.Internal
+open Definitional.Project
+universe u
+variable {M : Structure.{u}} {𝒞 : OrderedPairConvention} (I : 𝒞.Interpretation M)
+
+/-- 由非空内部载体及其结构码构造整张司寇伦选择图。 -/
+theorem ssk_exists_l (hZFC : M.Models ZFC) {ω X} (hω : M.IsOmega ω) (c : M.Domain)
+    (hX : ∃ x, M.mem x X) : ∃ u C S T D K, Ssk_d I ω c X u C S T D K := by
+  classical
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨u, hu⟩ := hX
+  obtain ⟨C, hC⟩ := scode_exists_l I hZF hω
+  obtain ⟨S, hS⟩ := ZF.fseq_space_exists_l I hZF hω X
+  obtain ⟨T, hT⟩ := ZF.exists_cartesianProduct hZF I C ω
+  obtain ⟨D, hD⟩ := ZF.exists_cartesianProduct hZF I T S
+  let ρ : Env M 4 := (((⟨fun _ => ω, fun _ => ω⟩ : Env M 1).push c).push X).push u
+  let φ : BinarySchema 4 := { body := ssk_choice_m (𝒞 := 𝒞) (.bound 5) (.bound 4) (.bound 3) (.bound 2) (.bound 1) .newest }
+  have hφ p x : φ.denote ρ p x ↔ Ssk_choice_d I ω c X u p x := ssk_choice_sat_l I hZF.1 _ _ _ _ _ _ _
+  obtain ⟨K, hK, hk⟩ := ZFC.uniformize_formula_l I hZFC φ ρ (X := D) (Y := X) (by
+    intro p hp
+    obtain ⟨t, ht, s, _, hps⟩ := (hD p).mp hp
+    obtain ⟨a, _, i, _, hti⟩ := (hT t).mp ht
+    by_cases he : ∃ x, M.mem x X ∧ Ssk_wit_d I ω c X u a i s x
+    · obtain ⟨x, hx, hw⟩ := he
+      exact ⟨x, hx, (hφ p x).mpr ⟨a, i, t, s, hti, hps, Or.inl hw⟩⟩
+    · exact ⟨u, hu, (hφ p u).mpr ⟨a, i, t, s, hti, hps, Or.inr ⟨he, rfl⟩⟩⟩)
+  exact ⟨u, C, S, T, D, K, hu, hC, hS, hT, hD, hK, fun p x hx => (hφ p x).mp (hk p x hx)⟩
+
+theorem Ssk_d.value_l {ω c X u C S T D K a i t s p x} (h : Ssk_d I ω c X u C S T D K)
+    (ht : I.Codes t a i) (hp : I.Codes p t s) (hx : M.PairMember I p x K) :
+    Ssk_wit_d I ω c X u a i s x ∨ ((¬ ∃ y, M.mem y X ∧ Ssk_wit_d I ω c X u a i s y) ∧ x = u) := by
+  obtain ⟨b, j, v, r, hv, hr, hs⟩ := h.select p x hx
+  obtain ⟨rfl, rfl⟩ := I.injective hp hr
+  obtain ⟨rfl, rfl⟩ := I.injective ht hv
+  exact hs
+
+/-- 对选择图闭合的子集实际承接全部内部有限参数下的存在见证。 -/
+theorem Ssk_d.closed_l {ω c X u C S T D K N} (h : Ssk_d I ω c X u C S T D K)
+    (hN : M.MemberSubset N X) (hc : Fc_closed_d I ω T K N) : Ssk_closed_d I ω c X u C N := by
+  intro a i n s ha hi hn hs he
+  obtain ⟨t, ht⟩ := I.total a i
+  obtain ⟨p, hp⟩ := I.total t s
+  have htT := (h.labels t).mpr ⟨a, ha, i, hi, ht⟩
+  have hpD := (h.domain p).mpr ⟨t, htT, s, (h.params s).mpr ⟨n, hn, hs.mono_target_l I hN⟩, hp⟩
+  obtain ⟨x, _, hx⟩ := h.graph.2.2 p hpD
+  refine ⟨x, hc x ⟨n, s, t, p, hn, hs, htT, hp, hx⟩, ?_⟩
+  exact (h.value_l I ht hp hx).elim id (fun hx => (hx.1 he).elim)
+
+/-- 假公式提供返回基点的零元运算，所以任意闭集都非空，包括空种子的闭包。 -/
+theorem Ssk_d.point_mem_l (hZF : M.Models ZF) {ω c X R u C S T D K N}
+    (hω : M.IsOmega ω) (hM : Smdl_d I c X R) (h : Ssk_d I ω c X u C S T D K)
+    (hN : Fc_closed_d I ω T K N) : M.mem u N := by
+  obtain ⟨a, l, F, k, v, ha, _, hv⟩ := source_compile_l I hZF hω (.falsum : Formula 1 0)
+    (by simp only [Definitional.Formula.FreeClosed])
+  obtain ⟨e, he, heω⟩ := hω.1.1
+  have empty_fun (B : M.Domain) : M.IsSetFunctionFromTo I e e B :=
+    ⟨(Structure.IsSequenceOfLength.empty I he).2.1, (Structure.IsSequenceOfLength.empty I he).2.2,
+      fun i hi => (he i hi).elim⟩
+  obtain ⟨t, ht⟩ := I.total a e
+  obtain ⟨p, hp⟩ := I.total t e
+  have htT := (h.labels t).mpr ⟨a, (h.codes a).mpr ⟨l, F, k, ha⟩, e, heω, ht⟩
+  obtain ⟨x, hxX, hx⟩ := h.graph.2.2 p ((h.domain p).mpr
+    ⟨t, htT, e, (h.params e).mpr ⟨e, heω, empty_fun X⟩, hp⟩)
+  have hxN := hN x ⟨e, e, t, p, heω, empty_fun N, htT, hp, hx⟩
+  rcases h.value_l I ht hp hx with ⟨n, f, g, _, hs, hf, hg, hgSat⟩ | ⟨_, heq⟩
+  · obtain ⟨E, hE⟩ := ZF.exists_functionSpace hZF I ω X
+    have hgE := (hE g).mpr (hg.function_l I (hf.function_l I hs h.point) heω hxX)
+    let ρ : Env (smdl_structure_l I (R := R) hM.2.1) 0 := ⟨Fin.elim0, fun _ => ⟨u, h.point⟩⟩
+    have hh := (hv X R hM.2.1 E hE g hgE ρ (fun j => Fin.elim0 j)).mp
+      ((satisfies_decode_l I hZF.1 hM ha hE).mp hgSat)
+    simp only [Definitional.Semantics.satisfies] at hh
+  · exact heq ▸ hxN
+
+/-- 一次装配实际选择图与最小内部司寇伦闭包，允许任意 κ 小种子，包括空集。 -/
+theorem ssk_hull_bound_l (hZFC : M.Models ZFC) {ω κ c X R A} (hω : M.IsOmega ω)
+    (hκ : M.IsInfiniteCardinal I ω κ)
+    (hM : Smdl_d I c X R) (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A κ) :
+    ∃ u C S T D K N, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
+      M.CardinalLessOrEqual I N κ ∧ M.mem u N ∧ Ssk_closed_d I ω c X u C N := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨u, C, S, T, D, K, hK⟩ := ssk_exists_l I hZFC hω c hM.2.1
+  obtain ⟨J, hJ⟩ := ZF.exists_identityBijection hZF I ω
+  have htω := ZF.countable_product_l I hZF hω (scode_countable_l I hZF hω hK.codes) ⟨J, hJ.1⟩ hK.labels
+  obtain ⟨t, ht⟩ := htω
+  obtain ⟨j, hj⟩ := hκ.2
+  have ht := ZF.exists_compositionInjection hZF I ht hj
+  obtain ⟨P, Q, N, hP, hQ, hz, hs, hu, hN⟩ := ZF.fc_hull_chain_l I hZF hω hK.graph hA
+  -- 固定已构造的选择图后，各闭包阶段按实际原公式归纳保持大小不超过 κ。
+  let ρ : Env M 2 := (⟨fun _ => Q, fun _ => Q⟩ : Env M 1).push κ
+  let φ : UnarySchema 2 := { body := .forallE (.imp (Formula.orderedPairMem 𝒞 (.bound 1) .newest (.bound 3))
+    (Formula.cardinalLessOrEqual 𝒞 .newest (.bound 2))) }
+  have hφ i : φ.denote ρ i ↔ ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ := by
+    simp only [UnarySchema.denote, φ, Formula.satisfies_forall_iff, Formula.satisfies_imp_iff,
+      Formula.satisfies_orderedPairMem_iff I, Formula.satisfies_cardinalLessOrEqual_iff I hZF.1]
+    rfl
+  have count : ∀ i, M.mem i ω → ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ := by
+    apply hω.induction (fun i => ∀ B, M.PairMember I i B Q → M.CardinalLessOrEqual I B κ)
+    · obtain ⟨U, hU⟩ := ZF.separation_exists_d hZF φ ρ ω
+      exact ⟨U, fun i => (hU i).trans (and_congr_right fun _ => hφ i)⟩
+    · exact fun e he B hB => hQ.1.2 e A B (hz e he) hB ▸ ha
+    · intro i hi ih j hji E hj
+      obtain ⟨B, hB, hb⟩ := hQ.2.2 i hi
+      exact ZF.fc_step_bound_l I hZF hω hκ hK.params hK.domain hK.graph ht
+        ((hP B).mp hB) (ih B hb) (hs i j B E hji hb hj)
+  obtain ⟨Y, hY⟩ := ZF.exists_range_of_setFunction hZF I hQ.1 hQ.2.1
+  have hQY : M.IsSetFunctionFromTo I Q ω Y := ⟨hQ.1, hQ.2.1, fun i hi => by
+    obtain ⟨B, _, hb⟩ := hQ.2.2 i hi
+    exact ⟨B, (hY B).mpr ⟨i, hb⟩, hb⟩⟩
+  have hn := ZFC.cc_union_bound_l I hZFC hω hκ hQY hu (fun B hB => by
+    obtain ⟨i, hi⟩ := (hY B).mp hB
+    exact count i (hQ.input_mem_of_pairMember hi) B hi)
+  exact ⟨u, C, S, T, D, K, N, hK, hN, hn, hK.point_mem_l I hZF hω hM hN.2.2.1,
+    hK.closed_l I hN.2.1 hN.2.2.1⟩
+
+/-- 大小参数只须是含 ω 的序数；种子的双射延长为最小壳上的实际双射。 -/
+theorem ssk_hull_enum_l (hZFC : M.Models ZFC) {ω κ c X R A f} (hω : M.IsOmega ω)
+    (hκ : M.IsOrdinal κ) (hωκ : M.MemberSubset ω κ) (hM : Smdl_d I c X R)
+    (hA : M.MemberSubset A X) (hf : M.IsSetBijectionFromTo I f κ A) :
+    ∃ u C S T D K N g, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
+      M.IsSetBijectionFromTo I g κ N := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨μ, hμ, _⟩ := ZF.ordinalCardinal_existsUnique hZF I hκ
+  obtain ⟨q, hq⟩ := hμ.2.symm hZF I
+  obtain ⟨r, hr⟩ := (show M.Equinumerous I κ A from ⟨f, hf⟩).symm hZF I
+  have hμinf : M.IsInfiniteCardinal I ω μ := ⟨hμ.1,
+    (ZF.exists_inclusionInjection hZF I hωκ).elim fun p hp => ZF.exists_compositionInjection hZF I hp hq.1⟩
+  obtain ⟨u, C, S, T, D, K, N, skolem, hull, small, _, _⟩ := ssk_hull_bound_l I hZFC hω hμinf hM hA
+    (ZF.exists_compositionInjection hZF I hr.1 hq.1)
+  obtain ⟨p, hp⟩ := small
+  obtain ⟨q', hq'⟩ := hμ.2
+  obtain ⟨g, hg⟩ := ZF.equinumerous_of_cardinalLessOrEqual hZF I
+    ((ZF.exists_inclusionInjection hZF I hull.1).elim fun j hj => ZF.exists_compositionInjection hZF I hf.1 hj)
+    (ZF.exists_compositionInjection hZF I hp hq'.1)
+  exact ⟨u, C, S, T, D, K, N, g, skolem, hull, hg⟩
+
+/-- 可数 Skolem 壳是一般 κ 小闭包的实例。 -/
+theorem ssk_hull_l (hZFC : M.Models ZFC) {ω c X R A} (hω : M.IsOmega ω)
+    (hM : Smdl_d I c X R) (hA : M.MemberSubset A X) (ha : M.CardinalLessOrEqual I A ω) :
+    ∃ u C S T D K N, Ssk_d I ω c X u C S T D K ∧ Fc_hull_d I ω X T K A N ∧
+      M.CardinalLessOrEqual I N ω ∧ M.mem u N ∧ Ssk_closed_d I ω c X u C N := by
+  let hZF := ZFC.models_zf_l hZFC
+  obtain ⟨F, hF⟩ := ZF.exists_identityBijection hZF I ω
+  exact ssk_hull_bound_l I hZFC hω ⟨ZF.omega_cardinal_l I hZF hω, F, hF.1⟩ hM hA ha
+
+end YesMetaZFC.SetTheory.Internal
+
+/-! ## 极限秩初段中的实际小 Skolem 壳
+
+代码集与有限参数空间由固定的有限次配对和幂集界控制；选择图和枚举图
+再由关系图封闭放入 Vδ。这里只需 δ 为大于 ω 的极限序数。
+-/
+namespace YesMetaZFC.SetTheory.Internal
+open Definitional.Project InnerModel
+universe u
+variable {M : Structure.{u}}
+
+theorem scode_rank_mem_l (hZF : M.Models ZF) {ω δ Z C : M.Domain} (hω : M.IsOmega ω)
+    (hδ : M.IsLimitOrdinal δ) (hZ : V_d (kp_pair_l (ZF.modelsKP hZF)) δ Z)
+    (hωZ : M.mem ω Z) (hC : Scode_d (kp_pair_l (ZF.modelsKP hZF)) ω C) : M.mem C Z := by
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  obtain ⟨P, hP⟩ := ZF.exists_cartesianProduct hZF I ω ω
+  have hPZ := ZF.v_product_mem_l I hZF hZ hδ hωZ hωZ hP
+  obtain ⟨O, hO⟩ := ZF.exists_cartesianProduct hZF I ω P
+  have hOZ := ZF.v_product_mem_l I hZF hZ hδ hωZ hPZ hO
+  obtain ⟨J, hJ⟩ := ZF.fseq_space_exists_l I hZF hω O
+  have hJZ := ZF.v_fseq_mem_l I hZF hZ hδ hω hωZ hOZ hJ
+  have op {k c i j} (hc : Sop_d I k c i j) (hi : M.mem i ω) (hj : M.mem j ω) : M.mem c O := by
+    obtain ⟨a, o, ho, ha, code⟩ := hc
+    exact (hO c).mpr ⟨o, num_mem_l hZF.1 hω ho, a, (hP a).mpr ⟨i, hi, j, hj, ha⟩, code⟩
+  have program {n F} (hF : Sfm_d I ω n F) : M.mem F J := by
+    refine (hJ F).mpr ⟨n, hF.1, hF.2.1.2.1, hF.2.1.2.2, fun r hr => ?_⟩
+    obtain ⟨c, hc⟩ := (hF.2.1.2.2 r).mp hr
+    have hrω := hω.transitive (ZF.modelsKP hZF) n hF.1 r hr
+    refine ⟨c, ?_, hc⟩
+    rcases hF.2.2 r c hc with ⟨i, j, hs, hi, hj⟩ | ⟨i, j, hs, hi, hj⟩ |
+      ⟨i, j, hs, hi, hj⟩ | ⟨i, j, hs, hi, hj⟩
+    · exact op hs hi hj
+    · exact op hs hi hj
+    · exact op hs (hω.transitive (ZF.modelsKP hZF) r hrω i hi) (hω.transitive (ZF.modelsKP hZF) r hrω j hj)
+    · exact op hs hi (hω.transitive (ZF.modelsKP hZF) r hrω j hj)
+  obtain ⟨Y, hY, hJY, hωY⟩ := v_joint_bound_l I hZ hJZ hωZ
+  apply v_relation_mem_l I hZ hδ hY
+  intro a ha
+  obtain ⟨n, F, r, code, hF, hr⟩ := (hC a).mp ha
+  exact ⟨F, hJY F (program hF), r, hωY r (hω.transitive (ZF.modelsKP hZF) n hF.1 r hr), code⟩
+
+/-- 直接给论文所用秩初段构造实例；不把 Vδ 换成 Hχ，也不要求 Vδ 满足 ZF。 -/
+theorem sh_source_of_v_l (hZFC : M.Models ZFC) {ω δ Z : M.Domain} (hω : M.IsOmega ω)
+    (hδ : M.IsLimitOrdinal δ) (hωδ : M.mem ω δ)
+    (hZ : V_d (kp_pair_l (ZF.modelsKP (ZFC.models_zf_l hZFC))) δ Z) :
+    Sh_source_d (ZF.modelsKP (ZFC.models_zf_l hZFC)) ω Z := by
+  let hZF := ZFC.models_zf_l hZFC
+  let I := kp_pair_l (ZF.modelsKP hZF)
+  have hωZ := ZF.v_ordinal_mem_l I hZF hZ hωδ
+  have trans := v_transitive_l I hZ
+  have function {A B f} (hA : M.mem A Z) (hB : M.mem B Z) (hf : M.IsSetFunctionFromTo I f A B) : M.mem f Z := by
+    obtain ⟨Y, hY, hAY, hBY⟩ := v_joint_bound_l I hZ hA hB
+    exact v_relation_mem_l I hZ hδ hY fun p hp =>
+      (fn0_of_function_l (ZF.modelsKP hZF) hf).1 p hp |>.elim fun a ha => ha.2.elim fun b hb =>
+        ⟨a, hAY a ha.1, b, hBY b hb.1, hb.2⟩
+  intro c A R U κ f hA _ _ hκZ _ hm hκ hωκ hUA hf
+  obtain ⟨u, C, J, T, D, K, N, g, skolem, hull, hg⟩ := ssk_hull_enum_l I hZFC hω hκ hωκ hm hUA hf
+  have hC := scode_rank_mem_l hZF hω hδ hZ hωZ skolem.codes
+  have hJ := ZF.v_fseq_mem_l I hZF hZ hδ hω hωZ hA skolem.params
+  have hT := ZF.v_product_mem_l I hZF hZ hδ hC hωZ skolem.labels
+  have hD := ZF.v_product_mem_l I hZF hZ hδ hT hJ skolem.domain
+  have hN := v_subset_mem_l I hZ hA hull.2.1
+  exact ⟨u, C, J, T, D, K, N, g, trans A hA u skolem.point, hC, hJ, hT, hD,
+    function hD hA skolem.graph, hN, function hκZ hN hg.1.1, skolem,
+    ⟨hull.1, hull.2.1, hull.2.2.1, fun B _ hUB _ => hull.2.2.2 B hUB⟩, hg⟩
+
+end YesMetaZFC.SetTheory.Internal

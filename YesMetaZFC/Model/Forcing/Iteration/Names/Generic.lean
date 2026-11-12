@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Functions.Generic
+import YesMetaZFC.Model.Forcing.Functions.Generic
 
 /-! # 实际泛型滤子的内部名称
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Order
-import YesMetaZFC.Model.Forcing.Internal.Extension.Generic
+import YesMetaZFC.Model.Forcing.Extension.Generic
 
 /-! # 二步迭代的第一阶段投影与实际名称实例
 

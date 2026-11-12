@@ -31,7 +31,7 @@ theorem cohen_not_ch_l {M : SetTheory.Structure.{u}} {B R : M.Domain} {U : M.Dom
   let hEZF := ZFC.models_zf_l hE
   let J := kpair_interpretation_l E hE.1 (KP.exists_pair (ZF.modelsKP hEZF))
   obtain ⟨f, hf⟩ := ZF.exists_identityBijection hZF I ω
-  have hωκ := (hκ.2 ω (hω.isOrdinal hZF)).mpr ⟨f, hf.1⟩
+  have hωκ := (hκ.2 ω (hω.isOrdinal (ZF.modelsKP hZF))).mpr ⟨f, hf.1⟩
   have hκInf : M.IsInfiniteCardinal I ω κ :=
     ⟨hκ.isCardinal hZF I, ZF.exists_inclusionInjection hZF I (hκ.1.transitive ω hωκ)⟩
   have hκE : E.IsInfiniteCardinal J (e ω) (e κ) := hpres κ hκInf

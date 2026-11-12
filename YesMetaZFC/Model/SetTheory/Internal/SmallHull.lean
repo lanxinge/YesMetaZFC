@@ -1,5 +1,5 @@
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryHull
-import YesMetaZFC.Model.SetTheory.Internal.Sigma1Substructure
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # κ 小种子的实际 Σ₁ 隶属子结构
 

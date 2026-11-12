@@ -45,7 +45,7 @@ theorem mem_embedding_fixed_l (hZF : M.Models ZF) {N Y k T : M.Domain} (hN : M.T
     (hk.1.2.2 x hx).imp fun y hy => ⟨(hs y).mpr ⟨x, hy.2⟩, hy.2⟩⟩, hk.2⟩,
       fun y hy => ((hs y).mp hy).imp fun x hx => ⟨hk.1.input_mem_of_pairMember hx, hx⟩⟩
   obtain ⟨F, hf, fs⟩ := ZF.exists_inverseBijectionWithPairs hZF I bij
-  have iso : Mc_iso_d H N F := ⟨fn0_of_function_l (ZF.modelsKP hZF) hf.1.1, hf.1.2,
+  have iso : Mc_map_d H N F := ⟨fn0_of_function_l (ZF.modelsKP hZF) hf.1.1,
     fun y hy => (hf.2 y hy).imp fun _ h => h.2,
     fun a b x y ha hb => (rel x y a b ((fs a x).mp ha) ((fs b y).mp hb)).symm⟩
   have fixed x (hx : M.mem x T) : Rd_entry_d x x k := by

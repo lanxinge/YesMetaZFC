@@ -21,6 +21,7 @@ abbrev S := Nonlogical.BasicSetTheory.signature
 abbrev s := SetSort.set
 variable {ℳ : Structure.{0,0,0,x} ℒ}
 
+
 def interpretation : Interpretation S ℒ := { PureStructureStage.interpretation with
   relation := fun symbol => match symbol with
     | .isRelatedTermCodeAt => graph2 .term
@@ -82,7 +83,8 @@ theorem realizes (hℳ : Theory.Models ℳ theory) : Realizes (expansion hℳ) w
 theorem condition_satisfaction (hℳ : Theory.Models ℳ theory) (kind : Kind) (symbols depth length code : Carrier ℳ) :
     (condition kind).satisfies (templateEnv (.cons depth (.cons length (.cons code (.cons symbols .nil)))) : Env (expansion hℳ).model [] [s,s,s,s]) ↔
       Condition hℳ (state hℳ symbols) kind symbols depth length code := by
-  cases kind <;> rfl
+  -- 直接检查定义相等，避免 rfl 先尝试异质等式时重复展开整篇正文。
+  cases kind <;> apply_rfl
 
 theorem term_definition (hℳ : Theory.Models ℳ theory) (symbols depth code : Carrier ℳ) :
     (FormalSystem.related_term_code_at_definition_instance (.fvar .here) (.fvar (.there .here)) (.fvar (.there (.there .here)))).satisfies

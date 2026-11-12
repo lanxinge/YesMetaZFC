@@ -1,6 +1,6 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.Sequence
+import YesMetaZFC.Model.Forcing.Names.SequenceForcing
 import YesMetaZFC.Model.Forcing.Proper.Master.Basic
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Rules
+import YesMetaZFC.Model.Forcing.Truth.OrderCongruence
 
 /-! # 对内部公式标签及有限名称列统一构造判定集
 

@@ -107,13 +107,21 @@ theorem exists_rightInverseInjection_of_surjection_from_ordinal
       ℳ.IsSetFunctionFromTo 𝕀 function source target) (hSurjective :
       ℳ.IsSetSurjectiveOnto 𝕀 function source target) :
     ∃ inverse,
-      ℳ.IsSetInjectionFromTo 𝕀 inverse target source := by
+      ℳ.IsSetInjectionFromTo 𝕀 inverse target source ∧
+        ∀ input output, ℳ.PairMember 𝕀 input output inverse → ℳ.PairMember 𝕀 output input function := by
   let env : Env ℳ 2 := {
     bound := Fin.cases source <| Fin.cases function Fin.elim0
     free := fun _ => Classical.choice ℳ.nonempty
   }
-  apply exists_setInjectionFromTo_of_denote
-      hZF 𝕀 (BinarySchema.leastPreimageValue 𝒞) env
+  suffices ∃ inverse, ℳ.IsSetFunctionFromTo 𝕀 inverse target source ∧
+      ∀ input output, ℳ.PairMember 𝕀 input output inverse ↔
+        ℳ.mem input target ∧ (BinarySchema.leastPreimageValue 𝒞).denote env input output by
+    obtain ⟨inverse, fn, entries⟩ := this
+    have section' input output (edge : ℳ.PairMember 𝕀 input output inverse) :
+        ℳ.PairMember 𝕀 output input function :=
+      ((Formula.denote_leastPreimageValue_iff 𝕀 env input output).mp ((entries input output).mp edge).2).2.1
+    exact ⟨inverse,⟨fn,fun x y n hx hy => hFunction.1.2 n x y (section' x n hx) (section' y n hy)⟩,section'⟩
+  apply exists_setFunctionFromTo_of_denote hZF 𝕀 (BinarySchema.leastPreimageValue 𝒞) env
   · intro input hInput
     rcases hSurjective input hInput with
       ⟨witness, hWitnessSource, hWitnessPair⟩
@@ -181,11 +189,6 @@ theorem exists_rightInverseInjection_of_surjection_from_ordinal
   · intro input output _ hValue
     rw [Formula.denote_leastPreimageValue_iff 𝕀] at hValue
     exact hValue.1
-  · intro first second output _ _ hFirst hSecond
-    rw [Formula.denote_leastPreimageValue_iff 𝕀]
-      at hFirst hSecond
-    exact hFunction.1.2 output first second
-      hFirst.2.1 hSecond.2.1
 end ZF
 namespace Structure.IsCofinalNondecreasingOrdinalSequence
 /--
@@ -332,7 +335,7 @@ theorem eq_or_mem_of_cofinalFunctionRange
       hPair⟩
   rcases ZF.exists_rightInverseInjection_of_surjection_from_ordinal
       hZF 𝕀 hSourceCardinal.1 hFunctionToRange hSurjective with
-    ⟨rangeToSource, hRangeToSource⟩
+    ⟨rangeToSource, hRangeToSource, _⟩
   rcases ZF.exists_membershipWellOrderType_of_subsetOrdinal
       hZF 𝕀 hCofinalRange.1.1 hCofinalRange.2.1 with
     ⟨relation, orderType, hRelation, hOrder, hOrderType⟩

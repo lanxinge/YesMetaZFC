@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Master.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Functions.Rules
+import YesMetaZFC.Model.Forcing.Functions.ValueIsomorphism
 
 /-! # 主条件名称的原公式与局部消去规则 -/
 

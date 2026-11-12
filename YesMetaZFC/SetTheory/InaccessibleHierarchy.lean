@@ -77,7 +77,7 @@ theorem inaccessible_hereditary_l (hZFC : M.Models ZFC) {ω δ V : M.Domain}
   · intro hx
     obtain ⟨α, W, hα, hW, hx⟩ := (ZF.v_limit_mem_l I hZF hV hr.isLimitOrdinal.2.2 x).mp hx
     obtain ⟨μ, hμ, hw⟩ := inaccessible_level_small_l I hZFC hω hωδ hr hs hα hW
-    exact ZF.hmem_of_transitive_l I hZF (ZF.v_transitive_l I hZF hW) hx hμ hw
+    exact ZF.hmem_of_transitive_l I hZF (v_transitive_l I hW) hx hμ hw
   · rintro ⟨T, μ, ht, hμ, htμ⟩
     exact ZF.rk_transitive_bound_l I hZF ht.1 hr.isCardinal hμ htμ hV x ht.2.1
 

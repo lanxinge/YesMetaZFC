@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Distributive.Basic
-import YesMetaZFC.Model.Forcing.Internal.Extension.Operations
+import YesMetaZFC.Model.Forcing.Extension.Choice
 
 /-! # ZF 中内部可数分配力迫不增加实数
 

@@ -784,7 +784,7 @@ theorem equinumerous_successor_of_omegaSubset
             simpa [hSecondExtra.2] using hZero
           exact False.elim <| hOutputEmpty first <|
             hFirstNatural.2.predecessor_mem
-        · exact Structure.SuccessorOf.predecessor_eq hZF.1 (hω.members_areOrdinals hZF first hFirstNatural.1)
+        · exact Structure.SuccessorOf.predecessor_eq hZF.1 (hω.members_areOrdinals (ZF.modelsKP hZF) first hFirstNatural.1)
             hFirstNatural.2 hSecondNatural.2
         · rcases hω.1.2 first hFirstNatural.1 with
             ⟨selected, hSelected, hSelectedOmega⟩

@@ -11,7 +11,7 @@ open SetTheory
 universe u
 variable {M : SetTheory.Structure.{u}} {P R z Q S w F : M.Domain}
 variable (O : Cond_order_d M P R z) (L : Cond_order_d M Q S w) (hZF : M.Models ZF)
-variable (h : Reg_embed_d M P R z Q S w F)
+variable (h : Reg_map_d M P R z Q S w F)
 include O L hZF h
 
 theorem nmap_mem_push_l {x y s t p q} (hx : Name_d M P x) (hy : Name_d M P y)
@@ -31,7 +31,7 @@ theorem nmap_mem_push_l {x y s t p q} (hx : Name_d M P x) (hy : Name_d M P y)
   have ha'b := (nmap_entry_l M hZF.1 (check_ind_l M hZF) (KP.exists_pair (ZF.modelsKP hZF)) ht a' b').mpr
     ⟨a, b, hab, haa, hbb⟩
   have hvb := L.trans v q₁ b' hv.1 (h.domain p₁ q₁ hp₁q).2.2.1 (h.domain b b' hbb).2.2.1
-    hvq ((h.order p₁ b q₁ b' hp₁q hbb).mpr hp₁b)
+    hvq (h.mono p₁ b q₁ b' hp₁q hbb hp₁b)
   have he' := nmap_eq_push_l O L hZF h hx (name_entry_l M hy hab).1 hs haa hp₁q he
   exact ⟨v, a', b', hv, ha'b, hvb, eq_force_lower_l L hZF (name hs) (name haa) q₁ v
     (h.domain p₁ q₁ hp₁q).2.2.1 ⟨hv.1, hv.2.1, hvq⟩ he'⟩
@@ -69,7 +69,7 @@ private theorem neg_transfer_l {A D : M.Domain → Prop}
   · intro hn r hr ha
     obtain ⟨v, hrv⟩ := h.total r hr.1 hr.2.1
     have hv := (h.domain r v hrv).2.2
-    exact hn v ⟨hv.1, hv.2, (h.order r p v q hrv hpq).mpr hr.2.2⟩ (up r v hrv ha)
+    exact hn v ⟨hv.1, hv.2, h.mono r p v q hrv hpq hr.2.2⟩ (up r v hrv ha)
 
 theorem nmap_neg_eq_l {x y s t p q} (hx : Name_d M P x) (hy : Name_d M P y)
     (hs : Nmap_d M F x s) (ht : Nmap_d M F y t) (hpq : Entry_d M p q F) :

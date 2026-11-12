@@ -21,7 +21,7 @@ theorem bound_trans (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
   rcases (successor_spec h𝒩 b a).mp hAB with hAB | rfl
   · rcases (successor_spec h𝒩 c b).mp hBC with hBC | rfl
     · exact (successor_spec h𝒩 c a).mpr (Or.inl
-        (((omega_project h𝒩).members_areOrdinals (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩)) c hc).transitive b hBC a hAB))
+        (((omega_project h𝒩).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩))) c hc).transitive b hBC a hAB))
     · exact (successor_spec h𝒩 b a).mpr (Or.inl hAB)
   · exact hBC
 

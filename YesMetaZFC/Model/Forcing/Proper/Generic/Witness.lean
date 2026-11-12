@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.Hull
 import YesMetaZFC.Model.Forcing.Proper.Elementary.Membership
-import YesMetaZFC.Model.Forcing.Internal.Maximum.WitnessPool
-import YesMetaZFC.Model.Forcing.Internal.Forcing.Rules
+import YesMetaZFC.Model.Forcing.Maximum.WitnessPool
+import YesMetaZFC.Model.Forcing.Truth.OrderCongruence
 import YesMetaZFC.Model.Forcing.Proper.Master.Basic
 
 /-! # 主条件下的实际存在见证提升

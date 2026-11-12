@@ -92,18 +92,18 @@ theorem rel_ultra_sat_l {n} (ρ : Env ℳ n) (D B U : Term n) :
       fun A hA C hC => h.decides A C hA hC⟩⟩
 
 /-- 容许域为完整幂集时，相对超滤精确恢复原集合超滤接口。 -/
-theorem Rel_ultra_d.full_l (hZF : ℳ.Models ZF) {D B U} (h : Rel_ultra_d (ℳ := ℳ) D B U)
+theorem Rel_ultra_d.full_l (hKP : ℳ.Models KP) {D B U} (h : Rel_ultra_d (ℳ := ℳ) D B U)
     (hB : ℳ.IsPowerSetOf B D) : Maximal_d (ℳ := ℳ) D U := by
   have hf : IsFilter_d (ℳ := ℳ) D U := ⟨h.base.bounds, h.base.top,
     fun A C hA hAC hC => h.upward A C hA ((hB C).mpr hC) hAC, h.base.meet⟩
-  exact maximal_of_decides_d hZF hf h.proper fun A C hA hC =>
+  exact maximal_of_decides_d hKP hf h.proper fun A C hA hC =>
     h.decides A C ((hB A).mpr hA) ((hB C).mpr fun x hx => ((hC x).mp hx).1) hC
 
-theorem maximal_relative_l (hZF : ℳ.Models ZF) {D B U} (h : Maximal_d (ℳ := ℳ) D U)
+theorem maximal_relative_l (hKP : ℳ.Models KP) {D B U} (h : Maximal_d (ℳ := ℳ) D U)
     (hB : ℳ.IsPowerSetOf B D) : Rel_ultra_d D B U := by
-  refine ⟨field_power_l (ZF.modelsKP hZF) hB, h.1.base_l, fun A hA => (hB A).mpr (h.1.1 A hA), ?_, h.2.1, ?_⟩
+  refine ⟨field_power_l hKP hB, h.1.base_l, fun A hA => (hB A).mpr (h.1.1 A hA), ?_, h.2.1, ?_⟩
   · exact fun A C hA hC hAC => h.1.2.2.1 A C hA hAC ((hB C).mp hC)
-  · exact fun A C hA _ hC => maximal_decides_d hZF h ((hB A).mp hA) hC
+  · exact fun A C hA _ hC => maximal_decides_d hKP hB h ((hB A).mp hA) hC
 
 theorem Rel_ultra_d.complement_l {D B U A C} (h : Rel_ultra_d (ℳ := ℳ) D B U)
     (hA : ℳ.mem A B) (hC : ℳ.mem C B) (hc : ∀ x, ℳ.mem x C ↔ ℳ.mem x D ∧ ¬ ℳ.mem x A) :

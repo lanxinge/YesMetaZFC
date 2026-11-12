@@ -118,7 +118,7 @@ theorem type_natural (hℳ : Theory.Models ℳ theory) {relation carrier ordinal
   · exact hNatural
   · have hOmegaSubset : ∀ input, membership ℳ input (omega hℳ) → membership ℳ input ordinal := by
       rcases _root_.YesMetaZFC.SetTheory.Structure.IsOrdinal.trichotomy (project_models hℳ).1 hOrdinal
-        ((omega_project hℳ).isOrdinal (project_modelsZF hℳ))
+        ((omega_project hℳ).isOrdinal (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)))
         (_root_.YesMetaZFC.SetTheory.KP.difference_exists_d (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)))
         (_root_.YesMetaZFC.SetTheory.KP.intersection_exists_d (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) ordinal (omega hℳ)) with hSame | hLess | hGreater
       · exact fun input hInput => (hSame input).mpr hInput
@@ -142,7 +142,7 @@ theorem type_natural (hℳ : Theory.Models ℳ theory) {relation carrier ordinal
     have hNextValue := hIso.1.1.1.1.2 nextInput _ _ hNextPair (application_member hℳ hIso.1.1.1 hNextInput)
     have hNextP := (hP nextInput).mpr ⟨hNextInput,hNextValue ▸ hNext⟩
     have hSelfMember := (succ_spec hℳ (value hℳ function maximum) _).mpr (Or.inr rfl)
-    have hMaxOrdinal := (omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) _ hMaxIn.2
+    have hMaxOrdinal := (omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) _ hMaxIn.2
     by_cases hEqual : maximum = nextInput
     · have hEqualValue : succ hℳ (value hℳ function maximum) = value hℳ function maximum := hNextValue.trans (congrArg (value hℳ function) hEqual.symm)
       have hSelf : membership ℳ (value hℳ function maximum) (value hℳ function maximum) :=
@@ -169,7 +169,7 @@ theorem natural_type_unique (hℳ : Theory.Models ℳ theory) {relation carrier 
     (hF : Iso hℳ relation carrier first f) (hG : Iso hℳ relation carrier second g) : first = second := by
   obtain ⟨_,_,hUnique⟩ := _root_.YesMetaZFC.SetTheory.ZF.wellOrderType_existsUnique (project_modelsZF hℳ)
     (PureKuratowskiProject.interpretation hℳ) (well_order hℳ hLinear hLeast)
-  exact (hUnique first (iso_type hℳ ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) first hFirst) hF)).trans
-    (hUnique second (iso_type hℳ ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) second hSecond) hG)).symm
+  exact (hUnique first (iso_type hℳ ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) first hFirst) hF)).trans
+    (hUnique second (iso_type hℳ ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) second hSecond) hG)).symm
 
 end YesMetaZFC.Logic.FirstOrder.FormalSystem.ProofT.ZFC.PureFiniteOrderTypes

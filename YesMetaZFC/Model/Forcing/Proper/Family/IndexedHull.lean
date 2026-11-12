@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Family.ClosedLift
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryClub
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
 
 /-! # 全阶段共用的内部初等小模型
 

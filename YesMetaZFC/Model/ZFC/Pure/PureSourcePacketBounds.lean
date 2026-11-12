@@ -37,7 +37,7 @@ theorem successor_bound (h𝒩 : Theory.Models 𝒩 intrinsic_zfc_theory)
   · rcases (successor_spec h𝒩 a b).mp hg with hg | he
     · rcases (successor_spec h𝒩 b a).mp h with hl | he
       · have ht := ((omega_project h𝒩).members_areOrdinals
-          (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩)) a ha).transitive b hg a hl
+          (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (PureModel.project_modelsZF (PureZFCModels.reduct_models h𝒩))) a ha).transitive b hg a hl
         exact False.elim (natural_irrefl h𝒩 ha ht)
       · exact False.elim (natural_irrefl h𝒩 ha (he ▸ hg))
     · rw [he]; exact (successor_spec h𝒩 _ _).mpr (Or.inr rfl)

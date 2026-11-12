@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.TwoStep.Order
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Bounded
+import YesMetaZFC.Model.Forcing.Maximum.Bounded
 
 /-! # 首坐标不变的二步见证
 

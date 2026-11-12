@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Base
-import YesMetaZFC.Model.Forcing.Internal.Maximum.Basic
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Countermodel
+import YesMetaZFC.Model.Forcing.Maximum.Bounded
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
 
 /-! # proper 后继的统一 club 名称
 

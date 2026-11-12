@@ -9,18 +9,18 @@
 
 | 层 | 现有入口 | 可以直接复用的内容与边界 |
 | --- | --- | --- |
-| 预序与稠密映射 | [Order](Order/Basic.lean)、[Density](Order/Density.lean)、[Separative](Order/Separative.lean) | 加强方向、相容性、预稠密、稠密映射及分离商；原 `PO_dense` 要求像稠密，不是迭代阶段嵌入的合同 |
+| 预序与稠密映射 | [Order](Order/Tree.lean)、[Density](Order/Tree.lean)、[Separative](Order/Tree.lean) | 加强方向、相容性、预稠密、稠密映射及分离商；原 `PO_dense` 要求像稠密，不是迭代阶段嵌入的合同 |
 | 布尔装配 | [Completion](Boolean/Completion.lean)、[Boolean/Algebra](../Boolean/Algebra.lean) | 正则开完备化和完备布尔代数；尚无布尔迭代系统、阶段收缩映射或支撑极限 |
-| 内部名称与真值 | [InternalNames](Internal/Names/Basic.lean)、[InternalTruth](Internal/Forcing/Truth.lean)、[InternalChoice](Internal/Extension/Choice.lean) | 任意地模型的名称、商解释、完整公式真值及 ZFC 保持；允许外部非良基和非标准 ω |
+| 内部名称与真值 | [InternalNames](Names/Realization.lean)、[InternalTruth](Truth/Truth.lean)、[InternalChoice](Extension/Choice.lean) | 任意地模型的名称、商解释、完整公式真值及 ZFC 保持；允许外部非良基和非标准 ω |
 | 内部递归 | [Ord/Recursion](../../SetTheory/Ord/Recursion.lean)、[IterationRecursion](Iteration/Recursion/Basic.lean) | 已按原公式后继规则构造任意内部序数长度的支撑迭代，证明唯一性及精确前缀方程；不使用外部良基递归 |
 | 内部层级与候选集合 | [Cumulative](../../SetTheory/Cumulative.lean)、[CumulativeRank](../../SetTheory/CumulativeRank.lean)、[CumulativeSelection](../../SetTheory/CumulativeSelection.lean) | 原 ZF 内实际构造累积层级，证明覆盖全部模型对象，并为非空可定义类构造最早层中的唯一见证集合 |
 | 支撑大小 | [IterationSupport](Iteration/Condition/Support.lean)、[IterationSplice](Iteration/Condition/Splice.lean)、[Card/CountablePair](../../SetTheory/Card/CountablePair.lean) | 实际定义域的有限／可数支撑在限制、单坐标追加和前缀替换下保持，只需 ZF；可数族并仍由 `Card/CountableUnion` 在 ZFC 下处理 |
 | 序数界 | [Card/Cofinality/Boundedness](../../SetTheory/Card/Cofinality/Boundedness.lean) | 小基数子集有界、函数像与族并有界，供极限阶段的支撑界证明使用 |
 | 链条件 | [TwoStepCCC](TwoStep/CCC/Preservation.lean)、[IterationRecursionCCC](Iteration/FiniteSupport/RecursionCCC.lean)、[CohenIterationCCC](Applications/Cohen/FiniteSupport.lean) | 任意名称二步 CCC、有限支撑极限及完整内部迭代 CCC；参数化 Cohen 规则已有一键实例 |
-| 可数闭性 | [InternalClosed](Closed/Basic.lean)、[IterationClosedInduction](Iteration/Closed/Induction.lean)、[CollapseIteration](Applications/Collapse/Iteration.lean) | 实际内部下降链、精确前缀下界、任意内部长度可数支撑闭性保持及不新增实数；参数化塌缩规则自动装配 |
+| 可数闭性 | [InternalClosed](Closed/Basic.lean)、[IterationClosedInduction](Iteration/Closed/Induction.lean)、[CollapseIteration](Collapse/Iteration.lean) | 实际内部下降链、精确前缀下界、任意内部长度可数支撑闭性保持及不新增实数；参数化塌缩规则自动装配 |
 | 内部模型编码 | [SetTheory/Internal](../SetTheory/Internal.lean) | 实际集合结构码、全部内部有限指令码、赋值空间、唯一真值表及满足关系集合；原 Project AST 编译与参数语义对应、全部内部公式码的自然数编号已完成；只需 ZF |
-| 内部司寇伦闭包 | [SetTheory/Internal/Skolem](../SetTheory/Internal/Skolem.lean)：`ssk_hull_l` | 在 ZFC 中自动构造实际见证选择图与任意内部可数种子的最小可数闭包；覆盖非标准有限参数，空种子也返回非空闭包；通用闭包存在性、最小性与单步可数性保留 ZF 强度 |
-| 内部可数初等子模型 | [SetTheory/Internal/ElementaryHull](../SetTheory/Internal/ElementaryHull.lean)：`selem_hull_l` | 一次返回实际内部可数载体、诱导结构码和完整内部初等性；全部内部公式及 ω→N 赋值均被覆盖。有限支撑、完整见证回拉及 Tarski–Vaught 双向等价只需 ZF |
+| 内部司寇伦闭包 | [SetTheory/Internal/Skolem](../SetTheory/Reflection/RankSkolem.lean)：`ssk_hull_l` | 在 ZFC 中自动构造实际见证选择图与任意内部可数种子的最小可数闭包；覆盖非标准有限参数，空种子也返回非空闭包；通用闭包存在性、最小性与单步可数性保留 ZF 强度 |
+| 内部可数初等子模型 | [SetTheory/Internal/ElementaryHull](../SetTheory/Embedding/ElementaryTrace.lean)：`selem_hull_l` | 一次返回实际内部可数载体、诱导结构码和完整内部初等性；全部内部公式及 ω→N 赋值均被覆盖。有限支撑、完整见证回拉及 Tarski–Vaught 双向等价只需 ZF |
 | 初等子模型 | [SetTheory/Countable](../SetTheory/Countable.lean)、[SetTheory/ProjectReflection](../SetTheory/ProjectReflection.lean)、[InternalGenericTrace](Proper/Family/Trace.lean) | 外部可数反射、内部初等 `H(χ)` 子模型、全内部泛型提升及指定子集上的实际交集 club |
 | 内部主条件与 properness | [InternalProper](Proper/Basic.lean)、[CohenProper](Applications/Cohen/Proper.lean)、[IterationProper](Iteration/Proper/Preservation.lean) | 模型内主条件与实际 club，CCC 的 properness 及完整可数支撑保持；参数化 Cohen 实例自动装配 |
 | 可数支撑融合 | [IterationFusion](Iteration/Fusion/Basic.lean)、[IterationFusionRestriction](Iteration/Fusion/Restriction.lean) | 内部可数共尾前缀族的唯一融合、精确限制及实际条件的共尾前缀重构 |
@@ -44,7 +44,7 @@ C=\{(p,s)\in B\times W:p\le b,\ p\ne z,\ p\Vdash s\in A\},
 
 | 接口 | 实际结论 |
 | --- | --- |
-| [InternalForcingRules](Internal/Forcing/Rules.lean)：`forces_bind_l`、`forces_regular_l`、`forces_mp_l` | 不使用泛型存在假设的代入交换、正则真值与局部蕴涵消去 |
+| [InternalForcingRules](Truth/OrderCongruence.lean)：`forces_bind_l`、`forces_regular_l`、`forces_mp_l` | 不使用泛型存在假设的代入交换、正则真值与局部蕴涵消去 |
 | [TwoStepOrder](TwoStep/Order.lean)：`two_step_l` | 一次构造混合闭名称库 `W`、条件集 `C`、实际关系图 `S`，以及 `Cond_order_d M C S C`；固定库后三者的逐成员定义可直接审计 |
 | [TwoStepGeneric](TwoStep/Generic/Projection.lean)：`two_step_lift_l` | 任意第一坐标加强均可提升为二步加强，保留第二坐标名称 |
 | `two_step_generic_l` | 二步泛型的第一坐标向上闭包为原偏序上的地模型泛型 |
@@ -53,12 +53,12 @@ C=\{(p,s)\in B\times W:p\le b,\ p\ne z,\ p\Vdash s\in A\},
 | [TwoStepComposition](TwoStep/Generic/Composition.lean)：`two_step_compose_l` | 组合原地模型泛型与扩张上的泛型，并精确恢复输入的两阶段滤子 |
 | [TwoStepRecovery](TwoStep/Generic/Recovery.lean)：`two_step_recover_l` | 原二步泛型分解后再组合，逐条件恢复原滤子 |
 | `two_step_local_l` | 从扩张内任意实际非空预序取得名称、泛型中的首阶段条件及非空二步序 |
-| [InternalMixing](Internal/Maximum/Mixing.lean)：`mixing_l` | 对内部可定义、相容重叠处被迫相等的名称族构造实际混合名称 |
-| [InternalMaximum](Internal/Maximum/Basic.lean)：`maximum_l` | 一个规范名称同时实现全部正条件上的原公式存在力迫，并返回规范固定点证书；只要求实际有限参数为名称 |
-| [InternalUniqueMaximum](Internal/Maximum/Unique.lean)：`unique_maximum_l` | 原存在与唯一性公式被全局力迫时，在 ZF 内直接返回唯一规范见证名称；混合整个有界见证池，不选择极大反链 |
-| [InternalCountermodel](Internal/Reflection/Countermodel.lean)：`forcing_zf_countermodel_l`、`forces_zf_l`、`forces_zfc_l` | ZF 与 ZFC 分别反射力迫失败，产生相应理论的真实反模型；每个正条件迫使原理论全部公理与模式 |
-| [InternalGenericCriterion](Internal/Reflection/Criterion.lean)：`forces_of_generics_l` | 原模型的实际公式条件与有限参数同时反射；在 ZF 强度下把所有泛型中的名称构造提升为全局力迫证书 |
-| [InternalOrderCongruence](Internal/Forcing/OrderCongruence.lean)：`forces_order_l`、`generic_order_l` | 条件域内逐边相同的关系给出相同的全部名称力迫及泛型性；`preord_order_l` 自动构造规范关系并返回这些证书 |
+| [InternalMixing](Maximum/UniqueRules.lean)：`mixing_l` | 对内部可定义、相容重叠处被迫相等的名称族构造实际混合名称 |
+| [InternalMaximum](Maximum/Bounded.lean)：`maximum_l` | 一个规范名称同时实现全部正条件上的原公式存在力迫，并返回规范固定点证书；只要求实际有限参数为名称 |
+| [InternalUniqueMaximum](Maximum/Unique.lean)：`unique_maximum_l` | 原存在与唯一性公式被全局力迫时，在 ZF 内直接返回唯一规范见证名称；混合整个有界见证池，不选择极大反链 |
+| [InternalCountermodel](Reflection/Criterion.lean)：`forcing_zf_countermodel_l`、`forces_zf_l`、`forces_zfc_l` | ZF 与 ZFC 分别反射力迫失败，产生相应理论的真实反模型；每个正条件迫使原理论全部公理与模式 |
+| [InternalGenericCriterion](Reflection/Criterion.lean)：`forces_of_generics_l` | 原模型的实际公式条件与有限参数同时反射；在 ZF 强度下把所有泛型中的名称构造提升为全局力迫证书 |
+| [InternalOrderCongruence](Truth/OrderCongruence.lean)：`forces_order_l`、`generic_order_l` | 条件域内逐边相同的关系给出相同的全部名称力迫及泛型性；`preord_order_l` 自动构造规范关系并返回这些证书 |
 | [CohenNames](Applications/Cohen/Names.lean)：`cohen_names_l`、`cohen_names_unique_l` | 在原 ZF 内对任意添加量名称构造完整的规范名称三元组；原公式规格 `Cohen_names_d` 字面唯一 |
 | [TwoStepTop](TwoStep/Top.lean)：`two_step_pointed_l` | 由条件集名称与指定顶名称构造唯一确定的混合闭库，并取得实际二步最大条件 |
 | [TwoStepEmbedding](TwoStep/Embedding.lean)：`two_step_embed_l` | 构造首阶段锥到二步偏序的实际完全嵌入图，第一坐标是每个目标条件的约减 |
@@ -69,14 +69,14 @@ C=\{(p,s)\in B\times W:p\le b,\ p\ne z,\ p\Vdash s\in A\},
 | [StageAtomic](Stage/Atomic/Basic.lean)：`nmap_eq_l`、`nmap_mem_force_l`、`nmap_neg_eq_l`、`nmap_neg_mem_l` | 阶段像上的等号、隶属及其否定精确对应；反射由目标条件的源约减证明 |
 | [StageGeneric](Stage/Generic.lean)：`reg_generic_l` | 目标泛型沿实际完全嵌入图回拉后，满足全部源模型内稠密要求 |
 | [StageExtension](Stage/Extension.lean)：`stage_extension_l` | 源回拉泛型扩张到目标扩张的成员满覆盖单射，逐名称解释交换；保持原 universe 与任意外部非良基适用范围 |
-| [InternalNamePair](Internal/Names/PairConstruction.lean)：`npair_l`、`nkpair_l` | 对全部泛型统一、在原模型中唯一的无序对与 Kuratowski 有序对名称；原 ZF 配对保持已迁移到此构造 |
+| [InternalNamePair](Names/PairConstruction.lean)：`npair_l`、`nkpair_l` | 对全部泛型统一、在原模型中唯一的无序对与 Kuratowski 有序对名称；原 ZF 配对保持已迁移到此构造 |
 | [TwoStepNameInterpretation](TwoStep/Names/Interpretation.lean)：`two_step_name_l`、`curry_val_entry_l` | 自动把二步名称转换为第一阶段名称，证明其在每个第一扩张内是第二阶段名称，并给出第一次求值后的精确成员与条目方程 |
-| [InternalNamePairForcing](Internal/Names/PairForcing.lean)、[TwoStepNameForcing](TwoStep/Names/Forcing.lean) | 规范配对、有序对及转换后的第二阶段名称性均有对全部正条件有效的首阶段力迫证书，只需原 ZF |
+| [InternalNamePairForcing](Names/PairForcing.lean)、[TwoStepNameForcing](TwoStep/Names/Forcing.lean) | 规范配对、有序对及转换后的第二阶段名称性均有对全部正条件有效的首阶段力迫证书，只需原 ZF |
 | [TwoStepValuation](TwoStep/Names/Valuation.lean)：`two_step_valuation_l`、`curry_value_mem_l` | 一次装配原二步名称在双重扩张中的求值；总性、唯一性和组合滤子下的精确成员递归均已证明 |
 | [TwoStepAtomicWitness](TwoStep/Atomic/Witness.lean)：`two_step_eq_pick_l`；[TwoStepGeneric](TwoStep/Generic/Projection.lean)：`two_step_common_l` | 二步等号的匹配见证及第二阶段共同加强均可保留被首阶段泛型接受的坐标；组合泛型的有向性已复用共同加强构造 |
 | [TwoStepAtomicPush](TwoStep/Atomic/Push.lean)：`curry_forces_eq_l`、`curry_eq_push_l` | 原模型实际公式的条目归纳证明二步等号向嵌套第二阶段等号传输；只需 ZF，对全部首阶段泛型有效 |
 | [TwoStepAtomicPull](TwoStep/Atomic/Pull.lean)：`curry_forces_eq_iff_l`、`curry_eq_pull_l` | 在原模型闭支撑上构造实际双模拟，反射嵌套等号；每个真实二步条件上的等号与嵌套等号精确等价 |
-| [InternalNameDepth](Internal/Names/Depth.lean)：`entry_path_ind_l`、`qval_entry_path_l` | 任意固定正深度的内部公式归纳，以及第二阶段条目左坐标的三层原名称代表 |
+| [InternalNameDepth](Names/Depth.lean)：`entry_path_ind_l`、`qval_entry_path_l` | 任意固定正深度的内部公式归纳，以及第二阶段条目左坐标的三层原名称代表 |
 | [TwoStepFlatConstruction](TwoStep/Flatten/Construction.lean)：`flat_exists_l`、`flat_name_l` | 原 ZF 内任意输入对象的实际摊平递归图；唯一性及目标名称闭支撑均已证明 |
 | [TwoStepFlatValue](TwoStep/Flatten/Value.lean)：`flat_value_l` | 任意第二阶段名称的双重值由其原模型摊平名称精确实现，允许先规范化第二阶段关系 |
 | [TwoStepIsomorphism](TwoStep/Names/Isomorphism.lean)：`two_step_iso_l` | 自动取得单次二步泛型扩张到双重扩张的成员结构双射，并保留逐名称求值；原部分映射入口已迁移到此同构接口 |
@@ -298,9 +298,9 @@ S 的闭性给出 S ⊆ W；W 中名称的直接子名称来自 S，因此加权
 
 | 入口 | 结论与强度 |
 | --- | --- |
-| [InternalNamePool](Internal/Maximum/Pool.lean)：`name_pool_exists_l`、`name_pool_mix_l` | 实际构造唯一确定的名称库，证明可定义相容名称族的混合闭合；ZF |
-| [InternalNamePool](Internal/Maximum/Pool.lean)：`name_pool_represent_l` | 一个库内名称在每个迫使 v∈A 的原条件上等于 v；ZF |
-| [InternalBoundedMaximum](Internal/Maximum/Bounded.lean)：`name_pool_maximum_l` | 一个库内名称同时实现全部正条件上的任意原有界存在式；ZFC |
+| [InternalNamePool](Maximum/UniqueRules.lean)：`name_pool_exists_l`、`name_pool_mix_l` | 实际构造唯一确定的名称库，证明可定义相容名称族的混合闭合；ZF |
+| [InternalNamePool](Maximum/UniqueRules.lean)：`name_pool_represent_l` | 一个库内名称在每个迫使 v∈A 的原条件上等于 v；ZF |
+| [InternalBoundedMaximum](Maximum/Bounded.lean)：`name_pool_maximum_l` | 一个库内名称同时实现全部正条件上的任意原有界存在式；ZFC |
 | [TwoStepWitness](TwoStep/Witness.lean)：`two_step_represent_l`、`two_step_witness_l` | 返回第一坐标精确为输入 p 的真实二步条件；分别只需 ZF、ZFC |
 | [TwoStepWitness](TwoStep/Witness.lean)：`two_step_lower_name_l` | 把指定的第二坐标加强名称提升为二步加强，保留指定第一坐标；ZF |
 | [IterationWitness](Iteration/Names/Witness.lean)：`row_next_represent_l`、`row_next_witness_l` | 返回实际坐标后继条件 q，证明 q↾α=p，并给出坐标等号／正文力迫；分别只需 ZF、ZFC |
@@ -742,7 +742,7 @@ N 主条件 q，并在每个决定分支上加强 τ 的后继坐标。仍需 N 
 的坐标前提。`row_splice_glb_l` 给出 `u≤splice(q,p) ↔ u≤p ∧ u≤q`，本身不消费
 任何集合论公理证书。
 
-[InternalCheckApplication](Internal/Check/Application.lean) 的 `check_apply_l` 在 ZF 中
+[InternalCheckApplication](Check/Order.lean) 的 `check_apply_l` 在 ZF 中
 把实际地函数应用到名称，返回函数关系力迫和每个决定分支上的精确规范名称值。
 [IterationProjectionName](Iteration/Names/ProjectionName.lean) 的 `row_project_name_l` 将它
 应用到实际限制函数，得到仍属于同一个 N 的前缀商名称。`selem_restriction_l`
@@ -842,7 +842,7 @@ N 对实际函数求值及有序对坐标封闭，因而每个成员索引的后
 
 ## 整列名称比较、主融合与首个内部极限
 
-[InternalCheckOrder](Internal/Check/Order.lean) 的 `check_preord_force_l` 只用 ZF 证明
+[InternalCheckOrder](Check/Order.lean) 的 `check_preord_force_l` 只用 ZF 证明
 旧预序的规范名称被迫满足预序公理。[TwoStepClass](TwoStep/Class.lean) 在全部实际
 条件名称上证明二步序的自反性与传递性，原 `two_step_order_l` 已迁移为其闭库限制。
 通用 [RelationChain](../../SetTheory/RelationChain.lean) 以原公式内部归纳将相邻的
@@ -935,7 +935,7 @@ H(χ) 绝对性与实际内部初等性使该判定集属于 N。
 名称在旧 X 中的部分包含于旧可数集 N∩X。全泛型判据给出真实的覆盖力迫，
 完整有限参数反射消去地模型外部可数的要求。
 
-[InternalCover](Internal/Functions/Cover.lean) 的原公式 `Old_cover_d` 保存实际覆盖集、
+[InternalCover](Functions/Cover.lean) 的原公式 `Old_cover_d` 保存实际覆盖集、
 其地模型可数性、规范名称与力迫证书。`proper_cover_dense_l` 证明该原公式在
 原条件以下稠密，故给定的原泛型确实遇到覆盖见证。
 [InternalProperCoverValue](Proper/Preservation/CoverValue.lean) 的 `proper_set_cover_l`
@@ -969,7 +969,7 @@ proper 迭代的各阶段、各泛型自动装配上述保持结果。
 `cohen_iteration_preserves_l` 只接收 ZFC、添加量参数和内部序数长度，直接
 构造整个迭代及所有阶段的保持证书。
 实际单射名称的公共原公式和解释证书统一位于
-[InternalInjection](Internal/Functions/Injection.lean)，CCC 与 proper 两层均直接消费。
+[InternalInjection](Functions/ValueIsomorphism.lean)，CCC 与 proper 两层均直接消费。
 
 ## 可数闭后继与精确保留前缀的链下界
 
@@ -978,7 +978,7 @@ proper 迭代的各阶段、各泛型自动装配上述保持结果。
 下逐项被迫递降的实际函数图装配为完整名称链；泛型求值及有限参数反射覆盖全部
 内部自然数。[InternalClosedName](Closed/Name.lean) 的 `nchain_bound_name_l`
 在原条件上消去被迫闭性，最大值原理返回同时低于全部坐标的下界名称。
-规范索引条目的同条件读取由 [InternalNameSequenceForcing](Internal/Names/SequenceForcing.lean)
+规范索引条目的同条件读取由 [InternalNameSequenceForcing](Names/SequenceForcing.lean)
 证明。名称链装配、坐标读取和内部 ω 的规范名称力迫只需 ZF；选择下界名称使用 ZFC。
 
 [TwoStepClosed](TwoStep/Closed.lean) 的 `two_step_chain_bound_l` 输入真实二步下降链
@@ -992,9 +992,9 @@ proper 迭代的各阶段、各泛型自动装配上述保持结果。
 两张投影图由 [SetTheory/FunctionCoordinates](../../SetTheory/FunctionCoordinates.lean)
 的 `ZF.function_coords_l` 实际构造，并直接用于二步证明。
 
-[CollapseNames](Applications/Collapse/Names.lean) 接收任意大小界、源集、目标集名称，构造规范的
+[CollapseNames](Collapse/Iteration.lean) 接收任意大小界、源集、目标集名称，构造规范的
 可数部分函数偏序名称。实际塌缩定理给出预序、顶及 ω 大小界下的闭性力迫。
-[CollapseClosed](Applications/Collapse/Closed.lean) 提供三个实际消费者：
+[CollapseClosed](Collapse/Iteration.lean) 提供三个实际消费者：
 
 - `collapse_two_step_closed_l`：在任意可数闭首阶段后添加参数化塌缩，自动返回名称、
   原二步偏序、顶条件及闭性。
@@ -1028,10 +1028,10 @@ proper 迭代的各阶段、各泛型自动装配上述保持结果。
 - `row_iteration_closed_l`：全部阶段的内部可数闭性。
 - `row_iteration_closed_exists_l`：从已实现的原公式规则构造完整迭代及上述全部证书。
 
-[CollapseNameUniqueness](Applications/Collapse/NameUniqueness.lean) 在 ZF 内证明规范塌缩名称
-三元组字面唯一；[CollapseRule](Applications/Collapse/Rule.lean) 因此构造确定的实际原公式规则
+[CollapseNameUniqueness](Collapse/Iteration.lean) 在 ZF 内证明规范塌缩名称
+三元组字面唯一；[CollapseRule](Collapse/Iteration.lean) 因此构造确定的实际原公式规则
 及其闭性实例。旧 ω、源集和目标集的规范名称每阶段自动构造。
-[CollapseIteration](Applications/Collapse/Iteration.lean) 的 `collapse_iteration_closed_l` 只接收
+[CollapseIteration](Collapse/Iteration.lean) 的 `collapse_iteration_closed_l` 只接收
 ZFC 模型、两个集合参数与内部序数长度，一次构造整个可数支撑迭代、全部闭区间
 和各阶段闭性。`collapse_iteration_preserves_l` 还返回各泛型扩张的 ZFC、内部 ω、
 规范嵌入，以及每个扩张实数、任意旧目标上的内部 ω 函数和旧集合的可数子集的实际旧原像。
@@ -1042,14 +1042,14 @@ ZFC 模型、两个集合参数与内部序数长度，一次构造整个可数�
 
 ## 闭扩张的内部序列及可数子集反射
 
-[InternalFunction](Internal/Functions/Basic.lean) 的 `Fn_name_d` 保存实际名称与原函数公式力迫。
+[InternalFunction](Functions/ValueIsomorphism.lean) 的 `Fn_name_d` 保存实际名称与原函数公式力迫。
 函数和单射共用 `fn_env_l`；`fn_name_index_l` 只要求函数性，并分别保留力迫条件和
 规范名称的基点。原单射消费者已迁移到该函数接口。
 
 [Distributive/Function](Distributive/Function.lean) 的 `distributive_fn_dense_l` 在 ZF 中从实际
 可数分配性证明：存在一张地模型内部函数图、且条件决定其全部旧坐标的谓词是稠密的。
 `distributive_intersection_l` 只要求各成员在指定条件以下稠密；逐坐标旧值由
-[InternalFunctionDecision](Internal/Functions/Decision.lean) 取得，函数唯一性与规范名称
+[InternalFunctionDecision](Functions/Surjection.lean) 取得，函数唯一性与规范名称
 忠实性使原替换模式可收集整个图。
 
 [NoNewFunctions](Distributive/NoNewFunctions.lean) 的 `no_new_functions_l` 让给定原泛型遇到这个
@@ -1079,7 +1079,7 @@ ZFC 模型、两个集合参数与内部序数长度，一次构造整个可数�
 
 [InternalClosedProperName](Closed/ProperName.lean) 的 `closed_name_proper_l`
 把真实名称预序及旧 ω 下的闭性转为同条件的 properness 力迫。
-[CollapseProper](Applications/Collapse/Proper.lean) 的 `collapse_rule_pr_l` 将原参数化塌缩规则
+[CollapseProper](Collapse/Iteration.lean) 的 `collapse_rule_pr_l` 将原参数化塌缩规则
 接入通用 proper 迭代引理。`collapse_iteration_pil_l` 一次返回同一迭代的全部闭区间、
 各阶段闭性和 properness，并为任意内部可数种子构造共同 H(χ) 小模型 N 与全部
 适用区间的 `Row_pil_stage_d`。

@@ -54,7 +54,7 @@ private theorem row_cl_coherent_l {ω δ F G b β f A X Q}
         have hep := hQ.1.2 i r p hjr hip
         exact heα ▸ hep ▸ hrq
   intro i j α γ p q hiα hjγ hip hjq hαγ
-  rcases (hω.isOrdinal hZF).wellOrder.linear.compare i (hQ.input_mem_of_pairMember hip)
+  rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare i (hQ.input_mem_of_pairMember hip)
       j (hQ.input_mem_of_pairMember hjq) with he | hij | hji
   · have he := hZF.1.eq_of_same_members i j he
     subst j

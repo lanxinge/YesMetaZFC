@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Iteration.Proper.Thread.Coherence
-import YesMetaZFC.Model.Forcing.Internal.Check.Order
+import YesMetaZFC.Model.Forcing.Check.Order
 import YesMetaZFC.SetTheory.RelationChain
 
 /-! # 全部早期名称在同一旧偏序中的加强关系

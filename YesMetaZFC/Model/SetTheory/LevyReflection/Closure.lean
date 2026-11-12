@@ -26,7 +26,7 @@ theorem lr_params_bound_l (hZF : M.Models ZF) {ω P Q X} (hω : M.IsOmega ω)
   obtain ⟨f, hf, he⟩ := senv_params_l I hZF hE hX k v hinj (fun i => num_mem_l hZF.1 hω (hk i)) hv
   obtain ⟨g, hg⟩ := ZF.exists_restriction hZF I f d
   have hdω := num_mem_l hZF.1 hω hd
-  have hgX := hg.isSetFunctionFromTo ((hE f).mp hf) (hω.transitive hZF d hdω)
+  have hgX := hg.isSetFunctionFromTo ((hE f).mp hf) (hω.transitive (ZF.modelsKP hZF) d hdω)
   obtain ⟨j, Y, hj, hy⟩ := ZF.cc_fseq_bound_l I hZF hω hQ hm hu hdω hgX
   exact ⟨j, Y, hj, fun i => hy.output_mem_of_pairMember
     ((hg.2 (k i) (v i)).mpr ⟨num_lt_l hZF.1 (hk i) hd i.isLt, he i⟩)⟩
@@ -39,7 +39,7 @@ theorem ZF.lr_closed_layer_l (hZF : M.Models ZF) {ω} (hω : M.IsOmega ω)
   have ascend {i j Y Z} (hij : M.SuccessorOf j i) (hi : M.PairMember I i Y Q)
       (hj : M.PairMember I j Z Q) : M.MemberSubset Y Z := by
     obtain ⟨⟨α, hZ⟩, hyZ, _⟩ := (hs i j Y Z hij hi hj).cover_l I hZF
-    exact v_transitive_l I hZF hZ Y hyZ
+    exact v_transitive_l I hZ Y hyZ
   have inc := cc_increasing_of_successor_l I hZF hω hQ (fun _ _ _ _ => ascend)
   have layers {i Y} (hi : M.PairMember I i Y Q) : ∃ α, V_d I α Y := by
     classical

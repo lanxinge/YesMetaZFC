@@ -46,13 +46,13 @@ theorem infiniteCardinal_isLimitOrdinal
     {𝒞 : Definitional.Project.OrderedPairConvention} (𝕀 : 𝒞.Interpretation ℳ)
     {ω κ : ℳ.Domain} (hω : ℳ.IsOmega ω) (hωCardinal : ℳ.IsCardinal 𝕀 ω) (hκ : ℳ.IsInfiniteCardinal 𝕀 ω κ) :
     ℳ.IsLimitOrdinal κ := by
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   have hκOrdinal := hκ.1.1
   rcases Structure.IsOrdinal.trichotomy hZF.1
       hωOrdinal hκOrdinal (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF) ω κ) with
     hSame | hωκ | hκω
   · have hEq := hZF.1.eq_of_same_members ω κ hSame
-    simpa [← hEq] using hω.isLimitOrdinal hZF
+    simpa [← hEq] using hω.isLimitOrdinal (ZF.modelsKP hZF)
   · refine ⟨hκOrdinal, ⟨ω, hωκ⟩, ?_⟩
     intro predecessor hPredecessor
     have hPredecessorOrdinal :=
@@ -277,7 +277,7 @@ theorem cartesianSquare_bounded_in_omega
       ℳ.mem bound ω ∧
         ℳ.CardinalLessOrEqual 𝕀 square bound := by
   have hNumberOrdinal :=
-    hω.members_areOrdinals hZF number hNumber
+    hω.members_areOrdinals (ZF.modelsKP hZF) number hNumber
   rcases ordinalMultiplication_existsUnique
       hZF 𝕀 number hNumberOrdinal with
     ⟨product, hProduct, _⟩
@@ -303,7 +303,7 @@ theorem omega_selfMultiplication
       ⟨identity, hIdentity⟩
     exact ⟨hωCardinal, identity, hIdentity.1⟩
   rcases canonicalOrdinalPairOrderType_existsUnique
-      hZF 𝕀 (hω.isOrdinal hZF) with
+      hZF 𝕀 (hω.isOrdinal (ZF.modelsKP hZF)) with
     ⟨ordinal, hType, _⟩
   apply infiniteCardinal_selfMultiplication_of_successorSquareBound
     hZF 𝕀 hω hωInfinite hType
@@ -370,7 +370,7 @@ theorem infiniteCardinal_selfMultiplication
         ℳ.mem current κ ∧ ¬ property current
       rfl
     · intro current hCurrent hPrevious hCurrentInfinite
-      have hωOrdinal := hω.isOrdinal hZF
+      have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
       rcases Structure.IsOrdinal.trichotomy hZF.1
           hωOrdinal hCurrent (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF)
             ω current) with

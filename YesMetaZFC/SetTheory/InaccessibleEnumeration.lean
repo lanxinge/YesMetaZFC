@@ -28,7 +28,7 @@ theorem inaccessible_enumeration_l (hZFC : M.Models ZFC) {ω κ B : M.Domain}
     exact ⟨W, hW, ZF.v_unique_l I hZF hV (history α W hαW) ▸ hxV⟩,
     fun ⟨V, hvA, hxV⟩ => by
       obtain ⟨α, hα, hαV⟩ := onto V hvA
-      exact ZF.v_transitive_l I hZF hB V (ZF.v_mem_l I hZF (history α V hαV) hB hα) x hxV⟩
+      exact v_transitive_l I hB V (ZF.v_mem_l I hZF (history α V hαV) hB hα) x hxV⟩
   have hAκ := ZF.ordinal_image_bound_l I hZF hr.isCardinal.1
     (ZF.exists_inclusionInjection hZF I (fun _ h => h)) fn onto
   have bound : M.CardinalLessOrEqual I B κ := infinite_union_l I hZFC hω

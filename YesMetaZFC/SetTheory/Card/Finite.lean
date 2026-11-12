@@ -173,7 +173,7 @@ theorem finite_insert_l {ω X Y a} (hω : M.IsOmega ω) (hX : Finite_d I ω X)
 
 theorem finite_countable_l {ω X} (hω : M.IsOmega ω) (hX : Finite_d I ω X) : M.CardinalLessOrEqual I X ω := by
   obtain ⟨n, hn, F, hF⟩ := hX
-  obtain ⟨G, hG⟩ := exists_inclusionInjection hZF I (hω.transitive hZF n hn)
+  obtain ⟨G, hG⟩ := exists_inclusionInjection hZF I (hω.transitive (ZF.modelsKP hZF) n hn)
   exact exists_compositionInjection hZF I hF hG
 
 theorem finite_subset_l {ω X Y} (hX : Finite_d I ω X) (hY : M.MemberSubset Y X) : Finite_d I ω Y := by

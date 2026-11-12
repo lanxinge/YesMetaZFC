@@ -111,6 +111,19 @@ theorem cp0_exists_l (hKP : M.Models KP) {m n K q s : M.Domain} (hq : Fn0_d m n 
   obtain ⟨r, hr, hir, hrx⟩ := (sat i x).mp ((hp i x).mp hix).2
   exact ⟨r, hr, x, hx, hir, hrx, hix⟩
 
+/-- KP 内部直接生成恒等图，同时返回逐点读取方程。 -/
+theorem fn0_identity_l (hKP : M.Models KP) (X : M.Domain) :
+    ∃ q, Fn0_d X X q ∧ ∀ x y, Rd_entry_d x y q ↔ M.mem x X ∧ x = y := by
+  let φ : Delta0BinarySchema 0 := { body := Formula.extensionalEq (.bound 1) .newest, delta0 := .atom _ _ _ }
+  let ρ : Env M 0 := ⟨Fin.elim0, fun _ => X⟩
+  have sat x y : (S1_binary.of_delta0 φ).schema.denote ρ x y ↔ x = y :=
+    (S1_binary.of_delta0_sat_l ..).trans (Formula.satisfies_extensionalEq_iff_eq hKP.1 ..)
+  obtain ⟨q, fq, spec⟩ := s1_function_l hKP (S1_binary.of_delta0 φ) ρ X X
+    (fun x _ => ⟨x, (sat x x).mpr rfl⟩)
+    (fun x _ y z hy hz => ((sat x y).mp hy).symm.trans ((sat x z).mp hz))
+    (fun x hx y hy => (sat x y).mp hy ▸ hx)
+  exact ⟨q, fq, fun x y => (spec x y).trans (and_congr Iff.rfl (sat x y))⟩
+
 /-- 给定实际函数空间，一次内部收集构造全部坐标重排。 -/
 theorem cp0_projection_l (hKP : M.Models KP) {m n K q H D} (hq : Fn0_d m n q)
     (hH : ∀ s, M.mem s H ↔ Fn0_d n K s) (hD : ∀ t, M.mem t D ↔ Fn0_d m K t) :

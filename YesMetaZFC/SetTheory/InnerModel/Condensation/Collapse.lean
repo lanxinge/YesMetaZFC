@@ -31,7 +31,7 @@ theorem jc_condensation_l (hM : M.Models KPi) {a U X : M.Domain} (ha : M.IsOrdin
 theorem jc_condensation_unique_l (hM : M.Models KPi) {X b c B D F G : M.Domain}
     (hb : J_d b B) (hc : J_d c D) (hf : Mc_iso_d X B F) (hg : Mc_iso_d X D G) : b = c ∧ B = D ∧ F = G := by
   let hKP := (KPi.models_iff_l.mp hM).1
-  obtain ⟨eq, hfg⟩ := mc_iso_unique_l hM hf hg (jh_value_transitive_l hM hb.2) (jh_value_transitive_l hM hc.2)
+  obtain ⟨eq, hfg⟩ := mc_map_unique_l hM hf.toMc_map_d hg.toMc_map_d (jh_value_transitive_l hM hb.2) (jh_value_transitive_l hM hc.2)
   subst D
   refine ⟨?_, rfl, hfg⟩
   rcases Structure.IsOrdinal.trichotomy hKP.1 hb.1 hc.1 (KP.difference_exists_d hKP)

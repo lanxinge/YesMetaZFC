@@ -19,7 +19,7 @@ theorem vr_source_l (hZF : M.Models ZF) {δ X α V : M.Domain}
     ∃ B F, M.mem B X ∧ M.mem F X ∧ (∀ t, Vc_d α V B F t) ∧
       ∀ β W, Rd_entry_d β W F → V_d (kp_pair_l (ZF.modelsKP hZF)) β W := by
   let I := kp_pair_l (ZF.modelsKP hZF)
-  have ht := ZF.v_transitive_l I hZF hX
+  have ht := v_transitive_l I hX
   have hVX := ZF.v_mem_l I hZF hV hX hα
   obtain ⟨F, hf, step⟩ := hV
   have hV : V_d I α V := ⟨F, hf, step⟩
@@ -28,10 +28,10 @@ theorem vr_source_l (hZF : M.Models ZF) {δ X α V : M.Domain}
     exact ⟨W, ZF.v_mem_l I hZF (hf.recursionValue_of_pairMember hβ hw) hV hβ, hw⟩⟩
   obtain ⟨B, hb⟩ := ZF.exists_range_of_setFunction hZF I fn.1 fn.2.1
   obtain ⟨P, hP⟩ := ZF.exists_powerSet hZF V
-  have hBX : M.mem B X := ht P (ZF.v_power_mem_l I hZF hX hδ hVX hP) B
+  have hBX : M.mem B X := ht P (v_power_mem_l I hX hδ hVX hP) B
     ((hP B).mpr fun w hw => ((hb w).mp hw).elim fun _ hp => fn.output_mem_of_pairMember hp)
-  obtain ⟨Z, hZX, hαZ, hVZ⟩ := ZF.v_joint_bound_l I hZF hX (ZF.v_ordinal_mem_l I hZF hX hα) hVX
-  have hFX := ZF.v_relation_mem_l I hZF hX hδ hZX (F := F) (fun p hp => by
+  obtain ⟨Z, hZX, hαZ, hVZ⟩ := v_joint_bound_l I hX (ZF.v_ordinal_mem_l I hZF hX hα) hVX
+  have hFX := v_relation_mem_l I hX hδ hZX (F := F) (fun p hp => by
     obtain ⟨β, W, hpair⟩ := fn.1.1 p hp
     exact ⟨β, hαZ β (fn.input_mem_of_pairMember ⟨p, hpair, hp⟩), W,
       hVZ W (fn.output_mem_of_pairMember ⟨p, hpair, hp⟩), hpair⟩)

@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.Descriptive.Projective.Section
-import YesMetaZFC.SetTheory.Descriptive.Normal.Observation
+import YesMetaZFC.SetTheory.Descriptive.Normal.Closed
 
 /-! # 实际通用闭集
 
@@ -51,8 +51,8 @@ theorem uc_closed_l (hZF : M.Models ZF) {ω A B J} (hB : Baire_d I ω B)
       pair, fun s hs sub hb => h ⟨s, hs, sub, hb⟩⟩))
   obtain ⟨n, t, u, hn, ht, hu, obs⟩ := no_and_l I hZF hB.1 hxf hpf
     (no_sub_l I hZF hB.1 hA hxf hpf hs hsx) (no_nv_l I hZF hB.1 hxf hpf bad)
-  have htf := ht.isSetFunctionFromTo hxf (hB.1.transitive hZF n hn)
-  have huf := hu.isSetFunctionFromTo hpf (hB.1.transitive hZF n hn)
+  have htf := ht.isSetFunctionFromTo hxf (hB.1.transitive (ZF.modelsKP hZF) n hn)
+  have huf := hu.isSetFunctionFromTo hpf (hB.1.transitive (ZF.modelsKP hZF) n hn)
   obtain ⟨r, hrf, rp⟩ := rp_exists_l I hZF hJ huf htf
   refine ⟨r, (hA r).mpr ⟨n, hn, hrf⟩, (rp_subset_l I hJ huf htf rp pair).mpr
     ⟨(ds_restrict_iff_l I huf hpf.1).mp hu, (ds_restrict_iff_l I htf hxf.1).mp ht⟩, fun q' hq' hrq => ?_⟩

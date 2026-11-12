@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.Coordinates
 import YesMetaZFC.Model.Forcing.CCC.Bounds
-import YesMetaZFC.Model.Forcing.Internal.Extension.Choice
-import YesMetaZFC.Model.Forcing.Internal.Extension.Generic
+import YesMetaZFC.Model.Forcing.Extension.Choice
+import YesMetaZFC.Model.Forcing.Extension.Generic
 import YesMetaZFC.Model.Forcing.Applications.Cohen.Presentation
 
 /-! # 一次添加任意参数量的 Cohen 实数

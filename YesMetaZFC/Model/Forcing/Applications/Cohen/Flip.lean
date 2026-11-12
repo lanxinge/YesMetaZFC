@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Applications.Cohen.FlipSyntax
-import YesMetaZFC.Model.Forcing.Internal.Automorphism.Forcing
+import YesMetaZFC.Model.Forcing.Automorphism.RealSetName
 
 /-! # Cohen 位翻转的实际内部自同构
 

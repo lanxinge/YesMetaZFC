@@ -98,7 +98,7 @@ theorem cc_strict_cofinal_l (hZF : M.Models ZF) {ω A α} (hω : M.IsOmega ω)
     (fun x y z _ _ hz hxy hyz => (hθ x z).mpr ((hA.1.1.mem (hA.2.1 z hz)).transitive y
       ((hθ y z).mp hyz) x ((hθ x y).mp hxy)))
     (fun i j x y hij hix hjy => (hθ x y).mpr (step i j x y hij hix hjy).1)
-  have ord : M.IsOrdinalValuedSequence I Q ω := ⟨⟨hω.isOrdinal hZF, hQ.1, hQ.2.1⟩,
+  have ord : M.IsOrdinalValuedSequence I Q ω := ⟨⟨hω.isOrdinal (ZF.modelsKP hZF), hQ.1, hQ.2.1⟩,
     fun _ _ x hx => hA.1.1.mem (hA.2.1 x (hQ.output_mem_of_pairMember hx))⟩
   obtain ⟨T, hT⟩ := exists_range_of_setFunction hZF I hQ.1 hQ.2.1
   refine ⟨Q, hQ, hA.1, ⟨ord, fun i _ j _ hij x y hx hy => (hθ x y).mp (inc i j x y hij hx hy)⟩,
@@ -123,8 +123,8 @@ theorem cf_omega_iff_l (hZF : M.Models ZF) {ω α} (hω : M.IsOmega ω) :
   refine ⟨fun h => h.hasCofinalSequence, fun h => ⟨omega_cardinal_l I hZF hω, h, ?_⟩⟩
   rintro l ⟨F, hF⟩
   have hl := hF.length_isLimitOrdinal hZF
-  have hwl := hω.subset_limitOrdinal hZF hl
-  rcases (hω.isOrdinal hZF).trichotomy hZF.1 hl.1 (KP.difference_exists_d (modelsKP hZF))
+  have hwl := hω.subset_limitOrdinal (ZF.modelsKP hZF) hl
+  rcases (hω.isOrdinal (ZF.modelsKP hZF)).trichotomy hZF.1 hl.1 (KP.difference_exists_d (modelsKP hZF))
       (KP.intersection_exists_d (modelsKP hZF) ω l) with he | hwl' | hlw
   · exact Or.inl (hZF.1.eq_of_same_members ω l he)
   · exact Or.inr hwl'

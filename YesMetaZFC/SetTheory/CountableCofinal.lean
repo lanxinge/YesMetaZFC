@@ -92,7 +92,7 @@ theorem cc_cofinal_sequence_l (hZF : M.Models ZF) {ω β A a} (hω : M.IsOmega �
     intro i j x y hij hix hjy
     have hiy : θ.denote (ρ.push i) y := (hθ i y).mpr
       ⟨(bound hjy).1, (bound hjy).2.1, fun k hk z hkz => (bound hjy).2.2 k
-        (((hω.isOrdinal hZF).mem (hF.input_mem_of_pairMember hjy)).transitive i hij k hk) z hkz⟩
+        (((hω.isOrdinal (ZF.modelsKP hZF)).mem (hF.input_mem_of_pairMember hjy)).transitive i hij k hk) z hkz⟩
     exact ((hψ i x).mp ((hf i x).mp hix).2).2 y hiy
   obtain ⟨γ, hγ⟩ := KP.exists_union (modelsKP hZF) A
   have hγo := Structure.IsOrdinal.of_union (modelsKP hZF) hγ (fun x hx => hβ.mem (hAβ x hx))
@@ -109,7 +109,7 @@ theorem cc_cofinal_sequence_l (hZF : M.Models ZF) {ω β A a} (hω : M.IsOmega �
     obtain ⟨z, _, hjz⟩ := hF.2.2 j hj
     exact ⟨j, z, hjz, (hβ.mem (hAβ z (bound hjz).1)).transitive y
       ((bound hjz).2.2 i hij.predecessor_mem y (hgr y i hyi)) x hxy⟩
-  have ord : M.IsOrdinalValuedSequence I F ω := ⟨⟨hω.isOrdinal hZF, hF.1, hF.2.1⟩,
+  have ord : M.IsOrdinalValuedSequence I F ω := ⟨⟨hω.isOrdinal (ZF.modelsKP hZF), hF.1, hF.2.1⟩,
     fun _ _ x hx => hβ.mem (hAβ x (hF.output_mem_of_pairMember hx))⟩
   obtain ⟨J, hJ⟩ := exists_range_of_setFunction hZF I hF.1 hF.2.1
   have lim : M.IsUnionOf γ J := by

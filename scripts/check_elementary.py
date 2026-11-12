@@ -7,8 +7,11 @@ import sys
 
 from check_filters import main
 
-MODULES = ["YesMetaZFC.Model.Closure"] + [
-    "YesMetaZFC.Model.FirstOrder." + m for m in ("Elementary", "Substructure", "Skolem")
+MODULES = [
+    'YesMetaZFC.Model.Closure',
+    'YesMetaZFC.Model.FirstOrder.Elementary',
+    'YesMetaZFC.Model.FirstOrder.Substructure',
+    'YesMetaZFC.Model.FirstOrder.Skolem',
 ]
 PREFIX = "YesMetaZFC.Logic.FirstOrder."
 CHOICE_FREE = [PREFIX + "Str_emb." + n for n in (

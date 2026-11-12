@@ -32,13 +32,13 @@ theorem od_source_l (hZF : M.Models ZF) {d} (φ : UnarySchema d) (ρ : Env M d)
   obtain ⟨a, n, s, ⟨m, F, k, ha⟩, hn, hs, hc⟩ :=
     source_finite_compile_l I hZF hω he heB φ.body φ.freeClosed ρ.bound hpB
   obtain ⟨p, hp⟩ := oc_seq_exists_l I hZF hn
-    ⟨⟨hω.members_areOrdinals hZF n hn, hs.1, hs.2.1⟩,
+    ⟨⟨hω.members_areOrdinals (ZF.modelsKP hZF) n hn, hs.1, hs.2.1⟩,
       fun _ _ b hb => hBo b (hs.output_mem_of_pairMember hb)⟩
   obtain ⟨z, hz⟩ := sc_num_exists_l I hZF hω ha
   -- 只反射给定的原公式；同层的全部参数赋值均保持其真值。
   obtain ⟨A, hA⟩ := KP.exists_insert (ZF.modelsKP hZF) B x
   obtain ⟨θ, X, hX, _, hAX, hr⟩ := ZF.lr_reflect_l I hZF φ.body φ.freeClosed A
-  have ht := ZF.v_transitive_l I hZF hX
+  have ht := v_transitive_l I hX
   have hBX : M.MemberSubset B X := fun b hb => ht A hAX b ((hA b).mpr (Or.inl hb))
   have hxX : M.mem x X := ht A hAX x ((hA x).mpr (Or.inr rfl))
   obtain ⟨c, R, hM, hR⟩ := smdl_membership_l I hZF ⟨e, hBX e heB⟩

@@ -11,8 +11,8 @@ open Definitional.Project InnerModel
 universe u
 variable {M : Structure.{u}}
 
-theorem Mc_iso_d.canonical_l (hM : M.Models KPi) {X B F a y : M.Domain}
-    (h : Mc_iso_d X B F) (hb : M.TransitiveSet B) (hp : Rd_entry_d a y F) : Mc_value_d X a y := by
+theorem Mc_map_d.canonical_l (hM : M.Models KPi) {X B F a y : M.Domain}
+    (h : Mc_map_d X B F) (hb : M.TransitiveSet B) (hp : Rd_entry_d a y F) : Mc_value_d X a y := by
   let hE := (KPi.models_iff_l.mp hM).1.1
   let ρ := (mc_env_l X).push F
   let φ : UnarySchema 2 := { body := (.forallE <| .imp (rd_entry0_m (.bound 1) .newest (.bound 2))
@@ -40,8 +40,8 @@ theorem Mc_iso_d.canonical_l (hM : M.Models KPi) {X B F a y : M.Domain}
   subst v
   exact hv
 
-theorem mc_iso_unique_l (hM : M.Models KPi) {X B D F G : M.Domain}
-    (h : Mc_iso_d X B F) (g : Mc_iso_d X D G) (hb : M.TransitiveSet B) (hd : M.TransitiveSet D) : B = D ∧ F = G := by
+theorem mc_map_unique_l (hM : M.Models KPi) {X B D F G : M.Domain}
+    (h : Mc_map_d X B F) (g : Mc_map_d X D G) (hb : M.TransitiveSet B) (hd : M.TransitiveSet D) : B = D ∧ F = G := by
   let hKP := (KPi.models_iff_l.mp hM).1
   have entry a y : Rd_entry_d a y F ↔ Rd_entry_d a y G := by
     constructor

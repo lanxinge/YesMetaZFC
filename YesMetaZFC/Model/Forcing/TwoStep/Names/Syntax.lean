@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Names.PairConstruction
+import YesMetaZFC.Model.Forcing.Names.PairConstruction
 
 /-! # 两步名称的递归转换规格
 

@@ -1,5 +1,5 @@
 import YesMetaZFC.SetTheory.FlatPairing.Sequence
-import YesMetaZFC.Model.SetTheory.Internal.SupportSyntax
+import YesMetaZFC.Model.SetTheory.Internal.Theory
 
 /-! # 平坦前缀的精确反解
 

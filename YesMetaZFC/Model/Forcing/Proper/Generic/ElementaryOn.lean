@@ -1,6 +1,6 @@
 import YesMetaZFC.Model.Forcing.Proper.Generic.Elementary
 import YesMetaZFC.Model.Forcing.Proper.Syntax
-import YesMetaZFC.Model.SetTheory.Internal.ElementaryClub
+import YesMetaZFC.Model.SetTheory.Embedding.ElementaryTrace
 
 /-! # 在给定传递环境中装配内部泛型初等提升
 

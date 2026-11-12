@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.CCC.Basic
-import YesMetaZFC.Model.Forcing.Internal.Functions.Generic
+import YesMetaZFC.Model.Forcing.Functions.Generic
 
 /-! # 参数化 Cohen 坐标的稠密要求
 

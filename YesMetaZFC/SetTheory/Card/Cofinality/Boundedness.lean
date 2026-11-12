@@ -526,7 +526,7 @@ theorem finiteFamilyUnion_bounded
     hSequence.length_isLimitOrdinal hZF
   have hLengthCf :
       ℳ.mem length cf :=
-    hω.subset_limitOrdinal hZF hCfLimit
+    hω.subset_limitOrdinal (ZF.modelsKP hZF) hCfLimit
       length hLengthFinite
   exact familyUnion_bounded_of_length_mem
     hZF 𝕀 hCofinality hLengthCf hFamily

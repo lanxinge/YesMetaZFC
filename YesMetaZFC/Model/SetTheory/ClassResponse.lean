@@ -29,7 +29,7 @@ theorem ZFC.class_response_l (hZFC : M.Models ZFC) {n} (V : UnarySchema n)
   obtain ⟨B,_,bs⟩ := ZF.finite_params_l I hZF hw v
   have hb i : M.mem (v i) B := (bs _).mpr ⟨i,rfl⟩
   obtain ⟨α,X,rank,_,bx,closed⟩ := ZF.lr_closed_layer_l I hZF hw [⟨n+2,ψ⟩] B
-  have tr := ZF.v_transitive_l I hZF rank
+  have tr := v_transitive_l I rank
   have ax : M.mem a X := tr B bx a (hb 0)
   have alphabet : M.mem A X := tr B bx A (hb 1)
   have params i : M.mem (ρ.bound i) X := tr B bx _ (hb i.succ.succ)

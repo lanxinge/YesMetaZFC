@@ -106,7 +106,7 @@ private theorem exists_diagonalFunction
           rcases ZF.exists_rightInverseInjection_of_surjection_from_ordinal
               hZF 𝕀 (hκ.1.mem hStageκ)
               hEvaluation hSurjective with
-            ⟨κToStage, hκToStage⟩
+            ⟨κToStage, hκToStage, _⟩
           rcases ZF.exists_inclusionInjection
               hZF 𝕀 hStageSubset with
             ⟨stageToκ, hStageToκ⟩

@@ -172,7 +172,7 @@ theorem ordinalAddition_one_isSuccessor_on_omega
   · intro predecessor hPredecessorOmega hPredecessorProperty
       successor hSuccessor sum hSum
     have hPredecessorOrdinal :=
-      hω.members_areOrdinals hZF
+      hω.members_areOrdinals (ZF.modelsKP hZF)
         predecessor hPredecessorOmega
     rcases (ordinalAddition_successor_iff
         hZF 𝕀
@@ -194,7 +194,7 @@ theorem ordinalAddition_one_omega
     ordinalAddition_one_isSuccessor_on_omega
       hZF 𝕀 hω hOne
   rcases (ordinalAddition_limit_iff
-      hZF 𝕀 (hω.isLimitOrdinal hZF)).mp
+      hZF 𝕀 (hω.isLimitOrdinal (ZF.modelsKP hZF))).mp
       hSum with
     ⟨range, hRange, hUnion⟩
   apply hZF.1.eq_of_same_members
@@ -212,11 +212,11 @@ theorem ordinalAddition_one_omega
     have hRangeEq : rangeValue = successor := by
       exact Structure.SuccessorOf.eq hZF.1 hRangeSuccessor hSuccessor
     subst rangeValue
-    exact (hω.transitive hZF)
+    exact (hω.transitive (ZF.modelsKP hZF))
       successor hSuccessorOmega value hValueRange
   · intro hValue
     rcases ordinalAddition_existsUnique hZF 𝕀
-        one (hω.members_areOrdinals hZF value hValue) with
+        one (hω.members_areOrdinals (ZF.modelsKP hZF) value hValue) with
       ⟨successor, hSuccessorValue, _⟩
     have hSuccessor :=
       hFinite value hValue successor hSuccessorValue
@@ -234,7 +234,7 @@ theorem ordinalAddition_omega_one_ne_omega
   intro hEq
   subst sum
   have hSelf : ℳ.mem ω ω := (hSuccessor ω).mpr (Or.inr fun _ => Iff.rfl)
-  exact (hω.isOrdinal hZF).wellOrder.linear.irrefl
+  exact (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.irrefl
     ω hSelf hSelf
 /-- 加法在 `one` 与 `ω` 上不交换。 -/
 theorem ordinalAddition_not_commutative_at_omega
@@ -295,7 +295,7 @@ theorem ordinalMultiplication_two_bounded_on_omega
   · intro predecessor hPredecessor hPrevious
       successor hSuccessor product hProduct
     have hPredecessorOrdinal :=
-      hω.members_areOrdinals hZF
+      hω.members_areOrdinals (ZF.modelsKP hZF)
         predecessor hPredecessor
     have hSuccessorOrdinal :=
       KP.successor_isOrdinal (ZF.modelsKP hZF)
@@ -342,7 +342,7 @@ theorem ordinalMultiplication_two_bounded_on_omega
           hSuccessor hMiddleSuccessor
       simpa [hSuccessorEq] using hMiddleMemProduct
     · have hPreviousOrdinal :=
-        hω.members_areOrdinals hZF
+        hω.members_areOrdinals (ZF.modelsKP hZF)
           previous hPreviousData.1
       rcases Structure.IsOrdinal.trichotomy hZF.1
           hSuccessorOrdinal hPreviousOrdinal (KP.difference_exists_d (ZF.modelsKP hZF)) (KP.intersection_exists_d (ZF.modelsKP hZF)
@@ -381,7 +381,7 @@ theorem ordinalMultiplication_two_omega
     ordinalMultiplication_two_bounded_on_omega
       hZF 𝕀 hω hTwo
   rcases (ordinalMultiplication_limit_iff
-      hZF 𝕀 hTwoOrdinal (hω.isLimitOrdinal hZF)).mp hProduct with
+      hZF 𝕀 hTwoOrdinal (hω.isLimitOrdinal (ZF.modelsKP hZF))).mp hProduct with
     ⟨range, hRange, hUnion⟩
   apply hZF.1.eq_of_same_members
   intro value
@@ -392,13 +392,13 @@ theorem ordinalMultiplication_two_omega
     rcases (hRange rangeValue).mp hRangeValue with
       ⟨index, hIndex, hIndexValue⟩
     have hRangeOmega := (hFinite index hIndex rangeValue hIndexValue).1
-    exact (hω.transitive hZF)
+    exact (hω.transitive (ZF.modelsKP hZF))
       rangeValue hRangeOmega value hValueRange
   · intro hValue
     rcases hω.1.2 value hValue with
       ⟨successor, hSuccessor, hSuccessorOmega⟩
     have hSuccessorOrdinal :=
-      KP.successor_isOrdinal (ZF.modelsKP hZF) (hω.members_areOrdinals hZF value hValue)
+      KP.successor_isOrdinal (ZF.modelsKP hZF) (hω.members_areOrdinals (ZF.modelsKP hZF) value hValue)
         hSuccessor
     rcases ordinalMultiplication_existsUnique hZF
         𝕀 two hSuccessorOrdinal with
@@ -427,7 +427,7 @@ theorem ordinalAddition_omega_self_ne_omega
     sum ≠ ω := by
   rcases hω.1.1 with
     ⟨zero, hZero, hZeroOmega⟩
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   have hωPlusZero :
       ℳ.IsOrdinalAddition 𝕀 ω ω zero := (ordinalAddition_zero_iff
       hZF 𝕀 hZero).mpr rfl
@@ -450,7 +450,7 @@ theorem ordinalMultiplication_omega_two_eq_addition
       ℳ.IsOrdinalAddition 𝕀 sum ω ω) :
     product = sum := by
   rcases hTwo with ⟨one, hOne, hTwoSuccessor⟩
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   rcases (ordinalMultiplication_successor_iff
       hZF 𝕀 hωOrdinal (KP.ordinalOne_isOrdinal (ZF.modelsKP hZF) hOne)
       hTwoSuccessor).mp hProduct with
@@ -511,7 +511,7 @@ theorem exists_ordinalAddition_noncommutative
   rcases KP.exists_ordinalOne (ZF.modelsKP hZF) with
     ⟨one, hOne⟩
   rcases ordinalAddition_existsUnique hZF 𝕀
-      one (hω.isOrdinal hZF) with
+      one (hω.isOrdinal (ZF.modelsKP hZF)) with
     ⟨onePlusOmega, hOnePlusOmega, _⟩
   rcases ordinalAddition_existsUnique hZF 𝕀
       ω (KP.ordinalOne_isOrdinal (ZF.modelsKP hZF) hOne) with
@@ -542,7 +542,7 @@ theorem exists_ordinalMultiplication_noncommutative
   rcases exists_omega hZF with ⟨ω, hω⟩
   rcases KP.exists_ordinalTwo (ZF.modelsKP hZF) with
     ⟨two, hTwo⟩
-  have hωOrdinal := hω.isOrdinal hZF
+  have hωOrdinal := hω.isOrdinal (ZF.modelsKP hZF)
   have hTwoOrdinal :=
     hTwo.isOrdinal (ZF.modelsKP hZF)
   rcases ordinalMultiplication_existsUnique hZF

@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Hereditary.NameBound
-import YesMetaZFC.Model.Forcing.Internal.Functions.Rules
+import YesMetaZFC.Model.Forcing.Functions.ValueIsomorphism
 
 /-! # 按旧索引与条件选择小子名称
 

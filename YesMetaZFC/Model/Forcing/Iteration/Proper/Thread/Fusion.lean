@@ -42,7 +42,7 @@ theorem row_pr_fuse_l {ω δ F G b γ F' G' P T D V N A E X Q}
   refine ⟨q, hq, fun i x α p τ hx hα hxp => ?_⟩
   have hi := hQ.input_mem_of_pairMember hx
   have he : M.mem o i ∨ o = i := by
-    rcases (hω.isOrdinal hZF).wellOrder.linear.compare o hoω i hi with he | hoi | hio
+    rcases (hω.isOrdinal (ZF.modelsKP hZF)).wellOrder.linear.compare o hoω i hi with he | hoi | hio
     · exact Or.inr (hZFC.1.eq_of_same_members o i he)
     · exact Or.inl hoi
     · exact (ho i hio).elim

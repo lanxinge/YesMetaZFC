@@ -74,4 +74,53 @@ theorem delta0_image_l (e : M.Domain → N.Domain) (hi : Function.Injective e)
       obtain ⟨x, hx, rfl⟩ := (he (t.eval ρ) y).mp hy
       exact ⟨x, hx, (ih (ρ.push x)).mpr (by simpa only [image_env_push_l] using h)⟩
 
+/-- 保持并反映成员关系的满射保持全部原公式；定义等同不要求代表元唯一。 -/
+theorem formula_image_l (e : M.Domain → N.Domain)
+    (onto : Function.Surjective e) (mem : ∀ x y, M.mem x y ↔ N.mem (e x) (e y))
+    {n} (φ : Formula 1 n) (ρ : Env M n) :
+    Formula.satisfies ρ φ ↔ Formula.satisfies (image_env_l e ρ) φ := by
+  have equal a b : (∀ x, M.mem x a ↔ M.mem x b) ↔
+      ∀ y, N.mem y (e a) ↔ N.mem y (e b) := by
+    constructor
+    · intro h y
+      obtain ⟨x,rfl⟩ := onto y
+      exact (mem x a).symm.trans ((h x).trans (mem x b))
+    · exact fun h x => (mem x a).trans ((h (e x)).trans (mem x b).symm)
+  have subset a b : (∀ x, M.mem x a → M.mem x b) ↔
+      ∀ y, N.mem y (e a) → N.mem y (e b) := by
+    constructor
+    · intro h y hy
+      obtain ⟨x,rfl⟩ := onto y
+      exact (mem x b).mp (h x ((mem x a).mpr hy))
+    · exact fun h x hx => (mem x b).mpr (h (e x) ((mem x a).mp hx))
+  induction φ with
+  | falsum => rfl
+  | truth => rfl
+  | mem s t => simpa only [Formula.satisfies_mem_iff,eval_image_env_l] using mem (s.eval ρ) (t.eval ρ)
+  | atom r hr ts =>
+    cases r
+    · simpa only [Formula.satisfies_atom_extensionalEq_iff,eval_image_env_l] using equal ((ts.get 0).eval ρ) ((ts.get 1).eval ρ)
+    · simpa only [Formula.satisfies_atom_subset_iff,eval_image_env_l] using subset ((ts.get 0).eval ρ) ((ts.get 1).eval ρ)
+  | neg φ ih => simpa only [Formula.satisfies_neg_iff] using not_congr (ih ρ)
+  | conj φ ψ ih jh => simpa only [Formula.satisfies_conj_iff] using and_congr (ih ρ) (jh ρ)
+  | disj φ ψ ih jh => simpa only [Formula.satisfies_disj_iff] using or_congr (ih ρ) (jh ρ)
+  | imp φ ψ ih jh => simpa only [Formula.satisfies_imp_iff] using imp_congr (ih ρ) (jh ρ)
+  | iff φ ψ ih jh => simpa only [Formula.satisfies_iff_iff] using iff_congr (ih ρ) (jh ρ)
+  | existsE φ ih =>
+    simp only [Formula.satisfies_exists_iff]
+    constructor
+    · rintro ⟨x, h⟩
+      exact ⟨e x, by simpa only [image_env_push_l] using (ih (ρ.push x)).mp h⟩
+    · rintro ⟨y, h⟩
+      obtain ⟨x, rfl⟩ := onto y
+      exact ⟨x, (ih (ρ.push x)).mpr (by simpa only [image_env_push_l] using h)⟩
+  | forallE φ ih =>
+    simp only [Formula.satisfies_forall_iff]
+    constructor
+    · intro h y
+      obtain ⟨x, rfl⟩ := onto y
+      simpa only [image_env_push_l] using (ih (ρ.push x)).mp (h x)
+    · intro h x
+      exact (ih (ρ.push x)).mpr (by simpa only [image_env_push_l] using h (e x))
+
 end YesMetaZFC.SetTheory

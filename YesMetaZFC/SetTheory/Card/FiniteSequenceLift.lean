@@ -47,8 +47,8 @@ theorem fseq_lift_l (hZF : M.Models ZF) {ω X Y F n s} (hω : M.IsOmega ω)
     obtain ⟨y, hy, hsy⟩ := hs.2.2 m hn.predecessor_mem
     obtain ⟨x, hx, hxy⟩ := hF y hy
     obtain ⟨v, hv, hvt⟩ := Structure.IsSequenceOfLength.exists_append (value := x)
-      (modelsKP hZF) I ⟨(hω.isOrdinal hZF).mem hm, ht.1, ht.2.1⟩
-      (KP.successor_isOrdinal (modelsKP hZF) ((hω.isOrdinal hZF).mem hm) hn) hn
+      (modelsKP hZF) I ⟨(hω.isOrdinal (ZF.modelsKP hZF)).mem hm, ht.1, ht.2.1⟩
+      (KP.successor_isOrdinal (modelsKP hZF) ((hω.isOrdinal (ZF.modelsKP hZF)).mem hm) hn) hn
     refine ⟨v, ⟨hv.2.1, hv.2.2, fun i hi => ?_⟩, fun i a b ha hb => ?_⟩
     · obtain ⟨a, ha⟩ := (hv.2.2 i).mp hi
       refine ⟨a, ?_, ha⟩

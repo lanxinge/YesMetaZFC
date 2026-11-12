@@ -126,6 +126,6 @@ theorem wr_countable_l (hZF : M.Models ZF) {ω X R} (hω : M.IsOmega ω)
     (hw : Wf_rel_d X R) (hc : M.CardinalLessOrEqual I X ω) :
     ∃ α F, M.IsOrdinal α ∧ M.CardinalLessOrEqual I α ω ∧ M.IsSetFunctionFromTo I F X α ∧ Wr_d I X R F := by
   obtain ⟨α, F, ha, hf, hs, hr⟩ := wr_exists_l I hZF hw
-  exact ⟨α, F, ha, ZF.ordinal_image_bound_l I hZF (hω.isOrdinal hZF) hc hf hs, hf, hr⟩
+  exact ⟨α, F, ha, ZF.ordinal_image_bound_l I hZF (hω.isOrdinal (ZF.modelsKP hZF)) hc hf hs, hf, hr⟩
 
 end YesMetaZFC.SetTheory

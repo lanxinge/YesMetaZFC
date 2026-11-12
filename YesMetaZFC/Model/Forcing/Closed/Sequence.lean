@@ -1,7 +1,7 @@
 import YesMetaZFC.Model.Forcing.Closed.Syntax
-import YesMetaZFC.Model.Forcing.Internal.Names.SequenceForcing
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Criterion
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Names.SequenceForcing
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 
 /-! # 固定条件下名称下降链的逐项装配
 

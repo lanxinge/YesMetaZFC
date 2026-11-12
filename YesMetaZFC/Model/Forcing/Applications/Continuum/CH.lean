@@ -1,7 +1,7 @@
-import YesMetaZFC.Model.Forcing.Applications.Collapse.Generic
-import YesMetaZFC.Model.Forcing.Internal.Extension.Choice
+import YesMetaZFC.Model.Forcing.Collapse.Iteration
+import YesMetaZFC.Model.Forcing.Extension.Choice
 import YesMetaZFC.SetTheory.Continuum
-import YesMetaZFC.Model.Forcing.Internal.Extension.Generic
+import YesMetaZFC.Model.Forcing.Extension.Generic
 import YesMetaZFC.Model.SetTheory.CountableGround
 
 /-! # ZFC＋CH 的内部塌缩扩张

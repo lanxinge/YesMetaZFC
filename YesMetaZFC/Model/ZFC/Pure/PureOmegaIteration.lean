@@ -121,7 +121,7 @@ theorem functional (hℳ : Theory.Models ℳ theory) {step : Project.BinarySchem
     hOperator.symm ▸ operator_functional hℳ hTotal seed
   obtain ⟨sequence,hSequence⟩ := _root_.YesMetaZFC.SetTheory.ZF.recursiveSequence_exists
     (project_modelsZF hℳ) (PureKuratowskiProject.interpretation hℳ) env (history step) hFunction
-    ((omega_project hℳ).isOrdinal (project_modelsZF hℳ))
+    ((omega_project hℳ).isOrdinal (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)))
   refine ⟨sequence,(graph_correct hℳ hRep sequence seed).mpr (hOperator ▸ hSequence),?_⟩
   intro other hOther
   have hOther := (graph_correct hℳ hRep other seed).mp hOther
@@ -157,7 +157,7 @@ theorem iterates_of_graph (hℳ : Theory.Models ℳ theory) {step : Project.Bina
       ⟨(succ_spec hℳ input input).mpr (Or.inr rfl),hValue hInput⟩
     have hSuccessor : (Project.FirstOrderSemantics.reduct ℳ).IsSuccessorLengthSequenceWithLast
         (PureKuratowskiProject.interpretation hℳ) restricted (value hℳ sequence input) :=
-      ⟨input,(omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) input hInput,
+      ⟨input,(omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) input hInput,
         succ hℳ input,succ_project hℳ input,hRestriction,hLast⟩
     obtain ⟨next,hNext,_⟩ := hTotal (value hℳ sequence input)
     obtain ⟨_,_,hUnique⟩ := operator_functional hℳ hTotal seed restricted ⟨succ hℳ input,hRestriction⟩

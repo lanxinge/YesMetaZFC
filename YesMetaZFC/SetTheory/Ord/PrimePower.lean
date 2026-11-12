@@ -45,7 +45,7 @@ theorem prime_isOrdinal
     {𝕀 : 𝒞.Interpretation ℳ}
     {ω one prime : ℳ.Domain} (hω : ℳ.IsOmega ω) (hPrime : ℳ.IsPrimeInOmega 𝕀 ω one prime) :
     ℳ.IsOrdinal prime :=
-  hω.members_areOrdinals hZF prime hPrime.prime_mem_omega
+  hω.members_areOrdinals (ZF.modelsKP hZF) prime hPrime.prime_mem_omega
 /-- 素数合同中使用的一确实是序数。 -/
 theorem one_isOrdinal
     {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
@@ -63,7 +63,7 @@ theorem exponent_isOrdinal
     {𝕀 : 𝒞.Interpretation ℳ}
     {ω one power prime exponent : ℳ.Domain} (hω : ℳ.IsOmega ω) (hPower : ℳ.IsPrimePower 𝕀 ω one power prime exponent) :
     ℳ.IsOrdinal exponent :=
-  hω.members_areOrdinals hZF exponent hPower.exponent_mem_omega
+  hω.members_areOrdinals (ZF.modelsKP hZF) exponent hPower.exponent_mem_omega
 /-- 素数幂的值仍是序数。 -/
 theorem power_isOrdinal
     {ℳ : Structure.{u}} (hZF : ℳ.Models SetTheory.ZF)
@@ -94,7 +94,7 @@ theorem exists_unique_power
         ∀ other,
           ℳ.IsPrimePower 𝕀 ω one other prime exponent →
             other = power := by
-  rcases ZF.ordinalExponentiation_existsUnique hZF 𝕀 (hPrime.prime_isOrdinal hZF hω) (hω.members_areOrdinals hZF exponent hExponent) with
+  rcases ZF.ordinalExponentiation_existsUnique hZF 𝕀 (hPrime.prime_isOrdinal hZF hω) (hω.members_areOrdinals (ZF.modelsKP hZF) exponent hExponent) with
     ⟨power, hPower, hUnique⟩
   refine ⟨power, ⟨hPrime, hExponent, hPower⟩, ?_⟩
   intro other hOther

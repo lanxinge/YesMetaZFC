@@ -121,7 +121,7 @@ theorem iterate_l (hZF : M.Models ZF) {ω X F a : M.Domain} (hω : M.IsOmega ω)
     obtain ⟨x, hx, hu⟩ := ht s hs
     exact ⟨x, (iter_sat_l I hZF.1 ρ s x).mpr hx,
       fun y hy => hu y ((iter_sat_l I hZF.1 ρ s y).mp hy)⟩
-  obtain ⟨g, hg⟩ := ZF.recursiveSequence_exists hZF I ρ (iter_m 𝒞) hop (hω.isOrdinal hZF)
+  obtain ⟨g, hg⟩ := ZF.recursiveSequence_exists hZF I ρ (iter_m 𝒞) hop (hω.isOrdinal (ZF.modelsKP hZF))
   have hz e (he : ∀ x, ¬ M.mem x e) x (hx : M.PairMember I e x g) : x = a := by
     have heω := (hg.1.2.2 e).mpr ⟨x, hx⟩
     obtain ⟨s, hs, hop⟩ := hg.2 e heω x hx

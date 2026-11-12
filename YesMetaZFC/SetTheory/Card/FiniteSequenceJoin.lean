@@ -37,8 +37,8 @@ theorem ZF.fseq_join_l (hZF : M.Models ZF) {ω A n m f g} (hω : M.IsOmega ω)
     (hn : M.mem n ω) (hm : M.mem m ω) (hf : M.IsSetFunctionFromTo I f n A)
     (hg : M.IsSetFunctionFromTo I g m A) : ∃ k F, M.mem k ω ∧ M.IsOrdinalAddition I k n m ∧ M.IsSetFunctionFromTo I F k A ∧
       M.IsRestrictionOf I f F n ∧ Fs_tail_d I n m F g := by
-  have no := hω.members_areOrdinals hZF n hn
-  have mo := hω.members_areOrdinals hZF m hm
+  have no := hω.members_areOrdinals (ZF.modelsKP hZF) n hn
+  have mo := hω.members_areOrdinals (ZF.modelsKP hZF) m hm
   obtain ⟨k, hk, _⟩ := ordinalAddition_existsUnique hZF I n mo
   let ρ : Env M 4 := ⟨Fin.cases n (Fin.cases m (Fin.cases f (fun _ => g))), fun _ => A⟩
   let φ : BinarySchema 4 := {

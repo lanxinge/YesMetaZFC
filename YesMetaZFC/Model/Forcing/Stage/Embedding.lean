@@ -14,6 +14,16 @@ variable (M : SetTheory.Structure.{u})
 def Red_d (R Q S w F x p : M.Domain) : Prop :=
   ∀ q y, Entry_d M q y F → Entry_d M q p R → Cmp_d M Q S w x y
 
+/-- 名称传输所需的局部约减映射；约减只要求在像条件以下存在。 -/
+structure Reg_map_d (P R z Q S w F : M.Domain) : Prop where
+  total : ∀ p, M.mem p P → p ≠ z → ∃ x, Entry_d M p x F
+  domain : ∀ p x, Entry_d M p x F → M.mem p P ∧ p ≠ z ∧ M.mem x Q ∧ x ≠ w
+  mono : ∀ p q x y, Entry_d M p x F → Entry_d M q y F → Entry_d M p q R → Entry_d M x y S
+  compat : ∀ p q x y, Entry_d M p x F → Entry_d M q y F →
+    Cmp_d M Q S w x y → Cmp_d M P R z p q
+  reduction : ∀ x, M.mem x Q → x ≠ w → ∀ p y, Entry_d M p y F → Entry_d M x y S →
+    ∃ r, M.mem r P ∧ r ≠ z ∧ Red_d M R Q S w F x r
+
 structure Reg_embed_d (P R z Q S w F : M.Domain) : Prop where
   graph : ∀ a, M.mem a F → ∃ p x, KPair_d M a p x
   total : ∀ p, M.mem p P → p ≠ z → ∃ x, Entry_d M p x F
@@ -26,6 +36,11 @@ structure Reg_embed_d (P R z Q S w F : M.Domain) : Prop where
     (Cmp_d M Q S w x y ↔ Cmp_d M P R z p q)
   reduction : ∀ x, M.mem x Q → x ≠ w → ∃ p, M.mem p P ∧ p ≠ z ∧
     Red_d M R Q S w F x p
+
+/-- 完全嵌入的遗忘映射只删除单射性和顺序反射证书。 -/
+instance {P R z Q S w F : M.Domain} : Coe (Reg_embed_d M P R z Q S w F) (Reg_map_d M P R z Q S w F) where
+  coe h := ⟨h.total,h.domain,(fun p q x y hp hq => (h.order p q x y hp hq).mpr),
+    (fun p q x y hp hq => (h.compat p q x y hp hq).mp),(fun x hx nz _ _ _ _ => h.reduction x hx nz)⟩
 
 def Max_antichain_d (P R z D : M.Domain) : Prop :=
   Antichain_d M P R z D ∧ ∀ p, M.mem p P → p ≠ z → ∃ q, M.mem q D ∧ Cmp_d M P R z p q

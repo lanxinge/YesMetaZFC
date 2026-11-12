@@ -49,7 +49,7 @@ theorem ha_model_zf_l (hZF : M.Models ZF) (k : Bool) (A : M.Domain) : (ha_model_
   | infinity =>
     apply (Axioms.satisfies_infinity_iff f).mpr
     obtain ⟨ω, hω⟩ := ZF.exists_omega hZF
-    have hH := ha_ordinal_l hZF k A (hω.isOrdinal hZF)
+    have hH := ha_ordinal_l hZF k A (hω.isOrdinal (ZF.modelsKP hZF))
     refine ⟨⟨ω, hH⟩, ?_, fun x hx => ?_⟩
     · obtain ⟨e, he, heω⟩ := hω.1.1
       exact ⟨⟨e, ha_trans_l hH heω⟩, fun z => he z.val, heω⟩

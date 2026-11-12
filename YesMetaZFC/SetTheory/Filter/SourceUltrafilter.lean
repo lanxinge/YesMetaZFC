@@ -17,10 +17,28 @@ structure Sf_ultra_d (X D U : M.Domain) : Prop where
   decides : ∀ A B, M.mem A X → M.MemberSubset A D → M.mem B X →
     (∀ x, M.mem x B ↔ M.mem x D ∧ ¬ M.mem x A) → M.mem A U ∨ M.mem B U
 
-theorem Maximal_d.source_l (hZF : M.Models ZF) {D U : M.Domain}
-    (h : Maximal_d (ℳ := M) D U) (X : M.Domain) : Sf_ultra_d X D U :=
-  ⟨h.1.base_l, h.2.1, fun A B ha _ hb hab => h.1.2.2.1 A B ha hab hb,
-    fun _ _ _ ha _ hc => maximal_decides_d hZF h ha hc⟩
+/-- 只量化源中子集的二择条件；原测度本身可以含有源外集合。 -/
+def sf_ultra_m {d} (X D U : Term d) : Formula 1 d := set[d] ⟪
+  ⌜base_m⌝ₚ(⌜D⌝ₛ, ⌜U⌝ₛ) ∧ ⌜proper_m⌝ₚ(⌜U⌝ₛ) ∧
+  (∀ A B, A ∈ ⌜U⌝ₛ → B ∈ ⌜X⌝ₛ → B ⊆ ⌜D⌝ₛ → A ⊆ B → B ∈ ⌜U⌝ₛ) ∧
+  (∀ A B, A ∈ ⌜X⌝ₛ → A ⊆ ⌜D⌝ₛ → B ∈ ⌜X⌝ₛ →
+    (∀ x, x ∈ B ↔ x ∈ ⌜D⌝ₛ ∧ x ∉ A) → A ∈ ⌜U⌝ₛ ∨ B ∈ ⌜U⌝ₛ)⟫
+derive_free_closed sf_ultra_m
+
+theorem sf_ultra_sat_l {d} (ρ : Env M d) (X D U : Term d) :
+    Formula.satisfies ρ (sf_ultra_m X D U) ↔ Sf_ultra_d (X.eval ρ) (D.eval ρ) (U.eval ρ) := by
+  simp only [sf_ultra_m, Formula.satisfies_conj_iff, base_sat_l, proper_sat_d,
+    Formula.satisfies_forall_iff, Formula.satisfies_imp_iff, Formula.satisfies_mem_iff,
+    Formula.satisfies_subset_iff, Formula.satisfies_iff_iff, Formula.satisfies_neg_iff,
+    Formula.satisfies_disj_iff, Definitional.Term.eval_weaken]
+  exact ⟨fun ⟨b, p, u, d⟩ => ⟨b, p, u, d⟩, fun h => ⟨h.base, h.proper, h.upward, h.decides⟩⟩
+
+theorem Maximal_d.source_l (hKP : M.Models KP) {D U : M.Domain}
+    (power : ∃ P, M.IsPowerSetOf P D)
+    (h : Maximal_d (ℳ := M) D U) (X : M.Domain) : Sf_ultra_d X D U := by
+  obtain ⟨P, hp⟩ := power
+  exact ⟨h.1.base_l, h.2.1, fun A B ha _ hb hab => h.1.2.2.1 A B ha hab hb,
+    fun _ _ _ ha _ hc => maximal_decides_d hKP hp h ha hc⟩
 
 theorem Rel_ultra_d.source_l {X D P U : M.Domain} (h : Rel_ultra_d D P U)
     (hp : Source_d X D P) : Sf_ultra_d X D U :=

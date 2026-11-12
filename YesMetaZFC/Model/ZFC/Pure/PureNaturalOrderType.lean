@@ -29,9 +29,9 @@ theorem specification_correct (hℳ : Theory.Models ℳ theory) {relation carrie
   rw [omega_eq hℳ]
   constructor
   · rintro ⟨hOutput,hIso⟩
-    exact ⟨hOutput,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) output hOutput)).mp hIso⟩
+    exact ⟨hOutput,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) output hOutput)).mp hIso⟩
   · rintro ⟨hOutput,hIso⟩
-    exact ⟨hOutput,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (project_modelsZF hℳ) output hOutput)).mpr hIso⟩
+    exact ⟨hOutput,(isomorphic_correct hℳ hLinear ((omega_project hℳ).members_areOrdinals (_root_.YesMetaZFC.SetTheory.ZF.modelsKP (project_modelsZF hℳ)) output hOutput)).mpr hIso⟩
 
 theorem body_correct (hℳ : Theory.Models ℳ theory) (relation carrier output : Carrier ℳ) :
     body.satisfies (templateEnv (.cons output (.cons relation (.cons carrier .nil)))) ↔

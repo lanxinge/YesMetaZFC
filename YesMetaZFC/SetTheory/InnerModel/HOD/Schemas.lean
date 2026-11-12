@@ -57,7 +57,7 @@ theorem ha_model_collection_l (hZF : M.Models ZF) (k : Bool) (A : M.Domain) {n} 
   refine ⟨⟨S, hs⟩, fun x hx => ?_⟩
   obtain ⟨y, hyB, hy⟩ := hB x.val hx
   obtain ⟨hyH, hyφ⟩ := (sat x.val y).mp hy
-  exact ⟨⟨y, hyH⟩, (hS y).mpr ⟨ZF.v_transitive_l I hZF hv B hBV y hyB, hyH⟩,
+  exact ⟨⟨y, hyH⟩, (hS y).mpr ⟨v_transitive_l I hv B hBV y hyB, hyH⟩,
     (tr x ⟨y, hyH⟩).mp hyφ⟩
 
 end YesMetaZFC.SetTheory.InnerModel

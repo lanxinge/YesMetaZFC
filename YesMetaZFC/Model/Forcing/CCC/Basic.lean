@@ -1,4 +1,4 @@
-import YesMetaZFC.Model.Forcing.Internal.Ground.Transfer
+import YesMetaZFC.Model.Forcing.Ground.Collapse
 import YesMetaZFC.SetTheory.PartialFunctionCCC
 
 /-! # 内部可数链条件与有限部分函数实例

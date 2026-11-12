@@ -17,7 +17,7 @@ local notation "J" => fp_rank_interpretation_l I hZF hω hW hωY
 
 theorem rt_fs_trace_l (A f H : (N).Domain) :
     Fs_trace_d J ⟨ω, hωY⟩ A f H ↔ Fs_trace_d K ω A.val f.val H.val := by
-  have trans := ZF.v_transitive_l I hZF hW
+  have trans := v_transitive_l I hW
   have entry := rt_fp_entry_l I hZF hω hW hωY
   have fn := rt_fp_function_from_l I hZF hω hW hωY H ⟨ω, hωY⟩ A
   have successor := rt_successor_l trans (Nonempty.intro (Subtype.mk ω hωY)) hZF.1
@@ -60,7 +60,7 @@ theorem rt_fs_code_l (A f n p : (N).Domain) {ν : M.Domain}
   · rintro ⟨H, hH, hp⟩
     have bound := fp_function_rank_l I hZF hω hV hων
       (fun i hi => ZF.v_ordinal_mem_l I hZF hV (hων i hi)) hH.1
-    let H' : (N).Domain := ⟨H, ZF.v_subset_mem_l I hZF hW A.property bound⟩
+    let H' : (N).Domain := ⟨H, v_subset_mem_l I hW A.property bound⟩
     exact ⟨H', (trace H').mpr hH, (entry H').mpr hp⟩
 
 end YesMetaZFC.SetTheory.Internal

@@ -56,6 +56,15 @@ theorem v_empty_l {e V} (he : ∀ x, ¬ M.mem x e) (hV : V_d I e V) : ∀ x, ¬ 
   obtain ⟨β, W, hβ, _⟩ := (hv x).mp hx
   exact he β ((hF.1.2.2 β).mpr ⟨W, hβ⟩)
 
+/-- 同一历史中的较早层成员仍由原根方程覆盖，故层值直接传递。 -/
+theorem v_transitive_l {α V : M.Domain} (hV : V_d I α V) : M.TransitiveSet V := by
+  obtain ⟨F, hf, root⟩ := hV
+  intro x hx y hy
+  obtain ⟨β, W, hβW, xw⟩ := (root x).mp hx
+  obtain ⟨G, rest, step⟩ := hf.2 β ((hf.1.2.2 β).mpr ⟨W, hβW⟩) W hβW
+  obtain ⟨γ, U, hγU, yu⟩ := (step y).mp (xw y hy)
+  exact (root y).mpr ⟨γ, U, ((rest.2 γ U).mp hγU).2, yu⟩
+
 namespace ZF
 
 /-- 对任意实际集合函数图，先前值域幂集之并都是模型内集合。 -/
@@ -127,11 +136,6 @@ theorem v_mem_l (hZF : M.Models ZF) {α β V W} (hV : V_d I α V) (hW : V_d I β
     (hαβ : M.mem α β) : M.mem V W :=
   (v_unfold_l I hZF hW V).mpr ⟨α, V, hαβ, hV, fun _ hx => hx⟩
 
-theorem v_transitive_l (hZF : M.Models ZF) {α V} (hV : V_d I α V) : M.TransitiveSet V := by
-  intro x hx y hy
-  obtain ⟨β, W, hβ, hW, hxW⟩ := (v_unfold_l I hZF hV x).mp hx
-  exact v_mono_l I hZF hW hV ((v_ordinal_l I hV).transitive.memberSubset hβ) y (hxW y hy)
-
 /-- 后继层恰是前一层的内部幂集。 -/
 theorem v_successor_l (hZF : M.Models ZF) {α β V W} (hV : V_d I α V) (hW : V_d I β W)
     (hβ : M.SuccessorOf β α) : M.IsPowerSetOf W V := by
@@ -159,6 +163,29 @@ theorem v_limit_mem_l (hZF : M.Models ZF) {α V} (hV : V_d I α V)
     exact ⟨γ, U, hγ, hU, (v_unfold_l I hZF hU x).mpr ⟨β, W, hβγ, hW, hxW⟩⟩
   · rintro ⟨β, W, hβ, hW, hx⟩
     exact v_mono_l I hZF hW hV ((v_ordinal_l I hV).transitive.memberSubset hβ) x hx
+
+/-- 极限层中的有限参数列有同一个严格较低的层界；不要求不可数共尾度。 -/
+theorem v_list_bound_l (hZF : M.Models ZF) {δ Z} (rank : V_d I δ Z)
+    (limit : M.IsLimitOrdinal δ) (xs : List M.Domain)
+    (inside : ∀ x, x ∈ xs → M.mem x Z) :
+    ∃ κ V, M.mem κ δ ∧ V_d I κ V ∧ ∀ x, x ∈ xs → M.mem x V := by
+  induction xs with
+  | nil =>
+    obtain ⟨κ,hκ⟩ := limit.2.1
+    obtain ⟨V,hV⟩ := v_exists_l I hZF (limit.1.mem hκ)
+    exact ⟨κ,V,hκ,hV,by simp⟩
+  | cons x xs ih =>
+    obtain ⟨κ,V,hκ,hV,bound⟩ := ih (fun a ha => inside a (by simp [ha]))
+    obtain ⟨β,W,hβ,hW,hx⟩ := (v_limit_mem_l I hZF rank limit.2.2 x).mp (inside x (by simp))
+    have join {α U} (hα : M.mem α δ) (hU : V_d I α U)
+        (left : M.MemberSubset W U) (right : M.MemberSubset V U) :
+        ∃ κ V, M.mem κ δ ∧ V_d I κ V ∧ ∀ a, a ∈ x :: xs → M.mem a V :=
+      ⟨α,U,hα,hU,fun a ha => (List.mem_cons.mp ha).elim
+        (fun eq => eq ▸ left x hx) (fun ha => right a (bound a ha))⟩
+    rcases limit.1.wellOrder.linear.compare β hβ κ hκ with eq | lt | gt
+    · exact join hκ hV (v_mono_l I hZF hW hV (fun a ha => (eq a).mp ha)) (fun _ h => h)
+    · exact join hκ hV (v_mono_l I hZF hW hV ((limit.1.mem hκ).transitive β lt)) (fun _ h => h)
+    · exact join hβ hW (fun _ h => h) (v_mono_l I hZF hV hW ((limit.1.mem hβ).transitive κ gt))
 
 end ZF
 end YesMetaZFC.SetTheory

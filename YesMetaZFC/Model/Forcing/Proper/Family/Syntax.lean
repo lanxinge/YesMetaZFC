@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Family.Basic
-import YesMetaZFC.Model.Forcing.Internal.Reflection.Criterion
+import YesMetaZFC.Model.Forcing.Reflection.Criterion
 import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 全阶段 H(χ) 提升的内部力迫证书

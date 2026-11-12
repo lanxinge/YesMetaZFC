@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.Forcing.Proper.Hereditary.NameBound
-import YesMetaZFC.Model.Forcing.Internal.Atomic.Equivalence
+import YesMetaZFC.Model.Forcing.Atomic.Equivalence
 
 /-! # H(χ) 中的名称支撑与等号力迫证书
 

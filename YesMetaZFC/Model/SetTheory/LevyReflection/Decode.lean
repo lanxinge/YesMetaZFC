@@ -1,5 +1,5 @@
 import YesMetaZFC.Model.SetTheory.LevyReflection.Relativization
-import YesMetaZFC.Model.SetTheory.Internal.Membership
+import YesMetaZFC.Model.SetTheory.Internal.Hereditary
 
 /-! # 相对化真值与实际内部隶属结构
 

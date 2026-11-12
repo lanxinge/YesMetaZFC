@@ -12,19 +12,19 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 MODULES = [
-    "YesMetaZFC.Model.Boolean.Filter",
-    "YesMetaZFC.Model.Boolean.Completion",
-    "YesMetaZFC.Model.Boolean.Ultrafilter",
-    "YesMetaZFC.Logic.FirstOrder.Lindenbaum",
-    "YesMetaZFC.SetTheory.Filter",
-    "YesMetaZFC.SetTheory.Filter.Tarski",
-    "YesMetaZFC.SetTheory.Filter.Internal",
-    "YesMetaZFC.SetTheory.Filter.Extension",
-    "YesMetaZFC.SetTheory.Boolean.Completion",
-    "YesMetaZFC.SetTheory.Boolean.Algebra",
-    "YesMetaZFC.SetTheory.Boolean.Filter",
-    "YesMetaZFC.SetTheory.Separation",
-    "YesMetaZFC.SetTheory.SetConstruction",
+    'YesMetaZFC.Model.Boolean.Filter',
+    'YesMetaZFC.Model.Boolean.Completion',
+    'YesMetaZFC.Model.Boolean.Ultrafilter',
+    'YesMetaZFC.Logic.FirstOrder.Lindenbaum',
+    'YesMetaZFC.SetTheory.Filter',
+    'YesMetaZFC.SetTheory.Filter.Tarski',
+    'YesMetaZFC.SetTheory.Filter.Internal',
+    'YesMetaZFC.SetTheory.Filter.Extension',
+    'YesMetaZFC.SetTheory.Boolean.Completion',
+    'YesMetaZFC.SetTheory.Boolean.Algebra',
+    'YesMetaZFC.SetTheory.Boolean.Filter',
+    'YesMetaZFC.SetTheory.Separation',
+    'YesMetaZFC.SetTheory.SetConstruction',
 ]
 CHOICE_FREE = [
     "YesMetaZFC.Model.Boolean.BA_alg.Cut_l.algebra_l",
@@ -60,11 +60,17 @@ def main(modules=MODULES, choice_free=CHOICE_FREE, baseline=BASELINE,
     bounds = "#[" + ", ".join(
         f"(`{name}, {names(bound + ['propext', 'Quot.sound', 'Classical.choice'])})"
         for name, bound in (axiom_bounds or {}).items()) + "]"
+    # 名称表分别编译，避免大型审计闭包内的数组初始化触发代码生成器递归上限。
     guard = f'''
+@[noinline] private def guard_selected_l : Array Lean.Name := {names(modules)}
+@[noinline] private def guard_allowed_l : Array Lean.Name := {names(baseline + ["propext", "Quot.sound", "Classical.choice"])}
+@[noinline] private def guard_strict_l : Array Lean.Name := {names(choice_free)}
+@[noinline] private def guard_bounds_l : Array (Lean.Name × Array Lean.Name) := {bounds}
+
 run_cmd do
   let env ← Lean.getEnv
-  let selected : Array Lean.Name := {names(modules)}
-  let allowed : Array Lean.Name := {names(baseline + ["propext", "Quot.sound", "Classical.choice"])}
+  let selected := guard_selected_l
+  let allowed := guard_allowed_l
   let mut count : Nat := 0
   let mut modules : Nat := 0
   for i in [0 : env.header.moduleNames.size] do
@@ -80,13 +86,13 @@ run_cmd do
       for a in ← Lean.collectAxioms c.name do
         unless allowed.contains a do throwError "未知公理: {{c.name}} → {{a}}"
   unless modules == selected.size do throwError "审计模块遗漏: {{modules}}"
-  let strict : Array Lean.Name := {names(choice_free)}
+  let strict := guard_strict_l
   for n in strict do
     unless env.contains n do throwError "审计端点不存在: {{n}}"
     let axioms ← Lean.collectAxioms n
     if axioms.contains `Classical.choice then throwError "构造性端点退化: {{n}}"
     Lean.logInfo m!"CHOICE_FREE: {{n}}; {{axioms}}"
-  let bounds : Array (Lean.Name × Array Lean.Name) := {bounds}
+  let bounds := guard_bounds_l
   for (n, bound) in bounds do
     unless env.contains n do throwError "审计端点不存在: {{n}}"
     let axioms ← Lean.collectAxioms n
