@@ -43,7 +43,7 @@ jobs:
             threads: 4
           - os: macos-15-intel
             threads: 4
-          - os: macos-14
+          - os: macos-15
             threads: 2
     env:
       LEAN_NUM_THREADS: ${{ matrix.threads }}
