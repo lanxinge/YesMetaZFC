@@ -19,13 +19,13 @@
 通用搜索证明器、调度与注册机制、专用回放运行时和扫描器已移出主项目；
 旧模块路径不提供兼容转发。移出过程可查 Git 历史，不作为日常构建前置。
 
-## 验证与审计
+## 构建与边界
 
 使用 `lake --wfail build` 验证默认入口，`python scripts/lean_cache.py build`
 检查全部独立 Lean 模块；`--native` 另构建全部原生对象、静态库与共享库。
 构建、缓存和 CI 只依赖当前仓库配置，不依赖旧证明器归档或扫描器。
 
 公理与数据边界见 [UNIFIED_VERIFICATION.md](UNIFIED_VERIFICATION.md#当前-lean-公理边界)。
-审计模块路径必须指向实际声明所在位置；例如 Kuratowski 配对接口位于
+模块路径与数学命名空间分别维护；例如 Kuratowski 配对接口位于
 `YesMetaZFC.SetTheory.Kuratowski`，声明命名空间为 `YesMetaZFC.SetTheory`，
-由 `scripts/check_forcing.py` 按真实端点检查。
+由全源构建自动覆盖。

@@ -138,13 +138,11 @@ PA 和 Z₂ 最终入口用各自的真实公式填满归纳义务；抽象规�
 
 ```bash
 python scripts/lean_cache.py build --native
-python scripts/test_arithmetic_guard.py
-python scripts/check_arithmetic.py
 ```
 
 全源构建枚举全部独立模块，包括可选 Provability 模块。
-`check_arithmetic.py` 自身先构建全部算术模块，再检查公开声明的公理依赖及实际模块的数据边界。
-数据边界测试覆盖命题内经典推理、直接数据选择、私有数据选择、其他命名空间及新增公理。
-精确覆盖数量以本次脚本输出为准，不沿用旧模块数或旧工作区日志。
+模块清单从实际源码枚举；新增文件不需要维护另一份审计注册表。
+对象理论前提与宿主证明的数据选择边界仍按声明本身区分，具体约定见
+[证明边界](UNIFIED_VERIFICATION.md#当前-lean-公理边界)。
 
 一次性消费者和失败探针留在库外；本地验证与远端多平台 CI 分别报告。

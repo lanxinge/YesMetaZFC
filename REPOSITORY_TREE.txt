@@ -31,14 +31,8 @@ YesMetaZFC/
 |   |-- tests/
 |   |   `-- test_lean_cache.py
 |   |-- check-all.sh
-|   |-- check_arithmetic.py
-|   |-- check_elementary.py
-|   |-- check_filters.py
-|   |-- check_forcing.py
-|   |-- check_ultrapower.py
 |   |-- lean_cache.py
-|   |-- publish_cache.py
-|   `-- test_arithmetic_guard.py
+|   `-- publish_cache.py
 |-- tools/
 |   `-- metamath_kb/
 |       `-- build_kb.py

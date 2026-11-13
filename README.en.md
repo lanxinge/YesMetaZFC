@@ -114,7 +114,7 @@ These interfaces support the current results and the broader research-platform g
 | Reusable proof interfaces and lightweight derivation tactics | [ENGINEERING.md](markdown/ENGINEERING.md) |
 | Natural-number proof certificates, quotation, and complete AST coding | [NAT_DECODING.md](markdown/NAT_DECODING.md) |
 | Definitions, internal recursion, and staged extensions | [ELIMINATION.md](markdown/ELIMINATION.md) |
-| Axiom coverage, model correspondence, and recorded dependency audits | [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) |
+| Object-theory assumptions, model correspondence, and build scope | [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md) |
 | Source recovery and toolchain setup | [RESTORE.md](markdown/RESTORE.md) |
 | Development conventions | [AGENTS.md](markdown/AGENTS.md), [ProofNaming.md](markdown/ProofNaming.md) |
 
@@ -139,7 +139,7 @@ use Python 3.11 or later:
 python scripts/lean_cache.py build
 ```
 
-Warnings cause these checks to fail. Mathematical scope and dependency-audit entry points
+Warnings cause these builds to fail. Mathematical assumptions and verification scope
 are documented in [UNIFIED_VERIFICATION.md](markdown/UNIFIED_VERIFICATION.md).
 
 ## Prebuilt caches
