@@ -31,7 +31,8 @@ jobs:
     needs: cache-tests
     name: Build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 120
+    # macOS 原生冷构建已有约 110 分钟的记录，另留打包与恢复时间。
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
